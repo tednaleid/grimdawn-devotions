@@ -1,7 +1,7 @@
 // ABOUTME: Tests for the devotion stat formatter (label + percent/flat value rendering).
 // ABOUTME: Anchored on grimtools-confirmed cases (Falcon, Shepherd's Crook) plus family rules.
 import { expect, test, describe } from "bun:test";
-import { statRow, formatBonusRows } from "./statFormat";
+import { statRow, formatBonusRows, groupedBonusRows } from "./statFormat";
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
@@ -108,6 +108,24 @@ describe("statRow racial damage/defense names the concrete race", () => {
     expect(formatBonusRows({ racialBonusPercentDamage: 8 }, { racialTarget: ["Chthonic"] })).toEqual([
       { label: "Damage to Chthonics", value: "+8%" },
     ]);
+  });
+});
+
+describe("groupedBonusRows groups by category in render order", () => {
+  test("splits attributes / offense / defense / other", () => {
+    const groups = groupedBonusRows({
+      characterStrength: 10,
+      offensivePhysicalModifier: 15,
+      defensivePhysical: 12,
+      skillManaCostReduction: 5,
+    });
+    expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Defense", "Other"]);
+    expect(groups[0]!.rows).toEqual([{ label: "Physique", value: "+10" }]);
+    expect(groups[1]!.rows).toEqual([{ label: "Physical Damage", value: "+15%" }]);
+  });
+  test("omits groups with no rows", () => {
+    const groups = groupedBonusRows({ characterDexterity: 5 });
+    expect(groups.map((g) => g.group)).toEqual(["Attributes"]);
   });
 });
 

@@ -3,7 +3,7 @@
 import { AFFINITIES, type DevotionModel, type StarId } from "../core/types";
 import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityTotals } from "../core/affinity";
-import { formatBonusRows } from "../core/statFormat";
+import { groupedBonusRows } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 
 function escapeAttr(s: string): string {
@@ -13,8 +13,11 @@ function escapeAttr(s: string): string {
 export function renderBenefits(el: HTMLElement, model: DevotionModel, selected: Set<StarId>): void {
   const bonuses = sumBonuses(model, selected);
   const powers = powersGained(model, selected);
-  const rows = formatBonusRows(bonuses, { racialTarget: racialTargets(model, selected) })
-    .map((r) => `<div class="benefit"><span>${r.label}</span><span class="val">${r.value}</span></div>`)
+  const rows = groupedBonusRows(bonuses, { racialTarget: racialTargets(model, selected) })
+    .map((g) =>
+      `<h3>${g.group}</h3>` +
+      g.rows.map((r) => `<div class="benefit"><span>${r.label}</span><span class="val">${r.value}</span></div>`).join(""),
+    )
     .join("");
   const powerRows = powers
     .map((p) => `<div class="power"${p.description ? ` title="${escapeAttr(p.description)}"` : ""}>${p.name}</div>`)

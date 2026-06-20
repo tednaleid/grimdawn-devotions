@@ -184,16 +184,27 @@ export function statRow(id: string, value: number, racialTarget?: string[]): Sta
   return { label, value: fmtValue(value, c.percent, c.sign) };
 }
 
-/**
- * Format a bonuses map into sorted display rows. Merges flat <base>Min/<base>Max
- * damage pairs into a single "+min-max" range row, and drops weapon-class tokens.
- */
-export function formatBonusRows(
+// Display groups for the benefits sidebar, in render order.
+export const GROUP_ORDER = ["Attributes", "Offense", "Defense", "Other"] as const;
+export type StatGroup = (typeof GROUP_ORDER)[number];
+
+function groupFor(id: string): StatGroup {
+  if (id === "racialBonusPercentDamage") return "Offense";
+  if (id === "racialBonusPercentDefense") return "Defense";
+  if (/^offensive|^retaliation/.test(id)) return "Offense";
+  if (/^defensive/.test(id)) return "Defense";
+  if (/^character/.test(id)) return "Attributes";
+  return "Other";
+}
+
+// Build display rows paired with a representative stat id (for grouping). Merges
+// flat <base>Min/<base>Max damage pairs into one "+min-max" row, drops weapon tokens.
+function bonusEntries(
   bonuses: Record<string, number>,
-  opts: { racialTarget?: string[] } = {},
-): StatRow[] {
+  opts: { racialTarget?: string[] },
+): { id: string; row: StatRow }[] {
   const used = new Set<string>();
-  const rows: StatRow[] = [];
+  const out: { id: string; row: StatRow }[] = [];
   for (const k of Object.keys(bonuses)) {
     if (used.has(k)) continue;
     const mm = k.match(/^(.*)(Min|Max)$/);
@@ -205,15 +216,40 @@ export function formatBonusRows(
         if (c && !c.percent) {
           used.add(minK);
           used.add(maxK);
-          rows.push({ label: c.label, value: `+${bonuses[minK]}-${bonuses[maxK]}` });
+          out.push({ id: minK, row: { label: c.label, value: `+${bonuses[minK]}-${bonuses[maxK]}` } });
           continue;
         }
       }
     }
     const r = statRow(k, bonuses[k]!, opts.racialTarget);
     used.add(k);
-    if (r) rows.push(r);
+    if (r) out.push({ id: k, row: r });
   }
-  rows.sort((a, b) => a.label.localeCompare(b.label));
-  return rows;
+  return out;
+}
+
+/** Format a bonuses map into a single list of display rows, sorted by label. */
+export function formatBonusRows(
+  bonuses: Record<string, number>,
+  opts: { racialTarget?: string[] } = {},
+): StatRow[] {
+  return bonusEntries(bonuses, opts).map((e) => e.row).sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/** Format a bonuses map into display rows grouped by category, in GROUP_ORDER. */
+export function groupedBonusRows(
+  bonuses: Record<string, number>,
+  opts: { racialTarget?: string[] } = {},
+): { group: StatGroup; rows: StatRow[] }[] {
+  const byGroup = new Map<StatGroup, StatRow[]>();
+  for (const { id, row } of bonusEntries(bonuses, opts)) {
+    const g = groupFor(id);
+    const arr = byGroup.get(g) ?? [];
+    arr.push(row);
+    byGroup.set(g, arr);
+  }
+  return GROUP_ORDER.filter((g) => byGroup.has(g)).map((g) => ({
+    group: g,
+    rows: byGroup.get(g)!.sort((a, b) => a.label.localeCompare(b.label)),
+  }));
 }
