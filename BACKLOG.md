@@ -102,6 +102,33 @@ Notes:
 - The map re-renders on every selection change, so constellations un-fade as you
   earn the affinities to reach them.
 
+## Data + UI: celestial power ability stats
+
+### 7. Show each celestial power's proc stats, not just its description
+Celestial-power tooltips show the flavor text but not the actual ability (the
+proc trigger plus the skill's stats). Example, Scorpion Sting: "25% Chance on
+Attack", 1.5s recharge, 6 projectiles, 100% chance to pass through, 0.1m radius,
+40% Weapon Damage, 1125 Poison over 5s, 150 Reduced target's Defensive Ability
+for 5s.
+
+Blocked on data: these stats are NOT in devotions.json. celestial_power only
+carries name/dbr/skill_class/description. The stats live in the skill .dbr files,
+which the parser does not read, and the extracted game files are Windows-only, so
+this cannot be built or verified from the Mac checkout alone.
+
+Work required:
+- scripts/parse_devotions.py: for each celestial power, read the granted skill
+  .dbr and its buffSkillName/petSkillName/modifierSkillName children (the same
+  walk resolve_power_name already does) and extract the proc trigger + chance plus
+  the skill stats (skillCooldownTime, projectileLaunchNumber, radius,
+  weaponDamagePct, the offensive*/offensiveSlow* damage and DoT fields, debuffs,
+  etc.), formatted GD-style. Add them under celestial_power (for example
+  celestial_power.proc and celestial_power.stats).
+- Regenerate on Windows: `just parse` (or `just all`) against the extracted
+  records, then commit the new devotions.json.
+- Web UI: render the proc line + stat rows in the star tooltip, reusing the stat
+  formatter where stat ids overlap.
+
 ## Minor cleanups noted during review
 
 - `justfile` build still copies `data/stat_labels.json` into `dist`, but the app
