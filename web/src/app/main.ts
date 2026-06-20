@@ -8,7 +8,7 @@ import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, validClosure } from "../core/rules";
 import { canonicalStarIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
-import type { SelectionState } from "../core/types";
+import type { Affinity, SelectionState } from "../core/types";
 
 async function boot() {
   const data = await httpDataSource(".").load();
@@ -66,10 +66,14 @@ async function boot() {
     refresh();
   });
 
+  // Previous totals, so each render can highlight what just changed. Undefined on the
+  // first render (the baseline), so restoring a build from the URL does not flash.
+  let prevBonuses: Record<string, number> | undefined;
+  let prevAffinity: Record<Affinity, number> | undefined;
   function refresh() {
     handle.update(state);
-    renderBenefits(benefitsEl, model, state.selected);
-    renderAffinities(affinityEl, model, state.selected);
+    prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses);
+    prevAffinity = renderAffinities(affinityEl, model, state.selected, prevAffinity);
     countEl.textContent = `${state.selected.size} / ${state.pointCap}`;
     history.replaceState(null, "", `#${encodeHash(state.selected, state.pointCap, canonical)}`);
   }

@@ -120,8 +120,8 @@ describe("groupedBonusRows groups by category in render order", () => {
       skillManaCostReduction: 5,
     });
     expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Defense", "Other"]);
-    expect(groups[0]!.rows).toEqual([{ label: "Physique", value: "+10" }]);
-    expect(groups[1]!.rows).toEqual([{ label: "Physical Damage", value: "+15%" }]);
+    expect(groups[0]!.rows).toEqual([{ id: "characterStrength", label: "Physique", value: "+10" }]);
+    expect(groups[1]!.rows).toEqual([{ id: "offensivePhysicalModifier", label: "Physical Damage", value: "+15%" }]);
   });
   test("omits groups with no rows", () => {
     const groups = groupedBonusRows({ characterDexterity: 5 });

@@ -18,6 +18,11 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 .benefit, .affinity { display: flex; justify-content: space-between; padding: 2px 0; gap: .5rem; }
 .benefit > span:first-child { text-transform: capitalize; }
 .benefit .val, .affinity .val { color: #cdd6e3; white-space: nowrap; }
+/* Flash a value when it changes since the last selection: yellow up, red down. */
+@keyframes flash-up { from { color: #ffe066; } }
+@keyframes flash-down { from { color: #ff6b6b; } }
+.benefit.up .val, .affinity.up .val { animation: flash-up 1.3s ease-out; }
+.benefit.down .val, .affinity.down .val { animation: flash-down 1.3s ease-out; }
 .affinity > span:first-child { text-transform: capitalize; }
 .power, .tip-power { color: #f0c14b; }
 .power[title] { cursor: help; }

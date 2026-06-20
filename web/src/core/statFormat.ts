@@ -236,16 +236,21 @@ export function formatBonusRows(
   return bonusEntries(bonuses, opts).map((e) => e.row).sort((a, b) => a.label.localeCompare(b.label));
 }
 
+// A grouped row keeps its representative stat id so callers can diff it (highlight changes).
+export interface GroupedRow extends StatRow {
+  id: string;
+}
+
 /** Format a bonuses map into display rows grouped by category, in GROUP_ORDER. */
 export function groupedBonusRows(
   bonuses: Record<string, number>,
   opts: { racialTarget?: string[] } = {},
-): { group: StatGroup; rows: StatRow[] }[] {
-  const byGroup = new Map<StatGroup, StatRow[]>();
+): { group: StatGroup; rows: GroupedRow[] }[] {
+  const byGroup = new Map<StatGroup, GroupedRow[]>();
   for (const { id, row } of bonusEntries(bonuses, opts)) {
     const g = groupFor(id);
     const arr = byGroup.get(g) ?? [];
-    arr.push(row);
+    arr.push({ id, ...row });
     byGroup.set(g, arr);
   }
   return GROUP_ORDER.filter((g) => byGroup.has(g)).map((g) => ({
