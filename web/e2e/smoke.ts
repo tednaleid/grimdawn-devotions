@@ -1,6 +1,8 @@
 // ABOUTME: Self-contained headless-browser e2e for the built planner page (web/dist).
 // ABOUTME: Serves dist, drives Chrome over a raw CDP client on Bun's native WebSocket, asserts, cleans up.
 import { readdirSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
+import { join } from "node:path";
 
 const DIST = `${import.meta.dir}/../dist`;
 const results: { ok: boolean; msg: string }[] = [];
@@ -26,22 +28,41 @@ const server = Bun.serve({
 });
 const BASE = `http://localhost:${server.port}/`;
 
-// --- Launch headless Chrome with a debug port ---
-const msRoot = `${process.env.LOCALAPPDATA}\\ms-playwright`;
-const shellDir = readdirSync(msRoot).find((d) => d.startsWith("chromium_headless_shell-"));
-if (!shellDir) throw new Error("chrome-headless-shell not found; run: bunx playwright@1.61.0 install chromium");
-const exe = `${msRoot}\\${shellDir}\\chrome-headless-shell-win64\\chrome-headless-shell.exe`;
+// --- Launch headless Chrome with a debug port (macOS/Linux/Windows) ---
+// The Playwright cache holds chromium_headless_shell-<rev>/chrome-headless-shell-<plat>/<bin>.
+const isWin = process.platform === "win32";
+function chromeShellPath(): string {
+  const root = isWin
+    ? join(process.env.LOCALAPPDATA ?? "", "ms-playwright")
+    : process.platform === "darwin"
+      ? join(homedir(), "Library", "Caches", "ms-playwright")
+      : join(homedir(), ".cache", "ms-playwright");
+  const shellDir = readdirSync(root).find((d) => d.startsWith("chromium_headless_shell-"));
+  if (!shellDir) throw new Error("chrome-headless-shell not found; run: just install-e2e");
+  const base = join(root, shellDir);
+  const platDir = readdirSync(base).find((d) => d.startsWith("chrome-headless-shell-"));
+  if (!platDir) throw new Error(`no chrome-headless-shell binary under ${base}`);
+  return join(base, platDir, isWin ? "chrome-headless-shell.exe" : "chrome-headless-shell");
+}
+
+const exe = chromeShellPath();
 const dbgPort = 9222 + Math.floor(server.port % 1000);
-Bun.spawn(["cmd.exe", "/c", exe,
+const args = [
   `--remote-debugging-port=${dbgPort}`, "--remote-allow-origins=*",
-  `--user-data-dir=${process.env.TEMP}\\pw_e2e_${dbgPort}`,
+  `--user-data-dir=${join(tmpdir(), `pw_e2e_${dbgPort}`)}`,
   "--no-sandbox", "--no-first-run", "--disable-gpu",
   "about:blank",
-], { stdout: "ignore", stderr: "ignore" });
+];
+// On Windows, chrome is launched through cmd.exe (a child of that shell), so it is
+// reaped with taskkill; elsewhere we hold the process handle and kill it directly.
+const chrome = isWin
+  ? Bun.spawn(["cmd.exe", "/c", exe, ...args], { stdout: "ignore", stderr: "ignore" })
+  : Bun.spawn([exe, ...args], { stdout: "ignore", stderr: "ignore" });
 
 function cleanup(): void {
   server.stop(true);
-  Bun.spawnSync(["taskkill", "/F", "/IM", "chrome-headless-shell.exe"], { stdout: "ignore", stderr: "ignore" });
+  if (isWin) Bun.spawnSync(["taskkill", "/F", "/IM", "chrome-headless-shell.exe"], { stdout: "ignore", stderr: "ignore" });
+  else chrome.kill();
 }
 
 // --- Find the page target's websocket url ---
@@ -109,12 +130,14 @@ try {
   let rendered = false;
   for (let i = 0; i < 40; i++) {
     await Bun.sleep(250);
-    if ((await cdp.evaluate<number>("document.querySelectorAll('circle.star').length")) > 0) { rendered = true; break; }
+    if ((await cdp.evaluate<number>("document.querySelectorAll('.star').length")) > 0) { rendered = true; break; }
   }
   check(rendered, "page loads and renders the constellation map");
 
-  check(await cdp.evaluate<number>("document.querySelectorAll('circle.star').length") === 438,
-    "renders all 438 star circles");
+  // Stars render as circles, except the 50 celestial-power stars which are polygons,
+  // so count the shared .star class rather than circle.star.
+  check(await cdp.evaluate<number>("document.querySelectorAll('.star').length") === 438,
+    "renders all 438 stars");
 
   const selectable = await cdp.evaluate<string[]>(
     "[...document.querySelectorAll('circle.hit.selectable')].map(c => c.getAttribute('data-star-id'))");
@@ -132,8 +155,10 @@ try {
   }
   check(counted, 'point count reads "1 / 55" after selecting a Crossroads');
 
+  // Target the value span by class: the first span holds a nested .orb span, so
+  // span:last-child would match that empty orb rather than the affinity total.
   check(await cdp.evaluate<string | null>(
-    "document.querySelector('.affinity-eldritch')?.querySelector('span:last-child')?.textContent") === "1",
+    "document.querySelector('.affinity-eldritch .val')?.textContent") === "1",
     "eldritch affinity total becomes 1");
 
   check(await cdp.evaluate<boolean>(
