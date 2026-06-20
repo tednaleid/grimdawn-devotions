@@ -1,6 +1,6 @@
 // ABOUTME: Pure selection rules: validClosure (fixpoint), selectableStars, canRemove, toggleStar.
 // ABOUTME: No mutations of input state; all functions return new objects or Sets on change.
-import type { DevotionModel, StarId } from "./types";
+import type { DevotionModel, SelectionState, StarId } from "./types";
 import { affinityFrom, completedConstellations, meetsRequirement } from "./affinity";
 
 export function validClosure(model: DevotionModel, selected: Set<StarId>): Set<StarId> {
@@ -23,4 +23,21 @@ export function validClosure(model: DevotionModel, selected: Set<StarId>): Set<S
     if (next.size === cur.size) return next;
     cur = next;
   }
+}
+
+export function selectableStars(model: DevotionModel, state: SelectionState): Set<StarId> {
+  const out = new Set<StarId>();
+  if (state.selected.size >= state.pointCap) return out;
+  const completed = completedConstellations(model, state.selected);
+  const totals = affinityFrom(model, completed);
+  for (const star of model.stars.values()) {
+    if (state.selected.has(star.id)) continue;
+    if (!star.predecessors.every((p) => state.selected.has(p))) continue;
+    if (star.predecessors.length === 0) {
+      const con = model.constellations.get(star.constellationId)!;
+      if (!meetsRequirement(totals, con.affinityRequired)) continue;
+    }
+    out.add(star.id);
+  }
+  return out;
 }
