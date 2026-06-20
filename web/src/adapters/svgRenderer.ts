@@ -16,6 +16,12 @@ function dominantAffinity(con: { affinityBonus: Partial<Record<Affinity, number>
   return best;
 }
 
+// Star buttons use the 64x64 devotion_star_up.tex bitmap, placed by its top-left
+// (bitmapPositionX/Y, which is what `position` holds). The visible star and the
+// background art's glow sit at the button center, so dots and links are drawn
+// shifted by half the button to line up with the art.
+const STAR_CENTER = 32;
+
 export interface RenderOpts { manifest: AssetManifest | null }
 
 export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
@@ -26,9 +32,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   if (opts.manifest) {
     for (const c of model.constellations.values()) {
       const name = c.background?.image?.split("/").pop() ?? "";
-      const url = opts.manifest.images[name];
-      if (url && c.background && c.background.x != null && c.background.y != null) {
-        parts.push(`<image href="${url}" x="${c.background.x}" y="${c.background.y}" class="art"/>`);
+      const art = opts.manifest.images[name];
+      if (art && c.background && c.background.x != null && c.background.y != null) {
+        parts.push(`<image href="${art.url}" x="${c.background.x}" y="${c.background.y}" width="${art.w}" height="${art.h}" class="art"/>`);
       }
     }
   }
@@ -38,7 +44,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     for (const p of star.predecessors) {
       const a = model.stars.get(p);
       if (!a) continue;
-      parts.push(`<line class="link" x1="${a.position.x}" y1="${a.position.y}" x2="${star.position.x}" y2="${star.position.y}"/>`);
+      parts.push(`<line class="link" x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"/>`);
     }
   }
 
@@ -50,11 +56,11 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     if (state.selected.has(star.id)) cls = "star selected";
     else if (selectable.has(star.id)) cls = "star selectable";
     parts.push(
-      `<circle data-star-id="${star.id}" class="${cls}" cx="${star.position.x}" cy="${star.position.y}" r="6" style="--affinity:${color}"/>`,
+      `<circle data-star-id="${star.id}" class="${cls}" cx="${star.position.x + STAR_CENTER}" cy="${star.position.y + STAR_CENTER}" r="6" style="--affinity:${color}"/>`,
     );
   }
 
-  const pts = [...model.stars.values()].map((s) => s.position);
+  const pts = [...model.stars.values()].map((s) => ({ x: s.position.x + STAR_CENTER, y: s.position.y + STAR_CENTER }));
   const vb = toViewBoxString(fitViewBox(pts, 60));
   return `<svg id="map" viewBox="${vb}" preserveAspectRatio="xMidYMid meet">${parts.join("")}</svg>`;
 }

@@ -1,258 +1,1274 @@
 {
   "images": {
-    "devotionbuttons_background.tex": "assets/devotions/devotionbuttons_background.webp",
-    "devotionbuttons_background.png": "assets/devotions/devotionbuttons_background.webp",
-    "devotionbuttons_close01_down.tex": "assets/devotions/devotionbuttons_close01_down.webp",
-    "devotionbuttons_close01_down.png": "assets/devotions/devotionbuttons_close01_down.webp",
-    "devotionbuttons_close01_over.tex": "assets/devotions/devotionbuttons_close01_over.webp",
-    "devotionbuttons_close01_over.png": "assets/devotions/devotionbuttons_close01_over.webp",
-    "devotionbuttons_close01_up.tex": "assets/devotions/devotionbuttons_close01_up.webp",
-    "devotionbuttons_close01_up.png": "assets/devotions/devotionbuttons_close01_up.webp",
-    "devotionbuttons_help01_down.tex": "assets/devotions/devotionbuttons_help01_down.webp",
-    "devotionbuttons_help01_down.png": "assets/devotions/devotionbuttons_help01_down.webp",
-    "devotionbuttons_help01_over.tex": "assets/devotions/devotionbuttons_help01_over.webp",
-    "devotionbuttons_help01_over.png": "assets/devotions/devotionbuttons_help01_over.webp",
-    "devotionbuttons_help01_up.tex": "assets/devotions/devotionbuttons_help01_up.webp",
-    "devotionbuttons_help01_up.png": "assets/devotions/devotionbuttons_help01_up.webp",
-    "devotionbuttons_start.tex": "assets/devotions/devotionbuttons_start.webp",
-    "devotionbuttons_start.png": "assets/devotions/devotionbuttons_start.webp",
-    "devotionbuttons_tabclosedown.tex": "assets/devotions/devotionbuttons_tabclosedown.webp",
-    "devotionbuttons_tabclosedown.png": "assets/devotions/devotionbuttons_tabclosedown.webp",
-    "devotionbuttons_tabcloseover.tex": "assets/devotions/devotionbuttons_tabcloseover.webp",
-    "devotionbuttons_tabcloseover.png": "assets/devotions/devotionbuttons_tabcloseover.webp",
-    "devotionbuttons_tabcloseup.tex": "assets/devotions/devotionbuttons_tabcloseup.webp",
-    "devotionbuttons_tabcloseup.png": "assets/devotions/devotionbuttons_tabcloseup.webp",
-    "devotionbuttons_tabopendown.tex": "assets/devotions/devotionbuttons_tabopendown.webp",
-    "devotionbuttons_tabopendown.png": "assets/devotions/devotionbuttons_tabopendown.webp",
-    "devotionbuttons_tabopenover.tex": "assets/devotions/devotionbuttons_tabopenover.webp",
-    "devotionbuttons_tabopenover.png": "assets/devotions/devotionbuttons_tabopenover.webp",
-    "devotionbuttons_tabopenup.tex": "assets/devotions/devotionbuttons_tabopenup.webp",
-    "devotionbuttons_tabopenup.png": "assets/devotions/devotionbuttons_tabopenup.webp",
-    "devotionicon_disabled.tex": "assets/devotions/devotionicon_disabled.webp",
-    "devotionicon_disabled.png": "assets/devotions/devotionicon_disabled.webp",
-    "devotionicon_empty.tex": "assets/devotions/devotionicon_empty.webp",
-    "devotionicon_empty.png": "assets/devotions/devotionicon_empty.webp",
-    "devotion_affinity01.tex": "assets/devotions/devotion_affinity01.webp",
-    "devotion_affinity01.png": "assets/devotions/devotion_affinity01.webp",
-    "devotion_affinity01_lg.tex": "assets/devotions/devotion_affinity01_lg.webp",
-    "devotion_affinity01_lg.png": "assets/devotions/devotion_affinity01_lg.webp",
-    "devotion_affinity02.tex": "assets/devotions/devotion_affinity02.webp",
-    "devotion_affinity02.png": "assets/devotions/devotion_affinity02.webp",
-    "devotion_affinity02_lg.tex": "assets/devotions/devotion_affinity02_lg.webp",
-    "devotion_affinity02_lg.png": "assets/devotions/devotion_affinity02_lg.webp",
-    "devotion_affinity03.tex": "assets/devotions/devotion_affinity03.webp",
-    "devotion_affinity03.png": "assets/devotions/devotion_affinity03.webp",
-    "devotion_affinity03_lg.tex": "assets/devotions/devotion_affinity03_lg.webp",
-    "devotion_affinity03_lg.png": "assets/devotions/devotion_affinity03_lg.webp",
-    "devotion_affinity04.tex": "assets/devotions/devotion_affinity04.webp",
-    "devotion_affinity04.png": "assets/devotions/devotion_affinity04.webp",
-    "devotion_affinity04_lg.tex": "assets/devotions/devotion_affinity04_lg.webp",
-    "devotion_affinity04_lg.png": "assets/devotions/devotion_affinity04_lg.webp",
-    "devotion_affinity05.tex": "assets/devotions/devotion_affinity05.webp",
-    "devotion_affinity05.png": "assets/devotions/devotion_affinity05.webp",
-    "devotion_affinity05_lg.tex": "assets/devotions/devotion_affinity05_lg.webp",
-    "devotion_affinity05_lg.png": "assets/devotions/devotion_affinity05_lg.webp",
-    "devotion_connectordisabled.tex": "assets/devotions/devotion_connectordisabled.webp",
-    "devotion_connectordisabled.png": "assets/devotions/devotion_connectordisabled.webp",
-    "devotion_connectoroff.tex": "assets/devotions/devotion_connectoroff.webp",
-    "devotion_connectoroff.png": "assets/devotions/devotion_connectoroff.webp",
-    "devotion_connectoron.tex": "assets/devotions/devotion_connectoron.webp",
-    "devotion_connectoron.png": "assets/devotions/devotion_connectoron.webp",
-    "devotion_constellation001_bat.tex": "assets/devotions/devotion_constellation001_bat.webp",
-    "devotion_constellation001_bat.png": "assets/devotions/devotion_constellation001_bat.webp",
-    "devotion_constellation002_akeronsscorpion.tex": "assets/devotions/devotion_constellation002_akeronsscorpion.webp",
-    "devotion_constellation002_akeronsscorpion.png": "assets/devotions/devotion_constellation002_akeronsscorpion.webp",
-    "devotion_constellation003_raven.tex": "assets/devotions/devotion_constellation003_raven.webp",
-    "devotion_constellation003_raven.png": "assets/devotions/devotion_constellation003_raven.webp",
-    "devotion_constellation004_hammer.tex": "assets/devotions/devotion_constellation004_hammer.webp",
-    "devotion_constellation004_hammer.png": "assets/devotions/devotion_constellation004_hammer.webp",
-    "devotion_constellation005_anvil.tex": "assets/devotions/devotion_constellation005_anvil.webp",
-    "devotion_constellation005_anvil.png": "assets/devotions/devotion_constellation005_anvil.webp",
-    "devotion_constellation006_shepardscrook.tex": "assets/devotions/devotion_constellation006_shepardscrook.webp",
-    "devotion_constellation006_shepardscrook.png": "assets/devotions/devotion_constellation006_shepardscrook.webp",
-    "devotion_constellation007_sailiorsguide.tex": "assets/devotions/devotion_constellation007_sailiorsguide.webp",
-    "devotion_constellation007_sailiorsguide.png": "assets/devotions/devotion_constellation007_sailiorsguide.webp",
-    "devotion_constellation008_assassinsblade.tex": "assets/devotions/devotion_constellation008_assassinsblade.webp",
-    "devotion_constellation008_assassinsblade.png": "assets/devotions/devotion_constellation008_assassinsblade.webp",
-    "devotion_constellation009_eyeofdreeg.tex": "assets/devotions/devotion_constellation009_eyeofdreeg.webp",
-    "devotion_constellation009_eyeofdreeg.png": "assets/devotions/devotion_constellation009_eyeofdreeg.webp",
-    "devotion_constellation010_falcon.tex": "assets/devotions/devotion_constellation010_falcon.webp",
-    "devotion_constellation010_falcon.png": "assets/devotions/devotion_constellation010_falcon.webp",
-    "devotion_constellation011_eel.tex": "assets/devotions/devotion_constellation011_eel.webp",
-    "devotion_constellation011_eel.png": "assets/devotions/devotion_constellation011_eel.webp",
-    "devotion_constellation012_owl.tex": "assets/devotions/devotion_constellation012_owl.webp",
-    "devotion_constellation012_owl.png": "assets/devotions/devotion_constellation012_owl.webp",
-    "devotion_constellation013_viper.tex": "assets/devotions/devotion_constellation013_viper.webp",
-    "devotion_constellation013_viper.png": "assets/devotions/devotion_constellation013_viper.webp",
-    "devotion_constellation014_galows.tex": "assets/devotions/devotion_constellation014_galows.webp",
-    "devotion_constellation014_galows.png": "assets/devotions/devotion_constellation014_galows.webp",
-    "devotion_constellation015_crossroads.tex": "assets/devotions/devotion_constellation015_crossroads.webp",
-    "devotion_constellation015_crossroads.png": "assets/devotions/devotion_constellation015_crossroads.webp",
-    "devotion_constellation016_emptythrone.tex": "assets/devotions/devotion_constellation016_emptythrone.webp",
-    "devotion_constellation016_emptythrone.png": "assets/devotions/devotion_constellation016_emptythrone.webp",
-    "devotion_constellation017_rat.tex": "assets/devotions/devotion_constellation017_rat.webp",
-    "devotion_constellation017_rat.png": "assets/devotions/devotion_constellation017_rat.webp",
-    "devotion_constellation018_tsunami.tex": "assets/devotions/devotion_constellation018_tsunami.webp",
-    "devotion_constellation018_tsunami.png": "assets/devotions/devotion_constellation018_tsunami.webp",
-    "devotion_constellation019_imp.tex": "assets/devotions/devotion_constellation019_imp.webp",
-    "devotion_constellation019_imp.png": "assets/devotions/devotion_constellation019_imp.webp",
-    "devotion_constellation020_fiend.tex": "assets/devotions/devotion_constellation020_fiend.webp",
-    "devotion_constellation020_fiend.png": "assets/devotions/devotion_constellation020_fiend.webp",
-    "devotion_constellation021_bull.tex": "assets/devotions/devotion_constellation021_bull.webp",
-    "devotion_constellation021_bull.png": "assets/devotions/devotion_constellation021_bull.webp",
-    "devotion_constellation022_wraith.tex": "assets/devotions/devotion_constellation022_wraith.webp",
-    "devotion_constellation022_wraith.png": "assets/devotions/devotion_constellation022_wraith.webp",
-    "devotion_constellation023_harpy.tex": "assets/devotions/devotion_constellation023_harpy.webp",
-    "devotion_constellation023_harpy.png": "assets/devotions/devotion_constellation023_harpy.webp",
-    "devotion_constellation024_fox.tex": "assets/devotions/devotion_constellation024_fox.webp",
-    "devotion_constellation024_fox.png": "assets/devotions/devotion_constellation024_fox.webp",
-    "devotion_constellation025_ghoul.tex": "assets/devotions/devotion_constellation025_ghoul.webp",
-    "devotion_constellation025_ghoul.png": "assets/devotions/devotion_constellation025_ghoul.webp",
-    "devotion_constellation026_dryad.tex": "assets/devotions/devotion_constellation026_dryad.webp",
-    "devotion_constellation026_dryad.png": "assets/devotions/devotion_constellation026_dryad.webp",
-    "devotion_constellation027_hawk.tex": "assets/devotions/devotion_constellation027_hawk.webp",
-    "devotion_constellation027_hawk.png": "assets/devotions/devotion_constellation027_hawk.webp",
-    "devotion_constellation028_wolverine.tex": "assets/devotions/devotion_constellation028_wolverine.webp",
-    "devotion_constellation028_wolverine.png": "assets/devotions/devotion_constellation028_wolverine.webp",
-    "devotion_constellation029_tortoise.tex": "assets/devotions/devotion_constellation029_tortoise.webp",
-    "devotion_constellation029_tortoise.png": "assets/devotions/devotion_constellation029_tortoise.webp",
-    "devotion_constellation030_panther.tex": "assets/devotions/devotion_constellation030_panther.webp",
-    "devotion_constellation030_panther.png": "assets/devotions/devotion_constellation030_panther.webp",
-    "devotion_constellation031_crane.tex": "assets/devotions/devotion_constellation031_crane.webp",
-    "devotion_constellation031_crane.png": "assets/devotions/devotion_constellation031_crane.webp",
-    "devotion_constellation032_vulture.tex": "assets/devotions/devotion_constellation032_vulture.webp",
-    "devotion_constellation032_vulture.png": "assets/devotions/devotion_constellation032_vulture.webp",
-    "devotion_constellation033_hound.tex": "assets/devotions/devotion_constellation033_hound.webp",
-    "devotion_constellation033_hound.png": "assets/devotions/devotion_constellation033_hound.webp",
-    "devotion_constellation034_spider.tex": "assets/devotions/devotion_constellation034_spider.webp",
-    "devotion_constellation034_spider.png": "assets/devotions/devotion_constellation034_spider.webp",
-    "devotion_constellation035_lizard.tex": "assets/devotions/devotion_constellation035_lizard.webp",
-    "devotion_constellation035_lizard.png": "assets/devotions/devotion_constellation035_lizard.webp",
-    "devotion_constellation036_rhowanscrown.tex": "assets/devotions/devotion_constellation036_rhowanscrown.webp",
-    "devotion_constellation036_rhowanscrown.png": "assets/devotions/devotion_constellation036_rhowanscrown.webp",
-    "devotion_constellation037_scalesofulcama.tex": "assets/devotions/devotion_constellation037_scalesofulcama.webp",
-    "devotion_constellation037_scalesofulcama.png": "assets/devotions/devotion_constellation037_scalesofulcama.webp",
-    "devotion_constellation038_wendigo.tex": "assets/devotions/devotion_constellation038_wendigo.webp",
-    "devotion_constellation038_wendigo.png": "assets/devotions/devotion_constellation038_wendigo.webp",
-    "devotion_constellation039_huntress.tex": "assets/devotions/devotion_constellation039_huntress.webp",
-    "devotion_constellation039_huntress.png": "assets/devotions/devotion_constellation039_huntress.webp",
-    "devotion_constellation040_direbear.tex": "assets/devotions/devotion_constellation040_direbear.webp",
-    "devotion_constellation040_direbear.png": "assets/devotions/devotion_constellation040_direbear.webp",
-    "devotion_constellation041_assassin.tex": "assets/devotions/devotion_constellation041_assassin.webp",
-    "devotion_constellation041_assassin.png": "assets/devotions/devotion_constellation041_assassin.webp",
-    "devotion_constellation042_magi.tex": "assets/devotions/devotion_constellation042_magi.webp",
-    "devotion_constellation042_magi.png": "assets/devotions/devotion_constellation042_magi.webp",
-    "devotion_constellation043_autumnboar.tex": "assets/devotions/devotion_constellation043_autumnboar.webp",
-    "devotion_constellation043_autumnboar.png": "assets/devotions/devotion_constellation043_autumnboar.webp",
-    "devotion_constellation044_widow.tex": "assets/devotions/devotion_constellation044_widow.webp",
-    "devotion_constellation044_widow.png": "assets/devotions/devotion_constellation044_widow.webp",
-    "devotion_constellation045_revenant.tex": "assets/devotions/devotion_constellation045_revenant.webp",
-    "devotion_constellation045_revenant.png": "assets/devotions/devotion_constellation045_revenant.webp",
-    "devotion_constellation046_samaelswitchblade.tex": "assets/devotions/devotion_constellation046_samaelswitchblade.webp",
-    "devotion_constellation046_samaelswitchblade.png": "assets/devotions/devotion_constellation046_samaelswitchblade.webp",
-    "devotion_constellation047_bysmielsbond.tex": "assets/devotions/devotion_constellation047_bysmielsbond.webp",
-    "devotion_constellation047_bysmielsbond.png": "assets/devotions/devotion_constellation047_bysmielsbond.webp",
-    "devotion_constellation048_tempest.tex": "assets/devotions/devotion_constellation048_tempest.webp",
-    "devotion_constellation048_tempest.png": "assets/devotions/devotion_constellation048_tempest.webp",
-    "devotion_constellation049_targothebuilder.tex": "assets/devotions/devotion_constellation049_targothebuilder.webp",
-    "devotion_constellation049_targothebuilder.png": "assets/devotions/devotion_constellation049_targothebuilder.webp",
-    "devotion_constellation050_callerofthefrost.tex": "assets/devotions/devotion_constellation050_callerofthefrost.webp",
-    "devotion_constellation050_callerofthefrost.png": "assets/devotions/devotion_constellation050_callerofthefrost.webp",
-    "devotion_constellation051_pestilence.tex": "assets/devotions/devotion_constellation051_pestilence.webp",
-    "devotion_constellation051_pestilence.png": "assets/devotions/devotion_constellation051_pestilence.webp",
-    "devotion_constellation052_crab.tex": "assets/devotions/devotion_constellation052_crab.webp",
-    "devotion_constellation052_crab.png": "assets/devotions/devotion_constellation052_crab.webp",
-    "devotion_constellation053_manticore.tex": "assets/devotions/devotion_constellation053_manticore.webp",
-    "devotion_constellation053_manticore.png": "assets/devotions/devotion_constellation053_manticore.webp",
-    "devotion_constellation054_solemnwatcher.tex": "assets/devotions/devotion_constellation054_solemnwatcher.webp",
-    "devotion_constellation054_solemnwatcher.png": "assets/devotions/devotion_constellation054_solemnwatcher.webp",
-    "devotion_constellation055_heraldofwar.tex": "assets/devotions/devotion_constellation055_heraldofwar.webp",
-    "devotion_constellation055_heraldofwar.png": "assets/devotions/devotion_constellation055_heraldofwar.webp",
-    "devotion_constellation056_kraken.tex": "assets/devotions/devotion_constellation056_kraken.webp",
-    "devotion_constellation056_kraken.png": "assets/devotions/devotion_constellation056_kraken.webp",
-    "devotion_constellation057_hydra.tex": "assets/devotions/devotion_constellation057_hydra.webp",
-    "devotion_constellation057_hydra.png": "assets/devotions/devotion_constellation057_hydra.webp",
-    "devotion_constellation058_bladesofnadaan.tex": "assets/devotions/devotion_constellation058_bladesofnadaan.webp",
-    "devotion_constellation058_bladesofnadaan.png": "assets/devotions/devotion_constellation058_bladesofnadaan.webp",
-    "devotion_constellation059_rhowansscepter.tex": "assets/devotions/devotion_constellation059_rhowansscepter.webp",
-    "devotion_constellation059_rhowansscepter.png": "assets/devotions/devotion_constellation059_rhowansscepter.webp",
-    "devotion_constellation060_berserker.tex": "assets/devotions/devotion_constellation060_berserker.webp",
-    "devotion_constellation060_berserker.png": "assets/devotions/devotion_constellation060_berserker.webp",
-    "devotion_constellation061_oklaineslantern.tex": "assets/devotions/devotion_constellation061_oklaineslantern.webp",
-    "devotion_constellation061_oklaineslantern.png": "assets/devotions/devotion_constellation061_oklaineslantern.webp",
-    "devotion_constellation062_shieldmaiden.tex": "assets/devotions/devotion_constellation062_shieldmaiden.webp",
-    "devotion_constellation062_shieldmaiden.png": "assets/devotions/devotion_constellation062_shieldmaiden.webp",
-    "devotion_constellation063_behemoth.tex": "assets/devotions/devotion_constellation063_behemoth.webp",
-    "devotion_constellation063_behemoth.png": "assets/devotions/devotion_constellation063_behemoth.webp",
-    "devotion_constellation064_chariotofthedead.tex": "assets/devotions/devotion_constellation064_chariotofthedead.webp",
-    "devotion_constellation064_chariotofthedead.png": "assets/devotions/devotion_constellation064_chariotofthedead.webp",
-    "devotion_constellation065_keeperoftheforest.tex": "assets/devotions/devotion_constellation065_keeperoftheforest.webp",
-    "devotion_constellation065_keeperoftheforest.png": "assets/devotions/devotion_constellation065_keeperoftheforest.webp",
-    "devotion_constellation066_aeonshourglass.tex": "assets/devotions/devotion_constellation066_aeonshourglass.webp",
-    "devotion_constellation066_aeonshourglass.png": "assets/devotions/devotion_constellation066_aeonshourglass.webp",
-    "devotion_constellation067_abomination.tex": "assets/devotions/devotion_constellation067_abomination.webp",
-    "devotion_constellation067_abomination.png": "assets/devotions/devotion_constellation067_abomination.webp",
-    "devotion_constellation068_lightofempyrion.tex": "assets/devotions/devotion_constellation068_lightofempyrion.webp",
-    "devotion_constellation068_lightofempyrion.png": "assets/devotions/devotion_constellation068_lightofempyrion.webp",
-    "devotion_constellation069_oleron.tex": "assets/devotions/devotion_constellation069_oleron.webp",
-    "devotion_constellation069_oleron.png": "assets/devotions/devotion_constellation069_oleron.webp",
-    "devotion_constellation070_menhirsobelisk.tex": "assets/devotions/devotion_constellation070_menhirsobelisk.webp",
-    "devotion_constellation070_menhirsobelisk.png": "assets/devotions/devotion_constellation070_menhirsobelisk.webp",
-    "devotion_constellation071_spearoftheheavens.tex": "assets/devotions/devotion_constellation071_spearoftheheavens.webp",
-    "devotion_constellation071_spearoftheheavens.png": "assets/devotions/devotion_constellation071_spearoftheheavens.webp",
-    "devotion_constellation072_ulzuinsflame.tex": "assets/devotions/devotion_constellation072_ulzuinsflame.webp",
-    "devotion_constellation072_ulzuinsflame.png": "assets/devotions/devotion_constellation072_ulzuinsflame.webp",
-    "devotion_constellation073_thedyinggod.tex": "assets/devotions/devotion_constellation073_thedyinggod.webp",
-    "devotion_constellation073_thedyinggod.png": "assets/devotions/devotion_constellation073_thedyinggod.webp",
-    "devotion_constellation074_treeoflife.tex": "assets/devotions/devotion_constellation074_treeoflife.webp",
-    "devotion_constellation074_treeoflife.png": "assets/devotions/devotion_constellation074_treeoflife.webp",
-    "devotion_constellation075_mogdrogenthewolf.tex": "assets/devotions/devotion_constellation075_mogdrogenthewolf.webp",
-    "devotion_constellation075_mogdrogenthewolf.png": "assets/devotions/devotion_constellation075_mogdrogenthewolf.webp",
-    "devotion_constellation076_blindsage.tex": "assets/devotions/devotion_constellation076_blindsage.webp",
-    "devotion_constellation076_blindsage.png": "assets/devotions/devotion_constellation076_blindsage.webp",
-    "devotion_constellation077_leviathan.tex": "assets/devotions/devotion_constellation077_leviathan.webp",
-    "devotion_constellation077_leviathan.png": "assets/devotions/devotion_constellation077_leviathan.webp",
-    "devotion_constellation078_theshadow.tex": "assets/devotions/devotion_constellation078_theshadow.webp",
-    "devotion_constellation078_theshadow.png": "assets/devotions/devotion_constellation078_theshadow.webp",
-    "devotion_constellation079_harvestmansscythe.tex": "assets/devotions/devotion_constellation079_harvestmansscythe.webp",
-    "devotion_constellation079_harvestmansscythe.png": "assets/devotions/devotion_constellation079_harvestmansscythe.webp",
-    "devotion_constellation080_crossroads.tex": "assets/devotions/devotion_constellation080_crossroads.webp",
-    "devotion_constellation080_crossroads.png": "assets/devotions/devotion_constellation080_crossroads.webp",
-    "devotion_constellation081_crossroads.tex": "assets/devotions/devotion_constellation081_crossroads.webp",
-    "devotion_constellation081_crossroads.png": "assets/devotions/devotion_constellation081_crossroads.webp",
-    "devotion_constellation082_crossroads.tex": "assets/devotions/devotion_constellation082_crossroads.webp",
-    "devotion_constellation082_crossroads.png": "assets/devotions/devotion_constellation082_crossroads.webp",
-    "devotion_constellation083_crossroads.tex": "assets/devotions/devotion_constellation083_crossroads.webp",
-    "devotion_constellation083_crossroads.png": "assets/devotions/devotion_constellation083_crossroads.webp",
-    "devotion_constellation084_candle.tex": "assets/devotions/devotion_constellation084_candle.webp",
-    "devotion_constellation084_candle.png": "assets/devotions/devotion_constellation084_candle.webp",
-    "devotion_constellation085_lion.tex": "assets/devotions/devotion_constellation085_lion.webp",
-    "devotion_constellation085_lion.png": "assets/devotions/devotion_constellation085_lion.webp",
-    "devotion_constellation086_jackal.tex": "assets/devotions/devotion_constellation086_jackal.webp",
-    "devotion_constellation086_jackal.png": "assets/devotions/devotion_constellation086_jackal.webp",
-    "devotion_constellation087_crossroads.tex": "assets/devotions/devotion_constellation087_crossroads.webp",
-    "devotion_constellation087_crossroads.png": "assets/devotions/devotion_constellation087_crossroads.webp",
-    "devotion_constellation_temp.tex": "assets/devotions/devotion_constellation_temp.webp",
-    "devotion_constellation_temp.png": "assets/devotions/devotion_constellation_temp.webp",
-    "devotion_searchbar01_background.tex": "assets/devotions/devotion_searchbar01_background.webp",
-    "devotion_searchbar01_background.png": "assets/devotions/devotion_searchbar01_background.webp",
-    "devotion_section1.tex": "assets/devotions/devotion_section1.webp",
-    "devotion_section1.png": "assets/devotions/devotion_section1.webp",
-    "devotion_sidebar_background.tex": "assets/devotions/devotion_sidebar_background.webp",
-    "devotion_sidebar_background.png": "assets/devotions/devotion_sidebar_background.webp",
-    "devotion_starglow01.tex": "assets/devotions/devotion_starglow01.webp",
-    "devotion_starglow01.png": "assets/devotions/devotion_starglow01.webp",
-    "devotion_star_disabled.tex": "assets/devotions/devotion_star_disabled.webp",
-    "devotion_star_disabled.png": "assets/devotions/devotion_star_disabled.webp",
-    "devotion_star_down.tex": "assets/devotions/devotion_star_down.webp",
-    "devotion_star_down.png": "assets/devotions/devotion_star_down.webp",
-    "devotion_star_over.tex": "assets/devotions/devotion_star_over.webp",
-    "devotion_star_over.png": "assets/devotions/devotion_star_over.webp",
-    "devotion_star_up.tex": "assets/devotions/devotion_star_up.webp",
-    "devotion_star_up.png": "assets/devotions/devotion_star_up.webp",
-    "devotion_tile.tex": "assets/devotions/devotion_tile.webp",
-    "devotion_tile.png": "assets/devotions/devotion_tile.webp",
-    "devotion_vignetteframe.tex": "assets/devotions/devotion_vignetteframe.webp",
-    "devotion_vignetteframe.png": "assets/devotions/devotion_vignetteframe.webp"
+    "devotionbuttons_background.tex": {
+      "url": "assets/devotions/devotionbuttons_background.webp",
+      "w": 128,
+      "h": 128
+    },
+    "devotionbuttons_background.png": {
+      "url": "assets/devotions/devotionbuttons_background.webp",
+      "w": 128,
+      "h": 128
+    },
+    "devotionbuttons_close01_down.tex": {
+      "url": "assets/devotions/devotionbuttons_close01_down.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_close01_down.png": {
+      "url": "assets/devotions/devotionbuttons_close01_down.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_close01_over.tex": {
+      "url": "assets/devotions/devotionbuttons_close01_over.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_close01_over.png": {
+      "url": "assets/devotions/devotionbuttons_close01_over.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_close01_up.tex": {
+      "url": "assets/devotions/devotionbuttons_close01_up.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_close01_up.png": {
+      "url": "assets/devotions/devotionbuttons_close01_up.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_help01_down.tex": {
+      "url": "assets/devotions/devotionbuttons_help01_down.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_help01_down.png": {
+      "url": "assets/devotions/devotionbuttons_help01_down.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_help01_over.tex": {
+      "url": "assets/devotions/devotionbuttons_help01_over.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_help01_over.png": {
+      "url": "assets/devotions/devotionbuttons_help01_over.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_help01_up.tex": {
+      "url": "assets/devotions/devotionbuttons_help01_up.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_help01_up.png": {
+      "url": "assets/devotions/devotionbuttons_help01_up.webp",
+      "w": 38,
+      "h": 38
+    },
+    "devotionbuttons_start.tex": {
+      "url": "assets/devotions/devotionbuttons_start.webp",
+      "w": 50,
+      "h": 50
+    },
+    "devotionbuttons_start.png": {
+      "url": "assets/devotions/devotionbuttons_start.webp",
+      "w": 50,
+      "h": 50
+    },
+    "devotionbuttons_tabclosedown.tex": {
+      "url": "assets/devotions/devotionbuttons_tabclosedown.webp",
+      "w": 20,
+      "h": 40
+    },
+    "devotionbuttons_tabclosedown.png": {
+      "url": "assets/devotions/devotionbuttons_tabclosedown.webp",
+      "w": 20,
+      "h": 40
+    },
+    "devotionbuttons_tabcloseover.tex": {
+      "url": "assets/devotions/devotionbuttons_tabcloseover.webp",
+      "w": 20,
+      "h": 40
+    },
+    "devotionbuttons_tabcloseover.png": {
+      "url": "assets/devotions/devotionbuttons_tabcloseover.webp",
+      "w": 20,
+      "h": 40
+    },
+    "devotionbuttons_tabcloseup.tex": {
+      "url": "assets/devotions/devotionbuttons_tabcloseup.webp",
+      "w": 20,
+      "h": 40
+    },
+    "devotionbuttons_tabcloseup.png": {
+      "url": "assets/devotions/devotionbuttons_tabcloseup.webp",
+      "w": 20,
+      "h": 40
+    },
+    "devotionbuttons_tabopendown.tex": {
+      "url": "assets/devotions/devotionbuttons_tabopendown.webp",
+      "w": 30,
+      "h": 74
+    },
+    "devotionbuttons_tabopendown.png": {
+      "url": "assets/devotions/devotionbuttons_tabopendown.webp",
+      "w": 30,
+      "h": 74
+    },
+    "devotionbuttons_tabopenover.tex": {
+      "url": "assets/devotions/devotionbuttons_tabopenover.webp",
+      "w": 30,
+      "h": 74
+    },
+    "devotionbuttons_tabopenover.png": {
+      "url": "assets/devotions/devotionbuttons_tabopenover.webp",
+      "w": 30,
+      "h": 74
+    },
+    "devotionbuttons_tabopenup.tex": {
+      "url": "assets/devotions/devotionbuttons_tabopenup.webp",
+      "w": 30,
+      "h": 74
+    },
+    "devotionbuttons_tabopenup.png": {
+      "url": "assets/devotions/devotionbuttons_tabopenup.webp",
+      "w": 30,
+      "h": 74
+    },
+    "devotionicon_disabled.tex": {
+      "url": "assets/devotions/devotionicon_disabled.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotionicon_disabled.png": {
+      "url": "assets/devotions/devotionicon_disabled.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotionicon_empty.tex": {
+      "url": "assets/devotions/devotionicon_empty.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotionicon_empty.png": {
+      "url": "assets/devotions/devotionicon_empty.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity01.tex": {
+      "url": "assets/devotions/devotion_affinity01.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity01.png": {
+      "url": "assets/devotions/devotion_affinity01.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity01_lg.tex": {
+      "url": "assets/devotions/devotion_affinity01_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity01_lg.png": {
+      "url": "assets/devotions/devotion_affinity01_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity02.tex": {
+      "url": "assets/devotions/devotion_affinity02.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity02.png": {
+      "url": "assets/devotions/devotion_affinity02.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity02_lg.tex": {
+      "url": "assets/devotions/devotion_affinity02_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity02_lg.png": {
+      "url": "assets/devotions/devotion_affinity02_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity03.tex": {
+      "url": "assets/devotions/devotion_affinity03.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity03.png": {
+      "url": "assets/devotions/devotion_affinity03.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity03_lg.tex": {
+      "url": "assets/devotions/devotion_affinity03_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity03_lg.png": {
+      "url": "assets/devotions/devotion_affinity03_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity04.tex": {
+      "url": "assets/devotions/devotion_affinity04.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity04.png": {
+      "url": "assets/devotions/devotion_affinity04.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity04_lg.tex": {
+      "url": "assets/devotions/devotion_affinity04_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity04_lg.png": {
+      "url": "assets/devotions/devotion_affinity04_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity05.tex": {
+      "url": "assets/devotions/devotion_affinity05.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity05.png": {
+      "url": "assets/devotions/devotion_affinity05.webp",
+      "w": 20,
+      "h": 20
+    },
+    "devotion_affinity05_lg.tex": {
+      "url": "assets/devotions/devotion_affinity05_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_affinity05_lg.png": {
+      "url": "assets/devotions/devotion_affinity05_lg.webp",
+      "w": 32,
+      "h": 32
+    },
+    "devotion_connectordisabled.tex": {
+      "url": "assets/devotions/devotion_connectordisabled.webp",
+      "w": 78,
+      "h": 16
+    },
+    "devotion_connectordisabled.png": {
+      "url": "assets/devotions/devotion_connectordisabled.webp",
+      "w": 78,
+      "h": 16
+    },
+    "devotion_connectoroff.tex": {
+      "url": "assets/devotions/devotion_connectoroff.webp",
+      "w": 78,
+      "h": 16
+    },
+    "devotion_connectoroff.png": {
+      "url": "assets/devotions/devotion_connectoroff.webp",
+      "w": 78,
+      "h": 16
+    },
+    "devotion_connectoron.tex": {
+      "url": "assets/devotions/devotion_connectoron.webp",
+      "w": 78,
+      "h": 16
+    },
+    "devotion_connectoron.png": {
+      "url": "assets/devotions/devotion_connectoron.webp",
+      "w": 78,
+      "h": 16
+    },
+    "devotion_constellation001_bat.tex": {
+      "url": "assets/devotions/devotion_constellation001_bat.webp",
+      "w": 430,
+      "h": 171
+    },
+    "devotion_constellation001_bat.png": {
+      "url": "assets/devotions/devotion_constellation001_bat.webp",
+      "w": 430,
+      "h": 171
+    },
+    "devotion_constellation002_akeronsscorpion.tex": {
+      "url": "assets/devotions/devotion_constellation002_akeronsscorpion.webp",
+      "w": 304,
+      "h": 384
+    },
+    "devotion_constellation002_akeronsscorpion.png": {
+      "url": "assets/devotions/devotion_constellation002_akeronsscorpion.webp",
+      "w": 304,
+      "h": 384
+    },
+    "devotion_constellation003_raven.tex": {
+      "url": "assets/devotions/devotion_constellation003_raven.webp",
+      "w": 320,
+      "h": 256
+    },
+    "devotion_constellation003_raven.png": {
+      "url": "assets/devotions/devotion_constellation003_raven.webp",
+      "w": 320,
+      "h": 256
+    },
+    "devotion_constellation004_hammer.tex": {
+      "url": "assets/devotions/devotion_constellation004_hammer.webp",
+      "w": 390,
+      "h": 200
+    },
+    "devotion_constellation004_hammer.png": {
+      "url": "assets/devotions/devotion_constellation004_hammer.webp",
+      "w": 390,
+      "h": 200
+    },
+    "devotion_constellation005_anvil.tex": {
+      "url": "assets/devotions/devotion_constellation005_anvil.webp",
+      "w": 384,
+      "h": 255
+    },
+    "devotion_constellation005_anvil.png": {
+      "url": "assets/devotions/devotion_constellation005_anvil.webp",
+      "w": 384,
+      "h": 255
+    },
+    "devotion_constellation006_shepardscrook.tex": {
+      "url": "assets/devotions/devotion_constellation006_shepardscrook.webp",
+      "w": 180,
+      "h": 384
+    },
+    "devotion_constellation006_shepardscrook.png": {
+      "url": "assets/devotions/devotion_constellation006_shepardscrook.webp",
+      "w": 180,
+      "h": 384
+    },
+    "devotion_constellation007_sailiorsguide.tex": {
+      "url": "assets/devotions/devotion_constellation007_sailiorsguide.webp",
+      "w": 256,
+      "h": 256
+    },
+    "devotion_constellation007_sailiorsguide.png": {
+      "url": "assets/devotions/devotion_constellation007_sailiorsguide.webp",
+      "w": 256,
+      "h": 256
+    },
+    "devotion_constellation008_assassinsblade.tex": {
+      "url": "assets/devotions/devotion_constellation008_assassinsblade.webp",
+      "w": 180,
+      "h": 410
+    },
+    "devotion_constellation008_assassinsblade.png": {
+      "url": "assets/devotions/devotion_constellation008_assassinsblade.webp",
+      "w": 180,
+      "h": 410
+    },
+    "devotion_constellation009_eyeofdreeg.tex": {
+      "url": "assets/devotions/devotion_constellation009_eyeofdreeg.webp",
+      "w": 270,
+      "h": 270
+    },
+    "devotion_constellation009_eyeofdreeg.png": {
+      "url": "assets/devotions/devotion_constellation009_eyeofdreeg.webp",
+      "w": 270,
+      "h": 270
+    },
+    "devotion_constellation010_falcon.tex": {
+      "url": "assets/devotions/devotion_constellation010_falcon.webp",
+      "w": 512,
+      "h": 256
+    },
+    "devotion_constellation010_falcon.png": {
+      "url": "assets/devotions/devotion_constellation010_falcon.webp",
+      "w": 512,
+      "h": 256
+    },
+    "devotion_constellation011_eel.tex": {
+      "url": "assets/devotions/devotion_constellation011_eel.webp",
+      "w": 420,
+      "h": 200
+    },
+    "devotion_constellation011_eel.png": {
+      "url": "assets/devotions/devotion_constellation011_eel.webp",
+      "w": 420,
+      "h": 200
+    },
+    "devotion_constellation012_owl.tex": {
+      "url": "assets/devotions/devotion_constellation012_owl.webp",
+      "w": 257,
+      "h": 384
+    },
+    "devotion_constellation012_owl.png": {
+      "url": "assets/devotions/devotion_constellation012_owl.webp",
+      "w": 257,
+      "h": 384
+    },
+    "devotion_constellation013_viper.tex": {
+      "url": "assets/devotions/devotion_constellation013_viper.webp",
+      "w": 300,
+      "h": 300
+    },
+    "devotion_constellation013_viper.png": {
+      "url": "assets/devotions/devotion_constellation013_viper.webp",
+      "w": 300,
+      "h": 300
+    },
+    "devotion_constellation014_galows.tex": {
+      "url": "assets/devotions/devotion_constellation014_galows.webp",
+      "w": 299,
+      "h": 512
+    },
+    "devotion_constellation014_galows.png": {
+      "url": "assets/devotions/devotion_constellation014_galows.webp",
+      "w": 299,
+      "h": 512
+    },
+    "devotion_constellation015_crossroads.tex": {
+      "url": "assets/devotions/devotion_constellation015_crossroads.webp",
+      "w": 84,
+      "h": 150
+    },
+    "devotion_constellation015_crossroads.png": {
+      "url": "assets/devotions/devotion_constellation015_crossroads.webp",
+      "w": 84,
+      "h": 150
+    },
+    "devotion_constellation016_emptythrone.tex": {
+      "url": "assets/devotions/devotion_constellation016_emptythrone.webp",
+      "w": 200,
+      "h": 350
+    },
+    "devotion_constellation016_emptythrone.png": {
+      "url": "assets/devotions/devotion_constellation016_emptythrone.webp",
+      "w": 200,
+      "h": 350
+    },
+    "devotion_constellation017_rat.tex": {
+      "url": "assets/devotions/devotion_constellation017_rat.webp",
+      "w": 400,
+      "h": 400
+    },
+    "devotion_constellation017_rat.png": {
+      "url": "assets/devotions/devotion_constellation017_rat.webp",
+      "w": 400,
+      "h": 400
+    },
+    "devotion_constellation018_tsunami.tex": {
+      "url": "assets/devotions/devotion_constellation018_tsunami.webp",
+      "w": 320,
+      "h": 256
+    },
+    "devotion_constellation018_tsunami.png": {
+      "url": "assets/devotions/devotion_constellation018_tsunami.webp",
+      "w": 320,
+      "h": 256
+    },
+    "devotion_constellation019_imp.tex": {
+      "url": "assets/devotions/devotion_constellation019_imp.webp",
+      "w": 280,
+      "h": 280
+    },
+    "devotion_constellation019_imp.png": {
+      "url": "assets/devotions/devotion_constellation019_imp.webp",
+      "w": 280,
+      "h": 280
+    },
+    "devotion_constellation020_fiend.tex": {
+      "url": "assets/devotions/devotion_constellation020_fiend.webp",
+      "w": 300,
+      "h": 420
+    },
+    "devotion_constellation020_fiend.png": {
+      "url": "assets/devotions/devotion_constellation020_fiend.webp",
+      "w": 300,
+      "h": 420
+    },
+    "devotion_constellation021_bull.tex": {
+      "url": "assets/devotions/devotion_constellation021_bull.webp",
+      "w": 512,
+      "h": 256
+    },
+    "devotion_constellation021_bull.png": {
+      "url": "assets/devotions/devotion_constellation021_bull.webp",
+      "w": 512,
+      "h": 256
+    },
+    "devotion_constellation022_wraith.tex": {
+      "url": "assets/devotions/devotion_constellation022_wraith.webp",
+      "w": 256,
+      "h": 330
+    },
+    "devotion_constellation022_wraith.png": {
+      "url": "assets/devotions/devotion_constellation022_wraith.webp",
+      "w": 256,
+      "h": 330
+    },
+    "devotion_constellation023_harpy.tex": {
+      "url": "assets/devotions/devotion_constellation023_harpy.webp",
+      "w": 349,
+      "h": 350
+    },
+    "devotion_constellation023_harpy.png": {
+      "url": "assets/devotions/devotion_constellation023_harpy.webp",
+      "w": 349,
+      "h": 350
+    },
+    "devotion_constellation024_fox.tex": {
+      "url": "assets/devotions/devotion_constellation024_fox.webp",
+      "w": 360,
+      "h": 300
+    },
+    "devotion_constellation024_fox.png": {
+      "url": "assets/devotions/devotion_constellation024_fox.webp",
+      "w": 360,
+      "h": 300
+    },
+    "devotion_constellation025_ghoul.tex": {
+      "url": "assets/devotions/devotion_constellation025_ghoul.webp",
+      "w": 255,
+      "h": 384
+    },
+    "devotion_constellation025_ghoul.png": {
+      "url": "assets/devotions/devotion_constellation025_ghoul.webp",
+      "w": 255,
+      "h": 384
+    },
+    "devotion_constellation026_dryad.tex": {
+      "url": "assets/devotions/devotion_constellation026_dryad.webp",
+      "w": 310,
+      "h": 240
+    },
+    "devotion_constellation026_dryad.png": {
+      "url": "assets/devotions/devotion_constellation026_dryad.webp",
+      "w": 310,
+      "h": 240
+    },
+    "devotion_constellation027_hawk.tex": {
+      "url": "assets/devotions/devotion_constellation027_hawk.webp",
+      "w": 460,
+      "h": 256
+    },
+    "devotion_constellation027_hawk.png": {
+      "url": "assets/devotions/devotion_constellation027_hawk.webp",
+      "w": 460,
+      "h": 256
+    },
+    "devotion_constellation028_wolverine.tex": {
+      "url": "assets/devotions/devotion_constellation028_wolverine.webp",
+      "w": 350,
+      "h": 256
+    },
+    "devotion_constellation028_wolverine.png": {
+      "url": "assets/devotions/devotion_constellation028_wolverine.webp",
+      "w": 350,
+      "h": 256
+    },
+    "devotion_constellation029_tortoise.tex": {
+      "url": "assets/devotions/devotion_constellation029_tortoise.webp",
+      "w": 400,
+      "h": 255
+    },
+    "devotion_constellation029_tortoise.png": {
+      "url": "assets/devotions/devotion_constellation029_tortoise.webp",
+      "w": 400,
+      "h": 255
+    },
+    "devotion_constellation030_panther.tex": {
+      "url": "assets/devotions/devotion_constellation030_panther.webp",
+      "w": 512,
+      "h": 200
+    },
+    "devotion_constellation030_panther.png": {
+      "url": "assets/devotions/devotion_constellation030_panther.webp",
+      "w": 512,
+      "h": 200
+    },
+    "devotion_constellation031_crane.tex": {
+      "url": "assets/devotions/devotion_constellation031_crane.webp",
+      "w": 384,
+      "h": 384
+    },
+    "devotion_constellation031_crane.png": {
+      "url": "assets/devotions/devotion_constellation031_crane.webp",
+      "w": 384,
+      "h": 384
+    },
+    "devotion_constellation032_vulture.tex": {
+      "url": "assets/devotions/devotion_constellation032_vulture.webp",
+      "w": 512,
+      "h": 340
+    },
+    "devotion_constellation032_vulture.png": {
+      "url": "assets/devotions/devotion_constellation032_vulture.webp",
+      "w": 512,
+      "h": 340
+    },
+    "devotion_constellation033_hound.tex": {
+      "url": "assets/devotions/devotion_constellation033_hound.webp",
+      "w": 384,
+      "h": 270
+    },
+    "devotion_constellation033_hound.png": {
+      "url": "assets/devotions/devotion_constellation033_hound.webp",
+      "w": 384,
+      "h": 270
+    },
+    "devotion_constellation034_spider.tex": {
+      "url": "assets/devotions/devotion_constellation034_spider.webp",
+      "w": 340,
+      "h": 340
+    },
+    "devotion_constellation034_spider.png": {
+      "url": "assets/devotions/devotion_constellation034_spider.webp",
+      "w": 340,
+      "h": 340
+    },
+    "devotion_constellation035_lizard.tex": {
+      "url": "assets/devotions/devotion_constellation035_lizard.webp",
+      "w": 180,
+      "h": 330
+    },
+    "devotion_constellation035_lizard.png": {
+      "url": "assets/devotions/devotion_constellation035_lizard.webp",
+      "w": 180,
+      "h": 330
+    },
+    "devotion_constellation036_rhowanscrown.tex": {
+      "url": "assets/devotions/devotion_constellation036_rhowanscrown.webp",
+      "w": 230,
+      "h": 230
+    },
+    "devotion_constellation036_rhowanscrown.png": {
+      "url": "assets/devotions/devotion_constellation036_rhowanscrown.webp",
+      "w": 230,
+      "h": 230
+    },
+    "devotion_constellation037_scalesofulcama.tex": {
+      "url": "assets/devotions/devotion_constellation037_scalesofulcama.webp",
+      "w": 430,
+      "h": 430
+    },
+    "devotion_constellation037_scalesofulcama.png": {
+      "url": "assets/devotions/devotion_constellation037_scalesofulcama.webp",
+      "w": 430,
+      "h": 430
+    },
+    "devotion_constellation038_wendigo.tex": {
+      "url": "assets/devotions/devotion_constellation038_wendigo.webp",
+      "w": 430,
+      "h": 430
+    },
+    "devotion_constellation038_wendigo.png": {
+      "url": "assets/devotions/devotion_constellation038_wendigo.webp",
+      "w": 430,
+      "h": 430
+    },
+    "devotion_constellation039_huntress.tex": {
+      "url": "assets/devotions/devotion_constellation039_huntress.webp",
+      "w": 350,
+      "h": 460
+    },
+    "devotion_constellation039_huntress.png": {
+      "url": "assets/devotions/devotion_constellation039_huntress.webp",
+      "w": 350,
+      "h": 460
+    },
+    "devotion_constellation040_direbear.tex": {
+      "url": "assets/devotions/devotion_constellation040_direbear.webp",
+      "w": 400,
+      "h": 400
+    },
+    "devotion_constellation040_direbear.png": {
+      "url": "assets/devotions/devotion_constellation040_direbear.webp",
+      "w": 400,
+      "h": 400
+    },
+    "devotion_constellation041_assassin.tex": {
+      "url": "assets/devotions/devotion_constellation041_assassin.webp",
+      "w": 320,
+      "h": 400
+    },
+    "devotion_constellation041_assassin.png": {
+      "url": "assets/devotions/devotion_constellation041_assassin.webp",
+      "w": 320,
+      "h": 400
+    },
+    "devotion_constellation042_magi.tex": {
+      "url": "assets/devotions/devotion_constellation042_magi.webp",
+      "w": 255,
+      "h": 650
+    },
+    "devotion_constellation042_magi.png": {
+      "url": "assets/devotions/devotion_constellation042_magi.webp",
+      "w": 255,
+      "h": 650
+    },
+    "devotion_constellation043_autumnboar.tex": {
+      "url": "assets/devotions/devotion_constellation043_autumnboar.webp",
+      "w": 460,
+      "h": 400
+    },
+    "devotion_constellation043_autumnboar.png": {
+      "url": "assets/devotions/devotion_constellation043_autumnboar.webp",
+      "w": 460,
+      "h": 400
+    },
+    "devotion_constellation044_widow.tex": {
+      "url": "assets/devotions/devotion_constellation044_widow.webp",
+      "w": 300,
+      "h": 300
+    },
+    "devotion_constellation044_widow.png": {
+      "url": "assets/devotions/devotion_constellation044_widow.webp",
+      "w": 300,
+      "h": 300
+    },
+    "devotion_constellation045_revenant.tex": {
+      "url": "assets/devotions/devotion_constellation045_revenant.webp",
+      "w": 619,
+      "h": 581
+    },
+    "devotion_constellation045_revenant.png": {
+      "url": "assets/devotions/devotion_constellation045_revenant.webp",
+      "w": 619,
+      "h": 581
+    },
+    "devotion_constellation046_samaelswitchblade.tex": {
+      "url": "assets/devotions/devotion_constellation046_samaelswitchblade.webp",
+      "w": 512,
+      "h": 256
+    },
+    "devotion_constellation046_samaelswitchblade.png": {
+      "url": "assets/devotions/devotion_constellation046_samaelswitchblade.webp",
+      "w": 512,
+      "h": 256
+    },
+    "devotion_constellation047_bysmielsbond.tex": {
+      "url": "assets/devotions/devotion_constellation047_bysmielsbond.webp",
+      "w": 256,
+      "h": 440
+    },
+    "devotion_constellation047_bysmielsbond.png": {
+      "url": "assets/devotions/devotion_constellation047_bysmielsbond.webp",
+      "w": 256,
+      "h": 440
+    },
+    "devotion_constellation048_tempest.tex": {
+      "url": "assets/devotions/devotion_constellation048_tempest.webp",
+      "w": 512,
+      "h": 512
+    },
+    "devotion_constellation048_tempest.png": {
+      "url": "assets/devotions/devotion_constellation048_tempest.webp",
+      "w": 512,
+      "h": 512
+    },
+    "devotion_constellation049_targothebuilder.tex": {
+      "url": "assets/devotions/devotion_constellation049_targothebuilder.webp",
+      "w": 384,
+      "h": 512
+    },
+    "devotion_constellation049_targothebuilder.png": {
+      "url": "assets/devotions/devotion_constellation049_targothebuilder.webp",
+      "w": 384,
+      "h": 512
+    },
+    "devotion_constellation050_callerofthefrost.tex": {
+      "url": "assets/devotions/devotion_constellation050_callerofthefrost.webp",
+      "w": 430,
+      "h": 512
+    },
+    "devotion_constellation050_callerofthefrost.png": {
+      "url": "assets/devotions/devotion_constellation050_callerofthefrost.webp",
+      "w": 430,
+      "h": 512
+    },
+    "devotion_constellation051_pestilence.tex": {
+      "url": "assets/devotions/devotion_constellation051_pestilence.webp",
+      "w": 600,
+      "h": 500
+    },
+    "devotion_constellation051_pestilence.png": {
+      "url": "assets/devotions/devotion_constellation051_pestilence.webp",
+      "w": 600,
+      "h": 500
+    },
+    "devotion_constellation052_crab.tex": {
+      "url": "assets/devotions/devotion_constellation052_crab.webp",
+      "w": 480,
+      "h": 330
+    },
+    "devotion_constellation052_crab.png": {
+      "url": "assets/devotions/devotion_constellation052_crab.webp",
+      "w": 480,
+      "h": 330
+    },
+    "devotion_constellation053_manticore.tex": {
+      "url": "assets/devotions/devotion_constellation053_manticore.webp",
+      "w": 512,
+      "h": 460
+    },
+    "devotion_constellation053_manticore.png": {
+      "url": "assets/devotions/devotion_constellation053_manticore.webp",
+      "w": 512,
+      "h": 460
+    },
+    "devotion_constellation054_solemnwatcher.tex": {
+      "url": "assets/devotions/devotion_constellation054_solemnwatcher.webp",
+      "w": 270,
+      "h": 500
+    },
+    "devotion_constellation054_solemnwatcher.png": {
+      "url": "assets/devotions/devotion_constellation054_solemnwatcher.webp",
+      "w": 270,
+      "h": 500
+    },
+    "devotion_constellation055_heraldofwar.tex": {
+      "url": "assets/devotions/devotion_constellation055_heraldofwar.webp",
+      "w": 570,
+      "h": 540
+    },
+    "devotion_constellation055_heraldofwar.png": {
+      "url": "assets/devotions/devotion_constellation055_heraldofwar.webp",
+      "w": 570,
+      "h": 540
+    },
+    "devotion_constellation056_kraken.tex": {
+      "url": "assets/devotions/devotion_constellation056_kraken.webp",
+      "w": 512,
+      "h": 512
+    },
+    "devotion_constellation056_kraken.png": {
+      "url": "assets/devotions/devotion_constellation056_kraken.webp",
+      "w": 512,
+      "h": 512
+    },
+    "devotion_constellation057_hydra.tex": {
+      "url": "assets/devotions/devotion_constellation057_hydra.webp",
+      "w": 600,
+      "h": 480
+    },
+    "devotion_constellation057_hydra.png": {
+      "url": "assets/devotions/devotion_constellation057_hydra.webp",
+      "w": 600,
+      "h": 480
+    },
+    "devotion_constellation058_bladesofnadaan.tex": {
+      "url": "assets/devotions/devotion_constellation058_bladesofnadaan.webp",
+      "w": 270,
+      "h": 430
+    },
+    "devotion_constellation058_bladesofnadaan.png": {
+      "url": "assets/devotions/devotion_constellation058_bladesofnadaan.webp",
+      "w": 270,
+      "h": 430
+    },
+    "devotion_constellation059_rhowansscepter.tex": {
+      "url": "assets/devotions/devotion_constellation059_rhowansscepter.webp",
+      "w": 512,
+      "h": 610
+    },
+    "devotion_constellation059_rhowansscepter.png": {
+      "url": "assets/devotions/devotion_constellation059_rhowansscepter.webp",
+      "w": 512,
+      "h": 610
+    },
+    "devotion_constellation060_berserker.tex": {
+      "url": "assets/devotions/devotion_constellation060_berserker.webp",
+      "w": 470,
+      "h": 410
+    },
+    "devotion_constellation060_berserker.png": {
+      "url": "assets/devotions/devotion_constellation060_berserker.webp",
+      "w": 470,
+      "h": 410
+    },
+    "devotion_constellation061_oklaineslantern.tex": {
+      "url": "assets/devotions/devotion_constellation061_oklaineslantern.webp",
+      "w": 230,
+      "h": 512
+    },
+    "devotion_constellation061_oklaineslantern.png": {
+      "url": "assets/devotions/devotion_constellation061_oklaineslantern.webp",
+      "w": 230,
+      "h": 512
+    },
+    "devotion_constellation062_shieldmaiden.tex": {
+      "url": "assets/devotions/devotion_constellation062_shieldmaiden.webp",
+      "w": 430,
+      "h": 430
+    },
+    "devotion_constellation062_shieldmaiden.png": {
+      "url": "assets/devotions/devotion_constellation062_shieldmaiden.webp",
+      "w": 430,
+      "h": 430
+    },
+    "devotion_constellation063_behemoth.tex": {
+      "url": "assets/devotions/devotion_constellation063_behemoth.webp",
+      "w": 400,
+      "h": 640
+    },
+    "devotion_constellation063_behemoth.png": {
+      "url": "assets/devotions/devotion_constellation063_behemoth.webp",
+      "w": 400,
+      "h": 640
+    },
+    "devotion_constellation064_chariotofthedead.tex": {
+      "url": "assets/devotions/devotion_constellation064_chariotofthedead.webp",
+      "w": 770,
+      "h": 360
+    },
+    "devotion_constellation064_chariotofthedead.png": {
+      "url": "assets/devotions/devotion_constellation064_chariotofthedead.webp",
+      "w": 770,
+      "h": 360
+    },
+    "devotion_constellation065_keeperoftheforest.tex": {
+      "url": "assets/devotions/devotion_constellation065_keeperoftheforest.webp",
+      "w": 410,
+      "h": 450
+    },
+    "devotion_constellation065_keeperoftheforest.png": {
+      "url": "assets/devotions/devotion_constellation065_keeperoftheforest.webp",
+      "w": 410,
+      "h": 450
+    },
+    "devotion_constellation066_aeonshourglass.tex": {
+      "url": "assets/devotions/devotion_constellation066_aeonshourglass.webp",
+      "w": 330,
+      "h": 512
+    },
+    "devotion_constellation066_aeonshourglass.png": {
+      "url": "assets/devotions/devotion_constellation066_aeonshourglass.webp",
+      "w": 330,
+      "h": 512
+    },
+    "devotion_constellation067_abomination.tex": {
+      "url": "assets/devotions/devotion_constellation067_abomination.webp",
+      "w": 540,
+      "h": 800
+    },
+    "devotion_constellation067_abomination.png": {
+      "url": "assets/devotions/devotion_constellation067_abomination.webp",
+      "w": 540,
+      "h": 800
+    },
+    "devotion_constellation068_lightofempyrion.tex": {
+      "url": "assets/devotions/devotion_constellation068_lightofempyrion.webp",
+      "w": 768,
+      "h": 768
+    },
+    "devotion_constellation068_lightofempyrion.png": {
+      "url": "assets/devotions/devotion_constellation068_lightofempyrion.webp",
+      "w": 768,
+      "h": 768
+    },
+    "devotion_constellation069_oleron.tex": {
+      "url": "assets/devotions/devotion_constellation069_oleron.webp",
+      "w": 630,
+      "h": 500
+    },
+    "devotion_constellation069_oleron.png": {
+      "url": "assets/devotions/devotion_constellation069_oleron.webp",
+      "w": 630,
+      "h": 500
+    },
+    "devotion_constellation070_menhirsobelisk.tex": {
+      "url": "assets/devotions/devotion_constellation070_menhirsobelisk.webp",
+      "w": 300,
+      "h": 560
+    },
+    "devotion_constellation070_menhirsobelisk.png": {
+      "url": "assets/devotions/devotion_constellation070_menhirsobelisk.webp",
+      "w": 300,
+      "h": 560
+    },
+    "devotion_constellation071_spearoftheheavens.tex": {
+      "url": "assets/devotions/devotion_constellation071_spearoftheheavens.webp",
+      "w": 520,
+      "h": 700
+    },
+    "devotion_constellation071_spearoftheheavens.png": {
+      "url": "assets/devotions/devotion_constellation071_spearoftheheavens.webp",
+      "w": 520,
+      "h": 700
+    },
+    "devotion_constellation072_ulzuinsflame.tex": {
+      "url": "assets/devotions/devotion_constellation072_ulzuinsflame.webp",
+      "w": 274,
+      "h": 850
+    },
+    "devotion_constellation072_ulzuinsflame.png": {
+      "url": "assets/devotions/devotion_constellation072_ulzuinsflame.webp",
+      "w": 274,
+      "h": 850
+    },
+    "devotion_constellation073_thedyinggod.tex": {
+      "url": "assets/devotions/devotion_constellation073_thedyinggod.webp",
+      "w": 700,
+      "h": 400
+    },
+    "devotion_constellation073_thedyinggod.png": {
+      "url": "assets/devotions/devotion_constellation073_thedyinggod.webp",
+      "w": 700,
+      "h": 400
+    },
+    "devotion_constellation074_treeoflife.tex": {
+      "url": "assets/devotions/devotion_constellation074_treeoflife.webp",
+      "w": 660,
+      "h": 770
+    },
+    "devotion_constellation074_treeoflife.png": {
+      "url": "assets/devotions/devotion_constellation074_treeoflife.webp",
+      "w": 660,
+      "h": 770
+    },
+    "devotion_constellation075_mogdrogenthewolf.tex": {
+      "url": "assets/devotions/devotion_constellation075_mogdrogenthewolf.webp",
+      "w": 512,
+      "h": 512
+    },
+    "devotion_constellation075_mogdrogenthewolf.png": {
+      "url": "assets/devotions/devotion_constellation075_mogdrogenthewolf.webp",
+      "w": 512,
+      "h": 512
+    },
+    "devotion_constellation076_blindsage.tex": {
+      "url": "assets/devotions/devotion_constellation076_blindsage.webp",
+      "w": 570,
+      "h": 570
+    },
+    "devotion_constellation076_blindsage.png": {
+      "url": "assets/devotions/devotion_constellation076_blindsage.webp",
+      "w": 570,
+      "h": 570
+    },
+    "devotion_constellation077_leviathan.tex": {
+      "url": "assets/devotions/devotion_constellation077_leviathan.webp",
+      "w": 740,
+      "h": 800
+    },
+    "devotion_constellation077_leviathan.png": {
+      "url": "assets/devotions/devotion_constellation077_leviathan.webp",
+      "w": 740,
+      "h": 800
+    },
+    "devotion_constellation078_theshadow.tex": {
+      "url": "assets/devotions/devotion_constellation078_theshadow.webp",
+      "w": 440,
+      "h": 820
+    },
+    "devotion_constellation078_theshadow.png": {
+      "url": "assets/devotions/devotion_constellation078_theshadow.webp",
+      "w": 440,
+      "h": 820
+    },
+    "devotion_constellation079_harvestmansscythe.tex": {
+      "url": "assets/devotions/devotion_constellation079_harvestmansscythe.webp",
+      "w": 400,
+      "h": 400
+    },
+    "devotion_constellation079_harvestmansscythe.png": {
+      "url": "assets/devotions/devotion_constellation079_harvestmansscythe.webp",
+      "w": 400,
+      "h": 400
+    },
+    "devotion_constellation080_crossroads.tex": {
+      "url": "assets/devotions/devotion_constellation080_crossroads.webp",
+      "w": 108,
+      "h": 150
+    },
+    "devotion_constellation080_crossroads.png": {
+      "url": "assets/devotions/devotion_constellation080_crossroads.webp",
+      "w": 108,
+      "h": 150
+    },
+    "devotion_constellation081_crossroads.tex": {
+      "url": "assets/devotions/devotion_constellation081_crossroads.webp",
+      "w": 108,
+      "h": 150
+    },
+    "devotion_constellation081_crossroads.png": {
+      "url": "assets/devotions/devotion_constellation081_crossroads.webp",
+      "w": 108,
+      "h": 150
+    },
+    "devotion_constellation082_crossroads.tex": {
+      "url": "assets/devotions/devotion_constellation082_crossroads.webp",
+      "w": 150,
+      "h": 150
+    },
+    "devotion_constellation082_crossroads.png": {
+      "url": "assets/devotions/devotion_constellation082_crossroads.webp",
+      "w": 150,
+      "h": 150
+    },
+    "devotion_constellation083_crossroads.tex": {
+      "url": "assets/devotions/devotion_constellation083_crossroads.webp",
+      "w": 150,
+      "h": 150
+    },
+    "devotion_constellation083_crossroads.png": {
+      "url": "assets/devotions/devotion_constellation083_crossroads.webp",
+      "w": 150,
+      "h": 150
+    },
+    "devotion_constellation084_candle.tex": {
+      "url": "assets/devotions/devotion_constellation084_candle.webp",
+      "w": 250,
+      "h": 475
+    },
+    "devotion_constellation084_candle.png": {
+      "url": "assets/devotions/devotion_constellation084_candle.webp",
+      "w": 250,
+      "h": 475
+    },
+    "devotion_constellation085_lion.tex": {
+      "url": "assets/devotions/devotion_constellation085_lion.webp",
+      "w": 285,
+      "h": 325
+    },
+    "devotion_constellation085_lion.png": {
+      "url": "assets/devotions/devotion_constellation085_lion.webp",
+      "w": 285,
+      "h": 325
+    },
+    "devotion_constellation086_jackal.tex": {
+      "url": "assets/devotions/devotion_constellation086_jackal.webp",
+      "w": 300,
+      "h": 390
+    },
+    "devotion_constellation086_jackal.png": {
+      "url": "assets/devotions/devotion_constellation086_jackal.webp",
+      "w": 300,
+      "h": 390
+    },
+    "devotion_constellation087_crossroads.tex": {
+      "url": "assets/devotions/devotion_constellation087_crossroads.webp",
+      "w": 300,
+      "h": 300
+    },
+    "devotion_constellation087_crossroads.png": {
+      "url": "assets/devotions/devotion_constellation087_crossroads.webp",
+      "w": 300,
+      "h": 300
+    },
+    "devotion_constellation_temp.tex": {
+      "url": "assets/devotions/devotion_constellation_temp.webp",
+      "w": 256,
+      "h": 256
+    },
+    "devotion_constellation_temp.png": {
+      "url": "assets/devotions/devotion_constellation_temp.webp",
+      "w": 256,
+      "h": 256
+    },
+    "devotion_searchbar01_background.tex": {
+      "url": "assets/devotions/devotion_searchbar01_background.webp",
+      "w": 556,
+      "h": 62
+    },
+    "devotion_searchbar01_background.png": {
+      "url": "assets/devotions/devotion_searchbar01_background.webp",
+      "w": 556,
+      "h": 62
+    },
+    "devotion_section1.tex": {
+      "url": "assets/devotions/devotion_section1.webp",
+      "w": 1024,
+      "h": 1024
+    },
+    "devotion_section1.png": {
+      "url": "assets/devotions/devotion_section1.webp",
+      "w": 1024,
+      "h": 1024
+    },
+    "devotion_sidebar_background.tex": {
+      "url": "assets/devotions/devotion_sidebar_background.webp",
+      "w": 250,
+      "h": 700
+    },
+    "devotion_sidebar_background.png": {
+      "url": "assets/devotions/devotion_sidebar_background.webp",
+      "w": 250,
+      "h": 700
+    },
+    "devotion_starglow01.tex": {
+      "url": "assets/devotions/devotion_starglow01.webp",
+      "w": 128,
+      "h": 128
+    },
+    "devotion_starglow01.png": {
+      "url": "assets/devotions/devotion_starglow01.webp",
+      "w": 128,
+      "h": 128
+    },
+    "devotion_star_disabled.tex": {
+      "url": "assets/devotions/devotion_star_disabled.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_star_disabled.png": {
+      "url": "assets/devotions/devotion_star_disabled.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_star_down.tex": {
+      "url": "assets/devotions/devotion_star_down.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_star_down.png": {
+      "url": "assets/devotions/devotion_star_down.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_star_over.tex": {
+      "url": "assets/devotions/devotion_star_over.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_star_over.png": {
+      "url": "assets/devotions/devotion_star_over.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_star_up.tex": {
+      "url": "assets/devotions/devotion_star_up.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_star_up.png": {
+      "url": "assets/devotions/devotion_star_up.webp",
+      "w": 64,
+      "h": 64
+    },
+    "devotion_tile.tex": {
+      "url": "assets/devotions/devotion_tile.webp",
+      "w": 1,
+      "h": 3584
+    },
+    "devotion_tile.png": {
+      "url": "assets/devotions/devotion_tile.webp",
+      "w": 1,
+      "h": 3584
+    },
+    "devotion_vignetteframe.tex": {
+      "url": "assets/devotions/devotion_vignetteframe.webp",
+      "w": 128,
+      "h": 128
+    },
+    "devotion_vignetteframe.png": {
+      "url": "assets/devotions/devotion_vignetteframe.webp",
+      "w": 128,
+      "h": 128
+    }
   }
 }

@@ -19,7 +19,9 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--gd-dir", required=True, type=Path)
     ap.add_argument("--out-dir", required=True, type=Path)
-    ap.add_argument("--max-dim", type=int, default=512, help="downscale longest side to this")
+    ap.add_argument("--max-dim", type=int, default=0,
+                    help="if >0, downscale longest side to this many px (shrinks the file only; "
+                         "the manifest always records native size so art stays aligned)")
     ap.add_argument("--quality", type=int, default=85)
     ap.add_argument("--include-nebula", action="store_true")
     args = ap.parse_args(argv)
@@ -37,8 +39,9 @@ def main(argv=None) -> int:
         entries = [e for e in entries if "nebula" not in e.lower()]
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    images: dict[str, str] = {}
+    images: dict[str, dict] = {}
     skipped: list[str] = []
+    converted = 0
     with tempfile.TemporaryDirectory() as td:
         for e in entries:
             subprocess.run([str(tool), str(arc), "-extract", td, e], capture_output=True)
@@ -51,19 +54,23 @@ def main(argv=None) -> int:
             except ValueError as exc:
                 skipped.append(f"{e}: {exc}")
                 continue
-            w, h = img.size
-            scale = min(1.0, args.max_dim / max(w, h))
-            if scale < 1.0:
-                img = img.resize((max(1, int(w * scale)), max(1, int(h * scale))))
+            # Native size is the texture's footprint in the devotion-map coordinate
+            # space. The web app renders the <image> at this size so the art aligns
+            # with the star positions regardless of how much the file is downscaled.
+            native_w, native_h = img.size
+            if args.max_dim > 0 and max(native_w, native_h) > args.max_dim:
+                scale = args.max_dim / max(native_w, native_h)
+                img = img.resize((max(1, round(native_w * scale)), max(1, round(native_h * scale))))
             stem = tex.stem
             out = args.out_dir / f"{stem}.webp"
             img.save(out, "WEBP", quality=args.quality, method=6)
-            images[f"{stem}.tex"] = f"assets/devotions/{stem}.webp"
-            images[f"{stem}.png"] = f"assets/devotions/{stem}.webp"
+            entry = {"url": f"assets/devotions/{stem}.webp", "w": native_w, "h": native_h}
+            images[f"{stem}.tex"] = entry
+            images[f"{stem}.png"] = entry
+            converted += 1
 
     (args.out_dir / "manifest.json").write_text(json.dumps({"images": images}, indent=2))
     total = sum(p.stat().st_size for p in args.out_dir.glob("*.webp"))
-    converted = len(images) // 2
     print(f"Wrote {converted} images, {total/1_048_576:.1f} MB, manifest -> {args.out_dir}")
     if skipped:
         print(f"{len(skipped)} skipped:", file=sys.stderr)

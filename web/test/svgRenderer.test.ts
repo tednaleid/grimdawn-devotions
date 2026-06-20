@@ -19,3 +19,15 @@ test("omits the art layer when no manifest", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
   expect(markup).not.toContain("<image");
 });
+
+test("renders the art <image> at the manifest's native width/height", () => {
+  // The image must be drawn at native texture size so art aligns with the star
+  // coordinate space regardless of how much the file itself was downscaled.
+  const c = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null)!;
+  const name = c.background!.image!.split("/").pop()!;
+  const manifest = { images: { [name]: { url: "art.webp", w: 640, h: 480 } } };
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest });
+  expect(markup).toContain('<image href="art.webp"');
+  expect(markup).toContain('width="640" height="480"');
+  expect(markup).toContain(`x="${c.background!.x}" y="${c.background!.y}"`);
+});
