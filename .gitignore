@@ -15,6 +15,9 @@ __pycache__/
 Thumbs.db
 .superpowers/
 
+# Scratch space for temporary/LLM-generated files (mockups, notes) - not committed
+.llm/
+
 # Web app
 web/node_modules/
 web/dist/
