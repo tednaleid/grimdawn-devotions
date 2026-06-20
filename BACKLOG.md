@@ -160,9 +160,43 @@ Notes:
   tell the renderer to flash those stars / their constellation art for ~2s
   (a transient CSS class, similar to the change-highlight flash).
 
+## UI: map readability
+
+### 9. Expand constellation hover area to cover the whole artwork
+The constellation hover/click region is much smaller than the constellation
+image, so there is a lot of visible art you cannot mouse over to get the
+constellation tooltip or to toggle it. The hover area should cover the whole
+image, except where an individual star sits (the star's own hit target must
+still win so you can hover/click a single star).
+
+Notes:
+- `web/src/adapters/svgRenderer.ts` builds one `.con-hit` `<rect>` per
+  constellation from the STAR bounding box plus `CON_PAD` (24), NOT the art
+  bounds. This is deliberate (see the comment near line 54): star bounding boxes
+  do not overlap, but the art bounding boxes DO (an earlier measurement found
+  85/86 constellations' art rects overlapping a neighbor). So you cannot just
+  swap in `art.x/art.y/art.w/art.h` for the rect: overlapping rects would let one
+  constellation's hit region steal hovers meant for its neighbor, and SVG does
+  not alpha-test raster `<image>` elements (the whole rectangle is "solid" for
+  pointer events).
+- Options to evaluate:
+  - Grow `CON_PAD` (cheap) to a value that covers most art without colliding.
+    Limited: it cannot reach full-image coverage where neighbors are close.
+  - Shape the hit region to the art's non-transparent pixels. The renderer
+    already builds a `<mask>` from each art image for the affinity tint; a
+    similar mask could clip a per-constellation hit shape so transparent margins
+    do not claim hovers. Overlapping opaque regions would still need a tie-break.
+  - Resolve overlaps in JS instead of relying on element stacking: on mousemove
+    over the map, find candidate constellations whose art rect contains the
+    cursor and pick the one whose center (or nearest star) is closest. This gives
+    full-image coverage with a deterministic owner for contested pixels.
+- Whatever the approach, individual-star hit circles are drawn after the
+  `.con-hit` rects so they already win; keep that ordering (or equivalent
+  precedence) so single-star hover/click still works.
+
 ## Testing
 
-### 9. Fix two pre-existing failing e2e smoke checks on main
+### 11. Fix two pre-existing failing e2e smoke checks on main
 `just e2e` (`web/e2e/smoke.ts`) has two checks that fail deterministically on a
 clean `main` checkout. Verified pre-existing: stashing all other changes,
 rebuilding, and running the smoke gives the same two failures, so they are not
