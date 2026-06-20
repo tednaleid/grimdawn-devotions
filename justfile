@@ -112,3 +112,21 @@ web-install:
 # Run the core test suite
 test:
     cd "{{justfile_directory()}}/web" && bun test
+
+# Build the static site into web/dist (bundles JS, copies html/css/data/assets)
+build:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{justfile_directory()}}/web"
+    rm -rf dist && mkdir -p dist/data
+    bun build src/app/main.ts --outdir dist --target browser
+    cp index.html dist/index.html
+    cp src/styles.css dist/styles.css
+    cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
+    cp "{{justfile_directory()}}/data/stat_labels.json" dist/data/stat_labels.json
+    if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
+    echo "Built web/dist"
+
+# Serve web/dist locally for development
+serve: build
+    cd "{{justfile_directory()}}/web/dist" && bunx serve -l 5173 .

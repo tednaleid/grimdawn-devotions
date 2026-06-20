@@ -1,0 +1,27 @@
+<!-- ABOUTME: HTML shell for the Grim Dawn Devotion Planner static page. -->
+<!-- ABOUTME: Declares the layout skeleton (header, map container, sidebars, tooltip) and loads main.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grim Dawn Devotion Planner</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header>
+    <label>Points
+      <input id="point-slider" type="range" min="1" max="55" value="55" />
+      <span id="point-count">0 / 55</span>
+    </label>
+    <button id="reset-view">Reset view</button>
+  </header>
+  <main>
+    <aside id="benefits" class="sidebar"></aside>
+    <div id="map-container"></div>
+    <aside id="affinity" class="sidebar"></aside>
+  </main>
+  <div id="tooltip"></div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

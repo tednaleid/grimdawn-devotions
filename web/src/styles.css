@@ -1,0 +1,21 @@
+/* ABOUTME: Stylesheet for the Grim Dawn Devotion Planner static page. */
+/* ABOUTME: Covers layout (header, map, sidebars), SVG star states, and tooltip. */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: #0d1117; color: #e6edf3; height: 100vh; display: flex; flex-direction: column; }
+header { display: flex; gap: 1rem; align-items: center; padding: .5rem 1rem; background: #161b22; border-bottom: 1px solid #30363d; }
+main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-height: 0; }
+.sidebar { overflow-y: auto; padding: .75rem; background: #11161d; border-inline: 1px solid #30363d; font-size: .85rem; }
+.sidebar h2 { font-size: 1rem; margin: .25rem 0 .5rem; }
+.benefit, .affinity { display: flex; justify-content: space-between; padding: 2px 0; }
+.power, .tip-power { color: #f0c14b; }
+#map-container { position: relative; overflow: hidden; cursor: grab; background: radial-gradient(circle at 50% 40%, #15203a, #0d1117 70%); }
+#map-container.grabbing { cursor: grabbing; }
+#map { width: 100%; height: 100%; }
+.link { stroke: #3a4252; stroke-width: 1.5; }
+.art { opacity: .9; }
+.star { stroke: #0d1117; stroke-width: 1; }
+.star.locked { fill: #39414f; opacity: .5; }
+.star.selectable { fill: var(--affinity); opacity: 1; filter: drop-shadow(0 0 4px var(--affinity)); cursor: pointer; }
+.star.selected { fill: #fff; stroke: var(--affinity); stroke-width: 3; cursor: pointer; }
+#tooltip { position: fixed; display: none; pointer-events: none; background: #1c2330; border: 1px solid #30363d; padding: .5rem .6rem; border-radius: 6px; font-size: .8rem; max-width: 260px; z-index: 10; }
+.tip-req { margin-top: .35rem; color: #9aa4b2; }
