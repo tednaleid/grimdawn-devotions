@@ -10,7 +10,21 @@
 }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: system-ui, sans-serif; background: #0d1117; color: #e6edf3; height: 100vh; display: flex; flex-direction: column; }
-header { display: flex; gap: 1rem; align-items: center; padding: .5rem 1rem; background: #161b22; border-bottom: 1px solid #30363d; }
+header { display: flex; gap: .75rem; align-items: center; padding: .5rem 1rem; background: #161b22; border-bottom: 1px solid #30363d; }
+/* Points group (slider + count) on the left, reset controls pushed to the right. */
+header label { display: inline-flex; align-items: center; gap: .55rem; font-size: .8rem; letter-spacing: .02em; text-transform: uppercase; color: #9aa4b2; }
+#point-count { font-variant-numeric: tabular-nums; color: #e6edf3; background: #0d1117; border: 1px solid #30363d; border-radius: 999px; padding: .12rem .55rem; font-size: .8rem; text-transform: none; letter-spacing: 0; }
+header button { margin-left: 0; background: #21262d; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; padding: .35rem .75rem; font-size: .8rem; cursor: pointer; transition: background .12s, border-color .12s; }
+header button:hover { background: #2d333b; border-color: #444c56; }
+header button:active { background: #1a1e24; }
+/* Reset points stays next to the points group; only Reset view is pushed far right. */
+#reset-view { margin-left: auto; }
+/* Themed range slider (track + thumb) instead of the default browser control. */
+#point-slider { -webkit-appearance: none; appearance: none; width: 150px; height: 5px; border-radius: 999px; background: #30363d; outline: none; cursor: pointer; }
+#point-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 15px; height: 15px; border-radius: 50%; background: #6cb6ff; border: 2px solid #161b22; cursor: pointer; }
+#point-slider::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #6cb6ff; border: 2px solid #161b22; cursor: pointer; }
+#point-slider:hover::-webkit-slider-thumb { background: #84c5ff; }
+#point-slider:hover::-moz-range-thumb { background: #84c5ff; }
 main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-height: 0; }
 .sidebar { overflow-y: auto; padding: .75rem; background: #11161d; border-inline: 1px solid #30363d; font-size: .85rem; }
 .sidebar h2 { font-size: 1rem; margin: .25rem 0 .5rem; }

@@ -20,6 +20,9 @@ async function boot() {
   let state: SelectionState = restored
     ? { selected: validClosure(model, restored.selected), pointCap: restored.pointCap }
     : { selected: new Set(), pointCap: 55 };
+  // The cap can never be below the points actually allocated; raise it if a restored
+  // link is over budget (the slider also enforces this floor below).
+  state = { selected: state.selected, pointCap: Math.max(state.pointCap, state.selected.size) };
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -110,10 +113,11 @@ async function boot() {
   });
 
   slider.addEventListener("input", () => {
-    // The cap only gates ADDING (selectableStars checks selected.size < pointCap).
-    // Lowering it below the current allocation is allowed and shown as over-budget;
-    // the user removes leaf stars to get back under. No auto-removal (guarded model).
-    state = { selected: state.selected, pointCap: Number(slider.value) };
+    // The cap cannot drop below the points already allocated; snap the thumb back
+    // up to that floor if dragged under it.
+    const cap = Math.max(Number(slider.value), state.selected.size);
+    if (String(cap) !== slider.value) slider.value = String(cap);
+    state = { selected: state.selected, pointCap: cap };
     refresh();
   });
 
@@ -123,6 +127,7 @@ async function boot() {
   let prevAffinity: Record<Affinity, number> | undefined;
   function refresh() {
     handle.update(state);
+    slider.min = String(Math.max(1, state.selected.size)); // cannot drag below allocated points
     prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses);
     prevAffinity = renderAffinities(affinityEl, model, state.selected, prevAffinity);
     countEl.textContent = `${state.selected.size} / ${state.pointCap}`;
