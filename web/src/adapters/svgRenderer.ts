@@ -117,7 +117,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const reachable = meetsRequirement(totals, c.affinityRequired) || c.starIds.some((id) => state.selected.has(id));
       const dim = reachable ? "" : " unmet";
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
-      parts.push(`<image ${img} class="art${dim}"/>`);
+      // data-con-id lets a blocked constellation deselect flash this icon (see main.ts).
+      parts.push(`<image ${img} class="art${dim}" data-con-id="${c.id}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
         defs.push(`<mask id="${mid}"><image ${img}/></mask>`);

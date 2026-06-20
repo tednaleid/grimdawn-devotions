@@ -32,19 +32,29 @@ async function boot() {
   const tip = tooltipView(tooltipEl);
   slider.value = String(state.pointCap);
 
+  // Pulse one element by retriggering the transient flash animation.
+  function flashEl(el: Element | null | undefined) {
+    if (!el) return;
+    el.classList.remove("flash-blocked");
+    void (el as SVGElement).getBoundingClientRect(); // restart the animation if it is mid-flash
+    el.classList.add("flash-blocked");
+    el.addEventListener("animationend", () => el.classList.remove("flash-blocked"), { once: true });
+  }
+
   // A rejected deselection leaves state unchanged; flash the stars that must be
   // removed first (predecessor or affinity dependents) so the block is visible.
-  function flashBlockers(ids: Set<string>) {
+  // For a whole-constellation deselect we are likely zoomed out, so also flash
+  // the blocking constellations' art icons, which read at that distance.
+  function flashBlockers(ids: Set<string>, includeArt: boolean) {
     const svg = mapContainer.querySelector("svg");
     if (!svg) return;
+    const conIds = new Set<string>();
     for (const id of ids) {
-      const star = svg.querySelector(`[data-star-id="${id}"]`)?.nextElementSibling as SVGElement | null;
-      if (!star) continue;
-      star.classList.remove("flash-blocked");
-      void star.getBoundingClientRect(); // restart the animation if it is mid-flash
-      star.classList.add("flash-blocked");
-      star.addEventListener("animationend", () => star.classList.remove("flash-blocked"), { once: true });
+      flashEl(svg.querySelector(`[data-star-id="${id}"]`)?.nextElementSibling);
+      const con = model.stars.get(id)?.constellationId;
+      if (con) conIds.add(con);
     }
+    if (includeArt) for (const cid of conIds) flashEl(svg.querySelector(`image.art[data-con-id="${cid}"]`));
   }
 
   const handle = mountSvg(mapContainer, model, {
@@ -52,7 +62,7 @@ async function boot() {
     onStarClick: (id) => {
       const next = toggleStar(model, state, id);
       if (next === state) { // rejected: only flash if it was a removal attempt
-        if (state.selected.has(id)) flashBlockers(removalBlockers(model, state, new Set([id])));
+        if (state.selected.has(id)) flashBlockers(removalBlockers(model, state, new Set([id])), false);
         return;
       }
       state = next; refresh();
@@ -62,7 +72,7 @@ async function boot() {
       if (next === state) { // rejected: flash blockers only when it was a full-constellation removal
         const con = model.constellations.get(id);
         if (con && con.starIds.length > 0 && con.starIds.every((s) => state.selected.has(s))) {
-          flashBlockers(removalBlockers(model, state, new Set(con.starIds)));
+          flashBlockers(removalBlockers(model, state, new Set(con.starIds)), true);
         }
         return;
       }

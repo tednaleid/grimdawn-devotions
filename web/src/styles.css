@@ -50,6 +50,12 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
   50% { stroke: #ff6b6b; stroke-width: 12; filter: drop-shadow(0 0 6px #ff6b6b); }
 }
 .star.flash-blocked { animation: flash-blocked .5s ease-in-out 4; }
+/* The same block at constellation scale: brighten the blocking art icon (~2s). */
+@keyframes flash-blocked-art {
+  0%, 100% { opacity: var(--art-opacity); filter: none; }
+  50% { opacity: 1; filter: drop-shadow(0 0 8px #ff6b6b) brightness(1.3); }
+}
+.art.flash-blocked { animation: flash-blocked-art .5s ease-in-out 4; }
 .orb { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .3em; vertical-align: -.05em; }
 #tooltip { position: fixed; display: none; pointer-events: none; background: #1c2330; border: 1px solid #30363d; padding: .5rem .6rem; border-radius: 6px; font-size: .8rem; max-width: 280px; z-index: 10; }
 #tooltip strong { color: #6cb6ff; }
