@@ -41,3 +41,27 @@ export function selectableStars(model: DevotionModel, state: SelectionState): Se
   }
   return out;
 }
+
+export function canRemove(model: DevotionModel, state: SelectionState, starId: StarId): boolean {
+  if (!state.selected.has(starId)) return false;
+  const next = new Set(state.selected);
+  next.delete(starId);
+  // Removable only if nothing else falls out of validity (guarded / leaf rule).
+  return validClosure(model, next).size === next.size;
+}
+
+export function toggleStar(model: DevotionModel, state: SelectionState, starId: StarId): SelectionState {
+  if (state.selected.has(starId)) {
+    if (!canRemove(model, state, starId)) return state; // reject: would invalidate others
+    const next = new Set(state.selected);
+    next.delete(starId);
+    return { selected: next, pointCap: state.pointCap };
+  }
+  if (selectableStars(model, state).has(starId)) {
+    // Adding a selectable star never invalidates existing selections.
+    const next = new Set(state.selected);
+    next.add(starId);
+    return { selected: next, pointCap: state.pointCap };
+  }
+  return state;
+}
