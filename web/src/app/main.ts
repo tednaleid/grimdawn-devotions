@@ -28,6 +28,7 @@ async function boot() {
   const slider = document.getElementById("point-slider") as HTMLInputElement;
   const countEl = document.getElementById("point-count") as HTMLElement;
   const resetBtn = document.getElementById("reset-view") as HTMLButtonElement;
+  const resetPointsBtn = document.getElementById("reset-points") as HTMLButtonElement;
   const tip = tooltipView(tooltipEl);
   slider.value = String(state.pointCap);
 
@@ -52,6 +53,10 @@ async function boot() {
   mapContainer.addEventListener("mousedown", h.onDown);
   mapContainer.addEventListener("click", h.onClickCapture, true);
   resetBtn.addEventListener("click", () => nav.reset());
+  resetPointsBtn.addEventListener("click", () => {
+    state = { selected: new Set(), pointCap: state.pointCap };
+    refresh();
+  });
 
   slider.addEventListener("input", () => {
     // The cap only gates ADDING (selectableStars checks selected.size < pointCap).
