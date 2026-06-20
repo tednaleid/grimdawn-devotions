@@ -9,6 +9,7 @@ interface RawStar {
   bonuses: Record<string, number>;
   celestial_power: { name: string | null } | null;
   weapon_requirement: { weapons: string[] } | null;
+  racial_target?: string[] | null;
 }
 interface RawConstellation {
   id: string;
@@ -44,6 +45,7 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
         weaponRequirement: s.weapon_requirement
           ? { weapons: s.weapon_requirement.weapons }
           : null,
+        racialTarget: s.racial_target ?? undefined,
       });
     }
     constellations.set(c.id, {

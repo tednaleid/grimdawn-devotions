@@ -162,18 +162,36 @@ function fmtValue(value: number, percent: boolean, sign: number): string {
   return percent ? `${s}%` : s;
 }
 
+// Internal race name -> player-facing (GD shows the plural, except Undead).
+const RACE_LABEL: Record<string, string> = {
+  Beast: "Beasts", Chthonic: "Chthonics", Human: "Humans", Undead: "Undead",
+};
+function raceLabel(targets?: string[]): string | null {
+  if (!targets || targets.length === 0) return null;
+  return targets.map((t) => RACE_LABEL[t] ?? t).join(" & ");
+}
+
 /** Format a single stat id + value into a display row, or null if it is not a stat (weapon token). */
-export function statRow(id: string, value: number): StatRow | null {
+export function statRow(id: string, value: number, racialTarget?: string[]): StatRow | null {
   const c = classify(id);
   if (!c) return null;
-  return { label: c.label, value: fmtValue(value, c.percent, c.sign) };
+  let label = c.label;
+  const race = raceLabel(racialTarget);
+  if (race) {
+    if (id === "racialBonusPercentDamage") label = `Damage to ${race}`;
+    else if (id === "racialBonusPercentDefense") label = `Less Damage from ${race}`;
+  }
+  return { label, value: fmtValue(value, c.percent, c.sign) };
 }
 
 /**
  * Format a bonuses map into sorted display rows. Merges flat <base>Min/<base>Max
  * damage pairs into a single "+min-max" range row, and drops weapon-class tokens.
  */
-export function formatBonusRows(bonuses: Record<string, number>): StatRow[] {
+export function formatBonusRows(
+  bonuses: Record<string, number>,
+  opts: { racialTarget?: string[] } = {},
+): StatRow[] {
   const used = new Set<string>();
   const rows: StatRow[] = [];
   for (const k of Object.keys(bonuses)) {
@@ -192,7 +210,7 @@ export function formatBonusRows(bonuses: Record<string, number>): StatRow[] {
         }
       }
     }
-    const r = statRow(k, bonuses[k]!);
+    const r = statRow(k, bonuses[k]!, opts.racialTarget);
     used.add(k);
     if (r) rows.push(r);
   }

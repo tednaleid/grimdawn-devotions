@@ -14,6 +14,14 @@ export function sumBonuses(model: DevotionModel, selected: Set<StarId>): Record<
   return out;
 }
 
+export function racialTargets(model: DevotionModel, selected: Iterable<StarId>): string[] {
+  const out = new Set<string>();
+  for (const id of selected) {
+    model.stars.get(id)?.racialTarget?.forEach((r) => out.add(r));
+  }
+  return [...out];
+}
+
 export function powersGained(model: DevotionModel, selected: Set<StarId>): string[] {
   const out: string[] = [];
   for (const id of selected) {

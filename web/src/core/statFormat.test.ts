@@ -90,6 +90,27 @@ describe("statRow grimtools-verified corrections", () => {
   });
 });
 
+describe("statRow racial damage/defense names the concrete race", () => {
+  test("single race is pluralized", () => {
+    expect(statRow("racialBonusPercentDamage", 8, ["Human"])).toEqual({ label: "Damage to Humans", value: "+8%" });
+    expect(statRow("racialBonusPercentDefense", 10, ["Beast"])).toEqual({ label: "Less Damage from Beasts", value: "+10%" });
+  });
+  test("Undead stays Undead; multiple races join with &", () => {
+    expect(statRow("racialBonusPercentDamage", 6, ["Undead", "Human"])).toEqual({
+      label: "Damage to Undead & Humans",
+      value: "+6%",
+    });
+  });
+  test("falls back to the generic label when no target is given", () => {
+    expect(statRow("racialBonusPercentDamage", 8)).toEqual({ label: "Damage to specific enemy types", value: "+8%" });
+  });
+  test("formatBonusRows threads the racial target through", () => {
+    expect(formatBonusRows({ racialBonusPercentDamage: 8 }, { racialTarget: ["Chthonic"] })).toEqual([
+      { label: "Damage to Chthonics", value: "+8%" },
+    ]);
+  });
+});
+
 describe("formatBonusRows merges Min/Max damage into a range and skips weapon tokens", () => {
   test("merges a flat damage Min/Max pair", () => {
     expect(formatBonusRows({ offensiveFireMin: 3, offensiveFireMax: 5 })).toEqual([

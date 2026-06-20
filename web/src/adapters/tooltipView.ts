@@ -2,7 +2,7 @@
 // ABOUTME: Star view shows that star's bonuses; constellation view shows the union of all its stars' bonuses.
 import { type AffinityMap, type Constellation, type DevotionModel, type StarId } from "../core/types";
 import { formatBonusRows } from "../core/statFormat";
-import { sumBonuses, powersGained } from "../core/aggregate";
+import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 
 function affinityLine(map: AffinityMap): string {
@@ -11,8 +11,8 @@ function affinityLine(map: AffinityMap): string {
     .join(" ");
 }
 
-function bonusRowsHtml(bonuses: Record<string, number>): string {
-  return formatBonusRows(bonuses)
+function bonusRowsHtml(bonuses: Record<string, number>, racialTarget?: string[]): string {
+  return formatBonusRows(bonuses, { racialTarget })
     .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
     .join("");
 }
@@ -36,7 +36,7 @@ export function tooltipView(el: HTMLElement) {
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? `<div class="tip-power">${star.celestialPower.name}</div>` : "";
-      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses)}${affinitySections(con)}`;
+      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${affinitySections(con)}`;
       place(clientX, clientY);
     },
     showConstellation(model: DevotionModel, conId: string, clientX: number, clientY: number) {
@@ -47,7 +47,7 @@ export function tooltipView(el: HTMLElement) {
         .map((p) => `<div class="tip-power">${p}</div>`)
         .join("");
       const head = `<strong>${con.name}</strong> <span class="tip-cost">${con.starIds.length} pts</span>`;
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars))}${affinitySections(con)}`;
+      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${affinitySections(con)}`;
       place(clientX, clientY);
     },
     hide() {

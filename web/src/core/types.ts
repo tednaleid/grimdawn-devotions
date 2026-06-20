@@ -15,6 +15,7 @@ export interface Star {
   bonuses: Record<string, number>;
   celestialPower: { name: string } | null;
   weaponRequirement: { weapons: string[] } | null;
+  racialTarget?: string[]; // races a racialBonus* stat applies to, e.g. ["Beast"]
 }
 
 export interface Constellation {
