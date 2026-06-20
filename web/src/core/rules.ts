@@ -50,6 +50,20 @@ export function canRemove(model: DevotionModel, state: SelectionState, starId: S
   return validClosure(model, next).size === next.size;
 }
 
+// The currently-selected stars that would become invalid if `toRemove` were
+// deselected - i.e. what is blocking that removal and must be removed first.
+// Empty when the removal is allowed. Covers both predecessor dependencies and
+// affinity dependencies, since both fall out of validClosure. The stars in
+// `toRemove` are never themselves reported as blockers.
+export function removalBlockers(model: DevotionModel, state: SelectionState, toRemove: Set<StarId>): Set<StarId> {
+  const next = new Set(state.selected);
+  for (const id of toRemove) next.delete(id);
+  const closure = validClosure(model, next);
+  const blockers = new Set<StarId>();
+  for (const id of next) if (!closure.has(id)) blockers.add(id);
+  return blockers;
+}
+
 export function toggleConstellation(model: DevotionModel, state: SelectionState, conId: string): SelectionState {
   const con = model.constellations.get(conId);
   if (!con || con.starIds.length === 0) return state;

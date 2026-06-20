@@ -5,7 +5,7 @@ import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
-import { toggleStar, toggleConstellation, validClosure } from "../core/rules";
+import { toggleStar, toggleConstellation, validClosure, removalBlockers } from "../core/rules";
 import { canonicalStarIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
 import type { Affinity, SelectionState } from "../core/types";
@@ -32,10 +32,42 @@ async function boot() {
   const tip = tooltipView(tooltipEl);
   slider.value = String(state.pointCap);
 
+  // A rejected deselection leaves state unchanged; flash the stars that must be
+  // removed first (predecessor or affinity dependents) so the block is visible.
+  function flashBlockers(ids: Set<string>) {
+    const svg = mapContainer.querySelector("svg");
+    if (!svg) return;
+    for (const id of ids) {
+      const star = svg.querySelector(`[data-star-id="${id}"]`)?.nextElementSibling as SVGElement | null;
+      if (!star) continue;
+      star.classList.remove("flash-blocked");
+      void star.getBoundingClientRect(); // restart the animation if it is mid-flash
+      star.classList.add("flash-blocked");
+      star.addEventListener("animationend", () => star.classList.remove("flash-blocked"), { once: true });
+    }
+  }
+
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
-    onStarClick: (id) => { state = toggleStar(model, state, id); refresh(); },
-    onConstellationClick: (id) => { state = toggleConstellation(model, state, id); refresh(); },
+    onStarClick: (id) => {
+      const next = toggleStar(model, state, id);
+      if (next === state) { // rejected: only flash if it was a removal attempt
+        if (state.selected.has(id)) flashBlockers(removalBlockers(model, state, new Set([id])));
+        return;
+      }
+      state = next; refresh();
+    },
+    onConstellationClick: (id) => {
+      const next = toggleConstellation(model, state, id);
+      if (next === state) { // rejected: flash blockers only when it was a full-constellation removal
+        const con = model.constellations.get(id);
+        if (con && con.starIds.length > 0 && con.starIds.every((s) => state.selected.has(s))) {
+          flashBlockers(removalBlockers(model, state, new Set(con.starIds)));
+        }
+        return;
+      }
+      state = next; refresh();
+    },
     onHover: (t, x, y) => {
       if (!t) { tip.hide(); return; }
       const totals = affinityTotals(model, state.selected);
