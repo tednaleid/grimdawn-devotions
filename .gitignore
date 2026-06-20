@@ -21,5 +21,4 @@ web/dist/
 web/bun.lockb
 web/bun.lock
 
-# Optimized art (regenerate with `just assets`) - never committed
-/assets/
+# Optimized devotion art (committed for the GitHub Pages build; regenerate with `just assets`)
