@@ -5,14 +5,20 @@ import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
-import { toggleStar, toggleConstellation } from "../core/rules";
+import { toggleStar, toggleConstellation, validClosure } from "../core/rules";
+import { canonicalStarIds, decodeHash, encodeHash } from "../core/urlState";
 import type { SelectionState } from "../core/types";
 
 async function boot() {
   const data = await httpDataSource(".").load();
   const model = data.model;
 
-  let state: SelectionState = { selected: new Set(), pointCap: 55 };
+  // Restore state from the URL hash if present (validated so a stale link can't be invalid).
+  const canonical = canonicalStarIds(model);
+  const restored = decodeHash(location.hash, canonical);
+  let state: SelectionState = restored
+    ? { selected: validClosure(model, restored.selected), pointCap: restored.pointCap }
+    : { selected: new Set(), pointCap: 55 };
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -22,6 +28,7 @@ async function boot() {
   const countEl = document.getElementById("point-count") as HTMLElement;
   const resetBtn = document.getElementById("reset-view") as HTMLButtonElement;
   const tip = tooltipView(tooltipEl);
+  slider.value = String(state.pointCap);
 
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
@@ -57,6 +64,7 @@ async function boot() {
     renderBenefits(benefitsEl, model, state.selected);
     renderAffinities(affinityEl, model, state.selected);
     countEl.textContent = `${state.selected.size} / ${state.pointCap}`;
+    history.replaceState(null, "", `#${encodeHash(state.selected, state.pointCap, canonical)}`);
   }
   refresh();
 }
