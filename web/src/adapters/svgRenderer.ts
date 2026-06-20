@@ -7,13 +7,15 @@ import { fitViewBox, toViewBoxString } from "../core/viewbox";
 import { affinityColor, presentAffinities } from "./affinityColors";
 import type { AssetManifest } from "../ports/DataSource";
 
-// A constellation's identity colors = the affinities it REQUIRES (1-3), matching the art tint.
-// Crossroads (no requirement) fall back to the single affinity they grant.
+// A constellation's identity colors = the affinities it GRANTS when fully filled (1-3).
+// Reachability is shown by brightness (faded if you cannot start it), so the color is
+// free to convey what the constellation contributes to your affinity pool instead. Rare
+// constellations that grant no affinity fall back to what they require, then grey.
 function gradColors(c: Constellation): string[] {
-  const req = presentAffinities(c.affinityRequired).map(affinityColor);
-  if (req.length) return req;
   const grant = presentAffinities(c.affinityBonus).map(affinityColor);
-  return grant.length ? grant : ["#9aa3b2"];
+  if (grant.length) return grant;
+  const req = presentAffinities(c.affinityRequired).map(affinityColor);
+  return req.length ? req : ["#9aa3b2"];
 }
 
 // Diamond polygon points centered at (cx, cy) with the given radius.
@@ -21,7 +23,7 @@ function diamondPoints(cx: number, cy: number, r: number): string {
   return `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}`;
 }
 
-// Left-to-right gradient stops for the affinities a constellation requires (1-3 colors).
+// Left-to-right gradient stops for a constellation's identity colors (1-3 colors).
 function gradientStops(colors: string[]): string {
   if (colors.length === 1) return `<stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[0]}"/>`;
   return colors
@@ -69,8 +71,10 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     defs.push(`<linearGradient id="grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(gradColors(c))}</linearGradient>`);
   }
 
-  // Layer 1: optional art, dimmed and tinted by the affinities it requires to unlock.
+  // Layer 1: optional art, tinted by the constellation's identity (granted) colors.
   // Art of constellations you cannot yet start (requirement unmet) is faded further.
+  // The tint rect is only drawn for constellations that have an affinity requirement
+  // (it carries a mask built from the art); crossroads have no requirement and no tint.
   if (opts.manifest) {
     const totals = affinityFrom(model, completedConstellations(model, state.selected));
     for (const c of model.constellations.values()) {

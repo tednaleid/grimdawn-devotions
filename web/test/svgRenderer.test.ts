@@ -31,8 +31,9 @@ test("defines a per-constellation gradient and stars reference it", () => {
   // gradient def exists even without a manifest, and stars paint with it
   expect(markup).toContain('<linearGradient id="grad-falcon"');
   expect(markup).toContain("--grad:url(#grad-falcon)");
-  // assassin's blade requires order (gold) only -> its gradient is the order color, not bonus purple
-  expect(markup).toContain('<linearGradient id="grad-assassin_s_blade" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#e6c34d"/>');
+  // assassin's blade requires order but GRANTS ascendant + order -> its gradient is the
+  // granted colors (purple -> gold), not the order-only requirement color.
+  expect(markup).toContain('<linearGradient id="grad-assassin_s_blade" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#b06fd6"/><stop offset="100%" stop-color="#e6c34d"/>');
 });
 
 test("renders the art <image> at the manifest's native width/height", () => {
