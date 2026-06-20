@@ -1,5 +1,5 @@
 # Grim Dawn Devotion parser — task runner
-# Run `just` with no args to list recipes. Requires git-bash (Windows) or bash.
+# Run `just` with no args to list recipes. Works on macOS, Linux, and Windows (git-bash provides bash).
 
 set shell := ["bash", "-uc"]
 set windows-shell := ["bash", "-uc"]
@@ -18,62 +18,71 @@ default:
 
 # --- Prerequisite checks ----------------------------------------------------
 
-# Verify all tools and extracted data are present
+# Check tools + committed data needed to build/serve (extraction prereqs optional, Windows-only)
 doctor:
     #!/usr/bin/env bash
     set -uo pipefail
     ok=0; fail=0
     check() { if command -v "$1" >/dev/null 2>&1; then echo "  ok   $1 ($("$1" --version 2>&1 | head -1))"; ok=$((ok+1)); else echo "  MISS $1  — $2"; fail=$((fail+1)); fi; }
     echo "Tools:"
-    check git  "install Git for Windows"
-    check uv   "run 'just install-uv'"
-    check winget "Windows package manager (ships with Win10/11)"
-    check bun  "run 'just install' (winget install Oven-sh.Bun) then open a new shell"
-    check jq   "run 'just install' (winget install jqlang.jq) then open a new shell"
-    echo "Game install:"
-    if [ -f "{{gd_dir}}/database/database.arz" ]; then echo "  ok   Grim Dawn at {{gd_dir}}"; else echo "  MISS Grim Dawn not found at {{gd_dir}} — set GD_DIR or pass gd_dir=..."; fail=$((fail+1)); fi
-    echo "Extracted data:"
-    if [ -d "{{records_dir}}/records/ui/skills/devotion" ]; then echo "  ok   records extracted"; else echo "  MISS records — run 'just extract'"; fail=$((fail+1)); fi
-    if ls "{{text_dir}}"/*/tags_skills.txt >/dev/null 2>&1 || ls "{{text_dir}}"/tags_skills.txt >/dev/null 2>&1; then echo "  ok   text_en extracted"; else echo "  MISS text_en — run 'just extract'"; fail=$((fail+1)); fi
+    check git "install Git"
+    check uv  "run 'just install-uv'"
+    check bun "run 'just install-bun'"
+    check jq  "run 'just install-jq'"
+    case "$(uname -s)" in
+      Darwin|Linux) check brew "package manager — https://brew.sh" ;;
+      *)            check winget "package manager — ships with Windows 10/11" ;;
+    esac
+    echo "Web data (committed; needed for build/serve):"
+    for f in data/devotions.json data/stat_labels.json; do
+      if [ -f "{{justfile_directory()}}/$f" ]; then echo "  ok   $f"; ok=$((ok+1)); else echo "  MISS $f — run 'just parse'"; fail=$((fail+1)); fi
+    done
+    if [ -d "{{justfile_directory()}}/assets/devotions" ]; then echo "  ok   assets/devotions"; ok=$((ok+1)); else echo "  warn assets/devotions missing — run 'just assets' (artwork is optional)"; fi
+    echo "Extraction prereqs (optional; Windows-only, only needed to re-extract game data):"
+    if [ -f "{{gd_dir}}/database/database.arz" ]; then echo "  ok   Grim Dawn at {{gd_dir}}"; else echo "  n/a  Grim Dawn not found at {{gd_dir}} (set GD_DIR to extract)"; fi
+    if [ -d "{{records_dir}}/records/ui/skills/devotion" ]; then echo "  ok   records extracted"; else echo "  n/a  records not extracted (run 'just extract' on Windows)"; fi
+    if ls "{{text_dir}}"/*/tags_skills.txt >/dev/null 2>&1 || ls "{{text_dir}}"/tags_skills.txt >/dev/null 2>&1; then echo "  ok   text_en extracted"; else echo "  n/a  text_en not extracted (run 'just extract' on Windows)"; fi
     echo "---"
-    if [ "$fail" -eq 0 ]; then echo "All good ($ok checks passed)."; else echo "$fail item(s) need attention."; exit 1; fi
+    if [ "$fail" -eq 0 ]; then echo "All good ($ok checks passed). Ready to build/serve."; else echo "$fail item(s) need attention."; exit 1; fi
 
 # --- Installers -------------------------------------------------------------
+# brew on macOS/Linux, winget on Windows. Each tool is skipped if already
+# present, so these are safe to re-run.
 
-# Install uv (Python manager) via winget if missing
-install-uv:
+# Install one CLI via the platform package manager if it is missing
+_install-tool tool brew_formula winget_id:
     #!/usr/bin/env bash
     set -euo pipefail
-    if command -v uv >/dev/null 2>&1; then echo "uv already installed: $(uv --version)"; exit 0; fi
-    echo "Installing uv via winget..."
-    winget install --id astral-sh.uv -e --accept-source-agreements --accept-package-agreements
-    echo "uv installed. NOTE: open a new shell (or restart your terminal) so 'uv' is on PATH."
+    if command -v "{{tool}}" >/dev/null 2>&1; then echo "{{tool}} already installed: $({{tool}} --version 2>&1 | head -1)"; exit 0; fi
+    if command -v brew >/dev/null 2>&1; then
+        echo "Installing {{tool}} via brew..."
+        brew install "{{brew_formula}}"
+    elif command -v winget >/dev/null 2>&1; then
+        echo "Installing {{tool}} via winget..."
+        winget install --id "{{winget_id}}" -e --accept-source-agreements --accept-package-agreements
+        echo "{{tool}} installed. NOTE: open a new shell so '{{tool}}' is on PATH."
+    else
+        echo "No supported package manager found (need brew on macOS/Linux, or winget on Windows)."
+        echo "Install {{tool}} manually, then re-run."
+        exit 1
+    fi
 
-# Install bun (web toolchain) via winget if missing
-install-bun:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    if command -v bun >/dev/null 2>&1; then echo "bun already installed: $(bun --version)"; exit 0; fi
-    echo "Installing bun via winget..."
-    winget install --id Oven-sh.Bun -e --accept-source-agreements --accept-package-agreements
-    echo "bun installed. NOTE: open a new shell so 'bun' is on PATH."
+# Install uv (Python manager) if missing
+install-uv: (_install-tool "uv" "uv" "astral-sh.uv")
 
-# Install jq (JSON CLI) via winget if missing
-install-jq:
-    #!/usr/bin/env bash
-    set -euo pipefail
-    if command -v jq >/dev/null 2>&1; then echo "jq already installed: $(jq --version)"; exit 0; fi
-    echo "Installing jq via winget..."
-    winget install --id jqlang.jq -e --accept-source-agreements --accept-package-agreements
-    echo "jq installed. NOTE: open a new shell so 'jq' is on PATH."
+# Install bun (web toolchain) if missing
+install-bun: (_install-tool "bun" "bun" "Oven-sh.Bun")
 
-# Install everything needed to run the parser (uv + a managed Python)
+# Install jq (JSON CLI) if missing
+install-jq: (_install-tool "jq" "jq" "jqlang.jq")
+
+# Install everything needed to run the parser + web build (uv + bun + jq + a managed Python)
 install: install-uv install-bun install-jq
-    @command -v uv >/dev/null 2>&1 && uv python install || echo "Re-run 'just install' in a fresh shell so uv is on PATH."
+    @command -v uv >/dev/null 2>&1 && uv python install || echo "Re-run 'just install' once 'uv' is on PATH."
 
 # --- Pipeline ---------------------------------------------------------------
 
-# Extract records + English text from the game install (needs ~5 GB free)
+# Extract records + English text from the game install (Windows-only: runs the game's ArchiveTool.exe; needs ~5 GB free)
 extract:
     #!/usr/bin/env bash
     set -euo pipefail

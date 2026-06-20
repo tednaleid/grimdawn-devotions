@@ -46,21 +46,42 @@ gratitude for the game and a mod-friendly studio.
 
 ## Quick start
 
-Prereqs are managed for you via [`just`](https://github.com/casey/just) and
-[`uv`](https://docs.astral.sh/uv/). On Windows with git-bash:
+Prereqs are managed for you via [`just`](https://github.com/casey/just),
+[`bun`](https://bun.sh/), and [`uv`](https://docs.astral.sh/uv/). The recipes run
+on macOS, Linux, and Windows (git-bash provides `bash`).
 
 ```bash
 just doctor       # check tools + data are present, tells you what's missing
-just install      # install uv (+ a managed Python) via winget, if needed
+just install      # install uv + bun + jq (brew on macOS/Linux, winget on Windows)
+```
+
+`just install` uses your platform's package manager. If `just` itself isn't on
+`PATH` yet, install it once with `brew install just` (macOS/Linux) or `winget
+install Casey.Just` (Windows), then re-run.
+
+### Web planner
+
+The dataset and artwork are committed, so you can build and serve the planner on
+any platform without extracting anything from the game:
+
+```bash
+just web-install  # install web dependencies (bun)
+just serve        # build, then serve at http://localhost:5173
+just test         # run the test suite
+just build        # build the static site into web/dist
+```
+
+### Regenerating the dataset (Windows only)
+
+`data/devotions.json` ships in the repo; you only need this to rebuild it from a
+patched game. Extraction runs Crate's `ArchiveTool.exe`, which is **Windows-only**:
+
+```bash
 just extract      # decompile database.arz + Text_EN.arc  (~5 GB free needed)
 just parse        # produce devotions.json + validation report
 # or just:
 just all          # extract then parse
 ```
-
-`just install` shells out to `winget` for `uv`; if `just`/`uv` aren't installed
-yet, install once with `winget install Casey.Just astral-sh.uv` then **open a new
-shell** so they're on `PATH`.
 
 The parser script itself is self-executable via a uv shebang
 (`#!/usr/bin/env -S uv run --script`) with inline PEP 723 metadata and **zero
@@ -85,9 +106,10 @@ The justfile reads these (env var or `just var=… recipe`):
 GD_DIR="D:/Games/Grim Dawn" just extract
 ```
 
-## Getting the data (extraction)
+## Getting the data (extraction, Windows only)
 
-`just extract` runs Crate's own `ArchiveTool.exe` (ships in the game install):
+`just extract` runs Crate's own `ArchiveTool.exe` (ships in the game install, so
+extraction only runs on Windows):
 
 ```
 ArchiveTool.exe "<GD>/database/database.arz" -database "extracted/records"
@@ -184,7 +206,7 @@ and the swapped-in `devotions.json` is current. Bump `GD_VERSION` to taste.
 
 ```
 LICENSE                     # MIT (covers our code only; game content is Crate's)
-justfile                    # doctor / install / extract / parse / all / clean
+justfile                    # doctor / install / build / serve / test / extract / parse
 scripts/parse_devotions.py  # the parser (uv self-executable, stdlib only)
 docs/dbr-format.md          # the reverse-engineered data model
 docs/assets-and-textures.md # how to extract + convert the .tex artwork to PNG
