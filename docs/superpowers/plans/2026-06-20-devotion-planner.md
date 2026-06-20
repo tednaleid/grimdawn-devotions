@@ -17,6 +17,7 @@
 - Like-stat bonuses stack **additively** (sum values sharing a stat id).
 - No image assets are committed. `assets/`, `web/dist/`, and `web/node_modules/` are git-ignored.
 - The app must work with zero art (SVG dots) and only overlay art when `assets/devotions/manifest.json` is present.
+- All runtime asset references are **relative** (e.g. `./data/…`, `./assets/…`), so the site works unchanged under a GitHub Pages project subpath (`/<repo>/`). The end-goal deliverable is a GitHub Pages deploy (Task 16).
 - Affinity is granted only by **completing** a whole constellation. An **incomplete** constellation grants nothing, so its entry star needs affinity from *elsewhere* to be added. But a **completed** constellation's affinity counts toward the total pool, **including its own requirement** — so once a constellation is self-sustaining (its own grant ≥ its requirement) you can remove the bootstrap Crossroads stars that opened it, and it stays valid. (E.g. Crossroads `primordial:1` opens Eel; completing Eel grants `primordial:5`; deselect the Crossroads and Eel still satisfies its own `primordial:1`.)
 
 ---
@@ -1696,6 +1697,80 @@ git commit -m "feat(assets): optimized WebP devotion art pipeline (git-ignored o
 
 ---
 
+### Task 16: GitHub Pages deployment pipeline (end-goal deliverable)
+
+**Files:**
+- Create: `.github/workflows/deploy.yml`
+
+**Interfaces:**
+- Consumes: the built site (`web/dist`) produced the same way as `just build`.
+- Produces: a public GitHub Pages deployment on every push to `main`.
+
+**Decision gate (document, don't block):** CI **cannot** run `just assets` (no game install / `ArchiveTool.exe` in Actions), so the public site is **SVG-only** until a chosen, optimized WebP subset is **committed** to the repo. That image-commit decision (constellations only vs + nebulas; size/copyright) is a separate step; this task ships the always-working SVG-only deploy now and copies `assets/` if/when it exists in the repo.
+
+- [ ] **Step 1: Create `.github/workflows/deploy.yml`**
+
+```yaml
+name: Deploy to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - name: Build static site
+        working-directory: web
+        run: |
+          bun install
+          bun build src/app/main.ts --outdir dist --target browser
+          cp index.html dist/index.html
+          cp src/styles.css dist/styles.css
+          mkdir -p dist/data
+          cp ../data/devotions.json dist/data/
+          cp ../data/stat_labels.json dist/data/
+          # Art only appears if a committed assets/ exists (see decision gate).
+          if [ -d ../assets ]; then cp -r ../assets dist/assets; fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+```
+
+- [ ] **Step 2: Enable Pages (one-time, manual)**
+
+In the GitHub repo: **Settings → Pages → Build and deployment → Source = GitHub Actions**. (No `gh` CLI step required; this is a repo setting.)
+
+- [ ] **Step 3: Commit, push, verify**
+
+```bash
+git add .github/workflows/deploy.yml
+git commit -m "ci: GitHub Pages deploy pipeline for the static planner"
+git push
+```
+
+Expected: the workflow runs on `main`; the `deploy` job prints the Pages URL. Open it — the planner loads and is fully interactive as **SVG dots** (relative asset paths resolve under the `/<repo>/` subpath). Art is absent until the image-commit decision is made and a committed `assets/` subset is added.
+
+---
+
 ## Self-Review
 
 **Spec coverage:**
@@ -1710,8 +1785,9 @@ git commit -m "feat(assets): optimized WebP devotion art pipeline (git-ignored o
 - Optimized, git-ignored WebP art + manifest + graceful fallback → Tasks 10 (manifest load), 11 (optional art layer), 15 (pipeline). ✔
 - bun in install/doctor; test/build/serve/assets recipes → Tasks 1, 14, 15. ✔
 - Hexagonal core fully unit-tested → Tasks 2-9. ✔
+- GitHub Pages deploy pipeline (end-goal deliverable; SVG-only until the image-commit decision) → Task 16. ✔
 
-**Notes / deferred (per spec "out of scope"):** optimizer, committing images, production Pages CI, URL build sharing. Also deferred: a *visual* "removable" hint on selected leaf stars (the guard is implemented via `canRemove`, but v1 simply makes a non-removable click a no-op — wiring a `removable` CSS class is a fast follow). Over-budget (cap lowered below allocation) is shown as the count text only.
+**Notes / deferred (per spec "out of scope"):** optimizer, URL build sharing. Committing images is gated on a separate decision (Task 16 ships SVG-only Pages until then). Also deferred: a *visual* "removable" hint on selected leaf stars (the guard is implemented via `canRemove`, but v1 simply makes a non-removable click a no-op — wiring a `removable` CSS class is a fast follow). Over-budget (cap lowered below allocation) is shown as the count text only.
 
 **Type consistency:** `StarId`, `SelectionState`, `DevotionModel`, `affinityFrom`, `selectableStars`, `toggleStar`, `validClosure`, `renderSvgMarkup`/`mountSvg`, `httpDataSource`/`LoadedData`/`AssetManifest` names are used identically across producing and consuming tasks.
 

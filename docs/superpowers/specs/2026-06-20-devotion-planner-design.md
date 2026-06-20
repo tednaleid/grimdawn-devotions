@@ -183,12 +183,32 @@ affinity that unlocks others; Crossroads bootstrap; self-sustaining constellatio
 only, no cascade); additive bonus summation; graph-build integrity against the real
 `devotions.json`. Adapters stay thin; minimal/no DOM tests in v1.
 
+## Deployment (end-goal deliverable)
+
+The **end goal is a GitHub Pages pipeline** (GitHub Actions) that builds the static
+site and publishes it, so anyone can use the planner at a public URL. The app uses
+only **relative** asset paths, so it works unchanged under a Pages project subpath
+(`https://<user>.github.io/<repo>/`).
+
+The CI builds with `oven-sh/setup-bun` → `bun build` → `actions/upload-pages-artifact`
+→ `actions/deploy-pages`. Two milestones:
+
+1. **SVG-only Pages (no decision needed):** deploy immediately; the map renders as
+   affinity-colored dots/lines from `devotions.json` (committed). Works today.
+2. **Art on Pages (gated on an image-commit decision):** CI **cannot** regenerate
+   art — `just assets` needs the local game install + `ArchiveTool.exe`, which isn't
+   available in Actions. So for the real artwork to appear on the public site, a
+   chosen, optimized subset of WebP images **must be committed** to the repo (e.g.
+   un-ignore `assets/devotions/` for the committed set, or a dedicated `web/public/`
+   path). **This is the intermediate decision** — scope (constellations only? +
+   nebulas?) and size/copyright trade-off (see grimtools precedent + Crate's
+   copyright) — to be made before milestone 2. Until then Pages ships SVG-only via
+   the graceful fallback.
+
 ## Out of scope (v1)
 
 - The optimizer/solver (separate later milestone; reuses this core).
-- Committing any image assets.
-- Production GitHub Pages deploy wiring (CI/Action) — v1 target is "builds, serves
-  locally, tests pass"; Pages deployment is a fast follow.
+- Committing image assets **by default** — deferred to the gated decision above.
 - Persisting/sharing builds via URL (nice future add).
 
 ## Verification
@@ -205,6 +225,8 @@ only, no cascade); additive bonus summation; graph-build integrity against the r
    self-sustaining, its bootstrap Crossroads star becomes removable.
 4. `just assets` (optional, local) → re-open; real constellation art renders
    behind the dots; check `du -sh assets/` is at/under target.
+5. Push to `main` → the Pages workflow builds and deploys; the public URL serves
+   the working SVG-only planner. (Art appears only after the image-commit decision.)
 
 ## Notes / minor confirmables
 
