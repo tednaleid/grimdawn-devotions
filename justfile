@@ -130,3 +130,13 @@ build:
 # Serve web/dist locally for development
 serve: build
     cd "{{justfile_directory()}}/web/dist" && bunx serve -l 5173 .
+
+# Install the headless Chromium the e2e check drives (run once)
+install-e2e:
+    cd "{{justfile_directory()}}/web" && bunx playwright@1.61.0 install chromium
+
+# Build, then verify the page works in a real headless browser.
+# Drives Chromium with a raw CDP client over bun's native WebSocket; playwright's
+# own pipe and ws transports do not connect under bun on Windows. Run install-e2e once first.
+e2e: build
+    cd "{{justfile_directory()}}/web" && bun e2e/smoke.ts
