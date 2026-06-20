@@ -2,6 +2,7 @@
 // ABOUTME: renderSvgMarkup is a pure function; mountSvg wires it to a live HTMLElement with events.
 import { type Constellation, type DevotionModel, type SelectionState, type StarId } from "../core/types";
 import { selectableStars } from "../core/rules";
+import { affinityFrom, completedConstellations, meetsRequirement } from "../core/affinity";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
 import { affinityColor, presentAffinities } from "./affinityColors";
 import type { AssetManifest } from "../ports/DataSource";
@@ -62,18 +63,22 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   }
 
   // Layer 1: optional art, dimmed and tinted by the affinities it requires to unlock.
+  // Art of constellations you cannot yet start (requirement unmet) is faded further.
   if (opts.manifest) {
+    const totals = affinityFrom(model, completedConstellations(model, state.selected));
     for (const c of model.constellations.values()) {
       const name = c.background?.image?.split("/").pop() ?? "";
       const art = opts.manifest.images[name];
       if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
       const { x, y } = c.background;
+      const reachable = meetsRequirement(totals, c.affinityRequired) || c.starIds.some((id) => state.selected.has(id));
+      const dim = reachable ? "" : " unmet";
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
-      parts.push(`<image ${img} class="art"/>`);
+      parts.push(`<image ${img} class="art${dim}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
         defs.push(`<mask id="${mid}"><image ${img}/></mask>`);
-        parts.push(`<rect class="art-tint" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`);
+        parts.push(`<rect class="art-tint${dim}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`);
       }
     }
   }
