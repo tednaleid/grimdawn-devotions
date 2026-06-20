@@ -50,6 +50,30 @@ export function canRemove(model: DevotionModel, state: SelectionState, starId: S
   return validClosure(model, next).size === next.size;
 }
 
+export function toggleConstellation(model: DevotionModel, state: SelectionState, conId: string): SelectionState {
+  const con = model.constellations.get(conId);
+  if (!con || con.starIds.length === 0) return state;
+  const allSelected = con.starIds.every((id) => state.selected.has(id));
+  const next = new Set(state.selected);
+  if (allSelected) {
+    for (const id of con.starIds) next.delete(id);
+    // Only remove the whole constellation if nothing else falls out of validity.
+    if (validClosure(model, next).size !== next.size) return state;
+  } else {
+    // Must be startable now: requirement met by OTHER completed constellations'
+    // affinity (excluding this one), exactly as taking its first star would be.
+    // This blocks bootstrapping a self-sustaining constellation from nothing.
+    const completed = completedConstellations(model, state.selected);
+    completed.delete(conId);
+    if (!meetsRequirement(affinityFrom(model, completed), con.affinityRequired)) return state;
+    for (const id of con.starIds) next.add(id);
+    if (next.size > state.pointCap) return state; // would exceed the point budget
+    // Defensive: every star (this constellation's + all prior picks) stays valid.
+    if (validClosure(model, next).size !== next.size) return state;
+  }
+  return { selected: next, pointCap: state.pointCap };
+}
+
 export function toggleStar(model: DevotionModel, state: SelectionState, starId: StarId): SelectionState {
   if (state.selected.has(starId)) {
     if (!canRemove(model, state, starId)) return state; // reject: would invalidate others

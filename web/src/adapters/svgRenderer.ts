@@ -29,6 +29,8 @@ const STAR_CENTER = 32;
 const STAR_RADIUS = 12;
 // Invisible click/hover target radius around each star (larger than the visible dot).
 const HIT_RADIUS = 22;
+// Padding around a constellation's star bounding box for its hover/click region.
+const CON_PAD = 24;
 
 export interface RenderOpts { manifest: AssetManifest | null }
 
@@ -36,6 +38,20 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   const selectable = selectableStars(model, state);
   const defs: string[] = [];
   const parts: string[] = [];
+
+  // Layer 0: per-constellation hover/click region = the bounding box of its stars
+  // (star bboxes do not overlap; art bboxes do). Drawn first so star hit-circles win.
+  for (const c of model.constellations.values()) {
+    const stars = c.starIds.map((id) => model.stars.get(id)).filter((s): s is NonNullable<typeof s> => !!s);
+    if (stars.length === 0) continue;
+    const xs = stars.map((s) => s.position.x + STAR_CENTER);
+    const ys = stars.map((s) => s.position.y + STAR_CENTER);
+    const minX = Math.min(...xs) - CON_PAD;
+    const minY = Math.min(...ys) - CON_PAD;
+    const w = Math.max(...xs) - Math.min(...xs) + 2 * CON_PAD;
+    const h = Math.max(...ys) - Math.min(...ys) + 2 * CON_PAD;
+    parts.push(`<rect class="con-hit" data-con-id="${c.id}" x="${minX}" y="${minY}" width="${w}" height="${h}"/>`);
+  }
 
   // Layer 1: optional art, dimmed and tinted by the affinities it requires to unlock.
   if (opts.manifest) {
@@ -88,10 +104,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 }
 
 export interface SvgHandle { update(state: SelectionState): void; svg: SVGSVGElement }
+export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
   manifest: AssetManifest | null;
   onStarClick(id: StarId): void;
-  onStarHover(id: StarId | null, clientX: number, clientY: number): void;
+  onConstellationClick(id: string): void;
+  onHover(target: HoverTarget, clientX: number, clientY: number): void;
 }
 
 export function mountSvg(container: HTMLElement, model: DevotionModel, deps: SvgDeps): SvgHandle {
@@ -102,12 +120,18 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
   const svg = container.querySelector("svg") as SVGSVGElement;
 
   container.addEventListener("click", (e) => {
-    const id = (e.target as Element)?.getAttribute?.("data-star-id");
-    if (id) deps.onStarClick(id);
+    const el = e.target as Element;
+    const sid = el?.getAttribute?.("data-star-id");
+    if (sid) { deps.onStarClick(sid); return; }
+    const cid = el?.getAttribute?.("data-con-id");
+    if (cid) deps.onConstellationClick(cid);
   });
   container.addEventListener("mousemove", (e) => {
-    const id = (e.target as Element)?.getAttribute?.("data-star-id") ?? null;
-    deps.onStarHover(id, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
+    const el = e.target as Element;
+    const sid = el?.getAttribute?.("data-star-id");
+    const cid = el?.getAttribute?.("data-con-id");
+    const target: HoverTarget = sid ? { kind: "star", id: sid } : cid ? { kind: "constellation", id: cid } : null;
+    deps.onHover(target, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
   });
 
   return {

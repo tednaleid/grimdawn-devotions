@@ -22,9 +22,10 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 #map-container { position: relative; overflow: hidden; cursor: grab; background: radial-gradient(circle at 50% 40%, #15203a, #0d1117 70%); }
 #map-container.grabbing { cursor: grabbing; }
 #map { width: 100%; height: 100%; }
-.link { stroke: var(--link-color); stroke-width: var(--link-width); }
-.art { opacity: var(--art-opacity); }
+.link { stroke: var(--link-color); stroke-width: var(--link-width); pointer-events: none; }
+.art { opacity: var(--art-opacity); pointer-events: none; }
 .art-tint { opacity: var(--art-tint-opacity); mix-blend-mode: screen; pointer-events: none; }
+.con-hit { fill: transparent; pointer-events: all; cursor: pointer; }
 .hit { fill: transparent; pointer-events: all; }
 .hit.selectable, .hit.selected { cursor: pointer; }
 .star { stroke: #0d1117; stroke-width: 1; pointer-events: none; }
@@ -34,6 +35,7 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 .orb { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .3em; vertical-align: -.05em; }
 #tooltip { position: fixed; display: none; pointer-events: none; background: #1c2330; border: 1px solid #30363d; padding: .5rem .6rem; border-radius: 6px; font-size: .8rem; max-width: 280px; z-index: 10; }
 #tooltip strong { color: #6cb6ff; }
+.tip-cost { color: #9aa4b2; font-size: .9em; }
 .tip-bonus { color: #d7c89a; }
 .tip-bonus .val { color: #e6edf3; }
 .tip-req { margin-top: .35rem; color: #e0696a; }

@@ -5,7 +5,7 @@ import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
-import { toggleStar } from "../core/rules";
+import { toggleStar, toggleConstellation } from "../core/rules";
 import type { SelectionState } from "../core/types";
 
 async function boot() {
@@ -26,7 +26,12 @@ async function boot() {
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
     onStarClick: (id) => { state = toggleStar(model, state, id); refresh(); },
-    onStarHover: (id, x, y) => { if (id) tip.show(model, id, x, y); else tip.hide(); },
+    onConstellationClick: (id) => { state = toggleConstellation(model, state, id); refresh(); },
+    onHover: (t, x, y) => {
+      if (!t) { tip.hide(); return; }
+      if (t.kind === "star") tip.show(model, t.id, x, y);
+      else tip.showConstellation(model, t.id, x, y);
+    },
   });
 
   const nav = attachNav(() => mapContainer.querySelector("svg"), {

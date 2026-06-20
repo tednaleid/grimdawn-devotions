@@ -21,6 +21,11 @@ test("omits the art layer when no manifest", () => {
   expect(markup).not.toContain("<image");
 });
 
+test("renders a per-constellation hover/click region", () => {
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
+  expect(markup).toContain('class="con-hit" data-con-id="falcon"');
+});
+
 test("renders the art <image> at the manifest's native width/height", () => {
   // The image must be drawn at native texture size so art aligns with the star
   // coordinate space regardless of how much the file itself was downscaled.
