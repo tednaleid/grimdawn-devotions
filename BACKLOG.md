@@ -105,6 +105,9 @@ Notes:
 ## Data + UI: celestial power ability stats
 
 ### 7. Show each celestial power's proc stats, not just its description
+Full spec: docs/specs/celestial-power-stats.md (run on the Windows box with the
+extracted game files).
+
 Celestial-power tooltips show the flavor text but not the actual ability (the
 proc trigger plus the skill's stats). Example, Scorpion Sting: "25% Chance on
 Attack", 1.5s recharge, 6 projectiles, 100% chance to pass through, 0.1m radius,
@@ -128,6 +131,34 @@ Work required:
   records, then commit the new devotions.json.
 - Web UI: render the proc line + stat rows in the star tooltip, reusing the stat
   formatter where stat ids overlap.
+
+## UI: feedback
+
+### 8. Indicate what blocks a deselection
+When a click to deselect is rejected because other picks depend on it, show what
+is blocking it. Two cases:
+- Affinity dependency: deselecting would drop an affinity another selected
+  constellation requires (example: cannot deselect Akeron's Scorpion because
+  Rhowan's Crown is selected and needs the Eldritch the Scorpion provides).
+- Predecessor dependency: a star cannot be removed until a later star in the same
+  constellation is removed first.
+
+Surface the blockers visually, for example by flashing for a couple of seconds
+the constellation image and/or the specific stars that must be deselected first
+before the clicked star/constellation can be removed.
+
+Notes:
+- The core already knows a removal is invalid: `toggleStar` / `toggleConstellation`
+  in `web/src/core/rules.ts` reject via `canRemove` / `validClosure` (the result
+  is unchanged state). Today the UI just silently does nothing.
+- To highlight the blockers, compute WHICH selected stars would fall out of
+  `validClosure` if the clicked star/constellation were removed (the difference
+  between the current selection and the closure of the attempted removal), plus
+  any same-constellation successor stars whose predecessor was the clicked star.
+  Those are the things the user must remove first.
+- Have the rejected toggle return (or expose) that blocker set so `main.ts` can
+  tell the renderer to flash those stars / their constellation art for ~2s
+  (a transient CSS class, similar to the change-highlight flash).
 
 ## Minor cleanups noted during review
 
