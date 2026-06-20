@@ -1,15 +1,18 @@
 // ABOUTME: SVG renderer adapter for the devotion map - builds markup strings and mounts live DOM.
 // ABOUTME: renderSvgMarkup is a pure function; mountSvg wires it to a live HTMLElement with events.
-import { AFFINITIES, type Affinity, type DevotionModel, type SelectionState, type StarId } from "../core/types";
+import { type Constellation, type DevotionModel, type SelectionState, type StarId } from "../core/types";
 import { selectableStars } from "../core/rules";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
 import { affinityColor, presentAffinities } from "./affinityColors";
 import type { AssetManifest } from "../ports/DataSource";
 
-function dominantAffinity(con: { affinityBonus: Partial<Record<Affinity, number>> }): Affinity {
-  let best: Affinity = "primordial"; let bestV = -1;
-  for (const a of AFFINITIES) { const v = con.affinityBonus[a] ?? 0; if (v > bestV) { bestV = v; best = a; } }
-  return best;
+// A constellation's identity colors = the affinities it REQUIRES (1-3), matching the art tint.
+// Crossroads (no requirement) fall back to the single affinity they grant.
+function gradColors(c: Constellation): string[] {
+  const req = presentAffinities(c.affinityRequired).map(affinityColor);
+  if (req.length) return req;
+  const grant = presentAffinities(c.affinityBonus).map(affinityColor);
+  return grant.length ? grant : ["#9aa3b2"];
 }
 
 // Left-to-right gradient stops for the affinities a constellation requires (1-3 colors).
@@ -53,6 +56,11 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     parts.push(`<rect class="con-hit" data-con-id="${c.id}" x="${minX}" y="${minY}" width="${w}" height="${h}"/>`);
   }
 
+  // Gradient defs for every constellation (used by both the star fills and the art tint).
+  for (const c of model.constellations.values()) {
+    defs.push(`<linearGradient id="grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(gradColors(c))}</linearGradient>`);
+  }
+
   // Layer 1: optional art, dimmed and tinted by the affinities it requires to unlock.
   if (opts.manifest) {
     for (const c of model.constellations.values()) {
@@ -62,13 +70,10 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const { x, y } = c.background;
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
       parts.push(`<image ${img} class="art"/>`);
-      const reqColors = presentAffinities(c.affinityRequired).map(affinityColor);
-      if (reqColors.length > 0) {
-        const gid = `grad-${c.id}`;
+      if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
-        defs.push(`<linearGradient id="${gid}" x1="0" y1="0" x2="1" y2="0">${gradientStops(reqColors)}</linearGradient>`);
         defs.push(`<mask id="${mid}"><image ${img}/></mask>`);
-        parts.push(`<rect class="art-tint" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#${gid})" mask="url(#${mid})"/>`);
+        parts.push(`<rect class="art-tint" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`);
       }
     }
   }
@@ -86,7 +91,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   // plus a small visible dot (pointer-events:none) so the click/hover area is generous.
   for (const star of model.stars.values()) {
     const con = model.constellations.get(star.constellationId)!;
-    const color = affinityColor(dominantAffinity(con));
+    const solid = gradColors(con)[0] ?? "#9aa3b2"; // solid color for the glow shadow
     let st = "locked";
     if (state.selected.has(star.id)) st = "selected";
     else if (selectable.has(star.id)) st = "selectable";
@@ -94,7 +99,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const cy = star.position.y + STAR_CENTER;
     parts.push(
       `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>` +
-        `<circle class="star ${st}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="--affinity:${color}"/>`,
+        `<circle class="star ${st}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="--affinity:${solid};--grad:url(#grad-${con.id})"/>`,
     );
   }
 
