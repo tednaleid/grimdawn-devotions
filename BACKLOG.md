@@ -160,6 +160,37 @@ Notes:
   tell the renderer to flash those stars / their constellation art for ~2s
   (a transient CSS class, similar to the change-highlight flash).
 
+## Testing
+
+### 9. Fix two pre-existing failing e2e smoke checks on main
+`just e2e` (`web/e2e/smoke.ts`) has two checks that fail deterministically on a
+clean `main` checkout. Verified pre-existing: stashing all other changes,
+rebuilding, and running the smoke gives the same two failures, so they are not
+caused by the celestial-power work. The other checks (including a power-tooltip
+hover check) pass. Goal: get `just e2e` to exit 0 on a clean tree without
+weakening the assertions.
+
+The two failures:
+- "renders all 438 star circles": `document.querySelectorAll('circle.star').length`
+  is not 438 at the instant it is asserted. The assertion fires immediately after
+  the render-detection loop, which breaks as soon as `>0` stars exist, so it may
+  be catching a mid-render/re-render count (a timing race) rather than a real
+  miscount. First log the actual count it sees; if it is a race, poll for a stable
+  438 (like the other waits in the file) instead of asserting once.
+- "eldritch affinity total becomes 1": after clicking `crossroads_eldritch:0`,
+  `document.querySelector('.affinity-eldritch')?.querySelector('span:last-child')?.textContent`
+  is not "1". Likely the affinity panel's DOM/selector drifted from what the test
+  expects (check the current markup `renderAffinities` emits in
+  `web/src/adapters/sidebarView.ts`), or the optional-chained selector silently
+  resolves to undefined. Update the selector to match the real structure, or fix
+  the affinity total update if it is genuinely wrong.
+
+Notes:
+- Diagnose the root cause (render race vs. stale selector) before changing the
+  assertions; do not just loosen them to go green.
+- There are no git hooks, so these failures do not block commits today; this is
+  about restoring a trustworthy `just e2e`.
+
 ## Minor cleanups noted during review
 
 - `justfile` build still copies `data/stat_labels.json` into `dist`, but the app
