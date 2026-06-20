@@ -10,7 +10,7 @@ gd_dir      := env_var_or_default("GD_DIR", "C:/Program Files (x86)/Steam/steama
 gd_version  := env_var_or_default("GD_VERSION", "1.2.1.x")
 records_dir := justfile_directory() / "extracted/records"
 text_dir    := justfile_directory() / "extracted/text_en"
-out         := justfile_directory() / "devotions.json"
+out         := justfile_directory() / "data/devotions.json"
 
 # Default: show available recipes
 default:
@@ -73,6 +73,7 @@ parse *ARGS:
     # Best-effort: read the Steam build id from the app manifest for provenance.
     manifest="{{gd_dir}}/../../appmanifest_219990.acf"
     buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    mkdir -p "$(dirname "{{out}}")"
     uv run scripts/parse_devotions.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out}}" \
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
@@ -82,4 +83,4 @@ all: extract parse
 
 # Remove generated output (keeps extracted game files)
 clean:
-    rm -f "{{out}}" "{{justfile_directory()}}/stat_labels.json"
+    rm -f "{{out}}" "{{justfile_directory()}}/data/stat_labels.json" "{{justfile_directory()}}/data/devotion_records.csv"

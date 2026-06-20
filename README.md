@@ -37,7 +37,7 @@ dependencies** — it also runs directly:
 ```bash
 uv run scripts/parse_devotions.py \
   --records-dir extracted/records --text-dir extracted/text_en \
-  --out devotions.json --stat-labels
+  --out data/devotions.json --stat-labels
 ```
 
 ### Config / overrides
@@ -118,9 +118,9 @@ Notes:
   `racial_target` (resolved race names, e.g. `["Beast"]`).
 - Every object keeps its source `dbr` path for traceability.
 
-`--duckdb` additionally emits `devotion_records.csv` — a long-format
+`--duckdb` additionally emits `data/devotion_records.csv` — a long-format
 `(dbr, key, value)` table of all devotion records for ad-hoc querying (DuckDB
-reads the CSV, not `.dbr`).
+reads the CSV, not `.dbr`). It's git-ignored (~32 MB).
 
 ## Validation
 
@@ -147,7 +147,8 @@ and the swapped-in `devotions.json` is current. Bump `GD_VERSION` to taste.
 justfile                    # doctor / install / extract / parse / all / clean
 scripts/parse_devotions.py  # the parser (uv self-executable, stdlib only)
 docs/dbr-format.md          # the reverse-engineered data model
-devotions.json              # output (committed)
-stat_labels.json            # output (--stat-labels)
+data/devotions.json         # output (committed)
+data/stat_labels.json       # output (--stat-labels, committed)
+data/devotion_records.csv   # output (--duckdb, git-ignored)
 extracted/                  # game files, git-ignored — `just extract` to rebuild
 ```

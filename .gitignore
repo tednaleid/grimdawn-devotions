@@ -2,7 +2,7 @@
 /extracted/
 
 # Optional long-format dump (~32 MB) - regenerate with `just parse --duckdb`
-/devotion_records.csv
+/data/devotion_records.csv
 
 # Python / uv
 __pycache__/
