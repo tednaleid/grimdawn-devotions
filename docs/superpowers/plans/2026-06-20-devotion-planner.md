@@ -103,6 +103,7 @@ Add a check line inside the `doctor` recipe's "Tools:" block (after the `winget`
 
 ```bash
     check bun  "run 'just install' (winget install Oven-sh.Bun) then open a new shell"
+    check jq   "run 'just install' (winget install jqlang.jq) then open a new shell"
 ```
 
 Add a bun install to the `install-uv`/`install` area. Append this recipe:
@@ -116,12 +117,21 @@ install-bun:
     echo "Installing bun via winget..."
     winget install --id Oven-sh.Bun -e --accept-source-agreements --accept-package-agreements
     echo "bun installed. NOTE: open a new shell so 'bun' is on PATH."
+
+# Install jq (JSON CLI) via winget if missing
+install-jq:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v jq >/dev/null 2>&1; then echo "jq already installed: $(jq --version)"; exit 0; fi
+    echo "Installing jq via winget..."
+    winget install --id jqlang.jq -e --accept-source-agreements --accept-package-agreements
+    echo "jq installed. NOTE: open a new shell so 'jq' is on PATH."
 ```
 
 Change the `install` recipe dependency line from `install: install-uv` to:
 
 ```make
-install: install-uv install-bun
+install: install-uv install-bun install-jq
 ```
 
 Add web recipes at the end:
@@ -1775,6 +1785,59 @@ Expected: the workflow runs on `main`; the `deploy` job prints the Pages URL. Op
 
 ---
 
+### Task 17: Playwright e2e verification (`just e2e`)
+
+Runs after Task 14 (the page builds and serves). This is the "verified in a real
+browser" gate for the goal, complementing the `bun test` core suite. It drives a
+headless Chromium against the built `web/dist` using `@playwright/cli`
+(`microsoft/playwright-cli`, invoked as `bunx @playwright/cli`, agent-oriented
+browser CLI). Tool-discovery heavy (browser install, target syntax), so the
+controller iterates it live rather than dispatching blind.
+
+**Files:**
+- Modify: `web/package.json` (add `@playwright/cli` as a devDependency)
+- Create: `web/e2e/smoke.sh` (orchestrates serve + playwright-cli asserts)
+- Modify: `justfile` (add `e2e` recipe; runs `just build`, serves, asserts, tears down)
+
+**Interfaces:**
+- Consumes: built `web/dist` (`just build`), `bunx @playwright/cli`.
+- Produces: `just e2e` that exits nonzero on any failed assertion.
+
+- [ ] **Step 1: Ensure a browser is available** for playwright-cli (first run may need a Chromium download; resolve the exact command live, e.g. `bunx playwright install chromium`).
+
+- [ ] **Step 2: Write `web/e2e/smoke.sh`** that:
+  - starts a static server for `web/dist` on a free port in the background (`bunx serve` or python http), waits for it to answer.
+  - opens a headless browser, navigates to the served URL.
+  - asserts via `playwright-cli eval`:
+    - `document.querySelectorAll('circle.star').length === 438` (map rendered).
+    - exactly the 5 Crossroads entry stars carry `class="star selectable"` from empty state.
+    - after clicking `crossroads_eldritch:0`, the point count reads `1 / 55`, the affinity sidebar shows eldritch `1`, and `bat:0` becomes selectable.
+  - fails on any browser console error.
+  - always tears down the browser and background server (trap/EXIT).
+
+- [ ] **Step 3: Add the `e2e` recipe to the justfile**
+
+```make
+# Build then verify the page in a headless browser (playwright-cli)
+e2e: build
+    bash "{{justfile_directory()}}/web/e2e/smoke.sh"
+```
+
+- [ ] **Step 4: Run and verify**
+
+Run: `just e2e`
+Expected: build succeeds, browser asserts pass, recipe exits 0. A regression
+(missing stars, broken selection, console error) exits nonzero.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add web/package.json web/e2e/smoke.sh justfile
+git commit -m "test(e2e): playwright-cli headless verification of the planner page"
+```
+
+---
+
 ## Self-Review
 
 **Spec coverage:**
@@ -1787,7 +1850,8 @@ Expected: the workflow runs on `main`; the `deploy` job prints the Pages URL. Op
 - Sidebar A (benefits + powers) and Sidebar B (affinity totals): Tasks 13, 14. Covered
 - Hover tooltip (bonuses + requirement): Tasks 13, 14. Covered
 - Optimized, git-ignored WebP art + manifest + graceful fallback: Tasks 10 (manifest load), 11 (optional art layer), 15 (pipeline). Covered
-- bun in install/doctor; test/build/serve/assets recipes: Tasks 1, 14, 15. Covered
+- bun + jq in install/doctor; test/build/serve/assets recipes: Tasks 1, 14, 15. Covered
+- Playwright e2e verification of the real page in a headless browser: Task 17. Covered
 - Hexagonal core fully unit-tested: Tasks 2-9. Covered
 - GitHub Pages deploy pipeline (end-goal deliverable; SVG-only until the image-commit decision): Task 16. Covered
 
