@@ -64,7 +64,9 @@ devotionLinks3,2,    # → predecessor chain, 1-based indices
 - The sibling `constellationNN_background.dbr` (a `bitmapsingle.tpl`) holds the
   constellation's artwork: `bitmapName` → a `.tex`, plus its own
   `bitmapPositionX/Y`. Captured as `background`. The `.tex` files are not in the
-  database extract; export them to PNG with AssetManager if you want the art.
+  database extract — they live in `resources/UI.arc`; see
+  [assets-and-textures.md](assets-and-textures.md) for how to pull and convert
+  them to PNG.
 
 ## Star skill record (`records/skills/devotion/...`)
 

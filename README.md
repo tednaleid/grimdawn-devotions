@@ -154,6 +154,7 @@ and the swapped-in `devotions.json` is current. Bump `GD_VERSION` to taste.
 justfile                    # doctor / install / extract / parse / all / clean
 scripts/parse_devotions.py  # the parser (uv self-executable, stdlib only)
 docs/dbr-format.md          # the reverse-engineered data model
+docs/assets-and-textures.md # how to extract + convert the .tex artwork to PNG
 data/devotions.json         # output (committed)
 data/stat_labels.json       # output (--stat-labels, committed)
 data/devotion_records.csv   # output (--duckdb, git-ignored)
