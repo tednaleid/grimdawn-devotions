@@ -105,6 +105,11 @@ all: extract parse
 clean:
     rm -f "{{out}}" "{{justfile_directory()}}/data/stat_labels.json" "{{justfile_directory()}}/data/devotion_records.csv"
 
+# Extract + optimize devotion artwork into git-ignored assets/ (WebP + manifest)
+assets *ARGS:
+    uv run scripts/build_assets.py --gd-dir "{{gd_dir}}" \
+        --out-dir "{{justfile_directory()}}/assets/devotions" {{ARGS}}
+
 # Install web dependencies (bun)
 web-install:
     cd "{{justfile_directory()}}/web" && bun install
