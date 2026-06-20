@@ -38,9 +38,11 @@ function gradientStops(colors: string[]): string {
 const STAR_CENTER = 32;
 // Visible star dot radius.
 const STAR_RADIUS = 12;
-// Celestial-power stars render as a larger diamond so they stand out.
-const POWER_RADIUS = 15;
-// Invisible click/hover target radius around each star (larger than the visible dot).
+// Celestial-power stars render as a larger diamond so they stand out (~25% bigger
+// than the ordinary dots) without overwhelming them.
+const POWER_RADIUS = 19;
+// Invisible click/hover target radius around each star (larger than the visible dot;
+// also covers the power diamond, whose vertices sit within this radius).
 const HIT_RADIUS = 22;
 // Padding around a constellation's star bounding box for its hover/click region.
 const CON_PAD = 24;
