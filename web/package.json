@@ -8,6 +8,7 @@
     "serve": "bun --bun x serve dist"
   },
   "devDependencies": {
+    "bun-types": "^1.3.14",
     "typescript": "^5.5.0"
   }
 }
