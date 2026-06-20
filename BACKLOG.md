@@ -79,6 +79,29 @@ Notes:
   state will persist to the URL automatically.
 - Button lives in the header in `web/index.html` next to the existing controls.
 
+## UI: map readability
+
+### 6. Fade constellations whose requirements are not met
+A constellation you cannot currently start (its affinity requirement is not met
+by your current affinities) should have its artwork even more washed out: roughly
+25% of the opacity/brightness of a constellation you can interact with. This
+applies only to the constellation images, not the grey stars or the lines.
+
+Notes:
+- "Requirement met" means `meetsRequirement(affinityFrom(completedConstellations(selected)), con.affinityRequired)`,
+  or the constellation already has selected stars. The zero-requirement nodes
+  (crossroads) are always interactable and never faded.
+- `web/src/adapters/svgRenderer.ts` `renderSvgMarkup` already takes `(model,
+  state, opts)`; compute the met/unmet flag per constellation there (it can
+  import `affinityFrom`/`completedConstellations`/`meetsRequirement` from the
+  core) and add an `unmet` class to that constellation's `.art` image and
+  `.art-tint` rect.
+- Apply the extra fade in CSS to `.art.unmet` / `.art-tint.unmet` only (a new
+  tunable var, for example `--art-unmet-factor` around 0.25 of `--art-opacity`).
+  Do not touch `.link`, `.star`, or `.hit`.
+- The map re-renders on every selection change, so constellations un-fade as you
+  earn the affinities to reach them.
+
 ## Minor cleanups noted during review
 
 - `justfile` build still copies `data/stat_labels.json` into `dist`, but the app
