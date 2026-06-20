@@ -38,10 +38,24 @@ function affinitySections(con: Constellation, totals?: AffinityTotals): string {
 }
 
 export function tooltipView(el: HTMLElement) {
+  // Position near the cursor, but flip to the left/above and clamp so the tooltip
+  // stays fully on screen (measured after it is shown so its size is known).
   function place(clientX: number, clientY: number) {
-    el.style.left = `${clientX + 14}px`;
-    el.style.top = `${clientY + 14}px`;
     el.style.display = "block";
+    const gap = 14;
+    const margin = 12;
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let left = clientX + gap;
+    if (left + w > vw - margin) left = clientX - gap - w; // flip to the left of the cursor
+    left = Math.max(margin, Math.min(left, vw - margin - w));
+    let top = clientY + gap;
+    if (top + h > vh - margin) top = clientY - gap - h; // flip above the cursor
+    top = Math.max(margin, Math.min(top, vh - margin - h));
+    el.style.left = `${left}px`;
+    el.style.top = `${top}px`;
   }
   return {
     show(model: DevotionModel, starId: StarId, clientX: number, clientY: number, totals?: AffinityTotals) {
