@@ -17,7 +17,7 @@
 - Like-stat bonuses stack **additively** (sum values sharing a stat id).
 - No image assets are committed. `assets/`, `web/dist/`, and `web/node_modules/` are git-ignored.
 - The app must work with zero art (SVG dots) and only overlay art when `assets/devotions/manifest.json` is present.
-- Affinity is granted only by **completing** a whole constellation; a constellation's own bonus must NOT satisfy its own entry requirement.
+- Affinity is granted only by **completing** a whole constellation. An **incomplete** constellation grants nothing, so its entry star needs affinity from *elsewhere* to be added. But a **completed** constellation's affinity counts toward the total pool, **including its own requirement** — so once a constellation is self-sustaining (its own grant ≥ its requirement) you can remove the bootstrap Crossroads stars that opened it, and it stays valid. (E.g. Crossroads `primordial:1` opens Eel; completing Eel grants `primordial:5`; deselect the Crossroads and Eel still satisfies its own `primordial:1`.)
 
 ---
 
@@ -433,7 +433,7 @@ git commit -m "feat(core): affinity totals, completion, requirement check"
 **Interfaces:**
 - Consumes: Task 2 + Task 3 exports.
 - Produces: `validClosure(model: DevotionModel, selected: Set<StarId>): Set<StarId>`.
-  Rule: a star survives iff all its predecessors survive AND, if it is an **entry star** (no predecessors), the constellation's `affinityRequired` is met by affinity from completed constellations **other than its own**.
+  Rule: a star survives iff all its predecessors survive AND, if it is an **entry star** (no predecessors), the constellation's `affinityRequired` is met by the affinity pool from **all completed constellations, including its own once complete**. (An incomplete constellation contributes 0, so a partial/lone constellation still needs external affinity; a fully-completed one can satisfy its own requirement — enabling Crossroads bootstrap removal.)
 
 - [ ] **Step 1: Write the failing test** — `web/test/rules-closure.test.ts`
 
@@ -464,9 +464,16 @@ test("keeps a gated chain when affinity is satisfied", () => {
 });
 
 test("removing the affinity source cascades the whole gated chain out", () => {
-  // start valid, then drop the Crossroads -> eldritch falls to 0 -> bat invalid
+  // bat is incomplete (2 of 5) so it grants nothing; with no eldritch it is invalid
   const closed = validClosure(model, new Set(["bat:0", "bat:1"]));
   expect(closed.size).toBe(0);
+});
+
+test("a completed constellation sustains its own requirement (bootstrap removable)", () => {
+  // Eel is 3 stars, requires primordial:1, grants primordial:5 when complete.
+  // With all of Eel selected and NO Crossroads, Eel's own affinity keeps it valid.
+  const closed = validClosure(model, new Set(["eel:0", "eel:1", "eel:2"]));
+  expect(closed.size).toBe(3);
 });
 ```
 
@@ -492,8 +499,9 @@ export function validClosure(model: DevotionModel, selected: Set<StarId>): Set<S
       if (!star.predecessors.every((p) => cur.has(p))) continue; // predecessor gone
       if (star.predecessors.length === 0) {
         const con = model.constellations.get(star.constellationId)!;
-        const others = [...completed].filter((c) => c !== con.id);
-        if (!meetsRequirement(affinityFrom(model, others), con.affinityRequired)) continue;
+        // Total pool from ALL completed constellations, including this one once
+        // complete — so a self-sustaining constellation survives bootstrap removal.
+        if (!meetsRequirement(affinityFrom(model, completed), con.affinityRequired)) continue;
       }
       next.add(id);
     }
@@ -658,6 +666,18 @@ test("does not mutate the input state", () => {
   const before = new Set(empty.selected);
   toggleStar(model, empty, "crossroads_eldritch:0");
   expect(empty.selected).toEqual(before);
+});
+
+test("self-sustaining constellation keeps its stars after the bootstrap is deselected", () => {
+  // Crossroads primordial:1 opens Eel; completing Eel grants primordial:5;
+  // then the Crossroads star can be refunded and Eel stays valid.
+  let s: SelectionState = { selected: new Set(), pointCap: 55 };
+  s = toggleStar(model, s, "crossroads_primordial:0");
+  for (const id of ["eel:0", "eel:1", "eel:2"]) s = toggleStar(model, s, id);
+  expect(s.selected.size).toBe(4);
+  s = toggleStar(model, s, "crossroads_primordial:0"); // refund the bootstrap
+  expect(s.selected.has("eel:0")).toBe(true);
+  expect(s.selected.size).toBe(3);
 });
 ```
 

@@ -89,9 +89,14 @@ assets/devotions/         # git-ignored optimized art + manifest.json (just asse
   summed from completed constellations' `affinity_bonus`.
 - `validClosure(model, selected)` → largest subset of `selected` that is
   self-consistent: iterate to fixpoint dropping any star whose predecessors aren't
-  all present, or whose constellation's `affinity_required` isn't met by the
-  affinity from the *other* completed constellations. Used after every change
-  (gives cascade removal for free).
+  all present, or (for an entry star) whose constellation's `affinity_required`
+  isn't met by the pool from **all completed constellations, including its own
+  once complete**. An incomplete constellation contributes 0, so a partial
+  constellation still needs external affinity; a completed one can satisfy its own
+  requirement — which is why **Crossroads bootstrap stars can be refunded** once a
+  constellation is self-sustaining (e.g. Crossroads `primordial:1` opens Eel;
+  completing Eel grants `primordial:5`; remove the Crossroads and Eel stays valid).
+  Used after every change (gives cascade removal for free).
 - `selectableStars(model, state)` → set of currently-unselected star ids that
   could be added next: predecessors satisfied, constellation affinity requirement
   met, and `selected.size < pointCap`.
