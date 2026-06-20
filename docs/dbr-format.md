@@ -53,6 +53,19 @@ devotionLinks3,2,    # → predecessor chain, 1-based indices
 - `devotionLinks{n}`: the **predecessor** of star n, as a 1-based button index.
   Star 1 has no link. The result is a tree/forest rooted at star 1.
 
+### Layout / artwork (for redrawing the starmap)
+
+- Each **star button** record (`records/ui/skills/devotion/tierT_NN{a..}.dbr`)
+  carries `bitmapPositionX` / `bitmapPositionY` — the star's `(x, y)` on a single
+  shared map canvas (negative origin, spanning all 86 constellations). Captured
+  as `position`. (`skillOffsetX/Y` exist too but are the icon offset, not the
+  star location.) The button also names the generic star sprites
+  (`devotion_star_up/down/over/disabled.tex`).
+- The sibling `constellationNN_background.dbr` (a `bitmapsingle.tpl`) holds the
+  constellation's artwork: `bitmapName` → a `.tex`, plus its own
+  `bitmapPositionX/Y`. Captured as `background`. The `.tex` files are not in the
+  database extract; export them to PNG with AssetManager if you want the art.
+
 ## Star skill record (`records/skills/devotion/...`)
 
 A huge, sparse `skill_passive` record (~700 keys, almost all `0`). Only the

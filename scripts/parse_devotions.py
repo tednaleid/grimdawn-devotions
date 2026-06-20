@@ -166,6 +166,17 @@ def extract_weapon_requirement(skill: dict[str, str], tags: dict[str, str]):
     return {"weapons": weapons, "description": desc or None}
 
 
+def read_position(rec: dict[str, str]):
+    """(bitmapPositionX, bitmapPositionY) -> {x, y} on the shared devotion-map
+    canvas, or None. All stars/backgrounds share one coordinate plane (a negative
+    origin), so these can be drawn directly to recreate the starmap."""
+    x = as_number(rec.get("bitmapPositionX", ""))
+    y = as_number(rec.get("bitmapPositionY", ""))
+    if x is None and y is None:
+        return None
+    return {"x": int(x or 0), "y": int(y or 0)}
+
+
 # ---------------------------------------------------------------------------
 # Core parsing
 # ---------------------------------------------------------------------------
@@ -200,6 +211,7 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
     star = {
         "dbr": skill_ref,
         "predecessors": [],  # filled by caller from devotionLinks
+        "position": read_position(button),  # star's (x,y) on the shared map canvas
         "bonuses": {},
         "celestial_power": None,
         "weapon_requirement": extract_weapon_requirement(skill, tags),
@@ -297,11 +309,27 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
     affinity_required = parse_affinity_map(rec, "affinityRequired", "affinityRequiredName")
     affinity_bonus = parse_affinity_map(rec, "affinityGiven", "affinityGivenName")
 
+    # Constellation artwork (a .tex) + where it sits on the shared map canvas.
+    # Lives in the sibling constellationNN_background.dbr.
+    background = None
+    bg_path = con_path.with_name(con_path.stem + "_background.dbr")
+    if bg_path.exists():
+        bg = read_dbr(bg_path)
+        img = bg.get("bitmapName", "").strip()
+        pos = read_position(bg)
+        if img or pos:
+            background = {
+                "image": img or None,
+                "x": pos["x"] if pos else None,
+                "y": pos["y"] if pos else None,
+                "dbr": str(bg_path.relative_to(db.root)).replace("\\", "/"),
+            }
+
     stars = []
     for ref in button_refs:
         star, _ = parse_star(db, tags, ref, warnings)
         if star is None:
-            star = {"dbr": ref, "predecessors": [], "bonuses": {},
+            star = {"dbr": ref, "predecessors": [], "position": None, "bonuses": {},
                     "celestial_power": None, "weapon_requirement": None}
         stars.append(star)
 
@@ -334,6 +362,7 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
         "dbr": str(con_path.relative_to(db.root)).replace("\\", "/"),
         "affinity_required": affinity_required,
         "affinity_bonus": affinity_bonus,
+        "background": background,
         "point_cost": len(stars),
         "stars": stars,
     }
@@ -387,11 +416,19 @@ def validate(constellations: list[dict], tags: dict[str, str]) -> list[str]:
     bad_pred = 0
     powers = 0
     weapon_reqs = 0
+    stars_total = 0
+    stars_no_pos = 0
+    cons_no_bg = 0
     for c in constellations:
         if c["name"].startswith("tag"):
             leak += 1
+        if not c.get("background"):
+            cons_no_bg += 1
         n = len(c["stars"])
         for s in c["stars"]:
+            stars_total += 1
+            if not s.get("position"):
+                stars_no_pos += 1
             for p in s["predecessors"]:
                 if not (0 <= p < n):
                     bad_pred += 1
@@ -403,6 +440,10 @@ def validate(constellations: list[dict], tags: dict[str, str]) -> list[str]:
                 weapon_reqs += 1
     report.append(f"Celestial powers found: {powers}")
     report.append(f"Stars with weapon requirement: {weapon_reqs}")
+    report.append(f"Stars missing a map position: {stars_no_pos}/{stars_total}"
+                  + ("  WARNING" if stars_no_pos else "  OK"))
+    report.append(f"Constellations missing background art: {cons_no_bg}"
+                  + ("  WARNING" if cons_no_bg else "  OK"))
     report.append(f"Predecessor indices out of range: {bad_pred}"
                   + ("  ERROR" if bad_pred else "  OK"))
     report.append(f"Unresolved tag... names leaking: {leak}"

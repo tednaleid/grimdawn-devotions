@@ -3,7 +3,7 @@
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-06-20T04:27:52Z",
+    "generated_utc": "2026-06-20T04:36:00Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -24,12 +24,22 @@
       "affinity_bonus": {
         "eldritch": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation002_akeronsscorpion.tex",
+        "x": -283,
+        "y": 143,
+        "dbr": "records/ui/skills/devotion/constellations/constellation02_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_02a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -184,
+            "y": 171
+          },
           "bonuses": {
             "characterOffensiveAbility": 12
           },
@@ -42,6 +52,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -134,
+            "y": 225
+          },
           "bonuses": {
             "characterStrength": 15,
             "offensivePoisonModifier": 15,
@@ -56,6 +70,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -159,
+            "y": 350
+          },
           "bonuses": {
             "characterOffensiveAbility": 18,
             "offensivePoisonModifier": 24
@@ -69,6 +87,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -259,
+            "y": 420
+          },
           "bonuses": {
             "offensiveSlowPoisonDurationModifier": 30,
             "offensiveSlowPoisonModifier": 50
@@ -82,6 +104,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -94,
+            "y": 415
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Scorpion Sting",
@@ -104,12 +130,22 @@
       "affinity_bonus": {
         "ascendant": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation005_anvil.tex",
+        "x": 225,
+        "y": 532,
+        "dbr": "records/ui/skills/devotion/constellations/constellation05_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_05a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 320,
+            "y": 673
+          },
           "bonuses": {
             "characterDefensiveAbility": 15
           },
@@ -122,6 +158,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 437,
+            "y": 673
+          },
           "bonuses": {
             "characterStrength": 20
           },
@@ -134,6 +174,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 377,
+            "y": 618
+          },
           "bonuses": {
             "defensiveAbsorptionModifier": 3,
             "defensiveProtection": 45
@@ -147,6 +191,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 512,
+            "y": 555
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "characterOffensiveAbility": 10,
@@ -163,6 +211,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 282,
+            "y": 555
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Targo's Hammer",
@@ -186,12 +238,22 @@
         "ascendant": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation008_assassinsblade.tex",
+        "x": 549,
+        "y": -365,
+        "dbr": "records/ui/skills/devotion/constellations/constellation08_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_08a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 627,
+            "y": -282
+          },
           "bonuses": {
             "offensivePhysicalModifier": 15,
             "offensivePierceModifier": 15
@@ -205,6 +267,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 567,
+            "y": -282
+          },
           "bonuses": {
             "characterDefensiveAbility": 12
           },
@@ -217,6 +283,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 597,
+            "y": -192
+          },
           "bonuses": {
             "offensivePhysicalModifier": 24,
             "offensivePierceModifier": 24
@@ -230,6 +300,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 587,
+            "y": -92
+          },
           "bonuses": {
             "characterOffensiveAbility": 18
           },
@@ -242,6 +316,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 637,
+            "y": -15
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Assassin's Mark",
@@ -265,12 +343,22 @@
         "chaos": 2,
         "eldritch": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation001_bat.tex",
+        "x": -953,
+        "y": 38,
+        "dbr": "records/ui/skills/devotion/constellations/constellation01_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_01a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -968,
+            "y": 80
+          },
           "bonuses": {
             "offensiveLifeModifier": 15,
             "offensiveSlowBleedingModifier": 15
@@ -284,6 +372,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -865,
+            "y": 37
+          },
           "bonuses": {
             "characterOffensiveAbility": 15,
             "offensiveSlowLifeModifier": 30
@@ -297,6 +389,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -757,
+            "y": 74
+          },
           "bonuses": {
             "offensiveLifeModifier": 24,
             "offensiveSlowBleedingModifier": 50
@@ -310,6 +406,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -656,
+            "y": 31
+          },
           "bonuses": {
             "characterDefensiveAbility": 10,
             "offensiveLifeLeechMin": 3,
@@ -324,6 +424,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -578,
+            "y": 69
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Twin Fangs",
@@ -347,12 +451,22 @@
         "order": 2,
         "primordial": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation021_bull.tex",
+        "x": 336,
+        "y": -625,
+        "dbr": "records/ui/skills/devotion/constellations/constellation21_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_21a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 400,
+            "y": -469
+          },
           "bonuses": {
             "characterDefensiveAbility": 8,
             "characterStrength": 15
@@ -366,6 +480,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 470,
+            "y": -559
+          },
           "bonuses": {
             "characterRunSpeedModifier": 3,
             "offensiveSlowPhysicalDurationModifier": 30,
@@ -380,6 +498,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 610,
+            "y": -569
+          },
           "bonuses": {
             "characterStrength": 15,
             "defensiveProtection": 30
@@ -393,6 +515,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 549,
+            "y": -440
+          },
           "bonuses": {
             "characterArmorStrengthReqReduction": 10,
             "characterDefensiveAbility": 10,
@@ -409,6 +535,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 730,
+            "y": -529
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Bull Rush",
@@ -431,12 +561,22 @@
       "affinity_bonus": {
         "order": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation031_crane.tex",
+        "x": 505,
+        "y": 31,
+        "dbr": "records/ui/skills/devotion/constellations/constellation31_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_31a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 666,
+            "y": 336
+          },
           "bonuses": {
             "characterIntelligence": 15,
             "characterStrength": 15
@@ -450,6 +590,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 655,
+            "y": 185
+          },
           "bonuses": {
             "defensivePoison": 12
           },
@@ -466,6 +610,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 736,
+            "y": 138
+          },
           "bonuses": {
             "characterWeaponIntelligenceReqReduction": 10,
             "offensiveTotalDamageModifier": 15
@@ -479,6 +627,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 726,
+            "y": 65
+          },
           "bonuses": {
             "defensiveLife": 12
           },
@@ -495,6 +647,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 776,
+            "y": 66
+          },
           "bonuses": {
             "defensiveBleeding": 16,
             "defensiveElementalResistance": 16,
@@ -514,12 +670,22 @@
       "affinity_bonus": {
         "primordial": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation015_crossroads.tex",
+        "x": -41,
+        "y": -149,
+        "dbr": "records/ui/skills/devotion/constellations/constellation15_background.dbr"
+      },
       "point_cost": 1,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_15a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -31,
+            "y": -166
+          },
           "bonuses": {
             "characterDefensiveAbility": 18
           },
@@ -537,12 +703,22 @@
       "affinity_bonus": {
         "chaos": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation080_crossroads.tex",
+        "x": -149,
+        "y": -149,
+        "dbr": "records/ui/skills/devotion/constellations/constellation80_background.dbr"
+      },
       "point_cost": 1,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_15b.dbr",
           "predecessors": [],
+          "position": {
+            "x": -162,
+            "y": -73
+          },
           "bonuses": {
             "characterLifeModifier": 5
           },
@@ -560,12 +736,22 @@
       "affinity_bonus": {
         "order": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation081_crossroads.tex",
+        "x": 43,
+        "y": -149,
+        "dbr": "records/ui/skills/devotion/constellations/constellation81_background.dbr"
+      },
       "point_cost": 1,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_15c.dbr",
           "predecessors": [],
+          "position": {
+            "x": 99,
+            "y": -73
+          },
           "bonuses": {
             "characterLifeModifier": 5
           },
@@ -583,12 +769,22 @@
       "affinity_bonus": {
         "eldritch": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation082_crossroads.tex",
+        "x": -149,
+        "y": 1,
+        "dbr": "records/ui/skills/devotion/constellations/constellation82_background.dbr"
+      },
       "point_cost": 1,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_15d.dbr",
           "predecessors": [],
+          "position": {
+            "x": -111,
+            "y": 80
+          },
           "bonuses": {
             "characterOffensiveAbility": 18
           },
@@ -606,12 +802,22 @@
       "affinity_bonus": {
         "ascendant": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation083_crossroads.tex",
+        "x": 1,
+        "y": 1,
+        "dbr": "records/ui/skills/devotion/constellations/constellation83_background.dbr"
+      },
       "point_cost": 1,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_15e.dbr",
           "predecessors": [],
+          "position": {
+            "x": 48,
+            "y": 80
+          },
           "bonuses": {
             "characterOffensiveAbility": 18
           },
@@ -631,12 +837,22 @@
       "affinity_bonus": {
         "order": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation026_dryad.tex",
+        "x": 866,
+        "y": -609,
+        "dbr": "records/ui/skills/devotion/constellations/constellation26_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_26a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 858,
+            "y": -441
+          },
           "bonuses": {
             "characterMana": 200,
             "characterStrength": 15,
@@ -651,6 +867,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 928,
+            "y": -511
+          },
           "bonuses": {
             "characterLife": 80,
             "characterManaRegen": 1
@@ -664,6 +884,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1009,
+            "y": -461
+          },
           "bonuses": {
             "characterRunSpeedModifier": 3,
             "defensiveTotalSpeedResistance": 15
@@ -677,6 +901,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 1019,
+            "y": -561
+          },
           "bonuses": {
             "characterIntelligenceModifier": 5,
             "characterJewelryIntelligenceReqReduction": 10,
@@ -692,6 +920,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1099,
+            "y": -481
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Dryad's Blessing",
@@ -714,12 +946,22 @@
       "affinity_bonus": {
         "primordial": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation011_eel.tex",
+        "x": 291,
+        "y": -806,
+        "dbr": "records/ui/skills/devotion/constellations/constellation11_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_11a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 469,
+            "y": -688
+          },
           "bonuses": {
             "characterDefensiveAbility": 12,
             "characterDodgePercent": 2
@@ -733,6 +975,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 489,
+            "y": -788
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "characterDeflectProjectile": 2
@@ -746,6 +992,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 629,
+            "y": -728
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "characterRunSpeedModifier": 6,
@@ -767,12 +1017,22 @@
       "affinity_bonus": {
         "ascendant": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation016_emptythrone.tex",
+        "x": 356,
+        "y": 835,
+        "dbr": "records/ui/skills/devotion/constellations/constellation16_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_16a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 424,
+            "y": 907
+          },
           "bonuses": {
             "characterDefensiveAbility": 12,
             "defensiveTotalSpeedResistance": 10
@@ -786,6 +1046,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 424,
+            "y": 1078
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "defensivePierce": 8
@@ -803,6 +1067,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 364,
+            "y": 1028
+          },
           "bonuses": {
             "defensiveAether": 10,
             "defensiveFreeze": 25
@@ -821,6 +1089,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 484,
+            "y": 1028
+          },
           "bonuses": {
             "defensiveChaos": 10,
             "defensiveStun": 25
@@ -847,12 +1119,22 @@
         "eldritch": 3,
         "ascendant": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation009_eyeofdreeg.tex",
+        "x": -568,
+        "y": 231,
+        "dbr": "records/ui/skills/devotion/constellations/constellation09_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_09a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -468,
+            "y": 404
+          },
           "bonuses": {
             "offensivePoisonModifier": 15,
             "offensiveSlowPoisonModifier": 15
@@ -866,6 +1148,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -347,
+            "y": 334
+          },
           "bonuses": {
             "characterDefensiveAbility": 16,
             "characterOffensiveAbility": 16
@@ -879,6 +1165,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -468,
+            "y": 264
+          },
           "bonuses": {
             "offensiveChaosModifier": 20,
             "offensiveSlowPoisonModifier": 15
@@ -892,6 +1182,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -578,
+            "y": 334
+          },
           "bonuses": {
             "characterManaRegen": 1,
             "defensiveLife": 8,
@@ -906,6 +1200,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -468,
+            "y": 334
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Guardian's Gaze",
@@ -929,12 +1227,22 @@
         "eldritch": 3,
         "ascendant": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation010_falcon.tex",
+        "x": 10,
+        "y": 138,
+        "dbr": "records/ui/skills/devotion/constellations/constellation10_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_10a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 422,
+            "y": 234
+          },
           "bonuses": {
             "offensivePhysicalModifier": 15,
             "offensiveSlowBleedingModifier": 15
@@ -948,6 +1256,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 317,
+            "y": 149
+          },
           "bonuses": {
             "characterLife": 60,
             "characterOffensiveAbility": 15
@@ -961,6 +1273,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 227,
+            "y": 209
+          },
           "bonuses": {
             "characterDexterity": 20
           },
@@ -973,6 +1289,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 127,
+            "y": 154
+          },
           "bonuses": {
             "offensivePhysicalModifier": 24,
             "offensiveSlowBleedingModifier": 50
@@ -986,6 +1306,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 17,
+            "y": 244
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Falcon Swoop",
@@ -1009,12 +1333,22 @@
         "eldritch": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation020_fiend.tex",
+        "x": -1124,
+        "y": -370,
+        "dbr": "records/ui/skills/devotion/constellations/constellation20_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_20a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1083,
+            "y": -90
+          },
           "bonuses": {
             "offensiveChaosModifier": 15,
             "offensiveFireModifier": 15
@@ -1028,6 +1362,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1113,
+            "y": -250
+          },
           "bonuses": {
             "characterIntelligence": 15
           },
@@ -1044,6 +1382,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1033,
+            "y": -350
+          },
           "bonuses": {
             "defensiveChaos": 8
           },
@@ -1056,6 +1398,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1013,
+            "y": -260
+          },
           "bonuses": {
             "offensiveChaosModifier": 24,
             "offensiveFireModifier": 24
@@ -1073,6 +1419,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -903,
+            "y": -270
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Flame Torrent",
@@ -1095,12 +1445,22 @@
       "affinity_bonus": {
         "eldritch": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation024_fox.tex",
+        "x": -737,
+        "y": 779,
+        "dbr": "records/ui/skills/devotion/constellations/constellation24_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_24a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -712,
+            "y": 948
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterIntelligence": 15
@@ -1114,6 +1474,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -622,
+            "y": 828
+          },
           "bonuses": {
             "offensiveSlowBleedingDurationMin": 3,
             "offensiveSlowBleedingMin": 8,
@@ -1128,6 +1492,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -507,
+            "y": 823
+          },
           "bonuses": {
             "characterDexterity": 25,
             "defensiveBleeding": 8
@@ -1141,6 +1509,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -497,
+            "y": 923
+          },
           "bonuses": {
             "characterLifeRegen": 10,
             "offensiveLifeLeechMin": 6,
@@ -1164,12 +1536,22 @@
       "affinity_bonus": {
         "primordial": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation014_galows.tex",
+        "x": -281,
+        "y": -848,
+        "dbr": "records/ui/skills/devotion/constellations/constellation14_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_14a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -224,
+            "y": -444
+          },
           "bonuses": {
             "offensiveChaosModifier": 15,
             "offensiveLifeModifier": 15
@@ -1183,6 +1565,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -214,
+            "y": -744
+          },
           "bonuses": {
             "characterLifeModifier": 3,
             "defensiveBleeding": 10
@@ -1196,6 +1582,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -114,
+            "y": -744
+          },
           "bonuses": {
             "characterLifeModifier": 3,
             "defensiveLife": 10
@@ -1209,6 +1599,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -114,
+            "y": -624
+          },
           "bonuses": {
             "offensiveChaosModifier": 24,
             "offensiveLifeMin": 8,
@@ -1235,12 +1629,22 @@
       "affinity_bonus": {
         "chaos": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation025_ghoul.tex",
+        "x": -1196,
+        "y": -26,
+        "dbr": "records/ui/skills/devotion/constellations/constellation25_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_25a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1164,
+            "y": 217
+          },
           "bonuses": {
             "characterDefensiveAbility": 8,
             "characterStrength": 15
@@ -1254,6 +1658,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1114,
+            "y": 107
+          },
           "bonuses": {
             "characterLifeModifier": 3,
             "characterLifeRegen": 16
@@ -1267,6 +1675,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1034,
+            "y": 242
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "characterIntelligence": 15,
@@ -1281,6 +1693,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1134,
+            "y": 31
+          },
           "bonuses": {
             "characterLifeRegenModifier": 30,
             "offensiveLifeLeechMin": 5
@@ -1294,6 +1710,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1024,
+            "y": 131
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Ghoulish Hunger",
@@ -1316,12 +1736,22 @@
       "affinity_bonus": {
         "ascendant": 4
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation004_hammer.tex",
+        "x": 245,
+        "y": 380,
+        "dbr": "records/ui/skills/devotion/constellations/constellation04_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_04a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 547,
+            "y": 443
+          },
           "bonuses": {
             "defensiveProtection": 20,
             "offensivePhysicalModifier": 15
@@ -1335,6 +1765,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 282,
+            "y": 443
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "offensiveSlowPhysicalDurationModifier": 30,
@@ -1349,6 +1783,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 282,
+            "y": 503
+          },
           "bonuses": {
             "defensiveProtectionModifier": 8,
             "offensivePhysicalModifier": 24,
@@ -1370,12 +1808,22 @@
       "affinity_bonus": {
         "ascendant": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation023_harpy.tex",
+        "x": 856,
+        "y": 431,
+        "dbr": "records/ui/skills/devotion/constellations/constellation23_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_23a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1018,
+            "y": 644
+          },
           "bonuses": {
             "offensiveColdModifier": 15,
             "offensivePierceModifier": 15
@@ -1389,6 +1837,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1048,
+            "y": 534
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterManaRegen": 1
@@ -1402,6 +1854,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 958,
+            "y": 454
+          },
           "bonuses": {
             "characterOffensiveAbility": 24,
             "defensiveBleeding": 10
@@ -1415,6 +1871,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1098,
+            "y": 464
+          },
           "bonuses": {
             "offensiveColdModifier": 24,
             "offensiveCritDamageModifier": 8,
@@ -1438,12 +1898,22 @@
       "affinity_bonus": {
         "eldritch": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation027_hawk.tex",
+        "x": -138,
+        "y": 748,
+        "dbr": "records/ui/skills/devotion/constellations/constellation27_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_27a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -30,
+            "y": 805
+          },
           "bonuses": {
             "characterOffensiveAbility": 15
           },
@@ -1456,6 +1926,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 88,
+            "y": 855
+          },
           "bonuses": {
             "offensiveCritDamageModifier": 8
           },
@@ -1472,6 +1946,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 178,
+            "y": 790
+          },
           "bonuses": {
             "characterHuntingDexterityReqReduction": 10,
             "characterOffensiveAbilityModifier": 3
@@ -1496,12 +1974,22 @@
       "affinity_bonus": {
         "primordial": 4
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation033_hound.tex",
+        "x": 516,
+        "y": -1051,
+        "dbr": "records/ui/skills/devotion/constellations/constellation33_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_33a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 736,
+            "y": -958
+          },
           "bonuses": {
             "characterStrength": 15
           },
@@ -1518,6 +2006,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 616,
+            "y": -958
+          },
           "bonuses": {
             "defensiveProtectionModifier": 6,
             "retaliationTotalDamageModifier": 30
@@ -1531,6 +2023,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 546,
+            "y": -1038
+          },
           "bonuses": {
             "characterStrength": 20,
             "defensiveProtectionModifier": 9,
@@ -1558,12 +2054,22 @@
         "primordial": 3,
         "eldritch": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation019_imp.tex",
+        "x": -447,
+        "y": -409,
+        "dbr": "records/ui/skills/devotion/constellations/constellation19_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_19a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -259,
+            "y": -311
+          },
           "bonuses": {
             "offensiveAetherModifier": 15,
             "offensiveFireModifier": 15
@@ -1577,6 +2083,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -229,
+            "y": -241
+          },
           "bonuses": {
             "characterDefensiveAbility": 10,
             "characterIntelligence": 15
@@ -1590,6 +2100,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -299,
+            "y": -201
+          },
           "bonuses": {
             "characterStrength": 15,
             "defensiveAether": 8
@@ -1603,6 +2117,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -359,
+            "y": -271
+          },
           "bonuses": {
             "offensiveAetherModifier": 24,
             "offensiveFireModifier": 24
@@ -1616,6 +2134,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -409,
+            "y": -331
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Aetherfire",
@@ -1638,12 +2160,22 @@
       "affinity_bonus": {
         "chaos": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation086_jackal.tex",
+        "x": -827,
+        "y": -361,
+        "dbr": "records/ui/skills/devotion/constellations/constellation86_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_38a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -821,
+            "y": -355
+          },
           "bonuses": {
             "characterManaRegenModifier": 10
           },
@@ -1660,6 +2192,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -741,
+            "y": -185
+          },
           "bonuses": {
             "characterOffensiveAbility": 12,
             "characterTotalSpeedModifier": 6
@@ -1673,6 +2209,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -591,
+            "y": -125
+          },
           "bonuses": {
             "defensivePhysical": 2,
             "offensiveTotalDamageModifier": 15
@@ -1697,12 +2237,22 @@
       "affinity_bonus": {
         "order": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation085_lion.tex",
+        "x": 205,
+        "y": -180,
+        "dbr": "records/ui/skills/devotion/constellations/constellation85_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_37a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 208,
+            "y": -8
+          },
           "bonuses": {
             "characterDefensiveAbility": 8,
             "characterLifeModifier": 4
@@ -1720,6 +2270,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 313,
+            "y": -157
+          },
           "bonuses": {
             "characterIntelligence": 15,
             "characterRunSpeedModifier": 6,
@@ -1734,6 +2288,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 418,
+            "y": -8
+          },
           "bonuses": {
             "defensivePhysical": 2,
             "offensiveTotalDamageModifier": 15
@@ -1758,12 +2316,22 @@
       "affinity_bonus": {
         "primordial": 4
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation035_lizard.tex",
+        "x": -469,
+        "y": -741,
+        "dbr": "records/ui/skills/devotion/constellations/constellation35_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_35a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -351,
+            "y": -498
+          },
           "bonuses": {
             "characterConstitutionModifier": 15,
             "characterLifeRegen": 8
@@ -1777,6 +2345,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -411,
+            "y": -598
+          },
           "bonuses": {
             "characterLife": 50,
             "characterLifeRegen": 16,
@@ -1791,6 +2363,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -411,
+            "y": -718
+          },
           "bonuses": {
             "characterConstitutionModifier": 15,
             "characterLife": 50,
@@ -1812,12 +2388,22 @@
       "affinity_bonus": {
         "ascendant": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation012_owl.tex",
+        "x": 614,
+        "y": 394,
+        "dbr": "records/ui/skills/devotion/constellations/constellation12_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_12a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 700,
+            "y": 454
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterIntelligence": 15
@@ -1831,6 +2417,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 740,
+            "y": 534
+          },
           "bonuses": {
             "defensiveElementalResistance": 8,
             "skillManaCostReduction": 5
@@ -1844,6 +2434,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 700,
+            "y": 634
+          },
           "bonuses": {
             "offensiveSlowBleedingDurationModifier": 50,
             "offensiveSlowBleedingModifier": 50,
@@ -1869,6 +2463,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 770,
+            "y": 644
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "defensivePercentReflectionResistance": 15,
@@ -1891,12 +2489,22 @@
         "primordial": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation030_panther.tex",
+        "x": 716,
+        "y": -806,
+        "dbr": "records/ui/skills/devotion/constellations/constellation30_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_30a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1102,
+            "y": -688
+          },
           "bonuses": {
             "characterOffensiveAbility": 12
           },
@@ -1913,6 +2521,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1002,
+            "y": -748
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterIntelligence": 15
@@ -1930,6 +2542,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 862,
+            "y": -738
+          },
           "bonuses": {
             "characterManaRegenModifier": 15,
             "characterOffensiveAbility": 20
@@ -1947,6 +2563,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 762,
+            "y": -718
+          },
           "bonuses": {
             "characterOffensiveAbility": 25,
             "offensiveCritDamageModifier": 6
@@ -1973,12 +2593,22 @@
         "eldritch": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation017_rat.tex",
+        "x": -574,
+        "y": -198,
+        "dbr": "records/ui/skills/devotion/constellations/constellation17_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_17a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -466,
+            "y": -140
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterIntelligence": 15
@@ -1992,6 +2622,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -446,
+            "y": -30
+          },
           "bonuses": {
             "offensiveSlowPoisonDurationMin": 5,
             "offensiveSlowPoisonMin": 8,
@@ -2007,6 +2641,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -356,
+            "y": 60
+          },
           "bonuses": {
             "characterDexterity": 20,
             "characterIntelligence": 20,
@@ -2022,6 +2660,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -256,
+            "y": 10
+          },
           "bonuses": {
             "offensiveSlowPoisonDurationMin": 5,
             "offensiveSlowPoisonDurationModifier": 30,
@@ -2045,12 +2687,22 @@
       "affinity_bonus": {
         "eldritch": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation003_raven.tex",
+        "x": -703,
+        "y": 535,
+        "dbr": "records/ui/skills/devotion/constellations/constellation03_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_03a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -648,
+            "y": 658
+          },
           "bonuses": {
             "characterIntelligence": 15
           },
@@ -2067,6 +2719,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -473,
+            "y": 548
+          },
           "bonuses": {
             "characterManaRegen": 1.5,
             "characterOffensiveAbility": 10
@@ -2080,6 +2736,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -628,
+            "y": 568
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 3
           },
@@ -2097,6 +2757,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -553,
+            "y": 663
+          },
           "bonuses": {
             "characterOffensiveAbility": 15
           },
@@ -2120,12 +2784,22 @@
       "affinity_bonus": {
         "primordial": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation007_sailiorsguide.tex",
+        "x": 56,
+        "y": -632,
+        "dbr": "records/ui/skills/devotion/constellations/constellation07_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_07a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 82,
+            "y": -496
+          },
           "bonuses": {
             "characterDefensiveAbility": 8,
             "characterStrength": 15
@@ -2139,6 +2813,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 92,
+            "y": -566
+          },
           "bonuses": {
             "defensiveFreeze": 18,
             "defensiveTotalSpeedResistance": 18
@@ -2152,6 +2830,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 182,
+            "y": -596
+          },
           "bonuses": {
             "characterRunSpeedModifier": 10,
             "characterStrength": 15
@@ -2165,6 +2847,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 212,
+            "y": -486
+          },
           "bonuses": {
             "defensiveElementalResistance": 15,
             "defensivePhysical": 3
@@ -2185,12 +2871,22 @@
       "affinity_bonus": {
         "eldritch": 4
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation084_candle.tex",
+        "x": -377,
+        "y": 519,
+        "dbr": "records/ui/skills/devotion/constellations/constellation84_background.dbr"
+      },
       "point_cost": 3,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_36a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -286,
+            "y": 927
+          },
           "bonuses": {
             "offensiveElementalModifier": 15
           },
@@ -2203,6 +2899,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -286,
+            "y": 767
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "characterStrength": 15,
@@ -2217,6 +2917,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -286,
+            "y": 557
+          },
           "bonuses": {
             "characterManaRegen": 2.5,
             "defensiveAether": 8,
@@ -2238,12 +2942,22 @@
       "affinity_bonus": {
         "ascendant": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation006_shepardscrook.tex",
+        "x": 22,
+        "y": 394,
+        "dbr": "records/ui/skills/devotion/constellations/constellation06_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_06a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 50,
+            "y": 694
+          },
           "bonuses": {
             "characterLife": 40
           },
@@ -2260,6 +2974,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 50,
+            "y": 464
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterLife": 40
@@ -2273,6 +2991,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 80,
+            "y": 394
+          },
           "bonuses": {
             "defensiveElementalResistance": 10
           },
@@ -2289,6 +3011,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 130,
+            "y": 424
+          },
           "bonuses": {
             "characterLifeModifier": 3
           },
@@ -2306,6 +3032,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 110,
+            "y": 494
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Shepherd's Call",
@@ -2328,12 +3058,22 @@
       "affinity_bonus": {
         "eldritch": 6
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation034_spider.tex",
+        "x": -955,
+        "y": 216,
+        "dbr": "records/ui/skills/devotion/constellations/constellation34_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_34a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -817,
+            "y": 314
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterIntelligence": 15
@@ -2347,6 +3087,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -947,
+            "y": 384
+          },
           "bonuses": {
             "characterIntelligenceModifier": 3,
             "characterOffensiveAbility": 20
@@ -2360,6 +3104,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -877,
+            "y": 434
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "characterSpellCastSpeedModifier": 5
@@ -2373,6 +3121,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -747,
+            "y": 434
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 5,
             "characterDefensiveAbility": 20
@@ -2386,6 +3138,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -687,
+            "y": 384
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "characterDexterityModifier": 3
@@ -2407,12 +3163,22 @@
         "primordial": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation029_tortoise.tex",
+        "x": 154,
+        "y": -407,
+        "dbr": "records/ui/skills/devotion/constellations/constellation29_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_29a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 192,
+            "y": -272
+          },
           "bonuses": {
             "characterDefensiveAbility": 12,
             "defensiveProtection": 20
@@ -2426,6 +3192,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 252,
+            "y": -342
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "characterShieldStrengthReqReduction": 10,
@@ -2440,6 +3210,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 372,
+            "y": -342
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "defensiveProtection": 40
@@ -2453,6 +3227,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 432,
+            "y": -243
+          },
           "bonuses": {
             "characterDefensiveAbility": 10,
             "characterLifeModifier": 4,
@@ -2467,6 +3245,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 492,
+            "y": -382
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Turtle Shell",
@@ -2489,12 +3271,22 @@
       "affinity_bonus": {
         "primordial": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation018_tsunami.tex",
+        "x": -167,
+        "y": -396,
+        "dbr": "records/ui/skills/devotion/constellations/constellation18_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_18a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 77,
+            "y": -273
+          },
           "bonuses": {
             "offensiveColdModifier": 15,
             "offensiveLightningModifier": 15
@@ -2508,6 +3300,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -13,
+            "y": -313
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "characterIntelligence": 15
@@ -2521,6 +3317,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -82,
+            "y": -388
+          },
           "bonuses": {
             "characterStrength": 15,
             "offensiveSlowColdModifier": 50,
@@ -2535,6 +3335,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -157,
+            "y": -373
+          },
           "bonuses": {
             "offensiveColdModifier": 24,
             "offensiveLightningModifier": 24
@@ -2548,6 +3352,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -122,
+            "y": -308
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Tsunami",
@@ -2571,12 +3379,22 @@
         "primordial": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation013_viper.tex",
+        "x": -760,
+        "y": -645,
+        "dbr": "records/ui/skills/devotion/constellations/constellation13_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_13a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -735,
+            "y": -531
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterIntelligence": 15
@@ -2590,6 +3408,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -543,
+            "y": -463
+          },
           "bonuses": {
             "characterEnergyAbsorptionPercent": 10,
             "offensiveSlowManaLeachChance": 15,
@@ -2605,6 +3427,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -633,
+            "y": -578
+          },
           "bonuses": {
             "defensiveLife": 10
           },
@@ -2617,6 +3443,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -573,
+            "y": -628
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 3,
             "offensiveElementalResistanceReductionPercentDurationMin": 3,
@@ -2638,12 +3468,22 @@
       "affinity_bonus": {
         "chaos": 5
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation032_vulture.tex",
+        "x": -1231,
+        "y": -702,
+        "dbr": "records/ui/skills/devotion/constellations/constellation32_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_32a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1057,
+            "y": -514
+          },
           "bonuses": {
             "characterDexterity": 15,
             "characterIntelligence": 15
@@ -2657,6 +3497,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -967,
+            "y": -554
+          },
           "bonuses": {
             "characterOffensiveAbility": 15,
             "defensiveBleeding": 15,
@@ -2671,6 +3515,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -977,
+            "y": -444
+          },
           "bonuses": {
             "characterLife": 80,
             "characterMana": 200,
@@ -2685,6 +3533,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1097,
+            "y": -664
+          },
           "bonuses": {
             "characterDexterityModifier": 5,
             "characterIntelligenceModifier": 5,
@@ -2699,6 +3551,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -867,
+            "y": -654
+          },
           "bonuses": {
             "characterOffensiveAbility": 15,
             "defensiveChaos": 8,
@@ -2720,12 +3576,22 @@
       "affinity_bonus": {
         "ascendant": 6
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation028_wolverine.tex",
+        "x": 299,
+        "y": 1186,
+        "dbr": "records/ui/skills/devotion/constellations/constellation28_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_28a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 372,
+            "y": 1332
+          },
           "bonuses": {
             "characterDefensiveAbility": 15
           },
@@ -2742,6 +3608,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 372,
+            "y": 1272
+          },
           "bonuses": {
             "defensiveProtection": 30,
             "retaliationTotalDamageModifier": 30
@@ -2759,6 +3629,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 472,
+            "y": 1232
+          },
           "bonuses": {
             "characterDefensiveAbility": 25
           },
@@ -2775,6 +3649,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 452,
+            "y": 1342
+          },
           "bonuses": {
             "characterRunSpeedModifier": 3,
             "defensiveProtection": 30,
@@ -2793,6 +3671,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 552,
+            "y": 1242
+          },
           "bonuses": {
             "characterDefensiveAbilityModifier": 4,
             "characterMeleeDexterityReqReduction": 10,
@@ -2819,12 +3701,22 @@
         "ascendant": 3,
         "primordial": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation022_wraith.tex",
+        "x": 46,
+        "y": -947,
+        "dbr": "records/ui/skills/devotion/constellations/constellation22_background.dbr"
+      },
       "point_cost": 4,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_22a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 192,
+            "y": -734
+          },
           "bonuses": {
             "offensiveAetherModifier": 15,
             "offensiveLightningModifier": 15
@@ -2838,6 +3730,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 172,
+            "y": -844
+          },
           "bonuses": {
             "characterIntelligence": 15,
             "defensiveAether": 8,
@@ -2852,6 +3748,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 82,
+            "y": -904
+          },
           "bonuses": {
             "characterEnergyAbsorptionPercent": 15,
             "characterOffensiveAbility": 24,
@@ -2867,6 +3767,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 232,
+            "y": -934
+          },
           "bonuses": {
             "defensivePhysical": 3,
             "offensiveAetherModifier": 24,
@@ -2895,12 +3799,22 @@
         "eldritch": 1,
         "ascendant": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation051_pestilence.tex",
+        "x": -1230,
+        "y": 1157,
+        "dbr": "records/ui/skills/devotion/constellations/constellation51_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_16a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1162,
+            "y": 1475
+          },
           "bonuses": {
             "offensiveSlowLifeModifier": 40,
             "offensiveSlowPoisonModifier": 40
@@ -2914,6 +3828,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1012,
+            "y": 1495
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "characterIntelligence": 20,
@@ -2929,6 +3847,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -902,
+            "y": 1445
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Fetid Pool",
@@ -2944,6 +3866,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -962,
+            "y": 1385
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 4,
             "offensiveSlowPoisonModifier": 50,
@@ -2958,6 +3884,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -972,
+            "y": 1265
+          },
           "bonuses": {
             "characterOffensiveAbility": 40,
             "offensiveSlowLifeDurationMin": 3,
@@ -2975,6 +3905,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -842,
+            "y": 1375
+          },
           "bonuses": {
             "characterDefensiveAbilityModifier": 4,
             "offensiveSlowPoisonModifier": 50,
@@ -2989,6 +3923,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": -832,
+            "y": 1255
+          },
           "bonuses": {
             "characterDefensiveAbility": 40,
             "offensiveSlowLifeDurationMin": 3,
@@ -3015,12 +3953,22 @@
         "primordial": 1,
         "eldritch": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation050_callerofthefrost.tex",
+        "x": -300,
+        "y": -1647,
+        "dbr": "records/ui/skills/devotion/constellations/constellation50_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_15a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -117,
+            "y": -1313
+          },
           "bonuses": {
             "offensiveColdModifier": 40
           },
@@ -3033,6 +3981,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -117,
+            "y": -1483
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "characterLifeModifier": 6
@@ -3046,6 +3998,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -117,
+            "y": -1603
+          },
           "bonuses": {
             "characterDefensiveAbility": 30,
             "defensiveProtection": 80
@@ -3059,6 +4015,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -237,
+            "y": -1483
+          },
           "bonuses": {
             "defensiveProtection": 60,
             "offensiveColdModifier": 50,
@@ -3073,6 +4033,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -267,
+            "y": -1583
+          },
           "bonuses": {
             "offensiveColdModifier": 50,
             "offensiveSlowColdDurationMin": 3,
@@ -3088,6 +4052,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 2,
+            "y": -1483
+          },
           "bonuses": {
             "characterOffensiveAbility": 25,
             "offensiveSlowColdDurationModifier": 50,
@@ -3102,6 +4070,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": 42,
+            "y": -1593
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Blizzard",
@@ -3126,12 +4098,22 @@
         "ascendant": 1,
         "order": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation041_assassin.tex",
+        "x": 746,
+        "y": -381,
+        "dbr": "records/ui/skills/devotion/constellations/constellation41_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_06a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 784,
+            "y": -44
+          },
           "bonuses": {
             "offensivePierceModifier": 40
           },
@@ -3144,6 +4126,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 884,
+            "y": -213
+          },
           "bonuses": {
             "characterDexterity": 20,
             "defensiveProtection": 60
@@ -3157,6 +4143,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 974,
+            "y": -253
+          },
           "bonuses": {
             "characterDefensiveAbility": 10,
             "characterDodgePercent": 4,
@@ -3171,6 +4161,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 864,
+            "y": -303
+          },
           "bonuses": {
             "characterDexterityModifier": 5,
             "defensiveBleeding": 10,
@@ -3185,6 +4179,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 774,
+            "y": -233
+          },
           "bonuses": {
             "characterDefensiveAbility": 25,
             "defensivePoison": 10,
@@ -3202,6 +4200,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 934,
+            "y": -333
+          },
           "bonuses": {
             "offensivePierceMin": 12,
             "offensivePierceModifier": 50
@@ -3215,6 +4217,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": 904,
+            "y": -373
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Blades of Wrath",
@@ -3239,12 +4245,22 @@
       "affinity_bonus": {
         "ascendant": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation043_autumnboar.tex",
+        "x": 656,
+        "y": 1126,
+        "dbr": "records/ui/skills/devotion/constellations/constellation43_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_08a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 964,
+            "y": 1424
+          },
           "bonuses": {
             "characterDexterity": 20,
             "characterStrength": 20,
@@ -3259,6 +4275,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 953,
+            "y": 1303
+          },
           "bonuses": {
             "characterStrength": 15,
             "defensivePierce": 15,
@@ -3273,6 +4293,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 834,
+            "y": 1254
+          },
           "bonuses": {
             "characterStrengthModifier": 5,
             "retaliationTotalDamageModifier": 30
@@ -3286,6 +4310,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 844,
+            "y": 1444
+          },
           "bonuses": {
             "characterDefensiveAbility": 25,
             "characterRunSpeedModifier": 5,
@@ -3300,6 +4328,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 764,
+            "y": 1174
+          },
           "bonuses": {
             "characterDefensiveAbility": 30,
             "retaliationTotalDamageModifier": 60
@@ -3313,6 +4345,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 684,
+            "y": 1144
+          },
           "bonuses": {
             "characterDefensiveBlockRecoveryReduction": 10,
             "defensivePercentReflectionResistance": 15,
@@ -3328,6 +4364,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 694,
+            "y": 1234
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Trample",
@@ -3353,12 +4393,22 @@
         "eldritch": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation063_behemoth.tex",
+        "x": -1771,
+        "y": 934,
+        "dbr": "records/ui/skills/devotion/constellations/constellation63_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_28a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1643,
+            "y": 1092
+          },
           "bonuses": {
             "characterLifeRegen": 30
           },
@@ -3371,6 +4421,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1593,
+            "y": 1122
+          },
           "bonuses": {
             "characterLife": 300
           },
@@ -3387,6 +4441,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1463,
+            "y": 1292
+          },
           "bonuses": {
             "characterConstitutionModifier": 25,
             "characterLifeRegen": 70
@@ -3400,6 +4458,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1473,
+            "y": 1472
+          },
           "bonuses": {
             "characterLifeModifier": 8,
             "defensiveProtection": 80
@@ -3417,6 +4479,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1653,
+            "y": 1462
+          },
           "bonuses": {
             "characterLifeRegenModifier": 80
           },
@@ -3433,6 +4499,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1713,
+            "y": 1192
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Giant's Blood",
@@ -3457,12 +4527,22 @@
         "eldritch": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation060_berserker.tex",
+        "x": -1684,
+        "y": 554,
+        "dbr": "records/ui/skills/devotion/constellations/constellation60_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_25a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1482,
+            "y": 601
+          },
           "bonuses": {
             "Spear2h": 1,
             "characterLife": 300,
@@ -3483,6 +4563,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1582,
+            "y": 671
+          },
           "bonuses": {
             "Spear2h": 1,
             "defensiveFreeze": 15,
@@ -3504,6 +4588,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1652,
+            "y": 601
+          },
           "bonuses": {
             "Spear2h": 1,
             "characterOffensiveAbility": 60,
@@ -3524,6 +4612,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1362,
+            "y": 721
+          },
           "bonuses": {
             "Spear2h": 1,
             "defensiveStun": 15,
@@ -3545,6 +4637,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1312,
+            "y": 671
+          },
           "bonuses": {
             "Spear2h": 1,
             "offensiveSlowBleedingDurationMin": 3,
@@ -3567,6 +4663,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1482,
+            "y": 701
+          },
           "bonuses": {
             "Spear2h": 1,
             "characterLifeRegen": 25,
@@ -3596,12 +4696,22 @@
         "ascendant": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation058_bladesofnadaan.tex",
+        "x": 1129,
+        "y": -378,
+        "dbr": "records/ui/skills/devotion/constellations/constellation58_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_23a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1232,
+            "y": -365
+          },
           "bonuses": {
             "characterDeflectProjectile": 2,
             "characterDodgePercent": 2
@@ -3621,6 +4731,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1232,
+            "y": -155
+          },
           "bonuses": {
             "offensivePierceModifier": 40
           },
@@ -3639,6 +4753,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1152,
+            "y": -255
+          },
           "bonuses": {
             "offensivePierceModifier": 50
           },
@@ -3657,6 +4775,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1146,
+            "y": -72
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 4,
             "characterDefensiveAbility": 15
@@ -3676,6 +4798,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1312,
+            "y": -255
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 4,
             "characterDefensiveAbility": 15
@@ -3695,6 +4821,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1326,
+            "y": -72
+          },
           "bonuses": {
             "offensivePierceMin": 16,
             "offensivePierceModifier": 50
@@ -3722,12 +4852,22 @@
       "affinity_bonus": {
         "eldritch": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation047_bysmielsbond.tex",
+        "x": -957,
+        "y": 556,
+        "dbr": "records/ui/skills/devotion/constellations/constellation47_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_12a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -841,
+            "y": 864
+          },
           "bonuses": {
             "characterOffensiveAbility": 15
           },
@@ -3744,6 +4884,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -921,
+            "y": 784
+          },
           "bonuses": {
             "characterSpellCastSpeedModifier": 5,
             "characterStrength": 15
@@ -3761,6 +4905,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -791,
+            "y": 694
+          },
           "bonuses": {
             "defensiveLife": 15
           },
@@ -3777,6 +4925,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -831,
+            "y": 624
+          },
           "bonuses": {
             "defensiveTrap": 20,
             "offensiveTotalDamageModifier": 30
@@ -3795,6 +4947,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -891,
+            "y": 634
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Bysmiel's Command",
@@ -3819,12 +4975,22 @@
         "eldritch": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation064_chariotofthedead.tex",
+        "x": -1974,
+        "y": -577,
+        "dbr": "records/ui/skills/devotion/constellations/constellation64_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_29a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1361,
+            "y": -389
+          },
           "bonuses": {
             "characterDexterity": 20,
             "characterStrength": 20
@@ -3838,6 +5004,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1451,
+            "y": -479
+          },
           "bonuses": {
             "characterOffensiveAbility": 15,
             "defensiveTotalSpeedResistance": 10
@@ -3851,6 +5021,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1461,
+            "y": -549
+          },
           "bonuses": {
             "characterDexterity": 25,
             "defensiveProtection": 60
@@ -3864,6 +5038,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1391,
+            "y": -509
+          },
           "bonuses": {
             "defensiveLife": 16,
             "defensiveStun": 20
@@ -3877,6 +5055,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1531,
+            "y": -499
+          },
           "bonuses": {
             "characterOffensiveAbility": 25,
             "defensiveTotalSpeedResistance": 15
@@ -3890,6 +5072,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1771,
+            "y": -499
+          },
           "bonuses": {
             "characterOffensiveAbility": 15,
             "characterOffensiveAbilityModifier": 4
@@ -3903,6 +5089,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": -1861,
+            "y": -529
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Wayward Soul",
@@ -3926,12 +5116,22 @@
       "affinity_bonus": {
         "ascendant": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation052_crab.tex",
+        "x": 554,
+        "y": 772,
+        "dbr": "records/ui/skills/devotion/constellations/constellation52_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_17a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 862,
+            "y": 915
+          },
           "bonuses": {
             "characterConstitutionModifier": 15,
             "characterStrength": 25
@@ -3945,6 +5145,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 952,
+            "y": 875
+          },
           "bonuses": {
             "offensiveElementalModifier": 50,
             "offensivePhysicalModifier": 50,
@@ -3959,6 +5163,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 772,
+            "y": 845
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Arcane Barrier",
@@ -3974,6 +5182,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 662,
+            "y": 985
+          },
           "bonuses": {
             "characterDefensiveAbility": 40,
             "characterOffensiveAbility": 40,
@@ -3988,6 +5200,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 812,
+            "y": 1015
+          },
           "bonuses": {
             "defensiveElementalResistance": 15,
             "offensiveElementalMin": 15,
@@ -4014,12 +5230,22 @@
         "primordial": 1,
         "ascendant": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation040_direbear.tex",
+        "x": 110,
+        "y": -1317,
+        "dbr": "records/ui/skills/devotion/constellations/constellation40_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_05a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 420,
+            "y": -1023
+          },
           "bonuses": {
             "offensivePhysicalModifier": 40
           },
@@ -4032,6 +5258,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 370,
+            "y": -1138
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "characterDexterity": 20,
@@ -4046,6 +5276,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 330,
+            "y": -1203
+          },
           "bonuses": {
             "defensiveProtection": 60,
             "offensivePhysicalModifier": 50
@@ -4059,6 +5293,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 240,
+            "y": -1243
+          },
           "bonuses": {
             "characterLifeModifier": 6,
             "defensiveFreeze": 15,
@@ -4073,6 +5311,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 185,
+            "y": -1118
+          },
           "bonuses": {
             "defensiveProtection": 80,
             "offensiveLifeLeechMin": 4
@@ -4086,6 +5328,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 165,
+            "y": -1288
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Maul",
@@ -4111,12 +5357,22 @@
         "primordial": 3,
         "ascendant": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation079_harvestmansscythe.tex",
+        "x": -96,
+        "y": 992,
+        "dbr": "records/ui/skills/devotion/constellations/constellation79_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_31a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 162,
+            "y": 1320
+          },
           "bonuses": {
             "characterManaRegen": 2,
             "characterRunSpeedModifier": 3
@@ -4130,6 +5386,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 102,
+            "y": 1190
+          },
           "bonuses": {
             "characterLife": 200,
             "characterMana": 200,
@@ -4144,6 +5404,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 112,
+            "y": 1100
+          },
           "bonuses": {
             "characterConstitutionModifier": 20,
             "characterStrengthModifier": 4
@@ -4157,6 +5421,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 63,
+            "y": 1030
+          },
           "bonuses": {
             "characterDexterityModifier": 4,
             "characterIntelligenceModifier": 4
@@ -4170,6 +5438,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -27,
+            "y": 1030
+          },
           "bonuses": {
             "characterDefensiveAbilityModifier": 4,
             "characterLifeRegenModifier": 60,
@@ -4184,6 +5456,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -97,
+            "y": 1100
+          },
           "bonuses": {
             "characterLifeModifier": 8,
             "characterLifeRegen": 50,
@@ -4209,12 +5485,22 @@
         "eldritch": 1,
         "ascendant": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation039_huntress.tex",
+        "x": 103,
+        "y": 1654,
+        "dbr": "records/ui/skills/devotion/constellations/constellation39_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_04a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 336,
+            "y": 2012
+          },
           "bonuses": {
             "characterLife": 200,
             "characterOffensiveAbility": 15
@@ -4228,6 +5514,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 216,
+            "y": 1962
+          },
           "bonuses": {
             "characterDexterity": 20,
             "offensivePierceModifier": 50
@@ -4241,6 +5531,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 346,
+            "y": 1832
+          },
           "bonuses": {
             "characterOffensiveAbility": 25,
             "offensiveSlowBleedingModifier": 60
@@ -4254,6 +5548,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 287,
+            "y": 1766
+          },
           "bonuses": {
             "defensivePierce": 8,
             "defensiveProtection": 60,
@@ -4276,6 +5574,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 186,
+            "y": 1742
+          },
           "bonuses": {
             "characterLifeRegen": 25,
             "characterOffensiveAbilityModifier": 3
@@ -4293,6 +5595,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 186,
+            "y": 1912
+          },
           "bonuses": {
             "offensiveSlowBleedingDurationMin": 3,
             "offensiveSlowBleedingDurationModifier": 20,
@@ -4312,6 +5618,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 306,
+            "y": 1672
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Rend",
@@ -4337,12 +5647,22 @@
         "eldritch": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation057_hydra.tex",
+        "x": -2137,
+        "y": -51,
+        "dbr": "records/ui/skills/devotion/constellations/constellation57_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_22a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1679,
+            "y": 246
+          },
           "bonuses": {
             "characterOffensiveAbility": 25
           },
@@ -4361,6 +5681,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1879,
+            "y": 177
+          },
           "bonuses": {
             "characterOffensiveAbility": 35,
             "characterRunSpeedModifier": 10
@@ -4380,6 +5704,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1985,
+            "y": 32
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 5,
             "characterRunSpeedMaxModifier": 5,
@@ -4401,6 +5729,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1959,
+            "y": 147
+          },
           "bonuses": {
             "characterOffensiveAbility": 25,
             "offensivePhysicalMin": 6
@@ -4420,6 +5752,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -2085,
+            "y": 191
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 4,
             "defensiveTotalSpeedResistance": 20,
@@ -4440,6 +5776,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1880,
+            "y": -13
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 5,
             "characterRunSpeedMaxModifier": 5,
@@ -4470,12 +5810,22 @@
         "primordial": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation056_kraken.tex",
+        "x": -809,
+        "y": -1620,
+        "dbr": "records/ui/skills/devotion/constellations/constellation56_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_21a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -535,
+            "y": -1506
+          },
           "bonuses": {
             "Spear2h": 1,
             "offensiveTotalDamageModifier": 50,
@@ -4498,6 +5848,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -735,
+            "y": -1396
+          },
           "bonuses": {
             "Spear2h": 1,
             "characterAttackSpeedModifier": 13,
@@ -4521,6 +5875,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -670,
+            "y": -1296
+          },
           "bonuses": {
             "Spear2h": 1,
             "characterAttackSpeedModifier": 13,
@@ -4544,6 +5902,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -575,
+            "y": -1306
+          },
           "bonuses": {
             "Spear2h": 1,
             "characterRunSpeedModifier": 5,
@@ -4567,6 +5929,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -475,
+            "y": -1296
+          },
           "bonuses": {
             "Spear2h": 1,
             "defensivePhysical": 4,
@@ -4596,12 +5962,22 @@
       "affinity_bonus": {
         "eldritch": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation042_magi.tex",
+        "x": -1208,
+        "y": 498,
+        "dbr": "records/ui/skills/devotion/constellations/constellation42_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_07a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1023,
+            "y": 1081
+          },
           "bonuses": {
             "offensiveFireModifier": 40
           },
@@ -4614,6 +5990,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1113,
+            "y": 871
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "defensiveElementalResistance": 8
@@ -4627,6 +6007,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1093,
+            "y": 771
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "characterManaRegen": 1.5,
@@ -4641,6 +6025,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1013,
+            "y": 901
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 5,
             "characterSpellCastSpeedModifier": 5,
@@ -4656,6 +6044,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1063,
+            "y": 711
+          },
           "bonuses": {
             "defensiveFreeze": 15,
             "offensiveFireMax": 14,
@@ -4671,6 +6063,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1153,
+            "y": 721
+          },
           "bonuses": {
             "offensiveSlowFireDurationMin": 3,
             "offensiveSlowFireDurationModifier": 30,
@@ -4686,6 +6082,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": -1163,
+            "y": 561
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Fissure",
@@ -4710,12 +6110,22 @@
         "ascendant": 1,
         "eldritch": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation053_manticore.tex",
+        "x": -605,
+        "y": 1034,
+        "dbr": "records/ui/skills/devotion/constellations/constellation53_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_18a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -491,
+            "y": 1412
+          },
           "bonuses": {
             "characterLife": 250,
             "characterOffensiveAbility": 15
@@ -4729,6 +6139,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -481,
+            "y": 1322
+          },
           "bonuses": {
             "offensivePoisonModifier": 50,
             "offensiveSlowPoisonModifier": 50
@@ -4747,6 +6161,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -291,
+            "y": 1282
+          },
           "bonuses": {
             "characterLifeModifier": 6
           },
@@ -4763,6 +6181,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -291,
+            "y": 1392
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "defensivePhysical": 4,
@@ -4782,6 +6204,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -178,
+            "y": 1185
+          },
           "bonuses": {
             "offensivePoisonModifier": 40,
             "offensiveSlowPoisonDurationMin": 5,
@@ -4803,6 +6229,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -201,
+            "y": 1062
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Acid Spray",
@@ -4827,12 +6257,22 @@
         "primordial": 3,
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation055_heraldofwar.tex",
+        "x": -1317,
+        "y": -1226,
+        "dbr": "records/ui/skills/devotion/constellations/constellation55_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_20a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1244,
+            "y": -808
+          },
           "bonuses": {
             "retaliationFireMin": 90,
             "retaliationTotalDamageModifier": 30
@@ -4846,6 +6286,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1174,
+            "y": -908
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "characterRunSpeedModifier": 5,
@@ -4860,6 +6304,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1064,
+            "y": -888
+          },
           "bonuses": {
             "characterOffensiveAbility": 25,
             "retaliationTotalDamageModifier": 60
@@ -4873,6 +6321,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1084,
+            "y": -778
+          },
           "bonuses": {
             "defensiveProtectionModifier": 12,
             "retaliationFireMin": 120
@@ -4886,6 +6338,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1104,
+            "y": -998
+          },
           "bonuses": {
             "defensiveElementalResistance": 15,
             "retaliationFireMin": 120
@@ -4899,6 +6355,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1004,
+            "y": -1178
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Messenger of War",
@@ -4922,12 +6382,22 @@
         "eldritch": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation061_oklaineslantern.tex",
+        "x": -1385,
+        "y": 947,
+        "dbr": "records/ui/skills/devotion/constellations/constellation61_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_26a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1302,
+            "y": 1051
+          },
           "bonuses": {
             "Dagger": 1,
             "Scepter": 1,
@@ -4947,6 +6417,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1352,
+            "y": 1141
+          },
           "bonuses": {
             "Dagger": 1,
             "Scepter": 1,
@@ -4967,6 +6441,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1342,
+            "y": 1321
+          },
           "bonuses": {
             "Dagger": 1,
             "Scepter": 1,
@@ -4987,6 +6465,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1262,
+            "y": 1321
+          },
           "bonuses": {
             "Dagger": 1,
             "Scepter": 1,
@@ -5007,6 +6489,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1252,
+            "y": 1141
+          },
           "bonuses": {
             "Dagger": 1,
             "Scepter": 1,
@@ -5036,12 +6522,22 @@
         "primordial": 1,
         "chaos": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation045_revenant.tex",
+        "x": -1900,
+        "y": -1160,
+        "dbr": "records/ui/skills/devotion/constellations/constellation45_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_10a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1433,
+            "y": -692
+          },
           "bonuses": {
             "characterEnergyAbsorptionPercent": 15,
             "offensiveSlowManaLeachChance": 10,
@@ -5057,6 +6553,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1499,
+            "y": -863
+          },
           "bonuses": {
             "characterLifeModifier": 6,
             "racialBonusPercentDefense": 10
@@ -5073,6 +6573,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1523,
+            "y": -982
+          },
           "bonuses": {
             "defensiveLife": 24,
             "defensiveStun": 20
@@ -5086,6 +6590,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1593,
+            "y": -1052
+          },
           "bonuses": {
             "characterLife": 250,
             "offensiveLifeLeechMin": 6,
@@ -5100,6 +6608,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1604,
+            "y": -883
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 4,
             "characterSpellCastSpeedModifier": 4,
@@ -5114,6 +6626,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1649,
+            "y": -988
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Raise the Dead",
@@ -5138,12 +6654,22 @@
         "eldritch": 1,
         "ascendant": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation036_rhowanscrown.tex",
+        "x": 210,
+        "y": 1424,
+        "dbr": "records/ui/skills/devotion/constellations/constellation36_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_01a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 363,
+            "y": 1507
+          },
           "bonuses": {
             "offensiveElementalMax": 9,
             "offensiveElementalMin": 6,
@@ -5158,6 +6684,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 343,
+            "y": 1567
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "characterIntelligence": 20
@@ -5175,6 +6705,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 293,
+            "y": 1487
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Elemental Storm",
@@ -5190,6 +6724,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 243,
+            "y": 1567
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "defensiveElementalResistance": 18
@@ -5207,6 +6745,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 223,
+            "y": 1507
+          },
           "bonuses": {
             "defensiveChaos": 8,
             "offensiveElementalModifier": 40,
@@ -5232,12 +6774,22 @@
         "ascendant": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation059_rhowansscepter.tex",
+        "x": 1042,
+        "y": 783,
+        "dbr": "records/ui/skills/devotion/constellations/constellation59_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_24a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1406,
+            "y": 1246
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "defensiveProtection": 30
@@ -5257,6 +6809,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1246,
+            "y": 1016
+          },
           "bonuses": {
             "characterLifeModifier": 6,
             "defensiveProtection": 80
@@ -5276,6 +6832,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1136,
+            "y": 986
+          },
           "bonuses": {
             "defensivePetrify": 25,
             "offensivePhysicalModifier": 50
@@ -5295,6 +6855,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 1136,
+            "y": 926
+          },
           "bonuses": {
             "defensiveProtectionModifier": 8,
             "offensivePhysicalMin": 10,
@@ -5316,6 +6880,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1256,
+            "y": 906
+          },
           "bonuses": {
             "characterDefensiveAbility": 50,
             "offensiveSlowPhysicalModifier": 50
@@ -5335,6 +6903,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 1186,
+            "y": 886
+          },
           "bonuses": {
             "offensiveSlowPhysicalDurationMin": 5,
             "offensiveSlowPhysicalDurationModifier": 50,
@@ -5364,12 +6936,22 @@
       "affinity_bonus": {
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation037_scalesofulcama.tex",
+        "x": 1201,
+        "y": -747,
+        "dbr": "records/ui/skills/devotion/constellations/constellation37_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_02a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1384,
+            "y": -424
+          },
           "bonuses": {
             "characterLife": 250,
             "characterMana": 300
@@ -5383,6 +6965,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1384,
+            "y": -614
+          },
           "bonuses": {
             "characterLifeModifier": 6,
             "characterRunSpeedModifier": 6
@@ -5396,6 +6982,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1242,
+            "y": -614
+          },
           "bonuses": {
             "characterManaRegen": 2.5,
             "characterManaRegenModifier": 33
@@ -5409,6 +6999,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 1244,
+            "y": -474
+          },
           "bonuses": {
             "characterLifeRegen": 30,
             "characterLifeRegenModifier": 33,
@@ -5423,6 +7017,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1521,
+            "y": -574
+          },
           "bonuses": {
             "characterDefensiveAbility": 45,
             "characterStrength": 20
@@ -5436,6 +7034,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 1521,
+            "y": -444
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Tip the Scales",
@@ -5460,12 +7062,22 @@
         "primordial": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation062_shieldmaiden.tex",
+        "x": 1191,
+        "y": -1179,
+        "dbr": "records/ui/skills/devotion/constellations/constellation62_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_27a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1454,
+            "y": -979
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "defensiveBlockAmountModifier": 30
@@ -5484,6 +7096,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1454,
+            "y": -836
+          },
           "bonuses": {
             "offensiveSlowPhysicalModifier": 50,
             "retaliationTotalDamageModifier": 60
@@ -5502,6 +7118,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1394,
+            "y": -926
+          },
           "bonuses": {
             "characterDefensiveAbility": 50,
             "defensiveBlockModifier": 5
@@ -5520,6 +7140,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 1394,
+            "y": -1096
+          },
           "bonuses": {
             "defensiveBlockModifier": 6,
             "offensiveSlowPhysicalDurationMin": 5,
@@ -5540,6 +7164,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1514,
+            "y": -926
+          },
           "bonuses": {
             "defensiveBlockAmountModifier": 50,
             "defensiveStun": 25
@@ -5558,6 +7186,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 1514,
+            "y": -1096
+          },
           "bonuses": {
             "characterDefensiveBlockRecoveryReduction": 30,
             "defensiveBlockAmountModifier": 80
@@ -5585,12 +7217,22 @@
         "eldritch": 1,
         "chaos": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation046_samaelswitchblade.tex",
+        "x": -1601,
+        "y": 299,
+        "dbr": "records/ui/skills/devotion/constellations/constellation46_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_11a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1187,
+            "y": 365
+          },
           "bonuses": {
             "offensiveChaosModifier": 40
           },
@@ -5603,6 +7245,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1300,
+            "y": 392
+          },
           "bonuses": {
             "characterIntelligence": 15,
             "characterOffensiveAbility": 10,
@@ -5617,6 +7263,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1392,
+            "y": 375
+          },
           "bonuses": {
             "characterDefensiveAbility": 15,
             "offensiveChaosModifier": 30,
@@ -5631,6 +7281,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1447,
+            "y": 435
+          },
           "bonuses": {
             "characterDefensiveAbility": 25,
             "offensiveChaosModifier": 50,
@@ -5645,6 +7299,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1567,
+            "y": 435
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Eldritch Fire",
@@ -5668,12 +7326,22 @@
         "primordial": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation054_solemnwatcher.tex",
+        "x": 959,
+        "y": -1289,
+        "dbr": "records/ui/skills/devotion/constellations/constellation54_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_19a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1112,
+            "y": -891
+          },
           "bonuses": {
             "characterStrength": 25
           },
@@ -5686,6 +7354,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1032,
+            "y": -951
+          },
           "bonuses": {
             "defensiveChaos": 18,
             "defensiveProtection": 40
@@ -5699,6 +7371,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1098,
+            "y": -1053
+          },
           "bonuses": {
             "defensivePierce": 18,
             "defensiveProtection": 40
@@ -5712,6 +7388,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 1097,
+            "y": -1129
+          },
           "bonuses": {
             "characterDefensiveAbility": 30,
             "characterStrengthModifier": 3
@@ -5725,6 +7405,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1092,
+            "y": -1261
+          },
           "bonuses": {
             "characterDefensiveAbilityModifier": 5,
             "defensivePercentReflectionResistance": 20
@@ -5746,12 +7430,22 @@
       "affinity_bonus": {
         "order": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation049_targothebuilder.tex",
+        "x": 890,
+        "y": -78,
+        "dbr": "records/ui/skills/devotion/constellations/constellation49_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_14a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1090,
+            "y": 306
+          },
           "bonuses": {
             "characterDefensiveAbility": 20,
             "retaliationTotalDamageModifier": 30
@@ -5765,6 +7459,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1030,
+            "y": 216
+          },
           "bonuses": {
             "characterLifeModifier": 6,
             "defensiveAether": 8
@@ -5778,6 +7476,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 960,
+            "y": 296
+          },
           "bonuses": {
             "defensiveProtectionModifier": 8,
             "retaliationPhysicalMin": 150
@@ -5791,6 +7493,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1060,
+            "y": 116
+          },
           "bonuses": {
             "characterLifeModifier": 6,
             "defensiveChaos": 8
@@ -5804,6 +7510,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1150,
+            "y": 216
+          },
           "bonuses": {
             "characterDefensiveAbility": 35,
             "characterLife": 300,
@@ -5818,6 +7528,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 980,
+            "y": 26
+          },
           "bonuses": {
             "defensiveBlockAmountModifier": 24,
             "defensiveProtectionModifier": 12
@@ -5831,6 +7545,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": 1030,
+            "y": -14
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Shield Wall",
@@ -5855,12 +7573,22 @@
         "eldritch": 1,
         "primordial": 1
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation048_tempest.tex",
+        "x": -796,
+        "y": -1141,
+        "dbr": "records/ui/skills/devotion/constellations/constellation48_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_13a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -372,
+            "y": -1117
+          },
           "bonuses": {
             "offensiveLightningModifier": 40
           },
@@ -5873,6 +7601,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -442,
+            "y": -1017
+          },
           "bonuses": {
             "characterStrength": 20,
             "offensiveLightningMax": 20,
@@ -5887,6 +7619,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -532,
+            "y": -1007
+          },
           "bonuses": {
             "offensiveLightningModifier": 50,
             "offensiveSlowLightningModifier": 50
@@ -5900,6 +7636,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -562,
+            "y": -937
+          },
           "bonuses": {
             "characterDefensiveAbility": 25,
             "characterOffensiveAbility": 25,
@@ -5914,6 +7654,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -712,
+            "y": -907
+          },
           "bonuses": {
             "characterTotalSpeedModifier": 4,
             "defensiveStun": 15,
@@ -5929,6 +7673,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -562,
+            "y": -817
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "offensiveSlowLightningDurationModifier": 50,
@@ -5943,6 +7691,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": -693,
+            "y": -758
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Reckless Tempest",
@@ -5967,12 +7719,22 @@
         "primordial": 3,
         "order": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation065_keeperoftheforest.tex",
+        "x": 622,
+        "y": -1485,
+        "dbr": "records/ui/skills/devotion/constellations/constellation65_background.dbr"
+      },
       "point_cost": 5,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_30a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 735,
+            "y": -1252
+          },
           "bonuses": {
             "defensiveElementalResistance": 15
           },
@@ -5989,6 +7751,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 775,
+            "y": -1412
+          },
           "bonuses": {
             "characterLife": 300,
             "characterMana": 300,
@@ -6004,6 +7770,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 725,
+            "y": -1472
+          },
           "bonuses": {
             "defensiveFreeze": 15,
             "defensivePetrify": 15,
@@ -6026,6 +7796,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 825,
+            "y": -1462
+          },
           "bonuses": {
             "defensiveChaos": 20,
             "defensivePoison": 20
@@ -6044,6 +7818,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 845,
+            "y": -1242
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Cleansing Waters",
@@ -6067,12 +7845,22 @@
       "affinity_bonus": {
         "chaos": 2
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation038_wendigo.tex",
+        "x": -1645,
+        "y": -220,
+        "dbr": "records/ui/skills/devotion/constellations/constellation38_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_03a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1558,
+            "y": 60
+          },
           "bonuses": {
             "offensiveLifeModifier": 40,
             "offensiveSlowLifeModifier": 40
@@ -6086,6 +7874,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1528,
+            "y": -49
+          },
           "bonuses": {
             "characterIntelligence": 20,
             "characterLife": 300
@@ -6099,6 +7891,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1388,
+            "y": 10
+          },
           "bonuses": {
             "characterDefensiveAbility": 40,
             "characterTotalSpeedModifier": 5,
@@ -6113,6 +7909,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1408,
+            "y": -99
+          },
           "bonuses": {
             "characterLifeModifier": 6,
             "racialBonusPercentDefense": 10
@@ -6129,6 +7929,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1458,
+            "y": -149
+          },
           "bonuses": {
             "offensiveLifeModifier": 50,
             "offensiveSlowLifeDurationMin": 3,
@@ -6144,6 +7948,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1528,
+            "y": -129
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Wendigo's Mark",
@@ -6167,12 +7975,22 @@
       "affinity_bonus": {
         "primordial": 3
       },
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation044_widow.tex",
+        "x": -244,
+        "y": -1134,
+        "dbr": "records/ui/skills/devotion/constellations/constellation44_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier2_09a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -206,
+            "y": -916
+          },
           "bonuses": {
             "offensiveAetherModifier": 40
           },
@@ -6185,6 +8003,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -66,
+            "y": -936
+          },
           "bonuses": {
             "characterDefensiveAbility": 10,
             "characterManaModifier": 5,
@@ -6199,6 +8021,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -186,
+            "y": -986
+          },
           "bonuses": {
             "characterIntelligence": 15,
             "characterStrength": 15,
@@ -6213,6 +8039,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -166,
+            "y": -1066
+          },
           "bonuses": {
             "defensiveAether": 18,
             "defensiveLife": 8
@@ -6226,6 +8056,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -96,
+            "y": -1106
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 2,
             "offensiveAetherModifier": 50,
@@ -6240,6 +8074,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -31,
+            "y": -1081
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Arcane Bomb",
@@ -6261,12 +8099,22 @@
         "eldritch": 18
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation067_abomination.tex",
+        "x": -2308,
+        "y": 443,
+        "dbr": "records/ui/skills/devotion/constellations/constellation67_background.dbr"
+      },
       "point_cost": 8,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_02a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -2011,
+            "y": 992
+          },
           "bonuses": {
             "offensiveChaosModifier": 80,
             "offensiveSlowPoisonModifier": 80
@@ -6280,6 +8128,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -2053,
+            "y": 830
+          },
           "bonuses": {
             "offensiveLifeModifier": 80,
             "offensivePoisonModifier": 80,
@@ -6294,6 +8146,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -2020,
+            "y": 628
+          },
           "bonuses": {
             "characterOffensiveAbility": 40,
             "defensivePoison": 20,
@@ -6308,6 +8164,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1871,
+            "y": 822
+          },
           "bonuses": {
             "characterLife": 400,
             "characterOffensiveAbility": 40,
@@ -6323,6 +8183,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1877,
+            "y": 969
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Abominable Might",
@@ -6338,6 +8202,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -2151,
+            "y": 732
+          },
           "bonuses": {
             "characterLife": 400,
             "characterOffensiveAbility": 40,
@@ -6353,6 +8221,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": -2150,
+            "y": 945
+          },
           "bonuses": {
             "offensivePoisonMin": 12,
             "offensivePoisonModifier": 100,
@@ -6367,6 +8239,10 @@
           "predecessors": [
             6
           ],
+          "position": {
+            "x": -2141,
+            "y": 1102
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Tainted Eruption",
@@ -6388,12 +8264,22 @@
         "primordial": 18
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation066_aeonshourglass.tex",
+        "x": -1479,
+        "y": -1632,
+        "dbr": "records/ui/skills/devotion/constellations/constellation66_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_01a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -1426,
+            "y": -1593
+          },
           "bonuses": {
             "characterDexterity": 40,
             "characterIntelligence": 40,
@@ -6408,6 +8294,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -1266,
+            "y": -1593
+          },
           "bonuses": {
             "defensiveBleedingDuration": 25,
             "defensiveColdDuration": 25,
@@ -6427,6 +8317,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1326,
+            "y": -1408
+          },
           "bonuses": {
             "defensivePercentReflectionResistance": 25,
             "defensiveTotalSpeedResistance": 50,
@@ -6441,6 +8335,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1266,
+            "y": -1213
+          },
           "bonuses": {
             "defensiveAether": 20,
             "defensiveLife": 15,
@@ -6455,6 +8353,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1426,
+            "y": -1213
+          },
           "bonuses": {
             "characterDefensiveAbility": 70,
             "characterDeflectProjectile": 6,
@@ -6469,6 +8371,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1366,
+            "y": -1408
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Time Dilation",
@@ -6490,12 +8396,22 @@
         "eldritch": 18
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation076_blindsage.tex",
+        "x": -926,
+        "y": 1550,
+        "dbr": "records/ui/skills/devotion/constellations/constellation76_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_11a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -870,
+            "y": 1973
+          },
           "bonuses": {
             "characterIntelligence": 30,
             "characterOffensiveAbility": 25,
@@ -6510,6 +8426,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -500,
+            "y": 1973
+          },
           "bonuses": {
             "characterDefensiveAbility": 40,
             "defensiveElementalResistance": 15,
@@ -6524,6 +8444,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -673,
+            "y": 1863
+          },
           "bonuses": {
             "defensiveDisruption": 30,
             "defensivePhysical": 4,
@@ -6538,6 +8462,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -784,
+            "y": 1853
+          },
           "bonuses": {
             "characterOffensiveAbility": 45,
             "offensiveColdModifier": 100,
@@ -6553,6 +8481,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -560,
+            "y": 1853
+          },
           "bonuses": {
             "characterOffensiveAbility": 45,
             "offensiveLightningModifier": 100,
@@ -6568,6 +8500,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -673,
+            "y": 1703
+          },
           "bonuses": {
             "characterOffensiveAbility": 45,
             "offensiveFireModifier": 100,
@@ -6583,6 +8519,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": -673,
+            "y": 1567
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Elemental Seeker",
@@ -6604,12 +8544,22 @@
         "primordial": 15
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation073_thedyinggod.tex",
+        "x": -2398,
+        "y": -979,
+        "dbr": "records/ui/skills/devotion/constellations/constellation73_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_08a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -2236,
+            "y": -706
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "offensiveLifeModifier": 80
@@ -6623,6 +8573,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -2066,
+            "y": -676
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "offensiveChaosModifier": 80
@@ -6636,6 +8590,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -2146,
+            "y": -826
+          },
           "bonuses": {
             "characterIntelligence": 35,
             "characterOffensiveAbilityModifier": 3
@@ -6654,6 +8612,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -2046,
+            "y": -886
+          },
           "bonuses": {
             "characterDefensiveAbility": 25,
             "characterOffensiveAbility": 45,
@@ -6668,6 +8630,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1946,
+            "y": -846
+          },
           "bonuses": {
             "characterDefensiveAbility": 30,
             "offensiveChaosModifier": 100,
@@ -6682,6 +8648,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1916,
+            "y": -686
+          },
           "bonuses": {
             "offensiveChaosMax": 18,
             "offensiveChaosMin": 5,
@@ -6701,6 +8671,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1876,
+            "y": -776
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Hungering Void",
@@ -6722,12 +8696,22 @@
         "ascendant": 13
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation077_leviathan.tex",
+        "x": 444,
+        "y": 1548,
+        "dbr": "records/ui/skills/devotion/constellations/constellation77_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_12a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 512,
+            "y": 2156
+          },
           "bonuses": {
             "offensiveColdMin": 6,
             "offensiveColdModifier": 80
@@ -6741,6 +8725,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 592,
+            "y": 1906
+          },
           "bonuses": {
             "characterLifeModifier": 8,
             "characterStrength": 35
@@ -6754,6 +8742,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 812,
+            "y": 1816
+          },
           "bonuses": {
             "characterDefensiveAbility": 60,
             "characterManaModifier": 10,
@@ -6768,6 +8760,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 942,
+            "y": 1716
+          },
           "bonuses": {
             "defensiveLife": 20,
             "defensivePhysical": 5,
@@ -6782,6 +8778,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 942,
+            "y": 1556
+          },
           "bonuses": {
             "offensiveColdMin": 12,
             "offensiveColdModifier": 100
@@ -6795,6 +8795,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1132,
+            "y": 1676
+          },
           "bonuses": {
             "defensiveColdMaxResist": 3,
             "offensiveSlowColdDurationMin": 3,
@@ -6810,6 +8814,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1032,
+            "y": 1606
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Whirlpool",
@@ -6831,12 +8839,22 @@
         "primordial": 18
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation068_lightofempyrion.tex",
+        "x": 1019,
+        "y": -1938,
+        "dbr": "records/ui/skills/devotion/constellations/constellation68_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_03a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1303,
+            "y": -1867
+          },
           "bonuses": {
             "characterDefensiveAbility": 25,
             "offensiveFireModifier": 80
@@ -6850,6 +8868,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1183,
+            "y": -1647
+          },
           "bonuses": {
             "characterDefensiveAbility": 25,
             "offensivePhysicalModifier": 80
@@ -6863,6 +8885,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1263,
+            "y": -1467
+          },
           "bonuses": {
             "characterLifeModifier": 10,
             "defensiveElementalResistance": 15,
@@ -6877,6 +8903,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 1453,
+            "y": -1467
+          },
           "bonuses": {
             "characterLifeModifier": 10,
             "offensiveFireModifier": 100,
@@ -6891,6 +8921,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1483,
+            "y": -1617
+          },
           "bonuses": {
             "defensiveAether": 20,
             "defensiveChaos": 20,
@@ -6908,6 +8942,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 1413,
+            "y": -1687
+          },
           "bonuses": {
             "defensiveAetherMaxResist": 3,
             "defensiveChaosMaxResist": 3,
@@ -6923,6 +8961,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": 1353,
+            "y": -1617
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Light of Empyrion",
@@ -6944,12 +8986,22 @@
         "eldritch": 12
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation075_mogdrogenthewolf.tex",
+        "x": -412,
+        "y": 1477,
+        "dbr": "records/ui/skills/devotion/constellations/constellation75_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_10a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -178,
+            "y": 1903
+          },
           "bonuses": {
             "characterLife": 300,
             "characterOffensiveAbility": 35
@@ -6967,6 +9019,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -76,
+            "y": 1811
+          },
           "bonuses": {
             "offensiveSlowBleedingModifier": 80,
             "racialBonusPercentDamage": 10
@@ -6987,6 +9043,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -46,
+            "y": 1661
+          },
           "bonuses": {
             "characterDefensiveAbility": 50,
             "characterLife": 350,
@@ -7006,6 +9066,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 9,
+            "y": 1502
+          },
           "bonuses": {
             "offensiveLifeLeechMin": 10,
             "offensiveSlowBleedingDurationMin": 3,
@@ -7022,6 +9086,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -156,
+            "y": 1543
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 4,
             "defensiveBleeding": 15,
@@ -7041,6 +9109,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -315,
+            "y": 1591
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Howl of Mogdrogen",
@@ -7062,12 +9134,22 @@
         "primordial": 15
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation070_menhirsobelisk.tex",
+        "x": 1628,
+        "y": -1127,
+        "dbr": "records/ui/skills/devotion/constellations/constellation70_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_05a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1739,
+            "y": -682
+          },
           "bonuses": {
             "defensiveProtectionModifier": 10
           },
@@ -7080,6 +9162,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1855,
+            "y": -708
+          },
           "bonuses": {
             "characterDefensiveAbility": 30,
             "defensiveProtection": 210
@@ -7093,6 +9179,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1830,
+            "y": -837
+          },
           "bonuses": {
             "characterDefensiveAbility": 40,
             "characterDefensiveAbilityModifier": 6
@@ -7106,6 +9196,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1641,
+            "y": -708
+          },
           "bonuses": {
             "retaliationPhysicalMin": 120,
             "retaliationTotalDamageModifier": 140
@@ -7119,6 +9213,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1658,
+            "y": -906
+          },
           "bonuses": {
             "defensiveBlockAmountModifier": 40,
             "defensiveBlockModifier": 5
@@ -7132,6 +9230,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 1736,
+            "y": -1139
+          },
           "bonuses": {
             "defensiveAbsorptionModifier": 18,
             "defensiveFreeze": 30,
@@ -7147,6 +9249,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": 1813,
+            "y": -941
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Stone Form",
@@ -7168,12 +9274,22 @@
         "order": 7
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation069_oleron.tex",
+        "x": 1178,
+        "y": 1378,
+        "dbr": "records/ui/skills/devotion/constellations/constellation69_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_04a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1255,
+            "y": 1687
+          },
           "bonuses": {
             "characterDexterity": 30,
             "characterLife": 300,
@@ -7188,6 +9304,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1451,
+            "y": 1793
+          },
           "bonuses": {
             "offensivePhysicalModifier": 80,
             "offensiveSlowBleedingModifier": 80,
@@ -7202,6 +9322,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1405,
+            "y": 1577
+          },
           "bonuses": {
             "characterOffensiveAbility": 35,
             "defensiveBleeding": 10,
@@ -7216,6 +9340,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": 1465,
+            "y": 1456
+          },
           "bonuses": {
             "characterLife": 350,
             "defensivePhysical": 4
@@ -7229,6 +9357,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1215,
+            "y": 1497
+          },
           "bonuses": {
             "offensivePhysicalMax": 16,
             "offensivePhysicalMin": 12,
@@ -7244,6 +9376,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1575,
+            "y": 1387
+          },
           "bonuses": {
             "characterOffensiveAbility": 35,
             "defensivePierceMaxResist": 2,
@@ -7260,6 +9396,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1645,
+            "y": 1677
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Blind Fury",
@@ -7281,12 +9421,22 @@
         "chaos": 7
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation071_spearoftheheavens.tex",
+        "x": -1164,
+        "y": -2068,
+        "dbr": "records/ui/skills/devotion/constellations/constellation71_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_06a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -756,
+            "y": -2010
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "offensiveLightningModifier": 80
@@ -7300,6 +9450,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -896,
+            "y": -1810
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "offensiveAetherModifier": 80
@@ -7313,6 +9467,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -1003,
+            "y": -1659
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 5,
             "defensiveAether": 15
@@ -7326,6 +9484,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -1002,
+            "y": -1563
+          },
           "bonuses": {
             "characterManaRegenModifier": 15,
             "offensiveAetherMin": 10,
@@ -7340,6 +9502,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -1145,
+            "y": -1454
+          },
           "bonuses": {
             "defensiveLightningMaxResist": 3,
             "offensiveAetherModifier": 100,
@@ -7354,6 +9520,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": -1093,
+            "y": -1625
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Spear of the Heavens",
@@ -7375,12 +9545,22 @@
         "order": 7
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation074_treeoflife.tex",
+        "x": 57,
+        "y": -2064,
+        "dbr": "records/ui/skills/devotion/constellations/constellation74_background.dbr"
+      },
       "point_cost": 6,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_09a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 395,
+            "y": -1511
+          },
           "bonuses": {
             "characterLifeModifier": 8
           },
@@ -7397,6 +9577,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 395,
+            "y": -1691
+          },
           "bonuses": {
             "characterLifeRegen": 60
           },
@@ -7413,6 +9597,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 185,
+            "y": -1801
+          },
           "bonuses": {
             "characterLifeModifier": 8,
             "characterLifeRegenModifier": 30
@@ -7430,6 +9618,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 395,
+            "y": -1811
+          },
           "bonuses": {
             "characterDefensiveAbility": 30,
             "characterLifeRegen": 60
@@ -7447,6 +9639,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 525,
+            "y": -1931
+          },
           "bonuses": {
             "characterLifeModifier": 8,
             "characterLifeRegenModifier": 30
@@ -7464,6 +9660,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 355,
+            "y": -2001
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Healing Rain",
@@ -7485,12 +9685,22 @@
         "eldritch": 15
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation072_ulzuinsflame.tex",
+        "x": -2385,
+        "y": -603,
+        "dbr": "records/ui/skills/devotion/constellations/constellation72_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_07a.dbr",
           "predecessors": [],
+          "position": {
+            "x": -2280,
+            "y": 167
+          },
           "bonuses": {
             "characterOffensiveAbility": 20,
             "offensiveFireModifier": 80
@@ -7504,6 +9714,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": -2280,
+            "y": -42
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 5,
             "defensiveChaos": 15
@@ -7517,6 +9731,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": -2280,
+            "y": -263
+          },
           "bonuses": {
             "characterRunSpeedModifier": 5,
             "offensiveCritDamageModifier": 5
@@ -7530,6 +9748,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -2230,
+            "y": -331
+          },
           "bonuses": {
             "offensiveFireMax": 15,
             "offensiveFireMin": 12,
@@ -7544,6 +9766,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": -2230,
+            "y": -419
+          },
           "bonuses": {
             "defensiveFireMaxResist": 3,
             "defensiveStun": 20,
@@ -7560,6 +9786,10 @@
           "predecessors": [
             2
           ],
+          "position": {
+            "x": -2336,
+            "y": -369
+          },
           "bonuses": {
             "defensiveProtection": 120,
             "offensiveSlowFireDurationModifier": 50,
@@ -7574,6 +9804,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": -2292,
+            "y": -500
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Meteor Shower",
@@ -7595,12 +9829,22 @@
         "order": 8
       },
       "affinity_bonus": {},
+      "background": {
+        "image": "ui/skills/devotion/devotion_constellation078_theshadow.tex",
+        "x": 1268,
+        "y": 46,
+        "dbr": "records/ui/skills/devotion/constellations/constellation78_background.dbr"
+      },
       "point_cost": 7,
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier3_13a.dbr",
           "predecessors": [],
+          "position": {
+            "x": 1479,
+            "y": 83
+          },
           "bonuses": {
             "characterOffensiveAbility": 15,
             "offensivePierceModifier": 80
@@ -7614,6 +9858,10 @@
           "predecessors": [
             0
           ],
+          "position": {
+            "x": 1479,
+            "y": 193
+          },
           "bonuses": {
             "characterOffensiveAbility": 40,
             "offensiveSlowBleedingDurationMin": 3,
@@ -7629,6 +9877,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1369,
+            "y": 243
+          },
           "bonuses": {
             "characterAttackSpeedModifier": 5,
             "characterLife": 400
@@ -7642,6 +9894,10 @@
           "predecessors": [
             1
           ],
+          "position": {
+            "x": 1609,
+            "y": 223
+          },
           "bonuses": {
             "offensivePierceModifier": 120,
             "offensiveSlowBleedingModifier": 120
@@ -7655,6 +9911,10 @@
           "predecessors": [
             3
           ],
+          "position": {
+            "x": 1493,
+            "y": 363
+          },
           "bonuses": {
             "characterLifeModifier": 8,
             "characterOffensiveAbility": 40,
@@ -7669,6 +9929,10 @@
           "predecessors": [
             4
           ],
+          "position": {
+            "x": 1493,
+            "y": 493
+          },
           "bonuses": {
             "characterOffensiveAbilityModifier": 4,
             "offensiveCritDamageModifier": 12,
@@ -7683,6 +9947,10 @@
           "predecessors": [
             5
           ],
+          "position": {
+            "x": 1493,
+            "y": 730
+          },
           "bonuses": {},
           "celestial_power": {
             "name": "Living Shadow",

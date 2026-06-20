@@ -87,12 +87,15 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
       "dbr": "records/ui/skills/devotion/constellations/constellation01.dbr",
       "affinity_required": { "eldritch": 1 },
       "affinity_bonus":    { "chaos": 2, "eldritch": 3 },
+      "background": { "image": "ui/skills/devotion/devotion_constellation001_bat.tex",
+                      "x": -953, "y": 38, "dbr": "...constellation01_background.dbr" },
       "point_cost": 5,                       // = number of stars (1 point each)
       "stars": [
         {
           "index": 0,
           "dbr": "records/skills/devotion/tier1_01a.dbr",
           "predecessors": [],                // star indices within THIS constellation
+          "position": { "x": -968, "y": 80 },// (x,y) on the shared devotion-map canvas
           "bonuses": { "offensiveLifeModifier": 15, "offensiveSlowBleedingModifier": 15 },
           "celestial_power": null,           // or { name, dbr, skill_class, description }
           "weapon_requirement": null         // or { weapons: ["Sword","Sword2h"], description }
@@ -111,6 +114,10 @@ Notes:
   best-effort human label. Beware GD quirks: internal `Life` = **Vitality**.
 - `predecessors` are 0-based star indices; a star unlocks only after its
   predecessor(s) are taken. Tree/forest rooted at star 0.
+- `position` is each star's `(x, y)` on a single shared map canvas (negative
+  origin), and `background` is the constellation's artwork (`.tex`) + its
+  placement on that same canvas — enough to redraw the in-game starmap. The
+  `.tex` images themselves aren't extracted here (export via AssetManager).
 - Tier‑3 constellations have an empty `affinity_bonus` (they grant none).
 - Crossroads is 5 single-star constellations, ids `crossroads_<affinity>`.
 - Stars that grant pet stats also carry `pet_bonuses` / `pet_bonus_dbr`.
