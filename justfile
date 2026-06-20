@@ -123,7 +123,11 @@ build:
     #!/usr/bin/env bash
     set -euo pipefail
     cd "{{justfile_directory()}}/web"
-    rm -rf dist && mkdir -p dist/data
+    # Clean dist contents in place (not the dir itself), so a running `serve` holding
+    # dist does not cause `rm -rf dist` to fail with "Device or resource busy".
+    mkdir -p dist
+    rm -rf dist/* dist/.[!.]* 2>/dev/null || true
+    mkdir -p dist/data
     bun build src/app/main.ts --outdir dist --target browser
     cp index.html dist/index.html
     cp src/styles.css dist/styles.css
@@ -132,9 +136,9 @@ build:
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
     echo "Built web/dist"
 
-# Serve web/dist locally for development
+# Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)
 serve: build
-    cd "{{justfile_directory()}}/web/dist" && bunx serve -l 5173 .
+    bunx serve "{{justfile_directory()}}/web/dist" -l 5173
 
 # Install the headless Chromium the e2e check drives (run once)
 install-e2e:
