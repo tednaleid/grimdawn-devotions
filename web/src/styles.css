@@ -31,7 +31,7 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 .star { stroke: #0d1117; stroke-width: 1; pointer-events: none; }
 .star.locked { fill: #9aa3b2; opacity: .8; }
 .star.selectable { fill: var(--affinity); opacity: 1; filter: drop-shadow(0 0 4px var(--affinity)); }
-.star.selected { fill: #fff; stroke: var(--affinity); stroke-width: 3; }
+.star.selected { fill: #fff; stroke: var(--affinity); stroke-width: 7; }
 .orb { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .3em; vertical-align: -.05em; }
 #tooltip { position: fixed; display: none; pointer-events: none; background: #1c2330; border: 1px solid #30363d; padding: .5rem .6rem; border-radius: 6px; font-size: .8rem; max-width: 280px; z-index: 10; }
 #tooltip strong { color: #6cb6ff; }
