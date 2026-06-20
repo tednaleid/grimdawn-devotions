@@ -46,6 +46,42 @@ PASSIVE_CLASSES = {"Skill_Passive", "SkillBuff_Passive"}
 
 POINT_CAP = 55  # devotion points available at max (sanity ceiling)
 
+# --- Celestial power (proc skill) extraction --------------------------------
+# Every devotion celestial power is granted at skill level 25 (grimtools shows
+# "Current Level : 25"). The skills' stat fields are per-level arrays defined for
+# levels 1..20, so the level-25 value is linearly extrapolated past the array
+# (see level_array_value). This single constant reproduces both the displayed
+# level and the acceptance stat values (e.g. Scorpion Sting's 40% weapon damage).
+CELESTIAL_POWER_LEVEL = 25
+
+# GD's internal proc trigger enum -> the word grimtools shows after "<n>% Chance on ".
+TRIGGER_DISPLAY = {
+    "AttackEnemy": "Attack",
+    "AttackEnemyCrit": "Critical Hit",
+    "Block": "Block",
+    "HitByEnemy": "Hit",
+    "HitByMelee": "Melee Hit",
+    "HitByProjectile": "Projectile Hit",
+    "HitByCrit": "Critical Hit",
+    "OnKill": "Kill",
+    "LowHealth": "Low Health",
+    "LowMana": "Low Energy",
+    "CastBuff": "Cast",
+    "OnEquip": "Equip",
+}
+
+# Ability fields that are not "stat" ids but are shown on the power tooltip; the
+# web layer (statFormat) maps these raw ids to GD-style lines. A power carries at
+# most one of the two radius ids.
+POWER_META_FIELDS = {
+    "skillCooldownTime", "projectileLaunchNumber", "projectilePiercingChance",
+    "projectileExplosionRadius", "skillTargetRadius", "weaponDamagePct",
+}
+
+# Stat-id families to pull off a proc skill (same families as extract_bonuses),
+# selected at the granted level. Boolean flags and cosmetic radii are excluded.
+POWER_STAT_PREFIXES = ("offensive", "defensive", "retaliation", "character", "racial")
+
 
 # ---------------------------------------------------------------------------
 # Generic .dbr + translation readers
@@ -159,6 +195,107 @@ def extract_bonuses(skill: dict[str, str]) -> dict[str, float]:
     return bonuses
 
 
+def level_array_value(value: str, level: int):
+    """Select a skill stat value at a 1-based level from a per-level array.
+
+    Most proc-skill stats are semicolon-separated arrays ("10;20;30;..."), one
+    entry per level. The arrays define levels 1..N (N is usually 20) where the
+    final entry carries a small end-of-line bonus; the granted level (25) sits
+    past the array, so values are linearly extrapolated using the slope of the
+    clean region (levels 1..N-1), anchored on the last entry. For a scalar value
+    this is just the number. Returns None if the value is not numeric.
+    """
+    parts = [p for p in value.split(";") if p.strip() != ""]
+    if not parts:
+        return None
+    try:
+        nums = [float(p) for p in parts]
+    except ValueError:
+        return None
+    n = len(nums)
+    if n == 1:
+        val = nums[0]
+    elif level - 1 < n:
+        val = nums[level - 1]
+    elif n >= 3:
+        step = (nums[n - 2] - nums[0]) / (n - 2)
+        val = nums[n - 1] + (level - n) * step
+    else:  # n == 2
+        val = nums[n - 1] + (level - n) * (nums[1] - nums[0])
+    # Keep whole arrays whole (damage, projectiles); allow decimals otherwise.
+    if all(float(p) == int(float(p)) for p in parts):
+        val = round(val)
+    else:
+        val = round(val, 4)
+    return int(val) if val == int(val) else val
+
+
+def power_skill_chain(db: DB, skill: dict[str, str]) -> list[dict[str, str]]:
+    """The granting skill plus the buff/pet/modifier child skills it delegates to.
+
+    Damage-over-time and debuffs frequently live on a child skill, so the proc
+    trigger, name and stats are all gathered across this whole chain.
+    """
+    chain = [skill]
+    seen: set[str] = set()
+    for ref_key in ("buffSkillName", "petSkillName", "modifierSkillName"):
+        ref = skill.get(ref_key, "").strip()
+        if ref and ref not in seen:
+            seen.add(ref)
+            chain.append(db.get(ref))
+    return chain
+
+
+def is_power_stat_key(key: str) -> bool:
+    """Whether a raw key is a stat id to surface on a celestial power."""
+    if key in POWER_META_FIELDS:
+        return False  # handled explicitly, not via the stat-family scan
+    if not key.startswith(POWER_STAT_PREFIXES):
+        return False
+    if key.endswith(("Global", "XOR")):
+        return False  # boolean flags, not granted values
+    if key.endswith("Radius"):
+        return False  # characterLightRadius / cosmetic; real radius via meta fields
+    return True
+
+
+def extract_proc(db: DB, chain: list[dict[str, str]]):
+    """The proc trigger { chance, trigger } from a skill's autocast controller, or None.
+
+    Always-on auras/buffs have no autocast controller and so no proc.
+    """
+    for rec in chain:
+        ref = rec.get("templateAutoCast", "").strip()
+        if not ref:
+            continue
+        ctrl = db.get(ref)
+        chance = as_number(ctrl.get("chanceToRun", ""))
+        trig = ctrl.get("triggerType", "").strip()
+        if chance is None or not trig:
+            continue
+        return {"chance": chance, "trigger": TRIGGER_DISPLAY.get(trig, trig)}
+    return None
+
+
+def extract_power_stats(chain: list[dict[str, str]], level: int) -> dict[str, float]:
+    """Raw stat id -> value at the granted level, gathered across the skill chain.
+
+    Mirrors the bonuses convention (raw ids, numbers, non-zero only) but selects
+    per-level array values, and additionally keeps the ability meta fields used
+    for the tooltip (recharge, projectiles, pass-through, radius, weapon %).
+    """
+    stats: dict[str, float] = {}
+    for rec in chain:
+        for key, raw in rec.items():
+            if key not in POWER_META_FIELDS and not is_power_stat_key(key):
+                continue
+            val = level_array_value(raw, level)
+            if val is None or val == 0:
+                continue
+            stats.setdefault(key, val)  # first record in the chain wins
+    return stats
+
+
 def extract_weapon_requirement(skill: dict[str, str], tags: dict[str, str]):
     weapons = [w for w in WEAPON_FLAGS if skill.get(w, "0").strip() not in ("0", "")]
     if not weapons:
@@ -237,33 +374,33 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
                 star["pet_bonuses"] = pet_bonuses
                 star["pet_bonus_dbr"] = pet_ref
     else:
-        # Celestial power node: the granted proc skill, not passive stats.
-        name, desc = resolve_power_name(db, tags, skill)
+        # Celestial power node: the granted proc skill, not passive stats. The
+        # ability (proc trigger + per-level stats) is read across the skill chain
+        # at the fixed granted level; see CELESTIAL_POWER_LEVEL.
+        chain = power_skill_chain(db, skill)
+        name, desc = resolve_power_name(tags, chain)
         star["celestial_power"] = {
             "name": name,
             "dbr": skill_ref,
             "skill_class": cls,
             "description": desc,
+            "proc": extract_proc(db, chain),
+            "level": CELESTIAL_POWER_LEVEL,
+            "stats": extract_power_stats(chain, CELESTIAL_POWER_LEVEL),
         }
     return star, skill_ref
 
 
-def resolve_power_name(db: DB, tags: dict[str, str], skill: dict[str, str]):
+def resolve_power_name(tags: dict[str, str], chain: list[dict[str, str]]):
     """Find a celestial power's display name + description.
 
     Direct attack skills carry skillDisplayName themselves; buff/aura skills
     (Skill_BuffRadius, etc.) put it on the child skill referenced by
     buffSkillName / petSkillName. Fall back to FileDescription's "X - Power".
     """
-    candidates = [skill]
-    for ref_key in ("buffSkillName", "petSkillName", "modifierSkillName"):
-        ref = skill.get(ref_key, "").strip()
-        if ref:
-            candidates.append(db.get(ref))
-
     name = ""
     desc = ""
-    for rec in candidates:
+    for rec in chain:
         tag = rec.get("skillDisplayName", "").strip()
         if tag and tag in tags and not name:
             name = clean_text(tags[tag])
@@ -274,7 +411,7 @@ def resolve_power_name(db: DB, tags: dict[str, str], skill: dict[str, str]):
             break
 
     if not name:
-        fd = skill.get("FileDescription", "").strip()
+        fd = chain[0].get("FileDescription", "").strip()
         name = fd.split(" - ", 1)[1].strip() if " - " in fd else fd
     return name or None, desc or None
 
@@ -391,7 +528,7 @@ def ensure_unique_ids(constellations: list[dict]):
         used.add(c["id"])
 
 
-def validate(constellations: list[dict], tags: dict[str, str]) -> list[str]:
+def validate(constellations: list[dict], tags: dict[str, str], warnings: list[str]) -> list[str]:
     report: list[str] = []
     report.append(f"Constellations parsed: {len(constellations)}")
     if len(constellations) < 40:
@@ -417,6 +554,8 @@ def validate(constellations: list[dict], tags: dict[str, str]) -> list[str]:
     leak = 0
     bad_pred = 0
     powers = 0
+    powers_with_proc = 0
+    powers_with_stats = 0
     weapon_reqs = 0
     stars_total = 0
     stars_no_pos = 0
@@ -436,11 +575,21 @@ def validate(constellations: list[dict], tags: dict[str, str]) -> list[str]:
                     bad_pred += 1
             if s["celestial_power"]:
                 powers += 1
-                if (s["celestial_power"]["name"] or "").startswith("tag"):
+                cp = s["celestial_power"]
+                if (cp["name"] or "").startswith("tag"):
                     leak += 1
+                if cp.get("proc"):
+                    powers_with_proc += 1
+                if cp.get("stats"):
+                    powers_with_stats += 1
+                else:
+                    warnings.append(f"power '{cp['name']}' ({cp['dbr']}) parsed no stats")
             if s["weapon_requirement"]:
                 weapon_reqs += 1
     report.append(f"Celestial powers found: {powers}")
+    report.append(f"Celestial powers with a proc trigger: {powers_with_proc}/{powers}")
+    report.append(f"Celestial powers with parsed stats: {powers_with_stats}/{powers}"
+                  + ("  WARNING" if powers_with_stats < powers else "  OK"))
     report.append(f"Stars with weapon requirement: {weapon_reqs}")
     report.append(f"Stars missing a map position: {stars_no_pos}/{stars_total}"
                   + ("  WARNING" if stars_no_pos else "  OK"))
@@ -561,7 +710,7 @@ def main(argv=None) -> int:
         print(f"Wrote {cp}  ({rows} rows)")
 
     print("\n=== VALIDATION REPORT ===")
-    report = validate(constellations, tags)
+    report = validate(constellations, tags, warnings)
     for line in report:
         print("  " + line)
     if warnings:

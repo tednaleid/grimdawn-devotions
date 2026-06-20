@@ -3,7 +3,7 @@
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-06-20T04:36:00Z",
+    "generated_utc": "2026-06-20T19:56:50Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -113,7 +113,23 @@
             "name": "Scorpion Sting",
             "dbr": "records/skills/devotion/tier1_02e_skill.dbr",
             "skill_class": "Skill_AttackProjectileRing",
-            "description": "Spines coated with deadly toxin erupt around you."
+            "description": "Spines coated with deadly toxin erupt around you.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveSlowDefensiveAbilityDurationMin": 5,
+              "offensiveSlowDefensiveAbilityMin": 150,
+              "offensiveSlowPoisonDurationMin": 5,
+              "offensiveSlowPoisonMin": 225,
+              "projectileExplosionRadius": 0.1,
+              "projectileLaunchNumber": 6,
+              "projectilePiercingChance": 100,
+              "skillCooldownTime": 1.5,
+              "weaponDamagePct": 40
+            }
           },
           "weapon_requirement": null
         }
@@ -220,7 +236,23 @@
             "name": "Targo's Hammer",
             "dbr": "records/skills/devotion/tier1_05e_skill.dbr",
             "skill_class": "Skill_AttackProjectileOrbiting",
-            "description": "Targo's celestial hammer orbits around you, striking down nearby foes."
+            "description": "Targo's celestial hammer orbits around you, striking down nearby foes.",
+            "proc": {
+              "chance": 50,
+              "trigger": "Block"
+            },
+            "level": 25,
+            "stats": {
+              "offensivePhysicalMin": 203,
+              "offensiveSlowPhysicalDurationMin": 2,
+              "offensiveSlowPhysicalMin": 225,
+              "offensiveStunChance": 60,
+              "offensiveStunMin": 1,
+              "projectileExplosionRadius": 0.25,
+              "projectilePiercingChance": 100,
+              "skillCooldownTime": 0.1,
+              "weaponDamagePct": 45
+            }
           },
           "weapon_requirement": null
         }
@@ -325,7 +357,16 @@
             "name": "Assassin's Mark",
             "dbr": "records/skills/devotion/tier1_08e_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "Mark your target for a swift and painful death."
+            "description": "Mark your target for a swift and painful death.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Critical Hit"
+            },
+            "level": 25,
+            "stats": {
+              "defensivePhysical": -33,
+              "defensivePierce": -37
+            }
           },
           "weapon_requirement": null
         }
@@ -433,7 +474,22 @@
             "name": "Twin Fangs",
             "dbr": "records/skills/devotion/tier1_01e_skill.dbr",
             "skill_class": "Skill_AttackProjectileBurst",
-            "description": "Vampiric fangs assault your foes and sap them of vitality."
+            "description": "Vampiric fangs assault your foes and sap them of vitality.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveLifeLeechMin": 45,
+              "offensiveLifeMax": 221,
+              "offensiveLifeMin": 128,
+              "offensivePierceMin": 165,
+              "projectileLaunchNumber": 2,
+              "projectilePiercingChance": 100,
+              "skillCooldownTime": 0.6,
+              "weaponDamagePct": 22
+            }
           },
           "weapon_requirement": null
         }
@@ -544,7 +600,21 @@
             "name": "Bull Rush",
             "dbr": "records/skills/devotion/tier1_21e_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "Strike nearby foes in a rush of physical force, like a charging bull."
+            "description": "Strike nearby foes in a rush of physical force, like a charging bull.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensivePhysicalMax": 233,
+              "offensivePhysicalMin": 118,
+              "offensiveSlowPhysicalDurationMin": 2,
+              "offensiveSlowPhysicalMin": 225,
+              "skillCooldownTime": 0.4,
+              "skillTargetRadius": 3.5,
+              "weaponDamagePct": 31
+            }
           },
           "weapon_requirement": null
         }
@@ -929,7 +999,18 @@
             "name": "Dryad's Blessing",
             "dbr": "records/skills/devotion/tier1_26e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "The dryad's blessing cleanses your wounds and wards you against poison."
+            "description": "The dryad's blessing cleanses your wounds and wards you against poison.",
+            "proc": {
+              "chance": 33,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "defensiveBleedingDuration": 35,
+              "defensivePoisonDuration": 35,
+              "defensiveProtection": 70,
+              "skillCooldownTime": 2.5
+            }
           },
           "weapon_requirement": null
         }
@@ -1209,7 +1290,23 @@
             "name": "Guardian's Gaze",
             "dbr": "records/skills/devotion/tier1_09e_skill.dbr",
             "skill_class": "Skill_AttackProjectileOrbiting",
-            "description": "A peerless eye of the Great Guardian circles around you."
+            "description": "A peerless eye of the Great Guardian circles around you.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveChaosMin": 193,
+              "offensiveLifeLeechMin": 15,
+              "offensivePoisonMin": 83,
+              "offensiveSlowPoisonDurationMin": 2,
+              "offensiveSlowPoisonMin": 190,
+              "projectileExplosionRadius": 0.25,
+              "projectilePiercingChance": 100,
+              "skillCooldownTime": 0.5,
+              "weaponDamagePct": 15
+            }
           },
           "weapon_requirement": null
         }
@@ -1315,7 +1412,22 @@
             "name": "Falcon Swoop",
             "dbr": "records/skills/devotion/tier1_10e_skill.dbr",
             "skill_class": "Skill_AttackProjectileBurst",
-            "description": "A cast of celestial falcons swoops down upon your foes."
+            "description": "A cast of celestial falcons swoops down upon your foes.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensivePhysicalMin": 116,
+              "offensiveSlowBleedingDurationMin": 3,
+              "offensiveSlowBleedingMin": 225,
+              "projectileExplosionRadius": 0.1,
+              "projectileLaunchNumber": 7,
+              "projectilePiercingChance": 100,
+              "skillCooldownTime": 2,
+              "weaponDamagePct": 25
+            }
           },
           "weapon_requirement": null
         }
@@ -1428,7 +1540,21 @@
             "name": "Flame Torrent",
             "dbr": "records/skills/devotion/tier1_20e_skill.dbr",
             "skill_class": "Skill_AttackProjectileOrbiting",
-            "description": "Devilish flames swirl around you, incinerating all they touch."
+            "description": "Devilish flames swirl around you, incinerating all they touch.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveChaosMin": 121,
+              "offensiveFireMin": 178,
+              "offensiveSlowFireDurationMin": 3,
+              "offensiveSlowFireMin": 190,
+              "projectileExplosionRadius": 0.5,
+              "projectilePiercingChance": 100,
+              "weaponDamagePct": 20
+            }
           },
           "weapon_requirement": null
         }
@@ -1719,7 +1845,19 @@
             "name": "Ghoulish Hunger",
             "dbr": "records/skills/devotion/tier1_25e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "When cornered, you are thrown into a ghoulish fervor, desperate for a morsel of flesh."
+            "description": "When cornered, you are thrown into a ghoulish fervor, desperate for a morsel of flesh.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Low Health"
+            },
+            "level": 25,
+            "stats": {
+              "characterAttackSpeedModifier": 22,
+              "characterSpellCastSpeedModifier": 22,
+              "defensivePhysical": 17,
+              "offensiveLifeLeechMin": 78,
+              "skillCooldownTime": 25
+            }
           },
           "weapon_requirement": null
         }
@@ -2143,7 +2281,19 @@
             "name": "Aetherfire",
             "dbr": "records/skills/devotion/tier1_19e_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A small burst of aetherfire erupts at your target's feet."
+            "description": "A small burst of aetherfire erupts at your target's feet.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveAetherMin": 190,
+              "offensiveConfusionChance": 38,
+              "offensiveConfusionMin": 2,
+              "offensiveFireMin": 140,
+              "projectileExplosionRadius": 2.5
+            }
           },
           "weapon_requirement": null
         }
@@ -3041,7 +3191,16 @@
             "name": "Shepherd's Call",
             "dbr": "records/skills/devotion/tier1_06e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Call upon your minions to join you in battle."
+            "description": "Call upon your minions to join you in battle.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "characterOffensiveAbility": 80,
+              "skillCooldownTime": 6
+            }
           },
           "weapon_requirement": null
         }
@@ -3254,7 +3413,15 @@
             "name": "Turtle Shell",
             "dbr": "records/skills/devotion/tier1_29e_skill.dbr",
             "skill_class": "Skill_BuffSelfShield",
-            "description": "When threatened, a protective barrier forms around you, negating further harm."
+            "description": "When threatened, a protective barrier forms around you, negating further harm.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Low Health"
+            },
+            "level": 25,
+            "stats": {
+              "skillCooldownTime": 8
+            }
           },
           "weapon_requirement": null
         }
@@ -3361,7 +3528,26 @@
             "name": "Tsunami",
             "dbr": "records/skills/devotion/tier1_18e_skill.dbr",
             "skill_class": "Skill_AttackWave",
-            "description": "A torrent of water crashes down upon any foes unfortunate enough to be standing in front of you."
+            "description": "A torrent of water crashes down upon any foes unfortunate enough to be standing in front of you.",
+            "proc": {
+              "chance": 35,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveColdMax": 215,
+              "offensiveColdMin": 180,
+              "offensiveFumbleDurationMin": 2,
+              "offensiveFumbleMin": 14,
+              "offensiveLightningMax": 132,
+              "offensiveLightningMin": 85,
+              "offensiveProjectileFumbleDurationMin": 2,
+              "offensiveProjectileFumbleMin": 14,
+              "offensiveSlowColdDurationMin": 2,
+              "offensiveSlowColdMin": 225,
+              "skillCooldownTime": 0.7,
+              "weaponDamagePct": 45
+            }
           },
           "weapon_requirement": null
         }
@@ -3856,7 +4042,21 @@
             "name": "Fetid Pool",
             "dbr": "records/skills/devotion/tier2_16c_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A festering pool erupts beneath your enemies, corrupting the ground."
+            "description": "A festering pool erupts beneath your enemies, corrupting the ground.",
+            "proc": {
+              "chance": 33,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveLifeMin": 442,
+              "offensiveSlowLifeDurationMin": 2,
+              "offensiveSlowLifeMin": 300,
+              "offensiveSlowTotalSpeedDurationMin": 2,
+              "offensiveSlowTotalSpeedMin": 35,
+              "projectileExplosionRadius": 3,
+              "skillCooldownTime": 2
+            }
           },
           "weapon_requirement": null
         },
@@ -4079,7 +4279,26 @@
             "name": "Blizzard",
             "dbr": "records/skills/devotion/tier2_15g_skill.dbr",
             "skill_class": "Skill_AttackProjectileDrop",
-            "description": "Shards of razor-sharp ice rain down from the sky upon your foes."
+            "description": "Shards of razor-sharp ice rain down from the sky upon your foes.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Critical Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveColdMax": 477,
+              "offensiveColdMin": 385,
+              "offensiveFreezeChance": 60,
+              "offensiveFreezeMin": 1,
+              "offensiveSlowColdDurationMin": 2,
+              "offensiveSlowColdMin": 300,
+              "offensiveSlowRunSpeedDurationMin": 3,
+              "offensiveSlowRunSpeedMin": 90,
+              "projectileExplosionRadius": 2,
+              "skillCooldownTime": 3.2,
+              "skillTargetRadius": 6.5,
+              "weaponDamagePct": 16
+            }
           },
           "weapon_requirement": null
         }
@@ -4226,7 +4445,20 @@
             "name": "Blades of Wrath",
             "dbr": "records/skills/devotion/tier2_06g_skill.dbr",
             "skill_class": "Skill_AttackProjectileRing",
-            "description": "Push the advantage by unleashing a burst of phantasmal blades that pass through enemies with ease. Blades initially deal 30% reduced damage before reaching their full strength as they expand outward."
+            "description": "Push the advantage by unleashing a burst of phantasmal blades that pass through enemies with ease. Blades initially deal 30% reduced damage before reaching their full strength as they expand outward.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Critical Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensivePierceMax": 370,
+              "offensivePierceMin": 325,
+              "projectileLaunchNumber": 18,
+              "projectilePiercingChance": 100,
+              "skillCooldownTime": 1.8,
+              "weaponDamagePct": 28
+            }
           },
           "weapon_requirement": null
         }
@@ -4373,7 +4605,23 @@
             "name": "Trample",
             "dbr": "records/skills/devotion/tier2_08g_skill.dbr",
             "skill_class": "Skill_AttackProjectile",
-            "description": "Unleash a wave of force from your shield that shatters the very earth and scatters your foes."
+            "description": "Unleash a wave of force from your shield that shatters the very earth and scatters your foes.",
+            "proc": {
+              "chance": 50,
+              "trigger": "Block"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveKnockdownChance": 150,
+              "offensiveKnockdownMax": 1.5,
+              "offensiveKnockdownMin": 0.8,
+              "offensiveSlowPhysicalDurationMin": 2,
+              "offensiveSlowPhysicalMin": 339,
+              "projectileExplosionRadius": 0.1,
+              "projectilePiercingChance": 100,
+              "skillCooldownTime": 0.3,
+              "weaponDamagePct": 60
+            }
           },
           "weapon_requirement": null
         }
@@ -4508,7 +4756,16 @@
             "name": "Giant's Blood",
             "dbr": "records/skills/devotion/tier2_28f_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Giant's blood flows through your veins, incurring improved regeneration and healing."
+            "description": "Giant's blood flows through your veins, incurring improved regeneration and healing.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "characterLifeRegen": 725,
+              "skillCooldownTime": 25
+            }
           },
           "weapon_requirement": null
         }
@@ -4956,7 +5213,15 @@
             "name": "Bysmiel's Command",
             "dbr": "records/skills/devotion/tier2_12e_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Call forth an eldritch hound to snap and tear at your foes. The hound's presence in the physical realm is unstable and it will only remain at your side for a limited time. The hound scales with Pet Bonuses."
+            "description": "Call forth an eldritch hound to snap and tear at your foes. The hound's presence in the physical realm is unstable and it will only remain at your side for a limited time. The hound scales with Pet Bonuses.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "skillCooldownTime": 10
+            }
           },
           "weapon_requirement": null
         }
@@ -5098,7 +5363,16 @@
             "name": "Wayward Soul",
             "dbr": "records/skills/devotion/tier2_29g_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Sacrifice a wayward soul to ward yourself against the specter of death."
+            "description": "Sacrifice a wayward soul to ward yourself against the specter of death.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "characterDefensiveAbility": 150,
+              "defensiveProtection": 560
+            }
           },
           "weapon_requirement": null
         }
@@ -5172,7 +5446,15 @@
             "name": "Arcane Barrier",
             "dbr": "records/skills/devotion/tier2_17c_skill.dbr",
             "skill_class": "Skill_BuffSelfShield",
-            "description": "A barrier to the forces of magic forms around you."
+            "description": "A barrier to the forces of magic forms around you.",
+            "proc": {
+              "chance": 30,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "skillCooldownTime": 3
+            }
           },
           "weapon_requirement": null
         },
@@ -5337,7 +5619,18 @@
             "name": "Maul",
             "dbr": "records/skills/devotion/tier2_05f_skill.dbr",
             "skill_class": "Skill_AttackBuffRadius",
-            "description": "Maul nearby foes with the might of a dire bear, feasting on their exposed insides."
+            "description": "Maul nearby foes with the might of a dire bear, feasting on their exposed insides.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "defensiveProtectionModifier": -40,
+              "offensiveLifeLeechMin": 52,
+              "offensivePhysicalMin": 350,
+              "skillTargetRadius": 4.5
+            }
           },
           "weapon_requirement": null
         }
@@ -5627,7 +5920,19 @@
             "name": "Rend",
             "dbr": "records/skills/devotion/tier2_04g_skill.dbr",
             "skill_class": "Skill_AttackBuffRadius",
-            "description": "Shred your foes, exposing delicate arteries and inducing intense bleeding."
+            "description": "Shred your foes, exposing delicate arteries and inducing intense bleeding.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "characterOffensiveAbility": -175,
+              "defensiveBleeding": -38,
+              "offensiveSlowBleedingDurationMin": 1,
+              "offensiveSlowBleedingMin": 375,
+              "skillTargetRadius": 7
+            }
           },
           "weapon_requirement": null
         }
@@ -6091,7 +6396,22 @@
             "name": "Fissure",
             "dbr": "records/skills/devotion/tier2_07g_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A fissure opens in the earth, spewing lava and brimstone upon nearby foes."
+            "description": "A fissure opens in the earth, spewing lava and brimstone upon nearby foes.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveFireMax": 234,
+              "offensiveFireMin": 192,
+              "offensiveSlowFireDurationMin": 2,
+              "offensiveSlowFireMin": 240,
+              "offensiveStunChance": 35,
+              "offensiveStunMin": 1.5,
+              "projectileExplosionRadius": 1,
+              "skillCooldownTime": 1.8
+            }
           },
           "weapon_requirement": null
         }
@@ -6238,7 +6558,20 @@
             "name": "Acid Spray",
             "dbr": "records/skills/devotion/tier2_18f_skill.dbr",
             "skill_class": "Skill_AttackWave",
-            "description": "The manticore's sting pierces through your target, creating a spray of caustic acid behind them."
+            "description": "The manticore's sting pierces through your target, creating a spray of caustic acid behind them.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensivePoisonMin": 305,
+              "offensiveSlowPoisonDurationMin": 2,
+              "offensiveSlowPoisonMin": 240,
+              "offensiveTotalResistanceReductionAbsoluteDurationMin": 5,
+              "offensiveTotalResistanceReductionAbsoluteMin": 35,
+              "skillCooldownTime": 1
+            }
           },
           "weapon_requirement": null
         }
@@ -6364,7 +6697,20 @@
             "name": "Messenger of War",
             "dbr": "records/skills/devotion/tier2_20f_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Carry on your message of conquest, rebuking any foe daring enough to try and stop you."
+            "description": "Carry on your message of conquest, rebuking any foe daring enough to try and stop you.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Melee Hit"
+            },
+            "level": 25,
+            "stats": {
+              "characterRunSpeedModifier": 40,
+              "defensiveTotalSpeedResistance": 90,
+              "retaliationFireMin": 1055,
+              "retaliationFireModifier": 170,
+              "retaliationTotalDamageModifier": 170,
+              "skillCooldownTime": 5
+            }
           },
           "weapon_requirement": null
         }
@@ -6635,7 +6981,15 @@
             "name": "Raise the Dead",
             "dbr": "records/skills/devotion/tier2_10f_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Raise the dead to serve you. The necrotic energies required for this ritual are very unstable however, and the undead minions will only exist for a limited time. The dead scale with player damage bonuses."
+            "description": "Raise the dead to serve you. The necrotic energies required for this ritual are very unstable however, and the undead minions will only exist for a limited time. The dead scale with player damage bonuses.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "skillCooldownTime": 2
+            }
           },
           "weapon_requirement": null
         }
@@ -6714,7 +7068,25 @@
             "name": "Elemental Storm",
             "dbr": "records/skills/devotion/tier2_01c_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A crackling whirlwind of flame and ice manifests itself at your command."
+            "description": "A crackling whirlwind of flame and ice manifests itself at your command.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveElementalMin": 154,
+              "offensiveElementalResistanceReductionAbsoluteDurationMin": 2,
+              "offensiveElementalResistanceReductionAbsoluteMin": 40,
+              "offensiveSlowColdDurationMin": 2,
+              "offensiveSlowColdMin": 120,
+              "offensiveSlowFireDurationMin": 2,
+              "offensiveSlowFireMin": 120,
+              "offensiveSlowLightningDurationMin": 2,
+              "offensiveSlowLightningMin": 120,
+              "projectileExplosionRadius": 3.5,
+              "skillCooldownTime": 1.5
+            }
           },
           "weapon_requirement": null
         },
@@ -7043,7 +7415,22 @@
             "name": "Tip the Scales",
             "dbr": "records/skills/devotion/tier2_02f_skill.dbr",
             "skill_class": "Skill_AttackSpell",
-            "description": "Tip the scales in your favor, sapping your attackers of vitality and transferring it to you."
+            "description": "Tip the scales in your favor, sapping your attackers of vitality and transferring it to you.",
+            "proc": {
+              "chance": 33,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveLifeLeechMin": 140,
+              "offensiveLifeMin": 370,
+              "offensiveSlowManaLeachDurationMin": 2,
+              "offensiveSlowManaLeachMin": 240,
+              "offensiveTotalResistanceReductionAbsoluteDurationMin": 3,
+              "offensiveTotalResistanceReductionAbsoluteMin": 28,
+              "skillCooldownTime": 1,
+              "weaponDamagePct": 38
+            }
           },
           "weapon_requirement": null
         }
@@ -7308,7 +7695,20 @@
             "name": "Eldritch Fire",
             "dbr": "records/skills/devotion/tier2_11e_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "Eldritch flames erupt from your blows and spread wildly among your foes."
+            "description": "Eldritch flames erupt from your blows and spread wildly among your foes.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "characterRunSpeedModifier": -43,
+              "defensiveChaos": -53,
+              "defensiveFire": -30,
+              "offensiveChaosMin": 142,
+              "offensiveFireMin": 142,
+              "skillCooldownTime": 1
+            }
           },
           "weapon_requirement": null
         }
@@ -7554,7 +7954,18 @@
             "name": "Shield Wall",
             "dbr": "records/skills/devotion/tier2_14g_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "A metaphysical barrier forms around you."
+            "description": "A metaphysical barrier forms around you.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "defensiveBlockAmountModifier": 250,
+              "defensiveProtectionModifier": 55,
+              "retaliationPhysicalMin": 650,
+              "skillCooldownTime": 8
+            }
           },
           "weapon_requirement": null
         }
@@ -7700,7 +8111,22 @@
             "name": "Reckless Tempest",
             "dbr": "records/skills/devotion/tier2_13g_skill.dbr",
             "skill_class": "Skill_BuffAttackRadiusLightning",
-            "description": "Static energy swells within you, unleashed upon nearby foes in the form of destructive bolts of lightning."
+            "description": "Static energy swells within you, unleashed upon nearby foes in the form of destructive bolts of lightning.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Critical Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveLightningMax": 350,
+              "offensiveLightningMin": 143,
+              "offensiveSlowLightningDurationMin": 2,
+              "offensiveSlowLightningMin": 300,
+              "offensiveStunChance": 20,
+              "offensiveStunMin": 0.7,
+              "skillCooldownTime": 10,
+              "skillTargetRadius": 8
+            }
           },
           "weapon_requirement": null
         }
@@ -7827,7 +8253,18 @@
             "name": "Cleansing Waters",
             "dbr": "records/skills/devotion/tier2_30e_skill.dbr",
             "skill_class": "Skill_DispelMagic",
-            "description": "Ulo's cleansing waters purge all foul magic from the area, removing beneficial auras and spells from foes while allies are cleansed of negative ailments, including damage over time effects."
+            "description": "Ulo's cleansing waters purge all foul magic from the area, removing beneficial auras and spells from foes while allies are cleansed of negative ailments, including damage over time effects.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveSlowTotalSpeedDurationMin": 8,
+              "offensiveSlowTotalSpeedMin": 56,
+              "projectileExplosionRadius": 3.5,
+              "skillCooldownTime": 2
+            }
           },
           "weapon_requirement": null
         }
@@ -7957,7 +8394,16 @@
             "name": "Wendigo's Mark",
             "dbr": "records/skills/devotion/tier2_03f_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "You mark your foes with the sign of the wendigo, sapping them of what little there is left of their vitality and transferring it to you."
+            "description": "You mark your foes with the sign of the wendigo, sapping them of what little there is left of their vitality and transferring it to you.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveLifeLeechMin": 60,
+              "offensiveLifeMin": 370
+            }
           },
           "weapon_requirement": null
         }
@@ -8083,7 +8529,16 @@
             "name": "Arcane Bomb",
             "dbr": "records/skills/devotion/tier2_09f_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Mark the ground with an arcane sigil that erupts upon coming in contact with an enemy. Arcane Bombs take 1 second to arm."
+            "description": "Mark the ground with an arcane sigil that erupts upon coming in contact with an enemy. Arcane Bombs take 1 second to arm.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "projectileExplosionRadius": 1,
+              "skillCooldownTime": 1
+            }
           },
           "weapon_requirement": null
         }
@@ -8192,7 +8647,21 @@
             "name": "Abominable Might",
             "dbr": "records/skills/devotion/tier3_02e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "The chaotic powers of the Void flow through you, turning your weapons into conduits for your fiendish might."
+            "description": "The chaotic powers of the Void flow through you, turning your weapons into conduits for your fiendish might.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "characterLifeRegenModifier": 150,
+              "offensiveChaosMax": 205,
+              "offensiveChaosMin": 77,
+              "offensiveChaosModifier": 380,
+              "offensiveLifeModifier": 450,
+              "offensiveSlowLifeModifier": 450,
+              "skillCooldownTime": 18
+            }
           },
           "weapon_requirement": null
         },
@@ -8248,7 +8717,19 @@
             "name": "Tainted Eruption",
             "dbr": "records/skills/devotion/tier3_02h_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "The corruption trapped within you is unleashed in a massive explosion of vile toxins."
+            "description": "The corruption trapped within you is unleashed in a massive explosion of vile toxins.",
+            "proc": {
+              "chance": 15,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveConfusionMin": 1.8,
+              "offensiveSlowPoisonDurationMin": 5,
+              "offensiveSlowPoisonMin": 432,
+              "skillCooldownTime": 3,
+              "skillTargetRadius": 10
+            }
           },
           "weapon_requirement": null
         }
@@ -8380,7 +8861,15 @@
             "name": "Time Dilation",
             "dbr": "records/skills/devotion/tier3_01f_skill.dbr",
             "skill_class": "Skill_RefreshCooldown",
-            "description": "The sands of the hourglass spin in an untamed whirlwind. The laws of time itself no longer apply to you."
+            "description": "The sands of the hourglass spin in an untamed whirlwind. The laws of time itself no longer apply to you.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "skillCooldownTime": 0.5
+            }
           },
           "weapon_requirement": null
         }
@@ -8528,7 +9017,16 @@
             "name": "Elemental Seeker",
             "dbr": "records/skills/devotion/tier3_11g_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Conjure an eldritch creature of pure energy that seeks out and burns nearby foes with its very presence before returning to the Aether in an explosion of energy. Elemental Seekers scale with player damage bonuses."
+            "description": "Conjure an eldritch creature of pure energy that seeks out and burns nearby foes with its very presence before returning to the Aether in an explosion of energy. Elemental Seekers scale with player damage bonuses.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "projectileExplosionRadius": 1,
+              "skillCooldownTime": 0.8
+            }
           },
           "weapon_requirement": null
         }
@@ -8680,7 +9178,24 @@
             "name": "Hungering Void",
             "dbr": "records/skills/devotion/tier3_08g_skill.dbr",
             "skill_class": "Skill_BuffRadius",
-            "description": "The hungering void empowers you, your allies and your minions, but the power gained comes at a heavy toll to the body."
+            "description": "The hungering void empowers you, your allies and your minions, but the power gained comes at a heavy toll to the body.",
+            "proc": {
+              "chance": 33,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "characterTotalSpeedModifier": 14,
+              "offensiveChaosModifier": 570,
+              "offensiveCritDamageModifier": 23,
+              "offensiveLifeModifier": 570,
+              "offensiveSlowLifeModifier": 570,
+              "retaliationChaosMin": 1115,
+              "retaliationFearChance": 100,
+              "retaliationFearMin": 3,
+              "skillCooldownTime": 30,
+              "skillTargetRadius": 12
+            }
           },
           "weapon_requirement": null
         }
@@ -8823,7 +9338,22 @@
             "name": "Whirlpool",
             "dbr": "records/skills/devotion/tier3_12g_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "The stirring depths are unleashed as a hungering whirlpool appears to devastate your foes."
+            "description": "The stirring depths are unleashed as a hungering whirlpool appears to devastate your foes.",
+            "proc": {
+              "chance": 30,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveColdMin": 573,
+              "offensiveSlowColdDurationMin": 2,
+              "offensiveSlowColdMin": 400,
+              "offensiveSlowRunSpeedDurationMin": 2,
+              "offensiveSlowRunSpeedMin": 50,
+              "offensiveSlowTotalSpeedMin": 45,
+              "projectileExplosionRadius": 3.5,
+              "skillCooldownTime": 2
+            }
           },
           "weapon_requirement": null
         }
@@ -8970,7 +9500,26 @@
             "name": "Light of Empyrion",
             "dbr": "records/skills/devotion/tier3_03g_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "The divine light of Empyrion banishes the darkness and sears your foes."
+            "description": "The divine light of Empyrion banishes the darkness and sears your foes.",
+            "proc": {
+              "chance": 30,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveFireMax": 555,
+              "offensiveFireMin": 400,
+              "offensiveKnockdownMin": 1.8,
+              "offensivePhysicalMin": 475,
+              "offensiveSlowFireDurationMin": 2,
+              "offensiveSlowFireMin": 400,
+              "offensiveTotalDamageReductionPercentDurationMin": 3,
+              "offensiveTotalDamageReductionPercentMin": 35,
+              "racialBonusPercentDamage": 50,
+              "skillCooldownTime": 2,
+              "skillTargetRadius": 5,
+              "weaponDamagePct": 70
+            }
           },
           "weapon_requirement": null
         }
@@ -9118,7 +9667,23 @@
             "name": "Howl of Mogdrogen",
             "dbr": "records/skills/devotion/tier3_10f_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Driven by the thrill of a fresh kill, you and your minions enter a fervent rage."
+            "description": "Driven by the thrill of a fresh kill, you and your minions enter a fervent rage.",
+            "proc": {
+              "chance": 20,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "characterAttackSpeedModifier": 22,
+              "characterLifeRegenModifier": 150,
+              "characterSpellCastSpeedModifier": 20,
+              "offensiveSlowBleedingDurationMin": 3,
+              "offensiveSlowBleedingMin": 89,
+              "offensiveSlowBleedingModifier": 425,
+              "offensiveSlowDefensiveAbilityDurationMin": 3,
+              "offensiveSlowDefensiveAbilityMin": 210,
+              "skillCooldownTime": 15
+            }
           },
           "weapon_requirement": null
         }
@@ -9258,7 +9823,19 @@
             "name": "Stone Form",
             "dbr": "records/skills/devotion/tier3_05g_skill.dbr",
             "skill_class": "Skill_BuffRadius",
-            "description": "Your flesh becomes as stone, nearly impervious to all but the toughest blows."
+            "description": "Your flesh becomes as stone, nearly impervious to all but the toughest blows.",
+            "proc": {
+              "chance": 33,
+              "trigger": "Block"
+            },
+            "level": 25,
+            "stats": {
+              "defensiveBleedingDuration": 80,
+              "defensivePoisonDuration": 80,
+              "retaliationTotalDamageModifier": 175,
+              "skillCooldownTime": 12,
+              "skillTargetRadius": 15
+            }
           },
           "weapon_requirement": null
         }
@@ -9405,7 +9982,24 @@
             "name": "Blind Fury",
             "dbr": "records/skills/devotion/tier3_04g_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "Exhilarated by the blood and gore you spill, you violently assault all nearby foes in a flurry of vicious blows."
+            "description": "Exhilarated by the blood and gore you spill, you violently assault all nearby foes in a flurry of vicious blows.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Critical Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensivePhysicalMin": 340,
+              "offensiveSlowAttackSpeedDurationMin": 5,
+              "offensiveSlowAttackSpeedMin": 40,
+              "offensiveSlowBleedingDurationMin": 5,
+              "offensiveSlowBleedingMin": 465,
+              "offensiveSlowPhysicalDurationMin": 5,
+              "offensiveSlowPhysicalMin": 465,
+              "skillCooldownTime": 1,
+              "skillTargetRadius": 6,
+              "weaponDamagePct": 95
+            }
           },
           "weapon_requirement": null
         }
@@ -9529,7 +10123,24 @@
             "name": "Spear of the Heavens",
             "dbr": "records/skills/devotion/tier3_06f_skill.dbr",
             "skill_class": "Skill_AttackProjectileDrop",
-            "description": "A celestial spear smites foes who dare strike you."
+            "description": "A celestial spear smites foes who dare strike you.",
+            "proc": {
+              "chance": 50,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveAetherMin": 484,
+              "offensiveLightningMax": 390,
+              "offensiveLightningMin": 265,
+              "offensiveSlowLightningDurationMin": 2,
+              "offensiveSlowLightningMin": 310,
+              "offensiveStunMin": 1,
+              "projectileExplosionRadius": 2.4,
+              "skillCooldownTime": 1,
+              "skillTargetRadius": 0.5,
+              "weaponDamagePct": 80
+            }
           },
           "weapon_requirement": null
         }
@@ -9669,7 +10280,20 @@
             "name": "Healing Rain",
             "dbr": "records/skills/devotion/tier3_09f_skill.dbr",
             "skill_class": "Skill_BuffRadius",
-            "description": "A soothing mist emanates from you, mending wounds and curing ailments."
+            "description": "A soothing mist emanates from you, mending wounds and curing ailments.",
+            "proc": {
+              "chance": 25,
+              "trigger": "Hit"
+            },
+            "level": 25,
+            "stats": {
+              "characterLifeRegen": 675,
+              "characterLifeRegenModifier": 114,
+              "characterManaRegen": 25,
+              "characterManaRegenModifier": 95,
+              "skillCooldownTime": 12,
+              "skillTargetRadius": 15
+            }
           },
           "weapon_requirement": null
         }
@@ -9813,7 +10437,24 @@
             "name": "Meteor Shower",
             "dbr": "records/skills/devotion/tier3_07g_skill.dbr",
             "skill_class": "Skill_BuffAttackRadiusDrop",
-            "description": "At your behest, the sky splits open to unleash several barrages of molten rock. Only one Meteor Shower can be cast at any one time."
+            "description": "At your behest, the sky splits open to unleash several barrages of molten rock. Only one Meteor Shower can be cast at any one time.",
+            "proc": {
+              "chance": 30,
+              "trigger": "Attack"
+            },
+            "level": 25,
+            "stats": {
+              "offensiveFireMax": 352,
+              "offensiveFireMin": 290,
+              "offensivePhysicalMax": 320,
+              "offensivePhysicalMin": 285,
+              "offensiveSlowFireDurationMin": 2,
+              "offensiveSlowFireMin": 400,
+              "projectileExplosionRadius": 2.4,
+              "projectileLaunchNumber": 1,
+              "skillCooldownTime": 3.5,
+              "skillTargetRadius": 5
+            }
           },
           "weapon_requirement": null
         }
@@ -9956,7 +10597,15 @@
             "name": "Living Shadow",
             "dbr": "records/skills/devotion/tier3_13g_skill.dbr",
             "skill_class": "Skill_SpawnPet",
-            "description": "A manifestation of a nameless hero rises to fight alongside you and restore your vitality with every blow. Living Shadows scale with player damage bonuses."
+            "description": "A manifestation of a nameless hero rises to fight alongside you and restore your vitality with every blow. Living Shadows scale with player damage bonuses.",
+            "proc": {
+              "chance": 100,
+              "trigger": "Critical Hit"
+            },
+            "level": 25,
+            "stats": {
+              "skillCooldownTime": 6
+            }
           },
           "weapon_requirement": null
         }
