@@ -22,11 +22,14 @@ export function racialTargets(model: DevotionModel, selected: Iterable<StarId>):
   return [...out];
 }
 
-export function powersGained(model: DevotionModel, selected: Set<StarId>): string[] {
-  const out: string[] = [];
+export function powersGained(
+  model: DevotionModel,
+  selected: Set<StarId>,
+): { name: string; description: string | null }[] {
+  const out: { name: string; description: string | null }[] = [];
   for (const id of selected) {
     const star = model.stars.get(id);
-    if (star?.celestialPower) out.push(star.celestialPower.name);
+    if (star?.celestialPower) out.push(star.celestialPower);
   }
   return out;
 }

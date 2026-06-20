@@ -16,6 +16,11 @@ function gradColors(c: Constellation): string[] {
   return grant.length ? grant : ["#9aa3b2"];
 }
 
+// Diamond polygon points centered at (cx, cy) with the given radius.
+function diamondPoints(cx: number, cy: number, r: number): string {
+  return `${cx},${cy - r} ${cx + r},${cy} ${cx},${cy + r} ${cx - r},${cy}`;
+}
+
 // Left-to-right gradient stops for the affinities a constellation requires (1-3 colors).
 function gradientStops(colors: string[]): string {
   if (colors.length === 1) return `<stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[0]}"/>`;
@@ -31,6 +36,8 @@ function gradientStops(colors: string[]): string {
 const STAR_CENTER = 32;
 // Visible star dot radius.
 const STAR_RADIUS = 12;
+// Celestial-power stars render as a larger diamond so they stand out.
+const POWER_RADIUS = 15;
 // Invisible click/hover target radius around each star (larger than the visible dot).
 const HIT_RADIUS = 22;
 // Padding around a constellation's star bounding box for its hover/click region.
@@ -102,10 +109,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     else if (selectable.has(star.id)) st = "selectable";
     const cx = star.position.x + STAR_CENTER;
     const cy = star.position.y + STAR_CENTER;
-    parts.push(
-      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>` +
-        `<circle class="star ${st}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="--affinity:${solid};--grad:url(#grad-${con.id})"/>`,
-    );
+    const style = `--affinity:${solid};--grad:url(#grad-${con.id})`;
+    // Celestial-power stars are diamonds; the rest are circles. Both share the .star styling.
+    const visible = star.celestialPower
+      ? `<polygon class="star power ${st}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
+      : `<circle class="star ${st}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+    parts.push(`<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`);
   }
 
   const pts = [...model.stars.values()].map((s) => ({ x: s.position.x + STAR_CENTER, y: s.position.y + STAR_CENTER }));

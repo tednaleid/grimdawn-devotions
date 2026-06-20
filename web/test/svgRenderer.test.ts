@@ -46,3 +46,9 @@ test("renders the art <image> at the manifest's native width/height", () => {
   expect(markup).toContain('width="640" height="480"');
   expect(markup).toContain(`x="${c.background!.x}" y="${c.background!.y}"`);
 });
+
+test("renders celestial-power stars as diamonds (polygon)", () => {
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
+  // bat:4 is the "Twin Fangs" celestial power star; non-power stars stay circles.
+  expect(markup).toContain('<polygon class="star power');
+});

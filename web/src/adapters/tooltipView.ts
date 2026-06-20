@@ -48,7 +48,10 @@ export function tooltipView(el: HTMLElement) {
       const star = model.stars.get(starId);
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
-      const power = star.celestialPower ? `<div class="tip-power">${star.celestialPower.name}</div>` : "";
+      const power = star.celestialPower
+        ? `<div class="tip-power">${star.celestialPower.name}</div>` +
+          (star.celestialPower.description ? `<div class="tip-power-desc">${star.celestialPower.description}</div>` : "")
+        : "";
       el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${affinitySections(con, totals)}`;
       place(clientX, clientY);
     },
@@ -57,7 +60,7 @@ export function tooltipView(el: HTMLElement) {
       if (!con) return;
       const stars = new Set(con.starIds);
       const powers = powersGained(model, stars)
-        .map((p) => `<div class="tip-power">${p}</div>`)
+        .map((p) => `<div class="tip-power">${p.name}</div>`)
         .join("");
       const head = `<strong>${con.name}</strong> <span class="tip-cost">${con.starIds.length} pts</span>`;
       el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${affinitySections(con, totals)}`;

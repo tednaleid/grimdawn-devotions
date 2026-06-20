@@ -6,13 +6,19 @@ import { affinityTotals } from "../core/affinity";
 import { formatBonusRows } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 
+function escapeAttr(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+}
+
 export function renderBenefits(el: HTMLElement, model: DevotionModel, selected: Set<StarId>): void {
   const bonuses = sumBonuses(model, selected);
   const powers = powersGained(model, selected);
   const rows = formatBonusRows(bonuses, { racialTarget: racialTargets(model, selected) })
     .map((r) => `<div class="benefit"><span>${r.label}</span><span class="val">${r.value}</span></div>`)
     .join("");
-  const powerRows = powers.map((p) => `<div class="power">${p}</div>`).join("");
+  const powerRows = powers
+    .map((p) => `<div class="power"${p.description ? ` title="${escapeAttr(p.description)}"` : ""}>${p.name}</div>`)
+    .join("");
   el.innerHTML = `<h2>Benefits</h2>${rows}${powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : ""}`;
 }
 

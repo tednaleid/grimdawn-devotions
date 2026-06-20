@@ -13,7 +13,7 @@ export interface Star {
   predecessors: StarId[];
   position: { x: number; y: number };
   bonuses: Record<string, number>;
-  celestialPower: { name: string } | null;
+  celestialPower: { name: string; description: string | null } | null;
   weaponRequirement: { weapons: string[] } | null;
   racialTarget?: string[]; // races a racialBonus* stat applies to, e.g. ["Beast"]
 }

@@ -16,5 +16,6 @@ test("sums like stat ids additively across stars", () => {
 
 test("collects celestial power names", () => {
   const powers = powersGained(model, new Set(["bat:4"]));
-  expect(powers).toContain("Twin Fangs");
+  expect(powers.map((p) => p.name)).toContain("Twin Fangs");
+  expect(powers[0]!.description).toBeTruthy();
 });
