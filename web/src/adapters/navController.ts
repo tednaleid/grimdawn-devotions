@@ -16,7 +16,8 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
     const svg = svgGetter();
     const raw = svg?.getAttribute("viewBox");
     if (!raw) return baseVb;
-    const [x, y, w, h] = raw.split(" ").map(Number);
+    const parts = raw.split(" ").map(Number);
+    const [x, y, w, h] = [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0, parts[3] ?? 0];
     return { x, y, w, h };
   }
   function apply(vb: ViewBox) { svgGetter()?.setAttribute("viewBox", toViewBoxString(vb)); }
