@@ -9,10 +9,11 @@ const model = buildModel(doc as any);
 
 test("marks selected and selectable stars with classes and ids", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(["crossroads_eldritch:0"]), pointCap: 55 }, { manifest: null });
-  expect(markup).toContain('data-star-id="crossroads_eldritch:0"');
+  // The large hit target carries the id + state; the visible dot carries the matching star class.
+  expect(markup).toContain('data-star-id="crossroads_eldritch:0" class="hit selected"');
   expect(markup).toContain('class="star selected"');
   // bat:0 becomes selectable once eldritch is satisfied
-  expect(markup).toMatch(/data-star-id="bat:0"[^>]*class="star selectable"|class="star selectable"[^>]*data-star-id="bat:0"/);
+  expect(markup).toContain('data-star-id="bat:0" class="hit selectable"');
 });
 
 test("omits the art layer when no manifest", () => {

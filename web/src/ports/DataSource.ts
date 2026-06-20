@@ -17,7 +17,6 @@ export interface AssetManifest {
 
 export interface LoadedData {
   model: DevotionModel;
-  label: (statId: string) => string;
   manifest: AssetManifest | null;
 }
 

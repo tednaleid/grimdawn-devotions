@@ -1,17 +1,16 @@
 // ABOUTME: DOM adapter that renders the benefits and affinity sidebar panels.
-// ABOUTME: Reads from core aggregate/affinity functions; writes directly to HTMLElement.innerHTML.
+// ABOUTME: Formats summed stat totals via statFormat and shows affinity totals with colored orbs.
 import { AFFINITIES, type DevotionModel, type StarId } from "../core/types";
 import { sumBonuses, powersGained } from "../core/aggregate";
 import { affinityTotals } from "../core/affinity";
+import { formatBonusRows } from "../core/statFormat";
+import { affinityOrb } from "./affinityColors";
 
-export function renderBenefits(
-  el: HTMLElement, model: DevotionModel, selected: Set<StarId>, label: (s: string) => string,
-): void {
+export function renderBenefits(el: HTMLElement, model: DevotionModel, selected: Set<StarId>): void {
   const bonuses = sumBonuses(model, selected);
   const powers = powersGained(model, selected);
-  const rows = Object.entries(bonuses)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([stat, val]) => `<div class="benefit"><span>${label(stat)}</span><span>${val}</span></div>`)
+  const rows = formatBonusRows(bonuses)
+    .map((r) => `<div class="benefit"><span>${r.label}</span><span class="val">${r.value}</span></div>`)
     .join("");
   const powerRows = powers.map((p) => `<div class="power">${p}</div>`).join("");
   el.innerHTML = `<h2>Benefits</h2>${rows}${powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : ""}`;
@@ -20,7 +19,7 @@ export function renderBenefits(
 export function renderAffinities(el: HTMLElement, model: DevotionModel, selected: Set<StarId>): void {
   const totals = affinityTotals(model, selected);
   const rows = AFFINITIES.map(
-    (a) => `<div class="affinity affinity-${a}"><span>${a}</span><span>${totals[a]}</span></div>`,
+    (a) => `<div class="affinity affinity-${a}"><span>${affinityOrb(a)}${a}</span><span class="val">${totals[a]}</span></div>`,
   ).join("");
   el.innerHTML = `<h2>Affinity</h2>${rows}`;
 }

@@ -26,7 +26,7 @@ async function boot() {
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
     onStarClick: (id) => { state = toggleStar(model, state, id); refresh(); },
-    onStarHover: (id, x, y) => { if (id) tip.show(model, id, x, y, data.label); else tip.hide(); },
+    onStarHover: (id, x, y) => { if (id) tip.show(model, id, x, y); else tip.hide(); },
   });
 
   const nav = attachNav(() => mapContainer.querySelector("svg"), {
@@ -49,7 +49,7 @@ async function boot() {
 
   function refresh() {
     handle.update(state);
-    renderBenefits(benefitsEl, model, state.selected, data.label);
+    renderBenefits(benefitsEl, model, state.selected);
     renderAffinities(affinityEl, model, state.selected);
     countEl.textContent = `${state.selected.size} / ${state.pointCap}`;
   }
