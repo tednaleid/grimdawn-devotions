@@ -1,6 +1,6 @@
 // ABOUTME: DOM adapter that shows/hides a floating tooltip for a hovered star or whole constellation.
 // ABOUTME: Star view shows that star's bonuses; constellation view shows the union of all its stars' bonuses.
-import { type Affinity, type AffinityMap, type CelestialPower, type Constellation, type DevotionModel, type StarId } from "../core/types";
+import type { Affinity, AffinityMap, CelestialPower, Constellation, DevotionModel, StarId } from "../core/types";
 import { formatBonusRows, formatPowerStats } from "../core/statFormat";
 import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";

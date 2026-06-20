@@ -14,7 +14,7 @@ test("canonical ordering covers every star exactly once", () => {
 
 test("round-trips a selection and point cap", () => {
   const selected = new Set([canonical[0]!, canonical[5]!, canonical[200]!, canonical[canonical.length - 1]!]);
-  const decoded = decodeHash("#" + encodeHash(selected, 42, canonical), canonical)!;
+  const decoded = decodeHash(`#${encodeHash(selected, 42, canonical)}`, canonical)!;
   expect(decoded.pointCap).toBe(42);
   expect([...decoded.selected].sort()).toEqual([...selected].sort());
 });
@@ -22,7 +22,7 @@ test("round-trips a selection and point cap", () => {
 test("empty selection encodes to an empty bitset and round-trips", () => {
   const hash = encodeHash(new Set(), 55, canonical);
   expect(hash).toBe("p=55&s=");
-  const decoded = decodeHash("#" + hash, canonical)!;
+  const decoded = decodeHash(`#${hash}`, canonical)!;
   expect(decoded.selected.size).toBe(0);
   expect(decoded.pointCap).toBe(55);
 });

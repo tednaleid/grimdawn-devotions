@@ -1,6 +1,6 @@
 // ABOUTME: SVG renderer adapter for the devotion map - builds markup strings and mounts live DOM.
 // ABOUTME: renderSvgMarkup is a pure function; mountSvg wires it to a live HTMLElement with events.
-import { type Constellation, type DevotionModel, type SelectionState, type StarId } from "../core/types";
+import type { Constellation, DevotionModel, SelectionState, StarId } from "../core/types";
 import { selectableStars } from "../core/rules";
 import { affinityFrom, completedConstellations, meetsRequirement } from "../core/affinity";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";

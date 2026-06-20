@@ -67,7 +67,10 @@ any platform without extracting anything from the game:
 ```bash
 just web-install  # install web dependencies (bun)
 just serve        # build, then serve at http://localhost:5173
+just check        # tests + lint + type-check (the full verification gate)
 just test         # run the test suite
+just lint         # lint with Biome (just lint-fix to auto-fix the safe ones)
+just typecheck    # type-check with tsc (no emit)
 just build        # build the static site into web/dist
 ```
 

@@ -127,6 +127,21 @@ web-install:
 test:
     cd "{{justfile_directory()}}/web" && bun test
 
+# Type-check the web sources (no emit)
+typecheck:
+    cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
+
+# Lint the web sources with Biome
+lint:
+    cd "{{justfile_directory()}}/web" && bunx biome lint
+
+# Auto-fix the safe lint findings Biome can resolve on its own
+lint-fix:
+    cd "{{justfile_directory()}}/web" && bunx biome lint --write
+
+# Full verification gate: tests, lint, and type-check
+check: test lint typecheck
+
 # Build the static site into web/dist (bundles JS, copies html/css/data/assets)
 build:
     #!/usr/bin/env bash

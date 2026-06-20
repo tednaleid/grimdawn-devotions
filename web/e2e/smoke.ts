@@ -72,7 +72,7 @@ class CDP {
       } else if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error") {
         this.consoleErrors.push(m.params.args.map((a: any) => a.value ?? a.description ?? "").join(" "));
       } else if (m.method === "Runtime.exceptionThrown") {
-        this.consoleErrors.push("exception: " + (m.params.exceptionDetails?.exception?.description ?? m.params.exceptionDetails?.text ?? "unknown"));
+        this.consoleErrors.push(`exception: ${m.params.exceptionDetails?.exception?.description ?? m.params.exceptionDetails?.text ?? "unknown"}`);
       }
     };
   }
@@ -93,7 +93,7 @@ class CDP {
   }
   async evaluate<T>(expression: string): Promise<T> {
     const r = await this.send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true });
-    if (r.exceptionDetails) throw new Error("evaluate threw: " + (r.exceptionDetails.exception?.description ?? r.exceptionDetails.text));
+    if (r.exceptionDetails) throw new Error(`evaluate threw: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
     return r.result.value as T;
   }
 }
@@ -155,11 +155,11 @@ try {
     "power tooltip shows the level-25 ability stat lines");
 
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
-  if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log("    console: " + e);
+  if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log(`    console: ${e}`);
 
   failed = results.some((r) => !r.ok);
 } catch (err) {
-  console.error("\nE2E ERROR: " + (err as Error).message);
+  console.error(`\nE2E ERROR: ${(err as Error).message}`);
   failed = true;
 } finally {
   cleanup();

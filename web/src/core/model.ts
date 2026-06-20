@@ -45,7 +45,7 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
         predecessors: s.predecessors.map((p) => `${c.id}:${p}`),
         position: s.position,
         bonuses: s.bonuses,
-        celestialPower: s.celestial_power && s.celestial_power.name
+        celestialPower: s.celestial_power?.name
           ? {
               name: s.celestial_power.name,
               description: s.celestial_power.description ?? null,

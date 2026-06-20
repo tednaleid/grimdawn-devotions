@@ -7,6 +7,16 @@ export interface NavOpts {
   onDragStateChange?(dragging: boolean): void;
 }
 
+export interface NavHandlers {
+  onWheel(e: WheelEvent): void;
+  onDown(e: MouseEvent): void;
+  onClickCapture(e: MouseEvent): void;
+}
+
+// The wheel/down/click handlers are stashed on the function object so main.ts can
+// attach them to the container after construction; this is the typed view of that slot.
+type NavHandlerStore = { _handlers?: NavHandlers };
+
 const DRAG_THRESHOLD = 4;
 
 export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts): { reset(): void } {
@@ -62,13 +72,11 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
   window.addEventListener("mousemove", onMove);
   window.addEventListener("mouseup", onUp);
   // Caller attaches these to the container in main.ts:
-  (attachNav as any)._handlers = { onWheel, onDown, onClickCapture };
+  (attachNav as unknown as NavHandlerStore)._handlers = { onWheel, onDown, onClickCapture };
 
   return { reset() { apply(baseVb); } };
 }
 
-export function navHandlers() {
-  return (attachNav as any)._handlers as {
-    onWheel(e: WheelEvent): void; onDown(e: MouseEvent): void; onClickCapture(e: MouseEvent): void;
-  };
+export function navHandlers(): NavHandlers {
+  return (attachNav as unknown as NavHandlerStore)._handlers!;
 }
