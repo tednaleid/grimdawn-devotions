@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build a static, single-page web app that renders the Grim Dawn devotion map, lets the player pick valid stars under full game rules, and shows cumulative benefits + affinity totals.
+**Goal:** Build a static, single-page web app that renders the Grim Dawn devotion map, lets the player pick valid stars under the game rules, and shows cumulative benefits plus affinity totals.
 
 **Architecture:** Hexagonal. A pure, framework-free domain core (`web/src/core/`) holds all rules and aggregation and is unit-tested with `bun test`. Thin adapters (`web/src/adapters/`) handle fetch, SVG rendering, pan/zoom, and DOM views. `web/src/app/main.ts` wires them and owns the `SelectionState`.
 
@@ -15,10 +15,12 @@
 - Star global id format is `` `${constellationId}:${index}` `` (e.g. `bat:0`).
 - Devotion point cap is **55**; slider default is **55**.
 - Like-stat bonuses stack **additively** (sum values sharing a stat id).
+- **Every created file (source AND test) MUST begin with a 2-line `ABOUTME:` header** describing what it does (repo convention). `.ts`/`.js`: `// ABOUTME: …` on two lines. `.css`: `/* ABOUTME: … */` on two lines. `.py` scripts: the two `# ABOUTME: …` lines go immediately after the shebang, before the PEP 723 block. `index.html`: `<!-- ABOUTME: … -->`. The `types.ts` template (Task 2) shows the exact format; other code templates omit it for brevity but it is required on all of them.
+- Documentation and comments use no emojis, em-dashes, or hyperbole.
 - No image assets are committed. `assets/`, `web/dist/`, and `web/node_modules/` are git-ignored.
 - The app must work with zero art (SVG dots) and only overlay art when `assets/devotions/manifest.json` is present.
 - All runtime asset references are **relative** (e.g. `./data/…`, `./assets/…`), so the site works unchanged under a GitHub Pages project subpath (`/<repo>/`). The end-goal deliverable is a GitHub Pages deploy (Task 16).
-- Affinity is granted only by **completing** a whole constellation. An **incomplete** constellation grants nothing, so its entry star needs affinity from *elsewhere* to be added. But a **completed** constellation's affinity counts toward the total pool, **including its own requirement** — so once a constellation is self-sustaining (its own grant ≥ its requirement) you can remove the bootstrap Crossroads stars that opened it, and it stays valid. (E.g. Crossroads `primordial:1` opens Eel; completing Eel grants `primordial:5`; deselect the Crossroads and Eel still satisfies its own `primordial:1`.)
+- Affinity is granted only by **completing** a whole constellation. An **incomplete** constellation grants nothing, so its entry star needs affinity from *elsewhere* to be added. But a **completed** constellation's affinity counts toward the total pool, **including its own requirement**, so once a constellation is self-sustaining (its own grant is at least its requirement) you can remove the bootstrap Crossroads stars that opened it, and it stays valid. (E.g. Crossroads `primordial:1` opens Eel; completing Eel grants `primordial:5`; deselect the Crossroads and Eel still satisfies its own `primordial:1`.)
 
 ---
 
@@ -73,7 +75,7 @@
 }
 ```
 
-- [ ] **Step 3: Write the smoke test** — `web/src/core/smoke.test.ts`
+- [ ] **Step 3: Write the smoke test** in `web/src/core/smoke.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -103,7 +105,7 @@ Add a check line inside the `doctor` recipe's "Tools:" block (after the `winget`
     check bun  "run 'just install' (winget install Oven-sh.Bun) then open a new shell"
 ```
 
-Add a bun install to the `install-uv`/`install` area — append this recipe:
+Add a bun install to the `install-uv`/`install` area. Append this recipe:
 
 ```make
 # Install bun (web toolchain) via winget if missing
@@ -161,7 +163,7 @@ git commit -m "chore(web): scaffold bun + typescript project and just test"
   - `types.ts`: `Affinity`, `AffinityMap = Partial<Record<Affinity, number>>`, `StarId = string`, `Star`, `Constellation`, `DevotionModel`, `SelectionState`, `AFFINITIES: Affinity[]`.
   - `model.ts`: `buildModel(doc: DevotionsDoc): DevotionModel`.
 
-- [ ] **Step 1: Write the failing test** — `web/test/model.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/model.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -195,11 +197,13 @@ test("constellation carries affinity req/bonus and member ids", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/model.test.ts`
-Expected: FAIL — cannot find `../src/core/model`.
+Expected: FAIL, cannot find `../src/core/model`.
 
 - [ ] **Step 3: Write `web/src/core/types.ts`**
 
 ```ts
+// ABOUTME: Core domain types for the devotion planner (affinities, stars, model, selection).
+// ABOUTME: Pure data shapes with no DOM or IO dependencies.
 export type Affinity = "ascendant" | "chaos" | "eldritch" | "order" | "primordial";
 export const AFFINITIES: Affinity[] = ["ascendant", "chaos", "eldritch", "order", "primordial"];
 
@@ -329,7 +333,7 @@ git commit -m "feat(core): types and buildModel graph indexing"
   - `affinityTotals(model, selected: Set<StarId>): Record<Affinity, number>`
   - `meetsRequirement(have: Record<Affinity, number>, need: AffinityMap): boolean`
 
-- [ ] **Step 1: Write the failing test** — `web/test/affinity.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/affinity.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -366,7 +370,7 @@ test("meetsRequirement compares per-affinity", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/affinity.test.ts`
-Expected: FAIL — cannot find `../src/core/affinity`.
+Expected: FAIL, cannot find `../src/core/affinity`.
 
 - [ ] **Step 3: Write `web/src/core/affinity.ts`**
 
@@ -425,7 +429,7 @@ git commit -m "feat(core): affinity totals, completion, requirement check"
 
 ---
 
-### Task 4: `validClosure` (fixpoint pruning — used as the removal guard)
+### Task 4: `validClosure` (fixpoint pruning, used as the removal guard)
 
 **Files:**
 - Create: `web/src/core/rules.ts`
@@ -434,9 +438,9 @@ git commit -m "feat(core): affinity totals, completion, requirement check"
 **Interfaces:**
 - Consumes: Task 2 + Task 3 exports.
 - Produces: `validClosure(model: DevotionModel, selected: Set<StarId>): Set<StarId>`.
-  Rule: a star survives iff all its predecessors survive AND, if it is an **entry star** (no predecessors), the constellation's `affinityRequired` is met by the affinity pool from **all completed constellations, including its own once complete**. (An incomplete constellation contributes 0, so a partial/lone constellation still needs external affinity; a fully-completed one can satisfy its own requirement — enabling Crossroads bootstrap removal.)
+  Rule: a star survives iff all its predecessors survive AND, if it is an **entry star** (no predecessors), the constellation's `affinityRequired` is met by the affinity pool from **all completed constellations, including its own once complete**. (An incomplete constellation contributes 0, so a partial/lone constellation still needs external affinity; a fully-completed one can satisfy its own requirement, enabling Crossroads bootstrap removal.)
 
-- [ ] **Step 1: Write the failing test** — `web/test/rules-closure.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/rules-closure.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -482,7 +486,7 @@ test("a completed constellation sustains its own requirement (bootstrap removabl
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/rules-closure.test.ts`
-Expected: FAIL — cannot find `../src/core/rules`.
+Expected: FAIL, cannot find `../src/core/rules`.
 
 - [ ] **Step 3: Write `web/src/core/rules.ts`**
 
@@ -536,9 +540,9 @@ git commit -m "feat(core): validClosure fixpoint with affinity gating + self-sus
 **Interfaces:**
 - Consumes: Task 2-4.
 - Produces: `selectableStars(model: DevotionModel, state: SelectionState): Set<StarId>`.
-  A star qualifies iff it is unselected, points remain (`selected.size < pointCap`), its predecessors are all selected, and — if it is an entry star — its constellation's `affinityRequired` is met by affinity from all completed constellations.
+  A star qualifies iff it is unselected, points remain (`selected.size < pointCap`), its predecessors are all selected, and (if it is an entry star) its constellation's `affinityRequired` is met by affinity from all completed constellations.
 
-- [ ] **Step 1: Write the failing test** — `web/test/rules-selectable.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/rules-selectable.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -577,7 +581,7 @@ test("no points remaining means nothing is selectable", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/rules-selectable.test.ts`
-Expected: FAIL — `selectableStars` is not exported.
+Expected: FAIL, `selectableStars` is not exported.
 
 - [ ] **Step 3: Append to `web/src/core/rules.ts`**
 
@@ -607,7 +611,7 @@ Update the existing import line at the top of `rules.ts` to include `SelectionSt
 ```ts
 import type { DevotionModel, SelectionState, StarId } from "./types";
 ```
-(and delete the now-redundant second `import type { SelectionState }` line you added — keep a single import.)
+(and delete the now-redundant second `import type { SelectionState }` line you added, keeping a single import.)
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -632,10 +636,10 @@ git commit -m "feat(core): selectableStars with point-cap and affinity gating"
 **Interfaces:**
 - Consumes: Task 2-5.
 - Produces:
-  - `canRemove(model, state, starId): boolean` — true iff the star is selected and removing it leaves every remaining star valid (`validClosure(selected − star)` does not shrink). This is the **guarded/leaf** rule: a star is removable only when no selected star depends on it and removing it won't drop affinity another selected constellation requires.
-  - `toggleStar(model, state: SelectionState, starId: StarId): SelectionState` — if the star is selectable, add it; if it is selected **and `canRemove`**, remove it; otherwise return the state unchanged (a click that would invalidate other selections is **rejected, not cascaded**). Always returns a new object on change; never mutates input.
+  - `canRemove(model, state, starId): boolean`: true iff the star is selected and removing it leaves every remaining star valid (`validClosure(selected − star)` does not shrink). This is the **guarded/leaf** rule: a star is removable only when no selected star depends on it and removing it won't drop affinity another selected constellation requires.
+  - `toggleStar(model, state: SelectionState, starId: StarId): SelectionState`: if the star is selectable, add it; if it is selected **and `canRemove`**, remove it; otherwise return the state unchanged (a click that would invalidate other selections is **rejected, not cascaded**). Always returns a new object on change; never mutates input.
 
-- [ ] **Step 1: Write the failing test** — `web/test/rules-toggle.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/rules-toggle.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -702,7 +706,7 @@ test("self-sustaining constellation: the bootstrap IS removable (no cascade)", (
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/rules-toggle.test.ts`
-Expected: FAIL — `toggleStar` is not exported.
+Expected: FAIL, `toggleStar` is not exported.
 
 - [ ] **Step 3: Append to `web/src/core/rules.ts`**
 
@@ -759,7 +763,7 @@ git commit -m "feat(core): toggleStar add + guarded (leaf-valid) remove"
   - `powersGained(model, selected: Set<StarId>): string[]`
   - `weaponRequirements(model, selected: Set<StarId>): { starId: StarId; weapons: string[] }[]`
 
-- [ ] **Step 1: Write the failing test** — `web/test/aggregate.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/aggregate.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -785,7 +789,7 @@ test("collects celestial power names", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/aggregate.test.ts`
-Expected: FAIL — cannot find `../src/core/aggregate`.
+Expected: FAIL, cannot find `../src/core/aggregate`.
 
 - [ ] **Step 3: Write `web/src/core/aggregate.ts`**
 
@@ -848,9 +852,9 @@ git commit -m "feat(core): bonus/power/weapon aggregation"
 
 **Interfaces:**
 - Consumes: nothing (takes a plain `Record<string,string>`).
-- Produces: `makeLabeler(statLabels: Record<string, string>): (statId: string) => string`. Uses the map when present; otherwise humanizes the id (camelCase/`._` → spaced Title-ish).
+- Produces: `makeLabeler(statLabels: Record<string, string>): (statId: string) => string`. Uses the map when present; otherwise humanizes the id (camelCase/`._` to spaced Title-ish).
 
-- [ ] **Step 1: Write the failing test** — `web/test/labels.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/labels.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -870,7 +874,7 @@ test("humanizes unknown stat ids", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/labels.test.ts`
-Expected: FAIL — cannot find `../src/core/labels`.
+Expected: FAIL, cannot find `../src/core/labels`.
 
 - [ ] **Step 3: Write `web/src/core/labels.ts`**
 
@@ -914,10 +918,10 @@ git commit -m "feat(core): stat labeler with humanize fallback"
   - `interface ViewBox { x: number; y: number; w: number; h: number }`
   - `fitViewBox(points: { x: number; y: number }[], pad: number): ViewBox`
   - `panViewBox(vb: ViewBox, worldDx: number, worldDy: number): ViewBox`
-  - `zoomViewBox(vb, worldX, worldY, factor, minW, maxW): ViewBox` — scales about the given world point, clamped by width.
+  - `zoomViewBox(vb, worldX, worldY, factor, minW, maxW): ViewBox`: scales about the given world point, clamped by width.
   - `toViewBoxString(vb: ViewBox): string`
 
-- [ ] **Step 1: Write the failing test** — `web/test/viewbox.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/viewbox.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -951,7 +955,7 @@ test("toViewBoxString formats", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/viewbox.test.ts`
-Expected: FAIL — cannot find `../src/core/viewbox`.
+Expected: FAIL, cannot find `../src/core/viewbox`.
 
 - [ ] **Step 3: Write `web/src/core/viewbox.ts`**
 
@@ -1093,12 +1097,12 @@ git commit -m "feat(adapter): DataSource port + http loader"
 - Consumes: `DevotionModel`, `SelectionState`, `selectableStars` (Task 5), `fitViewBox`/`toViewBoxString` (Task 9), `AssetManifest` (Task 10), `AFFINITIES`.
 - Produces:
   - `affinityColor(affinity: Affinity): string`
-  - `renderSvgMarkup(model, state, opts): string` — pure string builder producing the `<svg>` inner markup (art `<image>` if manifest has it, `<line>` links, `<circle class="star ...">` with `data-star-id`). Used by the test and by the DOM mount.
-  - `mountSvg(container: HTMLElement, model, deps): { update(state): void; svg: SVGSVGElement }` — creates the live SVG, delegates clicks/hover via `data-star-id`.
+  - `renderSvgMarkup(model, state, opts): string`: pure string builder producing the `<svg>` inner markup (art `<image>` if manifest has it, `<line>` links, `<circle class="star ...">` with `data-star-id`). Used by the test and by the DOM mount.
+  - `mountSvg(container: HTMLElement, model, deps): { update(state): void; svg: SVGSVGElement }`: creates the live SVG, delegates clicks/hover via `data-star-id`.
 
 The pure `renderSvgMarkup` is unit-tested; `mountSvg` is verified at runtime (Task 14).
 
-- [ ] **Step 1: Write the failing test** — `web/test/svgRenderer.test.ts`
+- [ ] **Step 1: Write the failing test** in `web/test/svgRenderer.test.ts`
 
 ```ts
 import { test, expect } from "bun:test";
@@ -1125,7 +1129,7 @@ test("omits the art layer when no manifest", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd web && bun test test/svgRenderer.test.ts`
-Expected: FAIL — cannot find `../src/adapters/svgRenderer`.
+Expected: FAIL, cannot find `../src/adapters/svgRenderer`.
 
 - [ ] **Step 3: Write `web/src/adapters/svgRenderer.ts`**
 
@@ -1226,7 +1230,7 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 }
 ```
 
-(Unused import note: `affinityFrom`/`completedConstellations` may be removed if your linter flags them — they are imported for parity with future per-star tinting; delete if `bunx tsc --noEmit` complains about unused locals. The repo's tsconfig does not set `noUnusedLocals`, so this is safe to leave.)
+(Unused import note: `affinityFrom`/`completedConstellations` may be removed if your linter flags them. They are imported for parity with future per-star tinting; delete if `bunx tsc --noEmit` complains about unused locals. The repo's tsconfig does not set `noUnusedLocals`, so this is safe to leave.)
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -1352,8 +1356,8 @@ git commit -m "feat(adapter): pan/zoom nav controller with click-vs-drag"
 **Interfaces:**
 - Consumes: `sumBonuses`/`powersGained` (Task 7), `affinityTotals` (Task 3), `AFFINITIES`, the `label` fn.
 - Produces:
-  - `renderSidebars(deps): void` — `renderBenefits(el, model, selected, label)`, `renderAffinities(el, model, selected)`.
-  - `tooltipView(el)` → `{ show(model, starId, clientX, clientY, label): void; hide(): void }`.
+  - `renderSidebars(deps): void`: `renderBenefits(el, model, selected, label)`, `renderAffinities(el, model, selected)`.
+  - `tooltipView(el)` returns `{ show(model, starId, clientX, clientY, label): void; hide(): void }`.
 
 Runtime-verified in Task 14.
 
@@ -1494,7 +1498,7 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 </style>
 ```
 
-(Note: write only the CSS — do not include the trailing `</style>` tag; it is a `.css` file.)
+(Note: write only the CSS, not the trailing `</style>` tag; it is a `.css` file.)
 
 - [ ] **Step 3: Write `web/src/app/main.ts`**
 
@@ -1583,7 +1587,7 @@ serve: build
 - [ ] **Step 5: Build, serve, verify**
 
 Run: `just build && just serve`
-Expected: build succeeds; open `http://localhost:5173`. Map shows affinity-colored dots; only the 5 Crossroads stars are bright/selectable; slider reads `0 / 55`. Wheel zooms at cursor; drag empty space pans (grab cursor); clicking a Crossroads star selects it (turns white), its affinity appears in the right sidebar, and that constellation's neighbors light up. Hover shows a tooltip. Clicking a depended-on star (e.g. the affinity source) is **rejected** — you must remove leaf stars first; clicking a removable leaf deselects it. `Reset view` recenters.
+Expected: build succeeds; open `http://localhost:5173`. Map shows affinity-colored dots; only the 5 Crossroads stars are bright/selectable; slider reads `0 / 55`. Wheel zooms at cursor; drag empty space pans (grab cursor); clicking a Crossroads star selects it (turns white), its affinity appears in the right sidebar, and that constellation's neighbors light up. Hover shows a tooltip. Clicking a depended-on star (e.g. the affinity source) is **rejected**: you must remove leaf stars first; clicking a removable leaf deselects it. `Reset view` recenters.
 
 - [ ] **Step 6: Commit**
 
@@ -1681,7 +1685,7 @@ assets *ARGS:
 - [ ] **Step 3: Run and verify size**
 
 Run: `just assets`
-Expected: prints image count + total MB (target ≤ ~8 MB without nebulas; add `just assets --include-nebula` for the full look, target ~15 MB). `git status` shows nothing new (assets/ is git-ignored).
+Expected: prints image count + total MB (target at most ~8 MB without nebulas; add `just assets --include-nebula` for the full look, target ~15 MB). `git status` shows nothing new (assets/ is git-ignored).
 
 - [ ] **Step 4: Verify the app picks up the art**
 
@@ -1757,7 +1761,7 @@ jobs:
 
 - [ ] **Step 2: Enable Pages (one-time, manual)**
 
-In the GitHub repo: **Settings → Pages → Build and deployment → Source = GitHub Actions**. (No `gh` CLI step required; this is a repo setting.)
+In the GitHub repo: **Settings > Pages > Build and deployment > Source = GitHub Actions**. (No `gh` CLI step required; this is a repo setting.)
 
 - [ ] **Step 3: Commit, push, verify**
 
@@ -1767,32 +1771,32 @@ git commit -m "ci: GitHub Pages deploy pipeline for the static planner"
 git push
 ```
 
-Expected: the workflow runs on `main`; the `deploy` job prints the Pages URL. Open it — the planner loads and is fully interactive as **SVG dots** (relative asset paths resolve under the `/<repo>/` subpath). Art is absent until the image-commit decision is made and a committed `assets/` subset is added.
+Expected: the workflow runs on `main`; the `deploy` job prints the Pages URL. Open it: the planner loads and is interactive as **SVG dots** (relative asset paths resolve under the `/<repo>/` subpath). Art is absent until the image-commit decision is made and a committed `assets/` subset is added.
 
 ---
 
 ## Self-Review
 
 **Spec coverage:**
-- Full GD validity (predecessor + affinity gating, completion grants, Crossroads) → Tasks 3-6. ✔
-- In-memory JSON graph → Task 2. ✔
-- SVG+CSS render, selectable/locked states → Task 11, 14. ✔
-- grimtools-style click/drag-pan/wheel-zoom + reset → Tasks 9, 12, 14. ✔
-- Guarded (leaf-valid) removal — reject, don't cascade → Task 6 `canRemove`/`toggleStar`, using Task 4 `validClosure` as the guard. ✔
-- Slider default 55 + "Allocated X/N" → Task 14. ✔
-- Sidebar A (benefits + powers) and Sidebar B (affinity totals) → Tasks 13, 14. ✔
-- Hover tooltip (bonuses + requirement) → Tasks 13, 14. ✔
-- Optimized, git-ignored WebP art + manifest + graceful fallback → Tasks 10 (manifest load), 11 (optional art layer), 15 (pipeline). ✔
-- bun in install/doctor; test/build/serve/assets recipes → Tasks 1, 14, 15. ✔
-- Hexagonal core fully unit-tested → Tasks 2-9. ✔
-- GitHub Pages deploy pipeline (end-goal deliverable; SVG-only until the image-commit decision) → Task 16. ✔
+- Full GD validity (predecessor + affinity gating, completion grants, Crossroads): Tasks 3-6. Covered
+- In-memory JSON graph: Task 2. Covered
+- SVG+CSS render, selectable/locked states: Task 11, 14. Covered
+- grimtools-style click/drag-pan/wheel-zoom + reset: Tasks 9, 12, 14. Covered
+- Guarded (leaf-valid) removal, reject rather than cascade: Task 6 `canRemove`/`toggleStar`, using Task 4 `validClosure` as the guard. Covered
+- Slider default 55 + "Allocated X/N": Task 14. Covered
+- Sidebar A (benefits + powers) and Sidebar B (affinity totals): Tasks 13, 14. Covered
+- Hover tooltip (bonuses + requirement): Tasks 13, 14. Covered
+- Optimized, git-ignored WebP art + manifest + graceful fallback: Tasks 10 (manifest load), 11 (optional art layer), 15 (pipeline). Covered
+- bun in install/doctor; test/build/serve/assets recipes: Tasks 1, 14, 15. Covered
+- Hexagonal core fully unit-tested: Tasks 2-9. Covered
+- GitHub Pages deploy pipeline (end-goal deliverable; SVG-only until the image-commit decision): Task 16. Covered
 
-**Notes / deferred (per spec "out of scope"):** optimizer, URL build sharing. Committing images is gated on a separate decision (Task 16 ships SVG-only Pages until then). Also deferred: a *visual* "removable" hint on selected leaf stars (the guard is implemented via `canRemove`, but v1 simply makes a non-removable click a no-op — wiring a `removable` CSS class is a fast follow). Over-budget (cap lowered below allocation) is shown as the count text only.
+**Notes / deferred (per spec "out of scope"):** optimizer, URL build sharing. Committing images is gated on a separate decision (Task 16 ships SVG-only Pages until then). Also deferred: a *visual* "removable" hint on selected leaf stars (the guard is implemented via `canRemove`, but v1 simply makes a non-removable click a no-op; wiring a `removable` CSS class is a fast follow). Over-budget (cap lowered below allocation) is shown as the count text only.
 
 **Type consistency:** `StarId`, `SelectionState`, `DevotionModel`, `affinityFrom`, `selectableStars`, `toggleStar`, `validClosure`, `renderSvgMarkup`/`mountSvg`, `httpDataSource`/`LoadedData`/`AssetManifest` names are used identically across producing and consuming tasks.
 
 ## Verification (end-to-end)
 
-1. `just test` → all core suites green (model, affinity, rules-closure, rules-selectable, rules-toggle, aggregate, labels, viewbox, svgRenderer).
-2. `just build && just serve` → manual interaction checklist in Task 14 Step 5.
-3. `just assets [--include-nebula]` → art overlays; size at/under target; nothing committed.
+1. `just test`: all core suites green (model, affinity, rules-closure, rules-selectable, rules-toggle, aggregate, labels, viewbox, svgRenderer).
+2. `just build && just serve`: manual interaction checklist in Task 14 Step 5.
+3. `just assets [--include-nebula]`: art overlays; size at/under target; nothing committed.

@@ -1,4 +1,6 @@
 #!/usr/bin/env -S uv run --script
+# ABOUTME: Parses Grim Dawn's extracted .dbr devotion records into a single devotions.json.
+# ABOUTME: Stdlib-only; discovers keys at runtime so it survives game patches.
 # /// script
 # requires-python = ">=3.10"
 # dependencies = []

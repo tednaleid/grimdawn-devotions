@@ -2,13 +2,13 @@
 
 How to get the actual constellation/star *images* out of the game, reverse-
 engineered by inspection in this session. Not yet automated (no script ships for
-this yet — see "Status"). Re-verify after any patch.
+this yet; see "Status"). Re-verify after any patch.
 
 ## Where the art lives
 
 The devotion records (`database.arz`, what `just extract` pulls) reference
 textures by name, e.g. `ui/skills/devotion/devotion_constellation001_bat.tex`,
-but the **images themselves are not in `database.arz`** — they're in a separate
+but the **images themselves are not in `database.arz`**: they're in a separate
 resource archive: `resources/UI.arc`.
 
 - `UI.arc` holds **153** devotion-related entries, including **87** constellation
@@ -28,13 +28,13 @@ resource archive: `resources/UI.arc`.
 
 | Tool | Use here |
 |---|---|
-| `ArchiveTool.exe` | ✅ extract `.tex` files out of `UI.arc` (`-list`, `-extract`) |
-| `TextureCompiler.exe` | ❌ goes the **wrong way** — compiles an image **into** `.tex` |
+| `ArchiveTool.exe` | Yes, extract `.tex` files out of `UI.arc` (`-list`, `-extract`) |
+| `TextureCompiler.exe` | No, goes the **wrong way**: compiles an image **into** `.tex` |
 | `TexViewer.exe` | GUI viewer only; no usable CLI for batch export |
 | `AssetManager.exe` | GUI "Extract Game Files"; works but manual |
 
-So there is **no shipped CLI that converts `.tex` → png**. We don't need one —
-the format is trivial to decode ourselves (below).
+So there is **no shipped CLI that converts `.tex` → png**. We don't need one;
+the format is straightforward to decode ourselves (below).
 
 ## The `.tex` format
 
@@ -54,7 +54,7 @@ Layout (offsets into the `.tex` file):
 | 0 | `54 45 58 02` | magic `TEX` + version `0x02` |
 | 4 | `00 00 00 00` | reserved |
 | 8 | uint32 LE | size of the payload that follows |
-| 12 | `44 44 53 52` | `"DDSR"` — where a real DDS would have magic `"DDS "` |
+| 12 | `44 44 53 52` | `"DDSR"`, where a real DDS would have magic `"DDS "` |
 | 16 | DDS_HEADER (124 B) | `dwSize=124`, `dwFlags`, `dwHeight`@24, `dwWidth`@28, … |
 | 16+80 | `00 00 00 00` | `ddspf.dwFourCC` = 0 → **uncompressed** (no DXT/BC) |
 | 16+84 | `20` | `ddspf.dwRGBBitCount` = 32 |
@@ -63,14 +63,14 @@ Layout (offsets into the `.tex` file):
 Notes found by inspection:
 - The channel masks (`dwR/G/B/ABitMask`) are all **zero**; GD relies on a fixed
   **BGRA** byte order rather than masks. Decoding raw as BGRA gives correct color
-  + alpha (verified: alpha range 0–253, RGB 17–255 on the bat).
-- The **shape is in the alpha channel** — RGB is roughly a flat glow color. If you
+  + alpha (verified: alpha range 0 to 253, RGB 17 to 255 on the bat).
+- The **shape is in the alpha channel**: RGB is roughly a flat glow color. If you
   drop alpha (e.g. let Pillow open it as `RGB`), you get a near-blank rectangle
   (a tell-tale ~300-byte "PNG"). Always keep alpha.
 - Payload size matches exactly: 430·171·4 = 294,120 bytes (= file 294,260 − 140
   of headers/wrapper), confirming uncompressed 32-bit.
 - Verified uniform across samples: `bat` 430×171, `devotion_star_up` 64×64,
-  `devotion_connectoron` 78×16 — all `TEX\x02`, fourCC 0, 32-bit BGRA.
+  `devotion_connectoron` 78×16, all `TEX\x02`, fourCC 0, 32-bit BGRA.
 
 ## Converting `.tex` → png (proven recipe)
 
@@ -97,9 +97,9 @@ expansion ships a compressed texture, but nothing in v1.2 devotion art needs it.
 
 These images are **Crate Entertainment's copyrighted game art**. Extracting them
 for personal/local use is fine; **committing them to a public repo redistributes
-them.** Default plan is therefore to treat extracted art like `extracted/` —
+them.** Default plan is therefore to treat extracted art like `extracted/`,
 **git-ignored and regenerated locally** (e.g. `just assets` → `data/assets/`,
-git-ignored) — and to keep the eventual HTML starmap working from plain SVG
+git-ignored), and to keep the eventual HTML starmap working from plain SVG
 dots/lines (pure `devotions.json`) as the always-available baseline, layering the
 real artwork in only when the local assets are present. Committing the PNGs is a
 deliberate opt-in, not a default.

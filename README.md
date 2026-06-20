@@ -1,28 +1,28 @@
 # Grim Dawn Devotions
 
 A free, open-source toolkit for **[Grim Dawn](https://www.grimdawn.com/)**'s
-Devotion constellation system — built by a fan, for players.
+Devotion constellation system, built by a fan, for players.
 
-The goal is to make the whole Devotion system **open, queryable, and easy to plan
-against**: turn the game's own data into a clean, well-documented dataset and
-build friendly tools on top of it. No ads, no paywall, no account — just data and
+The goal is to make the Devotion system open, queryable, and straightforward to
+plan against: turn the game's own data into a clean, well-documented dataset and
+build tools on top of it. No ads, no paywall, no account, just data and
 tools you can read, fork, and run yourself.
 
 ### What's here & where it's going
 
-- ✅ **Parser + dataset** — `scripts/parse_devotions.py` reads the game's
+- Done: **Parser + dataset**. `scripts/parse_devotions.py` reads the game's
   extracted `.dbr` records into one clean [`data/devotions.json`](data/devotions.json):
   every constellation, its affinity unlock cost and the affinity it grants, and
   each star's stat bonuses, celestial power, weapon requirement, map position, and
   intra-constellation pick order. Current output: **86 constellations, 438 stars**
   (game build `19149150`, ~v1.2.1.x). Re-runnable after every patch.
-- 🔜 **Devotion-path optimizer** — find good star routes for a given build/goal,
+- Planned: **Devotion-path optimizer**. Find star routes for a given build/goal,
   using `devotions.json` as its input.
-- 🔜 **Interactive starmap** — an in-browser constellation map (the data already
+- Planned: **Interactive starmap**. An in-browser constellation map (the data already
   carries each star's coordinates and each constellation's artwork reference; see
   [docs/assets-and-textures.md](docs/assets-and-textures.md)).
 
-Everything is reproducible from your own game install — see Quick start below.
+Everything is reproducible from your own game install; see Quick start below.
 
 ## Fan project & disclaimer
 
@@ -34,15 +34,15 @@ property of **© Crate Entertainment**. This repository contains a tool that rea
 data from a copy of the game **you already own**, plus a derived dataset of game
 facts (stat values, names, structure) provided purely to help fellow players
 understand and plan their characters. Game **artwork/asset files are not
-redistributed here** — they stay in your local install and are
+redistributed here**; they stay in your local install and are
 regenerated/extracted on your own machine (see
 [docs/assets-and-textures.md](docs/assets-and-textures.md)).
 
 Our own code, scripts, and documentation are open source (see [LICENSE](LICENSE)).
-That license covers **only our work** — it does not grant any rights to Crate's
+That license covers **only our work**; it does not grant any rights to Crate's
 game content. If anyone at Crate would prefer something here be changed or
-removed, please reach out and we'll happily comply. Made with respect and
-gratitude for a great game and a famously mod-friendly studio.
+removed, please reach out and we'll comply. Made with respect and
+gratitude for the game and a mod-friendly studio.
 
 ## Quick start
 
@@ -64,7 +64,7 @@ shell** so they're on `PATH`.
 
 The parser script itself is self-executable via a uv shebang
 (`#!/usr/bin/env -S uv run --script`) with inline PEP 723 metadata and **zero
-dependencies** — it also runs directly:
+dependencies**; it also runs directly:
 
 ```bash
 uv run scripts/parse_devotions.py \
@@ -96,7 +96,7 @@ ArchiveTool.exe "<GD>/resources/Text_EN.arc" -extract "extracted/text_en"
 
 Records land in `extracted/records/records/ui/skills/devotion/` and translations
 in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
-(~5 GB) — regenerate it anytime with `just extract`.
+(~5 GB); regenerate it anytime with `just extract`.
 
 > Alternative: `AssetManager.exe → Tools → Extract Game Files` does the same via UI.
 
@@ -143,12 +143,12 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
 Notes:
 - `bonuses` keys are **raw internal stat ids** (stable; the optimizer needs
   these). `--stat-labels` also writes `stat_labels.json` mapping each id to a
-  best-effort human label. Beware GD quirks: internal `Life` = **Vitality**.
+  best-effort human label. Note a GD quirk: internal `Life` = **Vitality**.
 - `predecessors` are 0-based star indices; a star unlocks only after its
   predecessor(s) are taken. Tree/forest rooted at star 0.
 - `position` is each star's `(x, y)` on a single shared map canvas (negative
   origin), and `background` is the constellation's artwork (`.tex`) + its
-  placement on that same canvas — enough to redraw the in-game starmap. The
+  placement on that same canvas, enough to redraw the in-game starmap. The
   `.tex` images themselves aren't extracted here (export via AssetManager).
 - Tier‑3 constellations have an empty `affinity_bonus` (they grant none).
 - Crossroads is 5 single-star constellations, ids `crossroads_<affinity>`.
@@ -157,7 +157,7 @@ Notes:
   `racial_target` (resolved race names, e.g. `["Beast"]`).
 - Every object keeps its source `dbr` path for traceability.
 
-`--duckdb` additionally emits `data/devotion_records.csv` — a long-format
+`--duckdb` additionally emits `data/devotion_records.csv`, a long-format
 `(dbr, key, value)` table of all devotion records for ad-hoc querying (DuckDB
 reads the CSV, not `.dbr`). It's git-ignored (~32 MB).
 
@@ -170,7 +170,7 @@ weapon-requirement counts, and a per-tier breakdown.
 
 ## Re-running after a patch
 
-The parser **discovers** keys/paths at runtime and logs anything unexpected — it
+The parser **discovers** keys/paths at runtime and logs anything unexpected; it
 does not hard-code the full key list. After any game update (notably **Fangs of
 Asterkarn / v1.3, 2026‑07‑23**, which will likely change devotion balance), just:
 
