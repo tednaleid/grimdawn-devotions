@@ -56,10 +56,36 @@ describe("statRow speeds and weapon tokens", () => {
     expect(statRow("Spear2h", 1)).toBeNull();
     expect(statRow("Dagger", 1)).toBeNull();
   });
-  test("strips the redundant Character prefix from fallback keys (and renames attrs)", () => {
-    expect(statRow("characterArmorStrengthReqReduction", 10)).toEqual({
-      label: "Armor Physique Req Reduction",
+  test("strips the redundant Character prefix in the humanize fallback", () => {
+    expect(statRow("characterFooBar", 5)).toEqual({ label: "Foo Bar", value: "+5" });
+  });
+});
+
+describe("statRow grimtools-verified corrections", () => {
+  test("status effects are reduced-duration / protection, not resistances", () => {
+    expect(statRow("defensiveStun", 25)).toEqual({ label: "Reduced Stun Duration", value: "+25%" });
+    expect(statRow("defensiveTrap", 30)).toEqual({ label: "Reduced Entrapment Duration", value: "+30%" });
+    expect(statRow("defensiveDisruption", 30)).toEqual({ label: "Skill Disruption Protection", value: "+30%" });
+  });
+  test("defensive DoT duration uses DoT names and a positive percent", () => {
+    expect(statRow("defensiveFireDuration", 25)).toEqual({ label: "Reduced Burn Duration", value: "+25%" });
+    expect(statRow("defensivePhysicalDuration", 25)).toEqual({ label: "Reduced Internal Trauma Duration", value: "+25%" });
+    expect(statRow("defensiveColdDuration", 20)).toEqual({ label: "Reduced Frostburn Duration", value: "+20%" });
+  });
+  test("poison resistance is Poison & Acid", () => {
+    expect(statRow("defensivePoison", 15)).toEqual({ label: "Poison & Acid Resistance", value: "+15%" });
+    expect(statRow("defensivePoisonMaxResist", 3)).toEqual({ label: "Maximum Poison & Acid Resistance", value: "+3%" });
+  });
+  test("requirement reductions use official labels and a negative percent", () => {
+    expect(statRow("characterMeleeStrengthReqReduction", 10)).toEqual({
+      label: "Physique Requirement for Melee Weapons",
       value: "-10%",
+    });
+  });
+  test("reduced-target resistance debuff is shown positive", () => {
+    expect(statRow("offensiveElementalResistanceReductionPercentMin", 20)).toEqual({
+      label: "Reduced target's Elemental Resistances",
+      value: "+20%",
     });
   });
 });

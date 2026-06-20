@@ -117,7 +117,7 @@ try {
     "renders all 438 star circles");
 
   const selectable = await cdp.evaluate<string[]>(
-    "[...document.querySelectorAll('circle.star.selectable')].map(c => c.getAttribute('data-star-id'))");
+    "[...document.querySelectorAll('circle.hit.selectable')].map(c => c.getAttribute('data-star-id'))");
   check(selectable.length === 5, `exactly 5 selectable stars from empty (got ${selectable.length})`);
   check(selectable.every((id) => id.startsWith("crossroads_")), `all 5 selectable are Crossroads (${selectable.sort().join(", ")})`);
 

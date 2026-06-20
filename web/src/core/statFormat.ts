@@ -15,11 +15,11 @@ const DOT_DAMAGE: Record<string, string> = {
   Bleeding: "Bleeding", Physical: "Internal Trauma", Fire: "Burn", Cold: "Frostburn",
   Lightning: "Electrocute", Poison: "Poison", Life: "Vitality Decay",
 };
-// Resistance type segment -> display name.
+// Resistance type segment -> display name. (Status effects like Stun/Freeze are NOT
+// resistances in GD - they are duration-reduction stats, handled in OVERRIDES.)
 const RESIST: Record<string, string> = {
   Physical: "Physical", Pierce: "Pierce", Fire: "Fire", Cold: "Cold", Lightning: "Lightning",
-  Aether: "Aether", Chaos: "Chaos", Poison: "Poison", Life: "Vitality", Bleeding: "Bleeding",
-  Stun: "Stun", Freeze: "Freeze", Petrify: "Petrify", Trap: "Trap", Disruption: "Disruption",
+  Aether: "Aether", Chaos: "Chaos", Poison: "Poison & Acid", Life: "Vitality", Bleeding: "Bleeding",
 };
 // Character attribute segment -> display name (GD renamed the classic attributes).
 const ATTR: Record<string, string> = {
@@ -39,15 +39,21 @@ interface Classified {
 const OVERRIDES: Record<string, Classified> = {
   defensiveProtection: { label: "Armor", percent: false, sign: 1 },
   defensiveProtectionModifier: { label: "Armor", percent: true, sign: 1 },
-  defensiveAbsorptionModifier: { label: "Absorption", percent: true, sign: 1 },
-  defensiveBlockModifier: { label: "Block Chance", percent: true, sign: 1 },
+  defensiveAbsorptionModifier: { label: "Armor Absorption", percent: true, sign: 1 },
+  defensiveBlockModifier: { label: "Shield Block Chance", percent: true, sign: 1 },
   defensiveBlockAmountModifier: { label: "Shield Damage Blocked", percent: true, sign: 1 },
   defensiveElementalResistance: { label: "Elemental Resistance", percent: true, sign: 1 },
   defensiveTotalSpeedResistance: { label: "Slow Resistance", percent: true, sign: 1 },
   defensivePercentReflectionResistance: { label: "Reflected Damage Reduction", percent: true, sign: 1 },
   defensiveSlowLifeLeach: { label: "Life Leech Resistance", percent: true, sign: 1 },
   defensiveSlowManaLeach: { label: "Energy Leech Resistance", percent: true, sign: 1 },
-  defensiveSlowLifeLeachDuration: { label: "Life Leech Duration", percent: true, sign: -1 },
+  defensiveSlowLifeLeachDuration: { label: "Reduced Life Leech Duration", percent: true, sign: 1 },
+  // Status effects: duration-reduction / protection stats, NOT resistances.
+  defensiveStun: { label: "Reduced Stun Duration", percent: true, sign: 1 },
+  defensiveFreeze: { label: "Reduced Freeze Duration", percent: true, sign: 1 },
+  defensivePetrify: { label: "Reduced Petrify Duration", percent: true, sign: 1 },
+  defensiveTrap: { label: "Reduced Entrapment Duration", percent: true, sign: 1 },
+  defensiveDisruption: { label: "Skill Disruption Protection", percent: true, sign: 1 },
 
   offensiveTotalDamageModifier: { label: "Total Damage", percent: true, sign: 1 },
   offensiveCritDamageModifier: { label: "Crit Damage", percent: true, sign: 1 },
@@ -55,7 +61,7 @@ const OVERRIDES: Record<string, Classified> = {
   offensiveSlowManaLeachMin: { label: "Energy Leech", percent: false, sign: 1 },
   offensiveSlowManaLeachChance: { label: "Energy Leech Chance", percent: true, sign: 1 },
   offensiveSlowManaLeachDurationMin: { label: "Energy Leech Duration", percent: false, sign: 1 },
-  offensiveElementalResistanceReductionPercentMin: { label: "Reduced target's Elemental Resistance", percent: true, sign: -1 },
+  offensiveElementalResistanceReductionPercentMin: { label: "Reduced target's Elemental Resistances", percent: true, sign: 1 },
   offensiveElementalResistanceReductionPercentDurationMin: { label: "Reduced Elemental Resistance Duration", percent: false, sign: 1 },
   offensiveLightningModifierChance: { label: "Chance for Lightning Damage", percent: true, sign: 1 },
   retaliationTotalDamageModifier: { label: "Total Retaliation Damage", percent: true, sign: 1 },
@@ -72,8 +78,17 @@ const OVERRIDES: Record<string, Classified> = {
   characterConstitutionModifier: { label: "Constitution", percent: true, sign: 1 },
   characterDodgePercent: { label: "Chance to Avoid Melee Attacks", percent: true, sign: 1 },
   characterDeflectProjectile: { label: "Chance to Avoid Projectiles", percent: true, sign: 1 },
-  characterEnergyAbsorptionPercent: { label: "Energy Absorbed from Skills", percent: true, sign: 1 },
+  characterEnergyAbsorptionPercent: { label: "Energy Absorbed from Enemy Spells", percent: true, sign: 1 },
   characterDefensiveBlockRecoveryReduction: { label: "Shield Recovery", percent: true, sign: -1 },
+
+  // Attribute/requirement reductions (official game labels; shown as a negative percent).
+  characterArmorStrengthReqReduction: { label: "Physique Requirement for Armor", percent: true, sign: -1 },
+  characterMeleeStrengthReqReduction: { label: "Physique Requirement for Melee Weapons", percent: true, sign: -1 },
+  characterShieldStrengthReqReduction: { label: "Physique Requirement for Shields", percent: true, sign: -1 },
+  characterMeleeDexterityReqReduction: { label: "Cunning Requirement for Melee Weapons", percent: true, sign: -1 },
+  characterHuntingDexterityReqReduction: { label: "Cunning Requirement for Ranged Weapons", percent: true, sign: -1 },
+  characterWeaponIntelligenceReqReduction: { label: "Spirit Requirement for all Weapons", percent: true, sign: -1 },
+  characterJewelryIntelligenceReqReduction: { label: "Spirit Requirement for Jewelry", percent: true, sign: -1 },
 };
 
 function humanize(id: string): string {
@@ -114,10 +129,11 @@ function classify(id: string): Classified | null {
     const type = RESIST[m[1]!];
     if (type) return { label: `Maximum ${type} Resistance`, percent: true, sign: 1 };
   }
-  // Defensive reduced duration: defensive<Type>Duration
+  // Defensive reduced damage-over-time duration: defensive<Type>Duration.
+  // GD names these by the DoT (Internal Trauma/Burn/Frostburn/...) and shows them as a positive percent.
   if ((m = id.match(/^defensive([A-Za-z]+?)Duration$/))) {
-    const type = RESIST[m[1]!];
-    if (type) return { label: `${type} Duration`, percent: true, sign: -1 };
+    const type = DOT_DAMAGE[m[1]!];
+    if (type) return { label: `Reduced ${type} Duration`, percent: true, sign: 1 };
   }
   // Defensive base resistance: defensive<Type>
   if ((m = id.match(/^defensive([A-Za-z]+?)$/))) {
