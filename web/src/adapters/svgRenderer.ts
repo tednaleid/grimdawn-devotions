@@ -25,8 +25,10 @@ function gradientStops(colors: string[]): string {
 // background art's glow sit at the button center, so dots and links are drawn
 // shifted by half the button to line up with the art.
 const STAR_CENTER = 32;
-// Invisible click/hover target radius around each star (much larger than the 6px dot).
-const HIT_RADIUS = 20;
+// Visible star dot radius.
+const STAR_RADIUS = 12;
+// Invisible click/hover target radius around each star (larger than the visible dot).
+const HIT_RADIUS = 22;
 
 export interface RenderOpts { manifest: AssetManifest | null }
 
@@ -76,7 +78,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const cy = star.position.y + STAR_CENTER;
     parts.push(
       `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>` +
-        `<circle class="star ${st}" cx="${cx}" cy="${cy}" r="6" style="--affinity:${color}"/>`,
+        `<circle class="star ${st}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="--affinity:${color}"/>`,
     );
   }
 

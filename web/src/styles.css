@@ -28,7 +28,7 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 .hit { fill: transparent; pointer-events: all; }
 .hit.selectable, .hit.selected { cursor: pointer; }
 .star { stroke: #0d1117; stroke-width: 1; pointer-events: none; }
-.star.locked { fill: #39414f; opacity: .5; }
+.star.locked { fill: #9aa3b2; opacity: .8; }
 .star.selectable { fill: var(--affinity); opacity: 1; filter: drop-shadow(0 0 4px var(--affinity)); }
 .star.selected { fill: #fff; stroke: var(--affinity); stroke-width: 3; }
 .orb { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .3em; vertical-align: -.05em; }
