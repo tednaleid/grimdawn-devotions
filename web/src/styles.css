@@ -38,6 +38,8 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 .tip-cost { color: #9aa4b2; font-size: .9em; }
 .tip-bonus { color: #d7c89a; }
 .tip-bonus .val { color: #e6edf3; }
-.tip-req { margin-top: .35rem; color: #e0696a; }
+.tip-req { margin-top: .35rem; color: #9aa4b2; }
 .tip-grant { margin-top: .15rem; color: #c9d3e0; }
+.tip-req .aff.missing { color: #e0696a; }
+.tip-req .aff.met { color: #83c995; }
 .tip-req .aff, .tip-grant .aff { text-transform: capitalize; white-space: nowrap; margin-right: .4em; }

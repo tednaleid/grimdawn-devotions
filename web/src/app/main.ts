@@ -7,6 +7,7 @@ import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, validClosure } from "../core/rules";
 import { canonicalStarIds, decodeHash, encodeHash } from "../core/urlState";
+import { affinityTotals } from "../core/affinity";
 import type { SelectionState } from "../core/types";
 
 async function boot() {
@@ -36,8 +37,9 @@ async function boot() {
     onConstellationClick: (id) => { state = toggleConstellation(model, state, id); refresh(); },
     onHover: (t, x, y) => {
       if (!t) { tip.hide(); return; }
-      if (t.kind === "star") tip.show(model, t.id, x, y);
-      else tip.showConstellation(model, t.id, x, y);
+      const totals = affinityTotals(model, state.selected);
+      if (t.kind === "star") tip.show(model, t.id, x, y, totals);
+      else tip.showConstellation(model, t.id, x, y, totals);
     },
   });
 
