@@ -28,8 +28,11 @@ optimizer will reuse.
    DuckDB. (Optimizer phase may revisit its own data structures later.)
 3. **Rendering = SVG + CSS.** Stars/links/art as SVG nodes; states via CSS
    classes; pan/zoom via `viewBox`. Renderer is a thin adapter over the pure core.
-4. **Removal = cascade**, implemented via a single "valid-closure recompute"
-   (fixpoint) that powers add, remove, and selectable-set alike.
+4. **Removal = guarded (leaf-valid), not cascade.** A deselection is allowed only
+   if it leaves every remaining star valid (no selected dependents, and no other
+   constellation's affinity requirement broken); otherwise the click is **rejected**
+   (matches grimtools). Implemented by reusing the valid-closure recompute as the
+   guard: removable iff `validClosure(selected − star)` doesn't shrink.
 5. **Artwork = real but optimized + git-ignored.** `just assets` extracts +
    converts + optimizes to WebP targeting ~15 MB (incl. downscaled nebulas) or
    ~5–8 MB without. App loads art via a manifest and **falls back to SVG dots** if
@@ -65,7 +68,7 @@ web/
       main.ts             # wire adapters to core; hold SelectionState; re-render on change
     styles.css
   test/
-    rules.test.ts         # validity, gating, cascade, crossroads, point cap
+    rules.test.ts         # validity, gating, guarded removal, crossroads, point cap
     aggregate.test.ts     # additive summation, powers, edge cases
     model.test.ts         # graph build / indexing integrity vs real devotions.json
   dist/                   # bun build output (git-ignored)
@@ -96,13 +99,16 @@ assets/devotions/         # git-ignored optimized art + manifest.json (just asse
   requirement — which is why **Crossroads bootstrap stars can be refunded** once a
   constellation is self-sustaining (e.g. Crossroads `primordial:1` opens Eel;
   completing Eel grants `primordial:5`; remove the Crossroads and Eel stays valid).
-  Used after every change (gives cascade removal for free).
+  Used as the **removal guard**, not an auto-applier.
+- `canRemove(model, state, starId)` → true iff the star is selected and
+  `validClosure(selected − star)` doesn't shrink (no selected dependents, no
+  affinity another constellation requires is broken).
 - `selectableStars(model, state)` → set of currently-unselected star ids that
   could be added next: predecessors satisfied, constellation affinity requirement
   met, and `selected.size < pointCap`.
-- `toggleStar(model, state, starId)` → new state. If selectable → add, then
-  `validClosure`. If already selected → remove it and re-run `validClosure`
-  (cascades dependents). If neither → unchanged.
+- `toggleStar(model, state, starId)` → new state. If selectable → add. If selected
+  **and `canRemove`** → remove. Otherwise (would invalidate others, or neither)
+  → unchanged. Removal is **rejected, never cascaded**.
 - `sumBonuses(model, selected)` → `{ statId: number }` additive across all
   selected stars (Grim Dawn devotion like-stats stack additively; verify edge
   cases). `powersGained` → list of `celestial_power.name`. `weaponReqs` collected.
@@ -117,7 +123,8 @@ assets/devotions/         # git-ignored optimized art + manifest.json (just asse
   constellation. Coordinates normalized from the shared negative-origin canvas
   (compute bbox over all star + background positions).
 - **Navigation/interaction adapter** (grimtools-style; first-class v1):
-  - **Click a star** → toggle select/deselect (add or cascade-remove via core).
+  - **Click a star** → toggle via core (add if selectable; remove only if the
+    removal is valid, else the click is a no-op).
   - **Click-drag empty space** → pan. Mousedown on a non-star area starts a grab;
     moving the pointer translates the `viewBox`. Cursor switches `grab` →
     `grabbing`. A small movement threshold distinguishes a click from a drag, so a
@@ -135,7 +142,7 @@ assets/devotions/         # git-ignored optimized art + manifest.json (just asse
 - **Point slider** (top): default **55**, max 55 (GD cap); label
   "Allocated X / N". Lowering below current allocation triggers `validClosure`.
 - **Map**: SVG with grimtools-style navigation — **click a star** to toggle (add /
-  cascade-remove), **click-drag empty space** to pan (grab cursor), **scroll wheel**
+  remove if valid), **click-drag empty space** to pan (grab cursor), **scroll wheel**
   to zoom at the cursor, plus a reset/fit-view control. Selectable stars visibly
   highlighted; locked stars greyed/dimmed so it's obvious what can be picked.
 - **Sidebar A — Cumulative benefits**: additive stat totals (human-labeled, e.g.
@@ -171,9 +178,10 @@ manifest/art is absent.
 
 Almost all logic lives in `core/` as pure functions → `bun test` covers: entering
 a constellation requires affinity; predecessor ordering; completing grants
-affinity that unlocks others; Crossroads bootstrap; point-cap limiting; cascade
-removal correctness; additive bonus summation; graph-build integrity against the
-real `devotions.json`. Adapters stay thin; minimal/no DOM tests in v1.
+affinity that unlocks others; Crossroads bootstrap; self-sustaining constellations
+(bootstrap removable); point-cap limiting; guarded-removal correctness (leaf-valid
+only, no cascade); additive bonus summation; graph-build integrity against the real
+`devotions.json`. Adapters stay thin; minimal/no DOM tests in v1.
 
 ## Out of scope (v1)
 
@@ -193,7 +201,8 @@ real `devotions.json`. Adapters stay thin; minimal/no DOM tests in v1.
 3. Manual: pick a Crossroads star → affinity sidebar increments; a gated
    constellation's stars become selectable only after its requirement is met;
    hover shows bonuses + requirement; cumulative stats sum additively; clicking a
-   relied-upon star cascades the refund.
+   relied-upon star is rejected (remove leaf stars first); once a constellation is
+   self-sustaining, its bootstrap Crossroads star becomes removable.
 4. `just assets` (optional, local) → re-open; real constellation art renders
    behind the dots; check `du -sh assets/` is at/under target.
 

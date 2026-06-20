@@ -424,7 +424,7 @@ git commit -m "feat(core): affinity totals, completion, requirement check"
 
 ---
 
-### Task 4: `validClosure` (fixpoint, powers cascade)
+### Task 4: `validClosure` (fixpoint pruning — used as the removal guard)
 
 **Files:**
 - Create: `web/src/core/rules.ts`
@@ -463,8 +463,9 @@ test("keeps a gated chain when affinity is satisfied", () => {
   expect(closed.has("bat:1")).toBe(true);
 });
 
-test("removing the affinity source cascades the whole gated chain out", () => {
-  // bat is incomplete (2 of 5) so it grants nothing; with no eldritch it is invalid
+test("prunes an inconsistent set (the property the removal guard relies on)", () => {
+  // bat is incomplete (2 of 5) so it grants nothing; with no eldritch, bat:0's
+  // requirement is unmet -> bat:0 and its dependent bat:1 are pruned.
   const closed = validClosure(model, new Set(["bat:0", "bat:1"]));
   expect(closed.size).toBe(0);
 });
@@ -520,7 +521,7 @@ Expected: PASS (4 tests).
 
 ```bash
 git add web/src/core/rules.ts web/test/rules-closure.test.ts
-git commit -m "feat(core): validClosure fixpoint with affinity gating + cascade"
+git commit -m "feat(core): validClosure fixpoint with affinity gating + self-sustain"
 ```
 
 ---
@@ -629,7 +630,9 @@ git commit -m "feat(core): selectableStars with point-cap and affinity gating"
 
 **Interfaces:**
 - Consumes: Task 2-5.
-- Produces: `toggleStar(model, state: SelectionState, starId: StarId): SelectionState` — adds if selectable, cascade-removes if selected (via `validClosure`), else returns state unchanged. Always returns a new object; never mutates input.
+- Produces:
+  - `canRemove(model, state, starId): boolean` — true iff the star is selected and removing it leaves every remaining star valid (`validClosure(selected − star)` does not shrink). This is the **guarded/leaf** rule: a star is removable only when no selected star depends on it and removing it won't drop affinity another selected constellation requires.
+  - `toggleStar(model, state: SelectionState, starId: StarId): SelectionState` — if the star is selectable, add it; if it is selected **and `canRemove`**, remove it; otherwise return the state unchanged (a click that would invalidate other selections is **rejected, not cascaded**). Always returns a new object on change; never mutates input.
 
 - [ ] **Step 1: Write the failing test** — `web/test/rules-toggle.test.ts`
 
@@ -637,7 +640,7 @@ git commit -m "feat(core): selectableStars with point-cap and affinity gating"
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { toggleStar } from "../src/core/rules";
+import { toggleStar, canRemove } from "../src/core/rules";
 import type { SelectionState } from "../src/core/types";
 
 const model = buildModel(doc as any);
@@ -653,13 +656,26 @@ test("ignores an unselectable star", () => {
   expect(s.selected.size).toBe(0);
 });
 
-test("removing the affinity source cascades dependent stars out", () => {
+test("blocks removing a star that other selections depend on (no cascade)", () => {
   let s = toggleStar(model, empty, "crossroads_eldritch:0");
   s = toggleStar(model, s, "bat:0");
   s = toggleStar(model, s, "bat:1");
   expect(s.selected.size).toBe(3);
-  s = toggleStar(model, s, "crossroads_eldritch:0"); // remove the source
-  expect(s.selected.size).toBe(0);
+  // removing the affinity source would invalidate bat -> rejected, state unchanged
+  expect(toggleStar(model, s, "crossroads_eldritch:0").selected.size).toBe(3);
+  // removing a non-leaf (bat:0 has successor bat:1) -> rejected
+  expect(toggleStar(model, s, "bat:0").selected.size).toBe(3);
+  // removing the leaf bat:1 -> allowed
+  expect(toggleStar(model, s, "bat:1").selected.size).toBe(2);
+});
+
+test("canRemove reflects the guard", () => {
+  let s = toggleStar(model, empty, "crossroads_eldritch:0");
+  s = toggleStar(model, s, "bat:0");
+  s = toggleStar(model, s, "bat:1");
+  expect(canRemove(model, s, "bat:1")).toBe(true);
+  expect(canRemove(model, s, "bat:0")).toBe(false);
+  expect(canRemove(model, s, "crossroads_eldritch:0")).toBe(false);
 });
 
 test("does not mutate the input state", () => {
@@ -668,13 +684,14 @@ test("does not mutate the input state", () => {
   expect(empty.selected).toEqual(before);
 });
 
-test("self-sustaining constellation keeps its stars after the bootstrap is deselected", () => {
+test("self-sustaining constellation: the bootstrap IS removable (no cascade)", () => {
   // Crossroads primordial:1 opens Eel; completing Eel grants primordial:5;
-  // then the Crossroads star can be refunded and Eel stays valid.
+  // removing the Crossroads causes no cascade (Eel self-sustains) -> allowed.
   let s: SelectionState = { selected: new Set(), pointCap: 55 };
   s = toggleStar(model, s, "crossroads_primordial:0");
   for (const id of ["eel:0", "eel:1", "eel:2"]) s = toggleStar(model, s, id);
   expect(s.selected.size).toBe(4);
+  expect(canRemove(model, s, "crossroads_primordial:0")).toBe(true);
   s = toggleStar(model, s, "crossroads_primordial:0"); // refund the bootstrap
   expect(s.selected.has("eel:0")).toBe(true);
   expect(s.selected.size).toBe(3);
@@ -689,16 +706,26 @@ Expected: FAIL — `toggleStar` is not exported.
 - [ ] **Step 3: Append to `web/src/core/rules.ts`**
 
 ```ts
+export function canRemove(model: DevotionModel, state: SelectionState, starId: StarId): boolean {
+  if (!state.selected.has(starId)) return false;
+  const next = new Set(state.selected);
+  next.delete(starId);
+  // Removable only if nothing else falls out of validity (guarded / leaf rule).
+  return validClosure(model, next).size === next.size;
+}
+
 export function toggleStar(model: DevotionModel, state: SelectionState, starId: StarId): SelectionState {
   if (state.selected.has(starId)) {
+    if (!canRemove(model, state, starId)) return state; // reject: would invalidate others
     const next = new Set(state.selected);
     next.delete(starId);
-    return { selected: validClosure(model, next), pointCap: state.pointCap };
+    return { selected: next, pointCap: state.pointCap };
   }
   if (selectableStars(model, state).has(starId)) {
+    // Adding a selectable star never invalidates existing selections.
     const next = new Set(state.selected);
     next.add(starId);
-    return { selected: validClosure(model, next), pointCap: state.pointCap };
+    return { selected: next, pointCap: state.pointCap };
   }
   return state;
 }
@@ -713,7 +740,7 @@ Expected: PASS (4 tests).
 
 ```bash
 git add web/src/core/rules.ts web/test/rules-toggle.test.ts
-git commit -m "feat(core): toggleStar add/cascade-remove"
+git commit -m "feat(core): toggleStar add + guarded (leaf-valid) remove"
 ```
 
 ---
@@ -1477,7 +1504,6 @@ import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar } from "../core/rules";
-import { validClosure } from "../core/rules";
 import type { SelectionState } from "../core/types";
 
 async function boot() {
@@ -1512,8 +1538,10 @@ async function boot() {
   resetBtn.addEventListener("click", () => nav.reset());
 
   slider.addEventListener("input", () => {
-    state = { selected: validClosure(model, state.selected), pointCap: Number(slider.value) };
-    // if cap dropped below current allocation, trim deterministically is out of scope; closure keeps valid set
+    // The cap only gates ADDING (selectableStars checks selected.size < pointCap).
+    // Lowering it below the current allocation is allowed and shown as over-budget;
+    // the user removes leaf stars to get back under. No auto-removal (guarded model).
+    state = { selected: state.selected, pointCap: Number(slider.value) };
     refresh();
   });
 
@@ -1554,7 +1582,7 @@ serve: build
 - [ ] **Step 5: Build, serve, verify**
 
 Run: `just build && just serve`
-Expected: build succeeds; open `http://localhost:5173`. Map shows affinity-colored dots; only the 5 Crossroads stars are bright/selectable; slider reads `0 / 55`. Wheel zooms at cursor; drag empty space pans (grab cursor); clicking a Crossroads star selects it (turns white), its affinity appears in the right sidebar, and that constellation's neighbors light up. Hover shows a tooltip. Clicking the affinity-source star cascades dependents off. `Reset view` recenters.
+Expected: build succeeds; open `http://localhost:5173`. Map shows affinity-colored dots; only the 5 Crossroads stars are bright/selectable; slider reads `0 / 55`. Wheel zooms at cursor; drag empty space pans (grab cursor); clicking a Crossroads star selects it (turns white), its affinity appears in the right sidebar, and that constellation's neighbors light up. Hover shows a tooltip. Clicking a depended-on star (e.g. the affinity source) is **rejected** — you must remove leaf stars first; clicking a removable leaf deselects it. `Reset view` recenters.
 
 - [ ] **Step 6: Commit**
 
@@ -1675,7 +1703,7 @@ git commit -m "feat(assets): optimized WebP devotion art pipeline (git-ignored o
 - In-memory JSON graph → Task 2. ✔
 - SVG+CSS render, selectable/locked states → Task 11, 14. ✔
 - grimtools-style click/drag-pan/wheel-zoom + reset → Tasks 9, 12, 14. ✔
-- Cascade removal → Task 4 (`validClosure`) used by Task 6. ✔
+- Guarded (leaf-valid) removal — reject, don't cascade → Task 6 `canRemove`/`toggleStar`, using Task 4 `validClosure` as the guard. ✔
 - Slider default 55 + "Allocated X/N" → Task 14. ✔
 - Sidebar A (benefits + powers) and Sidebar B (affinity totals) → Tasks 13, 14. ✔
 - Hover tooltip (bonuses + requirement) → Tasks 13, 14. ✔
@@ -1683,7 +1711,7 @@ git commit -m "feat(assets): optimized WebP devotion art pipeline (git-ignored o
 - bun in install/doctor; test/build/serve/assets recipes → Tasks 1, 14, 15. ✔
 - Hexagonal core fully unit-tested → Tasks 2-9. ✔
 
-**Notes / deferred (per spec "out of scope"):** optimizer, committing images, production Pages CI, URL build sharing.
+**Notes / deferred (per spec "out of scope"):** optimizer, committing images, production Pages CI, URL build sharing. Also deferred: a *visual* "removable" hint on selected leaf stars (the guard is implemented via `canRemove`, but v1 simply makes a non-removable click a no-op — wiring a `removable` CSS class is a fast follow). Over-budget (cap lowered below allocation) is shown as the count text only.
 
 **Type consistency:** `StarId`, `SelectionState`, `DevotionModel`, `affinityFrom`, `selectableStars`, `toggleStar`, `validClosure`, `renderSvgMarkup`/`mountSvg`, `httpDataSource`/`LoadedData`/`AssetManifest` names are used identically across producing and consuming tasks.
 
