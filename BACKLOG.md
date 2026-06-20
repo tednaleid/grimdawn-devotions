@@ -64,6 +64,21 @@ Notes:
 - Consider whether to apply the same grouping to the constellation tooltip union
   or keep that flat.
 
+## UI: controls
+
+### 5. Reset all selected points
+Add a button in the header that clears the whole selection (all points back to
+zero), leaving the point cap as is.
+
+Notes:
+- This is separate from the existing "Reset view" button (`#reset-view`), which
+  only resets pan and zoom. Add a distinct control (for example "Reset points"
+  or "Clear").
+- `web/src/app/main.ts`: set `state = { selected: new Set(), pointCap: state.pointCap }`
+  then `refresh()`. Because `refresh()` already writes the URL hash, the cleared
+  state will persist to the URL automatically.
+- Button lives in the header in `web/index.html` next to the existing controls.
+
 ## Minor cleanups noted during review
 
 - `justfile` build still copies `data/stat_labels.json` into `dist`, but the app
