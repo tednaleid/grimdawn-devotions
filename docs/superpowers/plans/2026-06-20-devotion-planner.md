@@ -1785,56 +1785,48 @@ Expected: the workflow runs on `main`; the `deploy` job prints the Pages URL. Op
 
 ---
 
-### Task 17: Playwright e2e verification (`just e2e`)
+### Task 17: Headless-browser e2e verification (`just e2e`)
 
-Runs after Task 14 (the page builds and serves). This is the "verified in a real
-browser" gate for the goal, complementing the `bun test` core suite. It drives a
-headless Chromium against the built `web/dist` using `@playwright/cli`
-(`microsoft/playwright-cli`, invoked as `bunx @playwright/cli`, agent-oriented
-browser CLI). Tool-discovery heavy (browser install, target syntax), so the
-controller iterates it live rather than dispatching blind.
+Runs after Task 14 (the page builds). This is the "verified in a real browser"
+gate for the goal, complementing the `bun test` core suite.
+
+**As-built note (important).** The original intent was to drive the page with
+`@playwright/cli` (`microsoft/playwright-cli`). On this toolchain (bun on
+Windows) neither `@playwright/cli` nor `playwright-core` can connect to Chrome:
+Playwright's pipe transport (used by `launch()`) cannot wire its fds under bun,
+and its bundled ws client cannot complete Chrome's CDP handshake under bun
+(`connectOverCDP` hangs). Bun's *native* `WebSocket`, however, talks to Chrome's
+CDP fine. So the e2e is implemented as a small self-contained harness that drives
+the already-installed Chromium directly over a raw CDP client on bun's native
+WebSocket. No Node, pure bun. (`@playwright/cli` is still installed globally and
+usable interactively where a Node runtime is present.)
 
 **Files:**
-- Modify: `web/package.json` (add `@playwright/cli` as a devDependency)
-- Create: `web/e2e/smoke.sh` (orchestrates serve + playwright-cli asserts)
-- Modify: `justfile` (add `e2e` recipe; runs `just build`, serves, asserts, tears down)
+- Modify: `web/package.json` (add `playwright-core` as a devDependency; it ships the Chromium binary + `executablePath()`)
+- Create: `web/e2e/smoke.ts` (self-serves `web/dist`, launches headless Chromium, drives it over raw CDP, asserts, tears down)
+- Modify: `justfile` (add `install-e2e` to fetch Chromium, and `e2e: build` to run the harness)
 
 **Interfaces:**
-- Consumes: built `web/dist` (`just build`), `bunx @playwright/cli`.
+- Consumes: built `web/dist` (`just build`), the Chromium installed by `just install-e2e` (`bunx playwright@1.61.0 install chromium`).
 - Produces: `just e2e` that exits nonzero on any failed assertion.
 
-- [ ] **Step 1: Ensure a browser is available** for playwright-cli (first run may need a Chromium download; resolve the exact command live, e.g. `bunx playwright install chromium`).
+- [x] **Step 1: Install the browser** once: `just install-e2e` (`bunx playwright@1.61.0 install chromium`).
 
-- [ ] **Step 2: Write `web/e2e/smoke.sh`** that:
-  - starts a static server for `web/dist` on a free port in the background (`bunx serve` or python http), waits for it to answer.
-  - opens a headless browser, navigates to the served URL.
-  - asserts via `playwright-cli eval`:
-    - `document.querySelectorAll('circle.star').length === 438` (map rendered).
-    - exactly the 5 Crossroads entry stars carry `class="star selectable"` from empty state.
-    - after clicking `crossroads_eldritch:0`, the point count reads `1 / 55`, the affinity sidebar shows eldritch `1`, and `bat:0` becomes selectable.
-  - fails on any browser console error.
-  - always tears down the browser and background server (trap/EXIT).
+- [x] **Step 2: `web/e2e/smoke.ts`** (pure bun, no external test framework):
+  - starts an in-process `Bun.serve` static server for `web/dist` on a random port (no cwd lock on `dist`, unlike `bunx serve`).
+  - launches `chrome-headless-shell` (via a `cmd /c` wrapper, since `Bun.spawn` cannot exec the chrome binary directly here) with `--remote-debugging-port` + `--remote-allow-origins=*` + a temp profile + a startup page so a page target exists.
+  - connects a tiny CDP client (native `WebSocket`) to the page target, enables `Page`/`Runtime`, navigates, and asserts via `Runtime.evaluate`:
+    - renders 438 `circle.star`.
+    - exactly the 5 Crossroads entry stars are `selectable` from the empty state.
+    - clicking `crossroads_eldritch:0` (a bubbling synthetic click) makes the count read `1 / 55`, the eldritch affinity total `1`, `bat:0` selectable, and the clicked star `selected`.
+    - no `Runtime.consoleAPICalled` errors or `Runtime.exceptionThrown` during the run.
+  - always tears down the server and `taskkill`s `chrome-headless-shell.exe`.
 
-- [ ] **Step 3: Add the `e2e` recipe to the justfile**
+- [x] **Step 3: justfile recipes** `install-e2e` and `e2e: build`.
 
-```make
-# Build then verify the page in a headless browser (playwright-cli)
-e2e: build
-    bash "{{justfile_directory()}}/web/e2e/smoke.sh"
-```
+- [x] **Step 4: Run** `just e2e` -> build succeeds, 9/9 checks pass, exit 0; a regression exits nonzero.
 
-- [ ] **Step 4: Run and verify**
-
-Run: `just e2e`
-Expected: build succeeds, browser asserts pass, recipe exits 0. A regression
-(missing stars, broken selection, console error) exits nonzero.
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add web/package.json web/e2e/smoke.sh justfile
-git commit -m "test(e2e): playwright-cli headless verification of the planner page"
-```
+- [x] **Step 5: Commit** `test(e2e): headless-browser page check via raw CDP over bun websocket (just e2e)`.
 
 ---
 
