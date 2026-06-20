@@ -47,24 +47,56 @@ const CON_PAD = 24;
 
 export interface RenderOpts { manifest: AssetManifest | null }
 
-export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
-  const selectable = selectableStars(model, state);
-  const defs: string[] = [];
-  const parts: string[] = [];
+// A constellation's hover/click footprint in SVG world coords: its art bounds
+// (x0,y0)-(x1,y1) and the centroid of its stars, used to break ties where art
+// bounding boxes overlap.
+export interface ConRegion { id: string; x0: number; y0: number; x1: number; y1: number; cx: number; cy: number }
 
-  // Layer 0: per-constellation hover/click region = the bounding box of its stars
-  // (star bboxes do not overlap; art bboxes do). Drawn first so star hit-circles win.
+// Build a hover region per constellation: the art bounds when art is present, else
+// the star bounding box plus padding. Star centroids are the tie-break centers.
+export function buildConRegions(model: DevotionModel, manifest: AssetManifest | null): ConRegion[] {
+  const regions: ConRegion[] = [];
   for (const c of model.constellations.values()) {
     const stars = c.starIds.map((id) => model.stars.get(id)).filter((s): s is NonNullable<typeof s> => !!s);
     if (stars.length === 0) continue;
     const xs = stars.map((s) => s.position.x + STAR_CENTER);
     const ys = stars.map((s) => s.position.y + STAR_CENTER);
-    const minX = Math.min(...xs) - CON_PAD;
-    const minY = Math.min(...ys) - CON_PAD;
-    const w = Math.max(...xs) - Math.min(...xs) + 2 * CON_PAD;
-    const h = Math.max(...ys) - Math.min(...ys) + 2 * CON_PAD;
-    parts.push(`<rect class="con-hit" data-con-id="${c.id}" x="${minX}" y="${minY}" width="${w}" height="${h}"/>`);
+    const cx = xs.reduce((a, b) => a + b, 0) / xs.length;
+    const cy = ys.reduce((a, b) => a + b, 0) / ys.length;
+    const name = c.background?.image?.split("/").pop() ?? "";
+    const art = manifest?.images[name];
+    if (art && c.background && c.background.x != null && c.background.y != null) {
+      regions.push({ id: c.id, x0: c.background.x, y0: c.background.y, x1: c.background.x + art.w, y1: c.background.y + art.h, cx, cy });
+    } else {
+      regions.push({ id: c.id, x0: Math.min(...xs) - CON_PAD, y0: Math.min(...ys) - CON_PAD, x1: Math.max(...xs) + CON_PAD, y1: Math.max(...ys) + CON_PAD, cx, cy });
+    }
   }
+  return regions;
+}
+
+// The constellation owning a world point: among the regions whose bounds contain
+// it, the one whose centroid is nearest. null if the point is outside every region.
+export function constellationAt(regions: ConRegion[], wx: number, wy: number): string | null {
+  let best: string | null = null;
+  let bestD = Infinity;
+  for (const r of regions) {
+    if (wx < r.x0 || wx > r.x1 || wy < r.y0 || wy > r.y1) continue;
+    const dx = wx - r.cx;
+    const dy = wy - r.cy;
+    const d = dx * dx + dy * dy;
+    if (d < bestD) { bestD = d; best = r.id; }
+  }
+  return best;
+}
+
+export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
+  const selectable = selectableStars(model, state);
+  const defs: string[] = [];
+  const parts: string[] = [];
+
+  // Constellation hover/click is resolved in JS against each constellation's art
+  // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
+  // even though art bounding boxes overlap. Star hit-circles take precedence.
 
   // Gradient defs for every constellation (used by both the star fills and the art tint).
   for (const c of model.constellations.values()) {
@@ -136,24 +168,37 @@ export interface SvgDeps {
 }
 
 export function mountSvg(container: HTMLElement, model: DevotionModel, deps: SvgDeps): SvgHandle {
+  const regions = buildConRegions(model, deps.manifest);
   function render(state: SelectionState) {
     container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest });
   }
   render({ selected: new Set(), pointCap: 55 });
   const svg = container.querySelector("svg") as SVGSVGElement;
 
+  // The constellation under a screen point, found by mapping the point into the
+  // live SVG's coordinate space and resolving it against the art regions.
+  function conAt(clientX: number, clientY: number): string | null {
+    const live = container.querySelector("svg") as SVGSVGElement | null;
+    const ctm = live?.getScreenCTM?.();
+    if (!live || !ctm) return null;
+    const pt = live.createSVGPoint();
+    pt.x = clientX;
+    pt.y = clientY;
+    const w = pt.matrixTransform(ctm.inverse());
+    return constellationAt(regions, w.x, w.y);
+  }
+
   container.addEventListener("click", (e) => {
-    const el = e.target as Element;
-    const sid = el?.getAttribute?.("data-star-id");
+    const sid = (e.target as Element)?.getAttribute?.("data-star-id");
     if (sid) { deps.onStarClick(sid); return; }
-    const cid = el?.getAttribute?.("data-con-id");
+    const cid = conAt((e as MouseEvent).clientX, (e as MouseEvent).clientY);
     if (cid) deps.onConstellationClick(cid);
   });
   container.addEventListener("mousemove", (e) => {
-    const el = e.target as Element;
-    const sid = el?.getAttribute?.("data-star-id");
-    const cid = el?.getAttribute?.("data-con-id");
+    const sid = (e.target as Element)?.getAttribute?.("data-star-id");
+    const cid = sid ? null : conAt((e as MouseEvent).clientX, (e as MouseEvent).clientY);
     const target: HoverTarget = sid ? { kind: "star", id: sid } : cid ? { kind: "constellation", id: cid } : null;
+    container.classList.toggle("con-hover", !sid && !!cid);
     deps.onHover(target, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
   });
 

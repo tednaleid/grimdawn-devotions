@@ -21,9 +21,9 @@ test("omits the art layer when no manifest", () => {
   expect(markup).not.toContain("<image");
 });
 
-test("renders a per-constellation hover/click region", () => {
+test("no longer emits per-constellation hit rects (hover is resolved in JS)", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
-  expect(markup).toContain('class="con-hit" data-con-id="falcon"');
+  expect(markup).not.toContain("con-hit");
 });
 
 test("defines a per-constellation gradient and stars reference it", () => {
