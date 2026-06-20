@@ -194,6 +194,31 @@ Notes:
   `.con-hit` rects so they already win; keep that ordering (or equivalent
   precedence) so single-star hover/click still works.
 
+### 10. Color constellations by what they grant, not what they require
+Today a constellation's gradient/tint shows the affinities it REQUIRES. Switch it
+to show the affinities it GRANTS when fully filled out. Reachability is already
+communicated by brightness (constellations you cannot start are faded, item 6),
+so the requirement color is redundant; the granted color is the more useful
+signal (what this constellation contributes to your affinity pool).
+
+Notes:
+- `web/src/adapters/svgRenderer.ts` `gradColors(c)` currently returns
+  `presentAffinities(c.affinityRequired)` and only falls back to
+  `c.affinityBonus` for crossroads (zero-requirement nodes). Flip the preference:
+  use `c.affinityBonus` first, falling back to `c.affinityRequired` (then grey
+  `#9aa3b2`) for the rare constellation that grants no affinity. Update the
+  comments at the top of the file (lines ~10-11 and the `gradientStops` comment)
+  which currently say the identity colors are what it requires.
+- This one function feeds everything downstream automatically: the per
+  constellation `grad-<id>` linearGradient, the art tint rect (`url(#grad-<id>)`),
+  the star fills (`--grad`), and the glow color (`--affinity`, the first gradient
+  color). No other call sites should need changing.
+- Leave the requirement logic alone elsewhere: the tooltip "Requires:" line and
+  its met/missing red/green coloring, and the `reachable`/`unmet` fade in the art
+  loop, all still key off `affinityRequired`. Only the gradient source changes.
+- `web/test/svgRenderer.test.ts` asserts gradient colors; update those
+  expectations to the granted affinities.
+
 ## Testing
 
 ### 11. Fix two pre-existing failing e2e smoke checks on main
