@@ -1,16 +1,48 @@
-# Grim Dawn Devotion Parser
+# Grim Dawn Devotions
 
-Parses Grim Dawn's extracted `.dbr` game records into a single clean
-`devotions.json` describing the whole Devotion constellation system:
-every constellation, its affinity unlock requirement, the affinity it grants on
-completion, and each of its stars (stat bonuses, celestial power, weapon
-requirement, and intra-constellation pick ordering).
+A free, open-source toolkit for **[Grim Dawn](https://www.grimdawn.com/)**'s
+Devotion constellation system — built by a fan, for players.
 
-This JSON is meant as a drop-in data file for a separate devotion-path optimizer
-(built later). **This repo is only the parser + schema.**
+The goal is to make the whole Devotion system **open, queryable, and easy to plan
+against**: turn the game's own data into a clean, well-documented dataset and
+build friendly tools on top of it. No ads, no paywall, no account — just data and
+tools you can read, fork, and run yourself.
 
-Current output: **86 constellations, 438 stars** from game build `19149150`
-(~v1.2.1.x).
+### What's here & where it's going
+
+- ✅ **Parser + dataset** — `scripts/parse_devotions.py` reads the game's
+  extracted `.dbr` records into one clean [`data/devotions.json`](data/devotions.json):
+  every constellation, its affinity unlock cost and the affinity it grants, and
+  each star's stat bonuses, celestial power, weapon requirement, map position, and
+  intra-constellation pick order. Current output: **86 constellations, 438 stars**
+  (game build `19149150`, ~v1.2.1.x). Re-runnable after every patch.
+- 🔜 **Devotion-path optimizer** — find good star routes for a given build/goal,
+  using `devotions.json` as its input.
+- 🔜 **Interactive starmap** — an in-browser constellation map (the data already
+  carries each star's coordinates and each constellation's artwork reference; see
+  [docs/assets-and-textures.md](docs/assets-and-textures.md)).
+
+Everything is reproducible from your own game install — see Quick start below.
+
+## Fan project & disclaimer
+
+This is an **unofficial, non-commercial fan project**. It is **not affiliated
+with, endorsed by, or supported by Crate Entertainment**.
+
+*Grim Dawn* and all of its game data, names, artwork, and other content are the
+property of **© Crate Entertainment**. This repository contains a tool that reads
+data from a copy of the game **you already own**, plus a derived dataset of game
+facts (stat values, names, structure) provided purely to help fellow players
+understand and plan their characters. Game **artwork/asset files are not
+redistributed here** — they stay in your local install and are
+regenerated/extracted on your own machine (see
+[docs/assets-and-textures.md](docs/assets-and-textures.md)).
+
+Our own code, scripts, and documentation are open source (see [LICENSE](LICENSE)).
+That license covers **only our work** — it does not grant any rights to Crate's
+game content. If anyone at Crate would prefer something here be changed or
+removed, please reach out and we'll happily comply. Made with respect and
+gratitude for a great game and a famously mod-friendly studio.
 
 ## Quick start
 
@@ -151,6 +183,7 @@ and the swapped-in `devotions.json` is current. Bump `GD_VERSION` to taste.
 ## Layout
 
 ```
+LICENSE                     # MIT (covers our code only; game content is Crate's)
 justfile                    # doctor / install / extract / parse / all / clean
 scripts/parse_devotions.py  # the parser (uv self-executable, stdlib only)
 docs/dbr-format.md          # the reverse-engineered data model
