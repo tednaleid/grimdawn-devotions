@@ -20,6 +20,16 @@ test("star global ids and predecessor links resolve to ids", () => {
   expect(bat0.bonuses.offensiveLifeModifier).toBe(15);
 });
 
+test("celestial power carries proc, granted level and level-selected stats", () => {
+  const scorpion = [...model.stars.values()].find((s) => s.celestialPower?.name === "Scorpion Sting");
+  const power = scorpion!.celestialPower!;
+  expect(power.proc).toEqual({ chance: 25, trigger: "Attack" });
+  expect(power.level).toBe(25);
+  expect(power.stats.weaponDamagePct).toBe(40);
+  expect(power.stats.offensiveSlowPoisonMin).toBe(225);
+  expect(power.stats.offensiveSlowDefensiveAbilityMin).toBe(150);
+});
+
 test("constellation carries affinity req/bonus and member ids", () => {
   const bat = model.constellations.get("bat")!;
   expect(bat.affinityRequired).toEqual({ eldritch: 1 });

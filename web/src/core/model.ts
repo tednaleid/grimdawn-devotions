@@ -7,7 +7,13 @@ interface RawStar {
   predecessors: number[];
   position: { x: number; y: number };
   bonuses: Record<string, number>;
-  celestial_power: { name: string | null; description?: string | null } | null;
+  celestial_power: {
+    name: string | null;
+    description?: string | null;
+    proc?: { chance: number; trigger: string } | null;
+    level?: number;
+    stats?: Record<string, number>;
+  } | null;
   weapon_requirement: { weapons: string[] } | null;
   racial_target?: string[] | null;
 }
@@ -40,7 +46,13 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
         position: s.position,
         bonuses: s.bonuses,
         celestialPower: s.celestial_power && s.celestial_power.name
-          ? { name: s.celestial_power.name, description: s.celestial_power.description ?? null }
+          ? {
+              name: s.celestial_power.name,
+              description: s.celestial_power.description ?? null,
+              proc: s.celestial_power.proc ?? null,
+              level: s.celestial_power.level ?? 0,
+              stats: s.celestial_power.stats ?? {},
+            }
           : null,
         weaponRequirement: s.weapon_requirement
           ? { weapons: s.weapon_requirement.weapons }

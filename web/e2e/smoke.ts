@@ -144,6 +144,16 @@ try {
     `document.querySelector('circle[data-star-id="crossroads_eldritch:0"]').classList.contains('selected')`),
     "the clicked Crossroads star is marked selected");
 
+  // Hover a celestial-power star and confirm the tooltip shows the proc + ability stats.
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="akeron_s_scorpion:4"]').dispatchEvent(new MouseEvent('mousemove',{bubbles:true,clientX:200,clientY:200}))`);
+  const tip = await cdp.evaluate<string>("document.getElementById('tooltip').textContent");
+  check(tip.includes("Scorpion Sting") && tip.includes("25% Chance on Attack"),
+    "power tooltip shows the proc line (Scorpion Sting, 25% Chance on Attack)");
+  check(tip.includes("40% Weapon Damage") && tip.includes("1125 Poison Damage over 5 Seconds")
+    && tip.includes("150 Reduced target's Defensive Ability for 5 Seconds"),
+    "power tooltip shows the level-25 ability stat lines");
+
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
   if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log("    console: " + e);
 

@@ -1,7 +1,7 @@
 // ABOUTME: Tests for the devotion stat formatter (label + percent/flat value rendering).
 // ABOUTME: Anchored on grimtools-confirmed cases (Falcon, Shepherd's Crook) plus family rules.
 import { expect, test, describe } from "bun:test";
-import { statRow, formatBonusRows, groupedBonusRows } from "./statFormat";
+import { statRow, formatBonusRows, groupedBonusRows, formatPowerStats } from "./statFormat";
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
@@ -141,5 +141,67 @@ describe("formatBonusRows merges Min/Max damage into a range and skips weapon to
       { label: "Health", value: "+60" },
       { label: "Offensive Ability", value: "+15" },
     ]);
+  });
+});
+
+describe("formatPowerStats renders celestial-power ability lines GD-style", () => {
+  // The Scorpion Sting acceptance example: every line must reproduce exactly.
+  test("Scorpion Sting reproduces the grimtools tooltip stat lines in order", () => {
+    const rows = formatPowerStats({
+      skillCooldownTime: 1.5,
+      projectileLaunchNumber: 6,
+      projectilePiercingChance: 100,
+      projectileExplosionRadius: 0.1,
+      weaponDamagePct: 40,
+      offensiveSlowPoisonMin: 225,
+      offensiveSlowPoisonDurationMin: 5,
+      offensiveSlowDefensiveAbilityMin: 150,
+      offensiveSlowDefensiveAbilityDurationMin: 5,
+    });
+    expect(rows).toEqual([
+      { value: "1.5", label: "Second Skill Recharge" },
+      { value: "6", label: "Projectile(s)" },
+      { value: "100%", label: "Chance to pass through Enemies" },
+      { value: "0.1", label: "Meter Radius" },
+      { value: "40%", label: "Weapon Damage" },
+      { value: "1125", label: "Poison Damage over 5 Seconds" },
+      { value: "150", label: "Reduced target's Defensive Ability for 5 Seconds" },
+    ]);
+  });
+
+  test("DoT pairs multiply per-second by duration and use the DoT display name", () => {
+    expect(formatPowerStats({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 })).toEqual([
+      { value: "300", label: "Burn Damage over 3 Seconds" },
+    ]);
+    expect(formatPowerStats({ offensiveSlowPhysicalMin: 50, offensiveSlowPhysicalDurationMin: 4 })).toEqual([
+      { value: "200", label: "Internal Trauma Damage over 4 Seconds" },
+    ]);
+  });
+
+  test("radius falls back to skillTargetRadius when there is no projectile radius", () => {
+    expect(formatPowerStats({ skillTargetRadius: 3.5 })).toEqual([
+      { value: "3.5", label: "Meter Radius" },
+    ]);
+  });
+
+  test("unhandled stat ids fall through to bonus formatting without a leading +", () => {
+    // Twin Fangs: flat Vitality range + a leech percent, shown as ability lines.
+    const rows = formatPowerStats({
+      weaponDamagePct: 22,
+      offensiveLifeMin: 128,
+      offensiveLifeMax: 221,
+      offensiveLifeLeechMin: 45,
+    });
+    // Explicit meta lines come first; the rest reuse the bonus formatter (sorted
+    // by label, sign stripped).
+    expect(rows).toEqual([
+      { value: "22%", label: "Weapon Damage" },
+      { value: "45%", label: "of Attack Damage converted to Health" },
+      { value: "128-221", label: "Vitality Damage" },
+    ]);
+  });
+
+  test("empty stats yield no rows", () => {
+    expect(formatPowerStats({})).toEqual([]);
   });
 });

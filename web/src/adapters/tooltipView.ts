@@ -1,7 +1,7 @@
 // ABOUTME: DOM adapter that shows/hides a floating tooltip for a hovered star or whole constellation.
 // ABOUTME: Star view shows that star's bonuses; constellation view shows the union of all its stars' bonuses.
-import { type Affinity, type AffinityMap, type Constellation, type DevotionModel, type StarId } from "../core/types";
-import { formatBonusRows } from "../core/statFormat";
+import { type Affinity, type AffinityMap, type CelestialPower, type Constellation, type DevotionModel, type StarId } from "../core/types";
+import { formatBonusRows, formatPowerStats } from "../core/statFormat";
 import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 
@@ -28,6 +28,20 @@ function bonusRowsHtml(bonuses: Record<string, number>, racialTarget?: string[])
   return formatBonusRows(bonuses, { racialTarget })
     .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
     .join("");
+}
+
+// Star tooltip: power name + proc trigger ("Scorpion Sting (25% Chance on Attack)"),
+// description, granted level, then the ability's stat lines GD-style.
+function powerHtml(power: CelestialPower): string {
+  const proc = power.proc
+    ? ` <span class="tip-proc">(${power.proc.chance}% Chance on ${power.proc.trigger})</span>`
+    : "";
+  const desc = power.description ? `<div class="tip-power-desc">${power.description}</div>` : "";
+  const level = power.level ? `<div class="tip-power-level">Current Level: ${power.level}</div>` : "";
+  const stats = formatPowerStats(power.stats)
+    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
+    .join("");
+  return `<div class="tip-power">${power.name}${proc}</div>${desc}${level}${stats}`;
 }
 
 function affinitySections(con: Constellation, totals?: AffinityTotals): string {
@@ -62,10 +76,7 @@ export function tooltipView(el: HTMLElement) {
       const star = model.stars.get(starId);
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
-      const power = star.celestialPower
-        ? `<div class="tip-power">${star.celestialPower.name}</div>` +
-          (star.celestialPower.description ? `<div class="tip-power-desc">${star.celestialPower.description}</div>` : "")
-        : "";
+      const power = star.celestialPower ? powerHtml(star.celestialPower) : "";
       el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${affinitySections(con, totals)}`;
       place(clientX, clientY);
     },

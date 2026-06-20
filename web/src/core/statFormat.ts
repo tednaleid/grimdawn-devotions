@@ -241,6 +241,88 @@ export interface GroupedRow extends StatRow {
   id: string;
 }
 
+// --- Celestial power ability stats ------------------------------------------
+// A devotion power's tooltip is not a list of "+N%" bonuses; it is the ability's
+// own stat lines the way grimtools shows them ("1.5 Second Skill Recharge",
+// "1125 Poison Damage over 5 Seconds"). These render with the same value+label
+// shape as bonus rows, but the value carries the unit and no leading sign.
+
+function fmtNum(n: number): string {
+  return String(n);
+}
+
+/**
+ * Format a celestial power's level-selected stat map into GD-style ability rows.
+ * Ability meta fields (recharge, projectiles, pass-through, radius, weapon %) and
+ * the duration-paired damage-over-time / debuff lines are rendered explicitly, in
+ * grimtools' order; any remaining raw stat ids fall through to bonus formatting
+ * (sign stripped, since an ability grants the value rather than a +/- modifier).
+ */
+export function formatPowerStats(stats: Record<string, number>): StatRow[] {
+  const rows: StatRow[] = [];
+  const used = new Set<string>();
+  const take = (k: string): number | undefined => {
+    if (k in stats) {
+      used.add(k);
+      return stats[k];
+    }
+    return undefined;
+  };
+
+  const cd = take("skillCooldownTime");
+  if (cd !== undefined) rows.push({ value: fmtNum(cd), label: "Second Skill Recharge" });
+
+  const proj = take("projectileLaunchNumber");
+  if (proj !== undefined) rows.push({ value: fmtNum(proj), label: "Projectile(s)" });
+
+  const pierce = take("projectilePiercingChance");
+  if (pierce !== undefined) rows.push({ value: `${fmtNum(pierce)}%`, label: "Chance to pass through Enemies" });
+
+  const radius = take("projectileExplosionRadius") ?? take("skillTargetRadius");
+  if (radius !== undefined) rows.push({ value: fmtNum(radius), label: "Meter Radius" });
+
+  const weapon = take("weaponDamagePct");
+  if (weapon !== undefined) rows.push({ value: `${fmtNum(weapon)}%`, label: "Weapon Damage" });
+
+  // Damage-over-time: offensiveSlow<Type>Min holds per-second damage paired with a
+  // duration; grimtools shows the total over the listed duration.
+  for (const [seg, name] of Object.entries(DOT_DAMAGE)) {
+    const minK = `offensiveSlow${seg}Min`;
+    const durK = `offensiveSlow${seg}DurationMin`;
+    if (minK in stats && durK in stats) {
+      used.add(minK);
+      used.add(durK);
+      const total = Math.round(stats[minK]! * stats[durK]!);
+      rows.push({ value: fmtNum(total), label: `${name} Damage over ${fmtNum(stats[durK]!)} Seconds` });
+    }
+  }
+
+  // Offensive/Defensive Ability debuffs (e.g. Scorpion Sting's reduced DA).
+  for (const [seg, name] of [
+    ["DefensiveAbility", "Reduced target's Defensive Ability"],
+    ["OffensiveAbility", "Reduced target's Offensive Ability"],
+  ] as const) {
+    const minK = `offensiveSlow${seg}Min`;
+    const durK = `offensiveSlow${seg}DurationMin`;
+    if (minK in stats) {
+      used.add(minK);
+      const dur = stats[durK];
+      if (durK in stats) used.add(durK);
+      const suffix = dur !== undefined ? ` for ${fmtNum(dur)} Seconds` : "";
+      rows.push({ value: fmtNum(stats[minK]!), label: `${name}${suffix}` });
+    }
+  }
+
+  // Anything else (instant damage ranges, leech, resist reductions): reuse the
+  // bonus formatter and drop the leading "+" an ability line does not show.
+  const rest: Record<string, number> = {};
+  for (const k of Object.keys(stats)) if (!used.has(k)) rest[k] = stats[k]!;
+  for (const r of formatBonusRows(rest)) {
+    rows.push({ label: r.label, value: r.value.replace(/^\+/, "") });
+  }
+  return rows;
+}
+
 /** Format a bonuses map into display rows grouped by category, in GROUP_ORDER. */
 export function groupedBonusRows(
   bonuses: Record<string, number>,

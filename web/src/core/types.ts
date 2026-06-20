@@ -6,6 +6,16 @@ export const AFFINITIES: Affinity[] = ["ascendant", "chaos", "eldritch", "order"
 export type AffinityMap = Partial<Record<Affinity, number>>;
 export type StarId = string; // `${constellationId}:${index}`
 
+// A devotion celestial power: its proc trigger (null for always-on auras), the
+// fixed granted skill level, and the level-selected raw stat ids the tooltip shows.
+export interface CelestialPower {
+  name: string;
+  description: string | null;
+  proc: { chance: number; trigger: string } | null;
+  level: number;
+  stats: Record<string, number>;
+}
+
 export interface Star {
   id: StarId;
   constellationId: string;
@@ -13,7 +23,7 @@ export interface Star {
   predecessors: StarId[];
   position: { x: number; y: number };
   bonuses: Record<string, number>;
-  celestialPower: { name: string; description: string | null } | null;
+  celestialPower: CelestialPower | null;
   weaponRequirement: { weapons: string[] } | null;
   racialTarget?: string[]; // races a racialBonus* stat applies to, e.g. ["Beast"]
 }
