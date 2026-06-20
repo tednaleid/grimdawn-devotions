@@ -6,10 +6,6 @@ import { affinityTotals } from "../core/affinity";
 import { groupedBonusRows } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 
-function escapeAttr(s: string): string {
-  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
-}
-
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
 function changeClass(prev: Record<string, number> | undefined, key: string, cur: Record<string, number>): string {
   if (!prev) return "";
@@ -36,8 +32,9 @@ export function renderBenefits(
         .join(""),
     )
     .join("");
+  // data-star-id lets main.ts show the same rich tooltip as the power's map star on hover.
   const powerRows = powers
-    .map((p) => `<div class="power"${p.description ? ` title="${escapeAttr(p.description)}"` : ""}>${p.name}</div>`)
+    .map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`)
     .join("");
   el.innerHTML = `<h2>Benefits</h2>${rows}${powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : ""}`;
   return bonuses;

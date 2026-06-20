@@ -85,7 +85,7 @@ export function tooltipView(el: HTMLElement) {
       if (!con) return;
       const stars = new Set(con.starIds);
       const powers = powersGained(model, stars)
-        .map((p) => `<div class="tip-power">${p.name}</div>`)
+        .map((p) => `<div class="tip-power">${p.power.name}</div>`)
         .join("");
       const head = `<strong>${con.name}</strong> <span class="tip-cost">${con.starIds.length} pts</span>`;
       el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${affinitySections(con, totals)}`;

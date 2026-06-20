@@ -14,8 +14,9 @@ test("sums like stat ids additively across stars", () => {
   expect(totals.offensiveSlowBleedingModifier).toBe(65); // 15 + 50
 });
 
-test("collects celestial power names", () => {
+test("collects celestial powers with their star ids", () => {
   const powers = powersGained(model, new Set(["bat:4"]));
-  expect(powers.map((p) => p.name)).toContain("Twin Fangs");
-  expect(powers[0]!.description).toBeTruthy();
+  expect(powers.map((p) => p.power.name)).toContain("Twin Fangs");
+  expect(powers[0]!.power.description).toBeTruthy();
+  expect(powers[0]!.starId).toBe("bat:4");
 });

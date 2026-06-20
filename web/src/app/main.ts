@@ -86,6 +86,15 @@ async function boot() {
     },
   });
 
+  // The sidebar "Celestial Powers" list shows the same rich tooltip as the power's
+  // map star (proc, level, stats, requires/grants) when a row is hovered.
+  benefitsEl.addEventListener("mousemove", (e) => {
+    const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
+    if (sid) tip.show(model, sid, (e as MouseEvent).clientX, (e as MouseEvent).clientY, affinityTotals(model, state.selected));
+    else tip.hide();
+  });
+  benefitsEl.addEventListener("mouseleave", () => tip.hide());
+
   const nav = attachNav(() => mapContainer.querySelector("svg"), {
     fitPoints: [...model.stars.values()].map((s) => s.position),
     onDragStateChange: (d) => mapContainer.classList.toggle("grabbing", d),
