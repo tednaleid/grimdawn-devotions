@@ -16,7 +16,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
       - name: Build static site
         working-directory: web
@@ -27,10 +27,9 @@ jobs:
           cp src/styles.css dist/styles.css
           mkdir -p dist/data
           cp ../data/devotions.json dist/data/
-          cp ../data/stat_labels.json dist/data/
           # Art only appears if a committed assets/ exists (see decision gate).
           if [ -d ../assets ]; then cp -r ../assets dist/assets; fi
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: web/dist
   deploy:
@@ -41,4 +40,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

@@ -34,7 +34,7 @@ doctor:
       *)            check winget "package manager — ships with Windows 10/11" ;;
     esac
     echo "Web data (committed; needed for build/serve):"
-    for f in data/devotions.json data/stat_labels.json; do
+    for f in data/devotions.json; do
       if [ -f "{{justfile_directory()}}/$f" ]; then echo "  ok   $f"; ok=$((ok+1)); else echo "  MISS $f — run 'just parse'"; fail=$((fail+1)); fi
     done
     if [ -d "{{justfile_directory()}}/assets/devotions" ]; then echo "  ok   assets/devotions"; ok=$((ok+1)); else echo "  warn assets/devotions missing — run 'just assets' (artwork is optional)"; fi
@@ -156,7 +156,6 @@ build:
     cp index.html dist/index.html
     cp src/styles.css dist/styles.css
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
-    cp "{{justfile_directory()}}/data/stat_labels.json" dist/data/stat_labels.json
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
     echo "Built web/dist"
 
