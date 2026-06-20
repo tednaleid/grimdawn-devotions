@@ -14,3 +14,12 @@ __pycache__/
 .DS_Store
 Thumbs.db
 .superpowers/
+
+# Web app
+web/node_modules/
+web/dist/
+web/bun.lockb
+web/bun.lock
+
+# Optimized art (regenerate with `just assets`) - never committed
+/assets/

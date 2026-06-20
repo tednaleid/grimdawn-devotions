@@ -28,6 +28,8 @@ doctor:
     check git  "install Git for Windows"
     check uv   "run 'just install-uv'"
     check winget "Windows package manager (ships with Win10/11)"
+    check bun  "run 'just install' (winget install Oven-sh.Bun) then open a new shell"
+    check jq   "run 'just install' (winget install jqlang.jq) then open a new shell"
     echo "Game install:"
     if [ -f "{{gd_dir}}/database/database.arz" ]; then echo "  ok   Grim Dawn at {{gd_dir}}"; else echo "  MISS Grim Dawn not found at {{gd_dir}} — set GD_DIR or pass gd_dir=..."; fail=$((fail+1)); fi
     echo "Extracted data:"
@@ -47,8 +49,26 @@ install-uv:
     winget install --id astral-sh.uv -e --accept-source-agreements --accept-package-agreements
     echo "uv installed. NOTE: open a new shell (or restart your terminal) so 'uv' is on PATH."
 
+# Install bun (web toolchain) via winget if missing
+install-bun:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v bun >/dev/null 2>&1; then echo "bun already installed: $(bun --version)"; exit 0; fi
+    echo "Installing bun via winget..."
+    winget install --id Oven-sh.Bun -e --accept-source-agreements --accept-package-agreements
+    echo "bun installed. NOTE: open a new shell so 'bun' is on PATH."
+
+# Install jq (JSON CLI) via winget if missing
+install-jq:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v jq >/dev/null 2>&1; then echo "jq already installed: $(jq --version)"; exit 0; fi
+    echo "Installing jq via winget..."
+    winget install --id jqlang.jq -e --accept-source-agreements --accept-package-agreements
+    echo "jq installed. NOTE: open a new shell so 'jq' is on PATH."
+
 # Install everything needed to run the parser (uv + a managed Python)
-install: install-uv
+install: install-uv install-bun install-jq
     @command -v uv >/dev/null 2>&1 && uv python install || echo "Re-run 'just install' in a fresh shell so uv is on PATH."
 
 # --- Pipeline ---------------------------------------------------------------
@@ -84,3 +104,11 @@ all: extract parse
 # Remove generated output (keeps extracted game files)
 clean:
     rm -f "{{out}}" "{{justfile_directory()}}/data/stat_labels.json" "{{justfile_directory()}}/data/devotion_records.csv"
+
+# Install web dependencies (bun)
+web-install:
+    cd "{{justfile_directory()}}/web" && bun install
+
+# Run the core test suite
+test:
+    cd "{{justfile_directory()}}/web" && bun test

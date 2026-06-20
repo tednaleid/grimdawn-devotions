@@ -1,0 +1,13 @@
+{
+  "name": "grimdawn-devotion-planner",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "build": "bun build src/app/main.ts --outdir dist --target browser",
+    "serve": "bun --bun x serve dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
