@@ -1,7 +1,7 @@
 // ABOUTME: Tests for the devotion stat formatter (label + percent/flat value rendering).
 // ABOUTME: Anchored on grimtools-confirmed cases (Falcon, Shepherd's Crook) plus family rules.
 import { expect, test, describe } from "bun:test";
-import { statRow, formatBonusRows, groupedBonusRows, formatPowerStats } from "../src/core/statFormat";
+import { statRow, formatBonusRows, groupedBonusRows, formatPowerStats, formatPet } from "../src/core/statFormat";
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
@@ -204,6 +204,21 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
     ]);
   });
 
+  test("target debuffs (movement slow, resistance/damage reduction) render as timed reductions", () => {
+    expect(formatPowerStats({
+      offensiveSlowRunSpeedMin: 45,
+      offensiveSlowRunSpeedDurationMin: 3,
+      offensiveTotalResistanceReductionAbsoluteMin: 24,
+      offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
+      offensiveTotalDamageReductionPercentMin: 15,
+      offensiveTotalDamageReductionPercentDurationMin: 2,
+    })).toEqual([
+      { value: "45%", label: "Slower target Movement for 3 Seconds" },
+      { value: "24", label: "Reduced target's Resistances for 1 Seconds" },
+      { value: "15%", label: "Reduced target's Damage for 2 Seconds" },
+    ]);
+  });
+
   test("radius falls back to skillTargetRadius when there is no projectile radius", () => {
     expect(formatPowerStats({ skillTargetRadius: 3.5 })).toEqual([
       { value: "3.5", label: "Meter Radius" },
@@ -229,5 +244,24 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
 
   test("empty stats yield no rows", () => {
     expect(formatPowerStats({})).toEqual([]);
+  });
+});
+
+describe("formatPet renders a summon proc's summary + base attack", () => {
+  test("plural count + duration + base-attack damage (Raise the Dead)", () => {
+    const r = formatPet({ name: "Skeleton", count: 6, duration: 20, attackStats: { offensiveAetherMin: 230, offensiveLifeMin: 230 } });
+    expect(r.summon).toBe("Summons 6 Skeletons for 20 Seconds");
+    expect(r.attack).toEqual([
+      { value: "230", label: "Aether Damage" },
+      { value: "230", label: "Vitality Damage" },
+    ]);
+  });
+  test("single pet shows no count or plural (Bysmiel's Command)", () => {
+    expect(formatPet({ name: "Eldritch Hound", count: 1, duration: 20, attackStats: {} }).summon)
+      .toBe("Summons Eldritch Hound for 20 Seconds");
+  });
+  test("missing count omits the number (Elemental Seeker)", () => {
+    expect(formatPet({ name: "Elemental Seeker", count: null, duration: 3, attackStats: {} }).summon)
+      .toBe("Summons Elemental Seeker for 3 Seconds");
   });
 });

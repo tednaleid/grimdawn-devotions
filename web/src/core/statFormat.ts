@@ -1,5 +1,6 @@
 // ABOUTME: Formats raw Grim Dawn devotion stat ids + values into player-facing rows.
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
+import type { PetInfo } from "./types";
 export interface StatRow {
   label: string;
   value: string;
@@ -328,6 +329,22 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
     }
   }
 
+  // Other timed target debuffs: a percent movement slow, plus flat/percent resistance
+  // and damage reductions (which lack the "Slow" infix the ability debuffs use).
+  for (const [minK, durK, label, pct] of [
+    ["offensiveSlowRunSpeedMin", "offensiveSlowRunSpeedDurationMin", "Slower target Movement", true],
+    ["offensiveTotalResistanceReductionAbsoluteMin", "offensiveTotalResistanceReductionAbsoluteDurationMin", "Reduced target's Resistances", false],
+    ["offensiveTotalDamageReductionPercentMin", "offensiveTotalDamageReductionPercentDurationMin", "Reduced target's Damage", true],
+  ] as const) {
+    if (minK in stats) {
+      used.add(minK);
+      const dur = stats[durK];
+      if (durK in stats) used.add(durK);
+      const suffix = dur !== undefined ? ` for ${fmtNum(dur)} Seconds` : "";
+      rows.push({ value: pct ? `${fmtNum(stats[minK]!)}%` : fmtNum(stats[minK]!), label: `${label}${suffix}` });
+    }
+  }
+
   // Anything else (instant damage ranges, leech, resist reductions): reuse the
   // bonus formatter and drop the leading "+" an ability line does not show.
   const rest: Record<string, number> = {};
@@ -336,6 +353,18 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
     rows.push({ label: r.label, value: r.value.replace(/^\+/, "") });
   }
   return rows;
+}
+
+/**
+ * A summon proc's pet: a "Summons N <Pet> for M Seconds" summary line plus the pet's
+ * base attack rendered as ability stat rows (reusing the power-stat formatter).
+ */
+export function formatPet(pet: PetInfo): { summon: string; attack: StatRow[] } {
+  const plural = (pet.count ?? 1) > 1;
+  const num = plural ? `${fmtNum(pet.count!)} ` : "";
+  const name = `${pet.name ?? "minion"}${plural ? "s" : ""}`;
+  const dur = pet.duration ? ` for ${fmtNum(pet.duration)} Seconds` : "";
+  return { summon: `Summons ${num}${name}${dur}`, attack: formatPowerStats(pet.attackStats) };
 }
 
 // --- Condensed view: one line per concept (subject), carrying its dimensions ---

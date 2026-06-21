@@ -3,7 +3,7 @@
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-06-21T18:50:47Z",
+    "generated_utc": "2026-06-21T19:06:05Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -129,7 +129,8 @@
               "projectilePiercingChance": 100,
               "skillCooldownTime": 1.5,
               "weaponDamagePct": 40
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -253,7 +254,8 @@
               "retaliationDamagePct": 17,
               "skillCooldownTime": 0.1,
               "weaponDamagePct": 45
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -368,7 +370,8 @@
               "defensivePhysical": -32,
               "defensivePierce": -36,
               "skillActiveDuration": 18
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -491,7 +494,8 @@
               "projectilePiercingChance": 100,
               "skillCooldownTime": 0.6,
               "weaponDamagePct": 22
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -616,7 +620,8 @@
               "skillCooldownTime": 0.4,
               "skillTargetRadius": 3.5,
               "weaponDamagePct": 32
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -1015,7 +1020,8 @@
               "skillCooldownTime": 2.7,
               "skillLifeBonus": 848,
               "skillLifePercent": 10
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -1311,7 +1317,8 @@
               "projectilePiercingChance": 100,
               "skillCooldownTime": 0.5,
               "weaponDamagePct": 15
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -1432,7 +1439,8 @@
               "projectilePiercingChance": 100,
               "skillCooldownTime": 2,
               "weaponDamagePct": 24
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -1560,7 +1568,8 @@
               "projectilePiercingChance": 100,
               "skillCooldownTime": 0.5,
               "weaponDamagePct": 20
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -1865,7 +1874,8 @@
               "offensiveLifeLeechMin": 80,
               "skillActiveDuration": 5,
               "skillCooldownTime": 30
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -2302,7 +2312,8 @@
               "offensiveFireMin": 140,
               "projectileExplosionRadius": 2.5,
               "skillActiveDuration": 3
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -3670,7 +3681,8 @@
               "characterOffensiveAbility": 85,
               "skillActiveDuration": 4,
               "skillCooldownTime": 6
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -4106,7 +4118,8 @@
             "stats": {
               "damageAbsorption": 6100,
               "skillCooldownTime": 8
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -4232,7 +4245,8 @@
               "offensiveSlowColdMin": 225,
               "skillCooldownTime": 0.7,
               "weaponDamagePct": 45
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -4836,7 +4850,8 @@
               "retaliationDamagePct": 8,
               "skillActiveDuration": 6,
               "skillCooldownTime": 2
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -5045,7 +5060,8 @@
               "skillActiveDuration": 7,
               "skillCooldownTime": 12,
               "skillTargetRadius": 5
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -5209,7 +5225,8 @@
               "skillCooldownTime": 3.2,
               "skillTargetRadius": 6.5,
               "weaponDamagePct": 16
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -5369,7 +5386,8 @@
               "projectilePiercingChance": 100,
               "skillCooldownTime": 1.8,
               "weaponDamagePct": 25
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -5533,7 +5551,8 @@
               "retaliationDamagePct": 18,
               "skillCooldownTime": 0.3,
               "weaponDamagePct": 55
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -5682,7 +5701,8 @@
               "skillCooldownTime": 10,
               "skillManaPercent": 25,
               "skillTargetRadius": 15
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -5829,7 +5849,8 @@
               "skillCooldownTime": 25,
               "skillLifeBonus": 1200,
               "skillLifePercent": 20
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -6286,6 +6307,21 @@
             "level": 20,
             "stats": {
               "skillCooldownTime": 30
+            },
+            "pet": {
+              "name": "Eldritch Hound",
+              "count": 1,
+              "duration": 20,
+              "attack_stats": {
+                "offensivePoisonMax": 335,
+                "offensivePoisonMin": 286,
+                "offensiveSlowOffensiveAbilityDurationMin": 6,
+                "offensiveSlowOffensiveAbilityMin": 180,
+                "offensiveSlowPoisonDurationMin": 2,
+                "offensiveSlowPoisonMin": 238,
+                "offensiveTotalResistanceReductionAbsoluteDurationMin": 6,
+                "offensiveTotalResistanceReductionAbsoluteMin": 25
+              }
             }
           },
           "weapon_requirement": null
@@ -6441,7 +6477,8 @@
               "skillCooldownTime": 8,
               "skillLifeBonus": 1550,
               "skillLifePercent": 12
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -6524,7 +6561,8 @@
             "stats": {
               "damageAbsorption": 2900,
               "skillCooldownTime": 3
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -6701,7 +6739,8 @@
               "offensivePhysicalMin": 305,
               "skillActiveDuration": 5,
               "skillTargetRadius": 4.5
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -7005,7 +7044,8 @@
               "offensiveSlowBleedingMin": 325,
               "skillActiveDuration": 5,
               "skillTargetRadius": 5
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -7302,7 +7342,8 @@
               "retaliationDamagePct": 35,
               "skillCooldownTime": 2,
               "weaponDamagePct": 85
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -7636,7 +7677,8 @@
               "projectileExplosionRadius": 1,
               "skillActiveDuration": 5,
               "skillCooldownTime": 1.8
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -7796,7 +7838,8 @@
               "offensiveTotalResistanceReductionAbsoluteDurationMin": 5,
               "offensiveTotalResistanceReductionAbsoluteMin": 28,
               "skillCooldownTime": 1
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -7936,7 +7979,8 @@
               "retaliationTotalDamageModifier": 140,
               "skillActiveDuration": 8,
               "skillCooldownTime": 15
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -8042,7 +8086,8 @@
               "offensivePoisonMin": 97,
               "skillActiveDuration": 4,
               "skillCooldownTime": 1
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -8356,6 +8401,19 @@
             "level": 20,
             "stats": {
               "skillCooldownTime": 2
+            },
+            "pet": {
+              "name": "Skeleton",
+              "count": 6,
+              "duration": 20,
+              "attack_stats": {
+                "offensiveAetherMin": 230,
+                "offensiveLifeMin": 230,
+                "offensiveSlowRunSpeedDurationMin": 3,
+                "offensiveSlowRunSpeedMin": 45,
+                "offensiveTotalResistanceReductionAbsoluteDurationMin": 1,
+                "offensiveTotalResistanceReductionAbsoluteMin": 24
+              }
             }
           },
           "weapon_requirement": null
@@ -8454,7 +8512,8 @@
               "projectileExplosionRadius": 3.5,
               "skillActiveDuration": 5,
               "skillCooldownTime": 1.5
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -8798,7 +8857,8 @@
               "offensiveTotalResistanceReductionAbsoluteMin": 20,
               "skillCooldownTime": 1,
               "weaponDamagePct": 33
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -9077,7 +9137,8 @@
               "offensiveFireMin": 120,
               "skillActiveDuration": 4,
               "skillCooldownTime": 1
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -9481,7 +9542,8 @@
               "retaliationPhysicalMin": 525,
               "skillActiveDuration": 5,
               "skillCooldownTime": 8
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -9643,7 +9705,8 @@
               "skillActiveDuration": 6,
               "skillCooldownTime": 10,
               "skillTargetRadius": 8
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -9931,7 +9994,8 @@
               "projectileExplosionRadius": 3.5,
               "skillActiveDuration": 1,
               "skillCooldownTime": 10
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -10040,7 +10104,8 @@
               "retaliationPhysicalMin": 205,
               "skillActiveDuration": 10,
               "skillCooldownTime": 22
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -10216,7 +10281,8 @@
               "offensiveLifeLeechMin": 55,
               "offensiveLifeMin": 310,
               "skillActiveDuration": 10
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -10351,6 +10417,12 @@
             "stats": {
               "projectileExplosionRadius": 1,
               "skillCooldownTime": 1
+            },
+            "pet": {
+              "name": "Arcane Bomb",
+              "count": 6,
+              "duration": 24,
+              "attack_stats": {}
             }
           },
           "weapon_requirement": null
@@ -10475,7 +10547,8 @@
               "offensiveSlowLifeModifier": 310,
               "skillActiveDuration": 12,
               "skillCooldownTime": 18
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -10543,7 +10616,8 @@
               "offensiveSlowPoisonMin": 312,
               "skillCooldownTime": 3,
               "skillTargetRadius": 10
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -10683,7 +10757,8 @@
             "level": 10,
             "stats": {
               "skillCooldownTime": 8
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -10816,6 +10891,16 @@
             "level": 15,
             "stats": {
               "skillCooldownTime": 0.7
+            },
+            "pet": {
+              "name": "Arcane Current",
+              "count": 5,
+              "duration": 4.5,
+              "attack_stats": {
+                "offensiveAetherMin": 235,
+                "offensiveCritDamageModifier": 40,
+                "offensiveElementalMin": 430
+              }
             }
           },
           "weapon_requirement": null
@@ -10944,7 +11029,8 @@
               "skillActiveDuration": 1,
               "skillCooldownTime": 0.5,
               "weaponDamagePct": 30
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -11119,6 +11205,12 @@
             "stats": {
               "projectileExplosionRadius": 1,
               "skillCooldownTime": 0.8
+            },
+            "pet": {
+              "name": "Elemental Seeker",
+              "count": null,
+              "duration": 3,
+              "attack_stats": {}
             }
           },
           "weapon_requirement": null
@@ -11289,7 +11381,8 @@
               "skillActiveDuration": 20,
               "skillCooldownTime": 30,
               "skillTargetRadius": 12
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -11442,7 +11535,8 @@
             "stats": {
               "skillActiveDuration": 8,
               "skillCooldownTime": 15
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -11581,7 +11675,8 @@
               "projectilePiercingChance": 100,
               "skillCooldownTime": 1.5,
               "weaponDamagePct": 18
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         },
@@ -11761,7 +11856,8 @@
               "projectileExplosionRadius": 3.5,
               "skillActiveDuration": 6,
               "skillCooldownTime": 2
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -11927,7 +12023,8 @@
               "skillCooldownTime": 2,
               "skillTargetRadius": 5,
               "weaponDamagePct": 54
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -12092,7 +12189,8 @@
               "offensiveSlowDefensiveAbilityMin": 144,
               "skillActiveDuration": 10,
               "skillCooldownTime": 15
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -12246,7 +12344,8 @@
               "skillActiveDuration": 8,
               "skillCooldownTime": 12,
               "skillTargetRadius": 15
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -12410,7 +12509,8 @@
               "skillCooldownTime": 1,
               "skillTargetRadius": 6,
               "weaponDamagePct": 75
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -12551,7 +12651,8 @@
               "offensiveAetherMin": 185,
               "offensiveLifeMin": 185,
               "skillActiveDuration": 8
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -12692,7 +12793,8 @@
               "skillCooldownTime": 1,
               "skillTargetRadius": 0.5,
               "weaponDamagePct": 60
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -12848,7 +12950,8 @@
               "skillLifeBonus": 700,
               "skillLifePercent": 10,
               "skillTargetRadius": 15
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -12991,7 +13094,8 @@
               "offensiveStunMin": 0.4,
               "skillCooldownTime": 1.5,
               "weaponDamagePct": 20
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -13153,7 +13257,8 @@
               "skillActiveDuration": 3,
               "skillCooldownTime": 3.5,
               "skillTargetRadius": 5
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -13304,6 +13409,20 @@
             "level": 15,
             "stats": {
               "skillCooldownTime": 6
+            },
+            "pet": {
+              "name": "Living Shadow",
+              "count": 3,
+              "duration": 24,
+              "attack_stats": {
+                "offensiveLifeLeechMin": 25,
+                "offensivePierceMax": 260,
+                "offensivePierceMin": 205,
+                "offensiveSlowBleedingDurationMin": 2,
+                "offensiveSlowBleedingMin": 200,
+                "offensiveTotalDamageReductionPercentDurationMin": 2,
+                "offensiveTotalDamageReductionPercentMin": 15
+              }
             }
           },
           "weapon_requirement": null
@@ -13450,7 +13569,8 @@
               "skillActiveDuration": 1,
               "skillCooldownTime": 1,
               "weaponDamagePct": 65
-            }
+            },
+            "pet": null
           },
           "weapon_requirement": null
         }
@@ -13585,6 +13705,12 @@
             "level": 15,
             "stats": {
               "skillCooldownTime": 0.8
+            },
+            "pet": {
+              "name": "Black Blood of Yugol",
+              "count": 6,
+              "duration": 8,
+              "attack_stats": {}
             }
           },
           "weapon_requirement": null

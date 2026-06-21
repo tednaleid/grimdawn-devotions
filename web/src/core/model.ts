@@ -13,6 +13,12 @@ interface RawStar {
     proc?: { chance: number; trigger: string } | null;
     level?: number;
     stats?: Record<string, number>;
+    pet?: {
+      name: string | null;
+      count: number | null;
+      duration: number | null;
+      attack_stats?: Record<string, number>;
+    } | null;
   } | null;
   weapon_requirement: { weapons: string[] } | null;
   racial_target?: string[] | null;
@@ -52,6 +58,14 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
               proc: s.celestial_power.proc ?? null,
               level: s.celestial_power.level ?? 0,
               stats: s.celestial_power.stats ?? {},
+              pet: s.celestial_power.pet
+                ? {
+                    name: s.celestial_power.pet.name,
+                    count: s.celestial_power.pet.count,
+                    duration: s.celestial_power.pet.duration,
+                    attackStats: s.celestial_power.pet.attack_stats ?? {},
+                  }
+                : null,
             }
           : null,
         weaponRequirement: s.weapon_requirement

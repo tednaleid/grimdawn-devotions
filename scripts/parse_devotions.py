@@ -316,6 +316,42 @@ def extract_power_stats(chain: list[dict[str, str]], level: int) -> dict[str, fl
     return stats
 
 
+def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int):
+    """Summon info for a spawn-pet power, or None.
+
+    A Skill_*SpawnPet power summons a temporary creature. We surface the fixed
+    facts the proc tooltip needs: pet name, count (petLimit), duration
+    (spawnObjectsTimeToLive), and the pet's base attack damage. The summoned
+    creature is the level-indexed entry of spawnObjects (the list runs 1..level,
+    so the granted level picks the last). The pet's health/defenses scale with the
+    player's pet bonuses, so only the fixed base attack damage is read.
+    """
+    spawn = skill.get("spawnObjects", "").strip()
+    if "SpawnPet" not in skill.get("Class", "") and not spawn:
+        return None
+    objs = [o.strip() for o in spawn.split(";") if o.strip()]
+    if not objs:
+        return None
+    creature = db.get(objs[min(level, len(objs)) - 1])
+    pet_name = clean_text(tags.get(creature.get("description", "").strip(), "")) or None
+    count = level_array_value(skill.get("petLimit", ""), level)
+    duration = level_array_value(skill.get("spawnObjectsTimeToLive", ""), level)
+    # Base attack: the creature's basic attack, falling back to its special attack
+    # (some pets, e.g. the Eldritch Hound, only have the special). Damage stats only.
+    atk_ref = creature.get("attackSkillName", "").strip() or creature.get("specialAttackSkillName", "").strip()
+    attack_stats: dict[str, float] = {}
+    if atk_ref:
+        atk_chain = power_skill_chain(db, db.get(atk_ref))
+        attack_stats = {k: v for k, v in extract_power_stats(atk_chain, level).items()
+                        if k not in POWER_META_FIELDS}
+    return {
+        "name": pet_name,
+        "count": int(count) if count else None,
+        "duration": duration,
+        "attack_stats": attack_stats,
+    }
+
+
 def extract_weapon_requirement(skill: dict[str, str], tags: dict[str, str]):
     weapons = [w for w in WEAPON_FLAGS if skill.get(w, "0").strip() not in ("0", "")]
     if not weapons:
@@ -408,6 +444,7 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
             "proc": extract_proc(db, chain),
             "level": level,
             "stats": extract_power_stats(chain, level),
+            "pet": extract_pet(db, tags, skill, level),
         }
     return star, skill_ref
 

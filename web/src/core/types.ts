@@ -8,12 +8,23 @@ export type StarId = string; // `${constellationId}:${index}`
 
 // A devotion celestial power: its proc trigger (null for always-on auras), the
 // fixed granted skill level, and the level-selected raw stat ids the tooltip shows.
+// A temporary creature summoned by a spawn-pet power. count/duration are at the
+// granted level; attackStats is the pet's base attack damage (its other stats scale
+// with the player's pet bonuses, so they are not fixed and not surfaced).
+export interface PetInfo {
+  name: string | null;
+  count: number | null;
+  duration: number | null;
+  attackStats: Record<string, number>;
+}
+
 export interface CelestialPower {
   name: string;
   description: string | null;
   proc: { chance: number; trigger: string } | null;
   level: number;
   stats: Record<string, number>;
+  pet: PetInfo | null;
 }
 
 export interface Star {

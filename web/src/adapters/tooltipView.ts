@@ -1,7 +1,7 @@
 // ABOUTME: DOM adapter that shows/hides a floating tooltip for a hovered star or whole constellation.
 // ABOUTME: Star view shows that star's bonuses; constellation view shows the union of all its stars' bonuses.
-import type { Affinity, AffinityMap, CelestialPower, Constellation, DevotionModel, StarId } from "../core/types";
-import { formatBonusRows, formatPowerStats } from "../core/statFormat";
+import type { Affinity, AffinityMap, CelestialPower, Constellation, DevotionModel, PetInfo, StarId } from "../core/types";
+import { formatBonusRows, formatPet, formatPowerStats } from "../core/statFormat";
 import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 
@@ -41,7 +41,18 @@ function powerHtml(power: CelestialPower): string {
   const stats = formatPowerStats(power.stats)
     .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
     .join("");
-  return `<div class="tip-power">${power.name}${proc}</div>${desc}${level}${stats}`;
+  const pet = power.pet ? petHtml(power.pet) : "";
+  return `<div class="tip-power">${power.name}${proc}</div>${desc}${level}${stats}${pet}`;
+}
+
+// A summon proc's pet: the "Summons N <Pet>..." line, then the pet's base attack
+// rendered like the power's own ability stat lines.
+function petHtml(pet: PetInfo): string {
+  const { summon, attack } = formatPet(pet);
+  const lines = attack
+    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
+    .join("");
+  return `<div class="tip-pet">${summon}</div>${lines}`;
 }
 
 function affinitySections(con: Constellation, totals?: AffinityTotals): string {
