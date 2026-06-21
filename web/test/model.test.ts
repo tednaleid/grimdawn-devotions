@@ -7,8 +7,8 @@ import { buildModel } from "../src/core/model";
 const model = buildModel(doc as any);
 
 test("indexes every constellation and star", () => {
-  expect(model.constellations.size).toBe(86);
-  expect(model.stars.size).toBe(438);
+  expect(model.constellations.size).toBe(109);
+  expect(model.stars.size).toBe(559);
 });
 
 test("star global ids and predecessor links resolve to ids", () => {
@@ -16,7 +16,7 @@ test("star global ids and predecessor links resolve to ids", () => {
   const bat1 = model.stars.get("bat:1")!;
   expect(bat0.predecessors).toEqual([]);
   expect(bat1.predecessors).toEqual(["bat:0"]);
-  expect(bat0.position).toEqual({ x: -968, y: 80 });
+  expect(bat0.position).toEqual({ x: -777, y: 150 });
   expect(bat0.bonuses.offensiveLifeModifier).toBe(15);
 });
 

@@ -136,8 +136,8 @@ try {
 
   // Stars render as circles, except the 50 celestial-power stars which are polygons,
   // so count the shared .star class rather than circle.star.
-  check(await cdp.evaluate<number>("document.querySelectorAll('.star').length") === 438,
-    "renders all 438 stars");
+  check(await cdp.evaluate<number>("document.querySelectorAll('.star').length") === 559,
+    "renders all 559 stars");
 
   const selectable = await cdp.evaluate<string[]>(
     "[...document.querySelectorAll('circle.hit.selectable')].map(c => c.getAttribute('data-star-id'))");
