@@ -3,52 +3,14 @@
 Planned enhancements for the web planner that are not yet started. Each item
 should include implementation pointers for whoever picks it up.
 
-## UI: benefits panel
-
-### 1. Condense related benefit dimensions onto one line
-Proposal (for review): `docs/specs/benefit-grouping.md`.
-
-Many benefit rows are different dimensions of the same concept and clutter the
-list. Example: Frostburn appears as +N% damage, +N-M flat damage, +N% duration,
-and +N flat duration; a Frostburn user wants all of those, so show them on one
-"Frostburn" line. Resistances stay a separate concept from damage. The proposal
-defines a category -> subject -> dimension model, the subject taxonomy grounded
-in the data, three layout options, and the open questions (layout, sidebar width,
-whether the tooltip adopts it too).
-
-Notes:
-- `web/src/core/statFormat.ts` is where stat ids are classified/labeled; the
-  proposal adds `subject`/`dimension` to `classify` and a `condensedRows` builder.
-- `web/src/adapters/sidebarView.ts` `renderBenefits` renders the rows; the change
-  flash (`changeClass`) keys on the raw stat id, so a merged line needs a rule for
-  which part flashes.
-- Sets the tag granularity for item 2 (a tag = a subject).
-
-### 2. Filter/highlight the map by benefit (tag) - needs design
-Not ready to build; capture the idea first. Show ALL benefits in the left panel,
-with the ones the current selection already grants at the top and the rest below.
-Clicking a benefit (for example "Elemental Resistance") acts like a tag: the
-stars/constellations that grant it get highlighted on the map so the user can see
-where to pick up more of it.
-
-Open design questions (resolve before building):
-- Tag granularity: a subject from item 1, or a single raw stat id. (Depends on
-  item 1.)
-- How multiple selected tags combine (AND vs OR), and how to clear them.
-- How the highlight reads on the map and coexists with the affinity-requirement
-  coloring and the unmet fade (outline matching stars? dim everything else?).
-
-Pointers:
-- Enumerating all benefits: scan `model.stars` for `bonuses` keys; `statFormat`
-  already formats and groups stat ids.
-- `web/src/adapters/sidebarView.ts` `renderBenefits` currently shows only the
-  summed bonuses of the current selection, not the full catalog.
-- Highlighting would pass a set of matching star ids into `renderSvgMarkup` plus a
-  CSS highlight state.
-
 ## UI: feedback
 
-### 3. Flash the constellations that grant a missing affinity on a blocked activation
+### 1. Flash the constellations that grant a missing affinity on a blocked activation
+Note: partly either/or with item 3 ("Path predictor"). If the map instead shows
+every reachable constellation up front, the user already sees how to unlock a
+blocked one, so this forward-flash may be redundant. Decide which approach we
+want before building either; don't build both without revisiting this.
+
 When clicking a constellation you cannot yet activate because its affinity
 requirement is unmet, flash the unselected constellations that would grant points
 toward the missing affinities, so the user can see how to unlock it. This mirrors
@@ -71,6 +33,77 @@ Notes:
   helpful hue) and decide whether to also flash their stars.
 - Watch for flashing too many constellations if a missing affinity is widely
   granted; consider limiting or just accept it.
+
+## Controls: point budget
+
+### 2. Toggle to remove the 55-point cap (uncapped planning)
+Add a toggle that turns off the maximum point budget so the user can select as
+many stars/constellations as they want and see what the full benefits would total.
+Useful for exploring "what would everything grant" without the real-game limit.
+
+Notes:
+- The cap is `SelectionState.pointCap` (default 55). `selectableStars` in
+  `web/src/core/rules.ts` gates new picks on `selected.size >= pointCap`, and
+  `toggleConstellation` rejects with `next.size > pointCap`; an "uncapped" mode
+  needs both to treat the budget as unbounded (e.g. pointCap = Infinity or a
+  sentinel the rules read as "no cap").
+- UI lives in `web/src/app/main.ts`: the `#point-slider` (`slider.min`/`max`),
+  the `#point-count` display (`${selected.size} / ${pointCap}`), and the
+  floor logic (`Math.max(pointCap, selected.size)`) that snaps the cap up. The
+  count readout needs a sensible uncapped form (e.g. `12 / -`).
+- URL round-trip: `web/src/core/urlState.ts` clamps `p=` to `MAX_CAP` (55) on
+  both encode and decode, so an uncapped state needs an explicit sentinel
+  (e.g. `p=0` or omit `p`) that decodes back to "no cap" instead of 55.
+
+## Map: reachability / path-predictor mode
+
+### 3. "Path predictor" mode - highlight every constellation still reachable (needs spec + brainstorming)
+Large feature; do the brainstorming skill and write a `docs/specs/` proposal
+before building. Capture the idea here first.
+
+Note: partly either/or with item 1 (blocked-activation flash). Showing all
+reachable constellations up front may make the forward-flash redundant; settle
+which one we want as part of this spec.
+
+Instead of only highlighting the stars immediately takeable from the current
+selection, this mode highlights every star/constellation for which a *viable path
+to acquire it still exists* given the user's remaining points (and the affinity
+bootstrap rules). The user can then click a far-out target (say Leviathan) to
+commit it, the points are deducted, and anything that is no longer reachable as a
+result darkens - so the user picks the constellations they most want and backs
+into a valid path. Worked examples from the request:
+- 1 point, nothing picked: only the 5 Crossroads stars highlight (Crossroads is
+  the only constellation with no affinity requirement - the bootstrap).
+- 55 points (and likely fewer), nothing picked: the whole map lights up, since
+  everything is still reachable.
+- After committing Leviathan, constellations with no remaining viable path darken
+  (the user believes Tree of Life becomes unreachable once Leviathan is taken -
+  verify against the data).
+
+Why this is hard (resolve in the spec):
+- "Reachable" is a forward feasibility question, not the one-step
+  `selectableStars` answers. A target may require first completing cheaper
+  constellations to earn the affinity that unlocks it, all within the point
+  budget. That is a search over which constellations to complete, constrained by
+  affinity requirements/bonuses and the budget.
+- Affinity bonuses come only from *completed* constellations, while points are
+  spent per star - so partial picks cost budget without advancing affinity. The
+  feasibility model has to account for that.
+- Define precisely what "reachable" means when some stars are already selected
+  (paths must extend the current valid selection, not replace it).
+
+Pointers:
+- `web/src/core/rules.ts` (`validClosure`, `selectableStars`) and
+  `web/src/core/affinity.ts` (`affinityFrom`, `meetsRequirement`,
+  `completedConstellations`) hold the existing validity/affinity logic to build on.
+- Highlighting/darkening reuses the map render path: `handle.update(state, ...)`
+  in `main.ts` -> `web/src/adapters/svgRenderer.ts`, plus a CSS reachable/faded
+  state (compare with the existing unmet-affinity fade).
+- Feasibility precompute idea worth analyzing: the constellation count is small,
+  so it may be possible to brute-force all reachable sets (or a reachability
+  table keyed by remaining budget + earned affinity) as a build step and ship it
+  as a data file. Do the combinatorics analysis first - it may or may not be
+  tractable; if not, fall back to an on-the-fly search.
 
 ## Known limitations (accepted)
 
