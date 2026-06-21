@@ -47,11 +47,12 @@ PASSIVE_CLASSES = {"Skill_Passive", "SkillBuff_Passive"}
 POINT_CAP = 55  # devotion points available at max (sanity ceiling)
 
 # --- Celestial power (proc skill) extraction --------------------------------
-# Every devotion celestial power is granted at skill level 25 (grimtools shows
-# "Current Level : 25"). The skills' stat fields are per-level arrays defined for
-# levels 1..20, so the level-25 value is linearly extrapolated past the array
-# (see level_array_value). This single constant reproduces both the displayed
-# level and the acceptance stat values (e.g. Scorpion Sting's 40% weapon damage).
+# A devotion power is granted at a fixed skill level that VARIES per power (10..25;
+# grimtools shows it as "Current Level : N"). The real level is the number of skill
+# levels the power defines, read from skillExperienceLevels (see granted_level);
+# its stat arrays are defined for exactly levels 1..N. This constant is only a last
+# resort if that field is ever missing. (A previous version hardcoded 25 for all
+# powers and extrapolated past shorter arrays, inflating ~49 of 63 powers.)
 CELESTIAL_POWER_LEVEL = 25
 
 # GD's internal proc trigger enum -> the word grimtools shows after "<n>% Chance on ".
@@ -76,6 +77,7 @@ TRIGGER_DISPLAY = {
 POWER_META_FIELDS = {
     "skillCooldownTime", "projectileLaunchNumber", "projectilePiercingChance",
     "projectileExplosionRadius", "skillTargetRadius", "weaponDamagePct",
+    "skillActiveDuration", "damageAbsorption",
 }
 
 # Stat-id families to pull off a proc skill (same families as extract_bonuses),
@@ -199,11 +201,11 @@ def level_array_value(value: str, level: int):
     """Select a skill stat value at a 1-based level from a per-level array.
 
     Most proc-skill stats are semicolon-separated arrays ("10;20;30;..."), one
-    entry per level. The arrays define levels 1..N (N is usually 20) where the
-    final entry carries a small end-of-line bonus; the granted level (25) sits
-    past the array, so values are linearly extrapolated using the slope of the
-    clean region (levels 1..N-1), anchored on the last entry. For a scalar value
-    this is just the number. Returns None if the value is not numeric.
+    entry per level 1..N where N is the skill's granted level and the final entry
+    carries the end-of-line bonus. We pick the entry at `level`, clamping to the
+    last entry when `level` exceeds the array - the game never scales a stat past
+    its defined max, so never extrapolate. For a scalar this is just the number.
+    Returns None if the value is not numeric.
     """
     parts = [p for p in value.split(";") if p.strip() != ""]
     if not parts:
@@ -212,22 +214,38 @@ def level_array_value(value: str, level: int):
         nums = [float(p) for p in parts]
     except ValueError:
         return None
-    n = len(nums)
-    if n == 1:
-        val = nums[0]
-    elif level - 1 < n:
-        val = nums[level - 1]
-    elif n >= 3:
-        step = (nums[n - 2] - nums[0]) / (n - 2)
-        val = nums[n - 1] + (level - n) * step
-    else:  # n == 2
-        val = nums[n - 1] + (level - n) * (nums[1] - nums[0])
+    val = nums[min(max(level, 1) - 1, len(nums) - 1)]
     # Keep whole arrays whole (damage, projectiles); allow decimals otherwise.
     if all(float(p) == int(float(p)) for p in parts):
         val = round(val)
     else:
         val = round(val, 4)
     return int(val) if val == int(val) else val
+
+
+def granted_level(chain: list[dict[str, str]]) -> int:
+    """The level a devotion power is granted at = how many skill levels it defines.
+
+    Read from skillExperienceLevels (a per-level XP table present on every devotion
+    skill chain); its length is the granted level grimtools shows. Falls back to the
+    longest per-level numeric stat array, then to CELESTIAL_POWER_LEVEL, if absent.
+    """
+    for rec in chain:
+        parts = [p for p in rec.get("skillExperienceLevels", "").split(";") if p.strip() != ""]
+        if parts:
+            return len(parts)
+    best = 0
+    for rec in chain:
+        for v in rec.values():
+            parts = [p for p in v.split(";") if p.strip() != ""]
+            if len(parts) < 2:
+                continue
+            try:
+                [float(p) for p in parts]
+            except ValueError:
+                continue
+            best = max(best, len(parts))
+    return best or CELESTIAL_POWER_LEVEL
 
 
 def power_skill_chain(db: DB, skill: dict[str, str]) -> list[dict[str, str]]:
@@ -379,14 +397,15 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
         # at the fixed granted level; see CELESTIAL_POWER_LEVEL.
         chain = power_skill_chain(db, skill)
         name, desc = resolve_power_name(tags, chain)
+        level = granted_level(chain)
         star["celestial_power"] = {
             "name": name,
             "dbr": skill_ref,
             "skill_class": cls,
             "description": desc,
             "proc": extract_proc(db, chain),
-            "level": CELESTIAL_POWER_LEVEL,
-            "stats": extract_power_stats(chain, CELESTIAL_POWER_LEVEL),
+            "level": level,
+            "stats": extract_power_stats(chain, level),
         }
     return star, skill_ref
 

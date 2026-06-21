@@ -272,6 +272,9 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
   const cd = take("skillCooldownTime");
   if (cd !== undefined) rows.push({ value: fmtNum(cd), label: "Second Skill Recharge" });
 
+  const dur = take("skillActiveDuration");
+  if (dur !== undefined) rows.push({ value: fmtNum(dur), label: "Second Duration" });
+
   const proj = take("projectileLaunchNumber");
   if (proj !== undefined) rows.push({ value: fmtNum(proj), label: "Projectile(s)" });
 
@@ -280,6 +283,9 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
 
   const radius = take("projectileExplosionRadius") ?? take("skillTargetRadius");
   if (radius !== undefined) rows.push({ value: fmtNum(radius), label: "Meter Radius" });
+
+  const absorb = take("damageAbsorption");
+  if (absorb !== undefined) rows.push({ value: fmtNum(absorb), label: "Damage Absorption" });
 
   const weapon = take("weaponDamagePct");
   if (weapon !== undefined) rows.push({ value: `${fmtNum(weapon)}%`, label: "Weapon Damage" });

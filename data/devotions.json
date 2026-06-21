@@ -3,7 +3,7 @@
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-06-21T04:39:08Z",
+    "generated_utc": "2026-06-21T16:30:31Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -366,7 +366,8 @@
             "level": 25,
             "stats": {
               "defensivePhysical": -32,
-              "defensivePierce": -36
+              "defensivePierce": -36,
+              "skillActiveDuration": 18
             }
           },
           "weapon_requirement": null
@@ -482,7 +483,7 @@
             },
             "level": 25,
             "stats": {
-              "offensiveLifeLeechMin": 45,
+              "offensiveLifeLeechMin": 40,
               "offensiveLifeMax": 221,
               "offensiveLifeMin": 128,
               "offensivePierceMin": 165,
@@ -1010,6 +1011,7 @@
               "defensiveBleedingDuration": 36,
               "defensivePoisonDuration": 36,
               "defensiveProtection": 70,
+              "skillActiveDuration": 10,
               "skillCooldownTime": 2.7
             }
           },
@@ -1859,6 +1861,7 @@
               "characterSpellCastSpeedModifier": 22,
               "defensivePhysical": 18,
               "offensiveLifeLeechMin": 80,
+              "skillActiveDuration": 5,
               "skillCooldownTime": 30
             }
           },
@@ -2295,7 +2298,8 @@
               "offensiveConfusionChance": 33,
               "offensiveConfusionMin": 2,
               "offensiveFireMin": 140,
-              "projectileExplosionRadius": 2.5
+              "projectileExplosionRadius": 2.5,
+              "skillActiveDuration": 3
             }
           },
           "weapon_requirement": null
@@ -3662,6 +3666,7 @@
             "level": 25,
             "stats": {
               "characterOffensiveAbility": 85,
+              "skillActiveDuration": 4,
               "skillCooldownTime": 6
             }
           },
@@ -4097,6 +4102,7 @@
             },
             "level": 25,
             "stats": {
+              "damageAbsorption": 6100,
               "skillCooldownTime": 8
             }
           },
@@ -4817,15 +4823,16 @@
               "chance": 33,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveLifeMin": 450,
+              "offensiveLifeMin": 370,
               "offensiveSlowLifeDurationMin": 2,
-              "offensiveSlowLifeMin": 300,
+              "offensiveSlowLifeMin": 245,
               "offensiveSlowTotalSpeedDurationMin": 2,
-              "offensiveSlowTotalSpeedMin": 35,
+              "offensiveSlowTotalSpeedMin": 30,
               "projectileExplosionRadius": 3,
-              "retaliationDamagePct": 9,
+              "retaliationDamagePct": 8,
+              "skillActiveDuration": 6,
               "skillCooldownTime": 2
             }
           },
@@ -5024,14 +5031,16 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveAetherMin": 112,
-              "offensiveFireMin": 112,
+              "damageAbsorption": 188,
+              "offensiveAetherMin": 92,
+              "offensiveFireMin": 92,
               "offensiveSlowFireDurationMin": 2,
-              "offensiveSlowFireMin": 240,
-              "retaliationFireMin": 441,
-              "retaliationTotalDamageModifier": 170,
+              "offensiveSlowFireMin": 195,
+              "retaliationFireMin": 360,
+              "retaliationTotalDamageModifier": 140,
+              "skillActiveDuration": 7,
               "skillCooldownTime": 12,
               "skillTargetRadius": 5
             }
@@ -5184,16 +5193,16 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveColdMax": 477,
-              "offensiveColdMin": 385,
-              "offensiveFreezeChance": 60,
+              "offensiveColdMax": 392,
+              "offensiveColdMin": 315,
+              "offensiveFreezeChance": 50,
               "offensiveFreezeMin": 1,
               "offensiveSlowColdDurationMin": 2,
-              "offensiveSlowColdMin": 300,
+              "offensiveSlowColdMin": 245,
               "offensiveSlowRunSpeedDurationMin": 3,
-              "offensiveSlowRunSpeedMin": 85,
+              "offensiveSlowRunSpeedMin": 70,
               "projectileExplosionRadius": 2,
               "skillCooldownTime": 3.2,
               "skillTargetRadius": 6.5,
@@ -5350,14 +5359,14 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensivePierceMax": 370,
-              "offensivePierceMin": 325,
-              "projectileLaunchNumber": 18,
+              "offensivePierceMax": 310,
+              "offensivePierceMin": 270,
+              "projectileLaunchNumber": 16,
               "projectilePiercingChance": 100,
               "skillCooldownTime": 1.8,
-              "weaponDamagePct": 28
+              "weaponDamagePct": 25
             }
           },
           "weapon_requirement": null
@@ -5510,18 +5519,18 @@
               "chance": 50,
               "trigger": "Block"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveKnockdownChance": 121,
+              "offensiveKnockdownChance": 100,
               "offensiveKnockdownMax": 1.5,
               "offensiveKnockdownMin": 0.8,
               "offensiveSlowPhysicalDurationMin": 2,
-              "offensiveSlowPhysicalMin": 334,
+              "offensiveSlowPhysicalMin": 285,
               "projectileExplosionRadius": 0.1,
               "projectilePiercingChance": 100,
-              "retaliationDamagePct": 20,
+              "retaliationDamagePct": 18,
               "skillCooldownTime": 0.3,
-              "weaponDamagePct": 60
+              "weaponDamagePct": 55
             }
           },
           "weapon_requirement": null
@@ -5660,13 +5669,14 @@
               "chance": 30,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "characterDefensiveAbility": 185,
-              "characterManaRegen": 10,
-              "characterOffensiveAbility": 150,
-              "defensiveTotalSpeedResistance": 50,
-              "defensiveTrap": 50,
+              "characterDefensiveAbility": 160,
+              "characterManaRegen": 7,
+              "characterOffensiveAbility": 130,
+              "defensiveTotalSpeedResistance": 45,
+              "defensiveTrap": 45,
+              "skillActiveDuration": 6,
               "skillCooldownTime": 10,
               "skillTargetRadius": 15
             }
@@ -5809,9 +5819,10 @@
               "chance": 15,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "characterLifeRegen": 725,
+              "characterLifeRegen": 590,
+              "skillActiveDuration": 12,
               "skillCooldownTime": 25
             }
           },
@@ -6267,9 +6278,9 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "skillCooldownTime": 22
+              "skillCooldownTime": 30
             }
           },
           "weapon_requirement": null
@@ -6417,11 +6428,12 @@
               "chance": 20,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "characterDefensiveAbility": 145,
-              "defensiveProtection": 560,
-              "skillCooldownTime": 4
+              "characterDefensiveAbility": 130,
+              "defensiveProtection": 460,
+              "skillActiveDuration": 5,
+              "skillCooldownTime": 8
             }
           },
           "weapon_requirement": null
@@ -6501,8 +6513,9 @@
               "chance": 30,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
+              "damageAbsorption": 2900,
               "skillCooldownTime": 3
             }
           },
@@ -6674,11 +6687,12 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "defensiveProtectionModifier": -40,
-              "offensiveLifeLeechMin": 52,
-              "offensivePhysicalMin": 350,
+              "defensiveProtectionModifier": -35,
+              "offensiveLifeLeechMin": 45,
+              "offensivePhysicalMin": 305,
+              "skillActiveDuration": 5,
               "skillTargetRadius": 4.5
             }
           },
@@ -6976,13 +6990,14 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "characterOffensiveAbility": -175,
-              "defensiveBleeding": -37,
+              "characterOffensiveAbility": -150,
+              "defensiveBleeding": -32,
               "offensiveSlowBleedingDurationMin": 1,
-              "offensiveSlowBleedingMin": 375,
-              "skillTargetRadius": 5.8333
+              "offensiveSlowBleedingMin": 325,
+              "skillActiveDuration": 5,
+              "skillTargetRadius": 5
             }
           },
           "weapon_requirement": null
@@ -7266,20 +7281,20 @@
               "chance": 30,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveConfusionChance": 119,
+              "offensiveConfusionChance": 100,
               "offensiveConfusionMin": 1,
-              "offensiveElementalMin": 335,
+              "offensiveElementalMin": 280,
               "offensiveSlowColdDurationMin": 2,
-              "offensiveSlowColdMin": 115,
+              "offensiveSlowColdMin": 95,
               "offensiveSlowFireDurationMin": 2,
-              "offensiveSlowFireMin": 115,
+              "offensiveSlowFireMin": 95,
               "offensiveSlowLightningDurationMin": 2,
-              "offensiveSlowLightningMin": 115,
-              "retaliationDamagePct": 38,
+              "offensiveSlowLightningMin": 95,
+              "retaliationDamagePct": 35,
               "skillCooldownTime": 2,
-              "weaponDamagePct": 95
+              "weaponDamagePct": 85
             }
           },
           "weapon_requirement": null
@@ -7603,15 +7618,16 @@
               "chance": 15,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveFireMax": 233,
-              "offensiveFireMin": 190,
+              "offensiveFireMax": 198,
+              "offensiveFireMin": 160,
               "offensiveSlowFireDurationMin": 2,
-              "offensiveSlowFireMin": 240,
-              "offensiveStunChance": 35,
+              "offensiveSlowFireMin": 195,
+              "offensiveStunChance": 25,
               "offensiveStunMin": 1.5,
               "projectileExplosionRadius": 1,
+              "skillActiveDuration": 5,
               "skillCooldownTime": 1.8
             }
           },
@@ -7765,13 +7781,13 @@
               "chance": 15,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensivePoisonMin": 257,
+              "offensivePoisonMin": 217,
               "offensiveSlowPoisonDurationMin": 2,
-              "offensiveSlowPoisonMin": 240,
+              "offensiveSlowPoisonMin": 195,
               "offensiveTotalResistanceReductionAbsoluteDurationMin": 5,
-              "offensiveTotalResistanceReductionAbsoluteMin": 33,
+              "offensiveTotalResistanceReductionAbsoluteMin": 28,
               "skillCooldownTime": 1
             }
           },
@@ -7904,14 +7920,15 @@
               "chance": 20,
               "trigger": "Melee Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "characterRunSpeedModifier": 34,
-              "defensiveTotalSpeedResistance": 81,
-              "retaliationFireMin": 1055,
-              "retaliationFireModifier": 170,
-              "retaliationTotalDamageModifier": 170,
-              "skillCooldownTime": 11
+              "characterRunSpeedModifier": 30,
+              "defensiveTotalSpeedResistance": 70,
+              "retaliationFireMin": 860,
+              "retaliationFireModifier": 140,
+              "retaliationTotalDamageModifier": 140,
+              "skillActiveDuration": 8,
+              "skillCooldownTime": 15
             }
           },
           "weapon_requirement": null
@@ -8009,13 +8026,14 @@
               "chance": 15,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "characterOffensiveAbility": -116,
-              "defensiveCold": -28,
-              "defensivePoison": -36,
-              "offensiveColdMin": 112,
-              "offensivePoisonMin": 112,
+              "characterOffensiveAbility": -96,
+              "defensiveCold": -23,
+              "defensivePoison": -30,
+              "offensiveColdMin": 97,
+              "offensivePoisonMin": 97,
+              "skillActiveDuration": 4,
               "skillCooldownTime": 1
             }
           },
@@ -8328,7 +8346,7 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
               "skillCooldownTime": 2
             }
@@ -8415,18 +8433,19 @@
               "chance": 25,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveElementalMin": 152,
+              "offensiveElementalMin": 132,
               "offensiveElementalResistanceReductionAbsoluteDurationMin": 2,
-              "offensiveElementalResistanceReductionAbsoluteMin": 37,
+              "offensiveElementalResistanceReductionAbsoluteMin": 32,
               "offensiveSlowColdDurationMin": 2,
-              "offensiveSlowColdMin": 118,
+              "offensiveSlowColdMin": 98,
               "offensiveSlowFireDurationMin": 2,
-              "offensiveSlowFireMin": 118,
+              "offensiveSlowFireMin": 98,
               "offensiveSlowLightningDurationMin": 2,
-              "offensiveSlowLightningMin": 118,
+              "offensiveSlowLightningMin": 98,
               "projectileExplosionRadius": 3.5,
+              "skillActiveDuration": 5,
               "skillCooldownTime": 1.5
             }
           },
@@ -8762,16 +8781,16 @@
               "chance": 33,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveLifeLeechMin": 143,
-              "offensiveLifeMin": 370,
+              "offensiveLifeLeechMin": 132,
+              "offensiveLifeMin": 310,
               "offensiveSlowManaLeachDurationMin": 2,
-              "offensiveSlowManaLeachMin": 240,
+              "offensiveSlowManaLeachMin": 200,
               "offensiveTotalResistanceReductionAbsoluteDurationMin": 3,
-              "offensiveTotalResistanceReductionAbsoluteMin": 24,
+              "offensiveTotalResistanceReductionAbsoluteMin": 20,
               "skillCooldownTime": 1,
-              "weaponDamagePct": 38
+              "weaponDamagePct": 33
             }
           },
           "weapon_requirement": null
@@ -9042,13 +9061,14 @@
               "chance": 15,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "characterRunSpeedModifier": -42,
-              "defensiveChaos": -43,
-              "defensiveFire": -28,
-              "offensiveChaosMin": 140,
-              "offensiveFireMin": 140,
+              "characterRunSpeedModifier": -36,
+              "defensiveChaos": -35,
+              "defensiveFire": -23,
+              "offensiveChaosMin": 120,
+              "offensiveFireMin": 120,
+              "skillActiveDuration": 4,
               "skillCooldownTime": 1
             }
           },
@@ -9447,11 +9467,12 @@
               "chance": 25,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "defensiveBlockAmountModifier": 250,
-              "defensiveProtectionModifier": 55,
-              "retaliationPhysicalMin": 650,
+              "defensiveBlockAmountModifier": 210,
+              "defensiveProtectionModifier": 50,
+              "retaliationPhysicalMin": 525,
+              "skillActiveDuration": 5,
               "skillCooldownTime": 8
             }
           },
@@ -9604,14 +9625,15 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveLightningMax": 350,
-              "offensiveLightningMin": 143,
+              "offensiveLightningMax": 290,
+              "offensiveLightningMin": 118,
               "offensiveSlowLightningDurationMin": 2,
-              "offensiveSlowLightningMin": 300,
+              "offensiveSlowLightningMin": 245,
               "offensiveStunChance": 20,
               "offensiveStunMin": 0.7,
+              "skillActiveDuration": 6,
               "skillCooldownTime": 10,
               "skillTargetRadius": 8
             }
@@ -9895,12 +9917,13 @@
               "chance": 100,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
               "offensiveSlowTotalSpeedDurationMin": 8,
-              "offensiveSlowTotalSpeedMin": 59,
+              "offensiveSlowTotalSpeedMin": 50,
               "projectileExplosionRadius": 3.5,
-              "skillCooldownTime": 5.6667
+              "skillActiveDuration": 1,
+              "skillCooldownTime": 10
             }
           },
           "weapon_requirement": null
@@ -9998,16 +10021,17 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "defensiveProtection": 230,
-              "offensivePhysicalMax": 55,
-              "offensivePhysicalMin": 52,
-              "offensivePhysicalModifier": 240,
-              "offensivePierceModifier": 240,
-              "offensiveSlowPhysicalModifier": 240,
-              "retaliationPhysicalMax": 555,
-              "retaliationPhysicalMin": 250,
+              "defensiveProtection": 190,
+              "offensivePhysicalMax": 45,
+              "offensivePhysicalMin": 42,
+              "offensivePhysicalModifier": 200,
+              "offensivePierceModifier": 200,
+              "offensiveSlowPhysicalModifier": 200,
+              "retaliationPhysicalMax": 450,
+              "retaliationPhysicalMin": 205,
+              "skillActiveDuration": 10,
               "skillCooldownTime": 22
             }
           },
@@ -10180,10 +10204,11 @@
               "chance": 15,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
-              "offensiveLifeLeechMin": 60,
-              "offensiveLifeMin": 370
+              "offensiveLifeLeechMin": 55,
+              "offensiveLifeMin": 310,
+              "skillActiveDuration": 10
             }
           },
           "weapon_requirement": null
@@ -10315,7 +10340,7 @@
               "chance": 25,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 20,
             "stats": {
               "projectileExplosionRadius": 1,
               "skillCooldownTime": 1
@@ -10433,14 +10458,15 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "characterLifeRegenModifier": 150,
-              "offensiveChaosMax": 205,
-              "offensiveChaosMin": 88,
-              "offensiveChaosModifier": 380,
-              "offensiveLifeModifier": 450,
-              "offensiveSlowLifeModifier": 450,
+              "characterLifeRegenModifier": 100,
+              "offensiveChaosMax": 135,
+              "offensiveChaosMin": 54,
+              "offensiveChaosModifier": 260,
+              "offensiveLifeModifier": 310,
+              "offensiveSlowLifeModifier": 310,
+              "skillActiveDuration": 12,
               "skillCooldownTime": 18
             }
           },
@@ -10503,11 +10529,11 @@
               "chance": 15,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "offensiveConfusionMin": 1.8,
               "offensiveSlowPoisonDurationMin": 5,
-              "offensiveSlowPoisonMin": 441,
+              "offensiveSlowPoisonMin": 312,
               "skillCooldownTime": 3,
               "skillTargetRadius": 10
             }
@@ -10647,9 +10673,9 @@
               "chance": 100,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 10,
             "stats": {
-              "skillCooldownTime": 0.5
+              "skillCooldownTime": 8
             }
           },
           "weapon_requirement": null
@@ -10780,7 +10806,7 @@
               "chance": 25,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "skillCooldownTime": 0.7
             }
@@ -10897,19 +10923,20 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "offensiveCritDamageModifier": 60,
-              "offensivePhysicalMin": 305,
-              "offensivePierceMin": 505,
+              "offensiveCritDamageModifier": 40,
+              "offensivePhysicalMin": 205,
+              "offensivePierceMin": 335,
               "offensiveProjectileFumbleDurationMin": 3,
-              "offensiveProjectileFumbleMin": 35,
+              "offensiveProjectileFumbleMin": 25,
               "offensiveSlowOffensiveAbilityDurationMin": 3,
-              "offensiveSlowOffensiveAbilityMin": 180,
+              "offensiveSlowOffensiveAbilityMin": 140,
               "projectileExplosionRadius": 2,
               "projectilePiercingChance": 100,
+              "skillActiveDuration": 1,
               "skillCooldownTime": 0.5,
-              "weaponDamagePct": 40
+              "weaponDamagePct": 30
             }
           },
           "weapon_requirement": null
@@ -11081,7 +11108,7 @@
               "chance": 100,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "projectileExplosionRadius": 1,
               "skillCooldownTime": 0.8
@@ -11242,16 +11269,17 @@
               "chance": 33,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "characterTotalSpeedModifier": 15,
-              "offensiveChaosModifier": 570,
-              "offensiveCritDamageModifier": 25,
-              "offensiveLifeModifier": 570,
-              "offensiveSlowLifeModifier": 570,
-              "retaliationChaosMin": 1140,
-              "retaliationFearChance": 100,
+              "characterTotalSpeedModifier": 10,
+              "offensiveChaosModifier": 370,
+              "offensiveCritDamageModifier": 18,
+              "offensiveLifeModifier": 370,
+              "offensiveSlowLifeModifier": 370,
+              "retaliationChaosMin": 720,
+              "retaliationFearChance": 70,
               "retaliationFearMin": 3,
+              "skillActiveDuration": 20,
               "skillCooldownTime": 30,
               "skillTargetRadius": 12
             }
@@ -11403,8 +11431,9 @@
               "chance": 25,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
+              "skillActiveDuration": 8,
               "skillCooldownTime": 15
             }
           },
@@ -11532,19 +11561,19 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "offensivePetrifyChance": 50,
-              "offensivePetrifyMin": 1.9615,
+              "offensivePetrifyMin": 1.5,
               "offensiveSlowDefensiveAbilityDurationMin": 5,
-              "offensiveSlowDefensiveAbilityMin": 170,
+              "offensiveSlowDefensiveAbilityMin": 130,
               "offensiveSlowOffensiveAbilityDurationMin": 5,
-              "offensiveSlowOffensiveAbilityMin": 170,
+              "offensiveSlowOffensiveAbilityMin": 130,
               "projectileExplosionRadius": 1,
               "projectileLaunchNumber": 6,
               "projectilePiercingChance": 100,
               "skillCooldownTime": 1.5,
-              "weaponDamagePct": 23
+              "weaponDamagePct": 18
             }
           },
           "weapon_requirement": null
@@ -11715,14 +11744,15 @@
               "chance": 30,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "offensiveColdMin": 580,
+              "offensiveColdMin": 420,
               "offensiveSlowColdDurationMin": 2,
-              "offensiveSlowColdMin": 400,
+              "offensiveSlowColdMin": 270,
               "offensiveSlowRunSpeedDurationMin": 2,
-              "offensiveSlowRunSpeedMin": 50,
+              "offensiveSlowRunSpeedMin": 40,
               "projectileExplosionRadius": 3.5,
+              "skillActiveDuration": 6,
               "skillCooldownTime": 2
             }
           },
@@ -11876,20 +11906,20 @@
               "chance": 30,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "offensiveFireMax": 555,
-              "offensiveFireMin": 400,
+              "offensiveFireMax": 385,
+              "offensiveFireMin": 280,
               "offensiveKnockdownMin": 1.8,
-              "offensivePhysicalMin": 475,
+              "offensivePhysicalMin": 315,
               "offensiveSlowFireDurationMin": 2,
-              "offensiveSlowFireMin": 400,
+              "offensiveSlowFireMin": 270,
               "offensiveTotalDamageReductionPercentDurationMin": 3,
-              "offensiveTotalDamageReductionPercentMin": 34,
+              "offensiveTotalDamageReductionPercentMin": 24,
               "racialBonusPercentDamage": 50,
               "skillCooldownTime": 2,
               "skillTargetRadius": 5,
-              "weaponDamagePct": 69
+              "weaponDamagePct": 54
             }
           },
           "weapon_requirement": null
@@ -12043,16 +12073,17 @@
               "chance": 20,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "characterAttackSpeedModifier": 23,
-              "characterLifeRegenModifier": 150,
-              "characterSpellCastSpeedModifier": 20,
+              "characterAttackSpeedModifier": 18,
+              "characterLifeRegenModifier": 100,
+              "characterSpellCastSpeedModifier": 15,
               "offensiveSlowBleedingDurationMin": 3,
-              "offensiveSlowBleedingMin": 88,
-              "offensiveSlowBleedingModifier": 425,
+              "offensiveSlowBleedingMin": 58,
+              "offensiveSlowBleedingModifier": 275,
               "offensiveSlowDefensiveAbilityDurationMin": 3,
-              "offensiveSlowDefensiveAbilityMin": 210,
+              "offensiveSlowDefensiveAbilityMin": 144,
+              "skillActiveDuration": 10,
               "skillCooldownTime": 15
             }
           },
@@ -12199,11 +12230,13 @@
               "chance": 33,
               "trigger": "Block"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "defensiveBleedingDuration": 65,
-              "defensivePoisonDuration": 65,
-              "retaliationTotalDamageModifier": 175,
+              "damageAbsorption": 400,
+              "defensiveBleedingDuration": 50,
+              "defensivePoisonDuration": 50,
+              "retaliationTotalDamageModifier": 115,
+              "skillActiveDuration": 8,
               "skillCooldownTime": 12,
               "skillTargetRadius": 15
             }
@@ -12358,18 +12391,18 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "offensivePhysicalMin": 340,
+              "offensivePhysicalMin": 220,
               "offensiveSlowAttackSpeedDurationMin": 5,
-              "offensiveSlowAttackSpeedMin": 40,
+              "offensiveSlowAttackSpeedMin": 30,
               "offensiveSlowBleedingDurationMin": 5,
-              "offensiveSlowBleedingMin": 465,
+              "offensiveSlowBleedingMin": 335,
               "offensiveSlowPhysicalDurationMin": 5,
-              "offensiveSlowPhysicalMin": 465,
+              "offensiveSlowPhysicalMin": 335,
               "skillCooldownTime": 1,
               "skillTargetRadius": 6,
-              "weaponDamagePct": 95
+              "weaponDamagePct": 75
             }
           },
           "weapon_requirement": null
@@ -12504,12 +12537,13 @@
               "chance": 15,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "defensiveLife": -38,
-              "defensiveSlowLifeLeach": -15,
-              "offensiveAetherMin": 275,
-              "offensiveLifeMin": 275
+              "defensiveLife": -28,
+              "defensiveSlowLifeLeach": -10,
+              "offensiveAetherMin": 185,
+              "offensiveLifeMin": 185,
+              "skillActiveDuration": 8
             }
           },
           "weapon_requirement": null
@@ -12639,18 +12673,18 @@
               "chance": 50,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "offensiveAetherMin": 484,
-              "offensiveLightningMax": 390,
-              "offensiveLightningMin": 265,
+              "offensiveAetherMin": 324,
+              "offensiveLightningMax": 280,
+              "offensiveLightningMin": 175,
               "offensiveSlowLightningDurationMin": 2,
-              "offensiveSlowLightningMin": 310,
+              "offensiveSlowLightningMin": 200,
               "offensiveStunMin": 1,
               "projectileExplosionRadius": 2.4,
               "skillCooldownTime": 1,
               "skillTargetRadius": 0.5,
-              "weaponDamagePct": 80
+              "weaponDamagePct": 60
             }
           },
           "weapon_requirement": null
@@ -12796,12 +12830,13 @@
               "chance": 25,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "characterLifeRegen": 675,
-              "characterLifeRegenModifier": 115,
-              "characterManaRegen": 20,
-              "characterManaRegenModifier": 81,
+              "characterLifeRegen": 425,
+              "characterLifeRegenModifier": 75,
+              "characterManaRegen": 12,
+              "characterManaRegenModifier": 55,
+              "skillActiveDuration": 8,
               "skillCooldownTime": 12,
               "skillTargetRadius": 15
             }
@@ -12936,17 +12971,17 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "offensiveElementalResistanceReductionPercentDurationMin": 3,
-              "offensiveElementalResistanceReductionPercentMin": 25,
-              "offensiveLightningMax": 614,
-              "offensiveLightningMin": 342,
+              "offensiveElementalResistanceReductionPercentMin": 20,
+              "offensiveLightningMax": 434,
+              "offensiveLightningMin": 222,
               "offensiveSlowLightningDurationMin": 2,
-              "offensiveSlowLightningMin": 400,
+              "offensiveSlowLightningMin": 270,
               "offensiveStunMin": 0.4,
               "skillCooldownTime": 1.5,
-              "weaponDamagePct": 25
+              "weaponDamagePct": 20
             }
           },
           "weapon_requirement": null
@@ -13096,16 +13131,17 @@
               "chance": 30,
               "trigger": "Attack"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
-              "offensiveFireMax": 352,
-              "offensiveFireMin": 290,
-              "offensivePhysicalMax": 320,
-              "offensivePhysicalMin": 285,
+              "offensiveFireMax": 232,
+              "offensiveFireMin": 190,
+              "offensivePhysicalMax": 210,
+              "offensivePhysicalMin": 185,
               "offensiveSlowFireDurationMin": 2,
-              "offensiveSlowFireMin": 400,
+              "offensiveSlowFireMin": 270,
               "projectileExplosionRadius": 2.4,
               "projectileLaunchNumber": 1,
+              "skillActiveDuration": 3,
               "skillCooldownTime": 3.5,
               "skillTargetRadius": 5
             }
@@ -13256,7 +13292,7 @@
               "chance": 100,
               "trigger": "Critical Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "skillCooldownTime": 6
             }
@@ -13392,18 +13428,19 @@
               "chance": 20,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "offensivePetrifyMin": 2,
-              "offensivePhysicalMin": 355,
+              "offensivePhysicalMin": 245,
               "offensivePhysicalReductionPercentDurationMin": 5,
-              "offensivePhysicalReductionPercentMin": 28,
+              "offensivePhysicalReductionPercentMin": 20,
               "offensiveSlowPhysicalDurationMin": 5,
-              "offensiveSlowPhysicalMin": 400,
+              "offensiveSlowPhysicalMin": 270,
               "projectileExplosionRadius": 2.5,
-              "retaliationDamagePct": 29,
+              "retaliationDamagePct": 24,
+              "skillActiveDuration": 1,
               "skillCooldownTime": 1,
-              "weaponDamagePct": 85
+              "weaponDamagePct": 65
             }
           },
           "weapon_requirement": null
@@ -13536,7 +13573,7 @@
               "chance": 30,
               "trigger": "Hit"
             },
-            "level": 25,
+            "level": 15,
             "stats": {
               "skillCooldownTime": 0.8
             }

@@ -169,6 +169,21 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
     ]);
   });
 
+  test("Stone Form: active duration and damage absorption render as ability lines (grimtools)", () => {
+    const rows = formatPowerStats({
+      skillCooldownTime: 12,
+      skillActiveDuration: 8,
+      skillTargetRadius: 15,
+      damageAbsorption: 400,
+    });
+    expect(rows).toEqual([
+      { value: "12", label: "Second Skill Recharge" },
+      { value: "8", label: "Second Duration" },
+      { value: "15", label: "Meter Radius" },
+      { value: "400", label: "Damage Absorption" },
+    ]);
+  });
+
   test("DoT pairs multiply per-second by duration and use the DoT display name", () => {
     expect(formatPowerStats({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 })).toEqual([
       { value: "300", label: "Burn Damage over 3 Seconds" },
