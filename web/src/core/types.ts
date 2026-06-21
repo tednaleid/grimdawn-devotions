@@ -34,6 +34,7 @@ export interface Star {
   predecessors: StarId[];
   position: { x: number; y: number };
   bonuses: Record<string, number>;
+  petBonuses?: Record<string, number>; // "Bonus to All Pets" stats, same ids as bonuses
   celestialPower: CelestialPower | null;
   weaponRequirement: { weapons: string[] } | null;
   racialTarget?: string[]; // races a racialBonus* stat applies to, e.g. ["Beast"]

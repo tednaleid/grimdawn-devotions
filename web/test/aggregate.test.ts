@@ -3,9 +3,18 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { sumBonuses, powersGained, starsGranting } from "../src/core/aggregate";
+import { sumBonuses, sumPetBonuses, powersGained, starsGranting } from "../src/core/aggregate";
 
 const model = buildModel(doc as any);
+
+test("sumPetBonuses sums 'Bonus to All Pets' stats, separate from player bonuses", () => {
+  // Shepherd's Crook's elemental-resistance star: 10% to the player, 15% to pets.
+  const con = [...model.constellations.values()].find((c) => c.name === "Shepherd's Crook")!;
+  const star = con.starIds.map((id) => model.stars.get(id)!).find((s) => s.petBonuses?.defensiveElementalResistance)!;
+  expect(star.bonuses.defensiveElementalResistance).toBe(10);
+  expect(star.petBonuses!.defensiveElementalResistance).toBe(15);
+  expect(sumPetBonuses(model, [star.id])).toEqual({ defensiveElementalResistance: 15 });
+});
 
 function manualCount(pred: (b: Record<string, number>) => boolean): number {
   let n = 0;

@@ -76,6 +76,7 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .tip-proc { color: #8fb4d6; font-size: .9em; }
 .tip-power-level { color: #9aa4b2; font-size: .85em; margin-bottom: .15rem; }
 .tip-pet { margin-top: .35rem; color: #cda6e8; font-size: .92em; }
+.tip-pet-bonus-head { margin-top: .35rem; color: #cda6e8; font-weight: 600; font-size: .9em; }
 #map-container { position: relative; overflow: hidden; cursor: grab; background: radial-gradient(circle at 50% 40%, #15203a, #0d1117 70%); }
 #map-container.con-hover { cursor: pointer; }
 #map-container.grabbing { cursor: grabbing; }

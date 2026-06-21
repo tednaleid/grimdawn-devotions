@@ -2,7 +2,7 @@
 // ABOUTME: Star view shows that star's bonuses; constellation view shows the union of all its stars' bonuses.
 import type { Affinity, AffinityMap, CelestialPower, Constellation, DevotionModel, PetInfo, StarId } from "../core/types";
 import { formatBonusRows, formatPet, formatPowerStats } from "../core/statFormat";
-import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
+import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 
 type AffinityTotals = Record<Affinity, number>;
@@ -28,6 +28,13 @@ function bonusRowsHtml(bonuses: Record<string, number>, racialTarget?: string[])
   return formatBonusRows(bonuses, { racialTarget })
     .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
     .join("");
+}
+
+// "Bonus to All Pets": the same stat lines as a player bonus, under a header (GD shows
+// these in a distinct block). Empty when the star/constellation grants no pet bonuses.
+function petBonusHtml(petBonuses?: Record<string, number>): string {
+  if (!petBonuses || Object.keys(petBonuses).length === 0) return "";
+  return `<div class="tip-pet-bonus-head">Bonus to All Pets</div>${bonusRowsHtml(petBonuses)}`;
 }
 
 // Star tooltip: power name + proc trigger ("Scorpion Sting (25% Chance on Attack)"),
@@ -88,7 +95,7 @@ export function tooltipView(el: HTMLElement) {
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? powerHtml(star.celestialPower) : "";
-      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${affinitySections(con, totals)}`;
+      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}`;
       place(clientX, clientY);
     },
     showConstellation(model: DevotionModel, conId: string, clientX: number, clientY: number, totals?: AffinityTotals) {
@@ -99,7 +106,7 @@ export function tooltipView(el: HTMLElement) {
         .map((p) => `<div class="tip-power">${p.power.name}</div>`)
         .join("");
       const head = `<strong>${con.name}</strong> <span class="tip-cost">${con.starIds.length} pts</span>`;
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${affinitySections(con, totals)}`;
+      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}`;
       place(clientX, clientY);
     },
     hide() {

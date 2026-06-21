@@ -22,6 +22,7 @@ interface RawStar {
   } | null;
   weapon_requirement: { weapons: string[] } | null;
   racial_target?: string[] | null;
+  pet_bonuses?: Record<string, number> | null;
 }
 interface RawConstellation {
   id: string;
@@ -72,6 +73,7 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
           ? { weapons: s.weapon_requirement.weapons }
           : null,
         racialTarget: s.racial_target ?? undefined,
+        petBonuses: s.pet_bonuses ?? undefined,
       });
     }
     constellations.set(c.id, {

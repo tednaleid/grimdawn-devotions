@@ -14,6 +14,20 @@ export function sumBonuses(model: DevotionModel, selected: Set<StarId>): Record<
   return out;
 }
 
+// "Bonus to All Pets" stats summed across the selection, kept separate from the
+// player bonuses (same stat ids, but they apply to the player's pets).
+export function sumPetBonuses(model: DevotionModel, selected: Iterable<StarId>): Record<string, number> {
+  const out: Record<string, number> = {};
+  for (const id of selected) {
+    const pet = model.stars.get(id)?.petBonuses;
+    if (!pet) continue;
+    for (const [stat, val] of Object.entries(pet)) {
+      out[stat] = (out[stat] ?? 0) + val;
+    }
+  }
+  return out;
+}
+
 export function racialTargets(model: DevotionModel, selected: Iterable<StarId>): string[] {
   const out = new Set<string>();
   for (const id of selected) {
