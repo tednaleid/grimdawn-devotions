@@ -3,7 +3,7 @@
 import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "../core/types";
 import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityTotals } from "../core/affinity";
-import { condensedRows, type CondensedPart } from "../core/statFormat";
+import { condensedRows, type CondensedGroup, type CondensedPart, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
@@ -21,43 +21,75 @@ function partText(p: CondensedPart): string {
   return p.value;
 }
 
-// Renders the Benefits panel (condensed: one selectable subject line per concept,
-// each value individually selectable). Returns the summed bonuses so the caller can
-// pass them back as `prev` next time to highlight what changed.
+// Renders the Benefits panel. Active subjects (the current selection grants them)
+// show condensed values at the top; the rest of the catalog shows as name-only tags
+// below, so any benefit can be selected to highlight where it can be picked up.
+// `catalog` is condensedRows over every stat id in the model (subject -> its ids).
+// Returns the summed bonuses so the caller can pass them back as `prev` to flash changes.
 export function renderBenefits(
   el: HTMLElement,
   model: DevotionModel,
   selected: Set<StarId>,
   prev?: Record<string, number>,
   selectedBenefits: Set<string> = new Set(),
+  catalog: CondensedGroup[] = [],
 ): Record<string, number> {
   const bonuses = sumBonuses(model, selected);
   const powers = powersGained(model, selected);
+
+  // Every subject's full set of stat ids (for subject-level tagging + group-selected),
+  // so selecting a subject highlights all of its sources, not just the dimensions held.
+  const catalogIds = new Map<string, string[]>();
+  for (const g of catalog) for (const s of g.subjects) catalogIds.set(s.key, s.parts.map((p) => p.id));
+  const subjectIds = (s: CondensedSubject) => catalogIds.get(s.key) ?? s.parts.map((p) => p.id);
+  const groupSel = (s: CondensedSubject) => {
+    const ids = subjectIds(s);
+    return ids.length > 0 && ids.every((id) => selectedBenefits.has(id)) ? " gsel" : "";
+  };
   const chip = (p: CondensedPart) =>
     `<span class="bchip${selectedBenefits.has(p.id) ? " vsel" : ""}${changeClass(prev, p.id, bonuses)}" data-vid="${p.id}">${partText(p)}</span>`;
-  const rows = condensedRows(bonuses, { racialTarget: racialTargets(model, selected) })
+
+  // Active subject (with values): damage types split into damage/duration sub-rows.
+  const activeSubject = (s: CondensedSubject) => {
+    const open = `<div class="bgroup${groupSel(s)}" data-gkey="${s.key}" data-ids="${subjectIds(s).join(",")}">`;
+    const main = s.parts.filter((p) => p.dim !== "durFlat" && p.dim !== "durPct");
+    const dur = s.parts.filter((p) => p.dim === "durFlat" || p.dim === "durPct");
+    if (dur.length) {
+      return `${open}<div class="bsubj" data-gtoggle>${s.subject}</div>` +
+        `<div class="bsub"><span class="blbl">damage</span><span class="bvals">${main.map(chip).join("")}</span></div>` +
+        `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`;
+    }
+    return `${open}<div class="bsingle"><span class="bsubj" data-gtoggle>${s.subject}</span><span class="bvals">${main.map(chip).join("")}</span></div></div>`;
+  };
+
+  const activeGroups = condensedRows(bonuses, { racialTarget: racialTargets(model, selected) });
+  const activeKeys = new Set<string>();
+  for (const g of activeGroups) for (const s of g.subjects) activeKeys.add(s.key);
+
+  const activeHtml = activeGroups
+    .map((g) => `<h3>${g.group}</h3>${g.subjects.map(activeSubject).join("")}`)
+    .join("");
+
+  // Inactive catalog subjects, grouped by category, as name-only selectable tags.
+  const availHtml = catalog
     .map((g) => {
       const subs = g.subjects
-        .map((s) => {
-          const gsel = s.parts.every((p) => selectedBenefits.has(p.id)) ? " gsel" : "";
-          const main = s.parts.filter((p) => p.dim !== "durFlat" && p.dim !== "durPct");
-          const dur = s.parts.filter((p) => p.dim === "durFlat" || p.dim === "durPct");
-          if (dur.length) {
-            return `<div class="bgroup${gsel}" data-gkey="${s.key}"><div class="bsubj" data-gtoggle>${s.subject}</div>` +
-              `<div class="bsub"><span class="blbl">damage</span><span class="bvals">${main.map(chip).join("")}</span></div>` +
-              `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`;
-          }
-          return `<div class="bgroup${gsel}" data-gkey="${s.key}"><div class="bsingle"><span class="bsubj" data-gtoggle>${s.subject}</span><span class="bvals">${main.map(chip).join("")}</span></div></div>`;
-        })
+        .filter((s) => !activeKeys.has(s.key))
+        .map((s) => `<div class="bgroup avail${groupSel(s)}" data-gkey="${s.key}" data-ids="${subjectIds(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`)
         .join("");
-      return `<h3>${g.group}</h3>${subs}`;
+      return subs ? `<h3>${g.group}</h3><div class="avail-list">${subs}</div>` : "";
     })
     .join("");
+
   // data-star-id lets main.ts show the same rich tooltip as the power's map star on hover.
   const powerRows = powers
     .map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`)
     .join("");
-  el.innerHTML = `<h2>Benefits</h2>${rows}${powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : ""}`;
+
+  el.innerHTML =
+    `<h2>Benefits</h2>${activeHtml || '<div class="bempty">Select stars to gain benefits.</div>'}` +
+    (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "") +
+    (availHtml ? `<h2 class="avail-head">Available to get</h2>${availHtml}` : "");
   return bonuses;
 }
 

@@ -9,6 +9,7 @@ import { toggleStar, toggleConstellation, validClosure, removalBlockers } from "
 import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
 import { starsGranting } from "../core/aggregate";
+import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState } from "../core/types";
 
 async function boot() {
@@ -28,6 +29,11 @@ async function boot() {
   // Benefit "tags": the raw stat ids selected in the Benefits panel; they highlight the
   // matching map nodes and are persisted in the URL so a shared link restores them.
   const selectedBenefits = new Set<string>(restored?.benefits ?? []);
+  // The full benefit catalog (every subject + its stat ids), so the panel can list
+  // benefits the current build does not grant yet. Static per model, computed once.
+  const allBonuses: Record<string, number> = {};
+  for (const id of statCanonical) allBonuses[id] = 1;
+  const benefitCatalog = condensedRows(allBonuses);
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -113,7 +119,8 @@ async function boot() {
     } else {
       const group = (e.target as Element)?.closest?.("[data-gtoggle]")?.closest("[data-gkey]");
       if (!group) return;
-      const ids = [...group.querySelectorAll("[data-vid]")].map((c) => c.getAttribute("data-vid")!);
+      const ids = (group.getAttribute("data-ids") ?? "").split(",").filter(Boolean);
+      if (ids.length === 0) return;
       const allSel = ids.every((id) => selectedBenefits.has(id));
       for (const id of ids) allSel ? selectedBenefits.delete(id) : selectedBenefits.add(id);
     }
@@ -150,7 +157,7 @@ async function boot() {
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
   function renderBenefitsPanel() {
-    prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits);
+    prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits, benefitCatalog);
   }
   function refresh() {
     handle.update(state, starsGranting(model, selectedBenefits));
