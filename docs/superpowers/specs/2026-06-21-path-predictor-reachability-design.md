@@ -175,13 +175,33 @@ useful as a fast pre-filter (if the lower bound for `S union {C}` already exceed
 55, C dims with no search) and as the heuristic inside a branch-and-bound exact
 search. It is not the answer on its own.
 
-### Open risk: exact-search performance
+### P1 result (2026-06-21): exact pure-TS is not viable; greedy is fast but approximate
 
-gd-starnav runs this search per query in C++ compiled to WASM, which hints it is
-not trivially cheap. Whether the exact 0/1 search is fast enough in TypeScript for
-109 candidates on every click is unvalidated and is the next prototype step. If
-pure TypeScript is too slow, the options are branch-and-bound with the dense lower
-bound, memoizing per claimed set, or reusing gd-starnav's WASM.
+The exact 0/1 search was built and validated in TypeScript
+(`web/src/core/reachability.ts`, tests in `web/test/reachability.test.ts`):
+
+- Correct: `exactMinCost` matches a brute-force oracle on 300+ random models.
+- Intractable on real data: ~548,000 nodes for a single claimed capstone (about a
+  second), and it exceeds a 3,000,000-node cap without resolving two capstones. A
+  per-click 109-candidate sweep would take seconds to minutes, and with any
+  practical node cap the search returns wrong answers (false dims). The node count
+  is representation-independent, so this is an algorithmic wall, not a constant
+  factor. Pure-TS exact is out for the interactive hot path.
+- A greedy build (`greedyMinCost`) is fast (a full 109-sweep is 3 to 5 ms) and
+  sound for "reachable" (0 false positives vs the oracle on 300 models: if it
+  finds a build it genuinely exists), but has a ~8 percent false-dim rate, so it
+  is not a sound "dim" oracle on its own.
+
+Design-significant finding: at 55 points almost nothing actually dims. Greedy (a
+sound reachability witness) finds a cost-53 build for Leviathan + Tree of Life, so
+that pair does NOT conflict; the exact search's "dims" was a false dim from the
+node cap. The "claim a capstone and watch many others dim" premise barely holds on
+this data, which should be revisited before building the UI.
+
+Options going forward: (a) reuse gd-starnav's C++/WASM for the exact answer;
+(b) accept greedy's rare false dims (gd-starnav itself ships a heuristic);
+(c) reconsider the dimming feature given how seldom constellations actually
+conflict at 55 points.
 
 ## Precompute: size, role, technology
 
@@ -253,19 +273,17 @@ data. No UI.
 - P0 (done, 2026-06-21): Built the dense reach and cover tables on real data and
   measured them. Result: the space is dense, dense lookups are fast, but the
   relaxations are too loose to be correct. See "What the P0 probe established".
-- P1 (next): Implement the exact 0/1 search (gd-starnav style, tracking the chosen
-  set) in TypeScript, with the dense lower-bound table as a pruning bound.
-  Validate it against a brute-force oracle on small models and measure the
-  109-candidate sweep. This decides whether pure TypeScript is viable or whether
-  we reuse gd-starnav's WASM. This is the critical open risk.
-- P2: Validate scenarios against expectation with the exact engine:
-  - empty set: all constellations achievable;
-  - claim Leviathan: Tree of Life, Light of Empyrion, and Ishtak dim (cross-check
-    against gd-starnav and our data);
-  - the 53/55 leftover-star case works mid-process;
-  - free deselect restores achievability.
-- P3: Confirm a full recompute (all 109 candidates) lands under one frame; if not,
-  apply the fallbacks in "Open risk: exact-search performance".
+- P1 (done, 2026-06-21): Built and validated the exact 0/1 search plus a greedy
+  upper bound in `web/src/core/reachability.ts`. Result: exact is correct but
+  intractable in pure TS; greedy is fast and sound for "reachable" but ~8%
+  false-dim. See "P1 result" above. Pure-TS exact is out.
+- P2 (revisit the premise first): the data shows almost nothing dims at 55 points
+  (Leviathan + Tree of Life is reachable), so confirm the dimming feature is worth
+  building before more engine work. If yes, pick a path: gd-starnav WASM for exact
+  answers, or accept greedy's rare false dims. Then validate the empty,
+  leftover-star, and free-deselect scenarios against whichever engine is chosen.
+- P3: Confirm a full recompute (all 109 candidates) lands under one frame. Greedy
+  already does (3 to 5 ms); the exact path does not.
 
 ## Testing
 
@@ -283,13 +301,15 @@ is unvalidated, so this target is a requirement to prove in P1, not a result.
 
 ## Risks and open questions
 
-- Exact 0/1 search performance in TypeScript is unvalidated and is the headline
-  risk (P1). Fallbacks: branch-and-bound with the dense lower bound, memoize per
-  claimed set, or reuse gd-starnav's WASM.
-- Whether the exact engine reproduces the observed dimming on our data (P2
-  acceptance test); the P0 relaxations did not.
-- The exact "which individual stars" rule for leftover points (refine in
-  prototype).
+- Resolved (P1): exact 0/1 search performance in pure TypeScript. It is not
+  viable (intractable on real data). Remaining engine options are WASM or the
+  greedy approximation.
+- Premise risk (new, raised by P1): at 55 points almost nothing dims, so the core
+  user value ("claim a capstone, watch others narrow") may be too weak to justify
+  the feature. Revisit before building the UI.
+- If the feature proceeds: choosing between gd-starnav WASM (exact) and greedy
+  (fast, ~8% false dims), and how to present a possibly-wrong dim.
+- The exact "which individual stars" rule for leftover points (refine later).
 - UI legibility of dim plus hover explanation (defer to the UI phase).
 
 ## References
