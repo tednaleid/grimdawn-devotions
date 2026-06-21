@@ -133,6 +133,39 @@ existing `selectableStars` logic and is pinned during the prototype.
 
 ## Algorithm
 
+### Resolution (2026-06-21): the crossroads-refund reframe makes it tractable
+
+The P0/P1 sections below trace a wrong turn: they treat strict acquisition
+*order* as a hard constraint, which makes the exact answer NP-hard and pure-TS
+intractable. The fix (Ted's insight) is that a 1-star Crossroads bootstrap is
+effectively free: it has no requirement, grants 1 affinity, and can be deleted
+once the constellation it seeded is self-sustaining (its own grant meets its own
+requirement). So orderability is not a real cost, and a build is simply valid
+when its total affinity covers every member's requirement - exactly the rule the
+app's `validClosure` already uses.
+
+Under that rule `minCost(claimed)` is bracketed by two fast computations
+(`web/src/core/reachability.ts`):
+
+- A dense 0/1 cover table (`buildCoverTable`): min stars of a subset whose summed
+  affinity reaches a target. It is a sound LOWER bound, so `coverLowerBound > 55`
+  proves "dim". Built once (about 5 s for the full grid; precompute at build time
+  or in a worker), then O(1) lookups.
+- A refund-aware greedy (`greedyMinCost`): constructs a real valid build seeded by
+  the free crossroads. It is a sound UPPER bound, so `<= 55` proves "reachable".
+
+`classify` returns reachable / dim / unknown from the bracket; a full 109-candidate
+sweep is under 2.5 ms. Validated against a brute oracle (same self-sustaining rule)
+on 400 random models: the cover never over-counts and the greedy never
+under-counts, so the engine never lies (it only ever says "unknown" in the narrow
+gap). Real data: nothing dims from one capstone, but two capstones dim ~48
+candidates and four dim everything - the "watch it narrow" behavior, working.
+
+Open items: the "unknown" gap (up to ~13 candidates at 2-3 claims) needs a
+tiebreaker (tighter greedy, or a bounded exact resolve); the cover build (~5 s)
+should move to build time or a worker. The P0/P1 notes below are kept for the
+record but are superseded by this section.
+
 ### What the P0 probe established (2026-06-21)
 
 A throwaway probe over the real data overturned the precompute-as-answer plan:

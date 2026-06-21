@@ -1,26 +1,29 @@
-// ABOUTME: P1 prototype - reachability engine for the path-predictor mode (claim a set, see what stays achievable).
-// ABOUTME: minCost = cheapest orderable build placing every claimed constellation. Exact is correct but
-// ABOUTME: intractable on real data (NP-hard 0/1 cover); greedy is fast and sound only for "reachable".
-// See docs/superpowers/specs/2026-06-21-path-predictor-reachability-design.md (P1 findings) before using.
+// ABOUTME: Reachability engine for path-predictor mode (claim a set, see what stays achievable).
+// ABOUTME: A build is valid iff its total affinity covers every member's requirement (the
+// ABOUTME: self-sustaining rule the app already uses; crossroads are transient, refundable
+// ABOUTME: bootstraps). minCost is bracketed by a fast cover-table lower bound (sound for "dim")
+// ABOUTME: and a refund-aware greedy upper bound (sound for "reachable").
 import { AFFINITIES, type DevotionModel } from "./types";
 
 export type Vec = [number, number, number, number, number]; // order = AFFINITIES
-// Per-color cap: the max requirement that gates anything; affinity beyond this is worthless.
-const CAP: Vec = [20, 8, 20, 10, 20];
-const SIZES = CAP.map((c) => c + 1);
-const MAXKEY = SIZES.reduce((a, b) => a * b, 1);
-const STRIDE = SIZES.map((_, i) => SIZES.slice(i + 1).reduce((a, b) => a * b, 1));
+// Hard per-color cap: the max requirement that gates anything; affinity beyond this is worthless.
+const CAP_MAX: Vec = [20, 8, 20, 10, 20];
+const NOCOST = 65535;
 export const INF = 1e9;
+export const BUDGET = 55;
+// Crossroads supply 1 affinity of each color and are refundable, so any build can be seeded
+// with one point per color for free while bootstrapping.
+const SEED: Vec = [1, 1, 1, 1, 1];
 
 /** A constellation reduced to what reachability needs: its cost and affinity vectors. */
 export interface ReachCon { id: string; size: number; req: Vec; grant: Vec }
+/** A cover table carries its own grid dimensions (sized to the model's max requirements). */
+export interface CoverTable { cost: Uint16Array; caps: Vec; strides: Vec }
 
 const zero = (): Vec => [0, 0, 0, 0, 0];
-const cap = (v: Vec): Vec => v.map((x, i) => Math.min(x, CAP[i]!)) as Vec;
-const covers = (g: Vec, d: Vec): boolean => g[0]! >= d[0]! && g[1]! >= d[1]! && g[2]! >= d[2]! && g[3]! >= d[3]! && g[4]! >= d[4]!;
-const packV = (v: Vec): number => v.reduce((k, x, i) => k + Math.min(Math.max(x, 0), CAP[i]!) * STRIDE[i]!, 0);
-const addCap = (g: Vec, x: Vec): Vec => [Math.min(g[0]! + x[0]!, CAP[0]!), Math.min(g[1]! + x[1]!, CAP[1]!), Math.min(g[2]! + x[2]!, CAP[2]!), Math.min(g[3]! + x[3]!, CAP[3]!), Math.min(g[4]! + x[4]!, CAP[4]!)];
-const maxV = (a: Vec, b: Vec): Vec => [Math.max(a[0]!, b[0]!), Math.max(a[1]!, b[1]!), Math.max(a[2]!, b[2]!), Math.max(a[3]!, b[3]!), Math.max(a[4]!, b[4]!)];
+const covers = (g: Vec, d: Vec): boolean => g[0] >= d[0] && g[1] >= d[1] && g[2] >= d[2] && g[3] >= d[3] && g[4] >= d[4];
+const addCap = (g: Vec, x: Vec): Vec => [Math.min(g[0] + x[0], CAP_MAX[0]!), Math.min(g[1] + x[1], CAP_MAX[1]!), Math.min(g[2] + x[2], CAP_MAX[2]!), Math.min(g[3] + x[3], CAP_MAX[3]!), Math.min(g[4] + x[4], CAP_MAX[4]!)];
+const maxV = (a: Vec, b: Vec): Vec => [Math.max(a[0], b[0]), Math.max(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3]), Math.max(a[4], b[4])];
 
 function vecOf(m: Partial<Record<(typeof AFFINITIES)[number], number>>): Vec {
   return AFFINITIES.map((a) => m[a] ?? 0) as Vec;
@@ -36,131 +39,126 @@ export function buildReachCons(model: DevotionModel): ReachCon[] {
 }
 
 /**
- * Exact min-cost: the cheapest orderable build that completes every claimed constellation
- * (plus optional affinity "filler"). A* over placed-sets (bitmask = true 0/1), a constellation
- * may be placed only once affinity already meets its requirement (orderability built in), with
- * an admissible per-color ratio heuristic.
+ * The crossroads-refund cover table. `cost[D]` = the minimum stars of a SUBSET of distinct
+ * constellations whose summed (capped) affinity reaches at least `D`. Orderability-free: because
+ * bootstraps are refundable, the cheapest way to reach an affinity vector is just the cheapest
+ * subset that sums to it. Built once with an in-place 0/1 knapsack DP (descending so no
+ * constellation is reused), then a 5D suffix-min so a lookup answers ">= D".
  *
- * CORRECT (validated against a brute-force oracle) but NP-hard: on the real 109-constellation
- * data it explores ~550K nodes for a single capstone and exceeds nodeCap for two. Not for the
- * interactive hot path without WASM or approximation. Returns capped:true when it gives up.
+ * The grid is capped per color at the model's maximum requirement (affinity beyond what anything
+ * requires is useless), so a small model yields a tiny grid and the real model the full one.
+ *
+ * This is a LOWER BOUND on the true minCost (it ignores that filler must also be self-sustaining),
+ * so it is sound for dimming: if `coverLowerBound > 55`, the claim is genuinely unreachable.
  */
-export function exactMinCost(cons: ReachCon[], claimedIds: string[], budget = 55, nodeCap = 3_000_000): { cost: number; explored: number; capped: boolean } {
-  const byId = new Map(cons.map((c) => [c.id, c]));
-  const claimed = claimedIds.map((id) => byId.get(id)!);
-  const claimedSet = new Set(claimedIds);
-  const filler = cons.filter((c) => !claimedSet.has(c.id) && c.grant.some((x) => x > 0));
-  const relevant = [...claimed, ...filler];
-  const n = relevant.length;
-  const goal = (1n << BigInt(claimed.length)) - 1n;
-  const maxReq = claimed.reduce((r, c) => maxV(r, c.req), zero());
-  const maxRatio = zero();
-  for (const c of relevant) for (let i = 0; i < 5; i++) if (c.grant[i]! > 0) maxRatio[i] = Math.max(maxRatio[i]!, c.grant[i]! / c.size);
-  const heuristic = (mask: bigint, gain: Vec): number => {
-    let lb1 = 0;
-    for (let i = 0; i < claimed.length; i++) if (!(mask & (1n << BigInt(i)))) lb1 += claimed[i]!.size;
-    let lb2 = 0;
-    for (let i = 0; i < 5; i++) { const d = maxReq[i]! - gain[i]!; if (d > 0) { if (maxRatio[i]! === 0) return INF; lb2 = Math.max(lb2, Math.ceil(d / maxRatio[i]!)); } }
-    return Math.max(lb1, lb2);
-  };
-  const h0 = heuristic(0n, zero());
-  if (h0 > budget) return { cost: INF, explored: 0, capped: false };
-  const buckets: { mask: bigint; gain: Vec; cost: number }[][] = Array.from({ length: budget + 1 }, () => []);
-  buckets[h0]!.push({ mask: 0n, gain: zero(), cost: 0 });
-  const seen = new Set<bigint>();
-  let explored = 0;
-  for (let f = 0; f <= budget; f++) {
-    const bucket = buckets[f]!;
-    for (let bi = 0; bi < bucket.length; bi++) {
-      const node = bucket[bi]!;
-      if (seen.has(node.mask)) continue;
-      seen.add(node.mask);
-      if (++explored > nodeCap) return { cost: INF, explored, capped: true };
-      if ((node.mask & goal) === goal) return { cost: node.cost, explored, capped: false };
-      for (let i = 0; i < n; i++) {
-        const bit = 1n << BigInt(i);
-        if (node.mask & bit) continue;
-        const c = relevant[i]!;
-        if (!covers(node.gain, c.req)) continue;
-        const nc = node.cost + c.size;
-        if (nc > budget) continue;
-        const nmask = node.mask | bit;
-        if (seen.has(nmask)) continue;
-        const ng = addCap(node.gain, c.grant);
-        const nf = nc + heuristic(nmask, ng);
-        if (nf > budget) continue;
-        buckets[nf]!.push({ mask: nmask, gain: ng, cost: nc });
-      }
+export function buildCoverTable(cons: ReachCon[]): CoverTable {
+  const caps: Vec = zero();
+  for (const c of cons) for (let i = 0; i < 5; i++) caps[i] = Math.max(caps[i]!, c.req[i]!);
+  for (let i = 0; i < 5; i++) caps[i] = Math.min(caps[i]!, CAP_MAX[i]!);
+  const sizes = caps.map((c) => c + 1);
+  const strides = sizes.map((_, i) => sizes.slice(i + 1).reduce((a, b) => a * b, 1)) as Vec;
+  const maxKey = sizes.reduce((a, b) => a * b, 1);
+  const cost = new Uint16Array(maxKey).fill(NOCOST);
+  cost[0] = 0;
+  for (const c of cons) {
+    if (!(c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4])) continue;
+    const [g0, g1, g2, g3, g4] = c.grant;
+    for (let a = caps[0]!; a >= 0; a--) for (let ch = caps[1]!; ch >= 0; ch--) for (let e = caps[2]!; e >= 0; e--) for (let o = caps[3]!; o >= 0; o--) for (let p = caps[4]!; p >= 0; p--) {
+      const k = a * strides[0]! + ch * strides[1]! + e * strides[2]! + o * strides[3]! + p;
+      const pc = cost[k]!;
+      if (pc === NOCOST) continue;
+      const nc = pc + c.size;
+      if (nc > BUDGET) continue;
+      const nk = Math.min(a + g0, caps[0]!) * strides[0]! + Math.min(ch + g1, caps[1]!) * strides[1]! + Math.min(e + g2, caps[2]!) * strides[2]! + Math.min(o + g3, caps[3]!) * strides[3]! + Math.min(p + g4, caps[4]!);
+      if (nc < cost[nk]!) cost[nk] = nc;
     }
   }
-  return { cost: INF, explored, capped: false };
+  for (let i = 0; i < 5; i++) { const st = strides[i]!; for (let k = maxKey - 1; k >= 0; k--) if (Math.floor(k / st) % sizes[i]! < caps[i]!) { const up = cost[k + st]!; if (up < cost[k]!) cost[k] = up; } }
+  return { cost, caps, strides };
+}
+
+function claimSummary(claimed: ReachCon[]) {
+  let req = zero(), grant = zero(), own = 0;
+  for (const c of claimed) { req = maxV(req, c.req); grant = addCap(grant, c.grant); own += c.size; }
+  return { req, grant, own };
+}
+
+/** Lower bound on minCost(claimed): own stars + cheapest filler to cover the claimed deficit. */
+export function coverLowerBound(table: CoverTable, claimed: ReachCon[]): number {
+  const { req, grant, own } = claimSummary(claimed);
+  let k = 0;
+  for (let i = 0; i < 5; i++) k += Math.min(Math.max(0, req[i]! - grant[i]!), table.caps[i]!) * table.strides[i]!;
+  const cov = table.cost[k]!;
+  return cov === NOCOST ? INF : own + cov;
 }
 
 /**
- * Greedy min-cost upper bound: build an orderable set placing all claimed, repeatedly adding the
- * unlocked constellation that most reduces the remaining claimed deficit per star. FAST (a full
- * 109-candidate sweep is a few ms) and SOUND for "reachable": if it returns <= budget the build
- * genuinely exists. NOT sound for "dim": returning > budget does not prove infeasibility
- * (measured ~8% false dims vs the exact oracle on random models).
+ * Refund-aware greedy: construct a valid build placing every claimed constellation, seeded by
+ * the free crossroads, repeatedly adding the unlocked constellation that best closes the affinity
+ * deficit per star. Once the claimed are placed and the build's own affinity covers every placed
+ * member's requirement, the crossroads are refunded and the cost excludes them.
+ *
+ * SOUND for "reachable": a returned cost <= budget means a genuine valid build exists. It is an
+ * upper bound on minCost (it does not always find the cheapest build).
  */
-export function greedyMinCost(cons: ReachCon[], claimedIds: string[], budget = 55): number {
+export function greedyMinCost(cons: ReachCon[], claimedIds: string[], budget = BUDGET): number {
   const byId = new Map(cons.map((c) => [c.id, c]));
   const claimed = claimedIds.map((id) => byId.get(id)!);
   const claimedSet = new Set(claimedIds);
-  const maxReq = claimed.reduce((r, c) => maxV(r, c.req), zero());
-  const filler = cons.filter((c) => !claimedSet.has(c.id) && c.grant.some((x) => x > 0));
-  const need = [...claimed, ...filler];
-  const placed = new Array(need.length).fill(false);
-  let gain = zero(), cost = 0, claimedLeft = claimed.length;
+  const filler = cons.filter((c) => !claimedSet.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]));
+  const pool = [...claimed, ...filler];
+  const reqClaimed = claimSummary(claimed).req;
+  const placed = new Array(pool.length).fill(false);
+  let build = zero(); // affinity from placed constellations (excludes the transient seed)
+  let maxReqPlaced = zero(); // every placed constellation must stand under this once seed is gone
+  let cost = 0, claimedLeft = claimed.length;
   for (;;) {
+    const gain = addCap(SEED, build);
     let did = false;
-    for (let i = 0; i < claimed.length; i++) if (!placed[i] && covers(gain, need[i]!.req)) { placed[i] = true; claimedLeft--; cost += need[i]!.size; gain = addCap(gain, need[i]!.grant); did = true; }
-    if (claimedLeft === 0) return cost <= budget ? cost : INF;
+    // Auto-place only the claimed constellations as they unlock; filler is added selectively below.
+    for (let i = 0; i < claimed.length; i++) {
+      if (placed[i] || !covers(gain, claimed[i]!.req)) continue;
+      placed[i] = true; cost += claimed[i]!.size; build = addCap(build, claimed[i]!.grant); maxReqPlaced = maxV(maxReqPlaced, claimed[i]!.req); claimedLeft--; did = true;
+    }
+    if (claimedLeft === 0 && covers(build, maxReqPlaced)) return cost <= budget ? cost : INF;
     if (did) continue;
-    const deficit = maxReq.map((x, i) => Math.max(0, x - gain[i]!)) as Vec;
+    const g2 = addCap(SEED, build);
+    const target = covers(build, maxReqPlaced) ? reqClaimed : maxReqPlaced; // close self-sustain first, then claims
+    const deficit: Vec = [Math.max(0, target[0]! - build[0]), Math.max(0, target[1]! - build[1]), Math.max(0, target[2]! - build[2]), Math.max(0, target[3]! - build[3]), Math.max(0, target[4]! - build[4])];
     let best = -1, bestScore = 0;
-    for (let i = claimed.length; i < need.length; i++) {
-      if (placed[i] || !covers(gain, need[i]!.req)) continue;
-      let red = 0; for (let j = 0; j < 5; j++) red += Math.min(need[i]!.grant[j]!, deficit[j]!);
-      const score = red / need[i]!.size;
+    for (let i = claimed.length; i < pool.length; i++) {
+      if (placed[i] || !covers(g2, pool[i]!.req)) continue;
+      let red = 0; for (let j = 0; j < 5; j++) red += Math.min(pool[i]!.grant[j]!, deficit[j]!);
+      const score = red / pool[i]!.size;
       if (score > bestScore) { bestScore = score; best = i; }
     }
     if (best < 0 || bestScore === 0) return INF;
-    placed[best] = true; cost += need[best]!.size; gain = addCap(gain, need[best]!.grant);
+    placed[best] = true; cost += pool[best]!.size; build = addCap(build, pool[best]!.grant); maxReqPlaced = maxV(maxReqPlaced, pool[best]!.req);
     if (cost > budget) return INF;
   }
 }
 
+export type Reach = "reachable" | "dim" | "unknown";
+
 /**
- * Dense reuse-relaxation lower bound: min cost (reuse allowed, requirements respected) to reach
- * each affinity vector, as a 5D suffix-min cover table. An admissible lower bound on the exact
- * minCost: if even this exceeds the budget the set definitely dims. On real data it stays under
- * budget for the borderline cases, so it confirms few dims on its own. ~900 KB, built once.
+ * Classify a candidate claim by bracketing minCost. The cover lower bound soundly proves "dim";
+ * the greedy upper bound soundly proves "reachable". The (rare) gap between is "unknown".
  */
-export function buildReuseCover(cons: ReachCon[]): Uint16Array {
-  const granting = cons.filter((c) => c.grant.some((x) => x > 0));
-  const cost = new Uint16Array(MAXKEY).fill(65535);
-  cost[0] = 0;
-  const buckets: number[][] = Array.from({ length: 56 }, () => []);
-  buckets[0]!.push(0);
-  for (let d = 0; d <= 55; d++) {
-    for (const k of buckets[d]!) {
-      if (cost[k]! !== d) continue;
-      const s0 = Math.floor(k / STRIDE[0]!) % SIZES[0]!, s1 = Math.floor(k / STRIDE[1]!) % SIZES[1]!, s2 = Math.floor(k / STRIDE[2]!) % SIZES[2]!, s3 = Math.floor(k / STRIDE[3]!) % SIZES[3]!, s4 = k % SIZES[4]!;
-      for (const c of granting) {
-        if (s0 < c.req[0]! || s1 < c.req[1]! || s2 < c.req[2]! || s3 < c.req[3]! || s4 < c.req[4]!) continue;
-        const nc = d + c.size; if (nc > 55) continue;
-        const nk = Math.min(s0 + c.grant[0]!, CAP[0]!) * STRIDE[0]! + Math.min(s1 + c.grant[1]!, CAP[1]!) * STRIDE[1]! + Math.min(s2 + c.grant[2]!, CAP[2]!) * STRIDE[2]! + Math.min(s3 + c.grant[3]!, CAP[3]!) * STRIDE[3]! + Math.min(s4 + c.grant[4]!, CAP[4]!);
-        if (nc < cost[nk]!) { cost[nk] = nc; buckets[nc]!.push(nk); }
-      }
-    }
-  }
-  for (let i = 0; i < 5; i++) { const st = STRIDE[i]!; for (let k = MAXKEY - 1; k >= 0; k--) if (Math.floor(k / st) % SIZES[i]! < CAP[i]!) { const up = cost[k + st]!; if (up < cost[k]!) cost[k] = up; } }
-  return cost;
+export function classify(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): Reach {
+  const byId = new Map(cons.map((c) => [c.id, c]));
+  const claimed = claimedIds.map((id) => byId.get(id)!);
+  if (coverLowerBound(table, claimed) > budget) return "dim";
+  if (greedyMinCost(cons, claimedIds, budget) <= budget) return "reachable";
+  return "unknown";
 }
 
-/** Lower bound on the cost to gain `deficit` more affinity, via the reuse cover table. */
-export function reuseLowerBound(cover: Uint16Array, deficit: Vec): number {
-  const v = cover[packV(deficit)]!;
-  return v === 65535 ? INF : v;
+/** For a current claimed set S, classify every other constellation as a candidate next claim. */
+export function reachabilitySweep(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): Map<string, Reach> {
+  const out = new Map<string, Reach>();
+  const claimedSet = new Set(claimedIds);
+  for (const c of cons) {
+    if (claimedSet.has(c.id)) continue;
+    out.set(c.id, classify(cons, table, [...claimedIds, c.id], budget));
+  }
+  return out;
 }
