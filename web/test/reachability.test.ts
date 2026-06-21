@@ -4,7 +4,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, reachabilitySweep, INF, type ReachCon, type Vec } from "../src/core/reachability";
+import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, INF, type ReachCon, type Vec } from "../src/core/reachability";
 
 const CAP: Vec = [20, 8, 20, 10, 20];
 const SEED: Vec = [1, 1, 1, 1, 1];
@@ -109,6 +109,46 @@ test("Leviathan and Tree of Life are each reachable; their cover cost is ~26-27"
   expect(classify(cons, cover, [id("Leviathan")])).toBe("reachable");
   expect(classify(cons, cover, [id("Tree of Life")])).toBe("reachable");
   expect(coverLowerBound(cover, [id("Leviathan")].map((i) => cons.find((c) => c.id === i)!))).toBeLessThanOrEqual(30);
+});
+
+test("reachableExact matches the brute oracle's reachable/dim decision on 400 random models", () => {
+  let bad = 0;
+  for (let seed = 1; seed <= 400; seed++) {
+    const { model, pick, budget } = randCase(seed);
+    const table = buildCoverTable(model);
+    const claimed = pick.map((id) => model.find((c) => c.id === id)!);
+    const pool = model.filter((c) => !pick.includes(c.id) && c.grant.some((x) => x > 0));
+    if (reachableExact(model, table, pick, budget) !== (bruteRefund(claimed, pool, budget) <= budget)) bad++;
+  }
+  expect(bad).toBe(0);
+});
+
+test("classifyComplete is always reachable or dim, and matches the brute decision", () => {
+  let bad = 0;
+  for (let seed = 1; seed <= 400; seed++) {
+    const { model, pick, budget } = randCase(seed);
+    const table = buildCoverTable(model);
+    const claimed = pick.map((id) => model.find((c) => c.id === id)!);
+    const pool = model.filter((c) => !pick.includes(c.id) && c.grant.some((x) => x > 0));
+    const v = classifyComplete(model, table, pick, budget);
+    if ((v === "reachable") !== (bruteRefund(claimed, pool, budget) <= budget)) bad++;
+  }
+  expect(bad).toBe(0);
+});
+
+test("classifyComplete drives the real-data unknowns to zero (Leviathan + Tree of Life)", () => {
+  const claims = [id("Leviathan"), id("Tree of Life")];
+  const claimedSet = new Set(claims);
+  let unknowns = 0;
+  for (const c of cons) {
+    if (claimedSet.has(c.id)) continue;
+    const ids = [...claims, c.id];
+    if (classify(cons, cover, ids) !== "unknown") continue;
+    unknowns++;
+    const v = classifyComplete(cons, cover, ids);
+    expect(v === "reachable" || v === "dim").toBe(true);
+  }
+  expect(unknowns).toBeGreaterThan(0); // there genuinely are unknowns here, and all got resolved
 });
 
 test("claiming several capstones makes many candidates dim (the feature actually works)", () => {

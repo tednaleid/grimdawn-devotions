@@ -162,3 +162,62 @@ export function reachabilitySweep(cons: ReachCon[], table: CoverTable, claimedId
   }
   return out;
 }
+
+function coverCostAt(table: CoverTable, deficit: Vec): number {
+  let k = 0;
+  for (let i = 0; i < 5; i++) k += Math.min(Math.max(0, deficit[i]!), table.caps[i]!) * table.strides[i]!;
+  const v = table.cost[k]!;
+  return v === NOCOST ? INF : v;
+}
+
+/** Can every member of B be completed in some order, seeded by the free crossroads? */
+function constructible(B: ReachCon[]): boolean {
+  let gain: Vec = [...SEED];
+  const done = B.map(() => false);
+  let placed = 0, changed = true;
+  while (changed) {
+    changed = false;
+    for (let i = 0; i < B.length; i++) { if (done[i] || !covers(gain, B[i]!.req)) continue; done[i] = true; placed++; gain = addCap(gain, B[i]!.grant); changed = true; }
+  }
+  return placed === B.length;
+}
+
+/**
+ * Exact reachability decision (the "unknown" gap-closer). DFS over filler subsets, pruned by the
+ * cover table as an admissible lower bound, early-exiting on the first valid build within budget.
+ * For a reachable claim it stops at the first witness; for a dim claim it exhausts (the cover
+ * prune keeps that bounded). Definitive: returns the true reachable/dim answer.
+ *
+ * Run it only on candidates the cheap bracket left "unknown" - it is heavier than the bracket
+ * (worst seen ~700k nodes for one borderline candidate), so it is not for an unfiltered sweep.
+ */
+export function reachableExact(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): boolean {
+  const byId = new Map(cons.map((c) => [c.id, c]));
+  const claimed = claimedIds.map((id) => byId.get(id)!);
+  const claimedSet = new Set(claimedIds);
+  const filler = cons.filter((c) => !claimedSet.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]))
+    .sort((a, b) => (b.grant[0] + b.grant[1] + b.grant[2] + b.grant[3] + b.grant[4]) / b.size - (a.grant[0] + a.grant[1] + a.grant[2] + a.grant[3] + a.grant[4]) / a.size);
+  const { req: reqClaimed, grant: grantClaimed, own: ownClaimed } = claimSummary(claimed);
+  let found = false;
+  const chosen: ReachCon[] = [];
+  function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec): void {
+    if (found) return;
+    if (covers(build, maxReqPlaced) && constructible([...claimed, ...chosen])) { found = true; return; }
+    if (i >= filler.length) return;
+    const target = maxV(maxReqPlaced, reqClaimed);
+    const deficit: Vec = [Math.max(0, target[0] - build[0]), Math.max(0, target[1] - build[1]), Math.max(0, target[2] - build[2]), Math.max(0, target[3] - build[3]), Math.max(0, target[4] - build[4])];
+    if (cost + coverCostAt(table, deficit) > budget) return; // even the optimistic completion overflows
+    const c = filler[i]!;
+    if (cost + c.size <= budget) { chosen.push(c); rec(i + 1, addCap(build, c.grant), cost + c.size, maxV(maxReqPlaced, c.req)); chosen.pop(); }
+    if (!found) rec(i + 1, build, cost, maxReqPlaced);
+  }
+  rec(0, grantClaimed, ownClaimed, reqClaimed);
+  return found;
+}
+
+/** Like classify, but resolves the "unknown" gap with the exact resolver - always reachable or dim. */
+export function classifyComplete(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): "reachable" | "dim" {
+  const verdict = classify(cons, table, claimedIds, budget);
+  if (verdict !== "unknown") return verdict;
+  return reachableExact(cons, table, claimedIds, budget) ? "reachable" : "dim";
+}
