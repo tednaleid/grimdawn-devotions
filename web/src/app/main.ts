@@ -23,6 +23,9 @@ async function boot() {
   // The cap can never be below the points actually allocated; raise it if a restored
   // link is over budget (the slider also enforces this floor below).
   state = { selected: state.selected, pointCap: Math.max(state.pointCap, state.selected.size) };
+  // Benefit "tags": the raw stat ids the user has selected in the Benefits panel.
+  // Visual-only for now; the upcoming filter work highlights the map from this set.
+  const selectedBenefits = new Set<string>();
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -98,6 +101,26 @@ async function boot() {
   });
   benefitsEl.addEventListener("mouseleave", () => tip.hide());
 
+  // Benefit selection: click a value to toggle just it; click a subject to toggle
+  // all of its values (so the group reads as selected only when every value is).
+  benefitsEl.addEventListener("click", (e) => {
+    const valEl = (e.target as Element)?.closest?.("[data-vid]");
+    if (valEl) {
+      const id = valEl.getAttribute("data-vid")!;
+      selectedBenefits.has(id) ? selectedBenefits.delete(id) : selectedBenefits.add(id);
+      renderBenefitsPanel();
+      return;
+    }
+    const subjEl = (e.target as Element)?.closest?.("[data-gtoggle]");
+    if (!subjEl) return;
+    const group = subjEl.closest("[data-gkey]");
+    if (!group) return;
+    const ids = [...group.querySelectorAll("[data-vid]")].map((c) => c.getAttribute("data-vid")!);
+    const allSel = ids.every((id) => selectedBenefits.has(id));
+    for (const id of ids) allSel ? selectedBenefits.delete(id) : selectedBenefits.add(id);
+    renderBenefitsPanel();
+  });
+
   const nav = attachNav(() => mapContainer.querySelector("svg"), {
     fitPoints: [...model.stars.values()].map((s) => s.position),
     onDragStateChange: (d) => mapContainer.classList.toggle("grabbing", d),
@@ -125,10 +148,15 @@ async function boot() {
   // first render (the baseline), so restoring a build from the URL does not flash.
   let prevBonuses: Record<string, number> | undefined;
   let prevAffinity: Record<Affinity, number> | undefined;
+  // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
+  // change the star selection so nothing flashes).
+  function renderBenefitsPanel() {
+    prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits);
+  }
   function refresh() {
     handle.update(state);
     slider.min = String(Math.max(1, state.selected.size)); // cannot drag below allocated points
-    prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses);
+    renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, state.selected, prevAffinity);
     countEl.textContent = `${state.selected.size} / ${state.pointCap}`;
     history.replaceState(null, "", `#${encodeHash(state.selected, state.pointCap, canonical)}`);

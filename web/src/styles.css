@@ -25,10 +25,10 @@ header button:active { background: #1a1e24; }
 #point-slider::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #6cb6ff; border: 2px solid #161b22; cursor: pointer; }
 #point-slider:hover::-webkit-slider-thumb { background: #84c5ff; }
 #point-slider:hover::-moz-range-thumb { background: #84c5ff; }
-main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-height: 0; }
+main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-height: 0; }
 .sidebar { overflow-y: auto; padding: .75rem; background: #11161d; border-inline: 1px solid #30363d; font-size: .85rem; }
 .sidebar h2 { font-size: 1rem; margin: .25rem 0 .5rem; }
-.sidebar h3 { font-size: .9rem; margin: .6rem 0 .3rem; }
+.sidebar h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: #9aa4b2; margin: .7rem 0 .3rem; border-bottom: 1px solid #30363d; padding-bottom: .2rem; }
 .benefit, .affinity { display: flex; justify-content: space-between; padding: 2px 0; gap: .5rem; }
 .benefit > span:first-child { text-transform: capitalize; }
 .benefit .val, .affinity .val { color: #cdd6e3; white-space: nowrap; }
@@ -37,6 +37,21 @@ main { flex: 1; display: grid; grid-template-columns: 240px 1fr 200px; min-heigh
 @keyframes flash-down { from { color: #ff6b6b; } }
 .benefit.up .val, .affinity.up .val { animation: flash-up 10s linear; }
 .benefit.down .val, .affinity.down .val { animation: flash-down 10s linear; }
+/* Condensed benefits: selectable subject groups + individually selectable value chips. */
+.bgroup { border-radius: 12px; padding: 1px 5px; margin: 1px -3px; transition: background .1s, box-shadow .1s; }
+.bgroup.gsel { background: rgba(108,182,255,.08); box-shadow: 0 0 0 1.5px rgba(108,182,255,.6); }
+.bsingle { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; padding: 1px 0; }
+.bsub { display: flex; justify-content: space-between; gap: .5rem; align-items: baseline; padding-left: .9rem; font-size: .82rem; }
+.bsubj { text-transform: capitalize; cursor: pointer; }
+.bsubj:hover { color: #6cb6ff; }
+.blbl { color: #9aa4b2; }
+.bvals { white-space: nowrap; text-align: right; }
+.bchip { display: inline-block; padding: 0 5px; border-radius: 8px; box-shadow: inset 0 0 0 1px transparent; color: #cdd6e3; cursor: pointer; font-variant-numeric: tabular-nums; }
+.bchip + .bchip { margin-left: .1rem; }
+.bchip:hover { background: #1c2330; }
+.bchip.vsel { background: rgba(108,182,255,.16); box-shadow: inset 0 0 0 1px #6cb6ff; color: #fff; }
+.bchip.up { animation: flash-up 10s linear; }
+.bchip.down { animation: flash-down 10s linear; }
 .affinity > span:first-child { text-transform: capitalize; }
 .power, .tip-power { color: #f0c14b; }
 .power[data-star-id] { cursor: help; }

@@ -3,7 +3,7 @@
 import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "../core/types";
 import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityTotals } from "../core/affinity";
-import { groupedBonusRows } from "../core/statFormat";
+import { condensedRows, type CondensedPart } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
@@ -14,23 +14,44 @@ function changeClass(prev: Record<string, number> | undefined, key: string, cur:
   return n > p ? " up" : n < p ? " down" : "";
 }
 
-// Renders the Benefits panel; returns the summed bonuses so the caller can pass them
-// back as `prev` next time to highlight what changed.
+// A condensed value's display text: the max-resist and duration-seconds get a hint.
+function partText(p: CondensedPart): string {
+  if (p.dim === "max") return `max ${p.value}`;
+  if (p.dim === "durFlat") return `${p.value}s`;
+  return p.value;
+}
+
+// Renders the Benefits panel (condensed: one selectable subject line per concept,
+// each value individually selectable). Returns the summed bonuses so the caller can
+// pass them back as `prev` next time to highlight what changed.
 export function renderBenefits(
   el: HTMLElement,
   model: DevotionModel,
   selected: Set<StarId>,
   prev?: Record<string, number>,
+  selectedBenefits: Set<string> = new Set(),
 ): Record<string, number> {
   const bonuses = sumBonuses(model, selected);
   const powers = powersGained(model, selected);
-  const rows = groupedBonusRows(bonuses, { racialTarget: racialTargets(model, selected) })
-    .map((g) =>
-      `<h3>${g.group}</h3>` +
-      g.rows
-        .map((r) => `<div class="benefit${changeClass(prev, r.id, bonuses)}"><span>${r.label}</span><span class="val">${r.value}</span></div>`)
-        .join(""),
-    )
+  const chip = (p: CondensedPart) =>
+    `<span class="bchip${selectedBenefits.has(p.id) ? " vsel" : ""}${changeClass(prev, p.id, bonuses)}" data-vid="${p.id}">${partText(p)}</span>`;
+  const rows = condensedRows(bonuses, { racialTarget: racialTargets(model, selected) })
+    .map((g) => {
+      const subs = g.subjects
+        .map((s) => {
+          const gsel = s.parts.every((p) => selectedBenefits.has(p.id)) ? " gsel" : "";
+          const main = s.parts.filter((p) => p.dim !== "durFlat" && p.dim !== "durPct");
+          const dur = s.parts.filter((p) => p.dim === "durFlat" || p.dim === "durPct");
+          if (dur.length) {
+            return `<div class="bgroup${gsel}" data-gkey="${s.key}"><div class="bsubj" data-gtoggle>${s.subject}</div>` +
+              `<div class="bsub"><span class="blbl">damage</span><span class="bvals">${main.map(chip).join("")}</span></div>` +
+              `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`;
+          }
+          return `<div class="bgroup${gsel}" data-gkey="${s.key}"><div class="bsingle"><span class="bsubj" data-gtoggle>${s.subject}</span><span class="bvals">${main.map(chip).join("")}</span></div></div>`;
+        })
+        .join("");
+      return `<h3>${g.group}</h3>${subs}`;
+    })
     .join("");
   // data-star-id lets main.ts show the same rich tooltip as the power's map star on hover.
   const powerRows = powers

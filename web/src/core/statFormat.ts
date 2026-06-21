@@ -323,6 +323,76 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
   return rows;
 }
 
+// --- Condensed view: one line per concept (subject), carrying its dimensions ---
+// A "subject" is a damage type, a resistance type, an attribute, or a standalone
+// stat. Its dimensions (flat, percent, max-resist, duration flat/percent) collapse
+// onto that one subject so a concept is not spread across several rows.
+export type StatDim = "flat" | "pct" | "max" | "durFlat" | "durPct";
+// Flat before percent: the flat value is added first, then the percent applies.
+const DIM_ORDER: StatDim[] = ["flat", "pct", "max", "durFlat", "durPct"];
+
+export interface CondensedPart { dim: StatDim; value: string; id: string }
+export interface CondensedSubject { subject: string; key: string; parts: CondensedPart[] }
+export interface CondensedGroup { group: StatGroup; subjects: CondensedSubject[] }
+
+// Map a raw stat id to its (group, subject, dimension), mirroring classify's families.
+function decompose(id: string): { group: StatGroup; subject: string; dim: StatDim } | null {
+  const c = classify(id);
+  if (!c) return null;
+  const group = groupFor(id);
+  let m: RegExpMatchArray | null;
+  if ((m = id.match(/^offensiveSlow([A-Za-z]+?)(Duration)?(Modifier|Min|Max)?$/)) && DOT_DAMAGE[m[1]!]) {
+    const pct = m[3] === "Modifier";
+    const dim: StatDim = m[2] ? (pct ? "durPct" : "durFlat") : pct ? "pct" : "flat";
+    return { group, subject: DOT_DAMAGE[m[1]!]!, dim };
+  }
+  if ((m = id.match(/^offensive([A-Za-z]+?)(Modifier|Min|Max)?$/)) && INSTANT_DAMAGE[m[1]!]) {
+    return { group, subject: INSTANT_DAMAGE[m[1]!]!, dim: m[2] === "Modifier" ? "pct" : "flat" };
+  }
+  if ((m = id.match(/^defensive([A-Za-z]+?)MaxResist$/)) && RESIST[m[1]!]) {
+    return { group, subject: `${RESIST[m[1]!]} Resistance`, dim: "max" };
+  }
+  if ((m = id.match(/^defensive([A-Za-z]+?)$/)) && RESIST[m[1]!]) {
+    return { group, subject: `${RESIST[m[1]!]} Resistance`, dim: "pct" };
+  }
+  if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/)) && ATTR[m[1]!]) {
+    return { group, subject: ATTR[m[1]!]!, dim: m[2] ? "pct" : "flat" };
+  }
+  if (id === "defensiveProtection") return { group, subject: "Armor", dim: "flat" };
+  if (id === "defensiveProtectionModifier") return { group, subject: "Armor", dim: "pct" };
+  // Standalone stat: its own one-line subject.
+  return { group, subject: c.label, dim: c.percent ? "pct" : "flat" };
+}
+
+/** Format a bonuses map into subjects grouped by category, each subject carrying its dimensions. */
+export function condensedRows(
+  bonuses: Record<string, number>,
+  opts: { racialTarget?: string[] } = {},
+): CondensedGroup[] {
+  const groups = new Map<StatGroup, Map<string, CondensedSubject>>();
+  for (const { id, row } of bonusEntries(bonuses, opts)) {
+    const d = decompose(id);
+    if (!d) continue;
+    let subs = groups.get(d.group);
+    if (!subs) {
+      subs = new Map();
+      groups.set(d.group, subs);
+    }
+    let cs = subs.get(d.subject);
+    if (!cs) {
+      cs = { subject: d.subject, key: `${d.group}:${d.subject}`, parts: [] };
+      subs.set(d.subject, cs);
+    }
+    cs.parts.push({ dim: d.dim, value: row.value, id });
+  }
+  return GROUP_ORDER.filter((g) => groups.has(g)).map((g) => ({
+    group: g,
+    subjects: [...groups.get(g)!.values()]
+      .map((cs) => ({ ...cs, parts: cs.parts.sort((a, b) => DIM_ORDER.indexOf(a.dim) - DIM_ORDER.indexOf(b.dim)) }))
+      .sort((a, b) => a.subject.localeCompare(b.subject)),
+  }));
+}
+
 /** Format a bonuses map into display rows grouped by category, in GROUP_ORDER. */
 export function groupedBonusRows(
   bonuses: Record<string, number>,
