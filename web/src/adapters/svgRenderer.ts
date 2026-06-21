@@ -47,7 +47,7 @@ const HIT_RADIUS = 22;
 // Padding around a constellation's star bounding box for its hover/click region.
 const CON_PAD = 24;
 
-export interface RenderOpts { manifest: AssetManifest | null }
+export interface RenderOpts { manifest: AssetManifest | null; highlight?: Set<StarId> }
 
 // A constellation's hover/click footprint in SVG world coords: its art bounds
 // (x0,y0)-(x1,y1) and the centroid of its stars, used to break ties where art
@@ -149,10 +149,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const cx = star.position.x + STAR_CENTER;
     const cy = star.position.y + STAR_CENTER;
     const style = `--affinity:${solid};--grad:url(#grad-${con.id})`;
+    // A star that grants a selected benefit gets the "match" highlight.
+    const m = opts.highlight?.has(star.id) ? " match" : "";
     // Celestial-power stars are diamonds; the rest are circles. Both share the .star styling.
     const visible = star.celestialPower
-      ? `<polygon class="star power ${st}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
-      : `<circle class="star ${st}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+      ? `<polygon class="star power ${st}${m}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
+      : `<circle class="star ${st}${m}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
     parts.push(`<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`);
   }
 
@@ -161,7 +163,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   return `<svg id="map" viewBox="${vb}" preserveAspectRatio="xMidYMid meet"><defs>${defs.join("")}</defs>${parts.join("")}</svg>`;
 }
 
-export interface SvgHandle { update(state: SelectionState): void; svg: SVGSVGElement }
+export interface SvgHandle { update(state: SelectionState, highlight?: Set<StarId>): void; svg: SVGSVGElement }
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
   manifest: AssetManifest | null;
@@ -172,8 +174,8 @@ export interface SvgDeps {
 
 export function mountSvg(container: HTMLElement, model: DevotionModel, deps: SvgDeps): SvgHandle {
   const regions = buildConRegions(model, deps.manifest);
-  function render(state: SelectionState) {
-    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest });
+  function render(state: SelectionState, highlight?: Set<StarId>) {
+    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest, highlight });
   }
   render({ selected: new Set(), pointCap: 55 });
   const svg = container.querySelector("svg") as SVGSVGElement;
@@ -207,10 +209,10 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 
   return {
     svg,
-    update(state) {
+    update(state, highlight) {
       const live = container.querySelector("svg") as SVGSVGElement | null;
       const vb = live?.getAttribute("viewBox");
-      render(state);
+      render(state, highlight);
       const next = container.querySelector("svg") as SVGSVGElement | null;
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },

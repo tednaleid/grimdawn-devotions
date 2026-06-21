@@ -34,6 +34,22 @@ export function powersGained(
   return out;
 }
 
+// The stars whose bonuses include ANY of the given raw stat ids - used to highlight
+// on the map where a selected benefit can still be picked up. Empty for an empty set.
+export function starsGranting(model: DevotionModel, ids: Set<string>): Set<StarId> {
+  const out = new Set<StarId>();
+  if (ids.size === 0) return out;
+  for (const star of model.stars.values()) {
+    for (const k of Object.keys(star.bonuses)) {
+      if (ids.has(k)) {
+        out.add(star.id);
+        break;
+      }
+    }
+  }
+  return out;
+}
+
 export function weaponRequirements(
   model: DevotionModel,
   selected: Set<StarId>,

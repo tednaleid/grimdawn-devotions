@@ -73,6 +73,9 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .star.locked { fill: #9aa3b2; opacity: .8; }
 .star.selectable { fill: var(--grad); opacity: 1; filter: drop-shadow(0 0 4px var(--affinity)); }
 .star.selected { fill: #fff; stroke: var(--grad); stroke-width: 7; }
+/* A star that grants a benefit selected in the sidebar: a blue halo so you can see
+   where to pick it up. Defined after the state rules so the glow always applies. */
+.star.match { filter: drop-shadow(0 0 4px #6cb6ff) drop-shadow(0 0 8px #6cb6ff); }
 /* A blocked deselection pulses the dependents that must be removed first (~2s). */
 @keyframes flash-blocked {
   0%, 100% { stroke: #ff6b6b; stroke-width: 7; filter: none; }

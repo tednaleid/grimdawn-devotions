@@ -8,6 +8,7 @@ import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, validClosure, removalBlockers } from "../core/rules";
 import { canonicalStarIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
+import { starsGranting } from "../core/aggregate";
 import type { Affinity, SelectionState } from "../core/types";
 
 async function boot() {
@@ -108,17 +109,15 @@ async function boot() {
     if (valEl) {
       const id = valEl.getAttribute("data-vid")!;
       selectedBenefits.has(id) ? selectedBenefits.delete(id) : selectedBenefits.add(id);
-      renderBenefitsPanel();
-      return;
+    } else {
+      const group = (e.target as Element)?.closest?.("[data-gtoggle]")?.closest("[data-gkey]");
+      if (!group) return;
+      const ids = [...group.querySelectorAll("[data-vid]")].map((c) => c.getAttribute("data-vid")!);
+      const allSel = ids.every((id) => selectedBenefits.has(id));
+      for (const id of ids) allSel ? selectedBenefits.delete(id) : selectedBenefits.add(id);
     }
-    const subjEl = (e.target as Element)?.closest?.("[data-gtoggle]");
-    if (!subjEl) return;
-    const group = subjEl.closest("[data-gkey]");
-    if (!group) return;
-    const ids = [...group.querySelectorAll("[data-vid]")].map((c) => c.getAttribute("data-vid")!);
-    const allSel = ids.every((id) => selectedBenefits.has(id));
-    for (const id of ids) allSel ? selectedBenefits.delete(id) : selectedBenefits.add(id);
     renderBenefitsPanel();
+    handle.update(state, starsGranting(model, selectedBenefits)); // highlight matching map nodes
   });
 
   const nav = attachNav(() => mapContainer.querySelector("svg"), {
@@ -154,7 +153,7 @@ async function boot() {
     prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits);
   }
   function refresh() {
-    handle.update(state);
+    handle.update(state, starsGranting(model, selectedBenefits));
     slider.min = String(Math.max(1, state.selected.size)); // cannot drag below allocated points
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, state.selected, prevAffinity);
