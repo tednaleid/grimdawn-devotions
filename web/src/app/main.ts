@@ -6,7 +6,7 @@ import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, validClosure, removalBlockers } from "../core/rules";
-import { canonicalStarIds, decodeHash, encodeHash } from "../core/urlState";
+import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
 import { starsGranting } from "../core/aggregate";
 import type { Affinity, SelectionState } from "../core/types";
@@ -17,16 +17,17 @@ async function boot() {
 
   // Restore state from the URL hash if present (validated so a stale link can't be invalid).
   const canonical = canonicalStarIds(model);
-  const restored = decodeHash(location.hash, canonical);
+  const statCanonical = canonicalStatIds(model);
+  const restored = decodeHash(location.hash, canonical, statCanonical);
   let state: SelectionState = restored
     ? { selected: validClosure(model, restored.selected), pointCap: restored.pointCap }
     : { selected: new Set(), pointCap: 55 };
   // The cap can never be below the points actually allocated; raise it if a restored
   // link is over budget (the slider also enforces this floor below).
   state = { selected: state.selected, pointCap: Math.max(state.pointCap, state.selected.size) };
-  // Benefit "tags": the raw stat ids the user has selected in the Benefits panel.
-  // Visual-only for now; the upcoming filter work highlights the map from this set.
-  const selectedBenefits = new Set<string>();
+  // Benefit "tags": the raw stat ids selected in the Benefits panel; they highlight the
+  // matching map nodes and are persisted in the URL so a shared link restores them.
+  const selectedBenefits = new Set<string>(restored?.benefits ?? []);
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -116,8 +117,7 @@ async function boot() {
       const allSel = ids.every((id) => selectedBenefits.has(id));
       for (const id of ids) allSel ? selectedBenefits.delete(id) : selectedBenefits.add(id);
     }
-    renderBenefitsPanel();
-    handle.update(state, starsGranting(model, selectedBenefits)); // highlight matching map nodes
+    refresh(); // re-render benefits, re-highlight the map, and persist tags to the URL
   });
 
   const nav = attachNav(() => mapContainer.querySelector("svg"), {
@@ -158,7 +158,7 @@ async function boot() {
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, state.selected, prevAffinity);
     countEl.textContent = `${state.selected.size} / ${state.pointCap}`;
-    history.replaceState(null, "", `#${encodeHash(state.selected, state.pointCap, canonical)}`);
+    history.replaceState(null, "", `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, statCanonical)}`);
   }
   refresh();
 }

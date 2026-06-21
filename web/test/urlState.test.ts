@@ -2,10 +2,11 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { canonicalStarIds, encodeHash, decodeHash } from "../src/core/urlState";
+import { canonicalStarIds, canonicalStatIds, encodeHash, decodeHash } from "../src/core/urlState";
 
 const model = buildModel(doc as any);
 const canonical = canonicalStarIds(model);
+const statCanonical = canonicalStatIds(model);
 
 test("canonical ordering covers every star exactly once", () => {
   expect(canonical.length).toBe(model.stars.size);
@@ -25,6 +26,20 @@ test("empty selection encodes to an empty bitset and round-trips", () => {
   const decoded = decodeHash(`#${hash}`, canonical)!;
   expect(decoded.selected.size).toBe(0);
   expect(decoded.pointCap).toBe(55);
+});
+
+test("round-trips selected benefit tags via the b= param", () => {
+  const benefits = new Set([statCanonical[0]!, statCanonical[3]!, statCanonical[statCanonical.length - 1]!]);
+  const hash = encodeHash(new Set([canonical[0]!]), 30, canonical, benefits, statCanonical);
+  expect(hash).toContain("&b=");
+  const decoded = decodeHash(`#${hash}`, canonical, statCanonical)!;
+  expect([...decoded.benefits].sort()).toEqual([...benefits].sort());
+});
+
+test("omits b= when no benefits are selected and decodes to an empty set", () => {
+  const hash = encodeHash(new Set(), 55, canonical, new Set(), statCanonical);
+  expect(hash).toBe("p=55&s=");
+  expect(decodeHash(`#${hash}`, canonical, statCanonical)!.benefits.size).toBe(0);
 });
 
 test("returns null when there is nothing to decode", () => {

@@ -1,5 +1,5 @@
-// ABOUTME: Encodes/decodes planner state (point cap + selected stars) to a compact URL hash.
-// ABOUTME: Selected stars are a trailing-trimmed bitset over a stable canonical star-id order, base64url-encoded.
+// ABOUTME: Encodes/decodes planner state (point cap, selected stars, selected benefit tags) to a compact URL hash.
+// ABOUTME: Each selection is a trailing-trimmed bitset over a stable canonical id order, base64url-encoded.
 import type { DevotionModel, StarId } from "./types";
 
 const MIN_CAP = 1;
@@ -10,6 +10,13 @@ export function canonicalStarIds(model: DevotionModel): StarId[] {
   const out: StarId[] = [];
   for (const c of model.constellations.values()) for (const id of c.starIds) out.push(id);
   return out;
+}
+
+/** Stable ordering of every raw bonus stat id that appears anywhere in the model. */
+export function canonicalStatIds(model: DevotionModel): string[] {
+  const set = new Set<string>();
+  for (const s of model.stars.values()) for (const k of Object.keys(s.bonuses)) set.add(k);
+  return [...set].sort();
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {
@@ -26,40 +33,62 @@ function base64UrlToBytes(s: string): Uint8Array {
   return out;
 }
 
-/** Encode state into a hash payload like "p=55&s=AAEC" (no leading '#'). */
-export function encodeHash(selected: Set<StarId>, pointCap: number, canonical: StarId[]): string {
+// A trailing-trimmed bitset over `canonical`, base64url-encoded ("" when nothing is set).
+function encodeBitset(selected: Set<string>, canonical: string[]): string {
   const bytes = new Uint8Array(Math.ceil(canonical.length / 8));
   canonical.forEach((id, i) => {
     if (selected.has(id)) bytes[i >> 3]! |= 1 << (i & 7);
   });
   let end = bytes.length;
   while (end > 0 && bytes[end - 1] === 0) end--; // trim trailing zero bytes for a short hash
-  return `p=${pointCap}&s=${bytesToBase64Url(bytes.subarray(0, end))}`;
+  return bytesToBase64Url(bytes.subarray(0, end));
+}
+
+function decodeBitset(s: string, canonical: string[]): Set<string> {
+  const out = new Set<string>();
+  if (!s) return out;
+  let bytes: Uint8Array;
+  try {
+    bytes = base64UrlToBytes(s);
+  } catch {
+    return out; // unparseable -> empty
+  }
+  canonical.forEach((id, i) => {
+    if ((bytes[i >> 3] ?? 0) & (1 << (i & 7))) out.add(id);
+  });
+  return out;
+}
+
+/** Encode state into a hash payload like "p=55&s=AAEC&b=BA" (no leading '#'). */
+export function encodeHash(
+  selected: Set<StarId>,
+  pointCap: number,
+  canonical: StarId[],
+  benefits: Set<string> = new Set(),
+  statCanonical: string[] = [],
+): string {
+  let out = `p=${pointCap}&s=${encodeBitset(selected, canonical)}`;
+  const b = encodeBitset(benefits, statCanonical);
+  if (b) out += `&b=${b}`; // only when benefit tags are selected
+  return out;
 }
 
 /** Decode a hash payload back to state, tolerant of garbage. Returns null if there is nothing to decode. */
-export function decodeHash(hash: string, canonical: StarId[]): { selected: Set<StarId>; pointCap: number } | null {
+export function decodeHash(
+  hash: string,
+  canonical: StarId[],
+  statCanonical: string[] = [],
+): { selected: Set<StarId>; pointCap: number; benefits: Set<string> } | null {
   const raw = hash.replace(/^#/, "").trim();
   if (!raw) return null;
   const params = new URLSearchParams(raw);
-  if (!params.has("p") && !params.has("s")) return null;
+  if (!params.has("p") && !params.has("s") && !params.has("b")) return null;
 
   let pointCap = Number(params.get("p"));
   if (!Number.isFinite(pointCap)) pointCap = MAX_CAP;
   pointCap = Math.max(MIN_CAP, Math.min(MAX_CAP, Math.round(pointCap)));
 
-  const selected = new Set<StarId>();
-  const sParam = params.get("s") ?? "";
-  if (sParam) {
-    let bytes: Uint8Array;
-    try {
-      bytes = base64UrlToBytes(sParam);
-    } catch {
-      return { selected, pointCap }; // unparseable bitset -> empty selection, keep cap
-    }
-    canonical.forEach((id, i) => {
-      if ((bytes[i >> 3] ?? 0) & (1 << (i & 7))) selected.add(id);
-    });
-  }
-  return { selected, pointCap };
+  const selected = decodeBitset(params.get("s") ?? "", canonical);
+  const benefits = decodeBitset(params.get("b") ?? "", statCanonical);
+  return { selected, pointCap, benefits };
 }
