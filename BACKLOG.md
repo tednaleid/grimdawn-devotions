@@ -84,6 +84,33 @@ Pointers:
   as a data file. Do the combinatorics analysis first - it may or may not be
   tractable; if not, fall back to an on-the-fly search.
 
+## UI: benefits panel
+
+### 3. Make "Bonus to All Pets" benefits taggable / highlightable
+The Benefits sidebar's "Bonus to All Pets" section (and the pet rows in tooltips)
+are read-only. Unlike player benefits, you cannot click a pet benefit to highlight
+the stars that grant it on the map. The blocker: pet stat ids are the SAME ids as
+player bonuses (e.g. `defensiveElementalResistance` is both a player bonus and a
+pet bonus), so the existing tag/highlight system - which keys on the raw stat id
+via `data-vid` and `starsGranting(model, ids)` over `star.bonuses` - would conflate
+the two sources and highlight the wrong stars.
+
+To lift it, add a parallel pet-keyed path:
+- `starsGrantingPet(model, ids)` in `web/src/core/aggregate.ts` scanning
+  `star.petBonuses` instead of `star.bonuses`.
+- A separate selected-pet-benefit set plus a distinct attribute (e.g.
+  `data-pet-vid`) on the pet chips in `web/src/adapters/sidebarView.ts`, so a pet
+  tag cannot collide with a player tag of the same stat id.
+- Thread a pet highlight set into the map render (`handle.update` in `main.ts` ->
+  `svgRenderer.ts`), with its own CSS state if it should read differently from the
+  player-benefit highlight.
+- Decide how a player tag and a pet tag for the same stat coexist (two independent
+  toggles, or a combined view).
+
+Pointers: pet bonuses are already parsed (`star.petBonuses`, summed by
+`sumPetBonuses`) and rendered read-only in `sidebarView.ts` (the "Bonus to All
+Pets" section) and `tooltipView.ts` (`petBonusHtml`).
+
 ## Known limitations (accepted)
 
 - `racialBonusPercentDamage` aggregation in the sidebar uses the union of all
