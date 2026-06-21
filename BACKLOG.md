@@ -34,30 +34,9 @@ Notes:
 - Watch for flashing too many constellations if a missing affinity is widely
   granted; consider limiting or just accept it.
 
-## Controls: point budget
-
-### 2. Toggle to remove the 55-point cap (uncapped planning)
-Add a toggle that turns off the maximum point budget so the user can select as
-many stars/constellations as they want and see what the full benefits would total.
-Useful for exploring "what would everything grant" without the real-game limit.
-
-Notes:
-- The cap is `SelectionState.pointCap` (default 55). `selectableStars` in
-  `web/src/core/rules.ts` gates new picks on `selected.size >= pointCap`, and
-  `toggleConstellation` rejects with `next.size > pointCap`; an "uncapped" mode
-  needs both to treat the budget as unbounded (e.g. pointCap = Infinity or a
-  sentinel the rules read as "no cap").
-- UI lives in `web/src/app/main.ts`: the `#point-slider` (`slider.min`/`max`),
-  the `#point-count` display (`${selected.size} / ${pointCap}`), and the
-  floor logic (`Math.max(pointCap, selected.size)`) that snaps the cap up. The
-  count readout needs a sensible uncapped form (e.g. `12 / -`).
-- URL round-trip: `web/src/core/urlState.ts` clamps `p=` to `MAX_CAP` (55) on
-  both encode and decode, so an uncapped state needs an explicit sentinel
-  (e.g. `p=0` or omit `p`) that decodes back to "no cap" instead of 55.
-
 ## Map: reachability / path-predictor mode
 
-### 3. "Path predictor" mode - highlight every constellation still reachable (needs spec + brainstorming)
+### 2. "Path predictor" mode - highlight every constellation still reachable (needs spec + brainstorming)
 Large feature; do the brainstorming skill and write a `docs/specs/` proposal
 before building. Capture the idea here first.
 

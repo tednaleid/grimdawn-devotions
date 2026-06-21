@@ -31,3 +31,9 @@ test("no points remaining means nothing is selectable", () => {
   const sel = selectableStars(model, { selected: new Set(["crossroads_eldritch:0"]), pointCap: 1 });
   expect(sel.size).toBe(0);
 });
+
+test("an uncapped (Infinity) cap never exhausts the point budget", () => {
+  // Same selection that is exhausted at pointCap 1 stays open when uncapped.
+  const sel = selectableStars(model, { selected: new Set(["crossroads_eldritch:0"]), pointCap: Infinity });
+  expect(sel.has("bat:0")).toBe(true);
+});

@@ -5,7 +5,7 @@ import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
-import { toggleStar, toggleConstellation, validClosure, removalBlockers } from "../core/rules";
+import { toggleStar, toggleConstellation, validClosure, removalBlockers, recapValue } from "../core/rules";
 import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
 import { starsGranting } from "../core/aggregate";
@@ -26,6 +26,8 @@ async function boot() {
   // The cap can never be below the points actually allocated; raise it if a restored
   // link is over budget (the slider also enforces this floor below).
   state = { selected: state.selected, pointCap: Math.max(state.pointCap, state.selected.size) };
+  // The finite cap to fall back to when the user re-imposes the limit after going uncapped.
+  let lastFiniteCap = Number.isFinite(state.pointCap) ? state.pointCap : 55;
   // Benefit "tags": the raw stat ids selected in the Benefits panel; they highlight the
   // matching map nodes and are persisted in the URL so a shared link restores them.
   const selectedBenefits = new Set<string>(restored?.benefits ?? []);
@@ -41,10 +43,12 @@ async function boot() {
   const tooltipEl = document.getElementById("tooltip") as HTMLElement;
   const slider = document.getElementById("point-slider") as HTMLInputElement;
   const countEl = document.getElementById("point-count") as HTMLElement;
+  const usedEl = document.getElementById("point-used") as HTMLElement;
+  const capToggle = document.getElementById("cap-toggle") as HTMLButtonElement;
   const resetBtn = document.getElementById("reset-view") as HTMLButtonElement;
   const resetPointsBtn = document.getElementById("reset-points") as HTMLButtonElement;
   const tip = tooltipView(tooltipEl);
-  slider.value = String(state.pointCap);
+  if (Number.isFinite(state.pointCap)) slider.value = String(state.pointCap);
 
   // Pulse one element by retriggering the transient flash animation.
   function flashEl(el: Element | null | undefined) {
@@ -150,6 +154,22 @@ async function boot() {
     refresh();
   });
 
+  // The cap button toggles between the finite limit and uncapped (Infinity).
+  // Re-imposing the limit is blocked while over the max - the user must deselect
+  // back under it first, signalled by flashing the used count.
+  capToggle.addEventListener("click", () => {
+    if (Number.isFinite(state.pointCap)) {
+      lastFiniteCap = state.pointCap;
+      state = { selected: state.selected, pointCap: Infinity };
+      refresh();
+      return;
+    }
+    const cap = recapValue(state.selected.size, lastFiniteCap);
+    if (cap === null) { flashEl(countEl); return; }
+    state = { selected: state.selected, pointCap: cap };
+    refresh();
+  });
+
   // Previous totals, so each render can highlight what just changed. Undefined on the
   // first render (the baseline), so restoring a build from the URL does not flash.
   let prevBonuses: Record<string, number> | undefined;
@@ -164,7 +184,12 @@ async function boot() {
     slider.min = String(Math.max(1, state.selected.size)); // cannot drag below allocated points
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, state.selected, prevAffinity);
-    countEl.textContent = `${state.selected.size} / ${state.pointCap}`;
+    const uncapped = !Number.isFinite(state.pointCap);
+    usedEl.textContent = String(state.selected.size);
+    capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
+    capToggle.title = uncapped ? "Click to restore the 55-point limit" : "Click to remove the point limit";
+    slider.disabled = uncapped;
+    if (!uncapped) slider.value = String(state.pointCap);
     history.replaceState(null, "", `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, statCanonical)}`);
   }
   refresh();

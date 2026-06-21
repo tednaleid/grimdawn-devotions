@@ -67,7 +67,9 @@ export function encodeHash(
   benefits: Set<string> = new Set(),
   statCanonical: string[] = [],
 ): string {
-  let out = `p=${pointCap}&s=${encodeBitset(selected, canonical)}`;
+  // p=0 is the uncapped sentinel (0 is otherwise an invalid cap; the real min is 1).
+  const cap = Number.isFinite(pointCap) ? pointCap : 0;
+  let out = `p=${cap}&s=${encodeBitset(selected, canonical)}`;
   const b = encodeBitset(benefits, statCanonical);
   if (b) out += `&b=${b}`; // only when benefit tags are selected
   return out;
@@ -84,9 +86,15 @@ export function decodeHash(
   const params = new URLSearchParams(raw);
   if (!params.has("p") && !params.has("s") && !params.has("b")) return null;
 
-  let pointCap = Number(params.get("p"));
-  if (!Number.isFinite(pointCap)) pointCap = MAX_CAP;
-  pointCap = Math.max(MIN_CAP, Math.min(MAX_CAP, Math.round(pointCap)));
+  // p=0 restores the uncapped state; any other value clamps to the finite range.
+  let pointCap: number;
+  if (params.get("p") === "0") {
+    pointCap = Infinity;
+  } else {
+    pointCap = Number(params.get("p"));
+    if (!Number.isFinite(pointCap)) pointCap = MAX_CAP;
+    pointCap = Math.max(MIN_CAP, Math.min(MAX_CAP, Math.round(pointCap)));
+  }
 
   const selected = decodeBitset(params.get("s") ?? "", canonical);
   const benefits = decodeBitset(params.get("b") ?? "", statCanonical);

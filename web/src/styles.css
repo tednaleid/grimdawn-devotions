@@ -13,7 +13,15 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #0d1117; color
 header { display: flex; gap: .75rem; align-items: center; padding: .5rem 1rem; background: #161b22; border-bottom: 1px solid #30363d; }
 /* Points group (slider + count) on the left, reset controls pushed to the right. */
 header label { display: inline-flex; align-items: center; gap: .55rem; font-size: .8rem; letter-spacing: .02em; text-transform: uppercase; color: #9aa4b2; }
-#point-count { font-variant-numeric: tabular-nums; color: #e6edf3; background: #0d1117; border: 1px solid #30363d; border-radius: 999px; padding: .12rem .55rem; font-size: .8rem; text-transform: none; letter-spacing: 0; }
+#point-count { display: inline-flex; align-items: center; gap: .3rem; font-variant-numeric: tabular-nums; color: #9aa4b2; font-size: .8rem; text-transform: none; letter-spacing: 0; }
+/* The cap is a button: click it to remove the point limit (shows the infinity glyph), click again to restore it. */
+#cap-toggle { font-variant-numeric: tabular-nums; color: #e6edf3; background: #0d1117; border: 1px solid #30363d; border-radius: 999px; padding: .12rem .6rem; font-size: .8rem; line-height: 1; cursor: pointer; transition: background .12s, border-color .12s, color .12s; }
+#cap-toggle:hover { background: #1a2230; border-color: #6cb6ff; color: #fff; }
+/* Blocked re-cap (still over 55 while uncapped): pulse the used count red. */
+@keyframes flash-blocked-count { 0%, 100% { color: #9aa4b2; } 50% { color: #ff6b6b; } }
+#point-count.flash-blocked #point-used { animation: flash-blocked-count .5s ease-in-out 3; }
+/* While uncapped the slider is meaningless, so it is disabled and dimmed. */
+#point-slider:disabled { opacity: .4; cursor: not-allowed; }
 header button { margin-left: 0; background: #21262d; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; padding: .35rem .75rem; font-size: .8rem; cursor: pointer; transition: background .12s, border-color .12s; }
 header button:hover { background: #2d333b; border-color: #444c56; }
 header button:active { background: #1a1e24; }

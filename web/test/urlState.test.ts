@@ -54,6 +54,12 @@ test("tolerates a malformed bitset and clamps the cap", () => {
   expect(decoded.pointCap).toBe(55); // clamped to the max
 });
 
-test("clamps a too-small cap", () => {
-  expect(decodeHash("#p=0&s=", canonical)!.pointCap).toBe(1);
+test("clamps a too-small (but nonzero) cap to the minimum", () => {
+  expect(decodeHash("#p=-3&s=", canonical)!.pointCap).toBe(1);
+});
+
+test("encodes an uncapped (Infinity) cap as the p=0 sentinel and round-trips it", () => {
+  const hash = encodeHash(new Set(), Infinity, canonical);
+  expect(hash).toBe("p=0&s=");
+  expect(decodeHash(`#${hash}`, canonical)!.pointCap).toBe(Infinity);
 });

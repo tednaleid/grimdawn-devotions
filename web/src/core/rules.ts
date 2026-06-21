@@ -3,6 +3,15 @@
 import type { DevotionModel, SelectionState, StarId } from "./types";
 import { affinityFrom, completedConstellations, meetsRequirement } from "./affinity";
 
+// The finite cap to restore when leaving uncapped mode, or null when re-capping
+// is not allowed yet. A cap can never sit below the points already spent, and the
+// real-game maximum is maxCap - so a selection larger than maxCap must be trimmed
+// before any limit can be re-imposed.
+export function recapValue(selectedSize: number, lastFiniteCap: number, maxCap = 55): number | null {
+  if (selectedSize > maxCap) return null;
+  return Math.min(maxCap, Math.max(lastFiniteCap, selectedSize));
+}
+
 export function validClosure(model: DevotionModel, selected: Set<StarId>): Set<StarId> {
   let cur = new Set(selected);
   for (;;) {
