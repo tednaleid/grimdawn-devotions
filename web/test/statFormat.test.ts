@@ -1,7 +1,7 @@
 // ABOUTME: Tests for the devotion stat formatter (label + percent/flat value rendering).
 // ABOUTME: Anchored on grimtools-confirmed cases (Falcon, Shepherd's Crook) plus family rules.
 import { expect, test, describe } from "bun:test";
-import { statRow, formatBonusRows, groupedBonusRows, formatPowerStats } from "./statFormat";
+import { statRow, formatBonusRows, groupedBonusRows, formatPowerStats } from "../src/core/statFormat";
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
