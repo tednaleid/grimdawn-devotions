@@ -53,7 +53,7 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .bchip.up { animation: flash-up 10s linear; }
 .bchip.down { animation: flash-down 10s linear; }
 /* "Available to get": the rest of the catalog as compact, taggable pills. */
-.avail-head { margin-top: 1rem; color: #8a93a3; }
+.avail-head { margin-top: 1.6rem; padding-top: .9rem; border-top: 1px solid #30363d; color: #8a93a3; }
 .bempty { color: #9aa4b2; font-size: .82rem; padding: 2px 0; }
 .avail-list { display: flex; flex-wrap: wrap; gap: .25rem; margin-bottom: .2rem; }
 .bgroup.avail { display: inline-flex; margin: 0; padding: 1px 9px; border-radius: 999px; background: rgba(255,255,255,.045); }
