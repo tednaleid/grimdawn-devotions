@@ -140,6 +140,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 
   // Layer 3: stars. Each is an invisible large hit target (carries data-star-id)
   // plus a small visible dot (pointer-events:none) so the click/hover area is generous.
+  // When a benefit filter is active, matching stars are emphasized and the rest dimmed.
+  const filtering = (opts.highlight?.size ?? 0) > 0;
   for (const star of model.stars.values()) {
     const con = model.constellations.get(star.constellationId)!;
     const solid = gradColors(con)[0] ?? "#9aa3b2"; // solid color for the glow shadow
@@ -149,8 +151,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const cx = star.position.x + STAR_CENTER;
     const cy = star.position.y + STAR_CENTER;
     const style = `--affinity:${solid};--grad:url(#grad-${con.id})`;
-    // A star that grants a selected benefit gets the "match" highlight.
-    const m = opts.highlight?.has(star.id) ? " match" : "";
+    // A star granting a selected benefit is emphasized; the rest are dimmed while filtering.
+    const m = opts.highlight?.has(star.id) ? " match" : filtering ? " dim" : "";
     // Celestial-power stars are diamonds; the rest are circles. Both share the .star styling.
     const visible = star.celestialPower
       ? `<polygon class="star power ${st}${m}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
