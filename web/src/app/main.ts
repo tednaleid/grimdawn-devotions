@@ -173,11 +173,14 @@ async function boot() {
   // Previous totals, so each render can highlight what just changed. Undefined on the
   // first render (the baseline), so restoring a build from the URL does not flash.
   let prevBonuses: Record<string, number> | undefined;
+  let prevPet: Record<string, number> | undefined;
   let prevAffinity: Record<Affinity, number> | undefined;
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
   function renderBenefitsPanel() {
-    prevBonuses = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits, benefitCatalog);
+    const r = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits, benefitCatalog, prevPet);
+    prevBonuses = r.bonuses;
+    prevPet = r.petBonuses;
   }
   function refresh() {
     handle.update(state, starsGranting(model, selectedBenefits));

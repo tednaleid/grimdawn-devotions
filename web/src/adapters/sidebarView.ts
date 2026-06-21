@@ -1,7 +1,7 @@
 // ABOUTME: DOM adapter that renders the benefits and affinity sidebar panels.
 // ABOUTME: Formats summed stat totals via statFormat and shows affinity totals with colored orbs.
 import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "../core/types";
-import { sumBonuses, powersGained, racialTargets } from "../core/aggregate";
+import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityTotals } from "../core/affinity";
 import { condensedRows, type CondensedGroup, type CondensedPart, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
@@ -33,8 +33,10 @@ export function renderBenefits(
   prev?: Record<string, number>,
   selectedBenefits: Set<string> = new Set(),
   catalog: CondensedGroup[] = [],
-): Record<string, number> {
+  prevPet?: Record<string, number>,
+): { bonuses: Record<string, number>; petBonuses: Record<string, number> } {
   const bonuses = sumBonuses(model, selected);
+  const petBonuses = sumPetBonuses(model, selected);
   const powers = powersGained(model, selected);
 
   // Every subject's full set of stat ids (for subject-level tagging + group-selected),
@@ -86,11 +88,22 @@ export function renderBenefits(
     .map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`)
     .join("");
 
+  // "Bonus to All Pets": summed pet bonuses as their own read-only section. Pet stat ids
+  // overlap player ones, so these are not taggable/highlightable; and they carry no
+  // duration dimensions, so a flat subject line suffices. Flashes on change like above.
+  const petChip = (p: CondensedPart) => `<span class="bchip${changeClass(prevPet, p.id, petBonuses)}">${partText(p)}</span>`;
+  const petHtml = condensedRows(petBonuses)
+    .map((g) => `<h3>${g.group}</h3>` + g.subjects
+      .map((s) => `<div class="bgroup"><div class="bsingle"><span class="bsubj">${s.subject}</span><span class="bvals">${s.parts.map(petChip).join("")}</span></div></div>`)
+      .join(""))
+    .join("");
+
   el.innerHTML =
     `<h2>Benefits</h2>${activeHtml || '<div class="bempty">Select stars to gain benefits.</div>'}` +
+    (petHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petHtml}` : "") +
     (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "") +
     (availHtml ? `<h2 class="avail-head">Available to get</h2>${availHtml}` : "");
-  return bonuses;
+  return { bonuses, petBonuses };
 }
 
 // Renders the Affinity panel; returns the totals so the caller can pass them back as
