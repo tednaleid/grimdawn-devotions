@@ -1,5 +1,5 @@
 #!/usr/bin/env -S uv run --script
-# ABOUTME: Extracts devotion .tex textures from UI.arc, decodes, downscales, encodes WebP.
+# ABOUTME: Extracts devotion .tex textures from the base + expansion UI.arc archives, decodes, downscales, encodes WebP.
 # ABOUTME: Writes assets/devotions/*.webp and a manifest.json the web app reads.
 # /// script
 # requires-python = ">=3.10"
@@ -9,7 +9,7 @@
 plus a manifest the web app reads. Output dir is git-ignored. See
 docs/assets-and-textures.md for the .tex format."""
 from __future__ import annotations
-import argparse, json, subprocess, sys, tempfile
+import argparse, json, re, subprocess, sys, tempfile
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from tex2png import tex_to_image  # reuse the proven decoder
@@ -26,24 +26,40 @@ def main(argv=None) -> int:
     ap.add_argument("--include-nebula", action="store_true")
     args = ap.parse_args(argv)
 
-    arc = args.gd_dir / "resources/UI.arc"
     tool = args.gd_dir / "ArchiveTool.exe"
-    if not arc.exists() or not tool.exists():
-        print(f"need UI.arc + ArchiveTool under {args.gd_dir}", file=sys.stderr)
+    # UI textures live in the base game's UI.arc plus one per expansion (gdx1 = Ashes
+    # of Malmouth, gdx2 = Forgotten Gods, gdx3+ = future). Later expansions add and
+    # override art (e.g. Forgotten Gods' Lotus and Scarab constellations), so scan in
+    # load order and let a later archive win. New expansions are found via the gdx*
+    # convention with no change here.
+    def gdx_num(p: Path) -> int:
+        m = re.search(r"gdx(\d+)", p.as_posix().lower())
+        return int(m.group(1)) if m else 0
+    arcs = [a for a in [args.gd_dir / "resources/UI.arc"] if a.exists()]
+    arcs += sorted(args.gd_dir.glob("gdx*/resources/UI.arc"), key=gdx_num)
+    if not arcs or not tool.exists():
+        print(f"need resources/UI.arc + ArchiveTool under {args.gd_dir}", file=sys.stderr)
         return 2
 
-    listing = subprocess.run([str(tool), str(arc), "-list"], capture_output=True, text=True).stdout
-    entries = [ln.strip() for ln in listing.splitlines()
-               if ln.strip().lower().startswith("skills/devotion/") and ln.strip().lower().endswith(".tex")]
-    if not args.include_nebula:
-        entries = [e for e in entries if "nebula" not in e.lower()]
+    # stem -> (archive, entry); iterate archives in load order so a later expansion
+    # replaces an earlier same-named texture and adds its own.
+    chosen: dict[str, tuple[Path, str]] = {}
+    for arc in arcs:
+        listing = subprocess.run([str(tool), str(arc), "-list"], capture_output=True, text=True).stdout
+        for ln in listing.splitlines():
+            e = ln.strip()
+            if not (e.lower().startswith("skills/devotion/") and e.lower().endswith(".tex")):
+                continue
+            if not args.include_nebula and "nebula" in e.lower():
+                continue
+            chosen[Path(e).stem] = (arc, e)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     images: dict[str, dict] = {}
     skipped: list[str] = []
     converted = 0
     with tempfile.TemporaryDirectory() as td:
-        for e in entries:
+        for stem, (arc, e) in sorted(chosen.items()):
             subprocess.run([str(tool), str(arc), "-extract", td, e], capture_output=True)
             tex = Path(td) / e
             if not tex.exists():
@@ -61,7 +77,6 @@ def main(argv=None) -> int:
             if args.max_dim > 0 and max(native_w, native_h) > args.max_dim:
                 scale = args.max_dim / max(native_w, native_h)
                 img = img.resize((max(1, round(native_w * scale)), max(1, round(native_h * scale))))
-            stem = tex.stem
             out = args.out_dir / f"{stem}.webp"
             img.save(out, "WEBP", quality=args.quality, method=6)
             entry = {"url": f"assets/devotions/{stem}.webp", "w": native_w, "h": native_h}

@@ -82,17 +82,49 @@ install: install-uv install-bun install-jq
 
 # --- Pipeline ---------------------------------------------------------------
 
-# Extract records + English text from the game install (Windows-only: runs the game's ArchiveTool.exe; needs ~5 GB free)
-extract:
+# Abort if Grim Dawn is running: it holds its .arc resource archives open, so
+# ArchiveTool extracts nothing from them (silently producing empty text/art).
+_require-game-closed:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v tasklist >/dev/null 2>&1 && tasklist 2>/dev/null | grep -qi "Grim Dawn.exe"; then
+        echo "ERROR: Grim Dawn is running. Fully exit the game (to desktop), then re-run."
+        echo "       The open game locks its .arc resource archives, so the output would be missing."
+        exit 1
+    fi
+
+# Extract records + English text from the base game and expansions (Windows-only: runs the game's ArchiveTool.exe; needs ~5 GB free)
+extract: _require-game-closed
     #!/usr/bin/env bash
     set -euo pipefail
     GD="{{gd_dir}}"
     [ -f "$GD/database/database.arz" ] || { echo "Grim Dawn not found at $GD"; echo "Set GD_DIR env var or pass gd_dir=... See README."; exit 1; }
+    # Start clean so a constellation removed by a patch cannot linger as a stale file.
+    rm -rf "{{records_dir}}" "{{text_dir}}"
     mkdir -p "{{records_dir}}" "{{text_dir}}"
-    echo "Extracting database.arz -> records ..."
-    "$GD/ArchiveTool.exe" "$GD/database/database.arz" -database "{{records_dir}}"
-    echo "Extracting Text_EN.arc -> text_en ..."
-    "$GD/ArchiveTool.exe" "$GD/resources/Text_EN.arc" -extract "{{text_dir}}"
+    AT="$GD/ArchiveTool.exe"
+    # Extract one layer: every *.arz database and the Text_EN.arc under a game dir.
+    extract_layer() { # <label> <dir>
+        local arz arc
+        for arz in "$2"/database/*.arz; do
+            [ -e "$arz" ] || continue
+            echo "Extracting $1 records ($(basename "$arz")) ..."
+            "$AT" "$arz" -database "{{records_dir}}" >/dev/null
+        done
+        arc="$2/resources/Text_EN.arc"
+        [ -f "$arc" ] && { echo "Extracting $1 text ..."; "$AT" "$arc" -extract "{{text_dir}}" >/dev/null; }
+    }
+    # Base game first, then every official expansion (gdx1 = Ashes of Malmouth,
+    # gdx2 = Forgotten Gods, gdx3+ = future) in version/load order. Later archives
+    # override and extend earlier ones (Forgotten Gods reworked the devotion map and
+    # adds constellations like Lotus and Scarab), so they overlay the same dirs.
+    # Expansions are discovered by the gdx* convention, so a new release is picked
+    # up with no recipe change. Crucible (survivalmode*) and mods are excluded by
+    # design - they carry no campaign devotion constellations.
+    extract_layer "base game" "$GD"
+    while IFS= read -r dir; do
+        [ -n "$dir" ] && extract_layer "$(basename "${dir%/}")" "${dir%/}"
+    done < <(ls -d "$GD"/gdx*/ 2>/dev/null | sort -V)
     echo "Done."
 
 # Parse extracted records into devotions.json (passes version + steam build id)
@@ -114,8 +146,8 @@ all: extract parse
 clean:
     rm -f "{{out}}" "{{justfile_directory()}}/data/stat_labels.json" "{{justfile_directory()}}/data/devotion_records.csv"
 
-# Extract + optimize devotion artwork into git-ignored assets/ (WebP + manifest)
-assets *ARGS:
+# Extract + optimize devotion artwork from the base + expansion UI.arc archives into assets/ (WebP + manifest)
+assets *ARGS: _require-game-closed
     uv run scripts/build_assets.py --gd-dir "{{gd_dir}}" \
         --out-dir "{{justfile_directory()}}/assets/devotions" {{ARGS}}
 
