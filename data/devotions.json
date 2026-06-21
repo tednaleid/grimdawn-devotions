@@ -3,7 +3,7 @@
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-06-21T16:30:31Z",
+    "generated_utc": "2026-06-21T18:50:47Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -1012,7 +1012,9 @@
               "defensivePoisonDuration": 36,
               "defensiveProtection": 70,
               "skillActiveDuration": 10,
-              "skillCooldownTime": 2.7
+              "skillCooldownTime": 2.7,
+              "skillLifeBonus": 848,
+              "skillLifePercent": 10
             }
           },
           "weapon_requirement": null
@@ -5678,6 +5680,7 @@
               "defensiveTrap": 45,
               "skillActiveDuration": 6,
               "skillCooldownTime": 10,
+              "skillManaPercent": 25,
               "skillTargetRadius": 15
             }
           },
@@ -5823,7 +5826,9 @@
             "stats": {
               "characterLifeRegen": 590,
               "skillActiveDuration": 12,
-              "skillCooldownTime": 25
+              "skillCooldownTime": 25,
+              "skillLifeBonus": 1200,
+              "skillLifePercent": 20
             }
           },
           "weapon_requirement": null
@@ -6433,7 +6438,9 @@
               "characterDefensiveAbility": 130,
               "defensiveProtection": 460,
               "skillActiveDuration": 5,
-              "skillCooldownTime": 8
+              "skillCooldownTime": 8,
+              "skillLifeBonus": 1550,
+              "skillLifePercent": 12
             }
           },
           "weapon_requirement": null
@@ -12838,6 +12845,8 @@
               "characterManaRegenModifier": 55,
               "skillActiveDuration": 8,
               "skillCooldownTime": 12,
+              "skillLifeBonus": 700,
+              "skillLifePercent": 10,
               "skillTargetRadius": 15
             }
           },

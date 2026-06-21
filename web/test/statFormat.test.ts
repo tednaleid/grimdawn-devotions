@@ -184,6 +184,17 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
     ]);
   });
 
+  test("heal/restore powers render flat + percent health and percent energy (Dryad's Blessing, Inspiration)", () => {
+    expect(formatPowerStats({ skillCooldownTime: 2.7, skillLifeBonus: 848, skillLifePercent: 10 })).toEqual([
+      { value: "2.7", label: "Second Skill Recharge" },
+      { value: "848", label: "Health Restored" },
+      { value: "10%", label: "Health Restored" },
+    ]);
+    expect(formatPowerStats({ skillManaPercent: 25 })).toEqual([
+      { value: "25%", label: "Energy Restored" },
+    ]);
+  });
+
   test("DoT pairs multiply per-second by duration and use the DoT display name", () => {
     expect(formatPowerStats({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 })).toEqual([
       { value: "300", label: "Burn Damage over 3 Seconds" },

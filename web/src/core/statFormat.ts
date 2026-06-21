@@ -287,6 +287,15 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
   const absorb = take("damageAbsorption");
   if (absorb !== undefined) rows.push({ value: fmtNum(absorb), label: "Damage Absorption" });
 
+  // Heal / restore procs (Dryad's Blessing, Giant's Blood, Inspiration): a flat and a
+  // percent health restore, plus a percent energy restore. Value carries the unit.
+  const healFlat = take("skillLifeBonus");
+  if (healFlat !== undefined) rows.push({ value: fmtNum(healFlat), label: "Health Restored" });
+  const healPct = take("skillLifePercent");
+  if (healPct !== undefined) rows.push({ value: `${fmtNum(healPct)}%`, label: "Health Restored" });
+  const energyPct = take("skillManaPercent");
+  if (energyPct !== undefined) rows.push({ value: `${fmtNum(energyPct)}%`, label: "Energy Restored" });
+
   const weapon = take("weaponDamagePct");
   if (weapon !== undefined) rows.push({ value: `${fmtNum(weapon)}%`, label: "Weapon Damage" });
 

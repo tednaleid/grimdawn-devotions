@@ -78,6 +78,8 @@ POWER_META_FIELDS = {
     "skillCooldownTime", "projectileLaunchNumber", "projectilePiercingChance",
     "projectileExplosionRadius", "skillTargetRadius", "weaponDamagePct",
     "skillActiveDuration", "damageAbsorption",
+    # Heal / restore procs (Dryad's Blessing, Giant's Blood, Inspiration).
+    "skillLifeBonus", "skillLifePercent", "skillManaPercent",
 }
 
 # Stat-id families to pull off a proc skill (same families as extract_bonuses),
