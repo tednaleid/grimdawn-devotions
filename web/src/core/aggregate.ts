@@ -64,6 +64,30 @@ export function starsGranting(model: DevotionModel, ids: Set<string>): Set<StarI
   return out;
 }
 
+// The stat ids still obtainable from the current selection: every bonus carried by a
+// not-yet-selected star inside a constellation that remains completable. Drives the
+// "Available to get" panel so it lists only benefits the build can still fold in, and
+// empties once the points are spent and nothing stays completable. `completable` comes
+// from reachabilityForSelection; this stays a pure projection over the model.
+export function availableBonusIds(
+  model: DevotionModel,
+  selected: Set<StarId>,
+  completable: Set<string>,
+): Set<string> {
+  const out = new Set<string>();
+  for (const conId of completable) {
+    const con = model.constellations.get(conId);
+    if (!con) continue;
+    for (const sid of con.starIds) {
+      if (selected.has(sid)) continue;
+      const star = model.stars.get(sid);
+      if (!star) continue;
+      for (const k of Object.keys(star.bonuses)) out.add(k);
+    }
+  }
+  return out;
+}
+
 export function weaponRequirements(
   model: DevotionModel,
   selected: Set<StarId>,

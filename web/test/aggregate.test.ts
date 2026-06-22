@@ -3,9 +3,43 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { sumBonuses, sumPetBonuses, powersGained, starsGranting } from "../src/core/aggregate";
+import { sumBonuses, sumPetBonuses, powersGained, starsGranting, availableBonusIds } from "../src/core/aggregate";
 
 const model = buildModel(doc as any);
+
+const conByName = (name: string) => [...model.constellations.values()].find((c) => c.name === name)!;
+const bonusIdsOf = (starIds: Iterable<string>, skip: Set<string> = new Set()): Set<string> => {
+  const out = new Set<string>();
+  for (const sid of starIds) if (!skip.has(sid)) for (const k of Object.keys(model.stars.get(sid)!.bonuses)) out.add(k);
+  return out;
+};
+
+test("availableBonusIds: union of bonus ids of unselected stars in completable constellations", () => {
+  const bat = conByName("Bat");
+  const got = availableBonusIds(model, new Set(), new Set([bat.id]));
+  expect([...got].sort()).toEqual([...bonusIdsOf(bat.starIds)].sort());
+});
+
+test("availableBonusIds: skips already-selected stars, keeps the rest of the constellation", () => {
+  const bat = conByName("Bat");
+  const selected = new Set([bat.starIds[0]!]);
+  const got = availableBonusIds(model, selected, new Set([bat.id]));
+  expect([...got].sort()).toEqual([...bonusIdsOf(bat.starIds, selected)].sort());
+});
+
+test("availableBonusIds: ignores constellations not in the completable set", () => {
+  const bat = conByName("Bat");
+  const crane = conByName("Crane");
+  const got = availableBonusIds(model, new Set(), new Set([bat.id]));
+  // A bonus id unique to Crane (not granted anywhere in Bat) must not appear.
+  const craneOnly = [...bonusIdsOf(crane.starIds)].find((id) => !bonusIdsOf(bat.starIds).has(id));
+  expect(craneOnly).toBeTruthy();
+  expect(got.has(craneOnly!)).toBe(false);
+});
+
+test("availableBonusIds: empty when nothing is completable", () => {
+  expect(availableBonusIds(model, new Set(), new Set()).size).toBe(0);
+});
 
 test("sumPetBonuses sums 'Bonus to All Pets' stats, separate from player bonuses", () => {
   // Shepherd's Crook's elemental-resistance star: 10% to the player, 15% to pets.

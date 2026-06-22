@@ -33,6 +33,7 @@ export function renderBenefits(
   prev?: Record<string, number>,
   selectedBenefits: Set<string> = new Set(),
   catalog: CondensedGroup[] = [],
+  availableIds?: Set<string>,
   prevPet?: Record<string, number>,
 ): { bonuses: Record<string, number>; petBonuses: Record<string, number>; availHtml: string } {
   const bonuses = sumBonuses(model, selected);
@@ -72,11 +73,17 @@ export function renderBenefits(
     .map((g) => `<h3>${g.group}</h3>${g.subjects.map(activeSubject).join("")}`)
     .join("");
 
-  // Inactive catalog subjects, grouped by category, as name-only selectable tags.
+  // Inactive catalog subjects you can still obtain, grouped by category, as name-only selectable
+  // tags. A subject shows only if one of its stat ids is in `availableIds` (the bonuses still
+  // reachable given the selection); passing undefined disables the filter and lists every inactive
+  // subject (the permissive/uncapped path). A subject the user has tagged stays listed even when it
+  // is no longer obtainable, so a tag can always be cleared from the panel that set it.
+  const obtainable = (s: CondensedSubject) => availableIds === undefined || subjectIds(s).some((id) => availableIds.has(id));
+  const tagged = (s: CondensedSubject) => subjectIds(s).some((id) => selectedBenefits.has(id));
   const availHtml = catalog
     .map((g) => {
       const subs = g.subjects
-        .filter((s) => !activeKeys.has(s.key))
+        .filter((s) => !activeKeys.has(s.key) && (obtainable(s) || tagged(s)))
         .map((s) => `<div class="bgroup avail${groupSel(s)}" data-gkey="${s.key}" data-ids="${subjectIds(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`)
         .join("");
       return subs ? `<h3>${g.group}</h3><div class="avail-list">${subs}</div>` : "";

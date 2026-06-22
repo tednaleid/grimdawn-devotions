@@ -10,7 +10,7 @@ import { buildReachCons, reachabilityForSelection, completionMinCost, selectionS
 import { loadWasmResolver } from "../adapters/reachWasm";
 import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
-import { starsGranting } from "../core/aggregate";
+import { starsGranting, availableBonusIds } from "../core/aggregate";
 import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState } from "../core/types";
 
@@ -199,7 +199,11 @@ async function boot() {
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
   function renderBenefitsPanel() {
-    const r = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits, benefitCatalog, prevPet);
+    // "Available to get" lists only benefits still reachable from here: bonuses on unselected stars
+    // in constellations that remain completable. In the permissive path completable is every
+    // constellation, so this lists everything not yet held (the prior behavior).
+    const availableIds = availableBonusIds(model, state.selected, reach.completable);
+    const r = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits, benefitCatalog, availableIds, prevPet);
     prevBonuses = r.bonuses;
     prevPet = r.petBonuses;
     availHtml = r.availHtml;

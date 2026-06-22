@@ -200,6 +200,19 @@ try {
     && tip.includes("150 Reduced target's Defensive Ability for 5 Seconds"),
     "power tooltip shows the level-25 ability stat lines");
 
+  // "Available to get" is filtered to benefits still reachable from here: with points to spare it
+  // lists items, and once every point is spent (cap lowered to the points used) it empties out.
+  const availWithBudget = await cdp.evaluate<number>("document.querySelectorAll('#affinity .avail-list .bgroup').length");
+  check(availWithBudget > 0, `"Available to get" lists reachable benefits while budget remains (got ${availWithBudget})`);
+  await cdp.evaluate(
+    `(() => { const s = document.getElementById('point-slider'); s.value = document.getElementById('point-used').textContent; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+  let emptiedAvail = false;
+  for (let i = 0; i < 20; i++) {
+    await Bun.sleep(100);
+    if ((await cdp.evaluate<number>("document.querySelectorAll('#affinity .avail-list .bgroup').length")) === 0) { emptiedAvail = true; break; }
+  }
+  check(emptiedAvail, '"Available to get" empties once every point is spent (cap == points used)');
+
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
   if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log(`    console: ${e}`);
 
