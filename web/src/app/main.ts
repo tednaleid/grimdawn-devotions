@@ -17,11 +17,18 @@ import {
   type ReachCon,
 } from "../core/reachability";
 import { loadWasmResolver } from "../adapters/reachWasm";
-import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
+import {
+  canonicalStarIds,
+  canonicalStatIds,
+  canonicalPetStatIds,
+  canonicalBenefitIds,
+  decodeHash,
+  encodeHash,
+} from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
-import { starsGranting, availableBonusIds } from "../core/aggregate";
+import { starsGranting, availableBonusIds, starsGrantingPet, availablePetKeys } from "../core/aggregate";
 import { condensedRows } from "../core/statFormat";
-import type { Affinity, SelectionState } from "../core/types";
+import type { Affinity, SelectionState, StarId } from "../core/types";
 
 async function boot() {
   const data = await httpDataSource(".").load();
@@ -45,7 +52,8 @@ async function boot() {
   // Restore state from the URL hash if present (validated so a stale link can't be invalid).
   const canonical = canonicalStarIds(model);
   const statCanonical = canonicalStatIds(model);
-  const restored = decodeHash(location.hash, canonical, statCanonical);
+  const benefitCanonical = canonicalBenefitIds(model);
+  const restored = decodeHash(location.hash, canonical, benefitCanonical);
   let state: SelectionState = restored
     ? {
         selected: repairSelection(model, cons, table, restored.selected, restored.pointCap),
@@ -65,6 +73,11 @@ async function boot() {
   const allBonuses: Record<string, number> = {};
   for (const id of statCanonical) allBonuses[id] = 1;
   const benefitCatalog = condensedRows(allBonuses);
+  // The pet benefit catalog (every pet subject + its stat ids), for the pet "Available to get" list.
+  // Static per model, computed once. Pet stat ids are raw here; the renderer scopes them.
+  const allPetBonuses: Record<string, number> = {};
+  for (const id of canonicalPetStatIds(model)) allPetBonuses[id] = 1;
+  const petCatalog = condensedRows(allPetBonuses);
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -87,6 +100,20 @@ async function boot() {
     void (el as SVGElement).getBoundingClientRect(); // restart the animation if it is mid-flash
     el.classList.add("flash-blocked");
     el.addEventListener("animationend", () => el.classList.remove("flash-blocked"), { once: true });
+  }
+
+  // The map stars to emphasize for the current benefit tags: bare keys scan player bonuses,
+  // pet: keys scan pet bonuses; the map highlights the union.
+  function taggedStars(): Set<StarId> {
+    const playerTags = new Set<string>();
+    const petTags = new Set<string>();
+    for (const k of selectedBenefits) {
+      if (k.startsWith("pet:")) petTags.add(k.slice(4));
+      else playerTags.add(k);
+    }
+    const out = starsGranting(model, playerTags);
+    for (const id of starsGrantingPet(model, petTags)) out.add(id);
+    return out;
   }
 
   // The current ReachView, recomputed each refresh. When the table is present and the
@@ -294,6 +321,7 @@ async function boot() {
   let prevPet: Record<string, number> | undefined;
   let prevAffinity: Record<Affinity, number> | undefined;
   let availHtml = ""; // "available to get" catalog HTML; rendered under the Affinity panel on the right
+  let petAvailHtml = ""; // pet "available to get" catalog HTML; rendered below the player one on the right
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
   function renderBenefitsPanel() {
@@ -301,6 +329,7 @@ async function boot() {
     // in constellations that remain completable. In the permissive path completable is every
     // constellation, so this lists everything not yet held (the prior behavior).
     const availableIds = availableBonusIds(model, state.selected, reach.completable);
+    const availPetKeys = availablePetKeys(model, state.selected, reach.completable);
     const r = renderBenefits(
       benefitsEl,
       model,
@@ -310,10 +339,13 @@ async function boot() {
       benefitCatalog,
       availableIds,
       prevPet,
+      petCatalog,
+      availPetKeys,
     );
     prevBonuses = r.bonuses;
     prevPet = r.petBonuses;
     availHtml = r.availHtml;
+    petAvailHtml = r.petAvailHtml;
   }
   function refresh() {
     completionCache.clear();
@@ -327,12 +359,14 @@ async function boot() {
     if (Number.isFinite(state.pointCap) && state.pointCap < curMin)
       state = { selected: state.selected, pointCap: curMin };
     reach = computeReach();
-    handle.update(state, starsGranting(model, selectedBenefits), reach);
+    handle.update(state, taggedStars(), reach);
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
     if (availHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
+    if (petAvailHtml)
+      affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Bonus to All Pets</h2>${petAvailHtml}`);
     const uncapped = !Number.isFinite(state.pointCap);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
     capToggle.title = uncapped ? "Click to restore the 55-point limit" : "Click to remove the point limit";
@@ -341,7 +375,7 @@ async function boot() {
     history.replaceState(
       null,
       "",
-      `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, statCanonical)}`,
+      `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical)}`,
     );
   }
   refresh();

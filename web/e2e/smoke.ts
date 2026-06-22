@@ -185,12 +185,12 @@ try {
   let counted = false;
   for (let i = 0; i < 20; i++) {
     await Bun.sleep(100);
-    if ((await cdp.evaluate<string>("document.getElementById('point-count').textContent")) === "1 / 55") {
+    if ((await cdp.evaluate<string>("document.getElementById('point-bar').textContent")).includes("1 used")) {
       counted = true;
       break;
     }
   }
-  check(counted, 'point count reads "1 / 55" after selecting a Crossroads');
+  check(counted, 'the point bar reads "1 used" after selecting a Crossroads');
 
   // The two-column panel renders the current "have" total in .aff-have (the wanted-max
   // "need" column only appears for colors a started constellation requires).
@@ -258,8 +258,34 @@ try {
     availWithBudget > 0,
     `"Available to get" lists reachable benefits while budget remains (got ${availWithBudget})`,
   );
+  // Pet bonuses have their own "Available to get" list and, when tagged, highlight the stars that
+  // grant them as a pet bonus (a pet: tag must hit petBonuses, not player bonuses).
+  check(
+    await cdp.evaluate<boolean>(
+      `(document.getElementById('affinity')?.textContent||'').includes('Bonus to All Pets') && !!document.querySelector('#affinity .bgroup.avail[data-ids^="pet:"]')`,
+    ),
+    "pet 'Bonus to All Pets' available list is present",
+  );
   await cdp.evaluate(
-    `(() => { const s = document.getElementById('point-slider'); s.value = document.getElementById('point-used').textContent; s.dispatchEvent(new Event('input', { bubbles: true })); })()`,
+    `(() => { const g = [...document.querySelectorAll('#affinity .bgroup.avail')].find(d => (d.getAttribute('data-ids')||'').startsWith('pet:')); g.querySelector('[data-gtoggle]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})); })()`,
+  );
+  let petMatched = false;
+  for (let i = 0; i < 20; i++) {
+    await Bun.sleep(100);
+    if ((await cdp.evaluate<number>("document.querySelectorAll('.star.match').length")) > 0) {
+      petMatched = true;
+      break;
+    }
+  }
+  check(petMatched, "tagging a pet bonus highlights the stars that grant it as a pet bonus");
+  // Clear the pet tag so the later 'empties' assertion sees a clean filter.
+  await cdp.evaluate(
+    `(() => { const g = document.querySelector('#affinity .bgroup.avail.gsel[data-ids^="pet:"]'); if (g) g.querySelector('[data-gtoggle]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})); })()`,
+  );
+  // Spend every point: drive the point bar's cap to the validity floor (curMin == points used) so
+  // nothing else stays completable. Home sets the cap to curMin via the bar's keydown handler.
+  await cdp.evaluate(
+    `(() => { const b = document.getElementById('point-bar'); b.focus(); b.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true })); })()`,
   );
   let emptiedAvail = false;
   for (let i = 0; i < 20; i++) {
