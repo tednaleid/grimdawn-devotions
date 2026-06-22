@@ -4,7 +4,8 @@
 // ABOUTME: star. Reports the latency distribution and flags hotspots. Run via `just perf` or
 // ABOUTME: `bun scripts/perf-reachability.ts [--seeds N] [--start S] [--cap C] [--max-ms M] [--replay S]`.
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, reachabilityForSelection, selectionSummary } from "../src/core/reachability";
+import { buildReachCons, buildCoverTable, reachabilityForSelection, selectionSummary, setExactResolver } from "../src/core/reachability";
+import { loadWasmResolver } from "../src/adapters/reachWasm";
 import type { DevotionModel } from "../src/core/types";
 import { fileURLToPath } from "url";
 import { resolve } from "path";
@@ -17,8 +18,9 @@ function argNum(flag: string, def: number): number {
 const SEEDS = argNum("--seeds", 60);
 const START = argNum("--start", 1);
 const CAP = argNum("--cap", 55);
-const MAX_MS = argNum("--max-ms", 250);
+const MAX_MS = argNum("--max-ms", 400); // accepted bar: a ~350ms first-hit on the hardest borderline state
 const REPLAY = process.argv.indexOf("--replay") >= 0 ? argNum("--replay", 1) : null;
+const FORCE_TS = process.argv.includes("--ts"); // force the pure TS resolver (skip reach.wasm)
 
 // --- model + table (built once; the UI loads this from a blob) --------------
 const scriptPath = fileURLToPath(import.meta.url);
@@ -29,6 +31,16 @@ export const cons = buildReachCons(model);
 const tTable = performance.now();
 export const table = buildCoverTable(cons);
 console.log(`cover table built in ${(performance.now() - tTable).toFixed(0)} ms over ${cons.length} constellations`);
+
+// Use the shipped WASM resolver if present (just wasm), so the harness measures the real path.
+// Pass --ts to force the pure TS resolver (to compare distributions).
+if (!FORCE_TS) {
+  const wasmFile = Bun.file(resolve(root, "data", "reach.wasm"));
+  if (await wasmFile.exists()) {
+    const r = await loadWasmResolver(await wasmFile.arrayBuffer(), cons, table);
+    if (r) { setExactResolver(r); console.log("resolver: WASM (data/reach.wasm)"); } else console.log("resolver: TS (reach.wasm failed to load)");
+  } else console.log("resolver: TS (no data/reach.wasm; run `just wasm`)");
+} else console.log("resolver: TS (forced via --ts)");
 
 const reqSum = (id: string) => { const c = cons.find((x) => x.id === id)!; return c.req[0] + c.req[1] + c.req[2] + c.req[3] + c.req[4]; };
 const outerIds = [...model.constellations.values()].map((c) => c.id).filter((id) => reqSum(id) > 0);

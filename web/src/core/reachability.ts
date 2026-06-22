@@ -349,16 +349,24 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
   return found;
 }
 
+/** Signature of the exact gap-resolver; the WASM port is a drop-in for the TS `reachableExactFrom`. */
+export type ExactResolver = (cons: ReachCon[], table: CoverTable, st: ReachState, budget: number) => boolean;
+// The bracket gap is resolved by this. Defaults to the TS search; an adapter may swap in the
+// (verdict-equivalent, far faster) WASM port via setExactResolver. Pure default keeps the core testable.
+let exactResolver: ExactResolver = reachableExactFrom;
+/** Override the exact gap-resolver (pass null to restore the TS default). */
+export function setExactResolver(fn: ExactResolver | null): void { exactResolver = fn ?? reachableExactFrom; }
+
 /**
  * Classify a partial-selection state by bracketing minCost, then resolving the gap exactly.
  * `lowerBoundFrom` soundly proves "dim"; `greedyFrom` soundly proves "reachable"; the rare
- * remainder is decided by `reachableExactFrom`. Always returns "reachable" or "dim" and never
- * lies versus the covers + constructible rule.
+ * remainder is decided by the exact resolver (TS or the injected WASM port). Always returns
+ * "reachable" or "dim" and never lies versus the covers + constructible rule.
  */
 export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): Reach {
   if (lowerBoundFrom(table, st) > budget) return "dim";
   if (greedyFrom(cons, st, budget) <= budget) return "reachable";
-  return reachableExactFrom(cons, table, st, budget) ? "reachable" : "dim";
+  return exactResolver(cons, table, st, budget) ? "reachable" : "dim";
 }
 
 /** Like classify, but resolves the "unknown" gap with the exact resolver - always reachable or dim. */
@@ -377,11 +385,11 @@ export function completionMinCost(model: DevotionModel, cons: ReachCon[], table:
   const st = selectionSummary(model, withCon);
   let lo = st.own;                                            // cannot cost less than the stars already required
   if (lo > maxBudget) return INF;
-  if (reachableExactFrom(cons, table, st, maxBudget) === false) return INF;
+  if (exactResolver(cons, table, st, maxBudget) === false) return INF;
   let hi = maxBudget;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
-    if (reachableExactFrom(cons, table, st, mid)) hi = mid; else lo = mid + 1;
+    if (exactResolver(cons, table, st, mid)) hi = mid; else lo = mid + 1;
   }
   return lo;
 }

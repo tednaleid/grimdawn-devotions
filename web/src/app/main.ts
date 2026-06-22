@@ -6,7 +6,8 @@ import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
-import { buildReachCons, reachabilityForSelection, completionMinCost, selectionSummary, type ReachView, type ReachCon } from "../core/reachability";
+import { buildReachCons, reachabilityForSelection, completionMinCost, selectionSummary, setExactResolver, type ReachView, type ReachCon } from "../core/reachability";
+import { loadWasmResolver } from "../adapters/reachWasm";
 import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
 import { starsGranting } from "../core/aggregate";
@@ -18,6 +19,16 @@ async function boot() {
   const model = data.model;
   const cons: ReachCon[] = buildReachCons(model);
   const table = data.coverTable;                                 // null -> dimming disabled (degraded)
+
+  // Swap in the WASM resolver for the expensive bracket gap (verdict-equivalent, ~30x faster on the
+  // worst sweep). Must happen before repairSelection below, which classifies. Any failure leaves the
+  // pure TS resolver in place, so the page still works (just slower) without reach.wasm.
+  let resolverKind = "ts";
+  if (data.reachWasm && table) {
+    const wasm = await loadWasmResolver(data.reachWasm, cons, table);
+    if (wasm) { setExactResolver(wasm); resolverKind = "wasm"; }
+  }
+  (globalThis as Record<string, unknown>).__reachResolver = resolverKind; // diagnostic; the e2e asserts this
 
   // Restore state from the URL hash if present (validated so a stale link can't be invalid).
   const canonical = canonicalStarIds(model);

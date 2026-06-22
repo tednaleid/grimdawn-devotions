@@ -35,7 +35,12 @@ export function httpDataSource(base = "."): DataSource {
         if (res.ok) coverTable = coverTableFromBytesOrNull(new Uint8Array(await res.arrayBuffer()), buildReachCons(model));
         else console.warn(`cover blob fetch ${res.status}; disabling dimming`);
       } catch (e) { console.warn("cover blob fetch failed; disabling dimming", e); }
-      return { model, manifest, coverTable };
+      let reachWasm: Uint8Array | null = null;
+      try {
+        const res = await fetch(`${base}/data/reach.wasm${v}`);
+        if (res.ok) reachWasm = new Uint8Array(await res.arrayBuffer());        // absent -> TS resolver
+      } catch (e) { console.warn("reach.wasm fetch failed; using the TS resolver", e); }
+      return { model, manifest, coverTable, reachWasm };
     },
   };
 }

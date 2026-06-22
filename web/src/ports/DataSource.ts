@@ -20,6 +20,7 @@ export interface LoadedData {
   model: DevotionModel;
   manifest: AssetManifest | null;
   coverTable: CoverTable | null;
+  reachWasm: Uint8Array | null; // raw reach.wasm bytes, or null (engine falls back to the TS resolver)
 }
 
 export interface DataSource {

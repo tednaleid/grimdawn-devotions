@@ -139,6 +139,13 @@ try {
   check(await cdp.evaluate<number>("document.querySelectorAll('.star').length") === 559,
     "renders all 559 stars");
 
+  // When reach.wasm is shipped in dist, the engine must actually load it in-browser (not silently
+  // fall back to TS); when it is not shipped, the TS fallback is expected and fine.
+  const wasmShipped = await Bun.file(`${DIST}/data/reach.wasm`).exists();
+  const resolverKind = await cdp.evaluate<string>("window.__reachResolver ?? 'unknown'");
+  check(wasmShipped ? resolverKind === "wasm" : true,
+    `reachability resolver in browser: ${resolverKind}${wasmShipped ? " (wasm shipped, must be wasm)" : " (no wasm shipped, TS ok)"}`);
+
   const selectable = await cdp.evaluate<string[]>(
     "[...document.querySelectorAll('circle.hit.selectable')].map(c => c.getAttribute('data-star-id'))");
   // Reachability model: from an empty map you can START any constellation still completable

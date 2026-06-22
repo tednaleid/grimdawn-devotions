@@ -1,6 +1,7 @@
 # Reachability sweep performance: findings and decision record
 
-Status: investigation complete, fix direction recommended but not yet chosen.
+Status: resolved. The fix (a memoized branch-and-bound compiled to WebAssembly) is
+implemented and validated; see "Resolution" below.
 Date: 2026-06-22.
 Scope: the per-click reachability sweep in `web/src/core/reachability.ts`.
 
@@ -16,21 +17,67 @@ section first: we tried it and measured it.
   (`reachableExactFrom`) is exponential, and the hard instances are infeasible
   by exactly one star (true minimum cost 56 against a budget of 55), so proving
   "dim" requires exhausting on the order of 10^8 search nodes.
-- "Provably sound AND fast" is not realistically achievable. The underlying
+- No cheap sound *bound* gives "fast and provably correct": the underlying
   decision is a precedence-constrained 0/1 minimum-cost cover, which is NP-hard
-  in flavor, and every cheap sound bound we built is too loose to prove the
-  borderline dims.
-- Ruled out with data: a resolver node cap, a reuse-allowed lattice lower
+  in flavor, and every cheap bound we built is too loose to prove the borderline
+  dims.
+- But the exact search itself can be made fast without trading correctness: a
+  memoized branch-and-bound (dominance pruning) cuts the worst search ~24x and
+  stays verdict-exact, and compiling it to WebAssembly buys ~18x more. That is
+  the implemented fix (see "Resolution"). No soundness was traded.
+- Ruled out with data first: a resolver node cap, a reuse-allowed lattice lower
   bound, a per-color 0/1 lower bound, a tighter in-DFS prune, a bounded beam
-  upper bound, a Rust/WASM rewrite, and the exact reformulations (min-cost flow,
-  matroid intersection, Lagrangian, ILP, cardinality bounding).
-- Recommended direction: leash the exact resolver (node or time cap) and return
-  a safe-side "uncertain, lean reachable" verdict when it trips, then verify the
-  residual misclassification rate on the harness. This is a verified-on-data
-  heuristic, stated plainly. It is the same shape the reference tool (gd-starnav)
-  uses.
-- Reproduce everything with `just perf` and the probes described in
+  upper bound, and the exact reformulations (min-cost flow, matroid intersection,
+  Lagrangian, ILP, cardinality bounding). A Rust/WASM rewrite was ruled out *for
+  the original exponential search* (a constant factor cannot fix an unbounded
+  search); it became the answer only once the memo made the search bounded.
+- Reproduce with `just perf` (harness) and the probes described in
   "Reproductions" below.
+
+## Resolution (implemented)
+
+The hot path keeps the cheap sound bracket (`lowerBoundFrom` proves dim,
+`greedyFrom` proves reachable). Only the gap is expensive, and it is now resolved
+by a memoized branch-and-bound compiled to WebAssembly, in two steps that compose:
+
+1. **Memoize the exact search (sound).** The exponential DFS re-explores
+   affinity-equivalent subsets millions of times. A dominance memo keyed on
+   `(filler index, capped build vector, capped maxReqPlaced)` storing the minimum
+   failing cost prunes the revisits. It is verdict-exact: 0 mismatches versus the
+   original `reachableExactFrom` on the hotspot gap candidates, and it cuts the
+   worst dim proof from ~94M nodes to ~2.7M states (about 24x).
+
+2. **Run it in WebAssembly (constant factor, sound).** The memoized search is
+   ported to Rust (`web/wasm/src/lib.rs`), built to raw wasm32 (no wasm-bindgen)
+   as `data/reach.wasm` (~40KB) and loaded by `web/src/adapters/reachWasm.ts`,
+   which marshals the cover table + constellations into linear memory once and
+   decides each gap candidate. The engine swaps it in via `setExactResolver`
+   (`web/src/core/reachability.ts`); absent the wasm it falls back to the pure TS
+   resolver, so the site always works. The native search adds roughly 18x more.
+
+This was only possible because step 1 made the search bounded (polynomial-ish):
+WASM is a constant-factor accelerator, useless on the original unbounded search
+but exactly right on a bounded one. That is the reframe the Rust/WASM rejection
+note (below) refers to.
+
+Measured outcome (worst 5-capstone state, and a 30-seed sweep):
+
+```
+worst single sweep:          ~11,000 ms (all TS)  ->  ~350 ms (memo + wasm)
+worst dim candidate (aeon):  4934 ms              ->  ~120 ms
+30-seed per-click latency:   median 2.1 ms   p95 27.9 ms   p99 148.9 ms   max 321.5 ms
+```
+
+Correctness was checked against the TS exact resolver on the hotspot states and
+against a fast memoized-TS oracle across 19,274 gap candidates over 12 seeded
+games: 0 mismatches. The accepted product bar is a ~350ms pause on the first hit
+of the hardest borderline-infeasible capstone; repeated hits could be made free
+with the monotone dim-cache (BACKLOG item 5), but the latency is already at the
+bar without it.
+
+Toolchain: `just install-rust` (rustup + wasm32 target), `just wasm` (builds
+`data/reach.wasm`), and `just build` copies it into `dist`. None of these are
+required to build or run the site, only to rebuild the fast resolver.
 
 ## The decision problem (precise)
 
@@ -301,7 +348,12 @@ them:
 Only the gap between them is uncertain. Every hard dim we currently display is
 provably correct; the cost is paid only to resolve the gap.
 
-## Recommended direction (not yet chosen)
+## Recommended direction (historical: the fallback we did not need)
+
+This was the recommendation before the memoized-B&B-in-WASM fix landed. It is
+kept for context: if the wasm path ever has to be dropped, this verified-on-data
+heuristic is the fallback. We did not need it, because the memo + wasm kept full
+soundness at interactive speed (see "Resolution").
 
 Given the evidence, an exact, sound, polynomial decision is not on the table for
 the interactive hot path. The pragmatic, defensible design:
