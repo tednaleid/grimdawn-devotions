@@ -141,8 +141,10 @@ try {
 
   const selectable = await cdp.evaluate<string[]>(
     "[...document.querySelectorAll('circle.hit.selectable')].map(c => c.getAttribute('data-star-id'))");
-  check(selectable.length === 5, `exactly 5 selectable stars from empty (got ${selectable.length})`);
-  check(selectable.every((id) => id.startsWith("crossroads_")), `all 5 selectable are Crossroads (${selectable.sort().join(", ")})`);
+  // Reachability model: from an empty map you can START any constellation still completable
+  // within budget (claim-anywhere), not just the Crossroads.
+  check(selectable.length > 50, `claim-anywhere: many stars selectable from empty (got ${selectable.length})`);
+  check(selectable.some((id) => !id.startsWith("crossroads_")), "non-Crossroads constellations are claimable from empty");
 
   // Click a Crossroads star via a bubbling synthetic click (the app delegates on the container).
   await cdp.evaluate(
@@ -155,15 +157,17 @@ try {
   }
   check(counted, 'point count reads "1 / 55" after selecting a Crossroads');
 
-  // Target the value span by class: the first span holds a nested .orb span, so
-  // span:last-child would match that empty orb rather than the affinity total.
+  // The two-column panel renders the current "have" total in .aff-have (the wanted-max
+  // "need" column only appears for colors a started constellation requires).
+  check(await cdp.evaluate<boolean>("document.querySelector('.affinity-head') !== null"),
+    "affinity panel renders the have/need header");
   check(await cdp.evaluate<string | null>(
-    "document.querySelector('.affinity-eldritch .val')?.textContent") === "1",
-    "eldritch affinity total becomes 1");
+    "document.querySelector('.affinity-eldritch .aff-have')?.textContent") === "1",
+    "eldritch 'have' total becomes 1");
 
   check(await cdp.evaluate<boolean>(
     `document.querySelector('circle[data-star-id="bat:0"]').classList.contains('selectable')`),
-    "bat:0 becomes selectable once its affinity requirement is met");
+    "bat:0 (an affinity-gated constellation) is claimable");
 
   check(await cdp.evaluate<boolean>(
     `document.querySelector('circle[data-star-id="crossroads_eldritch:0"]').classList.contains('selected')`),
