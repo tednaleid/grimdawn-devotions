@@ -24,4 +24,7 @@ web/dist/
 web/bun.lockb
 web/bun.lock
 
+# Precomputed cover table (build artifact, regenerated from data/devotions.json)
+/data/cover-table.bin
+
 # Optimized devotion art (committed for the GitHub Pages build; regenerate with `just assets`)

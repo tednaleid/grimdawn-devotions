@@ -155,6 +155,16 @@ assets *ARGS: _require-game-closed
 web-install:
     cd "{{justfile_directory()}}/web" && bun install
 
+# Generate the precomputed cover table from data/devotions.json (only if stale)
+cover-table:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ ! -f "{{justfile_directory()}}/data/cover-table.bin" ] || [ "{{justfile_directory()}}/data/devotions.json" -nt "{{justfile_directory()}}/data/cover-table.bin" ]; then
+        cd "{{justfile_directory()}}/web" && bun scripts/build-cover-table.ts
+    else
+        echo "cover-table.bin is up to date"
+    fi
+
 # Run the core test suite
 test:
     cd "{{justfile_directory()}}/web" && bun test
@@ -175,7 +185,7 @@ lint-fix:
 check: test lint typecheck
 
 # Build the static site into web/dist (bundles JS, copies html/css/data/assets)
-build:
+build: cover-table
     #!/usr/bin/env bash
     set -euo pipefail
     cd "{{justfile_directory()}}/web"
@@ -184,12 +194,14 @@ build:
     mkdir -p dist
     rm -rf dist/* dist/.[!.]* 2>/dev/null || true
     mkdir -p dist/data
-    bun build src/app/main.ts --outdir dist --target browser
+    BUILD_ID=$(bun -e 'import {computeBuildId} from "./src/adapters/coverTableBlob"; console.log(computeBuildId(await Bun.file("../data/devotions.json").text()))')
+    bun build src/app/main.ts --outdir dist --target browser --define __BUILD_ID__="\"$BUILD_ID\""
     cp index.html dist/index.html
     cp src/styles.css dist/styles.css
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
+    cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
-    echo "Built web/dist"
+    echo "Built web/dist (buildId $BUILD_ID)"
 
 # Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)
 serve: build
