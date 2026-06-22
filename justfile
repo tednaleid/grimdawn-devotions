@@ -169,6 +169,11 @@ cover-table:
 test:
     cd "{{justfile_directory()}}/web" && bun test
 
+# Seeded reachability perf harness: simulate play and report per-click latency.
+# Flags: --seeds N --start S --cap C --max-ms M --replay <seed>.  e.g. just perf --seeds 100
+perf *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/perf-reachability.ts {{ARGS}}
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
