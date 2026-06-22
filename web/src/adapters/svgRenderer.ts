@@ -1,10 +1,9 @@
 // ABOUTME: SVG renderer adapter for the devotion map - builds markup strings and mounts live DOM.
 // ABOUTME: renderSvgMarkup is a pure function; mountSvg wires it to a live HTMLElement with events.
 import type { Constellation, DevotionModel, SelectionState, StarId } from "../core/types";
-import { selectableStars } from "../core/rules";
-import { affinityFrom, completedConstellations, meetsRequirement } from "../core/affinity";
-import { fitViewBox, toViewBoxString } from "../core/viewbox";
+import type { ReachView } from "../core/reachability";
 import { affinityColor, presentAffinities } from "./affinityColors";
+import { fitViewBox, toViewBoxString } from "../core/viewbox";
 import type { AssetManifest } from "../ports/DataSource";
 
 // A constellation's identity colors = the affinities it GRANTS when fully filled (1-3).
@@ -47,7 +46,7 @@ const HIT_RADIUS = 22;
 // Padding around a constellation's star bounding box for its hover/click region.
 const CON_PAD = 24;
 
-export interface RenderOpts { manifest: AssetManifest | null; highlight?: Set<StarId> }
+export interface RenderOpts { manifest: AssetManifest | null; highlight?: Set<StarId>; reach?: ReachView }
 
 // A constellation's hover/click footprint in SVG world coords: its art bounds
 // (x0,y0)-(x1,y1) and the centroid of its stars, used to break ties where art
@@ -92,9 +91,22 @@ export function constellationAt(regions: ConRegion[], wx: number, wy: number): s
 }
 
 export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
-  const selectable = selectableStars(model, state);
+  const reach = opts.reach;
   const defs: string[] = [];
   const parts: string[] = [];
+
+  // Constellation art class based on reachability:
+  //   "" (no class suffix) - completable, or you already have a star in it
+  //   " unmet"             - can start (a clickable star exists) but cannot complete
+  //   " unreachable"       - cannot even start (no clickable star)
+  // When reach is absent, nothing dims (permissive default).
+  const conArtClass = (c: Constellation): string => {
+    if (!reach) return "";
+    if (c.starIds.some((id) => state.selected.has(id))) return "";
+    if (reach.completable.has(c.id)) return "";
+    if (c.starIds.some((id) => reach.clickable.has(id))) return " unmet";
+    return " unreachable";
+  };
 
   // Constellation hover/click is resolved in JS against each constellation's art
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
@@ -106,18 +118,15 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   }
 
   // Layer 1: optional art, tinted by the constellation's identity (granted) colors.
-  // Art of constellations you cannot yet start (requirement unmet) is faded further.
   // The tint rect is only drawn for constellations that have an affinity requirement
   // (it carries a mask built from the art); crossroads have no requirement and no tint.
   if (opts.manifest) {
-    const totals = affinityFrom(model, completedConstellations(model, state.selected));
     for (const c of model.constellations.values()) {
       const name = c.background?.image?.split("/").pop() ?? "";
       const art = opts.manifest.images[name];
       if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
       const { x, y } = c.background;
-      const reachable = meetsRequirement(totals, c.affinityRequired) || c.starIds.some((id) => state.selected.has(id));
-      const dim = reachable ? "" : " unmet";
+      const dim = conArtClass(c);
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
       // data-con-id lets a blocked constellation deselect flash this icon (see main.ts).
       parts.push(`<image ${img} class="art${dim}" data-con-id="${c.id}"/>`);
@@ -147,7 +156,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const solid = gradColors(con)[0] ?? "#9aa3b2"; // solid color for the glow shadow
     let st = "locked";
     if (state.selected.has(star.id)) st = "selected";
-    else if (selectable.has(star.id)) st = "selectable";
+    else if (!reach || reach.clickable.has(star.id)) st = "selectable";
     const cx = star.position.x + STAR_CENTER;
     const cy = star.position.y + STAR_CENTER;
     const style = `--affinity:${solid};--grad:url(#grad-${con.id})`;
@@ -165,7 +174,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   return `<svg id="map" viewBox="${vb}" preserveAspectRatio="xMidYMid meet"><defs>${defs.join("")}</defs>${parts.join("")}</svg>`;
 }
 
-export interface SvgHandle { update(state: SelectionState, highlight?: Set<StarId>): void; svg: SVGSVGElement }
+export interface SvgHandle { update(state: SelectionState, highlight?: Set<StarId>, reach?: ReachView): void; svg: SVGSVGElement }
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
   manifest: AssetManifest | null;
@@ -176,8 +185,8 @@ export interface SvgDeps {
 
 export function mountSvg(container: HTMLElement, model: DevotionModel, deps: SvgDeps): SvgHandle {
   const regions = buildConRegions(model, deps.manifest);
-  function render(state: SelectionState, highlight?: Set<StarId>) {
-    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest, highlight });
+  function render(state: SelectionState, highlight?: Set<StarId>, reach?: ReachView) {
+    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest, highlight, reach });
   }
   render({ selected: new Set(), pointCap: 55 });
   const svg = container.querySelector("svg") as SVGSVGElement;
@@ -211,10 +220,10 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 
   return {
     svg,
-    update(state, highlight) {
+    update(state, highlight, reach) {
       const live = container.querySelector("svg") as SVGSVGElement | null;
       const vb = live?.getAttribute("viewBox");
-      render(state, highlight);
+      render(state, highlight, reach);
       const next = container.querySelector("svg") as SVGSVGElement | null;
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },

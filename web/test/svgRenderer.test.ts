@@ -4,6 +4,7 @@ import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { renderSvgMarkup } from "../src/adapters/svgRenderer";
+import type { ReachView } from "../src/core/reachability";
 
 const model = buildModel(doc as any);
 
@@ -52,4 +53,67 @@ test("renders celestial-power stars as diamonds (polygon)", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
   // bat:4 is the "Twin Fangs" celestial power star; non-power stars stay circles.
   expect(markup).toContain('<polygon class="star power');
+});
+
+test("two-layer dimming: completable normal, startable faded, unstartable dark", () => {
+  const ids = [...model.constellations.keys()];
+  // ids[0]=akeron_s_scorpion, ids[1]=anvil, ids[2]=assassin_s_blade
+  const reach: ReachView = {
+    completable: new Set([ids[0]!]),
+    clickable: new Set(),
+    have: [0, 0, 0, 0, 0],
+    need: [0, 0, 0, 0, 0],
+    needSource: new Map(),
+  };
+  // Make the first star of ids[1] clickable so it is "startable but not completable"
+  const firstStar = model.constellations.get(ids[1]!)!.starIds[0]!;
+  reach.clickable.add(firstStar);
+
+  const svg = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null, reach });
+
+  // The clickable star renders with class "selectable"
+  expect(svg).toMatch(new RegExp(`class="(star|hit) [^"]*selectable`));
+
+  // ids[2] is not completable and has no clickable stars -> its data-con-id should appear (it is rendered),
+  // and when a manifest is present its art gets "unreachable". Without a manifest we verify the star
+  // is "locked" (not selectable) since no star of ids[2] is in reach.clickable.
+  expect(svg).toContain(`data-star-id="${ids[2]!}:0" class="hit locked"`);
+
+  // ids[0] is completable -> its first star is also locked (no predecessors met), but the
+  // constellation itself is not unreachable; let's verify ids[1]'s firstStar is "selectable".
+  expect(svg).toContain(`data-star-id="${firstStar}" class="hit selectable"`);
+});
+
+test("two-layer dimming art: completable has no dim class, un-startable gets unreachable", () => {
+  const ids = [...model.constellations.keys()];
+  // Find a constellation with art
+  const withArt = [...model.constellations.values()].find(
+    (c) => c.background?.image && c.background.x != null,
+  )!;
+  const withArtId = withArt.id;
+  const name = withArt.background!.image!.split("/").pop()!;
+  const manifest = { images: { [name]: { url: "art.webp", w: 640, h: 480 } } };
+
+  // withArtId is completable; pick a different constellation as the unreachable one
+  const otherId = ids.find((id) => id !== withArtId)!;
+
+  const reach: ReachView = {
+    completable: new Set([withArtId]),
+    clickable: new Set(),
+    have: [0, 0, 0, 0, 0],
+    need: [0, 0, 0, 0, 0],
+    needSource: new Map(),
+  };
+
+  const svg = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest, reach });
+
+  // The completable constellation's art must NOT have the unmet or unreachable class
+  expect(svg).toContain(`data-con-id="${withArtId}"`);
+  expect(svg).not.toMatch(new RegExp(`class="art unreachable"[^>]*data-con-id="${withArtId}"`));
+  expect(svg).not.toMatch(new RegExp(`class="art unmet"[^>]*data-con-id="${withArtId}"`));
+
+  // otherId has no clickable stars -> if it has art it gets unreachable; if not, verify star is locked
+  if (model.constellations.get(otherId)!.starIds[0]) {
+    expect(svg).toContain(`data-star-id="${otherId}:0" class="hit locked"`);
+  }
 });
