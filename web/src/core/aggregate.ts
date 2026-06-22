@@ -63,6 +63,24 @@ export function starsGranting(model: DevotionModel, ids: Set<string>): Set<StarI
   return out;
 }
 
+// Like starsGranting, but over pet bonuses: the stars whose petBonuses include any of the
+// given raw pet stat ids. Used to highlight where a tagged pet benefit can be picked up.
+export function starsGrantingPet(model: DevotionModel, ids: Set<string>): Set<StarId> {
+  const out = new Set<StarId>();
+  if (ids.size === 0) return out;
+  for (const star of model.stars.values()) {
+    const pet = star.petBonuses;
+    if (!pet) continue;
+    for (const k of Object.keys(pet)) {
+      if (ids.has(k)) {
+        out.add(star.id);
+        break;
+      }
+    }
+  }
+  return out;
+}
+
 // The stat ids still obtainable from the current selection: every bonus carried by a
 // not-yet-selected star inside a constellation that remains completable. Drives the
 // "Available to get" panel so it lists only benefits the build can still fold in, and

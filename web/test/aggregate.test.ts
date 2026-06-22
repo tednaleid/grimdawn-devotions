@@ -3,7 +3,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { sumBonuses, sumPetBonuses, powersGained, starsGranting, availableBonusIds } from "../src/core/aggregate";
+import { sumBonuses, sumPetBonuses, powersGained, starsGranting, starsGrantingPet, availableBonusIds } from "../src/core/aggregate";
 
 const model = buildModel(doc as any);
 
@@ -80,4 +80,15 @@ test("collects celestial powers with their star ids", () => {
   expect(powers.map((p) => p.power.name)).toContain("Twin Fangs");
   expect(powers[0]!.power.description).toBeTruthy();
   expect(powers[0]!.starId).toBe("bat:4");
+});
+
+test("starsGrantingPet returns exactly the stars whose petBonuses include an id", () => {
+  const petStar = [...model.stars.values()].find((s) => s.petBonuses && Object.keys(s.petBonuses).length > 0)!;
+  const id = Object.keys(petStar.petBonuses!)[0]!;
+  let n = 0;
+  for (const s of model.stars.values()) if (s.petBonuses && id in s.petBonuses) n++;
+  const got = starsGrantingPet(model, new Set([id]));
+  expect(got.size).toBe(n);
+  for (const sid of got) expect(id in model.stars.get(sid)!.petBonuses!).toBe(true);
+  expect(starsGrantingPet(model, new Set()).size).toBe(0);
 });
