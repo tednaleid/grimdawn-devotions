@@ -2,7 +2,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { canonicalStarIds, canonicalStatIds, encodeHash, decodeHash } from "../src/core/urlState";
+import { canonicalStarIds, canonicalStatIds, canonicalPetStatIds, canonicalBenefitIds, encodeHash, decodeHash } from "../src/core/urlState";
 
 const model = buildModel(doc as any);
 const canonical = canonicalStarIds(model);
@@ -62,4 +62,29 @@ test("encodes an uncapped (Infinity) cap as the p=0 sentinel and round-trips it"
   const hash = encodeHash(new Set(), Infinity, canonical);
   expect(hash).toBe("p=0&s=");
   expect(decodeHash(`#${hash}`, canonical)!.pointCap).toBe(Infinity);
+});
+
+test("canonicalBenefitIds keeps the player block first, then pet: ids", () => {
+  const player = canonicalStatIds(model);
+  const all = canonicalBenefitIds(model);
+  expect(all.slice(0, player.length)).toEqual(player);
+  expect(all.length).toBeGreaterThan(player.length);
+  expect(all.slice(player.length).every((k) => k.startsWith("pet:"))).toBe(true);
+});
+
+test("an old player-only b= payload still decodes under the extended canonical", () => {
+  const benefits = new Set([statCanonical[0]!, statCanonical[3]!]);
+  const oldHash = encodeHash(new Set([canonical[0]!]), 30, canonical, benefits, statCanonical);
+  const benefitCanonical = canonicalBenefitIds(model);
+  const decoded = decodeHash(`#${oldHash}`, canonical, benefitCanonical)!;
+  expect([...decoded.benefits].sort()).toEqual([...benefits].sort());
+});
+
+test("mixed player and pet tags round-trip via b=", () => {
+  const benefitCanonical = canonicalBenefitIds(model);
+  const petKey = benefitCanonical.find((k) => k.startsWith("pet:"))!;
+  const benefits = new Set([statCanonical[0]!, petKey]);
+  const hash = encodeHash(new Set([canonical[0]!]), 30, canonical, benefits, benefitCanonical);
+  const decoded = decodeHash(`#${hash}`, canonical, benefitCanonical)!;
+  expect([...decoded.benefits].sort()).toEqual([...benefits].sort());
 });

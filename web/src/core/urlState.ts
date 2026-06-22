@@ -19,6 +19,22 @@ export function canonicalStatIds(model: DevotionModel): string[] {
   return [...set].sort();
 }
 
+/** Stable ordering of every raw pet bonus stat id that appears anywhere in the model. */
+export function canonicalPetStatIds(model: DevotionModel): string[] {
+  const set = new Set<string>();
+  for (const s of model.stars.values()) if (s.petBonuses) for (const k of Object.keys(s.petBonuses)) set.add(k);
+  return [...set].sort();
+}
+
+/**
+ * The benefit-tag ordering for the URL bitset: the player stat ids (unchanged positions) followed
+ * by the pet stat ids, each prefixed `pet:`. Because the player block is unchanged, an old
+ * player-only `b=` payload decodes identically; pet tags extend the bitset only when present.
+ */
+export function canonicalBenefitIds(model: DevotionModel): string[] {
+  return [...canonicalStatIds(model), ...canonicalPetStatIds(model).map((id) => `pet:${id}`)];
+}
+
 function bytesToBase64Url(bytes: Uint8Array): string {
   let bin = "";
   for (const b of bytes) bin += String.fromCharCode(b);
