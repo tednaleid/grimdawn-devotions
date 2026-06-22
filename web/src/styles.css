@@ -103,7 +103,7 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .art-tint.unreachable { opacity: 0; }
 /* A fully-selected (active) constellation: full-opacity, brighter art with a warm glow so active
    constellations stand out when zoomed out (a calmer, steady version of the old blocked flash). */
-.art.active { opacity: 1; filter: brightness(1.25) drop-shadow(0 0 5px rgba(255, 244, 214, .8)); }
+.art.active { opacity: 1; filter: brightness(1.2) drop-shadow(0 0 4px rgba(255, 244, 214, .8)); }
 .art-tint.active { opacity: calc(var(--art-tint-opacity) * 1.35); }
 .hit { fill: transparent; pointer-events: all; }
 .hit.selectable, .hit.selected { cursor: pointer; }
