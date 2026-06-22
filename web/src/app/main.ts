@@ -131,8 +131,9 @@ async function boot() {
   benefitsEl.addEventListener("mouseleave", () => tip.hide());
 
   // Benefit selection: click a value to toggle just it; click a subject to toggle
-  // all of its values (so the group reads as selected only when every value is).
-  benefitsEl.addEventListener("click", (e) => {
+  // all of its values (so the group reads as selected only when every value is). Attached to both
+  // sidebars: the "have" benefits live in the left panel, "available to get" in the right one.
+  function onBenefitClick(e: Event) {
     const valEl = (e.target as Element)?.closest?.("[data-vid]");
     if (valEl) {
       const id = valEl.getAttribute("data-vid")!;
@@ -146,7 +147,9 @@ async function boot() {
       for (const id of ids) allSel ? selectedBenefits.delete(id) : selectedBenefits.add(id);
     }
     refresh(); // re-render benefits, re-highlight the map, and persist tags to the URL
-  });
+  }
+  benefitsEl.addEventListener("click", onBenefitClick);
+  affinityEl.addEventListener("click", onBenefitClick);
 
   const nav = attachNav(() => mapContainer.querySelector("svg"), {
     fitPoints: [...model.stars.values()].map((s) => s.position),
@@ -192,12 +195,14 @@ async function boot() {
   let prevBonuses: Record<string, number> | undefined;
   let prevPet: Record<string, number> | undefined;
   let prevAffinity: Record<Affinity, number> | undefined;
+  let availHtml = ""; // "available to get" catalog HTML; rendered under the Affinity panel on the right
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
   function renderBenefitsPanel() {
     const r = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits, benefitCatalog, prevPet);
     prevBonuses = r.bonuses;
     prevPet = r.petBonuses;
+    availHtml = r.availHtml;
   }
   function refresh() {
     completionCache.clear();
@@ -206,6 +211,8 @@ async function boot() {
     slider.min = String(Math.max(1, state.selected.size)); // cannot drag below allocated points
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
+    // "Available to get" goes under the Affinity panel, separated from the affinity rows.
+    if (availHtml) affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
     const uncapped = !Number.isFinite(state.pointCap);
     usedEl.textContent = String(state.selected.size);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);

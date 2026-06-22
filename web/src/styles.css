@@ -33,7 +33,7 @@ header button:active { background: #1a1e24; }
 #point-slider::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: #6cb6ff; border: 2px solid #161b22; cursor: pointer; }
 #point-slider:hover::-webkit-slider-thumb { background: #84c5ff; }
 #point-slider:hover::-moz-range-thumb { background: #84c5ff; }
-main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-height: 0; }
+main { flex: 1; display: grid; grid-template-columns: 280px 1fr 250px; min-height: 0; }
 .sidebar { overflow-y: auto; padding: .75rem; background: #11161d; border-inline: 1px solid #30363d; font-size: .85rem; }
 .sidebar h2 { font-size: 1rem; margin: .25rem 0 .5rem; }
 .sidebar h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: #9aa4b2; margin: .7rem 0 .3rem; border-bottom: 1px solid #30363d; padding-bottom: .2rem; }
@@ -81,6 +81,8 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .aff-need-h { min-width: 1.6em; text-align: right; }
 .affinity.up .aff-have { animation: flash-up 10s linear; }
 .affinity.down .aff-have { animation: flash-down 10s linear; }
+/* Full-width divider between the Affinity panel and the "Available to get" list below it. */
+.panel-sep { border: 0; border-top: 1px solid #30363d; margin: 1.3rem -.75rem .7rem; }
 .power, .tip-power { color: #f0c14b; }
 .power[data-star-id] { cursor: help; }
 .tip-power-desc { color: #c9b88a; font-size: .92em; margin: .1rem 0 .25rem; }

@@ -177,6 +177,11 @@ try {
     "document.querySelectorAll('.affinity').length === 5 && document.querySelectorAll('.affinity .aff-have').length === 5 && document.querySelectorAll('.affinity .aff-need').length === 5"),
     "every affinity row has both a have and a need cell (columns stay aligned)");
 
+  // "Available to get" now lives under the Affinity panel (right), separated, not in Benefits (left).
+  check(await cdp.evaluate<boolean>(
+    "(document.getElementById('affinity')?.textContent||'').includes('Available to get') && !!document.querySelector('#affinity .avail-list') && !!document.querySelector('#affinity .panel-sep') && !(document.getElementById('benefits')?.textContent||'').includes('Available to get')"),
+    "'Available to get' is under the Affinity panel (right), separated, not in Benefits (left)");
+
   check(await cdp.evaluate<boolean>(
     `document.querySelector('circle[data-star-id="bat:0"]').classList.contains('selectable')`),
     "bat:0 (an affinity-gated constellation) is claimable");

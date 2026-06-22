@@ -21,11 +21,11 @@ function partText(p: CondensedPart): string {
   return p.value;
 }
 
-// Renders the Benefits panel. Active subjects (the current selection grants them)
-// show condensed values at the top; the rest of the catalog shows as name-only tags
-// below, so any benefit can be selected to highlight where it can be picked up.
-// `catalog` is condensedRows over every stat id in the model (subject -> its ids).
-// Returns the summed bonuses so the caller can pass them back as `prev` to flash changes.
+// Renders the Benefits panel: the subjects the current selection grants, with condensed values.
+// The rest of the catalog (benefits you could still pick up) is returned as `availHtml` rather than
+// rendered here, so the caller can place it under the Affinity panel on the right, kept distinct
+// from the benefits the build actually grants. `catalog` is condensedRows over every stat id in the
+// model (subject -> its ids). Returns the summed bonuses so the caller can flash changes via `prev`.
 export function renderBenefits(
   el: HTMLElement,
   model: DevotionModel,
@@ -34,7 +34,7 @@ export function renderBenefits(
   selectedBenefits: Set<string> = new Set(),
   catalog: CondensedGroup[] = [],
   prevPet?: Record<string, number>,
-): { bonuses: Record<string, number>; petBonuses: Record<string, number> } {
+): { bonuses: Record<string, number>; petBonuses: Record<string, number>; availHtml: string } {
   const bonuses = sumBonuses(model, selected);
   const petBonuses = sumPetBonuses(model, selected);
   const powers = powersGained(model, selected);
@@ -101,9 +101,10 @@ export function renderBenefits(
   el.innerHTML =
     `<h2>Benefits</h2>${activeHtml || '<div class="bempty">Select stars to gain benefits.</div>'}` +
     (petHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petHtml}` : "") +
-    (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "") +
-    (availHtml ? `<h2 class="avail-head">Available to get</h2>${availHtml}` : "");
-  return { bonuses, petBonuses };
+    (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "");
+  // availHtml (the "available to get" catalog) is returned, not rendered here - the caller places
+  // it under the Affinity panel on the right.
+  return { bonuses, petBonuses, availHtml };
 }
 
 // Renders the Affinity panel as two columns: the current total ("have") and, when a
