@@ -162,7 +162,7 @@ Expected: FAIL (new signatures / `removeWithDependents` not present).
 // ABOUTME: Reachability-driven selection rules: add only ReachView-approved targets, remove freely.
 // ABOUTME: No engine calls here; the controller passes a precomputed ReachView. recapValue is unchanged.
 import type { DevotionModel, SelectionState, StarId } from "./types";
-import { classifyForSelection, type CoverTable, type ReachCon, type ReachView } from "./reachability";
+import { classifyForSelection, selectionSummary, type CoverTable, type ReachCon, type ReachView } from "./reachability";
 
 // (recapValue unchanged - keep the existing implementation verbatim.)
 export function recapValue(selectedSize: number, lastFiniteCap: number, maxCap = 55): number | null {
@@ -221,7 +221,7 @@ function predecessorClosure(model: DevotionModel, selected: Set<StarId>): Set<St
 export function repairSelection(model: DevotionModel, cons: ReachCon[], table: CoverTable | null, selected: Set<StarId>, cap: number): Set<StarId> {
   let cur = predecessorClosure(model, selected);
   if (!table) return cur;
-  while (cur.size > 0 && classifyForSelection(model, cons, table, cur, cap) === "dim") {
+  while (cur.size > 0 && classifyForSelection(cons, table, selectionSummary(model, cur), cap) === "dim") {
     const started = new Map<string, number>();
     for (const id of cur) { const cid = model.stars.get(id)?.constellationId; if (cid) started.set(cid, (started.get(cid) ?? 0) + 1); }
     let drop = "", best = -1;
