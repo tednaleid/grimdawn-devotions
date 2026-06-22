@@ -140,9 +140,16 @@ The P0/P1 sections below trace a wrong turn: they treat strict acquisition
 intractable. The fix (Ted's insight) is that a 1-star Crossroads bootstrap is
 effectively free: it has no requirement, grants 1 affinity, and can be deleted
 once the constellation it seeded is self-sustaining (its own grant meets its own
-requirement). So orderability is not a real cost, and a build is simply valid
-when its total affinity covers every member's requirement - exactly the rule the
-app's `validClosure` already uses.
+requirement). So Crossroads make ordering cheap: any build can bootstrap one
+affinity of each color for free, which collapses the search. But ordering is not
+free. A build must still be *constructible*: there must be an acquisition order,
+seeded by the refundable Crossroads, in which every constellation's requirement is
+met by the time it is taken. The engine verifies both that total affinity covers
+every member's requirement (`covers`) and that such an order exists
+(`constructible`). A covering set can still be unbuildable when constellations
+mutually require each other's affinity above the 1-per-color Crossroads seed, so
+the `constructible` check is load-bearing, not redundant (confirmed: it changes
+the verdict on ~2% of random synthetic models).
 
 Under that rule `minCost(claimed)` is bracketed by two fast computations
 (`web/src/core/reachability.ts`):

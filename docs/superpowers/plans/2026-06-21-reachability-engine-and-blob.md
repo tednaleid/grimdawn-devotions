@@ -138,6 +138,24 @@ git commit -m "feat(core): selectionSummary derives reach state from a raw star 
 
 ## Task 2: The shared `*From(state)` bracket, with partial-finish soundness
 
+> **CORRECTION (2026-06-21, post-review):** The code below is UNSOUND as written and
+> must not be transcribed verbatim. A review caught that it drops the
+> `constructible` check the proven engine relies on, going "order-free" where the
+> real model is constructibility-aware (a build must be orderable from the
+> Crossroads seed, not merely cover its requirements). The corrected design:
+> (1) `ReachState` gains `built: ReachCon[]` (completed as `{size: full, req, grant}`,
+> partials as `{size: selectedCount, req, grant: [0,0,0,0,0]}`); (2) `greedyFrom`
+> auto-places `built` in seed-unlock order exactly as the committed `greedyMinCost`
+> auto-places claimed; (3) `reachableExactFrom` restores
+> `covers(...) && constructible([...st.built, ...chosen])` at its base case;
+> (4) `lowerBoundFrom` guards the INF sentinel (`cov >= INF` before adding `own`);
+> (5) the prune stays admissible (skip the cover-table prune when `partialFinish`
+> is non-empty); (6) the new `bruteSelection` oracle MUST check `covers` AND
+> `constructible` (partials as grant-0), matching the existing `isValidBuild`.
+> With `built` carried, `coverLowerBound`/`greedyMinCost`/`reachableExact` still
+> delegate cleanly. This section will be rewritten to match once the implementation
+> is green.
+
 **Files:**
 - Modify: `web/src/core/reachability.ts`
 - Test: `web/test/reachability.test.ts`
