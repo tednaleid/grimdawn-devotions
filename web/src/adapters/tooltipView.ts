@@ -98,7 +98,7 @@ export function tooltipView(el: HTMLElement) {
       el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}`;
       place(clientX, clientY);
     },
-    showConstellation(model: DevotionModel, conId: string, clientX: number, clientY: number, totals?: AffinityTotals) {
+    showConstellation(model: DevotionModel, conId: string, clientX: number, clientY: number, totals?: AffinityTotals, dim?: { needs: number; cap: number }) {
       const con = model.constellations.get(conId);
       if (!con) return;
       const stars = new Set(con.starIds);
@@ -106,7 +106,8 @@ export function tooltipView(el: HTMLElement) {
         .map((p) => `<div class="tip-power">${p.power.name}</div>`)
         .join("");
       const head = `<strong>${con.name}</strong> <span class="tip-cost">${con.starIds.length} pts</span>`;
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}`;
+      const dimLine = dim ? `<div class="tip-dim">Needs ${dim.needs} of your ${dim.cap} points</div>` : "";
+      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}`;
       place(clientX, clientY);
     },
     hide() {
