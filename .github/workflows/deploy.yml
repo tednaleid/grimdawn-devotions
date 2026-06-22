@@ -18,11 +18,16 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: oven-sh/setup-bun@v2
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
       - name: Build static site
         working-directory: web
         run: |
           bun install
           bun scripts/build-cover-table.ts
+          # Reachability WASM core (the fast resolver); the page falls back to the TS resolver if absent.
+          cargo build --release --target wasm32-unknown-unknown --manifest-path wasm/Cargo.toml
           BUILD_ID=$(bun -e 'import {computeBuildId} from "./src/adapters/coverTableBlob"; console.log(computeBuildId(await Bun.file("../data/devotions.json").text()))')
           bun build src/app/main.ts --outdir dist --target browser --define __BUILD_ID__="\"$BUILD_ID\""
           cp index.html dist/index.html
@@ -30,6 +35,7 @@ jobs:
           mkdir -p dist/data
           cp ../data/devotions.json dist/data/
           cp ../data/cover-table.bin dist/data/
+          cp wasm/target/wasm32-unknown-unknown/release/reach.wasm dist/data/reach.wasm
           # Art only appears if a committed assets/ exists (see decision gate).
           if [ -d ../assets ]; then cp -r ../assets dist/assets; fi
       - uses: actions/upload-pages-artifact@v5
