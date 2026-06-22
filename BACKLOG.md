@@ -13,11 +13,14 @@ flash" idea was superseded by claim-anywhere reachability and is dropped.)
 ### 1. Make "Bonus to All Pets" benefits taggable / highlightable
 The Benefits sidebar's "Bonus to All Pets" section (and the pet rows in tooltips)
 are read-only. Unlike player benefits, you cannot click a pet benefit to highlight
-the stars that grant it on the map. The blocker: pet stat ids are the SAME ids as
-player bonuses (e.g. `defensiveElementalResistance` is both a player bonus and a
-pet bonus), so the existing tag/highlight system - which keys on the raw stat id
-via `data-vid` and `starsGranting(model, ids)` over `star.bonuses` - would conflate
-the two sources and highlight the wrong stars.
+the stars that grant it on the map, nor does the right-hand "Available to get"
+list pet bonuses. For example, Korvaak, the Eldritch Sun grants several "Bonus to
+All Pets" stats: they show in the left panel when it is selected, but cannot be
+filtered for. The blocker: pet stat ids are the SAME ids as player bonuses (e.g.
+`defensiveElementalResistance` is both a player bonus and a pet bonus), so the
+existing tag/highlight system - which keys on the raw stat id via `data-vid` and
+`starsGranting(model, ids)` over `star.bonuses` - would conflate the two sources
+and highlight the wrong stars.
 
 To lift it, add a parallel pet-keyed path:
 - `starsGrantingPet(model, ids)` in `web/src/core/aggregate.ts` scanning
