@@ -5,7 +5,8 @@ import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
-import { toggleStar, toggleConstellation, validClosure, removalBlockers, recapValue } from "../core/rules";
+import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
+import { buildReachCons, reachabilityForSelection, completionMinCost, selectionSummary, type ReachView, type ReachCon } from "../core/reachability";
 import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
 import { starsGranting } from "../core/aggregate";
@@ -15,13 +16,15 @@ import type { Affinity, SelectionState } from "../core/types";
 async function boot() {
   const data = await httpDataSource(".").load();
   const model = data.model;
+  const cons: ReachCon[] = buildReachCons(model);
+  const table = data.coverTable;                                 // null -> dimming disabled (degraded)
 
   // Restore state from the URL hash if present (validated so a stale link can't be invalid).
   const canonical = canonicalStarIds(model);
   const statCanonical = canonicalStatIds(model);
   const restored = decodeHash(location.hash, canonical, statCanonical);
   let state: SelectionState = restored
-    ? { selected: validClosure(model, restored.selected), pointCap: restored.pointCap }
+    ? { selected: repairSelection(model, cons, table, restored.selected, restored.pointCap), pointCap: restored.pointCap }
     : { selected: new Set(), pointCap: 55 };
   // The cap can never be below the points actually allocated; raise it if a restored
   // link is over budget (the slider also enforces this floor below).
@@ -59,48 +62,51 @@ async function boot() {
     el.addEventListener("animationend", () => el.classList.remove("flash-blocked"), { once: true });
   }
 
-  // A rejected deselection leaves state unchanged; flash the stars that must be
-  // removed first (predecessor or affinity dependents) so the block is visible.
-  // For a whole-constellation deselect we are likely zoomed out, so also flash
-  // the blocking constellations' art icons, which read at that distance.
-  function flashBlockers(ids: Set<string>, includeArt: boolean) {
-    const svg = mapContainer.querySelector("svg");
-    if (!svg) return;
-    const conIds = new Set<string>();
-    for (const id of ids) {
-      flashEl(svg.querySelector(`[data-star-id="${id}"]`)?.nextElementSibling);
-      const con = model.stars.get(id)?.constellationId;
-      if (con) conIds.add(con);
+  // The current ReachView, recomputed each refresh. When the table is present and the
+  // cap is finite the engine drives dimming; otherwise (uncapped or no table) a permissive
+  // view is built so nothing dims, while have/need still come from the selection summary.
+  let reach: ReachView;
+  function computeReach(): ReachView {
+    const s = selectionSummary(model, state.selected);
+    const needSource = new Map<number, string[]>();
+    for (let i = 0; i < 5; i++) {
+      if (s.target[i] === 0) continue;
+      const src: string[] = [];
+      for (const cid of s.startedIds) {
+        const c = model.constellations.get(cid)!;
+        const r = [c.affinityRequired.ascendant ?? 0, c.affinityRequired.chaos ?? 0, c.affinityRequired.eldritch ?? 0, c.affinityRequired.order ?? 0, c.affinityRequired.primordial ?? 0];
+        if (r[i] === s.target[i]) src.push(cid);
+      }
+      needSource.set(i, src);
     }
-    if (includeArt) for (const cid of conIds) flashEl(svg.querySelector(`image.art[data-con-id="${cid}"]`));
+    if (table && Number.isFinite(state.pointCap)) return reachabilityForSelection(model, cons, table, state.selected, state.pointCap);
+    const completable = new Set<string>([...model.constellations.keys()]);
+    const clickable = new Set<string>();
+    for (const st of model.stars.values()) if (!state.selected.has(st.id) && st.predecessors.every((p) => state.selected.has(p))) clickable.add(st.id);
+    return { completable, clickable, have: s.supply, need: s.target, needSource };
+  }
+
+  // The minimum points to complete a faded constellation, cached per refresh. Returns
+  // undefined when the constellation is already completable (no "needs" line) or when
+  // dimming is off, so the tooltip only shows the line for genuinely un-completable ones.
+  const completionCache = new Map<string, number>();           // cleared each refresh
+  function completionInfo(conId: string): { needs: number; cap: number } | undefined {
+    if (!table || !Number.isFinite(state.pointCap)) return undefined;
+    if (reach.completable.has(conId)) return undefined;        // completable -> no "needs" line
+    if (!completionCache.has(conId)) completionCache.set(conId, completionMinCost(model, cons, table, state.selected, conId, state.pointCap));
+    const needs = completionCache.get(conId)!;
+    return Number.isFinite(needs) ? { needs, cap: state.pointCap } : undefined;
   }
 
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
-    onStarClick: (id) => {
-      const next = toggleStar(model, state, id);
-      if (next === state) { // rejected: only flash if it was a removal attempt
-        if (state.selected.has(id)) flashBlockers(removalBlockers(model, state, new Set([id])), false);
-        return;
-      }
-      state = next; refresh();
-    },
-    onConstellationClick: (id) => {
-      const next = toggleConstellation(model, state, id);
-      if (next === state) { // rejected: flash blockers only when it was a full-constellation removal
-        const con = model.constellations.get(id);
-        if (con && con.starIds.length > 0 && con.starIds.every((s) => state.selected.has(s))) {
-          flashBlockers(removalBlockers(model, state, new Set(con.starIds)), true);
-        }
-        return;
-      }
-      state = next; refresh();
-    },
+    onStarClick: (id) => { const next = toggleStar(model, state, reach, id); if (next !== state) { state = next; refresh(); } },
+    onConstellationClick: (id) => { const next = toggleConstellation(model, state, reach, id); if (next !== state) { state = next; refresh(); } },
     onHover: (t, x, y) => {
       if (!t) { tip.hide(); return; }
       const totals = affinityTotals(model, state.selected);
       if (t.kind === "star") tip.show(model, t.id, x, y, totals);
-      else tip.showConstellation(model, t.id, x, y, totals);
+      else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id));
     },
   });
 
@@ -183,10 +189,12 @@ async function boot() {
     prevPet = r.petBonuses;
   }
   function refresh() {
-    handle.update(state, starsGranting(model, selectedBenefits));
+    completionCache.clear();
+    reach = computeReach();
+    handle.update(state, starsGranting(model, selectedBenefits), reach);
     slider.min = String(Math.max(1, state.selected.size)); // cannot drag below allocated points
     renderBenefitsPanel();
-    prevAffinity = renderAffinities(affinityEl, model, state.selected, prevAffinity);
+    prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
     const uncapped = !Number.isFinite(state.pointCap);
     usedEl.textContent = String(state.selected.size);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
