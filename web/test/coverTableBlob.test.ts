@@ -5,6 +5,7 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { buildReachCons, buildCoverTable } from "../src/core/reachability";
 import { encodeCoverBlob, decodeCoverBlob, computeBuildId } from "../src/adapters/coverTableBlob";
+import { coverTableFromBytesOrNull } from "../src/adapters/httpDataSource";
 
 const cons = buildReachCons(buildModel(doc as any));
 const table = buildCoverTable(cons);
@@ -30,4 +31,14 @@ test("computeBuildId is stable and 16 hex chars", () => {
   expect(a).toMatch(/^[0-9a-f]{16}$/);
   expect(computeBuildId('{"x":1}')).toBe(a);
   expect(computeBuildId('{"x":2}')).not.toBe(a);
+});
+
+test("loader returns null (degrade) on a corrupt blob instead of throwing", () => {
+  expect(coverTableFromBytesOrNull(new Uint8Array([1, 2, 3]), cons)).toBeNull();
+});
+
+test("loader returns a CoverTable for a valid blob", () => {
+  const bytes = encodeCoverBlob(table, "abcdef0123456789");
+  const t = coverTableFromBytesOrNull(bytes, cons);
+  expect(t?.cost.length).toBe(table.cost.length);
 });

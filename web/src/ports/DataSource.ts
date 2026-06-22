@@ -1,6 +1,7 @@
 // ABOUTME: Port interfaces for data loading in the devotion planner.
 // ABOUTME: Defines AssetManifest, LoadedData, and the DataSource contract for adapters.
 import type { DevotionModel } from "../core/types";
+import type { CoverTable } from "../core/reachability";
 
 export interface AssetImage {
   url: string;
@@ -18,6 +19,7 @@ export interface AssetManifest {
 export interface LoadedData {
   model: DevotionModel;
   manifest: AssetManifest | null;
+  coverTable: CoverTable | null;
 }
 
 export interface DataSource {
