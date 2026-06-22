@@ -1,8 +1,8 @@
 // ABOUTME: DOM adapter that renders the benefits and affinity sidebar panels.
 // ABOUTME: Formats summed stat totals via statFormat and shows affinity totals with colored orbs.
 import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "../core/types";
+import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
-import { affinityTotals } from "../core/affinity";
 import { condensedRows, type CondensedGroup, type CondensedPart, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 
@@ -106,18 +106,30 @@ export function renderBenefits(
   return { bonuses, petBonuses };
 }
 
-// Renders the Affinity panel; returns the totals so the caller can pass them back as
-// `prev` next time to highlight what changed.
+// Renders the Affinity panel as two columns: the current total ("have") and, when a
+// started constellation demands a color ("need"), a second value colored met/unmet whose
+// title lists the demanding constellation names. Returns the have-totals so the caller can
+// pass them back as `prev` next time to highlight what changed.
 export function renderAffinities(
   el: HTMLElement,
   model: DevotionModel,
-  selected: Set<StarId>,
+  have: Vec,
+  need: Vec,
+  needSource: Map<number, string[]>,
   prev?: Record<Affinity, number>,
 ): Record<Affinity, number> {
-  const totals = affinityTotals(model, selected);
-  const rows = AFFINITIES.map(
-    (a) => `<div class="affinity affinity-${a}${changeClass(prev, a, totals)}"><span>${affinityOrb(a)}${a}</span><span class="val">${totals[a]}</span></div>`,
-  ).join("");
-  el.innerHTML = `<h2>Affinity</h2>${rows}`;
+  const totals = { ascendant: have[0], chaos: have[1], eldritch: have[2], order: have[3], primordial: have[4] } as Record<Affinity, number>;
+  const rows = AFFINITIES.map((a, i) => {
+    const flash = changeClass(prev, a, totals as Record<string, number>);
+    const n = need[i]!;
+    let needCell = "";
+    if (n > 0) {
+      const met = have[i]! >= n;
+      const names = (needSource.get(i) ?? []).map((cid) => model.constellations.get(cid)?.name ?? cid).join(", ");
+      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${names ? `needed by ${names}` : ""}">${n}</span>`;
+    }
+    return `<div class="affinity affinity-${a}${flash}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
+  }).join("");
+  el.innerHTML = `<h2>Affinity</h2><div class="affinity-head"><span></span><span class="aff-have">have</span><span class="aff-need-h">need</span></div>${rows}`;
   return totals;
 }
