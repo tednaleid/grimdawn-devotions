@@ -7,8 +7,8 @@ should include implementation pointers for whoever picks it up.
 correctness fuzzer have shipped; see `docs/reachability-performance.md` and the
 `docs/superpowers/specs/` path-predictor designs. The old "blocked-activation
 flash" idea was superseded by claim-anywhere reachability and is dropped.
-Pet-bonus filtering and tagging -- clickable pet benefit chips, pet "Available to
-get" list, scoped highlight keys -- has also shipped.)
+Pet-bonus filtering and tagging has also shipped: clickable pet benefit chips, a
+pet "Available to get" list, and scoped highlight keys.)
 
 ## Performance
 

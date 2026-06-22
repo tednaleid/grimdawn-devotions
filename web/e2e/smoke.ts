@@ -284,6 +284,8 @@ try {
   );
   // Spend every point: drive the point bar's cap to the validity floor (curMin == points used) so
   // nothing else stays completable. Home sets the cap to curMin via the bar's keydown handler.
+  // The empties count below spans BOTH the player and pet avail lists and assumes no benefit tag is
+  // active (the pet tag was cleared above); a tagged-but-unobtainable subject stays listed by design.
   await cdp.evaluate(
     `(() => { const b = document.getElementById('point-bar'); b.focus(); b.dispatchEvent(new KeyboardEvent('keydown', { key: 'Home', bubbles: true })); })()`,
   );
