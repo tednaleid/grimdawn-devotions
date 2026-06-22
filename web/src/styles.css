@@ -99,7 +99,7 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .art-tint { opacity: var(--art-tint-opacity); mix-blend-mode: screen; pointer-events: none; }
 .art-tint.unmet { opacity: calc(var(--art-tint-opacity) * var(--art-unmet-factor)); }
 /* Second dimming layer: un-completable AND unstartable constellations, darker than .unmet. */
-.art.unreachable { opacity: calc(var(--art-opacity) * 0.16); }
+.art.unreachable { opacity: calc(var(--art-opacity) * 0.4); }
 .art-tint.unreachable { opacity: 0; }
 /* A fully-selected (active) constellation: full-opacity, brighter art with a warm glow so active
    constellations stand out when zoomed out (a calmer, steady version of the old blocked flash). */
