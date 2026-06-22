@@ -81,7 +81,7 @@ early-game state where you have started a hard capstone with most of the budget
 still free, so ~15 OTHER capstones are simultaneously borderline (reachable but
 greedy-missed, plus a few newly dim) and each needs the exact resolver. This is
 inherent to the claim-a-capstone-first feature. Two things were tried and did not
-fix it: the monotone dim-cache (BACKLOG item 5) only helps dim verdicts, which are
+fix it: the monotone dim-cache (BACKLOG item 2) only helps dim verdicts, which are
 monotone, whereas this state is dominated by reachable-but-tight verdicts that
 cannot be cached; and the clickable shortcut helps the median but this state is
 completable-sweep-bound. Closing it would need a stronger constructive upper bound
