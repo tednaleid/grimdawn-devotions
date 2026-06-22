@@ -131,10 +131,16 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
       const { x, y } = c.background;
       const dim = conArtClass(c);
-      const active = isActive(c) ? " active" : "";
+      const act = isActive(c);
+      const active = act ? " active" : "";
+      // The active glow uses the constellation's own granted colors (1, or 2 for a gradient), so each
+      // active nebula glows in its identity colors rather than flat white; --glow2 is transparent for
+      // single-color constellations so they get one glow, not a doubled one.
+      const cols = gradColors(c);
+      const glow = act ? ` style="--glow1:${cols[0] ?? "#fff"};--glow2:${cols[1] ?? "transparent"}"` : "";
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
       // data-con-id lets a blocked constellation deselect flash this icon (see main.ts).
-      parts.push(`<image ${img} class="art${dim}${active}" data-con-id="${c.id}"/>`);
+      parts.push(`<image ${img} class="art${dim}${active}"${glow} data-con-id="${c.id}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
         defs.push(`<mask id="${mid}"><image ${img}/></mask>`);

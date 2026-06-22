@@ -60,13 +60,15 @@ test("a fully-selected constellation's art gets the 'active' class; a partial on
   const name = withArt.background!.image!.split("/").pop()!;
   const manifest = { images: { [name]: { url: "art.webp", w: 640, h: 480 } } };
 
-  // All stars selected -> the constellation is active.
+  // All stars selected -> the constellation is active, and its art carries the affinity-colored glow.
   const full = renderSvgMarkup(model, { selected: new Set(withArt.starIds), pointCap: 55 }, { manifest });
   expect(full).toMatch(new RegExp(`class="art active"[^>]*data-con-id="${withArt.id}"`));
+  expect(full).toContain("--glow1:"); // only the active constellation emits the glow vars
 
-  // Only the first star selected (a partial pick) -> NOT active.
+  // Only the first star selected (a partial pick) -> NOT active, no glow.
   const partial = renderSvgMarkup(model, { selected: new Set([withArt.starIds[0]!]), pointCap: 55 }, { manifest });
   expect(partial).not.toMatch(new RegExp(`class="art[^"]*active"[^>]*data-con-id="${withArt.id}"`));
+  expect(partial).not.toContain("--glow1:");
 });
 
 test("two-layer dimming: completable normal, startable faded, unstartable dark", () => {
