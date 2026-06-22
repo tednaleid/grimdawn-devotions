@@ -70,6 +70,16 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .bgroup.avail.gsel { background: rgba(108,182,255,.12); }
 .bgroup.avail.gsel .bsubj { color: #cfe8ff; }
 .affinity > span:first-child { text-transform: capitalize; }
+/* Affinity panel: two columns - current "have" total + wanted-max "need" (red unmet, green met). */
+.affinity { display: grid; grid-template-columns: 1fr auto auto; gap: .6rem; align-items: baseline; }
+.affinity-head { display: grid; grid-template-columns: 1fr auto auto; gap: .6rem; font-size: .7rem; text-transform: uppercase; letter-spacing: .04em; color: #6b7480; padding-bottom: .2rem; }
+.aff-have { font-variant-numeric: tabular-nums; color: #cdd6e3; min-width: 1.6em; text-align: right; white-space: nowrap; }
+.aff-need { font-variant-numeric: tabular-nums; min-width: 1.6em; text-align: right; cursor: help; }
+.aff-need.missing { color: #e0696a; }
+.aff-need.met { color: #83c995; }
+.aff-need-h { min-width: 1.6em; text-align: right; }
+.affinity.up .aff-have { animation: flash-up 10s linear; }
+.affinity.down .aff-have { animation: flash-down 10s linear; }
 .power, .tip-power { color: #f0c14b; }
 .power[data-star-id] { cursor: help; }
 .tip-power-desc { color: #c9b88a; font-size: .92em; margin: .1rem 0 .25rem; }
@@ -77,6 +87,7 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .tip-power-level { color: #9aa4b2; font-size: .85em; margin-bottom: .15rem; }
 .tip-pet { margin-top: .35rem; color: #cda6e8; font-size: .92em; }
 .tip-pet-bonus-head { margin-top: .35rem; color: #cda6e8; font-weight: 600; font-size: .9em; }
+.tip-dim { margin-top: .35rem; color: #e0a96a; font-size: .9em; }
 #map-container { position: relative; overflow: hidden; cursor: grab; background: radial-gradient(circle at 50% 40%, #15203a, #0d1117 70%); }
 #map-container.con-hover { cursor: pointer; }
 #map-container.grabbing { cursor: grabbing; }
@@ -86,6 +97,9 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .art.unmet { opacity: calc(var(--art-opacity) * var(--art-unmet-factor)); }
 .art-tint { opacity: var(--art-tint-opacity); mix-blend-mode: screen; pointer-events: none; }
 .art-tint.unmet { opacity: calc(var(--art-tint-opacity) * var(--art-unmet-factor)); }
+/* Second dimming layer: un-completable AND unstartable constellations, darker than .unmet. */
+.art.unreachable { opacity: calc(var(--art-opacity) * 0.08); }
+.art-tint.unreachable { opacity: 0; }
 .hit { fill: transparent; pointer-events: all; }
 .hit.selectable, .hit.selected { cursor: pointer; }
 .star { stroke: #0d1117; stroke-width: 1; pointer-events: none; }
