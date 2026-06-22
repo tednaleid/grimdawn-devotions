@@ -60,20 +60,33 @@ WASM is a constant-factor accelerator, useless on the original unbounded search
 but exactly right on a bounded one. That is the reframe the Rust/WASM rejection
 note (below) refers to.
 
-Measured outcome (worst 5-capstone state, and a 30-seed sweep):
+A second, sound, free speedup rides on top: a frontier star of a completable
+constellation is always clickable (any prefix of a reachable completion is
+reachable), so the clickable half of the sweep skips the resolver for it. The
+clickable set is unchanged; it roughly halves the median per-click latency.
+
+Measured outcome (40-seed sweep, 2200 clicks, plus the worst dim candidate):
 
 ```
-worst single sweep:          ~11,000 ms (all TS)  ->  ~350 ms (memo + wasm)
-worst dim candidate (aeon):  4934 ms              ->  ~120 ms
-30-seed per-click latency:   median 2.1 ms   p95 27.9 ms   p99 148.9 ms   max 321.5 ms
+worst dim candidate (aeon):  4934 ms -> ~120 ms (memo + wasm)
+per-click latency:   median 1.3 ms   p95 ~45 ms   p99 ~190 ms   max ~1.1 s
 ```
 
 Correctness was checked against the TS exact resolver on the hotspot states and
 against a fast memoized-TS oracle across 19,274 gap candidates over 12 seeded
-games: 0 mismatches. The accepted product bar is a ~350ms pause on the first hit
-of the hardest borderline-infeasible capstone; repeated hits could be made free
-with the monotone dim-cache (BACKLOG item 5), but the latency is already at the
-bar without it.
+games: 0 mismatches.
+
+Residual (accepted): the worst per-click is ~1.1s (about 1 in 2200 clicks), on an
+early-game state where you have started a hard capstone with most of the budget
+still free, so ~15 OTHER capstones are simultaneously borderline (reachable but
+greedy-missed, plus a few newly dim) and each needs the exact resolver. This is
+inherent to the claim-a-capstone-first feature. Two things were tried and did not
+fix it: the monotone dim-cache (BACKLOG item 5) only helps dim verdicts, which are
+monotone, whereas this state is dominated by reachable-but-tight verdicts that
+cannot be cached; and the clickable shortcut helps the median but this state is
+completable-sweep-bound. Closing it would need a stronger constructive upper bound
+(a beam search was too weak), with diminishing returns on these near-budget-tight
+instances. p99 ~190ms with no hangs was judged good enough.
 
 Toolchain: `just install-rust` (rustup + wasm32 target), `just wasm` (builds
 `data/reach.wasm`), and `just build` copies it into `dist`. None of these are

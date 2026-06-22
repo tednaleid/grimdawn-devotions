@@ -156,9 +156,14 @@ borderline-infeasible capstone become free. Invalidate the cache on any star
 removal (deselect) or budget (slider) change, which are the only moves that can turn
 a dim candidate reachable again.
 
-Deferred because the WASM resolver already brings per-click latency to the accepted
-bar (median ~2ms, p95 ~28ms, worst ~320ms first-hit on the hardest state). This is a
-polish item that would flatten the repeated-hit tail further. Pointers:
+Deferred because the WASM resolver already brings per-click latency to a good place
+(median ~1.3ms, p95 ~45ms, p99 ~190ms). It would help the late-game dim tail (it cut
+p99 ~190ms -> ~137ms in a harness experiment). NOTE: it does NOT fix the rare ~1.1s
+worst case, which is an early multi-capstone state dominated by reachable-but-tight
+verdicts (those are not monotone, so they cannot be cached); only dim verdicts are
+cacheable. See the "Residual" note in `docs/reachability-performance.md`. The sweep
+already accepts an optional cache hook shape (a frontier-star-of-completable
+shortcut landed; the dim-cache param did not). Pointers:
 `classifyForSelection`/`reachabilityForSelection` in `web/src/core/reachability.ts`,
 driven from `main.ts`; key the cache by candidate id + a generation counter bumped
 on removal/cap change.
