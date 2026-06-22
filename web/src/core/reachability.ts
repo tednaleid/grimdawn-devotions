@@ -298,40 +298,48 @@ export function reachableExact(cons: ReachCon[], table: CoverTable, claimedIds: 
 }
 
 /**
- * Exact reachability decision for a selection state. DFS over filler subsets (unstarted granting
- * constellations and partial finishes), early-exiting on the first build that both covers every
- * placed requirement AND is constructible from the crossroads seed. Definitive.
+ * Exact reachability decision for a selection state. Definitive (the true reachable/dim answer).
  *
- * The cover-table prune stays admissible with partial finishes by crediting their grants into the
- * build before the lookup: a finish can only ADD affinity, so coverCostAt over the credited deficit
- * is still a true lower bound on the remaining cost and never cuts a reachable branch. Without the
- * credit the bare cover over-estimates (a finish is cheaper than a whole constellation) and would
- * falsely dim; with it the prune is sound AND stays on, which keeps the search bounded (and fast).
+ * Partial finishes break the bare cover prune: the table is built from whole-constellation grants,
+ * so it cannot see that finishing a started constellation supplies affinity more cheaply, and the
+ * prune over-estimates the remaining cost (falsely dimming). Crediting the finishes keeps it sound
+ * but so loose the search explodes. So we DECIDE the finishes up front: enumerate which to complete
+ * (very few - one per started granting constellation), and for each choice run a pure
+ * whole-constellation DFS whose cover prune is then both admissible AND tight (no cheaper finishes
+ * remain to undercut it). Reachable iff some finish-choice yields a covering, constructible build
+ * within budget. With no partial finishes this is exactly the single whole-constellation DFS.
  */
 export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): boolean {
-  const filler = fillerFor(cons, st)
-    .sort((a, b) => (b.grant[0] + b.grant[1] + b.grant[2] + b.grant[3] + b.grant[4]) / b.size - (a.grant[0] + a.grant[1] + a.grant[2] + a.grant[3] + a.grant[4]) / a.size);
-  // Admissible prune credit: every partial-finish grant. Crediting all of them (even ones already
-  // placed) can only shrink the deficit, so coverCostAt over it stays a lower bound - sound to prune.
-  let pfGrant: Vec = [0, 0, 0, 0, 0];
-  for (const p of st.partialFinish) pfGrant = addCap(pfGrant, p.grant);
+  const ratio = (c: ReachCon) => (c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4]) / c.size;
+  const wholeFiller = cons
+    .filter((c) => !st.startedIds.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]))
+    .sort((a, b) => ratio(b) - ratio(a));
+  const pf = st.partialFinish;
+  const grantById = new Map(pf.map((p) => [p.id, p.grant]));
   let found = false;
   const chosen: ReachCon[] = [];
-  function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec): void {
+  // Whole-constellation DFS for one finish-choice; the cover prune is admissible (no finishes left).
+  function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec, builtCons: ReachCon[]): void {
     if (found) return;
-    if (covers(build, maxReqPlaced) && constructible([...st.built, ...chosen])) { found = true; return; }
-    if (i >= filler.length) return;
-    {
-      const target = maxV(maxReqPlaced, st.target);
-      const c2 = addCap(build, pfGrant);
-      const deficit: Vec = [Math.max(0, target[0] - c2[0]), Math.max(0, target[1] - c2[1]), Math.max(0, target[2] - c2[2]), Math.max(0, target[3] - c2[3]), Math.max(0, target[4] - c2[4])];
-      if (cost + coverCostAt(table, deficit) > budget) return; // even the finish-optimistic completion overflows
-    }
-    const c = filler[i]!;
-    if (cost + c.size <= budget) { chosen.push(c); rec(i + 1, addCap(build, c.grant), cost + c.size, maxV(maxReqPlaced, c.req)); chosen.pop(); }
-    if (!found) rec(i + 1, build, cost, maxReqPlaced);
+    if (covers(build, maxReqPlaced) && constructible([...builtCons, ...chosen])) { found = true; return; }
+    if (i >= wholeFiller.length) return;
+    const target = maxV(maxReqPlaced, st.target);
+    const deficit: Vec = [Math.max(0, target[0] - build[0]), Math.max(0, target[1] - build[1]), Math.max(0, target[2] - build[2]), Math.max(0, target[3] - build[3]), Math.max(0, target[4] - build[4])];
+    if (cost + coverCostAt(table, deficit) > budget) return; // even the cheapest completion overflows
+    const c = wholeFiller[i]!;
+    if (cost + c.size <= budget) { chosen.push(c); rec(i + 1, addCap(build, c.grant), cost + c.size, maxV(maxReqPlaced, c.req), builtCons); chosen.pop(); }
+    if (!found) rec(i + 1, build, cost, maxReqPlaced, builtCons);
   }
-  rec(0, st.supply, st.own, st.target);
+  // Decide every subset of partial finishes to complete (2^k with k tiny - usually 0 or 1).
+  for (let mask = 0; mask < 1 << pf.length && !found; mask++) {
+    let build0: Vec = [...st.supply], cost0 = st.own;
+    const finished = new Set<string>();
+    for (let j = 0; j < pf.length; j++) if (mask & (1 << j)) { build0 = addCap(build0, pf[j]!.grant); cost0 += pf[j]!.remaining; finished.add(pf[j]!.id); }
+    if (cost0 > budget) continue;
+    const builtCons = st.built.map((b) => (finished.has(b.id) ? { ...b, grant: grantById.get(b.id)! } : b));
+    chosen.length = 0;
+    rec(0, build0, cost0, st.target, builtCons);
+  }
   return found;
 }
 
