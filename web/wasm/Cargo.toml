@@ -1,0 +1,17 @@
+# ABOUTME: Cargo manifest for the reachability WASM core (raw wasm32, no wasm-bindgen).
+# ABOUTME: Built by `just wasm` into reach.wasm; the TS engine loads it and falls back to TS if absent.
+[package]
+name = "reach"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+name = "reach"
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"
+codegen-units = 1

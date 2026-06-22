@@ -76,6 +76,27 @@ install-bun: (_install-tool "bun" "bun" "Oven-sh.Bun")
 # Install jq (JSON CLI) if missing
 install-jq: (_install-tool "jq" "jq" "jqlang.jq")
 
+# Install the Rust toolchain + wasm32 target (only needed to rebuild the reachability WASM core).
+# The site builds and runs without it: the engine falls back to the (slower) TS resolver when
+# data/reach.wasm is absent. cargo lands in ~/.cargo/bin; open a new shell for it on PATH.
+install-rust:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    rustup_bin() { command -v rustup 2>/dev/null || { [ -x "$HOME/.cargo/bin/rustup" ] && echo "$HOME/.cargo/bin/rustup"; }; }
+    if [ -z "$(rustup_bin)" ]; then
+        if command -v winget >/dev/null 2>&1; then
+            echo "Installing rustup via winget..."
+            winget install --id Rustlang.Rustup -e --silent --accept-source-agreements --accept-package-agreements
+        elif command -v brew >/dev/null 2>&1; then
+            echo "Installing rustup via brew..."; brew install rustup-init && rustup-init -y --no-modify-path
+        else
+            echo "No winget/brew found. Install rustup from https://rustup.rs then re-run."; exit 1
+        fi
+    fi
+    RUSTUP="$(rustup_bin)"; [ -n "$RUSTUP" ] || { echo "rustup not found after install; open a new shell and re-run."; exit 1; }
+    "$RUSTUP" target add wasm32-unknown-unknown
+    echo "Rust + wasm32 target ready. If 'cargo' is not on PATH yet, open a new shell."
+
 # Install everything needed to run the parser + web build (uv + bun + jq + a managed Python)
 install: install-uv install-bun install-jq
     @command -v uv >/dev/null 2>&1 && uv python install || echo "Re-run 'just install' once 'uv' is on PATH."
@@ -165,6 +186,19 @@ cover-table:
         echo "cover-table.bin is up to date"
     fi
 
+# Build the reachability core to WebAssembly (raw wasm32, no wasm-bindgen) into data/reach.wasm.
+# Run `just install-rust` first. The engine loads this for the fast resolver; absent, it falls
+# back to the TS resolver, so this is optional for a working (if slower) build.
+wasm:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    CARGO="$(command -v cargo 2>/dev/null || true)"; [ -n "$CARGO" ] || CARGO="$HOME/.cargo/bin/cargo"
+    "$CARGO" --version >/dev/null 2>&1 || { echo "cargo not found - run 'just install-rust' (open a new shell after install)."; exit 1; }
+    cd "{{justfile_directory()}}/web/wasm"
+    "$CARGO" build --release --target wasm32-unknown-unknown
+    cp target/wasm32-unknown-unknown/release/reach.wasm "{{justfile_directory()}}/data/reach.wasm"
+    echo "built data/reach.wasm ($(wc -c < "{{justfile_directory()}}/data/reach.wasm") bytes)"
+
 # Run the core test suite
 test:
     cd "{{justfile_directory()}}/web" && bun test
@@ -205,6 +239,7 @@ build: cover-table
     cp src/styles.css dist/styles.css
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
+    if [ -f "{{justfile_directory()}}/data/reach.wasm" ]; then cp "{{justfile_directory()}}/data/reach.wasm" dist/data/reach.wasm; else echo "(no data/reach.wasm; run 'just wasm' for the fast resolver - the page falls back to TS)"; fi
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
     echo "Built web/dist (buildId $BUILD_ID)"
 

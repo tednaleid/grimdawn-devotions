@@ -27,4 +27,7 @@ web/bun.lock
 # Precomputed cover table (build artifact, regenerated from data/devotions.json)
 /data/cover-table.bin
 
+# Reachability WASM core (build artifact, regenerated from web/wasm with `just wasm`)
+/data/reach.wasm
+
 # Optimized devotion art (committed for the GitHub Pages build; regenerate with `just assets`)
