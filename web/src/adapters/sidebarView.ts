@@ -122,11 +122,14 @@ export function renderAffinities(
   const rows = AFFINITIES.map((a, i) => {
     const flash = changeClass(prev, a, totals as Record<string, number>);
     const n = need[i]!;
-    let needCell = "";
+    let needCell: string;
     if (n > 0) {
       const met = have[i]! >= n;
       const names = (needSource.get(i) ?? []).map((cid) => model.constellations.get(cid)?.name ?? cid).join(", ");
       needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${names ? `needed by ${names}` : ""}">${n}</span>`;
+    } else {
+      // Nothing requires this color: still render the cell (dimmed 0) so both columns stay aligned.
+      needCell = `<span class="aff-need none">0</span>`;
     }
     return `<div class="affinity affinity-${a}${flash}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
   }).join("");

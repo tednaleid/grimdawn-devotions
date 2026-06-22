@@ -172,6 +172,11 @@ try {
     "document.querySelector('.affinity-eldritch .aff-have')?.textContent") === "1",
     "eldritch 'have' total becomes 1");
 
+  // Both columns must always render so the rows stay aligned (here every need is 0; the cells must still exist).
+  check(await cdp.evaluate<boolean>(
+    "document.querySelectorAll('.affinity').length === 5 && document.querySelectorAll('.affinity .aff-have').length === 5 && document.querySelectorAll('.affinity .aff-need').length === 5"),
+    "every affinity row has both a have and a need cell (columns stay aligned)");
+
   check(await cdp.evaluate<boolean>(
     `document.querySelector('circle[data-star-id="bat:0"]').classList.contains('selectable')`),
     "bat:0 (an affinity-gated constellation) is claimable");

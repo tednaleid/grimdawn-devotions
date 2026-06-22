@@ -77,6 +77,7 @@ main { flex: 1; display: grid; grid-template-columns: 280px 1fr 200px; min-heigh
 .aff-need { font-variant-numeric: tabular-nums; min-width: 1.6em; text-align: right; cursor: help; }
 .aff-need.missing { color: #e0696a; }
 .aff-need.met { color: #83c995; }
+.aff-need.none { color: #5b636e; cursor: default; }   /* nothing requires this color: dim, neutral 0 */
 .aff-need-h { min-width: 1.6em; text-align: right; }
 .affinity.up .aff-have { animation: flash-up 10s linear; }
 .affinity.down .aff-have { animation: flash-down 10s linear; }
