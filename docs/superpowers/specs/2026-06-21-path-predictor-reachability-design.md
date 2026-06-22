@@ -4,6 +4,11 @@ Date: 2026-06-21
 Status: Draft for review
 Resolves: BACKLOG.md item 2 (path predictor). Supersedes item 1 (blocked-activation flash).
 
+Performance: the per-click sweep can hang (10+ seconds) on borderline-infeasible
+capstones. See `docs/reachability-performance.md` for the verified root cause
+(dims that are infeasible by exactly one star), the approaches we ruled out with
+measurements, and the recommended leashed-resolver fix.
+
 ## Summary
 
 A planning mode where the user claims constellations in any order, including
