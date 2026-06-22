@@ -153,8 +153,10 @@ git commit -m "feat(core): selectionSummary derives reach state from a raw star 
 > is non-empty); (6) the new `bruteSelection` oracle MUST check `covers` AND
 > `constructible` (partials as grant-0), matching the existing `isValidBuild`.
 > With `built` carried, `coverLowerBound`/`greedyMinCost`/`reachableExact` still
-> delegate cleanly. This section will be rewritten to match once the implementation
-> is green.
+> delegate cleanly. **As-built:** implemented and reviewed in
+> `web/src/core/reachability.ts` (commit `dfcfe99`); the verbatim code blocks below
+> are the SUPERSEDED original, kept only as a historical record. Do not transcribe
+> them — the committed source is the truth.
 
 **Files:**
 - Modify: `web/src/core/reachability.ts`
