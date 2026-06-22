@@ -55,6 +55,20 @@ test("renders celestial-power stars as diamonds (polygon)", () => {
   expect(markup).toContain('<polygon class="star power');
 });
 
+test("a fully-selected constellation's art gets the 'active' class; a partial one does not", () => {
+  const withArt = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null && c.starIds.length >= 2)!;
+  const name = withArt.background!.image!.split("/").pop()!;
+  const manifest = { images: { [name]: { url: "art.webp", w: 640, h: 480 } } };
+
+  // All stars selected -> the constellation is active.
+  const full = renderSvgMarkup(model, { selected: new Set(withArt.starIds), pointCap: 55 }, { manifest });
+  expect(full).toMatch(new RegExp(`class="art active"[^>]*data-con-id="${withArt.id}"`));
+
+  // Only the first star selected (a partial pick) -> NOT active.
+  const partial = renderSvgMarkup(model, { selected: new Set([withArt.starIds[0]!]), pointCap: 55 }, { manifest });
+  expect(partial).not.toMatch(new RegExp(`class="art[^"]*active"[^>]*data-con-id="${withArt.id}"`));
+});
+
 test("two-layer dimming: completable normal, startable faded, unstartable dark", () => {
   const ids = [...model.constellations.keys()];
   // ids[0]=akeron_s_scorpion, ids[1]=anvil, ids[2]=assassin_s_blade

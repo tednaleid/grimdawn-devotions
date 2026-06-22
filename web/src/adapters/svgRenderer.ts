@@ -108,6 +108,10 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     return " unreachable";
   };
 
+  // A fully-selected (active) constellation gets a brighter, glowing art so active ones stand out
+  // when zoomed out. Only complete constellations qualify (a partial pick does not).
+  const isActive = (c: Constellation): boolean => c.starIds.length > 0 && c.starIds.every((id) => state.selected.has(id));
+
   // Constellation hover/click is resolved in JS against each constellation's art
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
   // even though art bounding boxes overlap. Star hit-circles take precedence.
@@ -127,13 +131,14 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
       const { x, y } = c.background;
       const dim = conArtClass(c);
+      const active = isActive(c) ? " active" : "";
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
       // data-con-id lets a blocked constellation deselect flash this icon (see main.ts).
-      parts.push(`<image ${img} class="art${dim}" data-con-id="${c.id}"/>`);
+      parts.push(`<image ${img} class="art${dim}${active}" data-con-id="${c.id}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
         defs.push(`<mask id="${mid}"><image ${img}/></mask>`);
-        parts.push(`<rect class="art-tint${dim}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`);
+        parts.push(`<rect class="art-tint${dim}${active}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`);
       }
     }
   }
