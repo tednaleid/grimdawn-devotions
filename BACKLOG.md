@@ -113,39 +113,15 @@ Pets" section) and `tooltipView.ts` (`petBonusHtml`).
 
 ## Testing / correctness
 
-### 4. Reachability fuzzing: build known-good builds forward, then verify backward
-Turn the perf harness into a correctness fuzzer with an absolute ground truth (not
-just WASM-vs-TS relative checks). Construct N seeded, known-valid 55-point builds,
-then replay them in reverse and assert every intermediate state stays "reachable".
-
-Forward (build a guaranteed-valid scenario):
-- Start from the "free" footholds: the Crossroads stars, plus any cost-1
-  constellation (a 1-star constellation is effectively free because you can light a
-  Crossroads star for its affinity, complete the 1-star, then deselect the
-  Crossroads star and refund it). These are the legal starting moves with no real
-  cost.
-- Then move outward making only valid picks (each addition keeps the build
-  constructible and within budget) until all 55 points are used. Because every step
-  was a legal forward move, the final build and every prefix are known-correct.
-
-Backward (the assertion):
-- Take that known-good final build, reset to 0/55 unselected, then randomly pick
-  the more "outer" constellations from it (the capstones the user would actually
-  click first in claim-anywhere mode).
-- After each such pick, assert that everything the forward build used to reach that
-  constellation is still classified valid/reachable. Nothing that was genuinely on
-  a valid path should ever be dimmed. A failure is a real engine bug.
-
-Pointers:
-- Engine: `web/src/core/reachability.ts` (`reachabilityForSelection`,
-  `classifyForSelection`, `selectionSummary`); the existing small-model oracle in
-  `web/test/reachability.test.ts` (`isValidBuild`, `bruteRefund`) shows the
-  ground-truth validity rule to reuse at the real-model scale.
-- Harness: `web/scripts/perf-reachability.ts` already has a seeded `playGame` and
-  `mulberry32`; this is the natural home (or a sibling) for the forward/backward
-  generator. Keep it seedable so a failing case is reproducible.
-- This doubles as the broad correctness gate the WASM resolver wants (see
-  `docs/reachability-performance.md`).
+### 4. Reachability fuzzing: build known-good builds forward, then verify backward [DONE]
+Implemented in `web/scripts/reachability-fuzz.ts` (run `just fuzz`), with a CI guard
+in `web/test/reachability-fuzz.test.ts`. It constructs seeded known-valid builds
+forward from the free footholds using the ground-truth validity rule (independent of
+the engine), then replays them in claim-anywhere order (outer-first and shuffled) and
+asserts the engine never dims a constellation that is genuinely part of the build.
+Found 0 false dims across 100+ seeds. Possible extensions if ever wanted: vary the
+budget cap, deselect-and-reselect mid-replay, or assert exact `completable`/`clickable`
+set equality against the brute oracle on small models.
 
 ### 5. Monotone dim-cache for the reachability sweep
 Reachability is monotone under adding stars: if completing/clicking a candidate is

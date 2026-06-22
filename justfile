@@ -208,6 +208,12 @@ test:
 perf *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/perf-reachability.ts {{ARGS}}
 
+# Seeded reachability correctness fuzzer: build known-valid builds forward (ground-truth rule), replay
+# them claim-anywhere, assert the engine never dims a valid-build member. Flags: --seeds N --start S
+# --ts.  e.g. just fuzz --seeds 200.  Uses the WASM resolver if built (just wasm).
+fuzz *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/reachability-fuzz.ts {{ARGS}}
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
