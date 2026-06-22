@@ -4,7 +4,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, classifyForSelection, lowerBoundFrom, INF, type ReachCon, type ReachState, type Vec } from "../src/core/reachability";
+import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, classifyForSelection, lowerBoundFrom, completionMinCost, INF, type ReachCon, type ReachState, type Vec } from "../src/core/reachability";
 
 const CAP: Vec = [20, 8, 20, 10, 20];
 const SEED: Vec = [1, 1, 1, 1, 1];
@@ -252,4 +252,9 @@ test("lowerBoundFrom credits cheap partial finishes (sound vs the brute oracle)"
     if (lowerBoundFrom(table, st) > bruteSelectionMinCost(st, cons, budget)) bad++;
   }
   expect(bad).toBe(0);
+});
+
+test("completionMinCost reports Leviathan 26 and Tree of Life 27 from an empty selection", () => {
+  expect(completionMinCost(realModel, cons, cover, new Set(), id("Leviathan"))).toBe(26);
+  expect(completionMinCost(realModel, cons, cover, new Set(), id("Tree of Life"))).toBe(27);
 });

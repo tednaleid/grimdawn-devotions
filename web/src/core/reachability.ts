@@ -341,3 +341,21 @@ export function classifyComplete(cons: ReachCon[], table: CoverTable, claimedIds
   if (verdict !== "unknown") return verdict;
   return reachableExact(cons, table, claimedIds, budget) ? "reachable" : "dim";
 }
+
+/** Minimum total stars to COMPLETE conId on top of `selected`, or INF if not within maxBudget. */
+export function completionMinCost(model: DevotionModel, cons: ReachCon[], table: CoverTable, selected: Set<string>, conId: string, maxBudget = BUDGET): number {
+  const con = model.constellations.get(conId);
+  if (!con) return INF;
+  const withCon = new Set(selected);
+  for (const sid of con.starIds) withCon.add(sid);
+  const st = selectionSummary(model, withCon);
+  let lo = st.own;                                            // cannot cost less than the stars already required
+  if (lo > maxBudget) return INF;
+  if (reachableExactFrom(cons, table, st, maxBudget) === false) return INF;
+  let hi = maxBudget;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (reachableExactFrom(cons, table, st, mid)) hi = mid; else lo = mid + 1;
+  }
+  return lo;
+}
