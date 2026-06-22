@@ -38,6 +38,16 @@ export function buildReachCons(model: DevotionModel): ReachCon[] {
   return out;
 }
 
+/** The cover grid dimensions (caps + strides) for a model, without building the cost table. */
+export function coverDims(cons: ReachCon[]): { caps: Vec; strides: Vec } {
+  const caps: Vec = zero();
+  for (const c of cons) for (let i = 0; i < 5; i++) caps[i] = Math.max(caps[i]!, c.req[i]!);
+  for (let i = 0; i < 5; i++) caps[i] = Math.min(caps[i]!, CAP_MAX[i]!);
+  const sizes = caps.map((c) => c + 1);
+  const strides = sizes.map((_, i) => sizes.slice(i + 1).reduce((a, b) => a * b, 1)) as Vec;
+  return { caps, strides };
+}
+
 /**
  * The crossroads-refund cover table. `cost[D]` = the minimum stars of a SUBSET of distinct
  * constellations whose summed (capped) affinity reaches at least `D`. Orderability-free: because
@@ -52,11 +62,8 @@ export function buildReachCons(model: DevotionModel): ReachCon[] {
  * so it is sound for dimming: if `coverLowerBound > 55`, the claim is genuinely unreachable.
  */
 export function buildCoverTable(cons: ReachCon[]): CoverTable {
-  const caps: Vec = zero();
-  for (const c of cons) for (let i = 0; i < 5; i++) caps[i] = Math.max(caps[i]!, c.req[i]!);
-  for (let i = 0; i < 5; i++) caps[i] = Math.min(caps[i]!, CAP_MAX[i]!);
+  const { caps, strides } = coverDims(cons);
   const sizes = caps.map((c) => c + 1);
-  const strides = sizes.map((_, i) => sizes.slice(i + 1).reduce((a, b) => a * b, 1)) as Vec;
   const maxKey = sizes.reduce((a, b) => a * b, 1);
   const cost = new Uint16Array(maxKey).fill(NOCOST);
   cost[0] = 0;
