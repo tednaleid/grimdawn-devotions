@@ -1,5 +1,5 @@
-// ABOUTME: Tests for aggregate.ts -- sumBonuses, powersGained, weaponRequirements.
-// ABOUTME: Uses real devotions.json data via buildModel to verify additive stat summation.
+// ABOUTME: Tests for aggregate.ts -- sumBonuses, sumPetBonuses, powersGained, weaponRequirements,
+// ABOUTME: starsGranting, starsGrantingPet, availableBonusIds, availablePetKeys. Uses real devotions.json data.
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";

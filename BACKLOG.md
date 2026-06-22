@@ -6,41 +6,13 @@ should include implementation pointers for whoever picks it up.
 (The path-predictor / reachability mode, its WASM resolver, and the reachability
 correctness fuzzer have shipped; see `docs/reachability-performance.md` and the
 `docs/superpowers/specs/` path-predictor designs. The old "blocked-activation
-flash" idea was superseded by claim-anywhere reachability and is dropped.)
-
-## UI: benefits panel
-
-### 1. Make "Bonus to All Pets" benefits taggable / highlightable
-The Benefits sidebar's "Bonus to All Pets" section (and the pet rows in tooltips)
-are read-only. Unlike player benefits, you cannot click a pet benefit to highlight
-the stars that grant it on the map, nor does the right-hand "Available to get"
-list pet bonuses. For example, Korvaak, the Eldritch Sun grants several "Bonus to
-All Pets" stats: they show in the left panel when it is selected, but cannot be
-filtered for. The blocker: pet stat ids are the SAME ids as player bonuses (e.g.
-`defensiveElementalResistance` is both a player bonus and a pet bonus), so the
-existing tag/highlight system - which keys on the raw stat id via `data-vid` and
-`starsGranting(model, ids)` over `star.bonuses` - would conflate the two sources
-and highlight the wrong stars.
-
-To lift it, add a parallel pet-keyed path:
-- `starsGrantingPet(model, ids)` in `web/src/core/aggregate.ts` scanning
-  `star.petBonuses` instead of `star.bonuses`.
-- A separate selected-pet-benefit set plus a distinct attribute (e.g.
-  `data-pet-vid`) on the pet chips in `web/src/adapters/sidebarView.ts`, so a pet
-  tag cannot collide with a player tag of the same stat id.
-- Thread a pet highlight set into the map render (`handle.update` in `main.ts` ->
-  `svgRenderer.ts`), with its own CSS state if it should read differently from the
-  player-benefit highlight.
-- Decide how a player tag and a pet tag for the same stat coexist (two independent
-  toggles, or a combined view).
-
-Pointers: pet bonuses are already parsed (`star.petBonuses`, summed by
-`sumPetBonuses`) and rendered read-only in `sidebarView.ts` (the "Bonus to All
-Pets" section) and `tooltipView.ts` (`petBonusHtml`).
+flash" idea was superseded by claim-anywhere reachability and is dropped.
+Pet-bonus filtering and tagging -- clickable pet benefit chips, pet "Available to
+get" list, scoped highlight keys -- has also shipped.)
 
 ## Performance
 
-### 2. Monotone dim-cache for the reachability sweep
+### 1. Monotone dim-cache for the reachability sweep
 Reachability is monotone under adding stars: if completing/clicking a candidate is
 dim at a given selection and budget, it stays dim for every superset selection (more
 commitment only makes a build harder). Cache dim verdicts per session and skip
