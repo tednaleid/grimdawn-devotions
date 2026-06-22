@@ -329,3 +329,16 @@ test("reachabilityForSelection: empty map dims nothing at 55 and dims Leviathan 
   // Leviathan's first star needs minCost 20, so below 20 even its first star is not clickable.
   expect(tight.clickable.has(`${id("Leviathan")}:0`)).toBe(false);
 });
+
+test("reachabilityForSelection: the 2-capstone sweep stays fast (partial-finish prune regression guard)", () => {
+  // Leviathan + Tree of Life is the worst state: many clickable candidates start a granting
+  // constellation (a partial finish) and run the exact resolver. The resolver's cover prune must
+  // credit those finishes to stay both admissible AND on; disabling it instead balloons this from
+  // ~100ms to >8s. Generous bound (~30x headroom over the real cost) so it cannot flake on CI.
+  const sel = new Set<string>([...realModel.constellations.get(id("Leviathan"))!.starIds, ...realModel.constellations.get(id("Tree of Life"))!.starIds]);
+  const t = performance.now();
+  const view = reachabilityForSelection(realModel, cons, cover, sel, 55);
+  expect(performance.now() - t).toBeLessThan(3000);
+  expect(view.completable.size).toBeGreaterThan(0);
+  expect(view.clickable.size).toBeGreaterThan(0);
+});

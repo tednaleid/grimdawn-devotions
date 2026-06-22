@@ -302,25 +302,30 @@ export function reachableExact(cons: ReachCon[], table: CoverTable, claimedIds: 
  * constellations and partial finishes), early-exiting on the first build that both covers every
  * placed requirement AND is constructible from the crossroads seed. Definitive.
  *
- * The cover-table prune is only admissible when there are no partial finishes: the table is built
- * from full-constellation grants and does not know a finish can supply affinity more cheaply, so
- * with finishes present it would over-estimate the remaining cost and cut reachable branches. When
- * finishes are present we rely solely on the per-step `cost + size <= budget` bound.
+ * The cover-table prune stays admissible with partial finishes by crediting their grants into the
+ * build before the lookup: a finish can only ADD affinity, so coverCostAt over the credited deficit
+ * is still a true lower bound on the remaining cost and never cuts a reachable branch. Without the
+ * credit the bare cover over-estimates (a finish is cheaper than a whole constellation) and would
+ * falsely dim; with it the prune is sound AND stays on, which keeps the search bounded (and fast).
  */
 export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): boolean {
   const filler = fillerFor(cons, st)
     .sort((a, b) => (b.grant[0] + b.grant[1] + b.grant[2] + b.grant[3] + b.grant[4]) / b.size - (a.grant[0] + a.grant[1] + a.grant[2] + a.grant[3] + a.grant[4]) / a.size);
-  const usePrune = st.partialFinish.length === 0;
+  // Admissible prune credit: every partial-finish grant. Crediting all of them (even ones already
+  // placed) can only shrink the deficit, so coverCostAt over it stays a lower bound - sound to prune.
+  let pfGrant: Vec = [0, 0, 0, 0, 0];
+  for (const p of st.partialFinish) pfGrant = addCap(pfGrant, p.grant);
   let found = false;
   const chosen: ReachCon[] = [];
   function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec): void {
     if (found) return;
     if (covers(build, maxReqPlaced) && constructible([...st.built, ...chosen])) { found = true; return; }
     if (i >= filler.length) return;
-    if (usePrune) {
+    {
       const target = maxV(maxReqPlaced, st.target);
-      const deficit: Vec = [Math.max(0, target[0] - build[0]), Math.max(0, target[1] - build[1]), Math.max(0, target[2] - build[2]), Math.max(0, target[3] - build[3]), Math.max(0, target[4] - build[4])];
-      if (cost + coverCostAt(table, deficit) > budget) return; // even the optimistic completion overflows
+      const c2 = addCap(build, pfGrant);
+      const deficit: Vec = [Math.max(0, target[0] - c2[0]), Math.max(0, target[1] - c2[1]), Math.max(0, target[2] - c2[2]), Math.max(0, target[3] - c2[3]), Math.max(0, target[4] - c2[4])];
+      if (cost + coverCostAt(table, deficit) > budget) return; // even the finish-optimistic completion overflows
     }
     const c = filler[i]!;
     if (cost + c.size <= budget) { chosen.push(c); rec(i + 1, addCap(build, c.grant), cost + c.size, maxV(maxReqPlaced, c.req)); chosen.pop(); }
