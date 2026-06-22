@@ -1,8 +1,8 @@
 // ABOUTME: Reachability engine for path-predictor mode (claim a set, see what stays achievable).
-// ABOUTME: A build is valid iff its total affinity covers every member's requirement (the
-// ABOUTME: self-sustaining rule the app already uses; crossroads are transient, refundable
-// ABOUTME: bootstraps). minCost is bracketed by a fast cover-table lower bound (sound for "dim")
-// ABOUTME: and a refund-aware greedy upper bound (sound for "reachable").
+// ABOUTME: A build is valid iff its total affinity covers every member's requirement AND it is
+// ABOUTME: constructible from the refundable crossroads seed (some order places each member with
+// ABOUTME: its requirement met). minCost is bracketed by a fast cover-table lower bound (sound for
+// ABOUTME: "dim") and a constructibility-aware greedy upper bound (sound for "reachable").
 import { AFFINITIES, type DevotionModel } from "./types";
 
 export type Vec = [number, number, number, number, number]; // order = AFFINITIES
@@ -85,11 +85,15 @@ function claimSummary(claimed: ReachCon[]) {
 
 /** A normalized start point for the minCost bracket, derived from a raw star selection. */
 export interface ReachState {
-  own: number;        // total selected stars (all count against budget)
+  own: number;        // total selected stars (all count against budget); equals sum of `built` sizes
   supply: Vec;        // affinity from COMPLETED constellations only
   target: Vec;        // elementwise-max requirement over STARTED constellations
   startedIds: Set<string>;
   partialFinish: { id: string; remaining: number; grant: Vec; req: Vec }[];
+  // The started constellations as already-committed members, for the constructibility check:
+  // a completed one carries its full size and grant; a partial carries its SELECTED star count
+  // and a zero grant (it imposes its requirement but supplies nothing until finished).
+  built: ReachCon[];
 }
 
 /** Reduce a raw star selection to the data the bracket needs (honest partials). */
@@ -105,6 +109,7 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
   let supply = zero(), target = zero();
   const startedIds = new Set<string>();
   const partialFinish: ReachState["partialFinish"] = [];
+  const built: ReachCon[] = [];
   for (const [conId, count] of selByCon) {
     const c = model.constellations.get(conId);
     if (!c) continue;
@@ -112,19 +117,62 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
     const req = vecOf(c.affinityRequired);
     target = maxV(target, req);
     const grant = vecOf(c.affinityBonus);
-    if (count >= c.starIds.length) supply = addCap(supply, grant);
-    else if (grant[0] || grant[1] || grant[2] || grant[3] || grant[4]) partialFinish.push({ id: conId, remaining: c.starIds.length - count, grant, req });
+    if (count >= c.starIds.length) {
+      supply = addCap(supply, grant);
+      built.push({ id: conId, size: c.starIds.length, req, grant });
+    } else {
+      built.push({ id: conId, size: count, req, grant: zero() });
+      if (grant[0] || grant[1] || grant[2] || grant[3] || grant[4]) partialFinish.push({ id: conId, remaining: c.starIds.length - count, grant, req });
+    }
   }
-  return { own, supply, target, startedIds, partialFinish };
+  return { own, supply, target, startedIds, partialFinish, built };
+}
+
+/** Treat a fully-claimed set as a selection state: every claim is a completed member. */
+export function stateFromClaimed(claimed: ReachCon[]): ReachState {
+  const { req, grant, own } = claimSummary(claimed);
+  return {
+    own,
+    supply: grant,
+    target: req,
+    startedIds: new Set(claimed.map((c) => c.id)),
+    partialFinish: [],
+    built: claimed.map((c) => ({ id: c.id, size: c.size, req: c.req, grant: c.grant })),
+  };
+}
+
+/**
+ * Lower bound on minCost for a selection state: own stars plus the cheapest filler to cover the
+ * remaining affinity deficit. Partial finishes are credited as cheap completions - we minimise
+ * over every subset of finishes (paying their stars, adding their grant to supply) so the cover
+ * table only has to close whatever deficit the chosen finishes leave. This is a pure lower bound
+ * (the cover table itself is one) and ignores constructibility, so it is sound for "dim".
+ */
+export function lowerBoundFrom(table: CoverTable, st: ReachState): number {
+  const fins = st.partialFinish;
+  let best = INF;
+  for (let mask = 0; mask < 1 << fins.length; mask++) {
+    let supply = st.supply, extra = 0;
+    for (let i = 0; i < fins.length; i++) if (mask & (1 << i)) { supply = addCap(supply, fins[i]!.grant); extra += fins[i]!.remaining; }
+    const deficit: Vec = [Math.max(0, st.target[0] - supply[0]), Math.max(0, st.target[1] - supply[1]), Math.max(0, st.target[2] - supply[2]), Math.max(0, st.target[3] - supply[3]), Math.max(0, st.target[4] - supply[4])];
+    const cov = coverCostAt(table, deficit);
+    if (cov >= INF) continue; // uncoverable for this subset; the INF must not be added to own
+    const bound = st.own + extra + cov;
+    if (bound < best) best = bound;
+  }
+  return best;
 }
 
 /** Lower bound on minCost(claimed): own stars + cheapest filler to cover the claimed deficit. */
 export function coverLowerBound(table: CoverTable, claimed: ReachCon[]): number {
-  const { req, grant, own } = claimSummary(claimed);
-  let k = 0;
-  for (let i = 0; i < 5; i++) k += Math.min(Math.max(0, req[i]! - grant[i]!), table.caps[i]!) * table.strides[i]!;
-  const cov = table.cost[k]!;
-  return cov === NOCOST ? INF : own + cov;
+  return lowerBoundFrom(table, stateFromClaimed(claimed));
+}
+
+/** The filler a selection state may draw on: unstarted granting constellations plus its finishes. */
+function fillerFor(cons: ReachCon[], st: ReachState): ReachCon[] {
+  const filler = cons.filter((c) => !st.startedIds.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]));
+  for (const p of st.partialFinish) filler.push({ id: `${p.id}#finish`, size: p.remaining, req: p.req, grant: p.grant });
+  return filler;
 }
 
 /**
@@ -139,29 +187,39 @@ export function coverLowerBound(table: CoverTable, claimed: ReachCon[]): number 
 export function greedyMinCost(cons: ReachCon[], claimedIds: string[], budget = BUDGET): number {
   const byId = new Map(cons.map((c) => [c.id, c]));
   const claimed = claimedIds.map((id) => byId.get(id)!);
-  const claimedSet = new Set(claimedIds);
-  const filler = cons.filter((c) => !claimedSet.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]));
-  const pool = [...claimed, ...filler];
-  const reqClaimed = claimSummary(claimed).req;
+  return greedyFrom(cons, stateFromClaimed(claimed), budget);
+}
+
+/**
+ * Refund-aware greedy for a selection state. Auto-places every already-committed member
+ * (`st.built`, partials included as zero-grant) in seed-unlock order, then adds filler (unstarted
+ * granting constellations and partial finishes) by best deficit-reduction-per-star, until every
+ * committed member is placed AND the build's own affinity covers every placed requirement.
+ * SOUND for "reachable": a returned cost <= budget means a genuine, constructible valid build
+ * exists; it is an upper bound on minCost (constructibility-aware by construction).
+ */
+export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): number {
+  const built = st.built;
+  const pool = [...built, ...fillerFor(cons, st)];
   const placed = new Array(pool.length).fill(false);
   let build = zero(); // affinity from placed constellations (excludes the transient seed)
   let maxReqPlaced = zero(); // every placed constellation must stand under this once seed is gone
-  let cost = 0, claimedLeft = claimed.length;
+  let cost = 0, builtLeft = built.length;
   for (;;) {
     const gain = addCap(SEED, build);
     let did = false;
-    // Auto-place only the claimed constellations as they unlock; filler is added selectively below.
-    for (let i = 0; i < claimed.length; i++) {
-      if (placed[i] || !covers(gain, claimed[i]!.req)) continue;
-      placed[i] = true; cost += claimed[i]!.size; build = addCap(build, claimed[i]!.grant); maxReqPlaced = maxV(maxReqPlaced, claimed[i]!.req); claimedLeft--; did = true;
+    // Auto-place the committed members as they unlock; filler is added selectively below.
+    for (let i = 0; i < built.length; i++) {
+      if (placed[i] || !covers(gain, built[i]!.req)) continue;
+      placed[i] = true; cost += built[i]!.size; build = addCap(build, built[i]!.grant); maxReqPlaced = maxV(maxReqPlaced, built[i]!.req); builtLeft--; did = true;
     }
-    if (claimedLeft === 0 && covers(build, maxReqPlaced)) return cost <= budget ? cost : INF;
+    if (builtLeft === 0 && covers(build, maxReqPlaced)) return cost <= budget ? cost : INF;
     if (did) continue;
     const g2 = addCap(SEED, build);
-    const target = covers(build, maxReqPlaced) ? reqClaimed : maxReqPlaced; // close self-sustain first, then claims
+    const target = covers(build, maxReqPlaced) ? st.target : maxReqPlaced; // close self-sustain first, then started reqs
     const deficit: Vec = [Math.max(0, target[0]! - build[0]), Math.max(0, target[1]! - build[1]), Math.max(0, target[2]! - build[2]), Math.max(0, target[3]! - build[3]), Math.max(0, target[4]! - build[4])];
     let best = -1, bestScore = 0;
-    for (let i = claimed.length; i < pool.length; i++) {
+    for (let i = built.length; i < pool.length; i++) {
       if (placed[i] || !covers(g2, pool[i]!.req)) continue;
       let red = 0; for (let j = 0; j < 5; j++) red += Math.min(pool[i]!.grant[j]!, deficit[j]!);
       const score = red / pool[i]!.size;
@@ -229,25 +287,52 @@ function constructible(B: ReachCon[]): boolean {
 export function reachableExact(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): boolean {
   const byId = new Map(cons.map((c) => [c.id, c]));
   const claimed = claimedIds.map((id) => byId.get(id)!);
-  const claimedSet = new Set(claimedIds);
-  const filler = cons.filter((c) => !claimedSet.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]))
+  return reachableExactFrom(cons, table, stateFromClaimed(claimed), budget);
+}
+
+/**
+ * Exact reachability decision for a selection state. DFS over filler subsets (unstarted granting
+ * constellations and partial finishes), early-exiting on the first build that both covers every
+ * placed requirement AND is constructible from the crossroads seed. Definitive.
+ *
+ * The cover-table prune is only admissible when there are no partial finishes: the table is built
+ * from full-constellation grants and does not know a finish can supply affinity more cheaply, so
+ * with finishes present it would over-estimate the remaining cost and cut reachable branches. When
+ * finishes are present we rely solely on the per-step `cost + size <= budget` bound.
+ */
+export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): boolean {
+  const filler = fillerFor(cons, st)
     .sort((a, b) => (b.grant[0] + b.grant[1] + b.grant[2] + b.grant[3] + b.grant[4]) / b.size - (a.grant[0] + a.grant[1] + a.grant[2] + a.grant[3] + a.grant[4]) / a.size);
-  const { req: reqClaimed, grant: grantClaimed, own: ownClaimed } = claimSummary(claimed);
+  const usePrune = st.partialFinish.length === 0;
   let found = false;
   const chosen: ReachCon[] = [];
   function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec): void {
     if (found) return;
-    if (covers(build, maxReqPlaced) && constructible([...claimed, ...chosen])) { found = true; return; }
+    if (covers(build, maxReqPlaced) && constructible([...st.built, ...chosen])) { found = true; return; }
     if (i >= filler.length) return;
-    const target = maxV(maxReqPlaced, reqClaimed);
-    const deficit: Vec = [Math.max(0, target[0] - build[0]), Math.max(0, target[1] - build[1]), Math.max(0, target[2] - build[2]), Math.max(0, target[3] - build[3]), Math.max(0, target[4] - build[4])];
-    if (cost + coverCostAt(table, deficit) > budget) return; // even the optimistic completion overflows
+    if (usePrune) {
+      const target = maxV(maxReqPlaced, st.target);
+      const deficit: Vec = [Math.max(0, target[0] - build[0]), Math.max(0, target[1] - build[1]), Math.max(0, target[2] - build[2]), Math.max(0, target[3] - build[3]), Math.max(0, target[4] - build[4])];
+      if (cost + coverCostAt(table, deficit) > budget) return; // even the optimistic completion overflows
+    }
     const c = filler[i]!;
     if (cost + c.size <= budget) { chosen.push(c); rec(i + 1, addCap(build, c.grant), cost + c.size, maxV(maxReqPlaced, c.req)); chosen.pop(); }
     if (!found) rec(i + 1, build, cost, maxReqPlaced);
   }
-  rec(0, grantClaimed, ownClaimed, reqClaimed);
+  rec(0, st.supply, st.own, st.target);
   return found;
+}
+
+/**
+ * Classify a partial-selection state by bracketing minCost, then resolving the gap exactly.
+ * `lowerBoundFrom` soundly proves "dim"; `greedyFrom` soundly proves "reachable"; the rare
+ * remainder is decided by `reachableExactFrom`. Always returns "reachable" or "dim" and never
+ * lies versus the covers + constructible rule.
+ */
+export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): Reach {
+  if (lowerBoundFrom(table, st) > budget) return "dim";
+  if (greedyFrom(cons, st, budget) <= budget) return "reachable";
+  return reachableExactFrom(cons, table, st, budget) ? "reachable" : "dim";
 }
 
 /** Like classify, but resolves the "unknown" gap with the exact resolver - always reachable or dim. */

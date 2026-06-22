@@ -4,7 +4,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, INF, type ReachCon, type Vec } from "../src/core/reachability";
+import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, classifyForSelection, lowerBoundFrom, INF, type ReachCon, type ReachState, type Vec } from "../src/core/reachability";
 
 const CAP: Vec = [20, 8, 20, 10, 20];
 const SEED: Vec = [1, 1, 1, 1, 1];
@@ -173,4 +173,83 @@ test("selectionSummary splits started vs completed and tracks partial finishes",
   expect(s.target).toEqual([13, 0, 13, 7, 20]);
   // Tree grants nothing, so it is NOT a partial-finish candidate.
   expect(s.partialFinish.length).toBe(0);
+});
+
+// ---- classifyForSelection oracle (constructibility-aware, partial-selection aware) ----
+
+// The build implied by a partial-selection state plus a chosen filler subset: the started
+// constellations (completed with their grant, partials with grant zeroed) plus the chosen
+// filler (unstarted granting constellations and partial-finish completions, each with its
+// full grant). A finish entry pairs with its partial in `built`: own sums to the full size,
+// grant sums to the full grant. Validity is the same covers + constructible rule isValidBuild
+// uses, so this oracle is NOT order-free.
+function bruteSelectionMinCost(st: ReachState, cons: ReachCon[], budget: number): number {
+  const finishes: ReachCon[] = st.partialFinish.map((p) => ({ id: `${p.id}#finish`, size: p.remaining, req: p.req, grant: p.grant }));
+  const startedIds = st.startedIds;
+  const fillers = cons.filter((c) => !startedIds.has(c.id) && c.grant.some((x) => x > 0)).concat(finishes);
+  const baseOwn = st.built.reduce((s, c) => s + c.size, 0);
+  let best = INF;
+  for (let mask = 0; mask < 1 << fillers.length; mask++) {
+    const B = st.built.slice(); let own = baseOwn;
+    for (let i = 0; i < fillers.length; i++) if (mask & (1 << i)) { B.push(fillers[i]!); own += fillers[i]!.size; }
+    if (own >= best || own > budget) continue;
+    if (isValidBuild(B)) best = Math.min(best, own);
+  }
+  return best;
+}
+
+// A random partial-selection state: take a random model, start a few constellations, mark each
+// completed or partial, and assemble the ReachState the engine consumes (built carries partials
+// with grant zeroed; partialFinish lists the granting partials as cheap completions).
+function randSelectionCase(seed: number): { st: ReachState; cons: ReachCon[]; budget: number } {
+  const rng = mulberry32(seed);
+  const cons = randModel(rng, 6 + Math.floor(rng() * 4));
+  const realCons = cons.filter((c) => !c.id.startsWith("x"));
+  const built: ReachCon[] = [];
+  const partialFinish: ReachState["partialFinish"] = [];
+  const startedIds = new Set<string>();
+  const nStart = 1 + Math.floor(rng() * 3);
+  for (let i = 0; i < nStart; i++) {
+    const c = realCons[Math.floor(rng() * realCons.length)]!;
+    if (startedIds.has(c.id)) continue;
+    startedIds.add(c.id);
+    const complete = c.size === 1 || rng() < 0.5;
+    if (complete) {
+      built.push({ id: c.id, size: c.size, req: c.req, grant: c.grant });
+    } else {
+      const sel = 1 + Math.floor(rng() * (c.size - 1)); // 1..size-1 stars
+      built.push({ id: c.id, size: sel, req: c.req, grant: zero() });
+      if (c.grant.some((x) => x > 0)) partialFinish.push({ id: c.id, remaining: c.size - sel, grant: c.grant, req: c.req });
+    }
+  }
+  const supply = built.reduce((t, c) => addCap(t, c.grant), zero());
+  const target = built.reduce((r, c) => maxV(r, c.req), zero());
+  const own = built.reduce((s, c) => s + c.size, 0);
+  return { st: { own, supply, target, startedIds, partialFinish, built }, cons, budget: 8 + Math.floor(rng() * 10) };
+}
+
+test("classifyForSelection never lies vs the brute oracle (400 partial selections)", () => {
+  let falseDim = 0, falseReach = 0, unknown = 0;
+  for (let seed = 1; seed <= 400; seed++) {
+    const { st, cons, budget } = randSelectionCase(seed);
+    const table = buildCoverTable(cons);
+    const brute = bruteSelectionMinCost(st, cons, budget);
+    const verdict = classifyForSelection(cons, table, st, budget);
+    if (brute <= budget && verdict === "dim") falseDim++;
+    if (brute > budget && verdict === "reachable") falseReach++;
+    if (verdict === "unknown") unknown++;
+  }
+  expect(falseDim).toBe(0);
+  expect(falseReach).toBe(0);
+  expect(unknown).toBeLessThan(40);
+});
+
+test("lowerBoundFrom credits cheap partial finishes (sound vs the brute oracle)", () => {
+  let bad = 0;
+  for (let seed = 1; seed <= 400; seed++) {
+    const { st, cons, budget } = randSelectionCase(seed);
+    const table = buildCoverTable(cons);
+    if (lowerBoundFrom(table, st) > bruteSelectionMinCost(st, cons, budget)) bad++;
+  }
+  expect(bad).toBe(0);
 });
