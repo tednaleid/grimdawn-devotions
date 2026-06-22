@@ -83,6 +83,41 @@ function claimSummary(claimed: ReachCon[]) {
   return { req, grant, own };
 }
 
+/** A normalized start point for the minCost bracket, derived from a raw star selection. */
+export interface ReachState {
+  own: number;        // total selected stars (all count against budget)
+  supply: Vec;        // affinity from COMPLETED constellations only
+  target: Vec;        // elementwise-max requirement over STARTED constellations
+  startedIds: Set<string>;
+  partialFinish: { id: string; remaining: number; grant: Vec; req: Vec }[];
+}
+
+/** Reduce a raw star selection to the data the bracket needs (honest partials). */
+export function selectionSummary(model: DevotionModel, selected: Set<string>): ReachState {
+  const selByCon = new Map<string, number>();
+  let own = 0;
+  for (const sid of selected) {
+    const star = model.stars.get(sid);
+    if (!star) continue;
+    own++;
+    selByCon.set(star.constellationId, (selByCon.get(star.constellationId) ?? 0) + 1);
+  }
+  let supply = zero(), target = zero();
+  const startedIds = new Set<string>();
+  const partialFinish: ReachState["partialFinish"] = [];
+  for (const [conId, count] of selByCon) {
+    const c = model.constellations.get(conId);
+    if (!c) continue;
+    startedIds.add(conId);
+    const req = vecOf(c.affinityRequired);
+    target = maxV(target, req);
+    const grant = vecOf(c.affinityBonus);
+    if (count >= c.starIds.length) supply = addCap(supply, grant);
+    else if (grant[0] || grant[1] || grant[2] || grant[3] || grant[4]) partialFinish.push({ id: conId, remaining: c.starIds.length - count, grant, req });
+  }
+  return { own, supply, target, startedIds, partialFinish };
+}
+
 /** Lower bound on minCost(claimed): own stars + cheapest filler to cover the claimed deficit. */
 export function coverLowerBound(table: CoverTable, claimed: ReachCon[]): number {
   const { req, grant, own } = claimSummary(claimed);

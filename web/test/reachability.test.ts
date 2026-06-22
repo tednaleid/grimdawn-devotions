@@ -4,7 +4,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, INF, type ReachCon, type Vec } from "../src/core/reachability";
+import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, INF, type ReachCon, type Vec } from "../src/core/reachability";
 
 const CAP: Vec = [20, 8, 20, 10, 20];
 const SEED: Vec = [1, 1, 1, 1, 1];
@@ -156,4 +156,21 @@ test("claiming several capstones makes many candidates dim (the feature actually
   const sweep = reachabilitySweep(cons, cover, claims);
   const dim = [...sweep.values()].filter((v) => v === "dim").length;
   expect(dim).toBeGreaterThan(10);
+});
+
+test("selectionSummary splits started vs completed and tracks partial finishes", () => {
+  const lev = realModel.constellations.get(id("Leviathan"))!;     // grants nothing, requires eldritch+ascendant
+  const tree = realModel.constellations.get(id("Tree of Life"))!; // grants nothing
+  // Fully select Leviathan, partially select Tree of Life (first star only).
+  const sel = new Set<string>([...lev.starIds, tree.starIds[0]!]);
+  const s = selectionSummary(realModel, sel);
+  expect(s.own).toBe(lev.starIds.length + 1);
+  expect(s.startedIds.has(id("Leviathan"))).toBe(true);
+  expect(s.startedIds.has(id("Tree of Life"))).toBe(true);
+  // supply has NO Tree grant (partial) and no Leviathan grant (grants nothing): all zero here.
+  expect(s.supply).toEqual([0, 0, 0, 0, 0]);
+  // target covers Leviathan's eldritch 13 + ascendant 13 AND Tree's primordial 20 + order 7.
+  expect(s.target).toEqual([13, 0, 13, 7, 20]);
+  // Tree grants nothing, so it is NOT a partial-finish candidate.
+  expect(s.partialFinish.length).toBe(0);
 });
