@@ -1,42 +1,30 @@
-// ABOUTME: Tests for toggleConstellation: pick/unpick a whole constellation at once when valid.
-// ABOUTME: Uses the real dataset (crossroads_eldritch grants eldritch; bat requires eldritch 1, has 5 stars).
+// ABOUTME: Reachability-driven constellation claims: claim whole only when completable,
+// ABOUTME: remove the whole constellation freely.
 import { test, expect } from "bun:test";
-import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { toggleConstellation } from "../src/core/rules";
+import type { ReachView } from "../src/core/reachability";
 import type { SelectionState } from "../src/core/types";
 
-const model = buildModel(doc as any);
-const batStars = ["bat:0", "bat:1", "bat:2", "bat:3", "bat:4"];
+const doc = {
+  meta: { affinities: ["ascendant","chaos","eldritch","order","primordial"] },
+  constellations: [
+    { id: "A", name: "A", tier: 1, affinityRequired: {}, affinityBonus: { ascendant: 2 }, background: null,
+      stars: [{ index: 0, predecessors: [], position: { x: 0, y: 0 }, bonuses: {} }, { index: 1, predecessors: [0], position: { x: 1, y: 0 }, bonuses: {} }] },
+  ],
+} as any;
+const model = buildModel(doc);
+const view = (completable: string[]): ReachView => ({ completable: new Set(completable), clickable: new Set(), have: [0,0,0,0,0], need: [0,0,0,0,0], needSource: new Map() });
+const st = (ids: string[]): SelectionState => ({ selected: new Set(ids), pointCap: 55 });
 
-test("selects every star in a constellation when requirements are met", () => {
-  let state: SelectionState = { selected: new Set(["crossroads_eldritch:0"]), pointCap: 55 };
-  state = toggleConstellation(model, state, "bat");
-  for (const id of batStars) expect(state.selected.has(id)).toBe(true);
-  expect(state.selected.has("crossroads_eldritch:0")).toBe(true);
+test("claims all stars when completable", () => {
+  const next = toggleConstellation(model, st([]), view(["A"]), "A");
+  expect([...next.selected].sort()).toEqual(["A:0", "A:1"]);
 });
-
-test("a second toggle removes the whole constellation again", () => {
-  let state: SelectionState = { selected: new Set(["crossroads_eldritch:0"]), pointCap: 55 };
-  state = toggleConstellation(model, state, "bat");
-  state = toggleConstellation(model, state, "bat");
-  for (const id of batStars) expect(state.selected.has(id)).toBe(false);
-  expect(state.selected.has("crossroads_eldritch:0")).toBe(true);
+test("rejects a claim when not completable", () => {
+  expect(toggleConstellation(model, st([]), view([]), "A")).toEqual(st([]));
 });
-
-test("rejects a constellation whose affinity requirement is not met", () => {
-  const state: SelectionState = { selected: new Set(), pointCap: 55 };
-  const next = toggleConstellation(model, state, "bat");
-  expect(next).toBe(state); // unchanged (no eldritch affinity yet)
-});
-
-test("rejects a constellation that would exceed the point cap", () => {
-  const state: SelectionState = { selected: new Set(["crossroads_eldritch:0"]), pointCap: 3 };
-  const next = toggleConstellation(model, state, "bat"); // 1 + 5 = 6 > 3
-  expect(next.selected.size).toBe(1);
-});
-
-test("ignores unknown or empty constellation ids", () => {
-  const state: SelectionState = { selected: new Set(), pointCap: 55 };
-  expect(toggleConstellation(model, state, "nope")).toBe(state);
+test("removes the whole constellation freely when fully selected", () => {
+  const next = toggleConstellation(model, st(["A:0", "A:1"]), view([]), "A");
+  expect(next.selected.size).toBe(0);
 });
