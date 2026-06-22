@@ -309,7 +309,12 @@ export function reachableExact(cons: ReachCon[], table: CoverTable, claimedIds: 
  * remain to undercut it). Reachable iff some finish-choice yields a covering, constructible build
  * within budget. With no partial finishes this is exactly the single whole-constellation DFS.
  */
+let exactNodes = 0;
+/** Nodes visited by the last reachableExactFrom call (diagnostic / cap tuning). */
+export function lastExactNodes(): number { return exactNodes; }
+
 export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): boolean {
+  exactNodes = 0;
   const ratio = (c: ReachCon) => (c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4]) / c.size;
   const wholeFiller = cons
     .filter((c) => !st.startedIds.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]))
@@ -321,6 +326,7 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
   // Whole-constellation DFS for one finish-choice; the cover prune is admissible (no finishes left).
   function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec, builtCons: ReachCon[]): void {
     if (found) return;
+    exactNodes++;
     if (covers(build, maxReqPlaced) && constructible([...builtCons, ...chosen])) { found = true; return; }
     if (i >= wholeFiller.length) return;
     const target = maxV(maxReqPlaced, st.target);
