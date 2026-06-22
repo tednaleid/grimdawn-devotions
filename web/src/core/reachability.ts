@@ -411,6 +411,10 @@ export function reachabilityForSelection(model: DevotionModel, cons: ReachCon[],
   for (const star of model.stars.values()) {
     if (selected.has(star.id)) continue;
     if (!star.predecessors.every((p) => selected.has(p))) continue;
+    // A frontier star of a completable constellation is always clickable: the witness build that
+    // completes that constellation also contains this star, so any prefix of it stays reachable.
+    // This skips the resolver for most of the clickable pass (the dominant early-game cost).
+    if (completable.has(star.constellationId)) { clickable.add(star.id); continue; }
     const withStar = new Set(selected); withStar.add(star.id);
     if (classifyForSelection(cons, table, selectionSummary(model, withStar), budget) === "reachable") clickable.add(star.id);
   }
