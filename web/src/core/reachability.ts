@@ -3,7 +3,7 @@
 // ABOUTME: constructible from the refundable crossroads seed (some order places each member with
 // ABOUTME: its requirement met). minCost is bracketed by a fast cover-table lower bound (sound for
 // ABOUTME: "dim") and a constructibility-aware greedy upper bound (sound for "reachable").
-import { AFFINITIES, type DevotionModel } from "./types";
+import { AFFINITIES, type DevotionModel, type StarId } from "./types";
 
 export type Vec = [number, number, number, number, number]; // order = AFFINITIES
 // Hard per-color cap: the max requirement that gates anything; affinity beyond this is worthless.
@@ -358,4 +358,35 @@ export function completionMinCost(model: DevotionModel, cons: ReachCon[], table:
     if (reachableExactFrom(cons, table, st, mid)) hi = mid; else lo = mid + 1;
   }
   return lo;
+}
+
+export interface ReachView { completable: Set<string>; clickable: Set<StarId>; have: Vec; need: Vec; needSource: Map<number, string[]> }
+
+/** One full sweep for a selection: what can be completed, what stars can be clicked, and the panel vectors. */
+export function reachabilityForSelection(model: DevotionModel, cons: ReachCon[], table: CoverTable, selected: Set<StarId>, budget = BUDGET): ReachView {
+  const st = selectionSummary(model, selected);
+  const completable = new Set<string>();
+  const clickable = new Set<StarId>();
+  // completable: completing the whole constellation stays within budget (already-complete ones are trivially "completable").
+  for (const c of model.constellations.values()) {
+    const withCon = new Set(selected);
+    for (const sid of c.starIds) withCon.add(sid);
+    if (classifyForSelection(cons, table, selectionSummary(model, withCon), budget) === "reachable") completable.add(c.id);
+  }
+  // clickable: each not-selected star whose predecessors are all selected, if placing it keeps the selection reachable.
+  for (const star of model.stars.values()) {
+    if (selected.has(star.id)) continue;
+    if (!star.predecessors.every((p) => selected.has(p))) continue;
+    const withStar = new Set(selected); withStar.add(star.id);
+    if (classifyForSelection(cons, table, selectionSummary(model, withStar), budget) === "reachable") clickable.add(star.id);
+  }
+  // panel: have = supply, need = target, needSource = started cons defining each color's max.
+  const needSource = new Map<number, string[]>();
+  for (let i = 0; i < 5; i++) {
+    if (st.target[i] === 0) continue;
+    const src: string[] = [];
+    for (const conId of st.startedIds) { const c = model.constellations.get(conId)!; if ((vecOf(c.affinityRequired)[i] ?? 0) === st.target[i]) src.push(conId); }
+    needSource.set(i, src);
+  }
+  return { completable, clickable, have: st.supply, need: st.target, needSource };
 }

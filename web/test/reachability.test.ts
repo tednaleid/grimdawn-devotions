@@ -4,7 +4,8 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, classifyForSelection, lowerBoundFrom, completionMinCost, INF, type ReachCon, type ReachState, type Vec } from "../src/core/reachability";
+import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, classifyForSelection, lowerBoundFrom, completionMinCost, reachabilityForSelection, INF, type ReachCon, type ReachState, type Vec } from "../src/core/reachability";
+import type { DevotionModel } from "../src/core/types";
 
 const CAP: Vec = [20, 8, 20, 10, 20];
 const SEED: Vec = [1, 1, 1, 1, 1];
@@ -49,6 +50,48 @@ function randCase(seed: number) {
   const pick: string[] = [];
   for (let i = 0, nb = 1 + Math.floor(rng() * 2); i < nb; i++) { const id = ids[Math.floor(rng() * ids.length)]!; if (!pick.includes(id)) pick.push(id); }
   return { model, pick, budget: 8 + Math.floor(rng() * 10) };
+}
+
+// Build a synthetic DevotionModel from a list of constellation specs (for testing).
+// Each constellation gets stars with proper predecessors: star k has predecessors [ConId:(k-1)] for k>0.
+function modelFromCons(conSpecs: Array<{ id: string; size: number; req: Vec; grant: Vec }>): DevotionModel {
+  const stars = new Map();
+  const constellations = new Map();
+  for (const spec of conSpecs) {
+    const starIds: string[] = [];
+    for (let k = 0; k < spec.size; k++) {
+      const starId = `${spec.id}:${k}`;
+      starIds.push(starId);
+      const predecessors = k === 0 ? [] : [`${spec.id}:${k - 1}`];
+      stars.set(starId, {
+        id: starId,
+        constellationId: spec.id,
+        index: k,
+        predecessors,
+        position: { x: 0, y: 0 },
+        bonuses: {},
+        celestialPower: null,
+        weaponRequirement: null,
+      });
+    }
+    constellations.set(spec.id, {
+      id: spec.id,
+      name: spec.id,
+      tier: null,
+      affinityRequired: {},
+      affinityBonus: {},
+      background: null,
+      starIds,
+    });
+    // Convert req/grant vecs to AffinityMap
+    const affinities: ["ascendant", "chaos", "eldritch", "order", "primordial"] = ["ascendant", "chaos", "eldritch", "order", "primordial"];
+    const con = constellations.get(spec.id)!;
+    for (let i = 0; i < 5; i++) {
+      if (spec.req[i]) (con.affinityRequired as any)[affinities[i]!] = spec.req[i];
+      if (spec.grant[i]) (con.affinityBonus as any)[affinities[i]!] = spec.grant[i];
+    }
+  }
+  return { stars, constellations };
 }
 
 test("cover lower bound never exceeds the true min-cost (sound lower bound)", () => {
@@ -257,4 +300,32 @@ test("lowerBoundFrom credits cheap partial finishes (sound vs the brute oracle)"
 test("completionMinCost reports Leviathan 26 and Tree of Life 27 from an empty selection", () => {
   expect(completionMinCost(realModel, cons, cover, new Set(), id("Leviathan"))).toBe(26);
   expect(completionMinCost(realModel, cons, cover, new Set(), id("Tree of Life"))).toBe(27);
+});
+
+// ---- reachabilityForSelection ----
+
+test("reachabilityForSelection: a startable-but-not-completable constellation keeps a clickable first star", () => {
+  // Synthetic Crook/Anvil at budget 6: Crook (5 stars, grants ascendant 5) is complete; Anvil (4 stars, needs ascendant 1).
+  const model: any = modelFromCons([
+    { id: "x0", size: 1, req: [0,0,0,0,0], grant: [1,0,0,0,0] },
+    { id: "Crook", size: 5, req: [0,0,0,0,0], grant: [5,0,0,0,0] },
+    { id: "Anvil", size: 4, req: [1,0,0,0,0], grant: [0,0,0,2,0] },
+  ]);
+  const mc = buildReachCons(model);
+  const table = buildCoverTable(mc);
+  const selected = new Set<string>(["Crook:0","Crook:1","Crook:2","Crook:3","Crook:4"]);
+  const view = reachabilityForSelection(model, mc, table, selected, 6);
+  expect(view.completable.has("Anvil")).toBe(false);   // 5 + 4 = 9 > 6
+  expect(view.clickable.has("Anvil:0")).toBe(true);    // first star fits (cost 6, deficit 0)
+  expect(view.clickable.has("Anvil:1")).toBe(false);   // predecessor (Anvil:0) not yet selected
+  expect(view.have[0]).toBe(5);                          // ascendant supply from completed Crook
+});
+
+test("reachabilityForSelection: empty map dims nothing at 55 and dims Leviathan below its floor", () => {
+  const full = reachabilityForSelection(realModel, cons, cover, new Set(), 55);
+  expect(full.completable.size).toBe(realModel.constellations.size);
+  const tight = reachabilityForSelection(realModel, cons, cover, new Set(), 19);
+  expect(tight.completable.has(id("Leviathan"))).toBe(false);
+  // Leviathan's first star needs minCost 20, so below 20 even its first star is not clickable.
+  expect(tight.clickable.has(`${id("Leviathan")}:0`)).toBe(false);
 });
