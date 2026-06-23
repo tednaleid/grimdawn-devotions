@@ -43,7 +43,12 @@ export function renderBenefits(
   // Every subject's full set of stat ids (for subject-level tagging + group-selected),
   // so selecting a subject highlights all of its sources, not just the dimensions held.
   const catalogIds = new Map<string, string[]>();
-  for (const g of catalog) for (const s of g.subjects) catalogIds.set(s.key, s.parts.map((p) => p.id));
+  for (const g of catalog)
+    for (const s of g.subjects)
+      catalogIds.set(
+        s.key,
+        s.parts.map((p) => p.id),
+      );
   const subjectIds = (s: CondensedSubject) => catalogIds.get(s.key) ?? s.parts.map((p) => p.id);
   const groupSel = (s: CondensedSubject) => {
     const ids = subjectIds(s);
@@ -58,9 +63,11 @@ export function renderBenefits(
     const main = s.parts.filter((p) => p.dim !== "durFlat" && p.dim !== "durPct");
     const dur = s.parts.filter((p) => p.dim === "durFlat" || p.dim === "durPct");
     if (dur.length) {
-      return `${open}<div class="bsubj" data-gtoggle>${s.subject}</div>` +
+      return (
+        `${open}<div class="bsubj" data-gtoggle>${s.subject}</div>` +
         `<div class="bsub"><span class="blbl">damage</span><span class="bvals">${main.map(chip).join("")}</span></div>` +
-        `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`;
+        `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`
+      );
     }
     return `${open}<div class="bsingle"><span class="bsubj" data-gtoggle>${s.subject}</span><span class="bvals">${main.map(chip).join("")}</span></div></div>`;
   };
@@ -69,40 +76,48 @@ export function renderBenefits(
   const activeKeys = new Set<string>();
   for (const g of activeGroups) for (const s of g.subjects) activeKeys.add(s.key);
 
-  const activeHtml = activeGroups
-    .map((g) => `<h3>${g.group}</h3>${g.subjects.map(activeSubject).join("")}`)
-    .join("");
+  const activeHtml = activeGroups.map((g) => `<h3>${g.group}</h3>${g.subjects.map(activeSubject).join("")}`).join("");
 
   // Inactive catalog subjects you can still obtain, grouped by category, as name-only selectable
   // tags. A subject shows only if one of its stat ids is in `availableIds` (the bonuses still
   // reachable given the selection); passing undefined disables the filter and lists every inactive
   // subject (the permissive/uncapped path). A subject the user has tagged stays listed even when it
   // is no longer obtainable, so a tag can always be cleared from the panel that set it.
-  const obtainable = (s: CondensedSubject) => availableIds === undefined || subjectIds(s).some((id) => availableIds.has(id));
+  const obtainable = (s: CondensedSubject) =>
+    availableIds === undefined || subjectIds(s).some((id) => availableIds.has(id));
   const tagged = (s: CondensedSubject) => subjectIds(s).some((id) => selectedBenefits.has(id));
   const availHtml = catalog
     .map((g) => {
       const subs = g.subjects
         .filter((s) => !activeKeys.has(s.key) && (obtainable(s) || tagged(s)))
-        .map((s) => `<div class="bgroup avail${groupSel(s)}" data-gkey="${s.key}" data-ids="${subjectIds(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`)
+        .map(
+          (s) =>
+            `<div class="bgroup avail${groupSel(s)}" data-gkey="${s.key}" data-ids="${subjectIds(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`,
+        )
         .join("");
       return subs ? `<h3>${g.group}</h3><div class="avail-list">${subs}</div>` : "";
     })
     .join("");
 
   // data-star-id lets main.ts show the same rich tooltip as the power's map star on hover.
-  const powerRows = powers
-    .map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`)
-    .join("");
+  const powerRows = powers.map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`).join("");
 
   // "Bonus to All Pets": summed pet bonuses as their own read-only section. Pet stat ids
   // overlap player ones, so these are not taggable/highlightable; and they carry no
   // duration dimensions, so a flat subject line suffices. Flashes on change like above.
-  const petChip = (p: CondensedPart) => `<span class="bchip${changeClass(prevPet, p.id, petBonuses)}">${partText(p)}</span>`;
+  const petChip = (p: CondensedPart) =>
+    `<span class="bchip${changeClass(prevPet, p.id, petBonuses)}">${partText(p)}</span>`;
   const petHtml = condensedRows(petBonuses)
-    .map((g) => `<h3>${g.group}</h3>` + g.subjects
-      .map((s) => `<div class="bgroup"><div class="bsingle"><span class="bsubj">${s.subject}</span><span class="bvals">${s.parts.map(petChip).join("")}</span></div></div>`)
-      .join(""))
+    .map(
+      (g) =>
+        `<h3>${g.group}</h3>` +
+        g.subjects
+          .map(
+            (s) =>
+              `<div class="bgroup"><div class="bsingle"><span class="bsubj">${s.subject}</span><span class="bvals">${s.parts.map(petChip).join("")}</span></div></div>`,
+          )
+          .join(""),
+    )
     .join("");
 
   el.innerHTML =
@@ -126,7 +141,13 @@ export function renderAffinities(
   needSource: Map<number, string[]>,
   prev?: Record<Affinity, number>,
 ): Record<Affinity, number> {
-  const totals = { ascendant: have[0], chaos: have[1], eldritch: have[2], order: have[3], primordial: have[4] } as Record<Affinity, number>;
+  const totals = {
+    ascendant: have[0],
+    chaos: have[1],
+    eldritch: have[2],
+    order: have[3],
+    primordial: have[4],
+  } as Record<Affinity, number>;
   const rows = AFFINITIES.map((a, i) => {
     const flash = changeClass(prev, a, totals as Record<string, number>);
     const n = need[i]!;

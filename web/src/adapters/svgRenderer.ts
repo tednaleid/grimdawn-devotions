@@ -24,7 +24,8 @@ function diamondPoints(cx: number, cy: number, r: number): string {
 
 // Left-to-right gradient stops for a constellation's identity colors (1-3 colors).
 function gradientStops(colors: string[]): string {
-  if (colors.length === 1) return `<stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[0]}"/>`;
+  if (colors.length === 1)
+    return `<stop offset="0%" stop-color="${colors[0]}"/><stop offset="100%" stop-color="${colors[0]}"/>`;
   return colors
     .map((c, i) => `<stop offset="${Math.round((i / (colors.length - 1)) * 100)}%" stop-color="${c}"/>`)
     .join("");
@@ -46,12 +47,24 @@ const HIT_RADIUS = 22;
 // Padding around a constellation's star bounding box for its hover/click region.
 const CON_PAD = 24;
 
-export interface RenderOpts { manifest: AssetManifest | null; highlight?: Set<StarId>; reach?: ReachView }
+export interface RenderOpts {
+  manifest: AssetManifest | null;
+  highlight?: Set<StarId>;
+  reach?: ReachView;
+}
 
 // A constellation's hover/click footprint in SVG world coords: its art bounds
 // (x0,y0)-(x1,y1) and the centroid of its stars, used to break ties where art
 // bounding boxes overlap.
-export interface ConRegion { id: string; x0: number; y0: number; x1: number; y1: number; cx: number; cy: number }
+export interface ConRegion {
+  id: string;
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  cx: number;
+  cy: number;
+}
 
 // Build a hover region per constellation: the art bounds when art is present, else
 // the star bounding box plus padding. Star centroids are the tie-break centers.
@@ -67,9 +80,25 @@ export function buildConRegions(model: DevotionModel, manifest: AssetManifest | 
     const name = c.background?.image?.split("/").pop() ?? "";
     const art = manifest?.images[name];
     if (art && c.background && c.background.x != null && c.background.y != null) {
-      regions.push({ id: c.id, x0: c.background.x, y0: c.background.y, x1: c.background.x + art.w, y1: c.background.y + art.h, cx, cy });
+      regions.push({
+        id: c.id,
+        x0: c.background.x,
+        y0: c.background.y,
+        x1: c.background.x + art.w,
+        y1: c.background.y + art.h,
+        cx,
+        cy,
+      });
     } else {
-      regions.push({ id: c.id, x0: Math.min(...xs) - CON_PAD, y0: Math.min(...ys) - CON_PAD, x1: Math.max(...xs) + CON_PAD, y1: Math.max(...ys) + CON_PAD, cx, cy });
+      regions.push({
+        id: c.id,
+        x0: Math.min(...xs) - CON_PAD,
+        y0: Math.min(...ys) - CON_PAD,
+        x1: Math.max(...xs) + CON_PAD,
+        y1: Math.max(...ys) + CON_PAD,
+        cx,
+        cy,
+      });
     }
   }
   return regions;
@@ -85,7 +114,10 @@ export function constellationAt(regions: ConRegion[], wx: number, wy: number): s
     const dx = wx - r.cx;
     const dy = wy - r.cy;
     const d = dx * dx + dy * dy;
-    if (d < bestD) { bestD = d; best = r.id; }
+    if (d < bestD) {
+      bestD = d;
+      best = r.id;
+    }
   }
   return best;
 }
@@ -110,7 +142,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 
   // A fully-selected (active) constellation gets a brighter, glowing art so active ones stand out
   // when zoomed out. Only complete constellations qualify (a partial pick does not).
-  const isActive = (c: Constellation): boolean => c.starIds.length > 0 && c.starIds.every((id) => state.selected.has(id));
+  const isActive = (c: Constellation): boolean =>
+    c.starIds.length > 0 && c.starIds.every((id) => state.selected.has(id));
 
   // Constellation hover/click is resolved in JS against each constellation's art
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
@@ -118,7 +151,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 
   // Gradient defs for every constellation (used by both the star fills and the art tint).
   for (const c of model.constellations.values()) {
-    defs.push(`<linearGradient id="grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(gradColors(c))}</linearGradient>`);
+    defs.push(
+      `<linearGradient id="grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(gradColors(c))}</linearGradient>`,
+    );
   }
 
   // Layer 1: optional art, tinted by the constellation's identity (granted) colors.
@@ -144,7 +179,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
         defs.push(`<mask id="${mid}"><image ${img}/></mask>`);
-        parts.push(`<rect class="art-tint${dim}${active}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`);
+        parts.push(
+          `<rect class="art-tint${dim}${active}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`,
+        );
       }
     }
   }
@@ -154,7 +191,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     for (const p of star.predecessors) {
       const a = model.stars.get(p);
       if (!a) continue;
-      parts.push(`<line class="link" x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"/>`);
+      parts.push(
+        `<line class="link" x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"/>`,
+      );
     }
   }
 
@@ -177,7 +216,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const visible = star.celestialPower
       ? `<polygon class="star power ${st}${m}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
       : `<circle class="star ${st}${m}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
-    parts.push(`<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`);
+    parts.push(
+      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`,
+    );
   }
 
   const pts = [...model.stars.values()].map((s) => ({ x: s.position.x + STAR_CENTER, y: s.position.y + STAR_CENTER }));
@@ -185,7 +226,10 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   return `<svg id="map" viewBox="${vb}" preserveAspectRatio="xMidYMid meet"><defs>${defs.join("")}</defs>${parts.join("")}</svg>`;
 }
 
-export interface SvgHandle { update(state: SelectionState, highlight?: Set<StarId>, reach?: ReachView): void; svg: SVGSVGElement }
+export interface SvgHandle {
+  update(state: SelectionState, highlight?: Set<StarId>, reach?: ReachView): void;
+  svg: SVGSVGElement;
+}
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
   manifest: AssetManifest | null;
@@ -217,7 +261,10 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 
   container.addEventListener("click", (e) => {
     const sid = (e.target as Element)?.getAttribute?.("data-star-id");
-    if (sid) { deps.onStarClick(sid); return; }
+    if (sid) {
+      deps.onStarClick(sid);
+      return;
+    }
     const cid = conAt((e as MouseEvent).clientX, (e as MouseEvent).clientY);
     if (cid) deps.onConstellationClick(cid);
   });

@@ -5,14 +5,21 @@ import { condensedRows } from "../src/core/statFormat";
 
 const bonuses = {
   // Frostburn (Cold DoT): flat dmg, % dmg, flat duration, % duration.
-  offensiveSlowColdMin: 10, offensiveSlowColdMax: 15, offensiveSlowColdModifier: 18,
-  offensiveSlowColdDurationMin: 0.5, offensiveSlowColdDurationModifier: 20,
+  offensiveSlowColdMin: 10,
+  offensiveSlowColdMax: 15,
+  offensiveSlowColdModifier: 18,
+  offensiveSlowColdDurationMin: 0.5,
+  offensiveSlowColdDurationModifier: 20,
   // Fire (instant): flat + %.
-  offensiveFireMin: 5, offensiveFireMax: 8, offensiveFireModifier: 13,
+  offensiveFireMin: 5,
+  offensiveFireMax: 8,
+  offensiveFireModifier: 13,
   // Fire resistance: base + max.
-  defensiveFire: 13, defensiveFireMaxResist: 3,
+  defensiveFire: 13,
+  defensiveFireMaxResist: 3,
   // Physique: flat + %.
-  characterStrength: 32, characterStrengthModifier: 3,
+  characterStrength: 32,
+  characterStrengthModifier: 3,
   // Standalone single-dimension.
   characterRunSpeedModifier: 5,
 };

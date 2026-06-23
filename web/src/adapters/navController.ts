@@ -30,7 +30,9 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
     const [x, y, w, h] = [parts[0] ?? 0, parts[1] ?? 0, parts[2] ?? 0, parts[3] ?? 0];
     return { x, y, w, h };
   }
-  function apply(vb: ViewBox) { svgGetter()?.setAttribute("viewBox", toViewBoxString(vb)); }
+  function apply(vb: ViewBox) {
+    svgGetter()?.setAttribute("viewBox", toViewBoxString(vb));
+  }
 
   function clientToWorld(svg: SVGSVGElement, clientX: number, clientY: number): { x: number; y: number } {
     const rect = svg.getBoundingClientRect();
@@ -41,10 +43,14 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
     };
   }
 
-  let dragging = false, moved = false, lastX = 0, lastY = 0;
+  let dragging = false,
+    moved = false,
+    lastX = 0,
+    lastY = 0;
 
   function onWheel(e: WheelEvent) {
-    const svg = svgGetter(); if (!svg) return;
+    const svg = svgGetter();
+    if (!svg) return;
     e.preventDefault();
     const w = clientToWorld(svg, e.clientX, e.clientY);
     const factor = e.deltaY > 0 ? 1.1 : 1 / 1.1;
@@ -52,29 +58,48 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
   }
   function onDown(e: MouseEvent) {
     if ((e.target as Element)?.getAttribute?.("data-star-id")) return; // let star clicks through
-    dragging = true; moved = false; lastX = e.clientX; lastY = e.clientY;
+    dragging = true;
+    moved = false;
+    lastX = e.clientX;
+    lastY = e.clientY;
     opts.onDragStateChange?.(true);
   }
   function onMove(e: MouseEvent) {
     if (!dragging) return;
-    const svg = svgGetter(); if (!svg) return;
+    const svg = svgGetter();
+    if (!svg) return;
     const vb = current();
     const rect = svg.getBoundingClientRect();
     const dx = ((e.clientX - lastX) / rect.width) * vb.w;
     const dy = ((e.clientY - lastY) / rect.height) * vb.h;
     if (Math.abs(e.clientX - lastX) + Math.abs(e.clientY - lastY) > DRAG_THRESHOLD) moved = true;
     apply(panViewBox(vb, dx, dy));
-    lastX = e.clientX; lastY = e.clientY;
+    lastX = e.clientX;
+    lastY = e.clientY;
   }
-  function onUp() { if (dragging) { dragging = false; opts.onDragStateChange?.(false); } }
-  function onClickCapture(e: MouseEvent) { if (moved) { e.stopPropagation(); moved = false; } }
+  function onUp() {
+    if (dragging) {
+      dragging = false;
+      opts.onDragStateChange?.(false);
+    }
+  }
+  function onClickCapture(e: MouseEvent) {
+    if (moved) {
+      e.stopPropagation();
+      moved = false;
+    }
+  }
 
   window.addEventListener("mousemove", onMove);
   window.addEventListener("mouseup", onUp);
   // Caller attaches these to the container in main.ts:
   (attachNav as unknown as NavHandlerStore)._handlers = { onWheel, onDown, onClickCapture };
 
-  return { reset() { apply(baseVb); } };
+  return {
+    reset() {
+      apply(baseVb);
+    },
+  };
 }
 
 export function navHandlers(): NavHandlers {

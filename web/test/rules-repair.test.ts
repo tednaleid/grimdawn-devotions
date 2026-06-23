@@ -12,11 +12,11 @@ const nameToId = new Map([...model.constellations.values()].map((c) => [c.name, 
 const lev = model.constellations.get(nameToId.get("Leviathan")!)!;
 
 test("keeps a reachable selection unchanged", () => {
-  const sel = new Set(lev.starIds);                       // Leviathan claimed, cap 55 -> reachable (26)
+  const sel = new Set(lev.starIds); // Leviathan claimed, cap 55 -> reachable (26)
   expect(repairSelection(model, cons, table, sel, 55)).toEqual(sel);
 });
 test("drops a claim that cannot fit the cap", () => {
-  const sel = new Set(lev.starIds);                       // needs 26
+  const sel = new Set(lev.starIds); // needs 26
   const repaired = repairSelection(model, cons, table, sel, 10); // cap 10 < 26 -> must drop Leviathan
   expect([...repaired].some((id) => lev.starIds.includes(id))).toBe(false);
 });

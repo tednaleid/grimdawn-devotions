@@ -4,7 +4,25 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, coverLowerBound, greedyMinCost, classify, classifyComplete, reachableExact, reachabilitySweep, selectionSummary, classifyForSelection, lowerBoundFrom, completionMinCost, reachabilityForSelection, INF, type ReachCon, type ReachState, type Vec } from "../src/core/reachability";
+import {
+  buildReachCons,
+  buildCoverTable,
+  coverLowerBound,
+  greedyMinCost,
+  classify,
+  classifyComplete,
+  reachableExact,
+  reachabilitySweep,
+  selectionSummary,
+  classifyForSelection,
+  lowerBoundFrom,
+  completionMinCost,
+  reachabilityForSelection,
+  INF,
+  type ReachCon,
+  type ReachState,
+  type Vec,
+} from "../src/core/reachability";
 import type { DevotionModel } from "../src/core/types";
 
 const CAP: Vec = [20, 8, 20, 10, 20];
@@ -20,27 +38,65 @@ function isValidBuild(B: ReachCon[]): boolean {
   const total = B.reduce((t, c) => addCap(t, c.grant), zero());
   const maxreq = B.reduce((r, c) => maxV(r, c.req), zero());
   if (!covers(total, maxreq)) return false;
-  let gain = SEED.slice() as Vec; const done = B.map(() => false); let placed = 0, changed = true;
-  while (changed) { changed = false; for (let i = 0; i < B.length; i++) { if (done[i]) continue; if (covers(gain, B[i]!.req)) { done[i] = true; placed++; gain = addCap(gain, B[i]!.grant); changed = true; } } }
+  let gain = SEED.slice() as Vec;
+  const done = B.map(() => false);
+  let placed = 0,
+    changed = true;
+  while (changed) {
+    changed = false;
+    for (let i = 0; i < B.length; i++) {
+      if (done[i]) continue;
+      if (covers(gain, B[i]!.req)) {
+        done[i] = true;
+        placed++;
+        gain = addCap(gain, B[i]!.grant);
+        changed = true;
+      }
+    }
+  }
   return placed === B.length;
 }
 // Exhaustive min-cost valid build over filler subsets (small models only).
 function bruteRefund(claimed: ReachCon[], pool: ReachCon[], budget: number): number {
-  let best = INF; const baseOwn = claimed.reduce((s, c) => s + c.size, 0);
+  let best = INF;
+  const baseOwn = claimed.reduce((s, c) => s + c.size, 0);
   for (let mask = 0; mask < 1 << pool.length; mask++) {
-    const B = claimed.slice(); let own = baseOwn;
-    for (let i = 0; i < pool.length; i++) if (mask & (1 << i)) { B.push(pool[i]!); own += pool[i]!.size; }
+    const B = claimed.slice();
+    let own = baseOwn;
+    for (let i = 0; i < pool.length; i++)
+      if (mask & (1 << i)) {
+        B.push(pool[i]!);
+        own += pool[i]!.size;
+      }
     if (own >= best || own > budget) continue;
     if (isValidBuild(B)) best = Math.min(best, own);
   }
   return best;
 }
 
-function mulberry32(a: number) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function mulberry32(a: number) {
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 function randModel(rng: () => number, n: number): ReachCon[] {
   const cons: ReachCon[] = [];
-  for (let i = 0; i < 5; i++) { const g = zero(); g[i] = 1; cons.push({ id: `x${i}`, size: 1, req: zero(), grant: g }); } // crossroads
-  for (let i = 0; i < n; i++) { const req = zero(), grant = zero(); req[Math.floor(rng() * 5)] = Math.floor(rng() * 4); grant[Math.floor(rng() * 5)] = 1 + Math.floor(rng() * 4); cons.push({ id: `c${i}`, size: 1 + Math.floor(rng() * 4), req, grant }); }
+  for (let i = 0; i < 5; i++) {
+    const g = zero();
+    g[i] = 1;
+    cons.push({ id: `x${i}`, size: 1, req: zero(), grant: g });
+  } // crossroads
+  for (let i = 0; i < n; i++) {
+    const req = zero(),
+      grant = zero();
+    req[Math.floor(rng() * 5)] = Math.floor(rng() * 4);
+    grant[Math.floor(rng() * 5)] = 1 + Math.floor(rng() * 4);
+    cons.push({ id: `c${i}`, size: 1 + Math.floor(rng() * 4), req, grant });
+  }
   return cons;
 }
 function randCase(seed: number) {
@@ -48,7 +104,10 @@ function randCase(seed: number) {
   const model = randModel(rng, 6 + Math.floor(rng() * 4));
   const ids = model.map((c) => c.id);
   const pick: string[] = [];
-  for (let i = 0, nb = 1 + Math.floor(rng() * 2); i < nb; i++) { const id = ids[Math.floor(rng() * ids.length)]!; if (!pick.includes(id)) pick.push(id); }
+  for (let i = 0, nb = 1 + Math.floor(rng() * 2); i < nb; i++) {
+    const id = ids[Math.floor(rng() * ids.length)]!;
+    if (!pick.includes(id)) pick.push(id);
+  }
   return { model, pick, budget: 8 + Math.floor(rng() * 10) };
 }
 
@@ -84,7 +143,13 @@ function modelFromCons(conSpecs: Array<{ id: string; size: number; req: Vec; gra
       starIds,
     });
     // Convert req/grant vecs to AffinityMap
-    const affinities: ["ascendant", "chaos", "eldritch", "order", "primordial"] = ["ascendant", "chaos", "eldritch", "order", "primordial"];
+    const affinities: ["ascendant", "chaos", "eldritch", "order", "primordial"] = [
+      "ascendant",
+      "chaos",
+      "eldritch",
+      "order",
+      "primordial",
+    ];
     const con = constellations.get(spec.id)!;
     for (let i = 0; i < 5; i++) {
       if (spec.req[i]) (con.affinityRequired as any)[affinities[i]!] = spec.req[i];
@@ -118,7 +183,9 @@ test("greedy never undercuts the true min-cost (sound upper bound)", () => {
 });
 
 test("classify never lies: no reachable-marked-dim and no dim-marked-reachable", () => {
-  let falseDim = 0, falseReach = 0, unknown = 0;
+  let falseDim = 0,
+    falseReach = 0,
+    unknown = 0;
   for (let seed = 1; seed <= 400; seed++) {
     const { model, pick, budget } = randCase(seed);
     const cover = buildCoverTable(model);
@@ -151,7 +218,12 @@ test("from an empty selection, every constellation is reachable", () => {
 test("Leviathan and Tree of Life are each reachable; their cover cost is ~26-27", () => {
   expect(classify(cons, cover, [id("Leviathan")])).toBe("reachable");
   expect(classify(cons, cover, [id("Tree of Life")])).toBe("reachable");
-  expect(coverLowerBound(cover, [id("Leviathan")].map((i) => cons.find((c) => c.id === i)!))).toBeLessThanOrEqual(30);
+  expect(
+    coverLowerBound(
+      cover,
+      [id("Leviathan")].map((i) => cons.find((c) => c.id === i)!),
+    ),
+  ).toBeLessThanOrEqual(30);
 });
 
 test("reachableExact matches the brute oracle's reachable/dim decision on 400 random models", () => {
@@ -161,7 +233,7 @@ test("reachableExact matches the brute oracle's reachable/dim decision on 400 ra
     const table = buildCoverTable(model);
     const claimed = pick.map((id) => model.find((c) => c.id === id)!);
     const pool = model.filter((c) => !pick.includes(c.id) && c.grant.some((x) => x > 0));
-    if (reachableExact(model, table, pick, budget) !== (bruteRefund(claimed, pool, budget) <= budget)) bad++;
+    if (reachableExact(model, table, pick, budget) !== bruteRefund(claimed, pool, budget) <= budget) bad++;
   }
   expect(bad).toBe(0);
 });
@@ -174,7 +246,7 @@ test("classifyComplete is always reachable or dim, and matches the brute decisio
     const claimed = pick.map((id) => model.find((c) => c.id === id)!);
     const pool = model.filter((c) => !pick.includes(c.id) && c.grant.some((x) => x > 0));
     const v = classifyComplete(model, table, pick, budget);
-    if ((v === "reachable") !== (bruteRefund(claimed, pool, budget) <= budget)) bad++;
+    if ((v === "reachable") !== bruteRefund(claimed, pool, budget) <= budget) bad++;
   }
   expect(bad).toBe(0);
 });
@@ -202,7 +274,7 @@ test("claiming several capstones makes many candidates dim (the feature actually
 });
 
 test("selectionSummary splits started vs completed and tracks partial finishes", () => {
-  const lev = realModel.constellations.get(id("Leviathan"))!;     // grants nothing, requires eldritch+ascendant
+  const lev = realModel.constellations.get(id("Leviathan"))!; // grants nothing, requires eldritch+ascendant
   const tree = realModel.constellations.get(id("Tree of Life"))!; // grants nothing
   // Fully select Leviathan, partially select Tree of Life (first star only).
   const sel = new Set<string>([...lev.starIds, tree.starIds[0]!]);
@@ -227,14 +299,24 @@ test("selectionSummary splits started vs completed and tracks partial finishes",
 // grant sums to the full grant. Validity is the same covers + constructible rule isValidBuild
 // uses, so this oracle is NOT order-free.
 function bruteSelectionMinCost(st: ReachState, cons: ReachCon[], budget: number): number {
-  const finishes: ReachCon[] = st.partialFinish.map((p) => ({ id: `${p.id}#finish`, size: p.remaining, req: p.req, grant: p.grant }));
+  const finishes: ReachCon[] = st.partialFinish.map((p) => ({
+    id: `${p.id}#finish`,
+    size: p.remaining,
+    req: p.req,
+    grant: p.grant,
+  }));
   const startedIds = st.startedIds;
   const fillers = cons.filter((c) => !startedIds.has(c.id) && c.grant.some((x) => x > 0)).concat(finishes);
   const baseOwn = st.built.reduce((s, c) => s + c.size, 0);
   let best = INF;
   for (let mask = 0; mask < 1 << fillers.length; mask++) {
-    const B = st.built.slice(); let own = baseOwn;
-    for (let i = 0; i < fillers.length; i++) if (mask & (1 << i)) { B.push(fillers[i]!); own += fillers[i]!.size; }
+    const B = st.built.slice();
+    let own = baseOwn;
+    for (let i = 0; i < fillers.length; i++)
+      if (mask & (1 << i)) {
+        B.push(fillers[i]!);
+        own += fillers[i]!.size;
+      }
     if (own >= best || own > budget) continue;
     if (isValidBuild(B)) best = Math.min(best, own);
   }
@@ -262,7 +344,8 @@ function randSelectionCase(seed: number): { st: ReachState; cons: ReachCon[]; bu
     } else {
       const sel = 1 + Math.floor(rng() * (c.size - 1)); // 1..size-1 stars
       built.push({ id: c.id, size: sel, req: c.req, grant: zero() });
-      if (c.grant.some((x) => x > 0)) partialFinish.push({ id: c.id, remaining: c.size - sel, grant: c.grant, req: c.req });
+      if (c.grant.some((x) => x > 0))
+        partialFinish.push({ id: c.id, remaining: c.size - sel, grant: c.grant, req: c.req });
     }
   }
   const supply = built.reduce((t, c) => addCap(t, c.grant), zero());
@@ -272,7 +355,9 @@ function randSelectionCase(seed: number): { st: ReachState; cons: ReachCon[]; bu
 }
 
 test("classifyForSelection never lies vs the brute oracle (400 partial selections)", () => {
-  let falseDim = 0, falseReach = 0, unknown = 0;
+  let falseDim = 0,
+    falseReach = 0,
+    unknown = 0;
   for (let seed = 1; seed <= 400; seed++) {
     const { st, cons, budget } = randSelectionCase(seed);
     const table = buildCoverTable(cons);
@@ -307,18 +392,18 @@ test("completionMinCost reports Leviathan 26 and Tree of Life 27 from an empty s
 test("reachabilityForSelection: a startable-but-not-completable constellation keeps a clickable first star", () => {
   // Synthetic Crook/Anvil at budget 6: Crook (5 stars, grants ascendant 5) is complete; Anvil (4 stars, needs ascendant 1).
   const model: any = modelFromCons([
-    { id: "x0", size: 1, req: [0,0,0,0,0], grant: [1,0,0,0,0] },
-    { id: "Crook", size: 5, req: [0,0,0,0,0], grant: [5,0,0,0,0] },
-    { id: "Anvil", size: 4, req: [1,0,0,0,0], grant: [0,0,0,2,0] },
+    { id: "x0", size: 1, req: [0, 0, 0, 0, 0], grant: [1, 0, 0, 0, 0] },
+    { id: "Crook", size: 5, req: [0, 0, 0, 0, 0], grant: [5, 0, 0, 0, 0] },
+    { id: "Anvil", size: 4, req: [1, 0, 0, 0, 0], grant: [0, 0, 0, 2, 0] },
   ]);
   const mc = buildReachCons(model);
   const table = buildCoverTable(mc);
-  const selected = new Set<string>(["Crook:0","Crook:1","Crook:2","Crook:3","Crook:4"]);
+  const selected = new Set<string>(["Crook:0", "Crook:1", "Crook:2", "Crook:3", "Crook:4"]);
   const view = reachabilityForSelection(model, mc, table, selected, 6);
-  expect(view.completable.has("Anvil")).toBe(false);   // 5 + 4 = 9 > 6
-  expect(view.clickable.has("Anvil:0")).toBe(true);    // first star fits (cost 6, deficit 0)
-  expect(view.clickable.has("Anvil:1")).toBe(false);   // predecessor (Anvil:0) not yet selected
-  expect(view.have[0]).toBe(5);                          // ascendant supply from completed Crook
+  expect(view.completable.has("Anvil")).toBe(false); // 5 + 4 = 9 > 6
+  expect(view.clickable.has("Anvil:0")).toBe(true); // first star fits (cost 6, deficit 0)
+  expect(view.clickable.has("Anvil:1")).toBe(false); // predecessor (Anvil:0) not yet selected
+  expect(view.have[0]).toBe(5); // ascendant supply from completed Crook
 });
 
 test("reachabilityForSelection: empty map dims nothing at 55 and dims Leviathan below its floor", () => {
@@ -336,7 +421,8 @@ test("reachabilityForSelection stays fast at a deep multi-capstone state (partia
   // goes loose (or off) for those it balloons to seconds. Deciding finishes up front keeps the prune
   // tight per branch, ~100ms. Generous bound so it cannot flake on CI while still catching a regression.
   const sel = new Set<string>();
-  for (const n of ["Lotus", "Kraken", "Leviathan", "Tree of Life", "Lion"]) for (const sid of realModel.constellations.get(id(n))!.starIds) sel.add(sid);
+  for (const n of ["Lotus", "Kraken", "Leviathan", "Tree of Life", "Lion"])
+    for (const sid of realModel.constellations.get(id(n))!.starIds) sel.add(sid);
   const t = performance.now();
   const view = reachabilityForSelection(realModel, cons, cover, sel, 55);
   expect(performance.now() - t).toBeLessThan(3000);

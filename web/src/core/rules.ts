@@ -25,17 +25,30 @@ export function removeWithDependents(model: DevotionModel, selected: Set<StarId>
   return next;
 }
 
-export function toggleStar(model: DevotionModel, state: SelectionState, reach: ReachView, starId: StarId): SelectionState {
-  if (state.selected.has(starId)) return { selected: removeWithDependents(model, state.selected, starId), pointCap: state.pointCap };
+export function toggleStar(
+  model: DevotionModel,
+  state: SelectionState,
+  reach: ReachView,
+  starId: StarId,
+): SelectionState {
+  if (state.selected.has(starId))
+    return { selected: removeWithDependents(model, state.selected, starId), pointCap: state.pointCap };
   if (!reach.clickable.has(starId)) return state; // not a valid target right now
-  const next = new Set(state.selected); next.add(starId);
+  const next = new Set(state.selected);
+  next.add(starId);
   return { selected: next, pointCap: state.pointCap };
 }
 
-export function toggleConstellation(model: DevotionModel, state: SelectionState, reach: ReachView, conId: string): SelectionState {
+export function toggleConstellation(
+  model: DevotionModel,
+  state: SelectionState,
+  reach: ReachView,
+  conId: string,
+): SelectionState {
   const con = model.constellations.get(conId);
   if (!con || con.starIds.length === 0) return state;
-  if (con.starIds.every((id) => state.selected.has(id))) { // fully selected -> remove all (free)
+  if (con.starIds.every((id) => state.selected.has(id))) {
+    // fully selected -> remove all (free)
     const next = new Set(state.selected);
     for (const id of con.starIds) next.delete(id);
     return { selected: next, pointCap: state.pointCap };
@@ -51,7 +64,10 @@ function predecessorClosure(model: DevotionModel, selected: Set<StarId>): Set<St
   let cur = new Set(selected);
   for (;;) {
     const next = new Set<StarId>();
-    for (const id of cur) { const s = model.stars.get(id); if (s && s.predecessors.every((p) => cur.has(p))) next.add(id); }
+    for (const id of cur) {
+      const s = model.stars.get(id);
+      if (s && s.predecessors.every((p) => cur.has(p))) next.add(id);
+    }
     if (next.size === cur.size) return next;
     cur = next;
   }
@@ -60,14 +76,28 @@ function predecessorClosure(model: DevotionModel, selected: Set<StarId>): Set<St
 // Best-effort repair for a restored selection: enforce predecessor-closure, then drop the largest
 // started constellation until the set is reachable within cap. App-generated links are already
 // reachable, so this only fires for stale or hand-edited links. Null table -> accept as-is (degraded).
-export function repairSelection(model: DevotionModel, cons: ReachCon[], table: CoverTable | null, selected: Set<StarId>, cap: number): Set<StarId> {
+export function repairSelection(
+  model: DevotionModel,
+  cons: ReachCon[],
+  table: CoverTable | null,
+  selected: Set<StarId>,
+  cap: number,
+): Set<StarId> {
   const cur = predecessorClosure(model, selected);
   if (!table) return cur;
   while (cur.size > 0 && classifyForSelection(cons, table, selectionSummary(model, cur), cap) === "dim") {
     const started = new Map<string, number>();
-    for (const id of cur) { const cid = model.stars.get(id)?.constellationId; if (cid) started.set(cid, (started.get(cid) ?? 0) + 1); }
-    let drop = "", best = -1;
-    for (const [cid, n] of started) if (n > best) { best = n; drop = cid; }
+    for (const id of cur) {
+      const cid = model.stars.get(id)?.constellationId;
+      if (cid) started.set(cid, (started.get(cid) ?? 0) + 1);
+    }
+    let drop = "",
+      best = -1;
+    for (const [cid, n] of started)
+      if (n > best) {
+        best = n;
+        drop = cid;
+      }
     const con = model.constellations.get(drop);
     if (!con) break;
     for (const id of con.starIds) cur.delete(id);

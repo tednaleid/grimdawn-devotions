@@ -6,13 +6,23 @@ import type { CondensedGroup } from "../src/core/statFormat";
 import type { DevotionModel } from "../src/core/types";
 
 const emptyModel = { stars: new Map(), constellations: new Map() } as unknown as DevotionModel;
-const catalog: CondensedGroup[] = [{
-  group: "Offense",
-  subjects: [
-    { subject: "Fire Damage", key: "Offense:Fire Damage", parts: [{ dim: "flat", value: "+10", id: "offensiveFireMin" }] },
-    { subject: "Cold Damage", key: "Offense:Cold Damage", parts: [{ dim: "flat", value: "+10", id: "offensiveColdMin" }] },
-  ],
-}];
+const catalog: CondensedGroup[] = [
+  {
+    group: "Offense",
+    subjects: [
+      {
+        subject: "Fire Damage",
+        key: "Offense:Fire Damage",
+        parts: [{ dim: "flat", value: "+10", id: "offensiveFireMin" }],
+      },
+      {
+        subject: "Cold Damage",
+        key: "Offense:Cold Damage",
+        parts: [{ dim: "flat", value: "+10", id: "offensiveColdMin" }],
+      },
+    ],
+  },
+];
 
 function availOf(availableIds?: Set<string>): string {
   const el = { innerHTML: "" } as unknown as HTMLElement;
@@ -38,7 +48,15 @@ test("without an availability filter, all inactive subjects are listed", () => {
 test("a tagged subject stays listed even when it is no longer obtainable (so it can be untagged)", () => {
   const el = { innerHTML: "" } as unknown as HTMLElement;
   // Cold is absent from availableIds (unobtainable) but tagged; it must remain in the list.
-  const html = renderBenefits(el, emptyModel, new Set(), undefined, new Set(["offensiveColdMin"]), catalog, new Set(["offensiveFireMin"])).availHtml;
+  const html = renderBenefits(
+    el,
+    emptyModel,
+    new Set(),
+    undefined,
+    new Set(["offensiveColdMin"]),
+    catalog,
+    new Set(["offensiveFireMin"]),
+  ).availHtml;
   expect(html).toContain("Cold Damage");
   expect(html).toContain("Fire Damage");
 });

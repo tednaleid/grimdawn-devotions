@@ -31,15 +31,14 @@ export function sumPetBonuses(model: DevotionModel, selected: Iterable<StarId>):
 export function racialTargets(model: DevotionModel, selected: Iterable<StarId>): string[] {
   const out = new Set<string>();
   for (const id of selected) {
-    model.stars.get(id)?.racialTarget?.forEach((r) => { out.add(r); });
+    model.stars.get(id)?.racialTarget?.forEach((r) => {
+      out.add(r);
+    });
   }
   return [...out];
 }
 
-export function powersGained(
-  model: DevotionModel,
-  selected: Set<StarId>,
-): { starId: StarId; power: CelestialPower }[] {
+export function powersGained(model: DevotionModel, selected: Set<StarId>): { starId: StarId; power: CelestialPower }[] {
   const out: { starId: StarId; power: CelestialPower }[] = [];
   for (const id of selected) {
     const star = model.stars.get(id);
@@ -69,11 +68,7 @@ export function starsGranting(model: DevotionModel, ids: Set<string>): Set<StarI
 // "Available to get" panel so it lists only benefits the build can still fold in, and
 // empties once the points are spent and nothing stays completable. `completable` comes
 // from reachabilityForSelection; this stays a pure projection over the model.
-export function availableBonusIds(
-  model: DevotionModel,
-  selected: Set<StarId>,
-  completable: Set<string>,
-): Set<string> {
+export function availableBonusIds(model: DevotionModel, selected: Set<StarId>, completable: Set<string>): Set<string> {
   const out = new Set<string>();
   for (const conId of completable) {
     const con = model.constellations.get(conId);

@@ -4,7 +4,13 @@ import { test, expect } from "bun:test";
 import { fitViewBox, panViewBox, zoomViewBox, toViewBoxString } from "../src/core/viewbox";
 
 test("fitViewBox bounds points with padding", () => {
-  const vb = fitViewBox([{ x: 0, y: 0 }, { x: 100, y: 50 }], 10);
+  const vb = fitViewBox(
+    [
+      { x: 0, y: 0 },
+      { x: 100, y: 50 },
+    ],
+    10,
+  );
   expect(vb).toEqual({ x: -10, y: -10, w: 120, h: 70 });
 });
 

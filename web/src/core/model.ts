@@ -69,9 +69,7 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
                 : null,
             }
           : null,
-        weaponRequirement: s.weapon_requirement
-          ? { weapons: s.weapon_requirement.weapons }
-          : null,
+        weaponRequirement: s.weapon_requirement ? { weapons: s.weapon_requirement.weapons } : null,
         racialTarget: s.racial_target ?? undefined,
         petBonuses: s.pet_bonuses ?? undefined,
       });

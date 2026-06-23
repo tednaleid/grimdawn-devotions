@@ -26,7 +26,12 @@ test("buildConRegions uses art bounds when a manifest provides them", () => {
   const name = c.background!.image!.split("/").pop()!;
   const regions = buildConRegions(model, { images: { [name]: { url: "art.webp", w: 640, h: 480 } } });
   const r = regions.find((r) => r.id === c.id)!;
-  expect([r.x0, r.y0, r.x1, r.y1]).toEqual([c.background!.x!, c.background!.y!, c.background!.x! + 640, c.background!.y! + 480]);
+  expect([r.x0, r.y0, r.x1, r.y1]).toEqual([
+    c.background!.x!,
+    c.background!.y!,
+    c.background!.x! + 640,
+    c.background!.y! + 480,
+  ]);
 });
 
 test("buildConRegions falls back to the star box and resolves its own centroid", () => {

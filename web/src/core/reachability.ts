@@ -16,14 +16,36 @@ export const BUDGET = 55;
 const SEED: Vec = [1, 1, 1, 1, 1];
 
 /** A constellation reduced to what reachability needs: its cost and affinity vectors. */
-export interface ReachCon { id: string; size: number; req: Vec; grant: Vec }
+export interface ReachCon {
+  id: string;
+  size: number;
+  req: Vec;
+  grant: Vec;
+}
 /** A cover table carries its own grid dimensions (sized to the model's max requirements). */
-export interface CoverTable { cost: Uint16Array; caps: Vec; strides: Vec }
+export interface CoverTable {
+  cost: Uint16Array;
+  caps: Vec;
+  strides: Vec;
+}
 
 const zero = (): Vec => [0, 0, 0, 0, 0];
-const covers = (g: Vec, d: Vec): boolean => g[0] >= d[0] && g[1] >= d[1] && g[2] >= d[2] && g[3] >= d[3] && g[4] >= d[4];
-const addCap = (g: Vec, x: Vec): Vec => [Math.min(g[0] + x[0], CAP_MAX[0]!), Math.min(g[1] + x[1], CAP_MAX[1]!), Math.min(g[2] + x[2], CAP_MAX[2]!), Math.min(g[3] + x[3], CAP_MAX[3]!), Math.min(g[4] + x[4], CAP_MAX[4]!)];
-const maxV = (a: Vec, b: Vec): Vec => [Math.max(a[0], b[0]), Math.max(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3]), Math.max(a[4], b[4])];
+const covers = (g: Vec, d: Vec): boolean =>
+  g[0] >= d[0] && g[1] >= d[1] && g[2] >= d[2] && g[3] >= d[3] && g[4] >= d[4];
+const addCap = (g: Vec, x: Vec): Vec => [
+  Math.min(g[0] + x[0], CAP_MAX[0]!),
+  Math.min(g[1] + x[1], CAP_MAX[1]!),
+  Math.min(g[2] + x[2], CAP_MAX[2]!),
+  Math.min(g[3] + x[3], CAP_MAX[3]!),
+  Math.min(g[4] + x[4], CAP_MAX[4]!),
+];
+const maxV = (a: Vec, b: Vec): Vec => [
+  Math.max(a[0], b[0]),
+  Math.max(a[1], b[1]),
+  Math.max(a[2], b[2]),
+  Math.max(a[3], b[3]),
+  Math.max(a[4], b[4]),
+];
 
 function vecOf(m: Partial<Record<(typeof AFFINITIES)[number], number>>): Vec {
   return AFFINITIES.map((a) => m[a] ?? 0) as Vec;
@@ -70,31 +92,53 @@ export function buildCoverTable(cons: ReachCon[]): CoverTable {
   for (const c of cons) {
     if (!(c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4])) continue;
     const [g0, g1, g2, g3, g4] = c.grant;
-    for (let a = caps[0]!; a >= 0; a--) for (let ch = caps[1]!; ch >= 0; ch--) for (let e = caps[2]!; e >= 0; e--) for (let o = caps[3]!; o >= 0; o--) for (let p = caps[4]!; p >= 0; p--) {
-      const k = a * strides[0]! + ch * strides[1]! + e * strides[2]! + o * strides[3]! + p;
-      const pc = cost[k]!;
-      if (pc === NOCOST) continue;
-      const nc = pc + c.size;
-      if (nc > BUDGET) continue;
-      const nk = Math.min(a + g0, caps[0]!) * strides[0]! + Math.min(ch + g1, caps[1]!) * strides[1]! + Math.min(e + g2, caps[2]!) * strides[2]! + Math.min(o + g3, caps[3]!) * strides[3]! + Math.min(p + g4, caps[4]!);
-      if (nc < cost[nk]!) cost[nk] = nc;
-    }
+    for (let a = caps[0]!; a >= 0; a--)
+      for (let ch = caps[1]!; ch >= 0; ch--)
+        for (let e = caps[2]!; e >= 0; e--)
+          for (let o = caps[3]!; o >= 0; o--)
+            for (let p = caps[4]!; p >= 0; p--) {
+              const k = a * strides[0]! + ch * strides[1]! + e * strides[2]! + o * strides[3]! + p;
+              const pc = cost[k]!;
+              if (pc === NOCOST) continue;
+              const nc = pc + c.size;
+              if (nc > BUDGET) continue;
+              const nk =
+                Math.min(a + g0, caps[0]!) * strides[0]! +
+                Math.min(ch + g1, caps[1]!) * strides[1]! +
+                Math.min(e + g2, caps[2]!) * strides[2]! +
+                Math.min(o + g3, caps[3]!) * strides[3]! +
+                Math.min(p + g4, caps[4]!);
+              if (nc < cost[nk]!) cost[nk] = nc;
+            }
   }
-  for (let i = 0; i < 5; i++) { const st = strides[i]!; for (let k = maxKey - 1; k >= 0; k--) if (Math.floor(k / st) % sizes[i]! < caps[i]!) { const up = cost[k + st]!; if (up < cost[k]!) cost[k] = up; } }
+  for (let i = 0; i < 5; i++) {
+    const st = strides[i]!;
+    for (let k = maxKey - 1; k >= 0; k--)
+      if (Math.floor(k / st) % sizes[i]! < caps[i]!) {
+        const up = cost[k + st]!;
+        if (up < cost[k]!) cost[k] = up;
+      }
+  }
   return { cost, caps, strides };
 }
 
 function claimSummary(claimed: ReachCon[]) {
-  let req = zero(), grant = zero(), own = 0;
-  for (const c of claimed) { req = maxV(req, c.req); grant = addCap(grant, c.grant); own += c.size; }
+  let req = zero(),
+    grant = zero(),
+    own = 0;
+  for (const c of claimed) {
+    req = maxV(req, c.req);
+    grant = addCap(grant, c.grant);
+    own += c.size;
+  }
   return { req, grant, own };
 }
 
 /** A normalized start point for the minCost bracket, derived from a raw star selection. */
 export interface ReachState {
-  own: number;        // total selected stars (all count against budget); equals sum of `built` sizes
-  supply: Vec;        // affinity from COMPLETED constellations only
-  target: Vec;        // elementwise-max requirement over STARTED constellations
+  own: number; // total selected stars (all count against budget); equals sum of `built` sizes
+  supply: Vec; // affinity from COMPLETED constellations only
+  target: Vec; // elementwise-max requirement over STARTED constellations
   startedIds: Set<string>;
   partialFinish: { id: string; remaining: number; grant: Vec; req: Vec }[];
   // The started constellations as already-committed members, for the constructibility check:
@@ -113,7 +157,8 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
     own++;
     selByCon.set(star.constellationId, (selByCon.get(star.constellationId) ?? 0) + 1);
   }
-  let supply = zero(), target = zero();
+  let supply = zero(),
+    target = zero();
   const startedIds = new Set<string>();
   const partialFinish: ReachState["partialFinish"] = [];
   const built: ReachCon[] = [];
@@ -129,7 +174,8 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
       built.push({ id: conId, size: c.starIds.length, req, grant });
     } else {
       built.push({ id: conId, size: count, req, grant: zero() });
-      if (grant[0] || grant[1] || grant[2] || grant[3] || grant[4]) partialFinish.push({ id: conId, remaining: c.starIds.length - count, grant, req });
+      if (grant[0] || grant[1] || grant[2] || grant[3] || grant[4])
+        partialFinish.push({ id: conId, remaining: c.starIds.length - count, grant, req });
     }
   }
   return { own, supply, target, startedIds, partialFinish, built };
@@ -159,9 +205,20 @@ export function lowerBoundFrom(table: CoverTable, st: ReachState): number {
   const fins = st.partialFinish;
   let best = INF;
   for (let mask = 0; mask < 1 << fins.length; mask++) {
-    let supply = st.supply, extra = 0;
-    for (let i = 0; i < fins.length; i++) if (mask & (1 << i)) { supply = addCap(supply, fins[i]!.grant); extra += fins[i]!.remaining; }
-    const deficit: Vec = [Math.max(0, st.target[0] - supply[0]), Math.max(0, st.target[1] - supply[1]), Math.max(0, st.target[2] - supply[2]), Math.max(0, st.target[3] - supply[3]), Math.max(0, st.target[4] - supply[4])];
+    let supply = st.supply,
+      extra = 0;
+    for (let i = 0; i < fins.length; i++)
+      if (mask & (1 << i)) {
+        supply = addCap(supply, fins[i]!.grant);
+        extra += fins[i]!.remaining;
+      }
+    const deficit: Vec = [
+      Math.max(0, st.target[0] - supply[0]),
+      Math.max(0, st.target[1] - supply[1]),
+      Math.max(0, st.target[2] - supply[2]),
+      Math.max(0, st.target[3] - supply[3]),
+      Math.max(0, st.target[4] - supply[4]),
+    ];
     const cov = coverCostAt(table, deficit);
     if (cov >= INF) continue; // uncoverable for this subset; the INF must not be added to own
     const bound = st.own + extra + cov;
@@ -177,8 +234,11 @@ export function coverLowerBound(table: CoverTable, claimed: ReachCon[]): number 
 
 /** The filler a selection state may draw on: unstarted granting constellations plus its finishes. */
 function fillerFor(cons: ReachCon[], st: ReachState): ReachCon[] {
-  const filler = cons.filter((c) => !st.startedIds.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]));
-  for (const p of st.partialFinish) filler.push({ id: `${p.id}#finish`, size: p.remaining, req: p.req, grant: p.grant });
+  const filler = cons.filter(
+    (c) => !st.startedIds.has(c.id) && (c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4]),
+  );
+  for (const p of st.partialFinish)
+    filler.push({ id: `${p.id}#finish`, size: p.remaining, req: p.req, grant: p.grant });
   return filler;
 }
 
@@ -211,29 +271,49 @@ export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): n
   const placed = new Array(pool.length).fill(false);
   let build = zero(); // affinity from placed constellations (excludes the transient seed)
   let maxReqPlaced = zero(); // every placed constellation must stand under this once seed is gone
-  let cost = 0, builtLeft = built.length;
+  let cost = 0,
+    builtLeft = built.length;
   for (;;) {
     const gain = addCap(SEED, build);
     let did = false;
     // Auto-place the committed members as they unlock; filler is added selectively below.
     for (let i = 0; i < built.length; i++) {
       if (placed[i] || !covers(gain, built[i]!.req)) continue;
-      placed[i] = true; cost += built[i]!.size; build = addCap(build, built[i]!.grant); maxReqPlaced = maxV(maxReqPlaced, built[i]!.req); builtLeft--; did = true;
+      placed[i] = true;
+      cost += built[i]!.size;
+      build = addCap(build, built[i]!.grant);
+      maxReqPlaced = maxV(maxReqPlaced, built[i]!.req);
+      builtLeft--;
+      did = true;
     }
     if (builtLeft === 0 && covers(build, maxReqPlaced)) return cost <= budget ? cost : INF;
     if (did) continue;
     const g2 = addCap(SEED, build);
     const target = covers(build, maxReqPlaced) ? st.target : maxReqPlaced; // close self-sustain first, then started reqs
-    const deficit: Vec = [Math.max(0, target[0]! - build[0]), Math.max(0, target[1]! - build[1]), Math.max(0, target[2]! - build[2]), Math.max(0, target[3]! - build[3]), Math.max(0, target[4]! - build[4])];
-    let best = -1, bestScore = 0;
+    const deficit: Vec = [
+      Math.max(0, target[0]! - build[0]),
+      Math.max(0, target[1]! - build[1]),
+      Math.max(0, target[2]! - build[2]),
+      Math.max(0, target[3]! - build[3]),
+      Math.max(0, target[4]! - build[4]),
+    ];
+    let best = -1,
+      bestScore = 0;
     for (let i = built.length; i < pool.length; i++) {
       if (placed[i] || !covers(g2, pool[i]!.req)) continue;
-      let red = 0; for (let j = 0; j < 5; j++) red += Math.min(pool[i]!.grant[j]!, deficit[j]!);
+      let red = 0;
+      for (let j = 0; j < 5; j++) red += Math.min(pool[i]!.grant[j]!, deficit[j]!);
       const score = red / pool[i]!.size;
-      if (score > bestScore) { bestScore = score; best = i; }
+      if (score > bestScore) {
+        bestScore = score;
+        best = i;
+      }
     }
     if (best < 0 || bestScore === 0) return INF;
-    placed[best] = true; cost += pool[best]!.size; build = addCap(build, pool[best]!.grant); maxReqPlaced = maxV(maxReqPlaced, pool[best]!.req);
+    placed[best] = true;
+    cost += pool[best]!.size;
+    build = addCap(build, pool[best]!.grant);
+    maxReqPlaced = maxV(maxReqPlaced, pool[best]!.req);
     if (cost > budget) return INF;
   }
 }
@@ -253,7 +333,12 @@ export function classify(cons: ReachCon[], table: CoverTable, claimedIds: string
 }
 
 /** For a current claimed set S, classify every other constellation as a candidate next claim. */
-export function reachabilitySweep(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): Map<string, Reach> {
+export function reachabilitySweep(
+  cons: ReachCon[],
+  table: CoverTable,
+  claimedIds: string[],
+  budget = BUDGET,
+): Map<string, Reach> {
   const out = new Map<string, Reach>();
   const claimedSet = new Set(claimedIds);
   for (const c of cons) {
@@ -274,10 +359,17 @@ function coverCostAt(table: CoverTable, deficit: Vec): number {
 function constructible(B: ReachCon[]): boolean {
   let gain: Vec = [...SEED];
   const done = B.map(() => false);
-  let placed = 0, changed = true;
+  let placed = 0,
+    changed = true;
   while (changed) {
     changed = false;
-    for (let i = 0; i < B.length; i++) { if (done[i] || !covers(gain, B[i]!.req)) continue; done[i] = true; placed++; gain = addCap(gain, B[i]!.grant); changed = true; }
+    for (let i = 0; i < B.length; i++) {
+      if (done[i] || !covers(gain, B[i]!.req)) continue;
+      done[i] = true;
+      placed++;
+      gain = addCap(gain, B[i]!.grant);
+      changed = true;
+    }
   }
   return placed === B.length;
 }
@@ -311,7 +403,9 @@ export function reachableExact(cons: ReachCon[], table: CoverTable, claimedIds: 
  */
 let exactNodes = 0;
 /** Nodes visited by the last reachableExactFrom call (diagnostic / cap tuning). */
-export function lastExactNodes(): number { return exactNodes; }
+export function lastExactNodes(): number {
+  return exactNodes;
+}
 
 export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): boolean {
   exactNodes = 0;
@@ -327,20 +421,39 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
   function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec, builtCons: ReachCon[]): void {
     if (found) return;
     exactNodes++;
-    if (covers(build, maxReqPlaced) && constructible([...builtCons, ...chosen])) { found = true; return; }
+    if (covers(build, maxReqPlaced) && constructible([...builtCons, ...chosen])) {
+      found = true;
+      return;
+    }
     if (i >= wholeFiller.length) return;
     const target = maxV(maxReqPlaced, st.target);
-    const deficit: Vec = [Math.max(0, target[0] - build[0]), Math.max(0, target[1] - build[1]), Math.max(0, target[2] - build[2]), Math.max(0, target[3] - build[3]), Math.max(0, target[4] - build[4])];
+    const deficit: Vec = [
+      Math.max(0, target[0] - build[0]),
+      Math.max(0, target[1] - build[1]),
+      Math.max(0, target[2] - build[2]),
+      Math.max(0, target[3] - build[3]),
+      Math.max(0, target[4] - build[4]),
+    ];
     if (cost + coverCostAt(table, deficit) > budget) return; // even the cheapest completion overflows
     const c = wholeFiller[i]!;
-    if (cost + c.size <= budget) { chosen.push(c); rec(i + 1, addCap(build, c.grant), cost + c.size, maxV(maxReqPlaced, c.req), builtCons); chosen.pop(); }
+    if (cost + c.size <= budget) {
+      chosen.push(c);
+      rec(i + 1, addCap(build, c.grant), cost + c.size, maxV(maxReqPlaced, c.req), builtCons);
+      chosen.pop();
+    }
     if (!found) rec(i + 1, build, cost, maxReqPlaced, builtCons);
   }
   // Decide every subset of partial finishes to complete (2^k with k tiny - usually 0 or 1).
   for (let mask = 0; mask < 1 << pf.length && !found; mask++) {
-    let build0: Vec = [...st.supply], cost0 = st.own;
+    let build0: Vec = [...st.supply],
+      cost0 = st.own;
     const finished = new Set<string>();
-    for (let j = 0; j < pf.length; j++) if (mask & (1 << j)) { build0 = addCap(build0, pf[j]!.grant); cost0 += pf[j]!.remaining; finished.add(pf[j]!.id); }
+    for (let j = 0; j < pf.length; j++)
+      if (mask & (1 << j)) {
+        build0 = addCap(build0, pf[j]!.grant);
+        cost0 += pf[j]!.remaining;
+        finished.add(pf[j]!.id);
+      }
     if (cost0 > budget) continue;
     const builtCons = st.built.map((b) => (finished.has(b.id) ? { ...b, grant: grantById.get(b.id)! } : b));
     chosen.length = 0;
@@ -355,7 +468,9 @@ export type ExactResolver = (cons: ReachCon[], table: CoverTable, st: ReachState
 // (verdict-equivalent, far faster) WASM port via setExactResolver. Pure default keeps the core testable.
 let exactResolver: ExactResolver = reachableExactFrom;
 /** Override the exact gap-resolver (pass null to restore the TS default). */
-export function setExactResolver(fn: ExactResolver | null): void { exactResolver = fn ?? reachableExactFrom; }
+export function setExactResolver(fn: ExactResolver | null): void {
+  exactResolver = fn ?? reachableExactFrom;
+}
 
 /**
  * Classify a partial-selection state by bracketing minCost, then resolving the gap exactly.
@@ -370,34 +485,59 @@ export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: Re
 }
 
 /** Like classify, but resolves the "unknown" gap with the exact resolver - always reachable or dim. */
-export function classifyComplete(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): "reachable" | "dim" {
+export function classifyComplete(
+  cons: ReachCon[],
+  table: CoverTable,
+  claimedIds: string[],
+  budget = BUDGET,
+): "reachable" | "dim" {
   const verdict = classify(cons, table, claimedIds, budget);
   if (verdict !== "unknown") return verdict;
   return reachableExact(cons, table, claimedIds, budget) ? "reachable" : "dim";
 }
 
 /** Minimum total stars to COMPLETE conId on top of `selected`, or INF if not within maxBudget. */
-export function completionMinCost(model: DevotionModel, cons: ReachCon[], table: CoverTable, selected: Set<string>, conId: string, maxBudget = BUDGET): number {
+export function completionMinCost(
+  model: DevotionModel,
+  cons: ReachCon[],
+  table: CoverTable,
+  selected: Set<string>,
+  conId: string,
+  maxBudget = BUDGET,
+): number {
   const con = model.constellations.get(conId);
   if (!con) return INF;
   const withCon = new Set(selected);
   for (const sid of con.starIds) withCon.add(sid);
   const st = selectionSummary(model, withCon);
-  let lo = st.own;                                            // cannot cost less than the stars already required
+  let lo = st.own; // cannot cost less than the stars already required
   if (lo > maxBudget) return INF;
   if (exactResolver(cons, table, st, maxBudget) === false) return INF;
   let hi = maxBudget;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
-    if (exactResolver(cons, table, st, mid)) hi = mid; else lo = mid + 1;
+    if (exactResolver(cons, table, st, mid)) hi = mid;
+    else lo = mid + 1;
   }
   return lo;
 }
 
-export interface ReachView { completable: Set<string>; clickable: Set<StarId>; have: Vec; need: Vec; needSource: Map<number, string[]> }
+export interface ReachView {
+  completable: Set<string>;
+  clickable: Set<StarId>;
+  have: Vec;
+  need: Vec;
+  needSource: Map<number, string[]>;
+}
 
 /** One full sweep for a selection: what can be completed, what stars can be clicked, and the panel vectors. */
-export function reachabilityForSelection(model: DevotionModel, cons: ReachCon[], table: CoverTable, selected: Set<StarId>, budget = BUDGET): ReachView {
+export function reachabilityForSelection(
+  model: DevotionModel,
+  cons: ReachCon[],
+  table: CoverTable,
+  selected: Set<StarId>,
+  budget = BUDGET,
+): ReachView {
   const st = selectionSummary(model, selected);
   const completable = new Set<string>();
   const clickable = new Set<StarId>();
@@ -405,7 +545,8 @@ export function reachabilityForSelection(model: DevotionModel, cons: ReachCon[],
   for (const c of model.constellations.values()) {
     const withCon = new Set(selected);
     for (const sid of c.starIds) withCon.add(sid);
-    if (classifyForSelection(cons, table, selectionSummary(model, withCon), budget) === "reachable") completable.add(c.id);
+    if (classifyForSelection(cons, table, selectionSummary(model, withCon), budget) === "reachable")
+      completable.add(c.id);
   }
   // clickable: each not-selected star whose predecessors are all selected, if placing it keeps the selection reachable.
   for (const star of model.stars.values()) {
@@ -414,16 +555,24 @@ export function reachabilityForSelection(model: DevotionModel, cons: ReachCon[],
     // A frontier star of a completable constellation is always clickable: the witness build that
     // completes that constellation also contains this star, so any prefix of it stays reachable.
     // This skips the resolver for most of the clickable pass (the dominant early-game cost).
-    if (completable.has(star.constellationId)) { clickable.add(star.id); continue; }
-    const withStar = new Set(selected); withStar.add(star.id);
-    if (classifyForSelection(cons, table, selectionSummary(model, withStar), budget) === "reachable") clickable.add(star.id);
+    if (completable.has(star.constellationId)) {
+      clickable.add(star.id);
+      continue;
+    }
+    const withStar = new Set(selected);
+    withStar.add(star.id);
+    if (classifyForSelection(cons, table, selectionSummary(model, withStar), budget) === "reachable")
+      clickable.add(star.id);
   }
   // panel: have = supply, need = target, needSource = started cons defining each color's max.
   const needSource = new Map<number, string[]>();
   for (let i = 0; i < 5; i++) {
     if (st.target[i] === 0) continue;
     const src: string[] = [];
-    for (const conId of st.startedIds) { const c = model.constellations.get(conId)!; if ((vecOf(c.affinityRequired)[i] ?? 0) === st.target[i]) src.push(conId); }
+    for (const conId of st.startedIds) {
+      const c = model.constellations.get(conId)!;
+      if ((vecOf(c.affinityRequired)[i] ?? 0) === st.target[i]) src.push(conId);
+    }
     needSource.set(i, src);
   }
   return { completable, clickable, have: st.supply, need: st.target, needSource };

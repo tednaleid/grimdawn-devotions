@@ -9,7 +9,11 @@ import type { ReachView } from "../src/core/reachability";
 const model = buildModel(doc as any);
 
 test("marks selected and selectable stars with classes and ids", () => {
-  const markup = renderSvgMarkup(model, { selected: new Set(["crossroads_eldritch:0"]), pointCap: 55 }, { manifest: null });
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(["crossroads_eldritch:0"]), pointCap: 55 },
+    { manifest: null },
+  );
   // The large hit target carries the id + state; the visible dot carries the matching star class.
   expect(markup).toContain('data-star-id="crossroads_eldritch:0" class="hit selected"');
   expect(markup).toContain('class="star selected"');
@@ -34,7 +38,9 @@ test("defines a per-constellation gradient and stars reference it", () => {
   expect(markup).toContain("--grad:url(#grad-falcon)");
   // assassin's blade requires order but GRANTS ascendant + order -> its gradient is the
   // granted colors (purple -> gold), not the order-only requirement color.
-  expect(markup).toContain('<linearGradient id="grad-assassin_s_blade" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#b06fd6"/><stop offset="100%" stop-color="#e6c34d"/>');
+  expect(markup).toContain(
+    '<linearGradient id="grad-assassin_s_blade" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#b06fd6"/><stop offset="100%" stop-color="#e6c34d"/>',
+  );
 });
 
 test("renders the art <image> at the manifest's native width/height", () => {
@@ -56,7 +62,9 @@ test("renders celestial-power stars as diamonds (polygon)", () => {
 });
 
 test("a fully-selected constellation's art gets the 'active' class; a partial one does not", () => {
-  const withArt = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null && c.starIds.length >= 2)!;
+  const withArt = [...model.constellations.values()].find(
+    (c) => c.background?.image && c.background.x != null && c.starIds.length >= 2,
+  )!;
   const name = withArt.background!.image!.split("/").pop()!;
   const manifest = { images: { [name]: { url: "art.webp", w: 640, h: 480 } } };
 
@@ -103,9 +111,7 @@ test("two-layer dimming: completable normal, startable faded, unstartable dark",
 test("two-layer dimming art: completable has no dim class, un-startable gets unreachable", () => {
   const ids = [...model.constellations.keys()];
   // Find a constellation with art
-  const withArt = [...model.constellations.values()].find(
-    (c) => c.background?.image && c.background.x != null,
-  )!;
+  const withArt = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null)!;
   const withArtId = withArt.id;
   const name = withArt.background!.image!.split("/").pop()!;
   const manifest = { images: { [name]: { url: "art.webp", w: 640, h: 480 } } };

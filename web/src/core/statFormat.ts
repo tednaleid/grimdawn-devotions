@@ -8,26 +8,52 @@ export interface StatRow {
 
 // Instant damage type segment -> display name. GD quirks: internal Life = Vitality, Poison = Acid.
 const INSTANT_DAMAGE: Record<string, string> = {
-  Physical: "Physical", Pierce: "Pierce", Fire: "Fire", Cold: "Cold", Lightning: "Lightning",
-  Elemental: "Elemental", Aether: "Aether", Chaos: "Chaos", Poison: "Acid", Life: "Vitality",
+  Physical: "Physical",
+  Pierce: "Pierce",
+  Fire: "Fire",
+  Cold: "Cold",
+  Lightning: "Lightning",
+  Elemental: "Elemental",
+  Aether: "Aether",
+  Chaos: "Chaos",
+  Poison: "Acid",
+  Life: "Vitality",
 };
 // "Slow" (damage-over-time) type segment -> display name.
 const DOT_DAMAGE: Record<string, string> = {
-  Bleeding: "Bleeding", Physical: "Internal Trauma", Fire: "Burn", Cold: "Frostburn",
-  Lightning: "Electrocute", Poison: "Poison", Life: "Vitality Decay",
+  Bleeding: "Bleeding",
+  Physical: "Internal Trauma",
+  Fire: "Burn",
+  Cold: "Frostburn",
+  Lightning: "Electrocute",
+  Poison: "Poison",
+  Life: "Vitality Decay",
 };
 // Resistance type segment -> display name. (Status effects like Stun/Freeze are NOT
 // resistances in GD - they are duration-reduction stats, handled in OVERRIDES.)
 const RESIST: Record<string, string> = {
-  Physical: "Physical", Pierce: "Pierce", Fire: "Fire", Cold: "Cold", Lightning: "Lightning",
-  Aether: "Aether", Chaos: "Chaos", Poison: "Poison & Acid", Life: "Vitality", Bleeding: "Bleeding",
+  Physical: "Physical",
+  Pierce: "Pierce",
+  Fire: "Fire",
+  Cold: "Cold",
+  Lightning: "Lightning",
+  Aether: "Aether",
+  Chaos: "Chaos",
+  Poison: "Poison & Acid",
+  Life: "Vitality",
+  Bleeding: "Bleeding",
 };
 // Character attribute segment -> display name (GD renamed the classic attributes).
 const ATTR: Record<string, string> = {
-  Strength: "Physique", Dexterity: "Cunning", Intelligence: "Spirit",
-  Life: "Health", Mana: "Energy",
-  OffensiveAbility: "Offensive Ability", DefensiveAbility: "Defensive Ability",
-  LifeRegen: "Health Regeneration", ManaRegen: "Energy Regeneration",
+  Strength: "Physique",
+  Dexterity: "Cunning",
+  Intelligence: "Spirit",
+  Life: "Health",
+  Mana: "Energy",
+  OffensiveAbility: "Offensive Ability",
+  DefensiveAbility: "Defensive Ability",
+  LifeRegen: "Health Regeneration",
+  ManaRegen: "Energy Regeneration",
 };
 
 interface Classified {
@@ -62,8 +88,16 @@ const OVERRIDES: Record<string, Classified> = {
   offensiveSlowManaLeachMin: { label: "Energy Leech", percent: false, sign: 1 },
   offensiveSlowManaLeachChance: { label: "Energy Leech Chance", percent: true, sign: 1 },
   offensiveSlowManaLeachDurationMin: { label: "Energy Leech Duration", percent: false, sign: 1 },
-  offensiveElementalResistanceReductionPercentMin: { label: "Reduced target's Elemental Resistances", percent: true, sign: 1 },
-  offensiveElementalResistanceReductionPercentDurationMin: { label: "Reduced Elemental Resistance Duration", percent: false, sign: 1 },
+  offensiveElementalResistanceReductionPercentMin: {
+    label: "Reduced target's Elemental Resistances",
+    percent: true,
+    sign: 1,
+  },
+  offensiveElementalResistanceReductionPercentDurationMin: {
+    label: "Reduced Elemental Resistance Duration",
+    percent: false,
+    sign: 1,
+  },
   offensiveLightningModifierChance: { label: "Chance for Lightning Damage", percent: true, sign: 1 },
   retaliationTotalDamageModifier: { label: "Total Retaliation Damage", percent: true, sign: 1 },
 
@@ -165,7 +199,10 @@ function fmtValue(value: number, percent: boolean, sign: number): string {
 
 // Internal race name -> player-facing (GD shows the plural, except Undead).
 const RACE_LABEL: Record<string, string> = {
-  Beast: "Beasts", Chthonic: "Chthonics", Human: "Humans", Undead: "Undead",
+  Beast: "Beasts",
+  Chthonic: "Chthonics",
+  Human: "Humans",
+  Undead: "Undead",
 };
 function raceLabel(targets?: string[]): string | null {
   if (!targets || targets.length === 0) return null;
@@ -230,11 +267,10 @@ function bonusEntries(
 }
 
 /** Format a bonuses map into a single list of display rows, sorted by label. */
-export function formatBonusRows(
-  bonuses: Record<string, number>,
-  opts: { racialTarget?: string[] } = {},
-): StatRow[] {
-  return bonusEntries(bonuses, opts).map((e) => e.row).sort((a, b) => a.label.localeCompare(b.label));
+export function formatBonusRows(bonuses: Record<string, number>, opts: { racialTarget?: string[] } = {}): StatRow[] {
+  return bonusEntries(bonuses, opts)
+    .map((e) => e.row)
+    .sort((a, b) => a.label.localeCompare(b.label));
 }
 
 // A grouped row keeps its representative stat id so callers can diff it (highlight changes).
@@ -333,8 +369,18 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
   // and damage reductions (which lack the "Slow" infix the ability debuffs use).
   for (const [minK, durK, label, pct] of [
     ["offensiveSlowRunSpeedMin", "offensiveSlowRunSpeedDurationMin", "Slower target Movement", true],
-    ["offensiveTotalResistanceReductionAbsoluteMin", "offensiveTotalResistanceReductionAbsoluteDurationMin", "Reduced target's Resistances", false],
-    ["offensiveTotalDamageReductionPercentMin", "offensiveTotalDamageReductionPercentDurationMin", "Reduced target's Damage", true],
+    [
+      "offensiveTotalResistanceReductionAbsoluteMin",
+      "offensiveTotalResistanceReductionAbsoluteDurationMin",
+      "Reduced target's Resistances",
+      false,
+    ],
+    [
+      "offensiveTotalDamageReductionPercentMin",
+      "offensiveTotalDamageReductionPercentDurationMin",
+      "Reduced target's Damage",
+      true,
+    ],
   ] as const) {
     if (minK in stats) {
       used.add(minK);
@@ -375,9 +421,20 @@ export type StatDim = "flat" | "pct" | "max" | "durFlat" | "durPct";
 // Flat before percent: the flat value is added first, then the percent applies.
 const DIM_ORDER: StatDim[] = ["flat", "pct", "max", "durFlat", "durPct"];
 
-export interface CondensedPart { dim: StatDim; value: string; id: string }
-export interface CondensedSubject { subject: string; key: string; parts: CondensedPart[] }
-export interface CondensedGroup { group: StatGroup; subjects: CondensedSubject[] }
+export interface CondensedPart {
+  dim: StatDim;
+  value: string;
+  id: string;
+}
+export interface CondensedSubject {
+  subject: string;
+  key: string;
+  parts: CondensedPart[];
+}
+export interface CondensedGroup {
+  group: StatGroup;
+  subjects: CondensedSubject[];
+}
 
 // Map a raw stat id to its (group, subject, dimension), mirroring classify's families.
 function decompose(id: string): { group: StatGroup; subject: string; dim: StatDim } | null {

@@ -13,7 +13,10 @@ function check(ok: unknown, msg: string): void {
 
 // --- Minimal static server for dist (no external deps) ---
 const TYPES: Record<string, string> = {
-  ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".json": "application/json",
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".json": "application/json",
 };
 const server = Bun.serve({
   port: 0,
@@ -48,9 +51,12 @@ function chromeShellPath(): string {
 const exe = chromeShellPath();
 const dbgPort = 9222 + Math.floor(server.port % 1000);
 const args = [
-  `--remote-debugging-port=${dbgPort}`, "--remote-allow-origins=*",
+  `--remote-debugging-port=${dbgPort}`,
+  "--remote-allow-origins=*",
   `--user-data-dir=${join(tmpdir(), `pw_e2e_${dbgPort}`)}`,
-  "--no-sandbox", "--no-first-run", "--disable-gpu",
+  "--no-sandbox",
+  "--no-first-run",
+  "--disable-gpu",
   "about:blank",
 ];
 // On Windows, chrome is launched through cmd.exe (a child of that shell), so it is
@@ -61,7 +67,8 @@ const chrome = isWin
 
 function cleanup(): void {
   server.stop(true);
-  if (isWin) Bun.spawnSync(["taskkill", "/F", "/IM", "chrome-headless-shell.exe"], { stdout: "ignore", stderr: "ignore" });
+  if (isWin)
+    Bun.spawnSync(["taskkill", "/F", "/IM", "chrome-headless-shell.exe"], { stdout: "ignore", stderr: "ignore" });
   else chrome.kill();
 }
 
@@ -93,7 +100,9 @@ class CDP {
       } else if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error") {
         this.consoleErrors.push(m.params.args.map((a: any) => a.value ?? a.description ?? "").join(" "));
       } else if (m.method === "Runtime.exceptionThrown") {
-        this.consoleErrors.push(`exception: ${m.params.exceptionDetails?.exception?.description ?? m.params.exceptionDetails?.text ?? "unknown"}`);
+        this.consoleErrors.push(
+          `exception: ${m.params.exceptionDetails?.exception?.description ?? m.params.exceptionDetails?.text ?? "unknown"}`,
+        );
       }
     };
   }
@@ -101,8 +110,14 @@ class CDP {
     return new Promise((resolve, reject) => {
       const ws = new WebSocket(url);
       const t = setTimeout(() => reject(new Error("CDP websocket open timeout")), 10_000);
-      ws.onopen = () => { clearTimeout(t); resolve(new CDP(ws)); };
-      ws.onerror = () => { clearTimeout(t); reject(new Error("CDP websocket error")); };
+      ws.onopen = () => {
+        clearTimeout(t);
+        resolve(new CDP(ws));
+      };
+      ws.onerror = () => {
+        clearTimeout(t);
+        reject(new Error("CDP websocket error"));
+      };
     });
   }
   send(method: string, params: Record<string, unknown> = {}): Promise<any> {
@@ -114,7 +129,8 @@ class CDP {
   }
   async evaluate<T>(expression: string): Promise<T> {
     const r = await this.send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true });
-    if (r.exceptionDetails) throw new Error(`evaluate threw: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
+    if (r.exceptionDetails)
+      throw new Error(`evaluate threw: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
     return r.result.value as T;
   }
 }
@@ -130,86 +146,128 @@ try {
   let rendered = false;
   for (let i = 0; i < 40; i++) {
     await Bun.sleep(250);
-    if ((await cdp.evaluate<number>("document.querySelectorAll('.star').length")) > 0) { rendered = true; break; }
+    if ((await cdp.evaluate<number>("document.querySelectorAll('.star').length")) > 0) {
+      rendered = true;
+      break;
+    }
   }
   check(rendered, "page loads and renders the constellation map");
 
   // Stars render as circles, except the 50 celestial-power stars which are polygons,
   // so count the shared .star class rather than circle.star.
-  check(await cdp.evaluate<number>("document.querySelectorAll('.star').length") === 559,
-    "renders all 559 stars");
+  check((await cdp.evaluate<number>("document.querySelectorAll('.star').length")) === 559, "renders all 559 stars");
 
   // When reach.wasm is shipped in dist, the engine must actually load it in-browser (not silently
   // fall back to TS); when it is not shipped, the TS fallback is expected and fine.
   const wasmShipped = await Bun.file(`${DIST}/data/reach.wasm`).exists();
   const resolverKind = await cdp.evaluate<string>("window.__reachResolver ?? 'unknown'");
-  check(wasmShipped ? resolverKind === "wasm" : true,
-    `reachability resolver in browser: ${resolverKind}${wasmShipped ? " (wasm shipped, must be wasm)" : " (no wasm shipped, TS ok)"}`);
+  check(
+    wasmShipped ? resolverKind === "wasm" : true,
+    `reachability resolver in browser: ${resolverKind}${wasmShipped ? " (wasm shipped, must be wasm)" : " (no wasm shipped, TS ok)"}`,
+  );
 
   const selectable = await cdp.evaluate<string[]>(
-    "[...document.querySelectorAll('circle.hit.selectable')].map(c => c.getAttribute('data-star-id'))");
+    "[...document.querySelectorAll('circle.hit.selectable')].map(c => c.getAttribute('data-star-id'))",
+  );
   // Reachability model: from an empty map you can START any constellation still completable
   // within budget (claim-anywhere), not just the Crossroads.
   check(selectable.length > 50, `claim-anywhere: many stars selectable from empty (got ${selectable.length})`);
-  check(selectable.some((id) => !id.startsWith("crossroads_")), "non-Crossroads constellations are claimable from empty");
+  check(
+    selectable.some((id) => !id.startsWith("crossroads_")),
+    "non-Crossroads constellations are claimable from empty",
+  );
 
   // Click a Crossroads star via a bubbling synthetic click (the app delegates on the container).
   await cdp.evaluate(
-    `document.querySelector('circle[data-star-id="crossroads_eldritch:0"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`);
+    `document.querySelector('circle[data-star-id="crossroads_eldritch:0"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
 
   let counted = false;
   for (let i = 0; i < 20; i++) {
     await Bun.sleep(100);
-    if ((await cdp.evaluate<string>("document.getElementById('point-count').textContent")) === "1 / 55") { counted = true; break; }
+    if ((await cdp.evaluate<string>("document.getElementById('point-count').textContent")) === "1 / 55") {
+      counted = true;
+      break;
+    }
   }
   check(counted, 'point count reads "1 / 55" after selecting a Crossroads');
 
   // The two-column panel renders the current "have" total in .aff-have (the wanted-max
   // "need" column only appears for colors a started constellation requires).
-  check(await cdp.evaluate<boolean>("document.querySelector('.affinity-head') !== null"),
-    "affinity panel renders the have/need header");
-  check(await cdp.evaluate<string | null>(
-    "document.querySelector('.affinity-eldritch .aff-have')?.textContent") === "1",
-    "eldritch 'have' total becomes 1");
+  check(
+    await cdp.evaluate<boolean>("document.querySelector('.affinity-head') !== null"),
+    "affinity panel renders the have/need header",
+  );
+  check(
+    (await cdp.evaluate<string | null>("document.querySelector('.affinity-eldritch .aff-have')?.textContent")) === "1",
+    "eldritch 'have' total becomes 1",
+  );
 
   // Both columns must always render so the rows stay aligned (here every need is 0; the cells must still exist).
-  check(await cdp.evaluate<boolean>(
-    "document.querySelectorAll('.affinity').length === 5 && document.querySelectorAll('.affinity .aff-have').length === 5 && document.querySelectorAll('.affinity .aff-need').length === 5"),
-    "every affinity row has both a have and a need cell (columns stay aligned)");
+  check(
+    await cdp.evaluate<boolean>(
+      "document.querySelectorAll('.affinity').length === 5 && document.querySelectorAll('.affinity .aff-have').length === 5 && document.querySelectorAll('.affinity .aff-need').length === 5",
+    ),
+    "every affinity row has both a have and a need cell (columns stay aligned)",
+  );
 
   // "Available to get" now lives under the Affinity panel (right), separated, not in Benefits (left).
-  check(await cdp.evaluate<boolean>(
-    "(document.getElementById('affinity')?.textContent||'').includes('Available to get') && !!document.querySelector('#affinity .avail-list') && !!document.querySelector('#affinity .panel-sep') && !(document.getElementById('benefits')?.textContent||'').includes('Available to get')"),
-    "'Available to get' is under the Affinity panel (right), separated, not in Benefits (left)");
+  check(
+    await cdp.evaluate<boolean>(
+      "(document.getElementById('affinity')?.textContent||'').includes('Available to get') && !!document.querySelector('#affinity .avail-list') && !!document.querySelector('#affinity .panel-sep') && !(document.getElementById('benefits')?.textContent||'').includes('Available to get')",
+    ),
+    "'Available to get' is under the Affinity panel (right), separated, not in Benefits (left)",
+  );
 
-  check(await cdp.evaluate<boolean>(
-    `document.querySelector('circle[data-star-id="bat:0"]').classList.contains('selectable')`),
-    "bat:0 (an affinity-gated constellation) is claimable");
+  check(
+    await cdp.evaluate<boolean>(
+      `document.querySelector('circle[data-star-id="bat:0"]').classList.contains('selectable')`,
+    ),
+    "bat:0 (an affinity-gated constellation) is claimable",
+  );
 
-  check(await cdp.evaluate<boolean>(
-    `document.querySelector('circle[data-star-id="crossroads_eldritch:0"]').classList.contains('selected')`),
-    "the clicked Crossroads star is marked selected");
+  check(
+    await cdp.evaluate<boolean>(
+      `document.querySelector('circle[data-star-id="crossroads_eldritch:0"]').classList.contains('selected')`,
+    ),
+    "the clicked Crossroads star is marked selected",
+  );
 
   // Hover a celestial-power star and confirm the tooltip shows the proc + ability stats.
   await cdp.evaluate(
-    `document.querySelector('circle[data-star-id="akeron_s_scorpion:4"]').dispatchEvent(new MouseEvent('mousemove',{bubbles:true,clientX:200,clientY:200}))`);
+    `document.querySelector('circle[data-star-id="akeron_s_scorpion:4"]').dispatchEvent(new MouseEvent('mousemove',{bubbles:true,clientX:200,clientY:200}))`,
+  );
   const tip = await cdp.evaluate<string>("document.getElementById('tooltip').textContent");
-  check(tip.includes("Scorpion Sting") && tip.includes("25% Chance on Attack"),
-    "power tooltip shows the proc line (Scorpion Sting, 25% Chance on Attack)");
-  check(tip.includes("40% Weapon Damage") && tip.includes("1125 Poison Damage over 5 Seconds")
-    && tip.includes("150 Reduced target's Defensive Ability for 5 Seconds"),
-    "power tooltip shows the level-25 ability stat lines");
+  check(
+    tip.includes("Scorpion Sting") && tip.includes("25% Chance on Attack"),
+    "power tooltip shows the proc line (Scorpion Sting, 25% Chance on Attack)",
+  );
+  check(
+    tip.includes("40% Weapon Damage") &&
+      tip.includes("1125 Poison Damage over 5 Seconds") &&
+      tip.includes("150 Reduced target's Defensive Ability for 5 Seconds"),
+    "power tooltip shows the level-25 ability stat lines",
+  );
 
   // "Available to get" is filtered to benefits still reachable from here: with points to spare it
   // lists items, and once every point is spent (cap lowered to the points used) it empties out.
-  const availWithBudget = await cdp.evaluate<number>("document.querySelectorAll('#affinity .avail-list .bgroup').length");
-  check(availWithBudget > 0, `"Available to get" lists reachable benefits while budget remains (got ${availWithBudget})`);
+  const availWithBudget = await cdp.evaluate<number>(
+    "document.querySelectorAll('#affinity .avail-list .bgroup').length",
+  );
+  check(
+    availWithBudget > 0,
+    `"Available to get" lists reachable benefits while budget remains (got ${availWithBudget})`,
+  );
   await cdp.evaluate(
-    `(() => { const s = document.getElementById('point-slider'); s.value = document.getElementById('point-used').textContent; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    `(() => { const s = document.getElementById('point-slider'); s.value = document.getElementById('point-used').textContent; s.dispatchEvent(new Event('input', { bubbles: true })); })()`,
+  );
   let emptiedAvail = false;
   for (let i = 0; i < 20; i++) {
     await Bun.sleep(100);
-    if ((await cdp.evaluate<number>("document.querySelectorAll('#affinity .avail-list .bgroup').length")) === 0) { emptiedAvail = true; break; }
+    if ((await cdp.evaluate<number>("document.querySelectorAll('#affinity .avail-list .bgroup').length")) === 0) {
+      emptiedAvail = true;
+      break;
+    }
   }
   check(emptiedAvail, '"Available to get" empties once every point is spent (cap == points used)');
 

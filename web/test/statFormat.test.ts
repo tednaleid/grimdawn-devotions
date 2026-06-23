@@ -69,7 +69,10 @@ describe("statRow grimtools-verified corrections", () => {
   });
   test("defensive DoT duration uses DoT names and a positive percent", () => {
     expect(statRow("defensiveFireDuration", 25)).toEqual({ label: "Reduced Burn Duration", value: "+25%" });
-    expect(statRow("defensivePhysicalDuration", 25)).toEqual({ label: "Reduced Internal Trauma Duration", value: "+25%" });
+    expect(statRow("defensivePhysicalDuration", 25)).toEqual({
+      label: "Reduced Internal Trauma Duration",
+      value: "+25%",
+    });
     expect(statRow("defensiveColdDuration", 20)).toEqual({ label: "Reduced Frostburn Duration", value: "+20%" });
   });
   test("poison resistance is Poison & Acid", () => {
@@ -93,7 +96,10 @@ describe("statRow grimtools-verified corrections", () => {
 describe("statRow racial damage/defense names the concrete race", () => {
   test("single race is pluralized", () => {
     expect(statRow("racialBonusPercentDamage", 8, ["Human"])).toEqual({ label: "Damage to Humans", value: "+8%" });
-    expect(statRow("racialBonusPercentDefense", 10, ["Beast"])).toEqual({ label: "Less Damage from Beasts", value: "+10%" });
+    expect(statRow("racialBonusPercentDefense", 10, ["Beast"])).toEqual({
+      label: "Less Damage from Beasts",
+      value: "+10%",
+    });
   });
   test("Undead stays Undead; multiple races join with &", () => {
     expect(statRow("racialBonusPercentDamage", 6, ["Undead", "Human"])).toEqual({
@@ -190,9 +196,7 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
       { value: "848", label: "Health Restored" },
       { value: "10%", label: "Health Restored" },
     ]);
-    expect(formatPowerStats({ skillManaPercent: 25 })).toEqual([
-      { value: "25%", label: "Energy Restored" },
-    ]);
+    expect(formatPowerStats({ skillManaPercent: 25 })).toEqual([{ value: "25%", label: "Energy Restored" }]);
   });
 
   test("DoT pairs multiply per-second by duration and use the DoT display name", () => {
@@ -205,14 +209,16 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
   });
 
   test("target debuffs (movement slow, resistance/damage reduction) render as timed reductions", () => {
-    expect(formatPowerStats({
-      offensiveSlowRunSpeedMin: 45,
-      offensiveSlowRunSpeedDurationMin: 3,
-      offensiveTotalResistanceReductionAbsoluteMin: 24,
-      offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
-      offensiveTotalDamageReductionPercentMin: 15,
-      offensiveTotalDamageReductionPercentDurationMin: 2,
-    })).toEqual([
+    expect(
+      formatPowerStats({
+        offensiveSlowRunSpeedMin: 45,
+        offensiveSlowRunSpeedDurationMin: 3,
+        offensiveTotalResistanceReductionAbsoluteMin: 24,
+        offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
+        offensiveTotalDamageReductionPercentMin: 15,
+        offensiveTotalDamageReductionPercentDurationMin: 2,
+      }),
+    ).toEqual([
       { value: "45%", label: "Slower target Movement for 3 Seconds" },
       { value: "24", label: "Reduced target's Resistances for 1 Seconds" },
       { value: "15%", label: "Reduced target's Damage for 2 Seconds" },
@@ -220,9 +226,7 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
   });
 
   test("radius falls back to skillTargetRadius when there is no projectile radius", () => {
-    expect(formatPowerStats({ skillTargetRadius: 3.5 })).toEqual([
-      { value: "3.5", label: "Meter Radius" },
-    ]);
+    expect(formatPowerStats({ skillTargetRadius: 3.5 })).toEqual([{ value: "3.5", label: "Meter Radius" }]);
   });
 
   test("unhandled stat ids fall through to bonus formatting without a leading +", () => {
@@ -249,7 +253,12 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
 
 describe("formatPet renders a summon proc's summary + base attack", () => {
   test("plural count + duration + base-attack damage (Raise the Dead)", () => {
-    const r = formatPet({ name: "Skeleton", count: 6, duration: 20, attackStats: { offensiveAetherMin: 230, offensiveLifeMin: 230 } });
+    const r = formatPet({
+      name: "Skeleton",
+      count: 6,
+      duration: 20,
+      attackStats: { offensiveAetherMin: 230, offensiveLifeMin: 230 },
+    });
     expect(r.summon).toBe("Summons 6 Skeletons for 20 Seconds");
     expect(r.attack).toEqual([
       { value: "230", label: "Aether Damage" },
@@ -257,11 +266,13 @@ describe("formatPet renders a summon proc's summary + base attack", () => {
     ]);
   });
   test("single pet shows no count or plural (Bysmiel's Command)", () => {
-    expect(formatPet({ name: "Eldritch Hound", count: 1, duration: 20, attackStats: {} }).summon)
-      .toBe("Summons Eldritch Hound for 20 Seconds");
+    expect(formatPet({ name: "Eldritch Hound", count: 1, duration: 20, attackStats: {} }).summon).toBe(
+      "Summons Eldritch Hound for 20 Seconds",
+    );
   });
   test("missing count omits the number (Elemental Seeker)", () => {
-    expect(formatPet({ name: "Elemental Seeker", count: null, duration: 3, attackStats: {} }).summon)
-      .toBe("Summons Elemental Seeker for 3 Seconds");
+    expect(formatPet({ name: "Elemental Seeker", count: null, duration: 3, attackStats: {} }).summon).toBe(
+      "Summons Elemental Seeker for 3 Seconds",
+    );
   });
 });

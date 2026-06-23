@@ -7,14 +7,30 @@ import type { ReachView } from "../src/core/reachability";
 import type { SelectionState } from "../src/core/types";
 
 const doc = {
-  meta: { affinities: ["ascendant","chaos","eldritch","order","primordial"] },
+  meta: { affinities: ["ascendant", "chaos", "eldritch", "order", "primordial"] },
   constellations: [
-    { id: "A", name: "A", tier: 1, affinityRequired: {}, affinityBonus: { ascendant: 2 }, background: null,
-      stars: [{ index: 0, predecessors: [], position: { x: 0, y: 0 }, bonuses: {} }, { index: 1, predecessors: [0], position: { x: 1, y: 0 }, bonuses: {} }] },
+    {
+      id: "A",
+      name: "A",
+      tier: 1,
+      affinityRequired: {},
+      affinityBonus: { ascendant: 2 },
+      background: null,
+      stars: [
+        { index: 0, predecessors: [], position: { x: 0, y: 0 }, bonuses: {} },
+        { index: 1, predecessors: [0], position: { x: 1, y: 0 }, bonuses: {} },
+      ],
+    },
   ],
 } as any;
 const model = buildModel(doc);
-const view = (completable: string[]): ReachView => ({ completable: new Set(completable), clickable: new Set(), have: [0,0,0,0,0], need: [0,0,0,0,0], needSource: new Map() });
+const view = (completable: string[]): ReachView => ({
+  completable: new Set(completable),
+  clickable: new Set(),
+  have: [0, 0, 0, 0, 0],
+  need: [0, 0, 0, 0, 0],
+  needSource: new Map(),
+});
 const st = (ids: string[]): SelectionState => ({ selected: new Set(ids), pointCap: 55 });
 
 test("claims all stars when completable", () => {

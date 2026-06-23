@@ -6,7 +6,15 @@ import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
-import { buildReachCons, reachabilityForSelection, completionMinCost, selectionSummary, setExactResolver, type ReachView, type ReachCon } from "../core/reachability";
+import {
+  buildReachCons,
+  reachabilityForSelection,
+  completionMinCost,
+  selectionSummary,
+  setExactResolver,
+  type ReachView,
+  type ReachCon,
+} from "../core/reachability";
 import { loadWasmResolver } from "../adapters/reachWasm";
 import { canonicalStarIds, canonicalStatIds, decodeHash, encodeHash } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
@@ -18,7 +26,7 @@ async function boot() {
   const data = await httpDataSource(".").load();
   const model = data.model;
   const cons: ReachCon[] = buildReachCons(model);
-  const table = data.coverTable;                                 // null -> dimming disabled (degraded)
+  const table = data.coverTable; // null -> dimming disabled (degraded)
 
   // Swap in the WASM resolver for the expensive bracket gap (verdict-equivalent, ~30x faster on the
   // worst sweep). Must happen before repairSelection below, which classifies. Any failure leaves the
@@ -26,7 +34,10 @@ async function boot() {
   let resolverKind = "ts";
   if (data.reachWasm && table) {
     const wasm = await loadWasmResolver(data.reachWasm, cons, table);
-    if (wasm) { setExactResolver(wasm); resolverKind = "wasm"; }
+    if (wasm) {
+      setExactResolver(wasm);
+      resolverKind = "wasm";
+    }
   }
   (globalThis as Record<string, unknown>).__reachResolver = resolverKind; // diagnostic; the e2e asserts this
 
@@ -35,7 +46,10 @@ async function boot() {
   const statCanonical = canonicalStatIds(model);
   const restored = decodeHash(location.hash, canonical, statCanonical);
   let state: SelectionState = restored
-    ? { selected: repairSelection(model, cons, table, restored.selected, restored.pointCap), pointCap: restored.pointCap }
+    ? {
+        selected: repairSelection(model, cons, table, restored.selected, restored.pointCap),
+        pointCap: restored.pointCap,
+      }
     : { selected: new Set(), pointCap: 55 };
   // The cap can never be below the points actually allocated; raise it if a restored
   // link is over budget (the slider also enforces this floor below).
@@ -85,36 +99,60 @@ async function boot() {
       const src: string[] = [];
       for (const cid of s.startedIds) {
         const c = model.constellations.get(cid)!;
-        const r = [c.affinityRequired.ascendant ?? 0, c.affinityRequired.chaos ?? 0, c.affinityRequired.eldritch ?? 0, c.affinityRequired.order ?? 0, c.affinityRequired.primordial ?? 0];
+        const r = [
+          c.affinityRequired.ascendant ?? 0,
+          c.affinityRequired.chaos ?? 0,
+          c.affinityRequired.eldritch ?? 0,
+          c.affinityRequired.order ?? 0,
+          c.affinityRequired.primordial ?? 0,
+        ];
         if (r[i] === s.target[i]) src.push(cid);
       }
       needSource.set(i, src);
     }
-    if (table && Number.isFinite(state.pointCap)) return reachabilityForSelection(model, cons, table, state.selected, state.pointCap);
+    if (table && Number.isFinite(state.pointCap))
+      return reachabilityForSelection(model, cons, table, state.selected, state.pointCap);
     const completable = new Set<string>([...model.constellations.keys()]);
     const clickable = new Set<string>();
-    for (const st of model.stars.values()) if (!state.selected.has(st.id) && st.predecessors.every((p) => state.selected.has(p))) clickable.add(st.id);
+    for (const st of model.stars.values())
+      if (!state.selected.has(st.id) && st.predecessors.every((p) => state.selected.has(p))) clickable.add(st.id);
     return { completable, clickable, have: s.supply, need: s.target, needSource };
   }
 
   // The minimum points to complete a faded constellation, cached per refresh. Returns
   // undefined when the constellation is already completable (no "needs" line) or when
   // dimming is off, so the tooltip only shows the line for genuinely un-completable ones.
-  const completionCache = new Map<string, number>();           // cleared each refresh
+  const completionCache = new Map<string, number>(); // cleared each refresh
   function completionInfo(conId: string): { needs: number; cap: number } | undefined {
     if (!table || !Number.isFinite(state.pointCap)) return undefined;
-    if (reach.completable.has(conId)) return undefined;        // completable -> no "needs" line
-    if (!completionCache.has(conId)) completionCache.set(conId, completionMinCost(model, cons, table, state.selected, conId, state.pointCap));
+    if (reach.completable.has(conId)) return undefined; // completable -> no "needs" line
+    if (!completionCache.has(conId))
+      completionCache.set(conId, completionMinCost(model, cons, table, state.selected, conId, state.pointCap));
     const needs = completionCache.get(conId)!;
     return Number.isFinite(needs) ? { needs, cap: state.pointCap } : undefined;
   }
 
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
-    onStarClick: (id) => { const next = toggleStar(model, state, reach, id); if (next !== state) { state = next; refresh(); } },
-    onConstellationClick: (id) => { const next = toggleConstellation(model, state, reach, id); if (next !== state) { state = next; refresh(); } },
+    onStarClick: (id) => {
+      const next = toggleStar(model, state, reach, id);
+      if (next !== state) {
+        state = next;
+        refresh();
+      }
+    },
+    onConstellationClick: (id) => {
+      const next = toggleConstellation(model, state, reach, id);
+      if (next !== state) {
+        state = next;
+        refresh();
+      }
+    },
     onHover: (t, x, y) => {
-      if (!t) { tip.hide(); return; }
+      if (!t) {
+        tip.hide();
+        return;
+      }
       const totals = affinityTotals(model, state.selected);
       if (t.kind === "star") tip.show(model, t.id, x, y, totals);
       else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id));
@@ -125,7 +163,8 @@ async function boot() {
   // map star (proc, level, stats, requires/grants) when a row is hovered.
   benefitsEl.addEventListener("mousemove", (e) => {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
-    if (sid) tip.show(model, sid, (e as MouseEvent).clientX, (e as MouseEvent).clientY, affinityTotals(model, state.selected));
+    if (sid)
+      tip.show(model, sid, (e as MouseEvent).clientX, (e as MouseEvent).clientY, affinityTotals(model, state.selected));
     else tip.hide();
   });
   benefitsEl.addEventListener("mouseleave", () => tip.hide());
@@ -185,7 +224,10 @@ async function boot() {
       return;
     }
     const cap = recapValue(state.selected.size, lastFiniteCap);
-    if (cap === null) { flashEl(countEl); return; }
+    if (cap === null) {
+      flashEl(countEl);
+      return;
+    }
     state = { selected: state.selected, pointCap: cap };
     refresh();
   });
@@ -203,7 +245,16 @@ async function boot() {
     // in constellations that remain completable. In the permissive path completable is every
     // constellation, so this lists everything not yet held (the prior behavior).
     const availableIds = availableBonusIds(model, state.selected, reach.completable);
-    const r = renderBenefits(benefitsEl, model, state.selected, prevBonuses, selectedBenefits, benefitCatalog, availableIds, prevPet);
+    const r = renderBenefits(
+      benefitsEl,
+      model,
+      state.selected,
+      prevBonuses,
+      selectedBenefits,
+      benefitCatalog,
+      availableIds,
+      prevPet,
+    );
     prevBonuses = r.bonuses;
     prevPet = r.petBonuses;
     availHtml = r.availHtml;
@@ -216,16 +267,23 @@ async function boot() {
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
-    if (availHtml) affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
+    if (availHtml)
+      affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
     const uncapped = !Number.isFinite(state.pointCap);
     usedEl.textContent = String(state.selected.size);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
     capToggle.title = uncapped ? "Click to restore the 55-point limit" : "Click to remove the point limit";
     slider.disabled = uncapped;
     if (!uncapped) slider.value = String(state.pointCap);
-    history.replaceState(null, "", `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, statCanonical)}`);
+    history.replaceState(
+      null,
+      "",
+      `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, statCanonical)}`,
+    );
   }
   refresh();
 }
 
-boot().catch((e) => { document.body.innerHTML = `<pre style="color:#f88;padding:1rem">${String(e)}</pre>`; });
+boot().catch((e) => {
+  document.body.innerHTML = `<pre style="color:#f88;padding:1rem">${String(e)}</pre>`;
+});

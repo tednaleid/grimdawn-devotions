@@ -1,6 +1,14 @@
 // ABOUTME: DOM adapter that shows/hides a floating tooltip for a hovered star or whole constellation.
 // ABOUTME: Star view shows that star's bonuses; constellation view shows the union of all its stars' bonuses.
-import type { Affinity, AffinityMap, CelestialPower, Constellation, DevotionModel, PetInfo, StarId } from "../core/types";
+import type {
+  Affinity,
+  AffinityMap,
+  CelestialPower,
+  Constellation,
+  DevotionModel,
+  PetInfo,
+  StarId,
+} from "../core/types";
 import { formatBonusRows, formatPet, formatPowerStats } from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
@@ -65,8 +73,10 @@ function petHtml(pet: PetInfo): string {
 function affinitySections(con: Constellation, totals?: AffinityTotals): string {
   const req = requiresLine(con.affinityRequired, totals);
   const grant = affinityLine(con.affinityBonus);
-  return (req ? `<div class="tip-req">Requires: ${req}</div>` : "") +
-    (grant ? `<div class="tip-grant">Grants: ${grant}</div>` : "");
+  return (
+    (req ? `<div class="tip-req">Requires: ${req}</div>` : "") +
+    (grant ? `<div class="tip-grant">Grants: ${grant}</div>` : "")
+  );
 }
 
 export function tooltipView(el: HTMLElement) {
@@ -98,7 +108,14 @@ export function tooltipView(el: HTMLElement) {
       el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}`;
       place(clientX, clientY);
     },
-    showConstellation(model: DevotionModel, conId: string, clientX: number, clientY: number, totals?: AffinityTotals, dim?: { needs: number; cap: number }) {
+    showConstellation(
+      model: DevotionModel,
+      conId: string,
+      clientX: number,
+      clientY: number,
+      totals?: AffinityTotals,
+      dim?: { needs: number; cap: number },
+    ) {
       const con = model.constellations.get(conId);
       if (!con) return;
       const stars = new Set(con.starIds);
