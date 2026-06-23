@@ -3,7 +3,7 @@
 // ABOUTME: order; the engine must never dim a constellation genuinely part of the valid build. Uses the
 // ABOUTME: fast WASM resolver when data/reach.wasm is built (run `just wasm`), else a small TS fallback.
 import { test, expect, beforeAll, afterAll } from "bun:test";
-import { resolve } from "path";
+import { resolve } from "node:path";
 import { fuzzSeed, cons, table } from "../scripts/reachability-fuzz";
 import { setExactResolver } from "../src/core/reachability";
 import { loadWasmResolver } from "../src/adapters/reachWasm";

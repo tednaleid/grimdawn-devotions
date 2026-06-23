@@ -238,9 +238,9 @@ fuzz *ARGS:
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
 
-# Lint the web sources with Biome
+# Lint the web sources with Biome (warnings fail too, so check/CI catch them)
 lint:
-    cd "{{justfile_directory()}}/web" && bunx biome lint
+    cd "{{justfile_directory()}}/web" && bunx biome lint --error-on-warnings
 
 # Auto-fix the safe lint findings Biome can resolve on its own
 lint-fix:

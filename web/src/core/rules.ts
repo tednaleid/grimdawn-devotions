@@ -66,7 +66,7 @@ function predecessorClosure(model: DevotionModel, selected: Set<StarId>): Set<St
     const next = new Set<StarId>();
     for (const id of cur) {
       const s = model.stars.get(id);
-      if (s && s.predecessors.every((p) => cur.has(p))) next.add(id);
+      if (s?.predecessors.every((p) => cur.has(p))) next.add(id);
     }
     if (next.size === cur.size) return next;
     cur = next;

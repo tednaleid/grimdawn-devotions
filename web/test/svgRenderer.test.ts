@@ -96,7 +96,7 @@ test("two-layer dimming: completable normal, startable faded, unstartable dark",
   const svg = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null, reach });
 
   // The clickable star renders with class "selectable"
-  expect(svg).toMatch(new RegExp(`class="(star|hit) [^"]*selectable`));
+  expect(svg).toMatch(/class="(star|hit) [^"]*selectable/);
 
   // ids[2] is not completable and has no clickable stars -> its data-con-id should appear (it is rendered),
   // and when a manifest is present its art gets "unreachable". Without a manifest we verify the star
