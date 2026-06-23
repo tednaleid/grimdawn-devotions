@@ -139,3 +139,34 @@ test("two-layer dimming art: completable has no dim class, un-startable gets unr
     expect(svg).toContain(`data-star-id="${otherId}:0" class="hit locked"`);
   }
 });
+
+test("a link between two selected stars gets the 'taken' class (the rest stay plain)", () => {
+  const child = [...model.stars.values()].find((s) => s.predecessors.length > 0)!;
+  const parent = child.predecessors[0]!;
+  const both = renderSvgMarkup(model, { selected: new Set([child.id, parent]), pointCap: 55 }, { manifest: null });
+  expect(both).toContain('class="link taken"');
+  // With only one endpoint selected the connecting link stays plain.
+  const one = renderSvgMarkup(model, { selected: new Set([parent]), pointCap: 55 }, { manifest: null });
+  expect(one).not.toContain('class="link taken"');
+});
+
+test("stars and links in a dim (un-activatable) constellation get 'con-dim'", () => {
+  // a constellation that has at least one intra-constellation link (a star with a predecessor)
+  const dimCon = [...model.constellations.values()].find((c) =>
+    c.starIds.some((id) => (model.stars.get(id)?.predecessors.length ?? 0) > 0),
+  )!;
+  // dim = neither completable nor holding any clickable star
+  const reach: ReachView = {
+    completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
+    clickable: new Set(),
+    have: [0, 0, 0, 0, 0],
+    need: [0, 0, 0, 0, 0],
+    needSource: new Map(),
+  };
+  const svg = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null, reach });
+  expect(svg).toMatch(/class="star [^"]*con-dim"/);
+  expect(svg).toMatch(/class="link con-dim"/);
+  // Without a reach view nothing dims, so no star or link is faded.
+  const noReach = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
+  expect(noReach).not.toContain("con-dim");
+});

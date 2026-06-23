@@ -145,6 +145,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   const isActive = (c: Constellation): boolean =>
     c.starIds.length > 0 && c.starIds.every((id) => state.selected.has(id));
 
+  // Constellations whose art is dimmed (cannot be activated) also fade their links and star
+  // symbols (CSS halves their brightness), so a dim constellation reads as dim end to end while
+  // its symbols stay clearer than the much fainter background art.
+  const dimCons = new Set<string>();
+  for (const c of model.constellations.values()) if (conArtClass(c) !== "") dimCons.add(c.id);
+
   // Constellation hover/click is resolved in JS against each constellation's art
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
   // even though art bounding boxes overlap. Star hit-circles take precedence.
@@ -186,13 +192,16 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     }
   }
 
-  // Layer 2: links
+  // Layer 2: links. A segment whose both endpoints are selected is "taken" (drawn gold, like
+  // grimtools); a segment in a dim constellation is faded with "con-dim".
   for (const star of model.stars.values()) {
+    const cd = dimCons.has(star.constellationId) ? " con-dim" : "";
     for (const p of star.predecessors) {
       const a = model.stars.get(p);
       if (!a) continue;
+      const taken = state.selected.has(p) && state.selected.has(star.id) ? " taken" : "";
       parts.push(
-        `<line class="link" x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"/>`,
+        `<line class="link${taken}${cd}" x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"/>`,
       );
     }
   }
@@ -212,10 +221,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const style = `--affinity:${solid};--grad:url(#grad-${con.id})`;
     // A star granting a selected benefit is emphasized; the rest are dimmed while filtering.
     const m = opts.highlight?.has(star.id) ? " match" : filtering ? " dim" : "";
+    // Stars in a dim constellation fade too (CSS halves their brightness).
+    const cd = dimCons.has(star.constellationId) ? " con-dim" : "";
     // Celestial-power stars are diamonds; the rest are circles. Both share the .star styling.
     const visible = star.celestialPower
-      ? `<polygon class="star power ${st}${m}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
-      : `<circle class="star ${st}${m}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+      ? `<polygon class="star power ${st}${m}${cd}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
+      : `<circle class="star ${st}${m}${cd}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
     parts.push(
       `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`,
     );

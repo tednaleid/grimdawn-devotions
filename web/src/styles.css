@@ -3,7 +3,8 @@
 :root {
   /* Tunable map visuals. */
   --link-color: #6f82ad; /* constellation lines (brighter than the art) */
-  --link-width: 2;
+  --link-width: 4;
+  --link-taken-color: #f0c14b; /* gold, like grimtools, for a segment whose both ends are taken */
   --art-opacity: 0.25; /* dim the constellation art (was ~0.9) */
   --art-tint-opacity: 0.6; /* strength of the affinity-requirement color wash */
   --art-unmet-factor: 0.25; /* extra fade for constellations you cannot yet start */
@@ -428,6 +429,11 @@ main {
   stroke-width: var(--link-width);
   pointer-events: none;
 }
+/* A fully-taken segment (both endpoint stars selected) glows gold, like grimtools. */
+.link.taken {
+  stroke: var(--link-taken-color);
+  filter: drop-shadow(0 0 2px var(--link-taken-color));
+}
 .art {
   opacity: var(--art-opacity);
   pointer-events: none;
@@ -496,6 +502,17 @@ main {
 }
 .star.dim {
   opacity: 0.13;
+}
+/* Stars and links of a dim (un-activatable) constellation fade to ~half their normal brightness:
+   well above the much fainter background art, but clearly subdued. */
+.link.con-dim {
+  opacity: 0.5;
+}
+.star.con-dim {
+  opacity: 0.5; /* selectable stars (normally 1) -> 0.5 */
+}
+.star.locked.con-dim {
+  opacity: 0.4; /* locked stars (normally 0.8) -> half */
 }
 .orb {
   display: inline-block;
