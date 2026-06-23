@@ -71,3 +71,12 @@ viewport meta is already in `index.html`; URL-state sharing is device-agnostic.
 - `racialBonusPercentDamage` aggregation in the sidebar uses the union of all
   selected stars' `racial_target`; if different races are mixed it lumps them
   together. Acceptable given how rare these stars are.
+
+- The faded-constellation tooltip's completion line ("Needs N of your M points")
+  searches `completionMinCost` only up to the current cap (`main.ts` `completionInfo`),
+  so a constellation whose true completion cost sits between the current cap and the
+  55-point game max shows "Cannot be completed within M points" rather than a real
+  "Needs N (raise your cap)". Only affects users who lowered the cap below 55; at cap 55
+  the message is exact. Fuller fix: search to `BUDGET` (55) in `completionMinCost` and
+  render the cap-raise hint when `cap < N <= 55`. The minimal fix already landed (it
+  stopped leaking the INF sentinel as "Needs 1000000000").

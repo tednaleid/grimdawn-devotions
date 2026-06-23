@@ -114,7 +114,7 @@ export function tooltipView(el: HTMLElement) {
       clientX: number,
       clientY: number,
       totals?: AffinityTotals,
-      dim?: { needs: number; cap: number },
+      dim?: { needs?: number; cap: number },
     ) {
       const con = model.constellations.get(conId);
       if (!con) return;
@@ -123,7 +123,13 @@ export function tooltipView(el: HTMLElement) {
         .map((p) => `<div class="tip-power">${p.power.name}</div>`)
         .join("");
       const head = `<strong>${con.name}</strong> <span class="tip-cost">${con.starIds.length} pts</span>`;
-      const dimLine = dim ? `<div class="tip-dim">Needs ${dim.needs} of your ${dim.cap} points</div>` : "";
+      // `dim` with a `needs` count: how many points would complete it. `dim` without one: the engine
+      // found no completion within the cap (do not leak the INF sentinel as a giant point count).
+      const dimLine = dim
+        ? dim.needs !== undefined
+          ? `<div class="tip-dim">Needs ${dim.needs} of your ${dim.cap} points</div>`
+          : `<div class="tip-dim">Cannot be completed within ${dim.cap} points</div>`
+        : "";
       el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}`;
       place(clientX, clientY);
     },

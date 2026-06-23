@@ -13,6 +13,7 @@ import {
   selectionMinCost,
   selectionSummary,
   setExactResolver,
+  INF,
   type ReachView,
   type ReachCon,
 } from "../core/reachability";
@@ -152,13 +153,15 @@ async function boot() {
   // undefined when the constellation is already completable (no "needs" line) or when
   // dimming is off, so the tooltip only shows the line for genuinely un-completable ones.
   const completionCache = new Map<string, number>(); // cleared each refresh
-  function completionInfo(conId: string): { needs: number; cap: number } | undefined {
+  function completionInfo(conId: string): { needs?: number; cap: number } | undefined {
     if (!table || !Number.isFinite(state.pointCap)) return undefined;
     if (reach.completable.has(conId)) return undefined; // completable -> no "needs" line
     if (!completionCache.has(conId))
       completionCache.set(conId, completionMinCost(model, cons, table, state.selected, conId, state.pointCap));
     const needs = completionCache.get(conId)!;
-    return Number.isFinite(needs) ? { needs, cap: state.pointCap } : undefined;
+    // A finite cost is the completion minimum; INF means no completion within the cap, so show a
+    // plain "cannot" line rather than leaking the sentinel as a giant point count.
+    return needs < INF ? { needs, cap: state.pointCap } : { cap: state.pointCap };
   }
 
   const handle = mountSvg(mapContainer, model, {
