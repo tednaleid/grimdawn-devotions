@@ -521,10 +521,11 @@ main {
   transform-box: fill-box;
   transform-origin: center;
   transform: scale(1.45);
-  filter: drop-shadow(0 0 4px #cfe8ff) drop-shadow(0 0 10px #6cb6ff) drop-shadow(0 0 16px #6cb6ff);
+  /* brightness() trails the glows so it lifts both the star and its halo ~25%. */
+  filter: drop-shadow(0 0 4px #cfe8ff) drop-shadow(0 0 10px #6cb6ff) drop-shadow(0 0 16px #6cb6ff) brightness(1.25);
 }
 .star.dim {
-  opacity: 0.13;
+  opacity: 0.4; /* non-matching stars on reachable constellations: visible but clearly below matches */
 }
 /* Stars and links of a dim (un-activatable) constellation fade well below normal brightness:
    still above the much fainter background art, but clearly subdued. */
@@ -536,6 +537,12 @@ main {
 }
 .star.locked.con-dim {
   opacity: 0.1; /* locked stars (normally 0.8) */
+}
+/* A search match on an un-activatable constellation keeps nearly full brightness (and its
+   glow) so matches stay findable even where the constellation itself is faded out. Placed
+   after .star.locked.con-dim so it wins the specificity tie for locked stars. */
+.star.match.con-dim {
+  opacity: 0.85;
 }
 .orb {
   display: inline-block;
