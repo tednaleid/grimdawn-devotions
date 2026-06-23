@@ -1,0 +1,3 @@
+# ABOUTME: Force LF line endings on checkout across all platforms (Windows included), so the
+# ABOUTME: biome formatter check, bash recipes, and the committed sources stay consistent.
+* text=auto eol=lf
