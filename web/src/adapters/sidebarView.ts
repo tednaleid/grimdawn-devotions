@@ -53,7 +53,12 @@ export function renderBenefits(
     totals: Record<string, number>,
   ) {
     const catIds = new Map<string, string[]>();
-    for (const g of scopeCatalog) for (const s of g.subjects) catIds.set(s.key, s.parts.map((p) => p.id));
+    for (const g of scopeCatalog)
+      for (const s of g.subjects)
+        catIds.set(
+          s.key,
+          s.parts.map((p) => p.id),
+        );
     const rawIds = (s: CondensedSubject) => catIds.get(s.key) ?? s.parts.map((p) => p.id);
     const keys = (s: CondensedSubject) => rawIds(s).map(keyOf);
     const gkey = (s: CondensedSubject) => keyOf(s.key);
@@ -69,9 +74,11 @@ export function renderBenefits(
       const main = s.parts.filter((p) => p.dim !== "durFlat" && p.dim !== "durPct");
       const dur = s.parts.filter((p) => p.dim === "durFlat" || p.dim === "durPct");
       if (dur.length) {
-        return `${open}<div class="bsubj" data-gtoggle>${s.subject}</div>` +
+        return (
+          `${open}<div class="bsubj" data-gtoggle>${s.subject}</div>` +
           `<div class="bsub"><span class="blbl">damage</span><span class="bvals">${main.map(chip).join("")}</span></div>` +
-          `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`;
+          `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`
+        );
       }
       return `${open}<div class="bsingle"><span class="bsubj" data-gtoggle>${s.subject}</span><span class="bvals">${main.map(chip).join("")}</span></div></div>`;
     };
@@ -101,19 +108,29 @@ export function renderBenefits(
 
   // "Available to get": inactive catalog subjects still obtainable (a key in availKeys) or tagged
   // (so a tag can always be cleared). availKeys undefined disables the filter (permissive path).
-  const availListHtml = (scopeCatalog: CondensedGroup[], scope: Scope, scopeActiveKeys: Set<string>, availKeys: Set<string> | undefined) =>
-    scopeCatalog.map((g) => {
-      const subs = g.subjects
-        .filter((s) => {
-          if (scopeActiveKeys.has(s.key)) return false;
-          const ks = scope.keys(s);
-          const obtainable = availKeys === undefined || ks.some((k) => availKeys.has(k));
-          return obtainable || ks.some((k) => selectedBenefits.has(k));
-        })
-        .map((s) => `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`)
-        .join("");
-      return subs ? `<h3>${g.group}</h3><div class="avail-list">${subs}</div>` : "";
-    }).join("");
+  const availListHtml = (
+    scopeCatalog: CondensedGroup[],
+    scope: Scope,
+    scopeActiveKeys: Set<string>,
+    availKeys: Set<string> | undefined,
+  ) =>
+    scopeCatalog
+      .map((g) => {
+        const subs = g.subjects
+          .filter((s) => {
+            if (scopeActiveKeys.has(s.key)) return false;
+            const ks = scope.keys(s);
+            const obtainable = availKeys === undefined || ks.some((k) => availKeys.has(k));
+            return obtainable || ks.some((k) => selectedBenefits.has(k));
+          })
+          .map(
+            (s) =>
+              `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`,
+          )
+          .join("");
+        return subs ? `<h3>${g.group}</h3><div class="avail-list">${subs}</div>` : "";
+      })
+      .join("");
 
   const availHtml = availListHtml(catalog, player, activeKeys, availableIds);
   const petAvailHtml = availListHtml(petCatalog, pet, petActiveKeys, availablePetKeys);
@@ -142,7 +159,13 @@ export function renderAffinities(
   needSource: Map<number, string[]>,
   prev?: Record<Affinity, number>,
 ): Record<Affinity, number> {
-  const totals = { ascendant: have[0], chaos: have[1], eldritch: have[2], order: have[3], primordial: have[4] } as Record<Affinity, number>;
+  const totals = {
+    ascendant: have[0],
+    chaos: have[1],
+    eldritch: have[2],
+    order: have[3],
+    primordial: have[4],
+  } as Record<Affinity, number>;
   const rows = AFFINITIES.map((a, i) => {
     const flash = changeClass(prev, a, totals as Record<string, number>);
     const n = need[i]!;

@@ -104,11 +104,7 @@ export function availableBonusIds(model: DevotionModel, selected: Set<StarId>, c
 // The pet bonuses still obtainable from the current selection, as pet:-scoped tag keys: every
 // petBonus carried by a not-yet-selected star inside a constellation that remains completable.
 // Drives the pet "Available to get" list. `completable` comes from reachabilityForSelection.
-export function availablePetKeys(
-  model: DevotionModel,
-  selected: Set<StarId>,
-  completable: Set<string>,
-): Set<string> {
+export function availablePetKeys(model: DevotionModel, selected: Set<StarId>, completable: Set<string>): Set<string> {
   const out = new Set<string>();
   for (const conId of completable) {
     const con = model.constellations.get(conId);

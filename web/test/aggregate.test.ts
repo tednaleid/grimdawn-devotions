@@ -3,7 +3,15 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { sumBonuses, sumPetBonuses, powersGained, starsGranting, starsGrantingPet, availableBonusIds, availablePetKeys } from "../src/core/aggregate";
+import {
+  sumBonuses,
+  sumPetBonuses,
+  powersGained,
+  starsGranting,
+  starsGrantingPet,
+  availableBonusIds,
+  availablePetKeys,
+} from "../src/core/aggregate";
 
 const model = buildModel(doc as any);
 
@@ -93,13 +101,21 @@ test("starsGrantingPet returns exactly the stars whose petBonuses include an id"
   expect(starsGrantingPet(model, new Set()).size).toBe(0);
 });
 
-const conWithPet = () => [...model.constellations.values()].find((c) =>
-  c.starIds.some((id) => { const p = model.stars.get(id)?.petBonuses; return p && Object.keys(p).length > 0; }))!;
+const conWithPet = () =>
+  [...model.constellations.values()].find((c) =>
+    c.starIds.some((id) => {
+      const p = model.stars.get(id)?.petBonuses;
+      return p && Object.keys(p).length > 0;
+    }),
+  )!;
 
 test("availablePetKeys returns pet: keys for unselected stars' petBonuses in completable cons", () => {
   const con = conWithPet();
   const expected = new Set<string>();
-  for (const sid of con.starIds) { const p = model.stars.get(sid)?.petBonuses; if (p) for (const k of Object.keys(p)) expected.add(`pet:${k}`); }
+  for (const sid of con.starIds) {
+    const p = model.stars.get(sid)?.petBonuses;
+    if (p) for (const k of Object.keys(p)) expected.add(`pet:${k}`);
+  }
   const got = availablePetKeys(model, new Set(), new Set([con.id]));
   expect([...got].sort()).toEqual([...expected].sort());
   expect(availablePetKeys(model, new Set(), new Set()).size).toBe(0);

@@ -65,16 +65,27 @@ test("a tagged subject stays listed even when it is no longer obtainable (so it 
 
 const realModel = buildModel(doc as any);
 const petStar = [...realModel.stars.values()].find((s) => s.petBonuses && Object.keys(s.petBonuses).length > 0)!;
-const petCat: CondensedGroup[] = [{
-  group: "Defense",
-  subjects: [
-    { subject: "Fire Resistance", key: "Defense:Fire Resistance", parts: [{ dim: "pct", value: "+10%", id: "defensiveFire" }] },
-    { subject: "Cold Resistance", key: "Defense:Cold Resistance", parts: [{ dim: "pct", value: "+10%", id: "defensiveCold" }] },
-  ],
-}];
+const petCat: CondensedGroup[] = [
+  {
+    group: "Defense",
+    subjects: [
+      {
+        subject: "Fire Resistance",
+        key: "Defense:Fire Resistance",
+        parts: [{ dim: "pct", value: "+10%", id: "defensiveFire" }],
+      },
+      {
+        subject: "Cold Resistance",
+        key: "Defense:Cold Resistance",
+        parts: [{ dim: "pct", value: "+10%", id: "defensiveCold" }],
+      },
+    ],
+  },
+];
 function petAvailOf(keys?: Set<string>, tags: Set<string> = new Set()): string {
   const el = { innerHTML: "" } as unknown as HTMLElement;
-  return renderBenefits(el, emptyModel, new Set(), undefined, tags, [], undefined, undefined, petCat, keys).petAvailHtml;
+  return renderBenefits(el, emptyModel, new Set(), undefined, tags, [], undefined, undefined, petCat, keys)
+    .petAvailHtml;
 }
 
 test("the active 'Bonus to All Pets' section is taggable with pet: scoped ids", () => {

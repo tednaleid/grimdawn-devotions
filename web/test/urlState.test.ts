@@ -2,7 +2,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { canonicalStarIds, canonicalStatIds, canonicalPetStatIds, canonicalBenefitIds, encodeHash, decodeHash } from "../src/core/urlState";
+import { canonicalStarIds, canonicalStatIds, canonicalBenefitIds, encodeHash, decodeHash } from "../src/core/urlState";
 
 const model = buildModel(doc as any);
 const canonical = canonicalStarIds(model);
