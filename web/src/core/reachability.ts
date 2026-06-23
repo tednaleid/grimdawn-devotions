@@ -522,6 +522,35 @@ export function completionMinCost(
   return lo;
 }
 
+/**
+ * Minimum total points for `selected` to be a valid, constructible build - the smallest budget at
+ * which the selection classifies "reachable". This is the slider floor: below it the current
+ * selection cannot be a legal build (e.g. claiming Leviathan alone is 7 stars but needs ~26 points
+ * once the affinity it requires is paid for). Returns `own` when nothing gates the selection, 0 when
+ * empty, and never exceeds maxBudget (a selection needing more pins to maxBudget). Monotone in
+ * budget, so a binary search over classifyForSelection is exact.
+ */
+export function selectionMinCost(
+  model: DevotionModel,
+  cons: ReachCon[],
+  table: CoverTable,
+  selected: Set<string>,
+  maxBudget = BUDGET,
+): number {
+  const st = selectionSummary(model, selected);
+  let lo = st.own; // cannot cost less than the stars already selected
+  if (lo === 0) return 0;
+  if (lo >= maxBudget) return maxBudget;
+  if (classifyForSelection(cons, table, st, maxBudget) !== "reachable") return maxBudget;
+  let hi = maxBudget;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (classifyForSelection(cons, table, st, mid) === "reachable") hi = mid;
+    else lo = mid + 1;
+  }
+  return lo;
+}
+
 export interface ReachView {
   completable: Set<string>;
   clickable: Set<StarId>;

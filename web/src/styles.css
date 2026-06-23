@@ -29,25 +29,23 @@ header {
   background: #161b22;
   border-bottom: 1px solid #30363d;
 }
-/* Points group (slider + count) on the left, reset controls pushed to the right. */
-header label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
+/* Points group (label + bar + total) on the left, reset controls pushed to the right. */
+.plabel {
   font-size: 0.8rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: #9aa4b2;
+  flex: none;
 }
-#point-count {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-variant-numeric: tabular-nums;
-  color: #9aa4b2;
+#point-total {
   font-size: 0.8rem;
-  text-transform: none;
-  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  color: #aab4c0;
+  white-space: nowrap;
+  flex: none;
+}
+#total-word {
+  color: #9aa4b2;
 }
 /* The cap is a button: click it to remove the point limit (shows the infinity glyph), click again to restore it. */
 #cap-toggle {
@@ -80,13 +78,8 @@ header label {
     color: #ff6b6b;
   }
 }
-#point-count.flash-blocked #point-used {
+#cap-toggle.flash-blocked {
   animation: flash-blocked-count 0.5s ease-in-out 3;
-}
-/* While uncapped the slider is meaningless, so it is disabled and dimmed. */
-#point-slider:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
 }
 header button {
   margin-left: 0;
@@ -112,40 +105,70 @@ header button:active {
 #reset-view {
   margin-left: auto;
 }
-/* Themed range slider (track + thumb) instead of the default browser control. */
-#point-slider {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 150px;
-  height: 5px;
-  border-radius: 999px;
+/* Points budget bar: used (spent) / min (validity floor) / headroom, with a grey cap grabber. */
+#point-bar {
+  position: relative;
+  flex: 1 1 auto;
+  max-width: 420px;
+  min-width: 220px;
+  height: 24px;
+  border-radius: 7px;
   background: #30363d;
-  outline: none;
   cursor: pointer;
+  user-select: none;
 }
-#point-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 15px;
-  height: 15px;
+#point-bar:focus-visible {
+  outline: 2px solid #6cb6ff;
+  outline-offset: 2px;
+}
+#point-bar.uncapped {
+  cursor: default;
+  opacity: 0.75;
+}
+.pb-seg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.pb-used {
+  left: 0;
+  background: #2f6da8;
+  border-radius: 7px 0 0 7px;
+}
+.pb-min {
+  background: #8a6233;
+}
+.pb-head {
+  background: #2a3d56;
+}
+.pb-lab {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 0 6px;
+  pointer-events: none;
+  text-shadow: 0 1px 2px #000;
+  color: #e6edf3;
+  z-index: 2;
+}
+.pb-grab {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: #6cb6ff;
+  background: #aab4c0;
   border: 2px solid #161b22;
-  cursor: pointer;
+  box-shadow: 0 1px 3px #000;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  z-index: 3;
 }
-#point-slider::-moz-range-thumb {
-  width: 13px;
-  height: 13px;
-  border-radius: 50%;
-  background: #6cb6ff;
-  border: 2px solid #161b22;
-  cursor: pointer;
-}
-#point-slider:hover::-webkit-slider-thumb {
-  background: #84c5ff;
-}
-#point-slider:hover::-moz-range-thumb {
-  background: #84c5ff;
+.pb-grab:active {
+  cursor: grabbing;
 }
 main {
   flex: 1;

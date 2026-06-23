@@ -17,6 +17,7 @@ import {
   classifyForSelection,
   lowerBoundFrom,
   completionMinCost,
+  selectionMinCost,
   reachabilityForSelection,
   INF,
   type ReachCon,
@@ -224,6 +225,17 @@ test("Leviathan and Tree of Life are each reachable; their cover cost is ~26-27"
       [id("Leviathan")].map((i) => cons.find((c) => c.id === i)!),
     ),
   ).toBeLessThanOrEqual(30);
+});
+
+test("selectionMinCost: empty is 0; a gated capstone needs filler beyond its own stars", () => {
+  expect(selectionMinCost(realModel, cons, cover, new Set())).toBe(0);
+  const lev = realModel.constellations.get(id("Leviathan"))!;
+  const own = lev.starIds.length;
+  const min = selectionMinCost(realModel, cons, cover, new Set(lev.starIds));
+  expect(min).toBeGreaterThan(own); // the affinity gate forces filler beyond Leviathan's own stars
+  expect(min).toBeLessThanOrEqual(55);
+  expect(min).toBeGreaterThanOrEqual(24); // ~26 to field Leviathan (matches the cover-cost test above)
+  expect(min).toBeLessThanOrEqual(28);
 });
 
 test("reachableExact matches the brute oracle's reachable/dim decision on 400 random models", () => {

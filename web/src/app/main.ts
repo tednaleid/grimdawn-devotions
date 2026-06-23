@@ -10,6 +10,7 @@ import {
   buildReachCons,
   reachabilityForSelection,
   completionMinCost,
+  selectionMinCost,
   selectionSummary,
   setExactResolver,
   type ReachView,
@@ -69,14 +70,15 @@ async function boot() {
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
   const affinityEl = document.getElementById("affinity") as HTMLElement;
   const tooltipEl = document.getElementById("tooltip") as HTMLElement;
-  const slider = document.getElementById("point-slider") as HTMLInputElement;
-  const countEl = document.getElementById("point-count") as HTMLElement;
-  const usedEl = document.getElementById("point-used") as HTMLElement;
+  const barEl = document.getElementById("point-bar") as HTMLElement;
+  const totalWord = document.getElementById("total-word") as HTMLElement;
   const capToggle = document.getElementById("cap-toggle") as HTMLButtonElement;
   const resetBtn = document.getElementById("reset-view") as HTMLButtonElement;
   const resetPointsBtn = document.getElementById("reset-points") as HTMLButtonElement;
   const tip = tooltipView(tooltipEl);
-  if (Number.isFinite(state.pointCap)) slider.value = String(state.pointCap);
+  // Max devotion points = the bar's full extent; the slider floor is the validity minimum (curMin).
+  const MAX_POINTS = 55;
+  let curMin = 0; // selectionMinCost for the current selection, recomputed each refresh
 
   // Pulse one element by retriggering the transient flash animation.
   function flashEl(el: Element | null | undefined) {
@@ -204,13 +206,67 @@ async function boot() {
     refresh();
   });
 
-  slider.addEventListener("input", () => {
-    // The cap cannot drop below the points already allocated; snap the thumb back
-    // up to that floor if dragged under it.
-    const cap = Math.max(Number(slider.value), state.selected.size);
-    if (String(cap) !== slider.value) slider.value = String(cap);
+  // The points bar: a custom control showing used (spent) / min (validity floor) / cap (budget),
+  // with a grey grabber for the cap. The grabber is floored at curMin - the fewest points that keep
+  // the current selection a legal build - not merely at the points already spent.
+  function capFromClientX(clientX: number): number {
+    const r = barEl.getBoundingClientRect();
+    const v = Math.round(((clientX - r.left) / r.width) * MAX_POINTS);
+    return Math.max(curMin, Math.min(MAX_POINTS, v));
+  }
+  function setCap(cap: number): void {
     state = { selected: state.selected, pointCap: cap };
     refresh();
+  }
+  function renderPointBar(): void {
+    const used = state.selected.size;
+    const uncapped = !Number.isFinite(state.pointCap);
+    const cap = uncapped ? MAX_POINTS : (state.pointCap as number);
+    const pct = (v: number) => (v / MAX_POINTS) * 100;
+    const showMin = curMin > used;
+    // The min label is anchored at the used boundary and runs right, so it overlaps the grabber once
+    // used is within ~8 points of the cap; hide just the label then (the orange band still shows).
+    const hideMinLabel = cap - used <= 8;
+    const headStart = showMin ? curMin : used;
+    let html = `<div class="pb-seg pb-used" style="width:${pct(used)}%"></div>`;
+    if (showMin)
+      html += `<div class="pb-seg pb-min" style="left:${pct(used)}%;width:${pct(curMin) - pct(used)}%"></div>`;
+    html += `<div class="pb-seg pb-head" style="left:${pct(headStart)}%;width:${pct(cap) - pct(headStart)}%"></div>`;
+    html += `<span class="pb-lab" style="left:0">${used} used</span>`;
+    if (showMin && !hideMinLabel) html += `<span class="pb-lab" style="left:${pct(used)}%">${curMin} min</span>`;
+    if (!uncapped) html += `<div class="pb-grab" style="left:${pct(cap)}%"></div>`;
+    barEl.innerHTML = html;
+    barEl.classList.toggle("uncapped", uncapped);
+    barEl.setAttribute("aria-valuemin", String(curMin));
+    barEl.setAttribute("aria-valuemax", String(MAX_POINTS));
+    barEl.setAttribute("aria-valuenow", String(cap));
+  }
+  let dragging = false;
+  const onBarMove = (e: MouseEvent) => {
+    if (dragging) setCap(capFromClientX(e.clientX));
+  };
+  const onBarUp = () => {
+    dragging = false;
+    window.removeEventListener("mousemove", onBarMove);
+    window.removeEventListener("mouseup", onBarUp);
+  };
+  barEl.addEventListener("mousedown", (e) => {
+    if (!Number.isFinite(state.pointCap)) return; // uncapped: the bar is read-only
+    dragging = true;
+    setCap(capFromClientX(e.clientX));
+    window.addEventListener("mousemove", onBarMove);
+    window.addEventListener("mouseup", onBarUp);
+  });
+  barEl.addEventListener("keydown", (e) => {
+    if (!Number.isFinite(state.pointCap)) return;
+    let c = state.pointCap as number;
+    if (e.key === "ArrowLeft" || e.key === "ArrowDown") c -= 1;
+    else if (e.key === "ArrowRight" || e.key === "ArrowUp") c += 1;
+    else if (e.key === "Home") c = curMin;
+    else if (e.key === "End") c = MAX_POINTS;
+    else return;
+    e.preventDefault();
+    setCap(Math.max(curMin, Math.min(MAX_POINTS, c)));
   });
 
   // The cap button toggles between the finite limit and uncapped (Infinity).
@@ -225,7 +281,7 @@ async function boot() {
     }
     const cap = recapValue(state.selected.size, lastFiniteCap);
     if (cap === null) {
-      flashEl(countEl);
+      flashEl(capToggle);
       return;
     }
     state = { selected: state.selected, pointCap: cap };
@@ -261,20 +317,27 @@ async function boot() {
   }
   function refresh() {
     completionCache.clear();
+    // The validity floor: fewest points that keep this selection a legal build. Cap-independent, so
+    // compute it before the sweep. Only meaningful capped + with dimming on; else floor = points spent.
+    curMin =
+      table && Number.isFinite(state.pointCap)
+        ? selectionMinCost(model, cons, table, state.selected)
+        : state.selected.size;
+    // The cap can never sit below the validity floor (raise a stale/over-tight restored link).
+    if (Number.isFinite(state.pointCap) && state.pointCap < curMin)
+      state = { selected: state.selected, pointCap: curMin };
     reach = computeReach();
     handle.update(state, starsGranting(model, selectedBenefits), reach);
-    slider.min = String(Math.max(1, state.selected.size)); // cannot drag below allocated points
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
     if (availHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
     const uncapped = !Number.isFinite(state.pointCap);
-    usedEl.textContent = String(state.selected.size);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
     capToggle.title = uncapped ? "Click to restore the 55-point limit" : "Click to remove the point limit";
-    slider.disabled = uncapped;
-    if (!uncapped) slider.value = String(state.pointCap);
+    totalWord.style.display = uncapped ? "none" : "";
+    renderPointBar();
     history.replaceState(
       null,
       "",
