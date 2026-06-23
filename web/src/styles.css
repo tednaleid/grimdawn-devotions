@@ -526,16 +526,16 @@ main {
 .star.dim {
   opacity: 0.13;
 }
-/* Stars and links of a dim (un-activatable) constellation fade to ~half their normal brightness:
-   well above the much fainter background art, but clearly subdued. */
+/* Stars and links of a dim (un-activatable) constellation fade well below normal brightness:
+   still above the much fainter background art, but clearly subdued. */
 .link.con-dim {
-  opacity: 0.5;
+  opacity: 0.15;
 }
 .star.con-dim {
-  opacity: 0.5; /* selectable stars (normally 1) -> 0.5 */
+  opacity: 0.15; /* selectable stars (normally 1) */
 }
 .star.locked.con-dim {
-  opacity: 0.4; /* locked stars (normally 0.8) -> half */
+  opacity: 0.1; /* locked stars (normally 0.8) */
 }
 .orb {
   display: inline-block;
