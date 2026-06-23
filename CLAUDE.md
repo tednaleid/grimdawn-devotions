@@ -1,5 +1,7 @@
 # grimdawn-devotions
 
+For project orientation (stack, build/test commands, architecture, entry points), see [ONBOARDING.md](./ONBOARDING.md).
+
 ## Backlog / new ideas
 
 New ideas and backlog items go in [BACKLOG.md](BACKLOG.md) at the project root.
