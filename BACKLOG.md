@@ -58,6 +58,39 @@ shortcut landed; the dim-cache param did not). Pointers:
 driven from `main.ts`; key the cache by candidate id + a generation counter bumped
 on removal/cap change.
 
+## Mobile-friendly responsive pass
+
+Make the single planner page usable on phones. The hexagonal split means this is
+almost entirely an adapters + CSS effort; `core/` is untouched. Needs a full
+brainstorming pass first - the touch interaction model is the crux. Direction settled
+on so far:
+
+- Keep desktop exactly as-is: mouse hover = preview tooltip, click = select. Do NOT
+  regress this. Branch on the actual input per interaction (`PointerEvent.pointerType`,
+  `@media (hover: hover)` / `(pointer: coarse)`), never a global "mobile mode" - a 2-in-1
+  must do the right thing per gesture.
+- Input foundation: migrate `web/src/adapters/navController.ts` from mouse events to the
+  Pointer Events API (`pointerdown/move/up`), add pinch-zoom by tracking two active
+  pointers (feed the distance ratio to the existing `zoomViewBox`), and set
+  `touch-action: none` on `#map-container`. The pan/zoom math in `core/viewbox.ts` is
+  reused unchanged. Without this the large map cannot be navigated on touch (the actual
+  blocker today - tap already synthesizes a click, so selection mostly works).
+- Touch detail: hover does not exist on touch, so generalize "show info for X" out of
+  `tooltipView.ts` (today a cursor-anchored popover) into a detail panel / bottom-sheet a
+  tap fills. Desktop keeps the floating tooltip; touch gets the sheet; share the content
+  rendering.
+- Touch interaction model (DECIDE FIRST): leaning tap = preview (fills the sheet) + a
+  "Take" button to commit, mirroring desktop hover->click. The 438-star map is dense, so
+  select-immediately-on-tap risks mis-taps. This decision drives the sheet and the
+  tap/drag disambiguation in navController.
+- Layout: the `main` grid (`280px 1fr 250px` in `styles.css`) collapses below ~768px to a
+  full-width map with the two sidebars as a bottom tab bar or swipe-up drawers. The
+  `sidebarView` HTML is reusable verbatim inside a drawer.
+- Header: reflow the points control + reset buttons for narrow widths; the new points
+  control (current work) should be built mobile-aware so it is not redone.
+
+viewport meta is already in `index.html`; URL-state sharing is device-agnostic.
+
 ## Known limitations (accepted)
 
 - `racialBonusPercentDamage` aggregation in the sidebar uses the union of all
