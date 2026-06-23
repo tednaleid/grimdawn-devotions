@@ -1,0 +1,27 @@
+# ABOUTME: CI gate — runs `just check` (tests, lint, type-check) on every push to main and on PRs.
+# ABOUTME: Runs on Linux AND Windows so the cross-platform (bash/just) build promise stays honest.
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+      - name: Install web dependencies
+        run: just web-install
+      - name: Run checks (tests, lint, type-check)
+        run: just check

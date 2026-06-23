@@ -163,9 +163,15 @@ parse *ARGS:
 # Full pipeline: extract then parse
 all: extract parse
 
-# Remove generated output (keeps extracted game files)
+# KEEPS the committed dataset (data/devotions.json, data/stat_labels.json) — those only
+# regenerate via `just parse` on Windows, so clean must never delete them.
+# Remove build artifacts: web/dist, data/cover-table.bin, data/reach.wasm, web/wasm/target, csv dump.
 clean:
-    rm -f "{{out}}" "{{justfile_directory()}}/data/stat_labels.json" "{{justfile_directory()}}/data/devotion_records.csv"
+    rm -rf "{{justfile_directory()}}/web/dist" \
+           "{{justfile_directory()}}/web/wasm/target" \
+           "{{justfile_directory()}}/data/cover-table.bin" \
+           "{{justfile_directory()}}/data/reach.wasm" \
+           "{{justfile_directory()}}/data/devotion_records.csv"
 
 # Extract + optimize devotion artwork from the base + expansion UI.arc archives into assets/ (WebP + manifest)
 assets *ARGS: _require-game-closed
@@ -186,10 +192,24 @@ cover-table:
         echo "cover-table.bin is up to date"
     fi
 
+# Add the wasm32 target if it is not already installed (cheap check; no-op when present).
+# Kept separate from install-rust so `just wasm` can self-heal a missing target without ever
+# triggering a full rustup install (winget/brew). If rustup itself is absent, point at install-rust.
+_ensure-wasm-target:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    RUSTUP="$(command -v rustup 2>/dev/null || true)"; [ -n "$RUSTUP" ] || RUSTUP="$HOME/.cargo/bin/rustup"
+    "$RUSTUP" --version >/dev/null 2>&1 || { echo "rustup not found - run 'just install-rust' (open a new shell after install)."; exit 1; }
+    if ! "$RUSTUP" target list --installed 2>/dev/null | grep -q '^wasm32-unknown-unknown$'; then
+        echo "wasm32-unknown-unknown target missing; adding it ..."
+        "$RUSTUP" target add wasm32-unknown-unknown
+    fi
+
+# Depends on _ensure-wasm-target, which cheaply adds the wasm32 target if missing (run
+# `just install-rust` first if you have no rust toolchain at all). The engine loads this for the
+# fast resolver; absent, it falls back to the TS resolver, so this is optional for a working build.
 # Build the reachability core to WebAssembly (raw wasm32, no wasm-bindgen) into data/reach.wasm.
-# Run `just install-rust` first. The engine loads this for the fast resolver; absent, it falls
-# back to the TS resolver, so this is optional for a working (if slower) build.
-wasm:
+wasm: _ensure-wasm-target
     #!/usr/bin/env bash
     set -euo pipefail
     CARGO="$(command -v cargo 2>/dev/null || true)"; [ -n "$CARGO" ] || CARGO="$HOME/.cargo/bin/cargo"
@@ -226,8 +246,26 @@ lint:
 lint-fix:
     cd "{{justfile_directory()}}/web" && bunx biome lint --write
 
-# Full verification gate: tests, lint, and type-check
-check: test lint typecheck
+# Format the web sources with Biome (writes changes in place)
+fmt:
+    cd "{{justfile_directory()}}/web" && bunx biome format --write
+
+# Verify formatting without writing (fails if anything is unformatted); used by check + CI
+fmt-check:
+    cd "{{justfile_directory()}}/web" && bunx biome format
+
+# Full verification gate: formatting, tests, lint, and type-check
+check: fmt-check test lint typecheck
+
+# Opt-in (hooks are not tracked): run this once after cloning.
+# Install a git pre-commit hook that runs `just check` before each commit.
+install-hooks:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    hook="{{justfile_directory()}}/.git/hooks/pre-commit"
+    printf '#!/bin/sh\njust check\n' > "$hook"
+    chmod +x "$hook"
+    echo "Installed pre-commit hook: $hook"
 
 # Build the static site into web/dist (bundles JS, copies html/css/data/assets)
 build: cover-table
