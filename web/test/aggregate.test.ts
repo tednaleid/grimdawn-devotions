@@ -11,6 +11,7 @@ import {
   starsGrantingPet,
   availableBonusIds,
   availablePetKeys,
+  weaponRequirements,
 } from "../src/core/aggregate";
 
 const model = buildModel(doc as any);
@@ -124,4 +125,10 @@ test("availablePetKeys returns pet: keys for unselected stars' petBonuses in com
 test("availablePetKeys skips already-selected stars", () => {
   const con = conWithPet();
   expect(availablePetKeys(model, new Set(con.starIds), new Set([con.id])).size).toBe(0);
+});
+
+test("weaponRequirements carries each gated star's description", () => {
+  const reqs = weaponRequirements(model, new Set(["kraken:0"]));
+  expect(reqs).toHaveLength(1);
+  expect(reqs[0]!.description).toBe("Requires a two-handed melee or two-handed ranged weapon.");
 });

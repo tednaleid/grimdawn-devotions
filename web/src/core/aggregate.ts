@@ -122,11 +122,16 @@ export function availablePetKeys(model: DevotionModel, selected: Set<StarId>, co
 export function weaponRequirements(
   model: DevotionModel,
   selected: Set<StarId>,
-): { starId: StarId; weapons: string[] }[] {
-  const out: { starId: StarId; weapons: string[] }[] = [];
+): { starId: StarId; weapons: string[]; description: string | null }[] {
+  const out: { starId: StarId; weapons: string[]; description: string | null }[] = [];
   for (const id of selected) {
     const star = model.stars.get(id);
-    if (star?.weaponRequirement) out.push({ starId: id, weapons: star.weaponRequirement.weapons });
+    if (star?.weaponRequirement)
+      out.push({
+        starId: id,
+        weapons: star.weaponRequirement.weapons,
+        description: star.weaponRequirement.description,
+      });
   }
   return out;
 }
