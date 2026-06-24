@@ -219,9 +219,16 @@ wasm: _ensure-wasm-target
     cp target/wasm32-unknown-unknown/release/reach.wasm "{{justfile_directory()}}/data/reach.wasm"
     echo "built data/reach.wasm ($(wc -c < "{{justfile_directory()}}/data/reach.wasm") bytes)"
 
-# Run the core test suite
-test:
-    cd "{{justfile_directory()}}/web" && bun test
+# Run the core test suite. Pass args to target a file or filter, e.g.
+#   just test test/reachability.test.ts   (one file)   |   just test -t Oklaine   (by name)
+# The heavy downward-closure walk is gated out of this run; see `just test-slow`.
+test *ARGS:
+    cd "{{justfile_directory()}}/web" && bun test {{ARGS}}
+
+# Slow reachability property tier: the heavy metamorphic downward-closure walk, gated behind REACH_SLOW
+# so the default suite (and the pre-commit hook) stay fast. Run before big engine changes.
+test-slow:
+    cd "{{justfile_directory()}}/web" && REACH_SLOW=1 bun test test/reachability-monotonicity.test.ts
 
 # Per-click engine perf harness. Times selectionView (the validity-floor search + dimming sweep) = the
 # EXACT work one UI click costs; this is the pure core engine to optimize so the UI is fast (no DOM). Two
@@ -315,6 +322,22 @@ build: cover-table
 # Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)
 serve: build
     bunx serve "{{justfile_directory()}}/web/dist" -l 5173
+
+# Stop a running dev server (frees port 5173). Safe to run when nothing is listening.
+stop:
+    #!/usr/bin/env bash
+    set -uo pipefail
+    port=5173
+    case "$(uname -s)" in
+      MINGW*|MSYS*|CYGWIN*)
+        pid=$(netstat -ano 2>/dev/null | grep -E ":$port[[:space:]].*LISTENING" | awk '{print $NF}' | sort -u | head -1)
+        if [ -n "${pid:-}" ]; then taskkill //F //T //PID "$pid" >/dev/null 2>&1 && echo "stopped server on :$port (pid $pid)"; else echo "no server on :$port"; fi
+        ;;
+      *)
+        pids=$(lsof -ti "tcp:$port" 2>/dev/null || true)
+        if [ -n "${pids:-}" ]; then kill $pids 2>/dev/null && echo "stopped server on :$port (pids $pids)"; else echo "no server on :$port"; fi
+        ;;
+    esac
 
 # Install the headless Chromium the e2e check drives (run once)
 install-e2e:

@@ -1,8 +1,8 @@
 // ABOUTME: Metamorphic DOWNWARD-CLOSURE invariant: under ADDITIVE star picks at a fixed budget, no
 // ABOUTME: constellation may gain viability - a witness build for the larger selection also contains the
 // ABOUTME: smaller, so reachability only shrinks as stars are added. Any gain is a FALSE-DIM. Self-contained
-// ABOUTME: and seeded (no oracle). main UPHOLDS this in the sampled walks (passes); the heavier neutral
-// ABOUTME: check is `just harvest-false-dims`. (The costed-scaffolding alternate violates it pervasively.)
+// ABOUTME: and seeded (no oracle). main UPHOLDS this (passes). Heavy metamorphic walk (tens of seconds), so
+// ABOUTME: gated to the slow tier: runs under `just test-slow` (REACH_SLOW=1), skipped in the default suite.
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
@@ -78,10 +78,15 @@ function firstViolation(seed: number, maxPts = 30): string | null {
   return null;
 }
 
-test("downward-closure: an additive pick never makes a new constellation viable", () => {
-  // A couple of seeded additive walks: each pick keeps the selection reachable, then we check no watched
-  // constellation became NEWLY viable (which would prove it was a false-dim a step earlier). main finds
-  // none. Short-circuits on the first violation if one ever appears.
-  const v = firstViolation(1) ?? firstViolation(2);
-  expect(v).toBeNull();
-}, 60_000);
+const SLOW = process.env.REACH_SLOW === "1";
+test.skipIf(!SLOW)(
+  "downward-closure: an additive pick never makes a new constellation viable",
+  () => {
+    // A couple of seeded additive walks: each pick keeps the selection reachable, then we check no watched
+    // constellation became NEWLY viable (which would prove it was a false-dim a step earlier). main finds
+    // none. Short-circuits on the first violation if one ever appears.
+    const v = firstViolation(1) ?? firstViolation(2);
+    expect(v).toBeNull();
+  },
+  60_000,
+);
