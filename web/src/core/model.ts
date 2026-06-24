@@ -20,7 +20,7 @@ interface RawStar {
       attack_stats?: Record<string, number>;
     } | null;
   } | null;
-  weapon_requirement: { weapons: string[] } | null;
+  weapon_requirement: { weapons: string[]; description?: string | null } | null;
   racial_target?: string[] | null;
   pet_bonuses?: Record<string, number> | null;
 }
@@ -69,7 +69,9 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
                 : null,
             }
           : null,
-        weaponRequirement: s.weapon_requirement ? { weapons: s.weapon_requirement.weapons } : null,
+        weaponRequirement: s.weapon_requirement
+          ? { weapons: s.weapon_requirement.weapons, description: s.weapon_requirement.description ?? null }
+          : null,
         racialTarget: s.racial_target ?? undefined,
         petBonuses: s.pet_bonuses ?? undefined,
       });

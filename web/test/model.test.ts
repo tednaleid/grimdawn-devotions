@@ -36,3 +36,11 @@ test("constellation carries affinity req/bonus and member ids", () => {
   expect(bat.affinityBonus).toEqual({ chaos: 2, eldritch: 3 });
   expect(bat.starIds).toEqual(["bat:0", "bat:1", "bat:2", "bat:3", "bat:4"]);
 });
+
+test("carries a star's weapon-requirement description through the model", () => {
+  expect(model.stars.get("kraken:0")?.weaponRequirement?.description).toBe(
+    "Requires a two-handed melee or two-handed ranged weapon.",
+  );
+  // an ungated star has no requirement at all
+  expect(model.stars.get("anvil:0")?.weaponRequirement).toBeNull();
+});
