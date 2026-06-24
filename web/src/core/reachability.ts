@@ -606,3 +606,29 @@ export function reachabilityForSelection(
   }
   return { completable, clickable, have: st.supply, need: st.target, needSource };
 }
+
+/** The full engine result one UI refresh needs for a selection: the validity floor and the sweep. */
+export interface SelectionView {
+  minCost: number; // selectionMinCost: fewest points that keep this selection a legal build (the slider floor)
+  reach: ReachView; // reachabilityForSelection: dimming, clickable stars, and the affinity panel vectors
+}
+
+/**
+ * THE per-click engine port. Bundles every reachability call a refresh makes (the validity-floor binary
+ * search plus the dimming sweep) into one pure function, so the UI is a thin caller and tests/perf harnesses
+ * can exercise the exact same work headlessly. This is the function to optimize: its cost IS the per-click
+ * cost the user pays. The sweep budget is raised to the floor, mirroring the controller (the cap can never
+ * sit below the fewest points that keep the selection legal). Requires dimming on (finite cap, present
+ * table); the uncapped/no-table path is permissive and cheap, handled in the adapter.
+ */
+export function selectionView(
+  model: DevotionModel,
+  cons: ReachCon[],
+  table: CoverTable,
+  selected: Set<StarId>,
+  cap = BUDGET,
+): SelectionView {
+  const minCost = selectionMinCost(model, cons, table, selected);
+  const reach = reachabilityForSelection(model, cons, table, selected, Math.max(cap, minCost));
+  return { minCost, reach };
+}

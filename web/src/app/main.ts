@@ -8,9 +8,8 @@ import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
 import {
   buildReachCons,
-  reachabilityForSelection,
+  selectionView,
   completionMinCost,
-  selectionMinCost,
   selectionSummary,
   setExactResolver,
   INF,
@@ -117,11 +116,11 @@ async function boot() {
     return out;
   }
 
-  // The current ReachView, recomputed each refresh. When the table is present and the
-  // cap is finite the engine drives dimming; otherwise (uncapped or no table) a permissive
-  // view is built so nothing dims, while have/need still come from the selection summary.
+  // The permissive ReachView for the degraded path (uncapped, or no cover table): nothing dims, every
+  // constellation is completable and every frontier star clickable, while have/need still come from the
+  // selection summary. The dimming-on path goes through the core selectionView port (see refresh).
   let reach: ReachView;
-  function computeReach(): ReachView {
+  function permissiveReach(): ReachView {
     const s = selectionSummary(model, state.selected);
     const needSource = new Map<number, string[]>();
     for (let i = 0; i < 5; i++) {
@@ -140,8 +139,6 @@ async function boot() {
       }
       needSource.set(i, src);
     }
-    if (table && Number.isFinite(state.pointCap))
-      return reachabilityForSelection(model, cons, table, state.selected, state.pointCap);
     const completable = new Set<string>([...model.constellations.keys()]);
     const clickable = new Set<string>();
     for (const st of model.stars.values())
@@ -352,16 +349,19 @@ async function boot() {
   }
   function refresh() {
     completionCache.clear();
-    // The validity floor: fewest points that keep this selection a legal build. Cap-independent, so
-    // compute it before the sweep. Only meaningful capped + with dimming on; else floor = points spent.
-    curMin =
-      table && Number.isFinite(state.pointCap)
-        ? selectionMinCost(model, cons, table, state.selected)
-        : state.selected.size;
-    // The cap can never sit below the validity floor (raise a stale/over-tight restored link).
-    if (Number.isFinite(state.pointCap) && state.pointCap < curMin)
-      state = { selected: state.selected, pointCap: curMin };
-    reach = computeReach();
+    // The full per-click engine cost (validity floor + dimming sweep) is the core selectionView port;
+    // this controller is a thin caller, so optimize selectionView, not refresh. The degraded path
+    // (uncapped or no table) stays permissive and cheap.
+    if (table && Number.isFinite(state.pointCap)) {
+      const view = selectionView(model, cons, table, state.selected, state.pointCap);
+      curMin = view.minCost;
+      // The cap can never sit below the validity floor (raise a stale/over-tight restored link).
+      if (state.pointCap < curMin) state = { selected: state.selected, pointCap: curMin };
+      reach = view.reach;
+    } else {
+      curMin = state.selected.size;
+      reach = permissiveReach();
+    }
     handle.update(state, taggedStars(), reach);
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
