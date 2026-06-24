@@ -1,10 +1,13 @@
-// ABOUTME: Seeded, UI-free perf harness for the reachability engine's per-click cost. Simulates real
-// ABOUTME: play (2 random outer constellations, then click stars one-by-one completing surviving
-// ABOUTME: constellations until the budget is spent) and times reachabilityForSelection after every
-// ABOUTME: star. Reports the latency distribution and flags hotspots. Run via `just perf` or
-// ABOUTME: `bun scripts/perf-reachability.ts [--seeds N] [--start S] [--cap C] [--max-ms M] [--replay S]`.
+// ABOUTME: Seeded, UI-free perf harness for the engine's PER-CLICK cost = selectionView (the validity-floor
+// ABOUTME: search PLUS the dimming sweep), the exact work one UI refresh does. THIS is the core engine to
+// ABOUTME: optimize so the UI is fast; the harness never wires up the DOM. Two passes: (1) demanding
+// ABOUTME: singletons - each non-self-covering constellation selected WHOLE from empty (the multi-second
+// ABOUTME: freeze cases, e.g. Affliction); (2) seeded random play, timing selectionView after every star.
+// ABOUTME: Run `just perf` (deployed WASM path) or `just perf --ts` (the pure TS core algorithm you iterate
+// ABOUTME: on). Flags: --seeds N --start S --cap C --max-ms M --replay S --ts. NOTE: until the engine is
+// ABOUTME: optimized a single demanding click can take seconds, so the random sweep defaults to few seeds.
 import { buildModel } from "../src/core/model";
-import { buildReachCons, buildCoverTable, reachabilityForSelection, selectionSummary, setExactResolver } from "../src/core/reachability";
+import { buildReachCons, buildCoverTable, reachabilityForSelection, selectionView, selectionSummary, setExactResolver, type ReachCon } from "../src/core/reachability";
 import { loadWasmResolver } from "../src/adapters/reachWasm";
 import type { DevotionModel } from "../src/core/types";
 import { fileURLToPath } from "url";
@@ -15,7 +18,7 @@ function argNum(flag: string, def: number): number {
   const i = process.argv.indexOf(flag);
   return i >= 0 && process.argv[i + 1] !== undefined ? Number(process.argv[i + 1]) : def;
 }
-const SEEDS = argNum("--seeds", 60);
+const SEEDS = argNum("--seeds", 8); // selectionView per-click is seconds at demanding states until optimized; scale up once fast
 const START = argNum("--start", 1);
 const CAP = argNum("--cap", 55);
 const MAX_MS = argNum("--max-ms", 400); // accepted bar: a ~350ms first-hit on the hardest borderline state
@@ -67,8 +70,9 @@ export function playGame(seed: number, verbose = false, onStep?: (selected: Set<
   let lastView = reachabilityForSelection(model, cons, table, selected, CAP);
   const sweep = (clicked: string): void => {
     const t = performance.now();
-    lastView = reachabilityForSelection(model, cons, table, selected, CAP);
+    const view = selectionView(model, cons, table, selected, CAP); // the FULL per-click cost (floor + sweep)
     const ms = performance.now() - t;
+    lastView = view.reach;
     const st = selectionSummary(model, selected);
     const step: Step = { seed, idx: idx++, own: selected.size, ms, completable: lastView.completable.size, clickable: lastView.clickable.size, partials: st.partialFinish.length, clicked };
     steps.push(step);
@@ -111,6 +115,35 @@ export function playGame(seed: number, verbose = false, onStep?: (selected: Set<
   return steps;
 }
 
+// Set when a demanding singleton exceeds the threshold, so the final exit code reflects it too.
+let singletonHotspot = false;
+
+// Deterministic worst case: select each non-self-covering "outer" constellation WHOLE from empty and time
+// selectionView. This is exactly the freeze a real user hits (e.g. Affliction from empty), independent of
+// random play, so it is the reliable per-click-cost report. Top-K by requirement (where freezes concentrate).
+function runSingletons(): void {
+  const selfCovers = (c: ReachCon) => c.grant.every((g, j) => g >= c.req[j]!);
+  const reqOf = (c: ReachCon) => c.req[0] + c.req[1] + c.req[2] + c.req[3] + c.req[4];
+  const demanding = outerIds
+    .map((id) => cons.find((c) => c.id === id)!)
+    .filter((c) => !selfCovers(c))
+    .sort((a, b) => reqOf(b) - reqOf(a))
+    .slice(0, 30);
+  console.log(`demanding singletons (non-self-covering, top ${demanding.length} by requirement) - selectionView WHOLE from empty:`);
+  const rows: { name: string; ms: number; min: number }[] = [];
+  for (const c of demanding) {
+    const sel = new Set(model.constellations.get(c.id)!.starIds);
+    const t = performance.now();
+    const view = selectionView(model, cons, table, sel, CAP);
+    rows.push({ name: nameOf(c.id), ms: performance.now() - t, min: view.minCost });
+  }
+  rows.sort((a, b) => b.ms - a.ms);
+  for (const r of rows.slice(0, 12)) console.log(`  ${r.ms.toFixed(0).padStart(7)} ms  floor ${String(r.min).padStart(2)}  ${r.name}`);
+  const over = rows.filter((r) => r.ms > MAX_MS);
+  console.log(`  ${over.length} of ${rows.length} demanding singletons over ${MAX_MS} ms.\n`);
+  if (over.length) singletonHotspot = true;
+}
+
 // --- CLI (this file also exports model/cons/table/playGame for instrumentation) ---
 function runReplay(seed: number): void {
   console.log(`REPLAY seed ${seed} (cap ${CAP}):`);
@@ -143,8 +176,8 @@ function runSweep(): void {
 
   const over = allSteps.filter((x) => x.ms > MAX_MS);
   console.log(`\n${over.length} click(s) over ${MAX_MS} ms.`);
-  if (over.length) { console.log("HOTSPOT: per-click latency exceeded the threshold."); process.exit(1); }
+  if (over.length || singletonHotspot) { console.log("HOTSPOT: per-click latency exceeded the threshold."); process.exit(1); }
   console.log("OK: no hotspots.");
 }
 
-if (import.meta.main) { if (REPLAY !== null) runReplay(REPLAY); else runSweep(); }
+if (import.meta.main) { if (REPLAY !== null) runReplay(REPLAY); else { runSingletons(); runSweep(); } }

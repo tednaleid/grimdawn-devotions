@@ -223,8 +223,11 @@ wasm: _ensure-wasm-target
 test:
     cd "{{justfile_directory()}}/web" && bun test
 
-# Seeded reachability perf harness: simulate play and report per-click latency.
-# Flags: --seeds N --start S --cap C --max-ms M --replay <seed>.  e.g. just perf --seeds 100
+# Per-click engine perf harness. Times selectionView (the validity-floor search + dimming sweep) = the
+# EXACT work one UI click costs; this is the pure core engine to optimize so the UI is fast (no DOM). Two
+# passes: demanding singletons (each non-self-covering constellation whole from empty - the freeze cases)
+# and seeded random play. `just perf` uses the deployed WASM path; `just perf --ts` measures the pure TS
+# core algorithm you iterate on. Flags: --seeds N --start S --cap C --max-ms M --replay <seed> --ts.
 perf *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/perf-reachability.ts {{ARGS}}
 
@@ -233,6 +236,28 @@ perf *ARGS:
 # --ts.  e.g. just fuzz --seeds 200.  Uses the WASM resolver if built (just wasm).
 fuzz *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/reachability-fuzz.ts {{ARGS}}
+
+# Regenerate the reachable-builds fixture (web/test/fixtures/reachable-builds.json): ground-truth-reachable
+# builds the engine wrongly dims (confirmed by the constructor) plus guards. Run after a data change.
+gen-reach-fixtures:
+    cd "{{justfile_directory()}}/web" && bun scripts/gen-reach-fixtures.ts
+
+# Metamorphic false-dim harvester: seeded ADDITIVE star walks. Reachability is downward-closed, so any
+# constellation that becomes viable after an additive pick was a false-dim before (oracle-free, real model).
+# Reports the rate and dumps cases to web/test/fixtures/false-dims.json. Flags: --seeds N --start S
+# --max-pts P --cap C --ts --no-dump.  e.g. just harvest-false-dims --seeds 30.  Re-run after a data change.
+harvest-false-dims *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/harvest-false-dims.ts {{ARGS}}
+
+# Heavy reachability validation for big algorithm changes (minutes): cross-checks the engine against the
+# BFS oracle at scale (both directions) and harvests ground-truth real-model false-dims. Exits non-zero
+# on any disagreement. Flags: --a-seeds N (small-model oracle) --b-seeds N (real-model harvest).
+validate-reach *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/validate-reach.ts {{ARGS}}
+
+# Verify the Rust/WASM resolver is verdict-equivalent to the TS resolver (run after `just wasm`).
+validate-wasm:
+    cd "{{justfile_directory()}}/web" && bun scripts/validate-wasm.ts
 
 # Type-check the web sources (no emit)
 typecheck:
