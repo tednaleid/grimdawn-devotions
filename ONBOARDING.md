@@ -62,6 +62,8 @@ hash (`core/urlState.ts`) so links are shareable.
 ## Dig deeper
 - `README.md` -- project overview, `devotions.json` schema, extraction steps
 - `docs/dbr-format.md` -- reverse-engineered game data model
+- `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings
+- `docs/reachability-engine.md` -- shipped vs costed engine comparison + the current-state decision
 - `docs/superpowers/specs/` -- planner and path-predictor design specs
 - `BACKLOG.md` -- planned enhancements with implementation pointers
