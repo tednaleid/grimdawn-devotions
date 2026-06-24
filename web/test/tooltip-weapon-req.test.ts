@@ -27,3 +27,15 @@ test("star tooltip omits the qualifier for an ungated star", () => {
   const html = render((tip) => tip.show(model, "anvil:0", 0, 0));
   expect(html).not.toContain("tip-weapon-req");
 });
+
+test("constellation tooltip shows one deduped 'Some bonuses require' line", () => {
+  const html = render((tip) => tip.showConstellation(model, "kraken", 0, 0));
+  expect(html).toContain("Some bonuses require a two-handed melee or two-handed ranged weapon.");
+  // Kraken's stars share one description, so it collapses to a single line.
+  expect(html.match(/tip-weapon-req/g)?.length).toBe(1);
+});
+
+test("constellation tooltip omits the qualifier when no star is gated", () => {
+  const html = render((tip) => tip.showConstellation(model, "anvil", 0, 0));
+  expect(html).not.toContain("tip-weapon-req");
+});

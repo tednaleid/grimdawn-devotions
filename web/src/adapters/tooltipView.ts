@@ -10,7 +10,7 @@ import type {
   StarId,
 } from "../core/types";
 import { formatBonusRows, formatPet, formatPowerStats } from "../core/statFormat";
-import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
+import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 
 type AffinityTotals = Record<Affinity, number>;
@@ -136,7 +136,16 @@ export function tooltipView(el: HTMLElement) {
           ? `<div class="tip-dim">Needs ${dim.needs} of your ${dim.cap} points</div>`
           : `<div class="tip-dim">Cannot be completed within ${dim.cap} points</div>`
         : "";
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}`;
+      const weaponReq = [
+        ...new Set(
+          weaponRequirements(model, stars)
+            .map((r) => r.description)
+            .filter((d): d is string => !!d),
+        ),
+      ]
+        .map((d) => `<div class="tip-weapon-req">Some bonuses require ${d.replace(/^Requires\s+/i, "")}</div>`)
+        .join("");
+      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${weaponReq}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}`;
       place(clientX, clientY);
     },
     hide() {
