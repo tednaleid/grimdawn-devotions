@@ -581,6 +581,11 @@ main {
   margin-top: 0.35rem;
   color: #9aa4b2;
 }
+.tip-weapon-req {
+  margin-top: 0.35rem;
+  color: #d7c89a;
+  font-style: italic;
+}
 .tip-grant {
   margin-top: 0.15rem;
   color: #c9d3e0;

@@ -38,6 +38,12 @@ function bonusRowsHtml(bonuses: Record<string, number>, racialTarget?: string[])
     .join("");
 }
 
+// A star's conditional qualifier (e.g. Kraken's two-handed weapon requirement), shown verbatim
+// under its bonuses. Empty when the star has no requirement or no description text.
+function weaponReqHtml(description: string | null | undefined): string {
+  return description ? `<div class="tip-weapon-req">${description}</div>` : "";
+}
+
 // "Bonus to All Pets": the same stat lines as a player bonus, under a header (GD shows
 // these in a distinct block). Empty when the star/constellation grants no pet bonuses.
 function petBonusHtml(petBonuses?: Record<string, number>): string {
@@ -105,7 +111,7 @@ export function tooltipView(el: HTMLElement) {
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? powerHtml(star.celestialPower) : "";
-      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}`;
+      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${weaponReqHtml(star.weaponRequirement?.description)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}`;
       place(clientX, clientY);
     },
     showConstellation(
