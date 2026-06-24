@@ -22,7 +22,13 @@ backend, no accounts.
 - Run: `just serve` (builds, serves http://localhost:5173)
 - Check (gate, run before commit; also CI): `just check`
 - Reachability WASM core (optional fast path): `just wasm`
-- Perf harness / correctness fuzzer: `just perf` / `just fuzz`
+- Per-click engine perf: `just perf` (times `selectionView`, the exact cost one UI click pays = the core
+  to optimize; deployed WASM path) or `just perf --ts` (the pure TS core algorithm you iterate on)
+- Reachability correctness: `just fuzz` (forward-built valid builds) and `just harvest-false-dims`
+  (downward-closure false-dim finder; the `test.failing` guards in `web/test/` lock in the engine's
+  known gaps - see BACKLOG "Reachability engine: current state and known gaps")
+- Reachability correctness fixtures: regenerate with `just gen-reach-fixtures`
+- Reachability heavy validation (minutes, before big engine changes): `just validate-reach`
 - Headless browser smoke: `just e2e` (run `just install-e2e` once first)
 - Pre-commit hook (opt-in, runs `just check`): `just install-hooks`
 - Tool/data check: `just doctor`

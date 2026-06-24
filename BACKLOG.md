@@ -10,6 +10,49 @@ flash" idea was superseded by claim-anywhere reachability and is dropped.
 Pet-bonus filtering and tagging has also shipped: clickable pet benefit chips, a
 pet "Available to get" list, and scoped highlight keys.)
 
+## Reachability engine: current state and known gaps
+
+The shipped engine (the memoized branch-and-bound resolver in `web/src/core/reachability.ts`,
+ported to `data/reach.wasm`) is FAST and rarely false-dims in normal play, but it has two
+measured gaps. A re-runnable test suite now guards both; the gaps are locked in as `test.failing`
+so they flip to passing - alerting us to drop `test.failing` - once fixed. Measure with
+`just harvest-false-dims`, `just fuzz`, `just validate-reach`, and `just perf`.
+
+Engine comparison that produced this (worktree experiment, see git history): on the neutral
+downward-closure harvest the shipped engine reveals ~0% false-dims vs the costed-scaffolding
+alternate's ~92%, and its per-click `selectionView` stays ~1ms-1.1s vs the alternate's multi-second
+freezes. The shipped engine is the right default; the costed alternate (branch
+`reachability-costed-scaffolding`) is kept as a SOUND-by-construction oracle and as the substrate
+for guided build order, not as the per-click engine.
+
+### A. Soundness gap (false-reach on the resolver)
+Against the independent BFS oracle on random small models, the resolver false-reaches on a few dozen
+of the sampled models - it calls some unreachable selections reachable. A false-reach is the worse
+error class for a planner (it claims an unbuildable build is buildable). Whether this manifests on
+the real 109-constellation model is UNVERIFIED (no BFS oracle scales to it); the costed alternate,
+being sound by construction, is the tool to audit it. Guard: `web/test/reachability-oracle.test.ts`
+(`test.failing`). FIX: make the resolver sound, or adopt the costed resolver for the cases that need
+it. First do the audit (run the sound constructor over the shipped engine's "reachable" verdicts).
+
+### B. Tight-build false-dims
+The resolver wrongly dims some constructor-confirmed-reachable TIGHT near-55-point builds (e.g.
+`thunder-warder-real-forum-build`, a real forum build, and Oklaine's Lantern). These are rare in
+normal additive play (0% on the harvest) but readily found among random self-covering 55-point
+builds (`just gen-reach-fixtures` finds 40+). Guards: `web/test/reachability-walk.test.ts`
+(`test.failing` half) and the Oklaine case in `web/test/reachability.test.ts`. FIX: a surgical
+witness-finder / dim-bound improvement for the tight self-covering region.
+
+## Guided build order ("pick these in this order")
+
+Tell the user a legal click order that reaches their target build, including the non-obvious
+temporary scaffolding (e.g. add the Eldritch Crossroads + Quill to break the Affliction asc4/eld4
+lock, then refund them once the build covers its own requirement). These orders are not obvious by
+hand. This needs a resolver that finds a real CONSTRUCTION ORDER (a witness), not just a boolean - the
+shipped engine returns only reachable/dim. The costed-scaffolding resolver on branch
+`reachability-costed-scaffolding` produces witnesses (`minPeakSampled`/`orderPeak`/`peakToReach`); the
+work is to wire that resolver in for this feature (on demand, not per click) and capture+return the
+witness it already finds. Build on top of the costed engine when this is picked up.
+
 ## Performance
 
 ### 1. Monotone dim-cache for the reachability sweep

@@ -2,6 +2,15 @@
 
 For project orientation (stack, build/test commands, architecture, entry points), see [ONBOARDING.md](./ONBOARDING.md).
 
+## The domain (read this first)
+
+This planner models Grim Dawn's devotion system: constellations, stars, affinity,
+and the non-obvious rules for which selections form a legal build (activation before
+self-sustain, refundable crossroads, temporary scaffolding and refund). All of that
+is documented in [docs/devotion-system.md](docs/devotion-system.md), the core
+reference for the whole system. Read it before working on selection, reachability,
+or URL state.
+
 ## Backlog / new ideas
 
 New ideas and backlog items go in [BACKLOG.md](BACKLOG.md) at the project root.
