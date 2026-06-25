@@ -210,12 +210,15 @@ async function boot() {
       refresh();
       return;
     }
-    if (t.id === "cmp-update") {
-      baseline = { selected: new Set(state.selected), pointCap: state.pointCap };
+    if (t.id === "cmp-keep" && baseline) {
+      // Keep the Base build: revert the live edits to the snapshot and exit compare.
+      state = { selected: new Set(baseline.selected), pointCap: baseline.pointCap };
+      baseline = null;
       refresh();
       return;
     }
-    if (t.id === "cmp-clear") {
+    if (t.id === "cmp-update") {
+      // Adopt the live (Now) build and exit compare.
       baseline = null;
       refresh();
       return;
