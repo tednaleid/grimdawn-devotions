@@ -51,6 +51,7 @@ export interface RenderOpts {
   manifest: AssetManifest | null;
   highlight?: Set<StarId>;
   reach?: ReachView;
+  diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
 }
 
 // A constellation's hover/click footprint in SVG world coords: its art bounds
@@ -124,6 +125,7 @@ export function constellationAt(regions: ConRegion[], wx: number, wy: number): s
 
 export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
   const reach = opts.reach;
+  const diff = opts.diff ?? null;
   const defs: string[] = [];
   const parts: string[] = [];
 
@@ -223,10 +225,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const m = opts.highlight?.has(star.id) ? " match" : filtering ? " dim" : "";
     // Stars in a dim constellation fade too (CSS halves their brightness).
     const cd = dimCons.has(star.constellationId) ? " con-dim" : "";
+    // Compare diff: mark stars added or removed vs the baseline build.
+    const cmp = diff ? (diff.added.has(star.id) ? " cmp-add" : diff.removed.has(star.id) ? " cmp-rm" : "") : "";
     // Celestial-power stars are diamonds; the rest are circles. Both share the .star styling.
     const visible = star.celestialPower
-      ? `<polygon class="star power ${st}${m}${cd}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
-      : `<circle class="star ${st}${m}${cd}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+      ? `<polygon class="star power ${st}${m}${cd}${cmp}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
+      : `<circle class="star ${st}${m}${cd}${cmp}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
     parts.push(
       `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`,
     );
@@ -238,7 +242,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 }
 
 export interface SvgHandle {
-  update(state: SelectionState, highlight?: Set<StarId>, reach?: ReachView): void;
+  update(
+    state: SelectionState,
+    highlight?: Set<StarId>,
+    reach?: ReachView,
+    diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
+  ): void;
   svg: SVGSVGElement;
 }
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
@@ -251,8 +260,13 @@ export interface SvgDeps {
 
 export function mountSvg(container: HTMLElement, model: DevotionModel, deps: SvgDeps): SvgHandle {
   const regions = buildConRegions(model, deps.manifest);
-  function render(state: SelectionState, highlight?: Set<StarId>, reach?: ReachView) {
-    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest, highlight, reach });
+  function render(
+    state: SelectionState,
+    highlight?: Set<StarId>,
+    reach?: ReachView,
+    diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
+  ) {
+    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest, highlight, reach, diff });
   }
   render({ selected: new Set(), pointCap: 55 });
   const svg = container.querySelector("svg") as SVGSVGElement;
@@ -289,10 +303,10 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 
   return {
     svg,
-    update(state, highlight, reach) {
+    update(state, highlight, reach, diff) {
       const live = container.querySelector("svg") as SVGSVGElement | null;
       const vb = live?.getAttribute("viewBox");
-      render(state, highlight, reach);
+      render(state, highlight, reach, diff);
       const next = container.querySelector("svg") as SVGSVGElement | null;
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },

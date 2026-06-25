@@ -722,3 +722,12 @@ body.comparing #benefits {
 .cmp-col.same {
   color: #566175;
 }
+.star.cmp-add {
+  stroke: #83c995;
+  stroke-width: 2.5;
+}
+.star.cmp-rm {
+  stroke: #e0696a;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 2;
+}

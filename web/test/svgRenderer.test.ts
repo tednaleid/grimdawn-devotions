@@ -170,3 +170,16 @@ test("stars and links in a dim (un-activatable) constellation get 'con-dim'", ()
   const noReach = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
   expect(noReach).not.toContain("con-dim");
 });
+
+test("compare diff marks added stars cmp-add and removed stars cmp-rm", () => {
+  const added = "crossroads_eldritch:0";
+  const removed = "bat:0";
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set([added]), pointCap: 55 },
+    { manifest: null, diff: { added: new Set([added]), removed: new Set([removed]) } },
+  );
+  // the added star is selected -> selected marker + cmp-add; the removed star is unselected + cmp-rm
+  expect(markup).toContain("cmp-add");
+  expect(markup).toContain("cmp-rm");
+});
