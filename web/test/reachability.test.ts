@@ -114,24 +114,24 @@ test("selectionView bundles the validity floor and the floor-raised sweep (the p
   expect(view.reach.need).toEqual(direct.need);
 });
 
-// Known engine gap on main, locked in as test.failing: main wrongly dims Oklaine's Lantern (a tight,
-// constructor-confirmed-reachable 55-point build). Flips to passing - alerting us to drop test.failing -
-// once main's tight-build false-dims are fixed. See BACKLOG "Reachability engine: current state and gaps".
+// Was a known engine gap (main false-dimmed Oklaine's Lantern, a non-self-covering ~26-point state that
+// needs filler to extend to a valid 55-point build containing Oklaine). The peak-witness gate in the
+// exact resolver (minPeakSampled at covering builds) closes it. See BACKLOG "Reachability engine".
 
-test.failing("Oklaine's Lantern is reachable from the user-reported state (main false-dims it)", () => {
-  // A tight 55-point build containing Oklaine exists (constructor-confirmed reachable, exact min-peak 55),
-  // but main's resolver wrongly dims it. Must classify reachable.
+test("Oklaine's Lantern is reachable from the user-reported state (filler-extension fix)", () => {
+  // A tight 55-point build containing Oklaine exists (constructor-confirmed reachable, exact min-peak 55).
+  // main's resolver dimmed it because its covering-build gate (seed-only constructible) could not model the
+  // scaffold-then-refund needed to bootstrap the build's own affinity. Must classify reachable.
   const hash = "p=55&s=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA_AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgP8H_AE";
   expect(urlCompletable(hash, "Oklaine's Lantern")).toBe(true);
 }, 30_000);
 
-test.failing("Vulture and Ghoul are reachable from the user-reported 47-point state (affinity-bootstrap false-dim)", () => {
-  // A 47-point self-covering build that grants no chaos. Vulture (req cha:1, grant cha:5) and Ghoul
-  // (req cha:1, grant cha:3) each self-cover chaos once bootstrapped, so each is reachable by holding a
-  // refundable chaos crossroads (+1 chaos) to place its first star, then refunding it (peak 53 <= 55).
-  // The engine dims both: greedy/exact model only the fixed crossroads seed, and the peak witness
-  // overshoots re-deriving the whole 52-star order. Adding any committed chaos member (Jackal/Rat) flips
-  // both reachable, which is a downward-closure violation. Same family as Oklaine. Must classify reachable.
+test("Vulture and Ghoul are reachable from the user-reported 47-point state (affinity-bootstrap fix)", () => {
+  // A 47-point build that grants no chaos but whose capstone (Ultos) needs chaos 6. Vulture (req cha:1,
+  // grant cha:5) and Ghoul (req cha:1, grant cha:3) are reachable by adding a chaos granter as filler and
+  // building with a refundable chaos crossroads scaffold (peak <= 55). main's resolver dimmed both: its
+  // covering-build gate was the seed-only constructible() check, which cannot model scaffold-then-refund.
+  // The peak-witness gate (minPeakSampled) closes it. Same root cause as Oklaine below.
   const hash = "p=55&s=AAAAAAAHAAAAAAAAwAMAAAAAAAAAAAB4-H8AAAAAAAAAAAAAwA_-AAB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAHw";
   expect(urlCompletable(hash, "Vulture")).toBe(true);
   expect(urlCompletable(hash, "Ghoul")).toBe(true);

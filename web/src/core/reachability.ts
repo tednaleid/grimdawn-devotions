@@ -20,6 +20,11 @@ const SEED: Vec = [1, 1, 1, 1, 1];
 // self-covering one - so it needs no budget-proximity gate; a sampler that finds no order keeps the dim.
 const PEAK_WITNESS_TRIES = 8;
 const PEAK_NODE_CAP = 3000;
+// Max peak-witness calls per exact-resolver invocation (the scaffold-then-refund fallback for covering
+// builds that are not seed-constructible). Bounds the resolver's worst case on dim candidates, where the
+// witness would otherwise fire at every covering node; the best-filler-first order means the cheapest
+// covering builds (the likeliest to witness) are tried first.
+const WITNESS_CALL_CAP = 4;
 
 /** A constellation reduced to what reachability needs: its cost and affinity vectors. */
 export interface ReachCon {
@@ -624,15 +629,38 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
     .sort((a, b) => ratio(b) - ratio(a));
   const pf = st.partialFinish;
   const grantById = new Map(pf.map((p) => [p.id, p.grant]));
+  const remainingById = new Map(pf.map((p) => [p.id, p.remaining]));
   let found = false;
+  // The peak witness (scaffold-then-refund modelling) is far costlier than constructible(), and on a dim
+  // candidate it fires at every covering node and never short-circuits. Bound the work: only the cheapest
+  // few covering builds (the resolver explores best-filler-first, so adding more filler only raises cost
+  // and peak) get witnessed. Exhausting the budget makes the verdict conservatively dim, never a
+  // false-reach, so this is sound; it just may leave a residual hard-to-witness false-dim.
+  let witnessLeft = WITNESS_CALL_CAP;
   const chosen: ReachCon[] = [];
   // Whole-constellation DFS for one finish-choice; the cover prune is admissible (no finishes left).
   function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec, builtCons: ReachCon[]): void {
     if (found) return;
     exactNodes++;
-    if (covers(build, maxReqPlaced) && constructible([...builtCons, ...chosen])) {
-      found = true;
-      return;
+    if (covers(build, maxReqPlaced)) {
+      // The covering build is a real reachable build iff it has a construction order within budget.
+      // constructible() is the cheap seed-only fixpoint; it MISSES builds reachable only by holding
+      // transient refundable scaffolding (the affinity-bootstrap gap, e.g. an outer constellation whose
+      // requirement is met only after scaffolding up to it, then refunding). minPeakSampled is the
+      // peak-bounded witness that DOES model scaffold-then-refund; a sampled peak <= budget is a genuine
+      // order, so falling back to it is sound (it only ever flips a false-dim, never a false-reach).
+      const members = [...builtCons, ...chosen];
+      if (constructible(members)) {
+        found = true;
+        return;
+      }
+      if (witnessLeft > 0) {
+        witnessLeft--;
+        if (minPeakSampled(cons, table, members, budget, PEAK_WITNESS_TRIES, PEAK_NODE_CAP) <= budget) {
+          found = true;
+          return;
+        }
+      }
     }
     if (i >= wholeFiller.length) return;
     const target = maxV(maxReqPlaced, st.target);
@@ -664,7 +692,12 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
         finished.add(pf[j]!.id);
       }
     if (cost0 > budget) continue;
-    const builtCons = st.built.map((b) => (finished.has(b.id) ? { ...b, grant: grantById.get(b.id)! } : b));
+    // A finished partial carries its full grant AND its full size (selected + remaining): the witness peak
+    // math reads member.size, so a finished partial must count its whole constellation, not just the stars
+    // already selected, or the peak is undercounted and an over-budget build wrongly looks reachable.
+    const builtCons = st.built.map((b) =>
+      finished.has(b.id) ? { ...b, grant: grantById.get(b.id)!, size: b.size + remainingById.get(b.id)! } : b,
+    );
     chosen.length = 0;
     rec(0, build0, cost0, st.target, builtCons);
   }
