@@ -1,5 +1,6 @@
 // ABOUTME: Round-trip + tolerance tests for the URL state codec (point cap + selected stars bitset).
 import { test, expect } from "bun:test";
+import type { StarId } from "../src/core/types";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { canonicalStarIds, canonicalStatIds, canonicalBenefitIds, encodeHash, decodeHash } from "../src/core/urlState";
@@ -87,4 +88,32 @@ test("mixed player and pet tags round-trip via b=", () => {
   const hash = encodeHash(new Set([canonical[0]!]), 30, canonical, benefits, benefitCanonical);
   const decoded = decodeHash(`#${hash}`, canonical, benefitCanonical)!;
   expect([...decoded.benefits].sort()).toEqual([...benefits].sort());
+});
+
+test("round-trips a baseline build as cs=/cp=", () => {
+  const canon = canonicalStarIds(model);
+  const stat = canonicalBenefitIds(model);
+  const cur = new Set<StarId>([canon[0]!, canon[5]!]);
+  const base = new Set<StarId>([canon[0]!, canon[9]!]);
+  const hash = encodeHash(cur, 55, canon, new Set(), stat, { selected: base, pointCap: 40 });
+  expect(hash).toContain("&cs=");
+  expect(hash).toContain("&cp=40");
+  const decoded = decodeHash(hash, canon, stat)!;
+  expect([...decoded.baseline!.selected].sort()).toEqual([...base].sort());
+  expect(decoded.baseline!.pointCap).toBe(40);
+});
+
+test("no baseline encodes byte-identical to the legacy form and decodes baseline null", () => {
+  const canon = canonicalStarIds(model);
+  const cur = new Set<StarId>([canon[0]!]);
+  const withArg = encodeHash(cur, 55, canon, new Set(), [], null);
+  const legacy = encodeHash(cur, 55, canon); // old call shape
+  expect(withArg).toBe(legacy);
+  expect(decodeHash(withArg, canon)!.baseline).toBeNull();
+});
+
+test("a malformed cs= decodes to a null baseline without throwing", () => {
+  const canon = canonicalStarIds(model);
+  const decoded = decodeHash("p=55&s=&cs=@@@not-base64@@@&cp=40", canon)!;
+  expect(decoded.baseline).toBeNull();
 });

@@ -82,12 +82,18 @@ export function encodeHash(
   canonical: StarId[],
   benefits: Set<string> = new Set(),
   statCanonical: string[] = [],
+  baseline: { selected: Set<StarId>; pointCap: number } | null = null,
 ): string {
   // p=0 is the uncapped sentinel (0 is otherwise an invalid cap; the real min is 1).
   const cap = Number.isFinite(pointCap) ? pointCap : 0;
   let out = `p=${cap}&s=${encodeBitset(selected, canonical)}`;
   const b = encodeBitset(benefits, statCanonical);
   if (b) out += `&b=${b}`; // only when benefit tags are selected
+  if (baseline) {
+    // The baseline build rides parallel to the live one; cs= present means "comparison active".
+    const bcap = Number.isFinite(baseline.pointCap) ? baseline.pointCap : 0;
+    out += `&cs=${encodeBitset(baseline.selected, canonical)}&cp=${bcap}`;
+  }
   return out;
 }
 
@@ -96,7 +102,12 @@ export function decodeHash(
   hash: string,
   canonical: StarId[],
   statCanonical: string[] = [],
-): { selected: Set<StarId>; pointCap: number; benefits: Set<string> } | null {
+): {
+  selected: Set<StarId>;
+  pointCap: number;
+  benefits: Set<string>;
+  baseline: { selected: Set<StarId>; pointCap: number } | null;
+} | null {
   const raw = hash.replace(/^#/, "").trim();
   if (!raw) return null;
   const params = new URLSearchParams(raw);
@@ -114,5 +125,21 @@ export function decodeHash(
 
   const selected = decodeBitset(params.get("s") ?? "", canonical);
   const benefits = decodeBitset(params.get("b") ?? "", statCanonical);
-  return { selected, pointCap, benefits };
+
+  // Baseline is active only when cs= decodes to a non-empty selection (a stale/empty/malformed
+  // cs= simply means "no comparison", matching the tolerance of the other params).
+  let baseline: { selected: Set<StarId>; pointCap: number } | null = null;
+  const baseSel = decodeBitset(params.get("cs") ?? "", canonical);
+  if (baseSel.size > 0) {
+    let bcap: number;
+    if (params.get("cp") === "0") bcap = Infinity;
+    else {
+      bcap = Number(params.get("cp"));
+      if (!Number.isFinite(bcap)) bcap = MAX_CAP;
+      bcap = Math.max(MIN_CAP, Math.min(MAX_CAP, Math.round(bcap)));
+    }
+    baseline = { selected: baseSel, pointCap: bcap };
+  }
+
+  return { selected, pointCap, benefits, baseline };
 }
