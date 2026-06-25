@@ -63,6 +63,8 @@ async function boot() {
   // The cap can never be below the points actually allocated; raise it if a restored
   // link is over budget (the slider also enforces this floor below).
   state = { selected: state.selected, pointCap: Math.max(state.pointCap, state.selected.size) };
+  // Baseline for the comparison mode: null when not comparing.
+  let baseline: SelectionState | null = restored?.baseline ?? null;
   // The finite cap to fall back to when the user re-imposes the limit after going uncapped.
   let lastFiniteCap = Number.isFinite(state.pointCap) ? state.pointCap : 55;
   // Benefit "tags": the raw stat ids selected in the Benefits panel; they highlight the
@@ -202,6 +204,22 @@ async function boot() {
   // all of its values (so the group reads as selected only when every value is). Attached to both
   // sidebars: the "have" benefits live in the left panel, "available to get" in the right one.
   function onBenefitClick(e: Event) {
+    const t = e.target as HTMLElement;
+    if (t.id === "set-baseline") {
+      baseline = { selected: new Set(state.selected), pointCap: state.pointCap };
+      refresh();
+      return;
+    }
+    if (t.id === "cmp-update") {
+      baseline = { selected: new Set(state.selected), pointCap: state.pointCap };
+      refresh();
+      return;
+    }
+    if (t.id === "cmp-clear") {
+      baseline = null;
+      refresh();
+      return;
+    }
     const valEl = (e.target as Element)?.closest?.("[data-vid]");
     if (valEl) {
       const id = valEl.getAttribute("data-vid")!;
@@ -341,6 +359,7 @@ async function boot() {
       prevPet,
       petCatalog,
       availPetKeys,
+      baseline?.selected ?? null,
     );
     prevBonuses = r.bonuses;
     prevPet = r.petBonuses;
@@ -362,7 +381,14 @@ async function boot() {
       curMin = state.selected.size;
       reach = permissiveReach();
     }
-    handle.update(state, taggedStars(), reach);
+    document.body.classList.toggle("comparing", baseline !== null);
+    const diff = baseline
+      ? {
+          added: new Set([...state.selected].filter((s) => !baseline!.selected.has(s))),
+          removed: new Set([...baseline.selected].filter((s) => !state.selected.has(s))),
+        }
+      : null;
+    handle.update(state, taggedStars(), reach, diff);
     renderBenefitsPanel();
     prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
@@ -378,7 +404,7 @@ async function boot() {
     history.replaceState(
       null,
       "",
-      `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical)}`,
+      `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline)}`,
     );
   }
   refresh();

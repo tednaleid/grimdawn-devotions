@@ -299,6 +299,28 @@ try {
   }
   check(emptiedAvail, '"Available to get" empties once every point is spent (cap == points used)');
 
+  // Baseline comparison: set a baseline, then confirm the panel enters compare mode and the URL carries cs=.
+  await cdp.evaluate(`document.getElementById('set-baseline').click()`);
+  let cmp = false;
+  for (let i = 0; i < 20; i++) {
+    await Bun.sleep(100);
+    if (await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') !== null")) {
+      cmp = true;
+      break;
+    }
+  }
+  check(cmp, "Set baseline enters compare mode (.cmp-bar renders)");
+  check(await cdp.evaluate<boolean>("location.hash.includes('cs=')"), "baseline rides in the URL as cs=");
+  check(
+    await cdp.evaluate<boolean>("document.body.classList.contains('comparing')"),
+    "body.comparing toggles the widened panel",
+  );
+  await cdp.evaluate(`document.getElementById('cmp-clear').click()`);
+  check(
+    await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') === null && !location.hash.includes('cs=')"),
+    "Clear exits compare mode and drops cs= from the URL",
+  );
+
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
   if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log(`    console: ${e}`);
 
