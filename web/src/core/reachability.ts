@@ -652,7 +652,6 @@ export function setExactResolver(fn: ExactResolver | null): void {
 export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): Reach {
   if (lowerBoundFrom(table, st) > budget) return "dim";
   if (greedyFrom(cons, st, budget) <= budget) return "reachable";
-  if (exactResolver(cons, table, st, budget)) return "reachable";
   // Peak-bounded witness for the exact resolver's blind spot. Its constructibility check models only
   // the free crossroads seed, so it wrongly dims tight self-covering builds that are reachable only by
   // holding transient refundable scaffolding (a crossroads or constellation beyond the seed) until the
@@ -662,12 +661,15 @@ export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: Re
   // false-reach. It early-exits on the first witness (fast for reachable builds) and tries a bounded
   // number of orders otherwise, so even a sweep of dozens of near-budget candidates stays in the ms.
   //
-  // Gated to near-budget self-covering states (the only place these locks bite - additive play never
-  // false-dims). A sampler that finds no witness keeps the (conservative) dim; the rare tight build whose
-  // only valid orders the sampler misses is the documented exact-min-peak residual (see BACKLOG gap B).
+  // Run BEFORE the exact resolver: the witness is ~0.1ms and the resolver is the expensive (WASM/DFS)
+  // call, so a witness hit short-circuits it. Verdict-identical - the witness only returns reachable on a
+  // real order the definitive resolver would also accept - it just saves the resolver on near-budget
+  // self-covering reachable candidates. Gated to near-budget self-covering states (the only place these
+  // locks bite - additive play never false-dims); a miss falls through to the resolver, losing nothing.
   if (st.partialFinish.length === 0 && st.own >= budget - PEAK_WITNESS_SLACK) {
     if (minPeakSampled(cons, table, st.built, budget, PEAK_WITNESS_TRIES, PEAK_NODE_CAP) <= budget) return "reachable";
   }
+  if (exactResolver(cons, table, st, budget)) return "reachable";
   return "dim";
 }
 
