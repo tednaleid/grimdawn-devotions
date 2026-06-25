@@ -118,7 +118,8 @@ fn cover_cost(deficit: &[i32; 5]) -> i32 {
         }
     }
 }
-fn constructible(members: &[([i32; 5], [i32; 5])]) -> bool {
+// Members are (req, grant, size). constructible() ignores size (it only needs the seed fixpoint).
+fn constructible(members: &[([i32; 5], [i32; 5], i32)]) -> bool {
     let mut gain = SEED;
     let mut done = vec![false; members.len()];
     let mut placed = 0usize;
@@ -138,6 +139,143 @@ fn constructible(members: &[([i32; 5], [i32; 5])]) -> bool {
     placed == members.len()
 }
 
+// --- peak witness (scaffold-then-refund construction), the TS minPeakSampled with GATE_WITNESS_TRIES=0 ---
+// Sound peak-bounded construction check: it can only flip a false-dim to reachable, never a false-reach.
+// Verdict-identical to the TS gate witness (deterministic heuristic order, no RNG).
+#[inline]
+fn con_req(i: usize) -> [i32; 5] {
+    unsafe { [CON_REQ[i * 5], CON_REQ[i * 5 + 1], CON_REQ[i * 5 + 2], CON_REQ[i * 5 + 3], CON_REQ[i * 5 + 4]] }
+}
+#[inline]
+fn con_grant(i: usize) -> [i32; 5] {
+    unsafe { [CON_GRANT[i * 5], CON_GRANT[i * 5 + 1], CON_GRANT[i * 5 + 2], CON_GRANT[i * 5 + 3], CON_GRANT[i * 5 + 4]] }
+}
+#[inline]
+fn grants_v(g: &[i32; 5]) -> bool {
+    g[0] | g[1] | g[2] | g[3] | g[4] != 0
+}
+
+// Smallest transient scaffold (held then refunded) whose grants cover `need`, given `base` already held.
+// DFS over distinct scaffolds (`scaf` = pool con indices, ratio-sorted), cover-table pruned. Mirrors the
+// TS peakToReach exactly, including the node-cap accounting (count only when not already pruned by `best`).
+struct PeakCtx<'a> {
+    scaf: &'a [usize],
+    need: [i32; 5],
+    base: [i32; 5],
+    used: Vec<bool>,
+    best: i32,
+    nodes: i32,
+    node_cap: i32,
+}
+impl<'a> PeakCtx<'a> {
+    fn dfs(&mut self, a: [i32; 5], size: i32) {
+        if size >= self.best {
+            return;
+        }
+        let old = self.nodes;
+        self.nodes += 1;
+        if old > self.node_cap {
+            return;
+        }
+        let rem = [
+            (self.need[0] - a[0]).max(0),
+            (self.need[1] - a[1]).max(0),
+            (self.need[2] - a[2]).max(0),
+            (self.need[3] - a[3]).max(0),
+            (self.need[4] - a[4]).max(0),
+        ];
+        if rem == [0, 0, 0, 0, 0] {
+            self.best = size;
+            return;
+        }
+        if size + cover_cost(&rem) >= self.best {
+            return;
+        }
+        let avail = add_cap(&self.base, &a);
+        for i in 0..self.scaf.len() {
+            if self.used[i] {
+                continue;
+            }
+            let ci = self.scaf[i];
+            let ssize = unsafe { CON_SIZE[ci] };
+            if size + ssize >= self.best || !covers(&avail, &con_req(ci)) {
+                continue;
+            }
+            self.used[i] = true;
+            self.dfs(add_cap(&a, &con_grant(ci)), size + ssize);
+            self.used[i] = false;
+        }
+    }
+}
+fn peak_to_reach(scaf: &[usize], deficit: &[i32; 5], base: &[i32; 5], node_cap: i32) -> i32 {
+    let need = [deficit[0].max(0), deficit[1].max(0), deficit[2].max(0), deficit[3].max(0), deficit[4].max(0)];
+    if need == [0, 0, 0, 0, 0] {
+        return 0;
+    }
+    let mut ctx = PeakCtx { scaf, need, base: *base, used: vec![false; scaf.len()], best: BIG, nodes: 0, node_cap };
+    ctx.dfs([0, 0, 0, 0, 0], 0);
+    ctx.best
+}
+
+// Peak of the deterministic heuristic construction order for self-covering build `members` (the TS
+// minPeakSampled with tries=0). `gsorted` is every granting con index ratio-sorted; `in_b` masks B's own
+// constellations out of the scaffold pool. Returns BIG (= not within budget) if not self-covering, if the
+// build itself overflows budget, or if some step's deficit cannot be scaffolded.
+fn min_peak(members: &[([i32; 5], [i32; 5], i32)], gsorted: &[usize], in_b: &[bool], budget: i32, node_cap: i32) -> i32 {
+    let mut tot = [0; 5];
+    let mut mreq = [0; 5];
+    let mut total_size = 0;
+    for m in members {
+        tot = add_cap(&tot, &m.1);
+        mreq = max_v(&mreq, &m.0);
+        total_size += m.2;
+    }
+    if !covers(&tot, &mreq) || total_size > budget {
+        return BIG;
+    }
+    let mut g: Vec<&([i32; 5], [i32; 5], i32)> = members.iter().filter(|m| grants_v(&m.1)).collect();
+    if g.is_empty() {
+        return total_size;
+    }
+    let reqsum = |r: &[i32; 5]| r[0] + r[1] + r[2] + r[3] + r[4];
+    let ratio = |gr: &[i32; 5], sz: i32| (gr[0] + gr[1] + gr[2] + gr[3] + gr[4]) as f64 / sz as f64;
+    g.sort_by(|a, b| {
+        let (ra, rb) = (reqsum(&a.0), reqsum(&b.0));
+        if ra != rb {
+            return ra.cmp(&rb);
+        }
+        ratio(&b.1, b.2).partial_cmp(&ratio(&a.1, a.2)).unwrap_or(std::cmp::Ordering::Equal)
+    });
+    let pool: Vec<usize> = gsorted.iter().cloned().filter(|&i| !in_b[i]).collect();
+    let mut grant = [0; 5];
+    let mut mr = [0; 5];
+    let mut size = 0;
+    let mut peak = total_size;
+    for m in &g {
+        mr = max_v(&mr, &m.0);
+        size += m.2;
+        let def = [
+            (mr[0] - grant[0]).max(0),
+            (mr[1] - grant[1]).max(0),
+            (mr[2] - grant[2]).max(0),
+            (mr[3] - grant[3]).max(0),
+            (mr[4] - grant[4]).max(0),
+        ];
+        let sc = peak_to_reach(&pool, &def, &grant, node_cap);
+        if sc >= BIG {
+            return BIG;
+        }
+        if size + sc > peak {
+            peak = size + sc;
+        }
+        grant = add_cap(&grant, &m.1);
+    }
+    peak
+}
+
+const WITNESS_CALL_CAP: i32 = 4;
+const PEAK_NODE_CAP: i32 = 3000;
+
 struct Ctx<'a> {
     fr: &'a [[i32; 5]],
     fg: &'a [[i32; 5]],
@@ -146,7 +284,11 @@ struct Ctx<'a> {
     budget: i32,
     target: [i32; 5],
     chosen: Vec<usize>,
-    bcons: &'a [([i32; 5], [i32; 5])],
+    bcons: &'a [([i32; 5], [i32; 5], i32)],
+    started: &'a [bool], // B's own constellations (started), masked out of the scaffold pool
+    filler: &'a [usize], // filler index -> constellation index, to mask chosen filler too
+    gsorted: &'a [usize], // every granting constellation, ratio-sorted: the scaffold pool source
+    witness_left: i32,
     seen: FxMap,
     found: bool,
 }
@@ -156,13 +298,28 @@ impl<'a> Ctx<'a> {
             return;
         }
         if covers(&build, &maxreq) {
-            let mut members: Vec<([i32; 5], [i32; 5])> = self.bcons.to_vec();
+            // A covering build is reachable iff it has a construction order within budget. constructible()
+            // is the cheap seed-only fixpoint; it misses builds reachable only by holding transient
+            // refundable scaffolding. min_peak() is the peak-bounded witness that models scaffold-then-
+            // refund (sound: it only flips a false-dim, never a false-reach). Bounded by witness_left.
+            let mut members: Vec<([i32; 5], [i32; 5], i32)> = self.bcons.to_vec();
             for &c in &self.chosen {
-                members.push((self.fr[c], self.fg[c]));
+                members.push((self.fr[c], self.fg[c], self.fs[c]));
             }
             if constructible(&members) {
                 self.found = true;
                 return;
+            }
+            if self.witness_left > 0 {
+                self.witness_left -= 1;
+                let mut in_b = self.started.to_vec();
+                for &c in &self.chosen {
+                    in_b[self.filler[c]] = true;
+                }
+                if min_peak(&members, self.gsorted, &in_b, self.budget, PEAK_NODE_CAP) <= self.budget {
+                    self.found = true;
+                    return;
+                }
             }
         }
         if i >= self.nf {
@@ -226,12 +383,12 @@ pub extern "C" fn reachable_exact(ptr: *const i32, _len: usize, budget: i32) -> 
             }
         }
         let nbuilt = rd!() as usize;
-        let mut built: Vec<([i32; 5], [i32; 5])> = Vec::with_capacity(nbuilt);
+        let mut built: Vec<([i32; 5], [i32; 5], i32)> = Vec::with_capacity(nbuilt);
         for _ in 0..nbuilt {
             let req = [rd!(), rd!(), rd!(), rd!(), rd!()];
             let grant = [rd!(), rd!(), rd!(), rd!(), rd!()];
-            let _size = rd!();
-            built.push((req, grant));
+            let size = rd!();
+            built.push((req, grant, size));
         }
         let npf = rd!() as usize;
         let mut pf: Vec<(usize, [i32; 5], i32)> = Vec::with_capacity(npf);
@@ -264,6 +421,16 @@ pub extern "C" fn reachable_exact(ptr: *const i32, _len: usize, budget: i32) -> 
         let fs: Vec<i32> = filler.iter().map(|&i| CON_SIZE[i]).collect();
         let nf = filler.len();
 
+        // Every granting constellation, ratio-sorted: the witness's scaffold pool (B is masked out per call).
+        let mut gsorted: Vec<usize> = (0..NCON)
+            .filter(|&i| CON_GRANT[i * 5] | CON_GRANT[i * 5 + 1] | CON_GRANT[i * 5 + 2] | CON_GRANT[i * 5 + 3] | CON_GRANT[i * 5 + 4] != 0)
+            .collect();
+        gsorted.sort_by(|&a, &b| {
+            let ra = (CON_GRANT[a * 5] + CON_GRANT[a * 5 + 1] + CON_GRANT[a * 5 + 2] + CON_GRANT[a * 5 + 3] + CON_GRANT[a * 5 + 4]) as f64 / CON_SIZE[a] as f64;
+            let rb = (CON_GRANT[b * 5] + CON_GRANT[b * 5 + 1] + CON_GRANT[b * 5 + 2] + CON_GRANT[b * 5 + 3] + CON_GRANT[b * 5 + 4]) as f64 / CON_SIZE[b] as f64;
+            rb.partial_cmp(&ra).unwrap_or(std::cmp::Ordering::Equal)
+        });
+
         let mut found = false;
         for mask in 0u32..(1u32 << pf.len()) {
             if found {
@@ -271,18 +438,37 @@ pub extern "C" fn reachable_exact(ptr: *const i32, _len: usize, budget: i32) -> 
             }
             let mut build0 = supply;
             let mut cost0 = own;
-            let mut bcons: Vec<([i32; 5], [i32; 5])> = built.clone();
+            let mut bcons: Vec<([i32; 5], [i32; 5], i32)> = built.clone();
             for j in 0..pf.len() {
                 if mask & (1 << j) != 0 {
                     build0 = add_cap(&build0, &pf[j].1);
                     cost0 += pf[j].2;
+                    // A finished partial carries its full grant AND full size (selected + remaining): the
+                    // witness peak math reads member size, so undercounting it would falsely pass an
+                    // over-budget build (a false-reach). The resolver's own cost uses cost0 above.
                     bcons[pf[j].0].1 = pf[j].1;
+                    bcons[pf[j].0].2 += pf[j].2;
                 }
             }
             if cost0 > budget {
                 continue;
             }
-            let mut ctx = Ctx { fr: &fr, fg: &fg, fs: &fs, nf, budget, target, chosen: Vec::new(), bcons: &bcons, seen: FxMap::default(), found: false };
+            let mut ctx = Ctx {
+                fr: &fr,
+                fg: &fg,
+                fs: &fs,
+                nf,
+                budget,
+                target,
+                chosen: Vec::new(),
+                bcons: &bcons,
+                started: &started,
+                filler: &filler,
+                gsorted: &gsorted,
+                witness_left: WITNESS_CALL_CAP,
+                seen: FxMap::default(),
+                found: false,
+            };
             ctx.rec(0, build0, cost0, target);
             found = ctx.found;
         }

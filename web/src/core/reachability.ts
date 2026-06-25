@@ -25,6 +25,10 @@ const PEAK_NODE_CAP = 3000;
 // witness would otherwise fire at every covering node; the best-filler-first order means the cheapest
 // covering builds (the likeliest to witness) are tried first.
 const WITNESS_CALL_CAP = 4;
+// The resolver-gate witness uses the deterministic heuristic order only (no random shuffles): it keeps the
+// gate cheap and, crucially, RNG-free so the Rust/WASM port stays bit-for-bit verdict-equivalent. Builds
+// that need a shuffled order to fit budget stay conservatively dim (sound).
+const GATE_WITNESS_TRIES = 0;
 
 /** A constellation reduced to what reachability needs: its cost and affinity vectors. */
 export interface ReachCon {
@@ -656,7 +660,7 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
       }
       if (witnessLeft > 0) {
         witnessLeft--;
-        if (minPeakSampled(cons, table, members, budget, PEAK_WITNESS_TRIES, PEAK_NODE_CAP) <= budget) {
+        if (minPeakSampled(cons, table, members, budget, GATE_WITNESS_TRIES, PEAK_NODE_CAP) <= budget) {
           found = true;
           return;
         }
