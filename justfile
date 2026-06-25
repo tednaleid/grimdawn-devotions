@@ -315,6 +315,21 @@ build: cover-table
     cp src/styles.css dist/styles.css
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
+    # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that
+    # `build` only copies, so a stale binary ships silently (correct but slow) unless we rebuild it.
+    # Rebuild when it is missing or older than web/wasm/src/lib.rs AND cargo is available; without a
+    # toolchain we warn rather than fail, and the page falls back to the TS resolver.
+    WASM="{{justfile_directory()}}/data/reach.wasm"
+    WASM_SRC="{{justfile_directory()}}/web/wasm/src/lib.rs"
+    CARGO="$(command -v cargo 2>/dev/null || true)"; [ -n "$CARGO" ] || CARGO="$HOME/.cargo/bin/cargo"
+    if [ ! -f "$WASM" ] || [ "$WASM_SRC" -nt "$WASM" ]; then
+      if "$CARGO" --version >/dev/null 2>&1; then
+        echo "reach.wasm missing or stale vs its Rust source; rebuilding via 'just wasm'..."
+        ( cd "{{justfile_directory()}}" && just wasm )
+      else
+        echo "WARNING: data/reach.wasm is missing or older than web/wasm/src/lib.rs and cargo is unavailable; shipping the existing resolver (may be stale). Run 'just install-rust' then 'just wasm' for the fast path."
+      fi
+    fi
     if [ -f "{{justfile_directory()}}/data/reach.wasm" ]; then cp "{{justfile_directory()}}/data/reach.wasm" dist/data/reach.wasm; else echo "(no data/reach.wasm; run 'just wasm' for the fast resolver - the page falls back to TS)"; fi
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
     echo "Built web/dist (buildId $BUILD_ID)"
