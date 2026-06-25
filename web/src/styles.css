@@ -264,7 +264,10 @@ main {
 }
 .brow-lbl {
   flex: 1;
+  min-width: 0; /* let a long label shrink and ellipsize instead of pushing the value columns right */
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .brow-lbl.subj {
   color: #d7c89a;

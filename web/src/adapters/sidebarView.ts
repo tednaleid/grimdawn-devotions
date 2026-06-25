@@ -37,7 +37,7 @@ function benefitListHtml(
       const vtint = comparing && s.verdict ? ` ${s.verdict}` : "";
       return (
         `<div class="brow${sel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}">` +
-        `<span class="brow-lbl subj${vtint}" data-gtoggle>${s.subject}</span>` +
+        `<span class="brow-lbl subj${vtint}" data-gtoggle title="${s.subject}">${s.subject}</span>` +
         `<span class="brow-vals" data-vid="${vid}">${cells(r)}</span></div>`
       );
     }
