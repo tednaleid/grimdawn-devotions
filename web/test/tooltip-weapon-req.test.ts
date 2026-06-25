@@ -28,10 +28,50 @@ test("star tooltip omits the qualifier for an ungated star", () => {
   expect(html).not.toContain("tip-weapon-req");
 });
 
-test("constellation tooltip shows one deduped 'Some bonuses require' line", () => {
+test("constellation tooltip shows the verbatim requirement when every star shares it", () => {
+  // Every gated constellation in the data is fully gated by one requirement (Kraken: all 5 stars
+  // need a two-handed weapon), so the line is unqualified - not hedged with "Some" - and deduped.
   const html = render((tip) => tip.showConstellation(model, "kraken", 0, 0));
-  expect(html).toContain("Some bonuses require a two-handed melee or two-handed ranged weapon.");
-  // Kraken's stars share one description, so it collapses to a single line.
+  expect(html).toContain("Requires a two-handed melee or two-handed ranged weapon.");
+  expect(html).not.toContain("Some bonuses require");
+  expect(html.match(/tip-weapon-req/g)?.length).toBe(1);
+});
+
+test("constellation tooltip hedges with 'Some bonuses require' when only some stars are gated", () => {
+  // No real constellation is partially gated, so build a minimal one: a gated star plus an
+  // ungated one. The line must hedge (the requirement does not cover the whole constellation).
+  const partial = buildModel({
+    constellations: [
+      {
+        id: "partialcon",
+        name: "Partial",
+        tier: 1,
+        affinity_required: {},
+        affinity_bonus: {},
+        background: null,
+        stars: [
+          {
+            index: 0,
+            predecessors: [],
+            position: { x: 0, y: 0 },
+            bonuses: { offensiveFireModifier: 10 },
+            celestial_power: null,
+            weapon_requirement: { weapons: ["Sword"], description: "Requires a sword." },
+          },
+          {
+            index: 1,
+            predecessors: [0],
+            position: { x: 1, y: 1 },
+            bonuses: { characterLife: 50 },
+            celestial_power: null,
+            weapon_requirement: null,
+          },
+        ],
+      },
+    ],
+  } as any);
+  const html = render((tip) => tip.showConstellation(partial, "partialcon", 0, 0));
+  expect(html).toContain("Some bonuses require a sword.");
   expect(html.match(/tip-weapon-req/g)?.length).toBe(1);
 });
 

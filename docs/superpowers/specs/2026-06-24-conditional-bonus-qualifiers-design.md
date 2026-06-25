@@ -42,11 +42,16 @@ Settled with Ted during brainstorming; not open:
 3. **Neutral styling, not red.** The planner has no character context, so it cannot
    know whether the player meets the requirement. The qualifier is purely
    informational; it must not be styled as an unmet-requirement warning (no red).
-4. **Constellation note phrased "Some bonuses require: ...".** Because the
-   constellation tooltip already merges all its stars' bonuses into one block, and a
-   constellation may gate only some of its stars, the aggregated line is phrased to
-   stay honest when the gating is partial (Kraken gates all of its stars; others may
-   not).
+4. **Constellation note is verbatim when fully gated, hedged only when partial.**
+   Revised after checking the data: all seven weapon-gated constellations (Kraken,
+   Oklaine's Lantern, Berserker, Blades of Nadaan, Hydra, Rhowan's Scepter,
+   Shieldmaiden) are gated on every star by a single requirement - none is partially
+   or multiply gated. So when one requirement covers the whole constellation, the
+   tooltip shows it verbatim ("Requires a two-handed melee or two-handed ranged
+   weapon."), matching the star tooltip rather than hedging. The "Some bonuses require
+   ..." phrasing is kept only as a fallback for a future partial or mixed-requirement
+   case (none exists today); the constellation tooltip detects "fully gated" as one
+   distinct description covering all of the constellation's stars.
 5. **One requirement line per star / per distinct description.** The requirement is a
    star-level fact in the data, so it renders once per star (not repeated under each
    bonus row). In the constellation view, distinct requirement descriptions are

@@ -136,15 +136,19 @@ export function tooltipView(el: HTMLElement) {
           ? `<div class="tip-dim">Needs ${dim.needs} of your ${dim.cap} points</div>`
           : `<div class="tip-dim">Cannot be completed within ${dim.cap} points</div>`
         : "";
-      const weaponReq = [
-        ...new Set(
-          weaponRequirements(model, stars)
-            .map((r) => r.description)
-            .filter((d): d is string => !!d),
-        ),
-      ]
-        .map((d) => `<div class="tip-weapon-req">Some bonuses require ${d.replace(/^Requires\s+/i, "")}</div>`)
-        .join("");
+      // Weapon requirement(s) across the constellation's stars. When every star shares one
+      // requirement (true of every gated constellation in the data today), show it verbatim like
+      // the star tooltip; only hedge with "Some bonuses require ..." if the gating is partial or mixed.
+      const reqDescs = weaponRequirements(model, stars)
+        .map((r) => r.description)
+        .filter((d): d is string => !!d);
+      const distinctReqs = [...new Set(reqDescs)];
+      const fullyGated = distinctReqs.length === 1 && reqDescs.length === stars.size;
+      const weaponReq = fullyGated
+        ? `<div class="tip-weapon-req">${distinctReqs[0]}</div>`
+        : distinctReqs
+            .map((d) => `<div class="tip-weapon-req">Some bonuses require ${d.replace(/^Requires\s+/i, "")}</div>`)
+            .join("");
       el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${weaponReq}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}`;
       place(clientX, clientY);
     },
