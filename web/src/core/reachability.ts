@@ -497,33 +497,32 @@ function orderPeak(
   return peak;
 }
 
-/**
- * Fast sound construction-peak witness for the self-covering whole-build `B`. Tries the bootstrap-order
- * heuristic (lowest requirement first, then highest grant density) plus up to `tries` seeded-random orders
- * of the granting members, returning the smallest peak found and early-exiting the moment one lands at or
- * under budget. A returned peak at or under budget is a GENUINE witness (that order builds `B` within
- * budget), so it is SOUND for "reachable" - it can only flip a false-dim, never invent a false-reach. It
- * does not compute the true minimum, so it may overshoot a hard-to-sample reachable build (a conservative
- * dim, closed only by the exact engine). Deterministic (RNG seeded from the build). INF if not self-covering.
- */
-export function minPeakSampled(
+// Core sampler shared by minPeakSampled (which wants the peak) and minPeakSampledOrder (which wants the
+// witness order). Tries the bootstrap-order heuristic (lowest requirement first, then highest grant
+// density) plus up to `tries` seeded shuffles of the granting members, keeping the smallest-peak order and
+// early-exiting the moment one lands at or under budget. `order` is the granting members in their best-peak
+// order; `tail` is the zero-grant members (placed last - they never raise the peak above the build size).
+function sampledConstruction(
   cons: ReachCon[],
   table: CoverTable,
   B: ReachCon[],
-  budget = BUDGET,
-  tries = 8,
-  peakNodeCap = 3000,
-): number {
+  budget: number,
+  tries: number,
+  peakNodeCap: number,
+): { peak: number; order: ReachCon[]; tail: ReachCon[] } {
+  const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
+  const tail = B.filter((c) => !grants(c));
   const parts = buildParts(cons, B);
-  if (!parts) return INF;
+  if (!parts) return { peak: INF, order: [], tail };
   const { G, totalSize, pool } = parts;
-  if (totalSize > budget) return INF;
-  if (G.length === 0) return totalSize;
+  if (totalSize > budget) return { peak: INF, order: [], tail };
+  if (G.length === 0) return { peak: totalSize, order: [], tail };
   const reqsum = (c: ReachCon) => c.req[0] + c.req[1] + c.req[2] + c.req[3] + c.req[4];
   const ratio = (c: ReachCon) => (c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4]) / c.size;
   const order = [...G].sort((a, b) => reqsum(a) - reqsum(b) || ratio(b) - ratio(a));
   let best = orderPeak(order, pool, table, totalSize, peakNodeCap);
-  if (best <= budget) return best;
+  let bestOrder = [...order];
+  if (best <= budget) return { peak: best, order: bestOrder, tail };
   let seed = (totalSize * 2654435761 + G.length * 40503) >>> 0; // deterministic per build
   const rnd = () => {
     seed = (seed + 0x6d2b79f5) >>> 0;
@@ -539,9 +538,49 @@ export function minPeakSampled(
       order[j] = tmp;
     }
     const p = orderPeak(order, pool, table, totalSize, peakNodeCap);
-    if (p < best) best = p;
+    if (p < best) {
+      best = p;
+      bestOrder = [...order];
+    }
   }
-  return best;
+  return { peak: best, order: bestOrder, tail };
+}
+
+/**
+ * Fast sound construction-peak witness for the self-covering whole-build `B`: the smallest peak among the
+ * sampled orders (see sampledConstruction). A peak at or under budget is a GENUINE witness (that order
+ * builds `B` within budget), so it is SOUND for "reachable" - it can only flip a false-dim, never invent a
+ * false-reach. It does not compute the true minimum, so it may overshoot a hard-to-sample reachable build
+ * (a conservative dim, closed only by the exact engine). Deterministic. INF if `B` is not self-covering.
+ */
+export function minPeakSampled(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  budget = BUDGET,
+  tries = 8,
+  peakNodeCap = 3000,
+): number {
+  return sampledConstruction(cons, table, B, budget, tries, peakNodeCap).peak;
+}
+
+/**
+ * The construction ORDER behind the witness: the constellations of self-covering build `B` in an order
+ * that builds it within `budget` points held at once (granting members first, in their peak-minimizing
+ * order, then the zero-grant members), or null when no sampled order fits the budget. This is the
+ * design-agnostic substrate for guided build order; the transient scaffold to hold (and refund) at each
+ * step is a further step the UI design will specify (see the guided-build-order spec). Deterministic.
+ */
+export function minPeakSampledOrder(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  budget = BUDGET,
+  tries = 16,
+  peakNodeCap = 3000,
+): ReachCon[] | null {
+  const { peak, order, tail } = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
+  return peak <= budget ? [...order, ...tail] : null;
 }
 
 /**
