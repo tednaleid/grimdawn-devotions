@@ -5,6 +5,7 @@ import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { condensedRows, type CondensedGroup, type CondensedPart, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
+import { compareBenefits, type CompareGroup } from "../core/compareBenefits";
 
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
 function changeClass(prev: Record<string, number> | undefined, key: string, cur: Record<string, number>): string {
@@ -19,6 +20,36 @@ function partText(p: CondensedPart): string {
   if (p.dim === "max") return `max ${p.value}`;
   if (p.dim === "durFlat") return `${p.value}s`;
   return p.value;
+}
+
+// Compare mode: one line per part with Base / Now / Delta cells. The subject and part LEFT labels
+// keep the same tag attributes as the normal view (data-gkey/data-ids, data-vid) so tagging is
+// unchanged; the value cells are inert. keyOf namespaces ids per scope (player vs pet).
+function compareListHtml(groups: CompareGroup[], keyOf: (id: string) => string, selectedBenefits: Set<string>): string {
+  const cell = (v: string, verdict: string) => `<span class="cmp-col ${verdict}">${v}</span>`;
+  const partRow = (p: CompareGroup["subjects"][number]["parts"][number]) => {
+    const vid = keyOf(p.id);
+    const sel = selectedBenefits.has(vid) ? " vsel" : "";
+    return (
+      `<div class="cmp-part${sel}">` +
+      `<span class="cmp-lbl" data-vid="${vid}">${p.label}</span>` +
+      cell(p.base, "base") +
+      cell(p.now, p.verdict) +
+      cell(p.delta, p.verdict) +
+      `</div>`
+    );
+  };
+  const subjBlock = (s: CompareGroup["subjects"][number]) => {
+    const ids = s.ids.map(keyOf);
+    const gsel = ids.length > 0 && ids.every((k) => selectedBenefits.has(k)) ? " gsel" : "";
+    return (
+      `<div class="cmp-grp${gsel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}">` +
+      `<div class="cmp-subj"><span class="cmp-lbl" data-gtoggle>${s.subject}</span></div>` +
+      s.parts.map(partRow).join("") +
+      `</div>`
+    );
+  };
+  return groups.map((g) => `<h3>${g.group}</h3>${g.subjects.map(subjBlock).join("")}`).join("");
 }
 
 // Renders the Benefits panel: the subjects the current selection grants, with condensed values,
@@ -38,6 +69,7 @@ export function renderBenefits(
   prevPet?: Record<string, number>,
   petCatalog: CondensedGroup[] = [],
   availablePetKeys?: Set<string>,
+  baselineSelected: Set<StarId> | null = null,
 ): { bonuses: Record<string, number>; petBonuses: Record<string, number>; availHtml: string; petAvailHtml: string } {
   const bonuses = sumBonuses(model, selected);
   const petBonuses = sumPetBonuses(model, selected);
@@ -138,10 +170,27 @@ export function renderBenefits(
   // data-star-id lets main.ts show the same rich tooltip as the power's map star on hover.
   const powerRows = powers.map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`).join("");
 
-  el.innerHTML =
-    `<h2>Benefits</h2>${activeHtml || '<div class="bempty">Select stars to gain benefits.</div>'}` +
-    (petActiveHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petActiveHtml}` : "") +
-    (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "");
+  if (baselineSelected) {
+    const cmp = compareBenefits(model, baselineSelected, selected);
+    const bar =
+      `<div class="cmp-bar">Comparing to baseline` +
+      `<span class="cmp-actions"><button id="cmp-update" type="button">Update</button>` +
+      `<button id="cmp-clear" type="button">Clear</button></span></div>`;
+    const header = `<div class="cmp-head"><span class="cmp-lbl"></span><span class="cmp-col">Base</span><span class="cmp-col">Now</span><span class="cmp-col">&Delta;</span></div>`;
+    const playerHtml = compareListHtml(cmp.player, (id) => id, selectedBenefits);
+    const petHtml = compareListHtml(cmp.pet, (id) => `pet:${id}`, selectedBenefits);
+    el.innerHTML =
+      `<h2>Benefits<button id="set-baseline" class="hidden" type="button"></button></h2>${bar}${header}` +
+      (playerHtml || '<div class="bempty">Select stars to gain benefits.</div>') +
+      (petHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petHtml}` : "") +
+      (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "");
+  } else {
+    el.innerHTML =
+      `<h2>Benefits<button id="set-baseline" type="button">Set baseline</button></h2>` +
+      `${activeHtml || '<div class="bempty">Select stars to gain benefits.</div>'}` +
+      (petActiveHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petActiveHtml}` : "") +
+      (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "");
+  }
   // availHtml and petAvailHtml are returned, not rendered here - the caller places them under the
   // Affinity panel on the right.
   return { bonuses, petBonuses, availHtml, petAvailHtml };

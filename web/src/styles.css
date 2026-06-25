@@ -602,3 +602,123 @@ main {
   white-space: nowrap;
   margin-right: 0.4em;
 }
+
+/* Baseline comparison: widened benefits panel + Base/Now/Delta table */
+body.comparing #benefits {
+  width: 430px;
+}
+.cmp-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #1b2531;
+  border: 1px solid #283446;
+  border-radius: 6px;
+  padding: 6px 9px;
+  margin: 6px 0 10px;
+  font-size: 0.78rem;
+  color: #d7c89a;
+}
+.cmp-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+.cmp-actions button {
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 1px 8px;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+#cmp-update {
+  color: #83c995;
+}
+#cmp-clear {
+  color: #7e8aa0;
+}
+#set-baseline {
+  float: right;
+  background: #1b2531;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  color: #d7c89a;
+  font-size: 0.68rem;
+  padding: 1px 7px;
+  cursor: pointer;
+}
+#set-baseline.hidden {
+  display: none;
+}
+.cmp-head {
+  display: flex;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #7e8aa0;
+  border-bottom: 1px solid #283446;
+  padding-bottom: 4px;
+  margin-bottom: 5px;
+}
+.cmp-head .cmp-lbl {
+  flex: 1;
+}
+.cmp-grp {
+  border-radius: 6px;
+  margin: 5px 0;
+}
+.cmp-grp.gsel {
+  background: #20313f;
+  box-shadow: inset 3px 0 0 #e3c97a;
+}
+.cmp-subj .cmp-lbl {
+  color: #d7c89a;
+  cursor: pointer;
+}
+.cmp-part {
+  display: flex;
+  align-items: center;
+  font-size: 0.78rem;
+  padding: 2px 4px;
+}
+.cmp-part.vsel {
+  background: #20313f;
+  box-shadow: inset 3px 0 0 #e3c97a;
+  border-radius: 4px;
+}
+.cmp-subj {
+  display: flex;
+  padding: 3px 4px 1px;
+  font-size: 0.8rem;
+}
+.cmp-part .cmp-lbl {
+  flex: 1;
+  color: #7e8aa0;
+  padding-left: 12px;
+  cursor: pointer;
+}
+.cmp-subj .cmp-lbl {
+  flex: 1;
+}
+.cmp-lbl:hover {
+  text-decoration: underline;
+}
+.cmp-col {
+  width: 58px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #c9d3e0;
+}
+.cmp-col.base {
+  color: #7e8aa0;
+}
+.cmp-col.up {
+  color: #83c995;
+}
+.cmp-col.down {
+  color: #e0696a;
+}
+.cmp-col.same {
+  color: #566175;
+}
