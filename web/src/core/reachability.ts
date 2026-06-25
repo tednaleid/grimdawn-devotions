@@ -14,11 +14,10 @@ export const BUDGET = 55;
 // Crossroads supply 1 affinity of each color and are refundable, so any build can be seeded
 // with one point per color for free while bootstrapping.
 const SEED: Vec = [1, 1, 1, 1, 1];
-// Peak-witness gating (see classifyForSelection): only attempt the scaffold-peak witness within this
-// many points of the budget (tight self-covering builds are the only false-dim region). The witness
-// samples a bounded number of construction orders, each with a per-scaffold node cap, so it stays cheap
-// even across a full sweep; a sampler that finds no witness keeps the conservative dim verdict.
-const PEAK_WITNESS_SLACK = 6;
+// Peak-witness search bounds (see classifyForSelection): it samples this many construction orders, each
+// with a per-scaffold node cap, so it stays cheap even across a full sweep. The witness is self-bounding -
+// it returns instantly for a non-self-covering build (no order can help) and only samples for a complete
+// self-covering one - so it needs no budget-proximity gate; a sampler that finds no order keeps the dim.
 const PEAK_WITNESS_TRIES = 8;
 const PEAK_NODE_CAP = 3000;
 
@@ -663,10 +662,11 @@ export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: Re
   //
   // Run BEFORE the exact resolver: the witness is ~0.1ms and the resolver is the expensive (WASM/DFS)
   // call, so a witness hit short-circuits it. Verdict-identical - the witness only returns reachable on a
-  // real order the definitive resolver would also accept - it just saves the resolver on near-budget
-  // self-covering reachable candidates. Gated to near-budget self-covering states (the only place these
-  // locks bite - additive play never false-dims); a miss falls through to the resolver, losing nothing.
-  if (st.partialFinish.length === 0 && st.own >= budget - PEAK_WITNESS_SLACK) {
+  // real order the definitive resolver would also accept - it just saves the resolver on self-covering
+  // reachable candidates. Applies only to a complete started build (no partials); minPeakSampled itself
+  // returns instantly for a non-self-covering build, so no budget-proximity gate is needed (an own>=49
+  // gate was measured to wrongly exclude ~6% of the false-dim region, self-covering builds at own 44-48).
+  if (st.partialFinish.length === 0) {
     if (minPeakSampled(cons, table, st.built, budget, PEAK_WITNESS_TRIES, PEAK_NODE_CAP) <= budget) return "reachable";
   }
   if (exactResolver(cons, table, st, budget)) return "reachable";
