@@ -44,7 +44,7 @@ function compareListHtml(groups: CompareGroup[], keyOf: (id: string) => string, 
     const gsel = ids.length > 0 && ids.every((k) => selectedBenefits.has(k)) ? " gsel" : "";
     return (
       `<div class="cmp-grp${gsel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}">` +
-      `<div class="cmp-subj"><span class="cmp-lbl" data-gtoggle>${s.subject}</span></div>` +
+      `<div class="cmp-subj ${s.verdict}"><span class="cmp-lbl" data-gtoggle>${s.subject}</span></div>` +
       s.parts.map(partRow).join("") +
       `</div>`
     );

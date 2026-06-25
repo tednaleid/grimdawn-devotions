@@ -604,8 +604,9 @@ main {
 }
 
 /* Baseline comparison: widened benefits panel + Base/Now/Delta table */
-body.comparing #benefits {
-  width: 430px;
+/* The panel is a grid track, so widen the track (not the item) to give the three value columns room. */
+body.comparing main {
+  grid-template-columns: 480px 1fr 250px;
 }
 .cmp-bar {
   display: flex;
@@ -676,6 +677,16 @@ body.comparing #benefits {
   color: #d7c89a;
   cursor: pointer;
 }
+/* Subject label tinted by its roll-up: net better/worse, or a distinct blue when parts moved both ways. */
+.cmp-subj.up .cmp-lbl {
+  color: #83c995;
+}
+.cmp-subj.down .cmp-lbl {
+  color: #e0696a;
+}
+.cmp-subj.mixed .cmp-lbl {
+  color: #6f9fc4;
+}
 .cmp-part {
   display: flex;
   align-items: center;
@@ -705,7 +716,7 @@ body.comparing #benefits {
   text-decoration: underline;
 }
 .cmp-col {
-  width: 58px;
+  width: 70px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: #c9d3e0;

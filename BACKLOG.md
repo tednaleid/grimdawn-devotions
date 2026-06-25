@@ -123,6 +123,13 @@ Implementation pointers:
 - Mock up the layout/interaction first (the slide-out column, the table, the
   promote/cancel affordances); treat the above as the data path, not the final UI.
 
+Deferred edge case (from the final review of the shipped version): setting a baseline
+with zero stars selected encodes `cs=`/`cp=` but does not survive a reload, because
+`decodeHash` treats an empty `cs=` as "no comparison" (`urlState.ts`, the `baseSel.size
+> 0` guard). The diff would be empty anyway, so it is low impact. Cheapest fix: make
+`set-baseline`/`cmp-update` a no-op when `state.selected.size === 0` (or disable the
+button when nothing is selected) in `web/src/app/main.ts`, with a test.
+
 ## Mobile-friendly responsive pass
 
 Make the single planner page usable on phones. The hexagonal split means this is

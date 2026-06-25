@@ -4,7 +4,9 @@ import type { DevotionModel, StarId } from "./types";
 import { sumBonuses, sumPetBonuses, racialTargets } from "./aggregate";
 import { condensedRows, classify, type CondensedPart, type StatGroup } from "./statFormat";
 
-export type Verdict = "up" | "down" | "same";
+// "mixed" only ever applies to a subject roll-up (some parts up, some down); a single part is
+// always one of up/down/same.
+export type Verdict = "up" | "down" | "same" | "mixed";
 export interface ComparePart {
   id: string;
   label: string;
@@ -54,28 +56,29 @@ function fmtDelta(n: number): string {
 }
 
 function buildScope(baseMap: Record<string, number>, nowMap: Record<string, number>, racial: string[]): CompareGroup[] {
-  // Condense each side independently, then index every part by its id so we can union them.
-  const sides: { groups: CompareGroup[]; partVal: Map<string, string> }[] = [baseMap, nowMap].map((m) => {
-    const groups = condensedRows(m, { racialTarget: racial });
-    const partVal = new Map<string, string>();
-    for (const g of groups) for (const s of g.subjects) for (const p of s.parts) partVal.set(p.id, p.value);
-    return { groups: groups as unknown as CompareGroup[], partVal };
-  });
-  const [baseSide, nowSide] = sides as [(typeof sides)[0], (typeof sides)[0]];
+  // Condense each side exactly once. The skeleton (which subjects/parts exist, their dim) comes
+  // from the union of both structures; the formatted Base/Now values come from these same groups,
+  // indexed by part id.
+  const baseGroups = condensedRows(baseMap, { racialTarget: racial });
+  const nowGroups = condensedRows(nowMap, { racialTarget: racial });
+  const partValOf = (groups: typeof baseGroups): Map<string, string> => {
+    const m = new Map<string, string>();
+    for (const g of groups) for (const s of g.subjects) for (const p of s.parts) m.set(p.id, p.value);
+    return m;
+  };
+  const basePartVal = partValOf(baseGroups);
+  const nowPartVal = partValOf(nowGroups);
 
-  // The subject/part skeleton (group, subject text, key, dim) comes from the union of both
-  // condensed structures; values+verdicts come from the raw maps.
-  type Meta = { group: StatGroup; subject: string; key: string; dim: CondensedPart["dim"] };
   const subjMeta = new Map<string, { group: StatGroup; subject: string; ids: string[] }>();
-  const partMeta = new Map<string, Meta & { subjKey: string }>();
-  for (const m of [baseMap, nowMap]) {
-    for (const g of condensedRows(m, { racialTarget: racial })) {
+  const partDim = new Map<string, CondensedPart["dim"]>();
+  for (const groups of [baseGroups, nowGroups]) {
+    for (const g of groups) {
       for (const s of g.subjects) {
         if (!subjMeta.has(s.key)) subjMeta.set(s.key, { group: g.group, subject: s.subject, ids: [] });
         const sm = subjMeta.get(s.key)!;
         for (const p of s.parts) {
-          if (!partMeta.has(p.id)) {
-            partMeta.set(p.id, { group: g.group, subject: s.subject, key: p.id, dim: p.dim, subjKey: s.key });
+          if (!partDim.has(p.id)) {
+            partDim.set(p.id, p.dim);
             sm.ids.push(p.id);
           }
         }
@@ -88,9 +91,8 @@ function buildScope(baseMap: Record<string, number>, nowMap: Record<string, numb
   const byGroup = new Map<StatGroup, CompareSubject[]>();
   for (const [key, sm] of subjMeta) {
     const parts: ComparePart[] = sm.ids.map((id) => {
-      const meta = partMeta.get(id)!;
-      const base = baseSide.partVal.get(id) ?? DASH;
-      const now = nowSide.partVal.get(id) ?? DASH;
+      const base = basePartVal.get(id) ?? DASH;
+      const now = nowPartVal.get(id) ?? DASH;
       const maxId = rangeMaxId(id);
       let delta: string;
       let verdict: Verdict;
@@ -106,15 +108,13 @@ function buildScope(baseMap: Record<string, number>, nowMap: Record<string, numb
         verdict = n > b ? "up" : n < b ? "down" : "same";
         delta = fmtDelta(n - b);
       }
-      return { id, label: DIM_LABEL[meta.dim], base, now, delta, verdict };
+      return { id, label: DIM_LABEL[partDim.get(id)!], base, now, delta, verdict };
     });
-    const verdict: Verdict = parts.every((p) => p.verdict === "same")
-      ? "same"
-      : parts.some((p) => p.verdict === "up") && !parts.some((p) => p.verdict === "down")
-        ? "up"
-        : parts.some((p) => p.verdict === "down") && !parts.some((p) => p.verdict === "up")
-          ? "down"
-          : "same";
+    // Subject roll-up: all parts unchanged -> "same"; net better/worse -> "up"/"down"; a subject
+    // with parts moving both ways (e.g. traded flat for percent) -> "mixed".
+    const hasUp = parts.some((p) => p.verdict === "up");
+    const hasDown = parts.some((p) => p.verdict === "down");
+    const verdict: Verdict = !hasUp && !hasDown ? "same" : hasUp && hasDown ? "mixed" : hasUp ? "up" : "down";
     const subj: CompareSubject = { subject: sm.subject, key, ids: sm.ids, verdict, parts };
     if (!byGroup.has(sm.group)) byGroup.set(sm.group, []);
     byGroup.get(sm.group)!.push(subj);
