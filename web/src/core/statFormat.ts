@@ -139,7 +139,7 @@ function humanize(id: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function classify(id: string): Classified | null {
+export function classify(id: string): Classified | null {
   if (/^[A-Z]/.test(id)) return null; // weapon-class token (Spear2h, Dagger, ...) - shown via weapon requirement
   const o = OVERRIDES[id];
   if (o) return o;
