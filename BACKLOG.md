@@ -58,12 +58,23 @@ reachable on the first order whose peak fits the budget. Real-model false-dims d
 See `docs/reachability-engine.md` "Update 2026-06-25" and the perf guard
 `web/test/reachability-perf-guard.test.ts`.
 
-The Oklaine case (`web/test/reachability.test.ts`, still `test.failing`) is a DIFFERENT, still-open
-gap: whether a non-self-covering ~26-point selection can be EXTENDED with filler to a 55-point build
-containing Oklaine. That is a filler-search limitation in the exact resolver, not a tight-build
-construction order, so the self-covering peak witness does not apply. A fuller fix would teach the
-exact resolver's filler search the scaffold-then-refund move, or expose the exact engine off the
-per-click path (guided build order). The 1/6618 real-model residual is the same class.
+### C. Affinity-bootstrap / filler-extension false-dims (FIXED 2026-06-25)
+The deeper gap behind B, Oklaine, and the 1/6618 residual: the exact resolver gated every covering
+build on `constructible()` - the seed-only fixpoint that cannot model holding transient refundable
+scaffolding (scaffold-then-refund) to bootstrap a build's own affinity. So builds reachable only via
+that move were dimmed even after filler was added (the Jackal/Vulture case: a self-covering build whose
+capstone needs chaos the build only supplies after a refundable crossroads bootstraps it; and Oklaine's
+filler-extension case). Fixed by gating the covering build on the peak witness instead
+(`reachableExactFrom` in `web/src/core/reachability.ts` and its Rust port `web/wasm/src/lib.rs`):
+`constructible()` stays the cheap fast path, falling back to `minPeakSampled() <= budget`, which models
+scaffold-then-refund. The gate uses the deterministic heuristic order (`GATE_WITNESS_TRIES=0`) so the
+Rust port is RNG-free and bit-for-bit verdict-equivalent (`just validate-wasm`: 0 mismatches). Two
+supporting fixes: finished partials count at full size in the witness members (a latent inconsistency
+that would otherwise undercount the peak and false-reach), and witness calls are capped per resolver
+invocation. Results: real-model false-dims 0 (`just validate-reach` Part B), the bootstrap-bug adds zero
+false-reaches (synthetic false-reach unchanged at 414 baseline), Vulture/Ghoul + Oklaine
+`test.failing` flipped to passing, and per-click p99 IMPROVED 199ms -> 35ms (the witness short-circuits
+the previously-exhaustive dim searches). The remaining synthetic-model false-reach is gap A, untouched.
 
 ## Guided build order ("pick these in this order")
 

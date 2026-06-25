@@ -144,3 +144,36 @@ does not appear to manifest on the real model (at least for self-covering builds
 sampler, so this is a strong upper bound, not a formal proof). We therefore do NOT invest in the
 expensive sound dim-proving fix. The oracle test (`reachability-oracle.test.ts`) stays `test.failing`
 as a guard on the small-model mechanism; re-run `just audit-false-reach` after any resolver change.
+
+## Update 2026-06-25: affinity-bootstrap / filler-extension false-dims FIXED (and the engine got faster)
+
+The exact resolver (`reachableExactFrom`, and its Rust port in `web/wasm/src/lib.rs`) gated every
+covering build on `constructible()` - the seed-only fixpoint, which cannot model holding transient
+refundable scaffolding to bootstrap a build's own affinity. So builds reachable only via
+scaffold-then-refund were dimmed even after filler was added. This was the deeper cause behind the
+tight-build false-dims, the Oklaine filler-extension case, the Jackal/Vulture affinity-bootstrap case
+(a self-covering build whose capstone needs chaos the build supplies only after a refundable crossroads
+bootstraps it), and the 1/6618 real-model residual.
+
+Fix: gate the covering build on the peak witness. `constructible()` stays the cheap fast path, falling
+back to `minPeakSampled() <= budget`, which models scaffold-then-refund and is sound (a sampled peak
+<= budget is a genuine order, so it only ever flips a false-dim, never invents a false-reach). The gate
+uses the deterministic heuristic order only (`GATE_WITNESS_TRIES = 0`), so the Rust port is RNG-free and
+bit-for-bit verdict-equivalent to TS (`just validate-wasm`: 0 mismatches over 900 small models + 152
+real fixtures).
+
+Two supporting fixes:
+- A finished partial in the resolver carried its full grant but its partial (selected) size. The witness
+  reads member size for its peak math, so it undercounted the build's point cost and could pass an
+  over-budget build (a false-reach). Finished partials now count at full size (selected + remaining).
+  This was a latent inconsistency the witness gate exposed; with it, the bootstrap fix adds zero
+  false-reaches (`just validate-reach` Part A false-reach unchanged at the 414 baseline).
+- The witness is far costlier than `constructible()` and fires at every covering node on dim candidates,
+  so witness calls are capped per resolver invocation (best-filler-first order tries the likeliest
+  builds first). Capping only makes a verdict conservatively dim, never a false-reach.
+
+Results: real-model false-dims 0 (`just validate-reach` Part B); Vulture/Ghoul and Oklaine
+`test.failing` flipped to passing in `reachability.test.ts`; and per-click p99 IMPROVED from 199 ms to
+35 ms (max 312 -> 55 ms) on `just perf` - the witness short-circuits the previously-exhaustive dim
+searches on now-reachable candidates. The remaining synthetic-model false-reach is the separate
+soundness gap A (the greedy/free-seed mechanism), untouched here.
