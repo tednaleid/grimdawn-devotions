@@ -8,7 +8,10 @@ correctness fuzzer have shipped; see `docs/reachability-performance.md` and the
 `docs/superpowers/specs/` path-predictor designs. The old "blocked-activation
 flash" idea was superseded by claim-anywhere reachability and is dropped.
 Pet-bonus filtering and tagging has also shipped: clickable pet benefit chips, a
-pet "Available to get" list, and scoped highlight keys.)
+pet "Available to get" list, and scoped highlight keys. Conditional bonus qualifiers
+have shipped too: a star's weapon requirement now shows on the star and constellation
+tooltips, verbatim when the whole constellation shares one requirement; see
+`docs/superpowers/specs/2026-06-24-conditional-bonus-qualifiers-design.md`.)
 
 ## Reachability engine: current state and known gaps
 
@@ -75,36 +78,6 @@ shortcut landed; the dim-cache param did not). Pointers:
 `classifyForSelection`/`reachabilityForSelection` in `web/src/core/reachability.ts`,
 driven from `main.ts`; key the cache by candidate id + a generation counter bumped
 on removal/cap change.
-
-## Conditional bonus qualifiers ("only with a two-handed weapon")
-
-Some devotion star bonuses are conditional, and the planner currently shows the raw
-number with no qualifier. A user reading Kraken sees "+X% Total Damage" with no hint
-that it only applies while wielding a two-handed weapon, so the build looks like it
-grants that damage unconditionally. Surface the qualifier in the UI, at minimum on the
-star mouseover/tooltip, so the number is not read as a free bonus.
-
-The qualifier data already survives end to end, so this is almost entirely a client
-display change. The parser extracts it (`extract_weapon_requirement` in
-`scripts/parse_devotions.py:355-361`, documented in `docs/dbr-format.md:77-86`) and
-`data/devotions.json` carries a `weapon_requirement: { weapons: [...], description:
-"Requires a two-handed melee or two-handed ranged weapon." }` on each conditional star
-(e.g. Kraken star 0).
-
-Implementation pointers:
-- Carry the description through the model: `web/src/core/model.ts:72` currently keeps
-  only `{ weapons }` and DROPS the human-readable `description`. Widen the
-  `weaponRequirement` type in `web/src/core/types.ts:39` to include `description` and
-  pass it through in `model.ts`.
-- Render it on the star tooltip: `web/src/adapters/tooltipView.ts` (around line 108,
-  where `bonusRowsHtml(star.bonuses, ...)` builds the bonus block) - add a qualifier
-  line or badge when `star.weaponRequirement` is present.
-- A selection-level summary is already computed but unused: `weaponRequirements()` in
-  `web/src/core/aggregate.ts:122-132` extracts the requirements across the selected set
-  and could drive a sidebar note (e.g. "some bonuses require a two-handed weapon") in
-  `sidebarView.ts`. Optional polish; the mouseover is the only piece the ask requires.
-- Before generalizing the label, verify whether conditional types other than weapon
-  requirements exist in the data; only `weapon_requirement` was found so far.
 
 ## Baseline build comparison (delta from a remembered build)
 
