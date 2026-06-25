@@ -1,7 +1,7 @@
-// ABOUTME: Unit tests pinning the peak-aware construction-cost helpers (peakToReach, peakCost) on small
-// ABOUTME: hand-computed models where "peak points held" differs from "subset size" (the costed-scaffold crux).
+// ABOUTME: Unit tests pinning the peak-aware construction-cost helpers (peakToReach, minPeakSampled) on
+// ABOUTME: small hand-computed models where "peak points held" differs from "subset size" (the scaffold crux).
 import { test, expect } from "bun:test";
-import { buildCoverTable, peakToReach, peakCost, INF, type ReachCon, type Vec } from "../src/core/reachability";
+import { buildCoverTable, peakToReach, minPeakSampled, INF, type ReachCon, type Vec } from "../src/core/reachability";
 import { reachableSet, randModel, mulberry32 } from "./support/reach-oracle";
 
 const z = (): Vec => [0, 0, 0, 0, 0];
@@ -61,19 +61,20 @@ test("peakToReach: a zero deficit costs nothing", () => {
   expect(peakToReach(cons, table, z())).toBe(0);
 });
 
-// --- Task 5: peakCost is a SOUND upper bound vs the BFS oracle --------------------------------------
-// peakCost(B) is the construction peak for a self-covering whole-constellation build B. It is a SOUND
-// upper bound: whenever peakCost(B) <= budget, B (all members complete, nothing else) is genuinely a
-// reachable state in the oracle, so the engine never claims an unbuildable build reachable (no
-// false-reach). It can overshoot a reachable build (false-dim); that residual gap is what the exact
-// resolver closes, so it is reported here, not gated to zero.
+// --- minPeakSampled is a SOUND witness vs the BFS oracle ---------------------------------------------
+// minPeakSampled(B) samples real construction orders for a self-covering whole-constellation build B and
+// returns the smallest peak found. It is SOUND: whenever minPeakSampled(B) <= budget it has an actual order
+// that builds B within budget, so B (all members complete, nothing else) is genuinely a reachable state in
+// the oracle - the engine never claims an unbuildable build reachable (no false-reach). The sampler can
+// MISS a reachable build's only valid orders (overshoot -> conservative false-dim); that residual is the
+// exact-min-peak tail, reported here, not gated to zero.
 const CAP: Vec = [20, 8, 20, 10, 20];
 const cap = (a: Vec, b: Vec): Vec => a.map((x, i) => Math.min(x + b[i]!, CAP[i]!)) as Vec;
 const ge = (a: Vec, b: Vec) => a.every((x, i) => x >= b[i]!);
 
-test("peakCost never under-charges (sound upper bound) on small self-covering builds", () => {
-  let falseReach = 0; // peakCost says reachable, oracle says no (UNSOUND - must be 0)
-  let falseDim = 0; // peakCost overshoots a reachable build (the gap the exact resolver closes)
+test("minPeakSampled never under-charges (sound witness) on small self-covering builds", () => {
+  let falseReach = 0; // minPeakSampled says reachable, oracle says no (UNSOUND - must be 0)
+  let falseDim = 0; // sampler overshoots a reachable build (the gap the exact engine closes)
   let checked = 0;
   for (let seed = 1; seed <= 600; seed++) {
     const rng = mulberry32(seed * 2 + 7);
@@ -91,18 +92,18 @@ test("peakCost never under-charges (sound upper bound) on small self-covering bu
         tot = cap(tot, m.grant);
         mreq = mreq.map((x, j) => Math.max(x, m.req[j]!)) as Vec;
       }
-      if (!ge(tot, mreq)) continue; // peakCost is defined for self-covering builds only
+      if (!ge(tot, mreq)) continue; // the witness is defined for self-covering builds only
       checked++;
       const counts = cons.map((_, i) => (idx.includes(i) ? cons[i]!.size : 0));
       const oracleReach = R.has(counts.join(","));
-      const engineReach = peakCost(cons, table, B) <= budget;
+      const engineReach = minPeakSampled(cons, table, B, budget) <= budget;
       if (engineReach && !oracleReach) falseReach++;
       if (!engineReach && oracleReach) falseDim++;
     }
   }
-  // Soundness is the invariant peakCost must hold; tightness (low false-dim) is a bonus the resolver finishes.
+  // Soundness is the invariant the witness must hold; tightness (low false-dim) is a bonus the exact engine finishes.
   console.log(
-    `peakCost upper-bound gap: ${falseDim}/${checked} reachable builds overshoot budget (closed by the exact resolver)`,
+    `minPeakSampled witness gap: ${falseDim}/${checked} reachable builds the sampler misses (exact-min-peak tail)`,
   );
   expect({ falseReach, checked: checked > 100 }).toEqual({ falseReach: 0, checked: true });
 }, 30_000);

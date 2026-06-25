@@ -42,22 +42,23 @@ being sound by construction, is the tool to audit it. Guard: `web/test/reachabil
 (`test.failing`). FIX: make the resolver sound, or adopt the costed resolver for the cases that need
 it. First do the audit (run the sound constructor over the shipped engine's "reachable" verdicts).
 
-### B. Tight-build false-dims (mostly fixed 2026-06-25; exact-peak residual remains)
-The resolver wrongly dimmed some constructor-confirmed-reachable TIGHT near-55-point builds. A
-sound bounded peak witness (`peakCost` in `web/src/core/reachability.ts`, wired into
-`classifyForSelection`) now closes most of this: real-model false-dims dropped 119 -> 23
-(`just validate-reach` Part B), and the named `thunder-warder-real-forum-build` and Affliction
-share-link builds are reachable, with per-click p99 within ~10% of baseline. See
-`docs/reachability-engine.md` "Update 2026-06-25".
+### B. Tight-build false-dims (FIXED 2026-06-25)
+The resolver wrongly dimmed some constructor-confirmed-reachable TIGHT near-55-point builds. A sound
+peak witness (`minPeakSampled` in `web/src/core/reachability.ts`, wired into `classifyForSelection`)
+closes this: it samples real construction orders for a near-budget self-covering build and flips it
+reachable on the first order whose peak fits the budget. Real-model false-dims dropped 119 -> 1
+(`just validate-reach` Part B), all 42 tight walk fixtures classify reachable
+(`web/test/reachability-walk.test.ts` is no longer `test.failing`), soundness is unchanged
+(false-reach 705), and per-click p99 is unchanged from baseline (the hang state went 4.5s -> 85ms).
+See `docs/reachability-engine.md` "Update 2026-06-25" and the perf guard
+`web/test/reachability-perf-guard.test.ts`.
 
-RESIDUAL (still `test.failing`): the tightest ~10 walk fixtures, the Oklaine case, and ~23
-real-model builds. `peakCost` is a no-refund UPPER bound on the construction peak and overshoots
-these by exactly one star; deciding them needs the EXACT min-peak (refund-aware / all-orders
-search - `minPeakCost`/`exactMinPeak` on branch `reachability-costed-scaffolding`), which costs
-1-5s per call on real 55-point builds and so cannot run on the per-click path within the latency
-budget. Guards: the `test.failing` half of `web/test/reachability-walk.test.ts` and the Oklaine
-case in `web/test/reachability.test.ts`. FIX options: precompute/scope a faster exact peak, or
-expose it only off the per-click path (e.g. a "verify this build" action / guided build order).
+The Oklaine case (`web/test/reachability.test.ts`, still `test.failing`) is a DIFFERENT, still-open
+gap: whether a non-self-covering ~26-point selection can be EXTENDED with filler to a 55-point build
+containing Oklaine. That is a filler-search limitation in the exact resolver, not a tight-build
+construction order, so the self-covering peak witness does not apply. A fuller fix would teach the
+exact resolver's filler search the scaffold-then-refund move, or expose the exact engine off the
+per-click path (guided build order). The 1/6618 real-model residual is the same class.
 
 ## Guided build order ("pick these in this order")
 

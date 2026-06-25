@@ -81,30 +81,38 @@ See BACKLOG "Reachability engine: current state and known gaps" for the follow-u
 (audit real-model soundness with the costed oracle; surgical fix for the tight-build
 false-dims).
 
-## Update 2026-06-25: the tight-build false-dim peak witness (tier-1)
+## Update 2026-06-25: the tight-build false-dim peak witness
 
-The tight-build false-dim gap is now largely closed by a sound, bounded peak witness in the
-TS layer (`peakCost`, ported from the costed branch and wired into `classifyForSelection`).
-When the cheap bracket and the exact resolver both dim a state that is a complete
-self-covering build within a few points of the budget, `peakCost` decides it by the
-construction PEAK (final build plus the transient refundable scaffold a lock needs, held then
-refunded). A peak at or under budget is a real construction order, so it only ever flips a
-false-dim to reachable - never a false-reach. It runs only on near-budget self-covering dim
-states (additive play never false-dims) and under a node cap, so it stays off the early-game
-hot path; a redundant late-game re-classification of already-complete constellations was also
+The tight-build false-dim gap (gap B) is essentially closed by a sound peak witness in the TS layer
+(`minPeakSampled`, ported from the costed branch and wired into `classifyForSelection`). When the
+cheap bracket and the exact resolver both dim a state that is a complete self-covering build within
+a few points of the budget, `minPeakSampled` samples real construction orders (a bootstrap-order
+heuristic plus a bounded number of seeded shuffles) and early-exits the moment one has a peak at or
+under budget. That peak is a genuine build order, so it only ever flips a false-dim to reachable -
+never a false-reach. It is gated to near-budget self-covering states (additive play never
+false-dims). A redundant late-game re-classification of already-complete constellations was also
 collapsed.
+
+The witness is a DECISION (early-exit on the first valid order), not a minimum-peak computation. An
+earlier attempt used `peakCost` (the exact construction-peak min), which on a real near-budget sweep
+ran ~100ms per candidate over dozens of candidates - a 4.5s hang on completing Affliction from a
+47-point build. `minPeakSampled` does the same sweep in ~10ms because reachable candidates early-exit
+in one or two orders, and it is also MORE accurate (it finds valid orders the exact min's heuristic
+branch capped out on).
 
 Measured (TS layer, so it applies to both the WASM and TS resolver paths):
 
-- Real-model false-dims (`just validate-reach` Part B): 119/6618 -> 23/6618 (about 81% closed).
-- Named builds now reachable: the real forum Thunder Warder build and the Affliction share link.
+- Real-model false-dims (`just validate-reach` Part B): 119/6618 -> 1/6618.
+- The 42 tight self-covering walk fixtures all classify reachable; `reachability-walk.test.ts` is no
+  longer `test.failing`. The named Thunder Warder and Affliction builds are reachable.
 - Soundness unchanged: false-reach stays 705/12000 vs the BFS oracle (the witness is sound).
-- Per-click WASM perf within budget: p99 ~198ms -> ~218ms, max ~300ms -> ~342ms, no >400ms clicks.
+- Per-click WASM perf unchanged from baseline: p99 ~200ms, max ~300ms, no >400ms clicks. The hang
+  state (complete Affliction from a 47-point build) went 4564ms -> 85ms.
+- Guard: `web/test/reachability-perf-guard.test.ts` times `selectionView` on the tight-build class the
+  seeded harness under-samples, so a regression that makes the witness expensive again is caught.
 
-Residual (still `test.failing`): the tightest ~10 walk fixtures, the Oklaine case, and the
-remaining 23 real-model builds need the EXACT minimum peak (a refund-aware / all-orders search),
-which `peakCost`'s no-refund upper bound overshoots by a star. That exact search (`minPeakCost`/
-`exactMinPeak` on the costed branch) costs 1-5s per call on real 55-point builds, so it cannot run
-on the per-click path within the latency budget; it is left for the costed engine / guided build
-order. The Gap A soundness (false-reach) gap is untouched - it is the opposite error direction and
-needs the expensive dim-proving search, not this witness.
+Residual: the Oklaine case (`reachability.test.ts`, still `test.failing`) is a DIFFERENT gap - it asks
+whether a non-self-covering 26-point selection can be EXTENDED with filler to a 55-point build
+containing Oklaine. That is a filler-search gap in the exact resolver, not a tight-build construction
+order, so the self-covering peak witness does not apply. The Gap A soundness (false-reach 705) gap is
+also untouched - it is the opposite error direction and needs the expensive dim-proving search.

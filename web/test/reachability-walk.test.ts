@@ -40,9 +40,11 @@ test("reachable guard builds stay reachable (no false-dim regression)", () => {
   expect(dimmed).toBe(0);
 }, 600_000);
 
-test.failing("known false-dim builds classify reachable (main wrongly dims these)", () => {
-  // Each is constructor-confirmed reachable (e.g. thunder-warder-real-forum-build) yet main dims it. Flips
-  // green - alerting us to drop test.failing - once main's tight-build false-dims are fixed.
-  const { dimmed } = dimCount(knownFalseDims);
+test("known false-dim builds classify reachable (peak witness)", () => {
+  // Each is constructor-confirmed reachable (e.g. thunder-warder-real-forum-build). The sampled peak
+  // witness (minPeakSampled in classifyForSelection) now reaches them all; this guards that fix.
+  const { dimmed, ex } = dimCount(knownFalseDims);
+  if (dimmed)
+    console.log(`${dimmed}/${knownFalseDims.length} false-dim builds still wrongly dimmed; e.g. ${ex.join(", ")}`);
   expect(dimmed).toBe(0);
 }, 600_000);
