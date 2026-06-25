@@ -125,6 +125,18 @@ test.failing("Oklaine's Lantern is reachable from the user-reported state (main 
   expect(urlCompletable(hash, "Oklaine's Lantern")).toBe(true);
 }, 30_000);
 
+test.failing("Vulture and Ghoul are reachable from the user-reported 47-point state (affinity-bootstrap false-dim)", () => {
+  // A 47-point self-covering build that grants no chaos. Vulture (req cha:1, grant cha:5) and Ghoul
+  // (req cha:1, grant cha:3) each self-cover chaos once bootstrapped, so each is reachable by holding a
+  // refundable chaos crossroads (+1 chaos) to place its first star, then refunding it (peak 53 <= 55).
+  // The engine dims both: greedy/exact model only the fixed crossroads seed, and the peak witness
+  // overshoots re-deriving the whole 52-star order. Adding any committed chaos member (Jackal/Rat) flips
+  // both reachable, which is a downward-closure violation. Same family as Oklaine. Must classify reachable.
+  const hash = "p=55&s=AAAAAAAHAAAAAAAAwAMAAAAAAAAAAAB4-H8AAAAAAAAAAAAAwA_-AAB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAHw";
+  expect(urlCompletable(hash, "Vulture")).toBe(true);
+  expect(urlCompletable(hash, "Ghoul")).toBe(true);
+}, 30_000);
+
 test("Imp is reachable from the user-reported Wraith state", () => {
   // main classifies Imp reachable here (no false-dim); guards that it keeps getting it right. The
   // costed-scaffolding alternate wrongly dimmed it (the original report was a downward-closure violation).
