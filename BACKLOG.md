@@ -11,7 +11,12 @@ Pet-bonus filtering and tagging has also shipped: clickable pet benefit chips, a
 pet "Available to get" list, and scoped highlight keys. Conditional bonus qualifiers
 have shipped too: a star's weapon requirement now shows on the star and constellation
 tooltips, verbatim when the whole constellation shares one requirement; see
-`docs/superpowers/specs/2026-06-24-conditional-bonus-qualifiers-design.md`.)
+`docs/superpowers/specs/2026-06-24-conditional-bonus-qualifiers-design.md`. Baseline
+build comparison has shipped: snapshot a build, see a live Base/Now/Delta against it,
+added/removed marks on the map, bookmarkable via `cs=`/`cp=`; the Benefits panel was then
+unified to one row per value in both modes. See the
+`docs/superpowers/specs/2026-06-24-baseline-build-comparison-design.md` and
+`docs/superpowers/specs/2026-06-24-unified-benefits-layout-design.md` designs.)
 
 ## Reachability engine: current state and known gaps
 
@@ -79,51 +84,9 @@ shortcut landed; the dim-cache param did not). Pointers:
 driven from `main.ts`; key the cache by candidate id + a generation counter bumped
 on removal/cap change.
 
-## Baseline build comparison (delta from a remembered build)
+## Baseline build comparison: remaining follow-up
 
-Bigger, and needs a mockup/brainstorm pass before building. Let the user snapshot the
-current build as a "baseline", then see a live delta as they change the selection, so
-swapping one constellation for another shows at a glance what improved or regressed.
-
-Sketch from Ted (to be mocked up and experimented with, not final):
-- A "Baseline" button on the benefits bar remembers the current points, selected
-  stars/constellations, and the resulting benefits.
-- Pressing it slides out a second column to the right of the benefits, with room for a
-  second set of numbers.
-- The user then changes the selection; the existing column keeps showing the baseline,
-  the new column shows the modified build, with per-stat red/green deltas (better/worse)
-  in a table view.
-- The new column has an "Update" button (promote the current selection to the new
-  baseline, dropping the old one) and a "Cancel" (discard the comparison, keep the
-  baseline as-is).
-- A visual indication on the map of which stars/constellations were added vs removed
-  relative to the baseline.
-- Deep-linkable: the whole thing must round-trip through the URL hash like every other
-  state-bearing feature.
-
-Implementation pointers:
-- Aggregation already takes a selection and returns the totals: `sumBonuses(model,
-  selected)` in `web/src/core/aggregate.ts:5-15` (and `sumPetBonuses`). Compute it twice
-  (baseline set vs current set) and diff the two `Record<string, number>` maps; render
-  the delta column in `renderBenefits()` (`web/src/adapters/sidebarView.ts:30-148`),
-  reusing the existing up/down flash classes (`changeClass`, `sidebarView.ts:10-15`).
-- State + deep-linking: a baseline is just another star selection (a `Set<StarId>` plus
-  its own cap). Encode it as a new field alongside `s=`/`p=`/`b=` in
-  `web/src/core/urlState.ts` (`encodeHash`/`decodeHash`, lines 78-118), e.g. a
-  `bl=<bitset>` baseline-selection bitset (reuse `encodeBitset`); tolerate its absence
-  (no baseline = no comparison panel). Store the SELECTION, not the computed numbers, so
-  the link stays small and the numbers recompute - this also keeps it inside the
-  URL-state invariant in CLAUDE.md.
-- Wiring: hold an optional `baseline: SelectionState | null` next to `state` in
-  `web/src/app/main.ts:57`; the Baseline/Update/Cancel buttons mutate it and call
-  `refresh()` (the existing render loop at `main.ts:350-383`). The added-vs-removed map
-  indication can ride the existing reach/tag plumbing into the renderer
-  (`handle.update(...)`, `main.ts:365`) as an extra per-star class keyed by membership in
-  baseline vs current.
-- Mock up the layout/interaction first (the slide-out column, the table, the
-  promote/cancel affordances); treat the above as the data path, not the final UI.
-
-Deferred edge case (from the final review of the shipped version): setting a baseline
+The feature shipped (see the intro). One known edge case is still open: setting a baseline
 with zero stars selected encodes `cs=`/`cp=` but does not survive a reload, because
 `decodeHash` treats an empty `cs=` as "no comparison" (`urlState.ts`, the `baseSel.size
 > 0` guard). The diff would be empty anyway, so it is low impact. Cheapest fix: make
