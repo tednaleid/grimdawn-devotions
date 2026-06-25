@@ -14,6 +14,12 @@ export const BUDGET = 55;
 // Crossroads supply 1 affinity of each color and are refundable, so any build can be seeded
 // with one point per color for free while bootstrapping.
 const SEED: Vec = [1, 1, 1, 1, 1];
+// Peak-witness gating (see classifyForSelection): only attempt the scaffold-peak witness within this
+// many points of the budget (tight self-covering builds are the only false-dim region), and bound its
+// search so a single attempt stays cheap. A capped miss keeps the conservative dim verdict.
+const PEAK_WITNESS_SLACK = 6;
+const PEAK_NODE_CAP = 2000;
+const PEAK_TO_REACH_CAP = 10000;
 
 /** A constellation reduced to what reachability needs: its cost and affinity vectors. */
 export interface ReachCon {
@@ -375,6 +381,236 @@ function constructible(B: ReachCon[]): boolean {
 }
 
 /**
+ * Minimum transient construction peak (points held at once) to stand up refundable scaffolding that
+ * grants at least `deficit` affinity, charging each scaffold's own bootstrap. Crossroads (requirement
+ * zero) are the floor. Reaching eldritch 3 via Quill (4 stars, itself needing eldritch 1) means
+ * holding the eldritch crossroads while Quill is placed, so the peak is 5, not 4.
+ *
+ * Equals the smallest bootstrap-closed, constructible scaffold set whose grants cover `deficit`: a
+ * no-refund schedule holds that set monotonically, so its peak is its size. That is a sound UPPER
+ * bound on the true min-peak (refunding a now-redundant bootstrap can only lower it), so it never
+ * under-charges, which is the safe direction for dimming. Returns INF if `deficit` is uncoverable.
+ *
+ * Implemented as a cover-table-pruned DFS over distinct scaffolds (a used-set forbids reusing a
+ * one-of-a-kind scaffold, e.g. a single crossroads, which would fabricate affinity that does not
+ * exist). Scaffolds are tried high-grant-per-star first so a tight bound is found early and prunes.
+ */
+export function peakToReach(
+  cons: ReachCon[],
+  table: CoverTable,
+  deficit: Vec,
+  base: Vec = [0, 0, 0, 0, 0],
+  peakNodeCap = 300_000,
+): number {
+  const need: Vec = [
+    Math.max(0, deficit[0]),
+    Math.max(0, deficit[1]),
+    Math.max(0, deficit[2]),
+    Math.max(0, deficit[3]),
+    Math.max(0, deficit[4]),
+  ];
+  if (need[0] === 0 && need[1] === 0 && need[2] === 0 && need[3] === 0 && need[4] === 0) return 0;
+  const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
+  const ratio = (c: ReachCon) => (c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4]) / c.size;
+  const scaffolds = cons.filter(grants).sort((a, b) => ratio(b) - ratio(a));
+  const used = new Array(scaffolds.length).fill(false);
+  let best = INF;
+  let nodes = 0;
+  const NODE_CAP = peakNodeCap;
+  // `a` is the scaffold affinity built so far; `base` is affinity already held from the permanent build,
+  // which legally bootstraps a scaffold (covers its requirement) without counting toward the deficit.
+  function dfs(a: Vec, size: number): void {
+    if (size >= best || nodes++ > NODE_CAP) return;
+    const rem: Vec = [
+      Math.max(0, need[0] - a[0]),
+      Math.max(0, need[1] - a[1]),
+      Math.max(0, need[2] - a[2]),
+      Math.max(0, need[3] - a[3]),
+      Math.max(0, need[4] - a[4]),
+    ];
+    if (rem[0] === 0 && rem[1] === 0 && rem[2] === 0 && rem[3] === 0 && rem[4] === 0) {
+      best = size;
+      return;
+    }
+    if (size + coverCostAt(table, rem) >= best) return; // cover table: cheapest extra subset, ignoring bootstrap
+    const avail = addCap(base, a);
+    for (let i = 0; i < scaffolds.length; i++) {
+      const c = scaffolds[i]!;
+      if (used[i] || size + c.size >= best || !covers(avail, c.req)) continue;
+      used[i] = true;
+      dfs(addCap(a, c.grant), size + c.size);
+      used[i] = false;
+    }
+  }
+  dfs(zero(), 0);
+  return best;
+}
+
+/** Deterministic min-peak greedy: a sound upper bound used as peakCost's fallback for very large builds. */
+function greedyPeakCost(B: ReachCon[], scaffoldPool: ReachCon[], table: CoverTable, peakNodeCap = 300_000): number {
+  const placed = B.map(() => false);
+  let placedAff = zero();
+  let placedReq = zero();
+  let placedSize = 0;
+  let remaining = B.length;
+  let scaffoldDef = zero();
+  let scaffoldPeak = 0;
+  let peak = 0;
+  for (let guard = 0; guard <= B.length + 2; guard++) {
+    const avail = scaffoldPeak > 0 ? addCap(placedAff, scaffoldDef) : placedAff;
+    let did = false;
+    for (let i = 0; i < B.length; i++) {
+      if (placed[i] || !covers(avail, B[i]!.req)) continue;
+      placed[i] = true;
+      placedAff = addCap(placedAff, B[i]!.grant);
+      placedReq = maxV(placedReq, B[i]!.req);
+      placedSize += B[i]!.size;
+      remaining--;
+      did = true;
+    }
+    peak = Math.max(peak, placedSize + scaffoldPeak);
+    if (covers(placedAff, placedReq)) {
+      scaffoldDef = zero();
+      scaffoldPeak = 0;
+    }
+    if (remaining === 0) return peak;
+    if (did) continue;
+    let bestPeak = INF;
+    let bestDef: Vec | null = null;
+    for (let i = 0; i < B.length; i++) {
+      if (placed[i]) continue;
+      const need = maxV(scaffoldDef, [
+        Math.max(0, B[i]!.req[0] - placedAff[0]),
+        Math.max(0, B[i]!.req[1] - placedAff[1]),
+        Math.max(0, B[i]!.req[2] - placedAff[2]),
+        Math.max(0, B[i]!.req[3] - placedAff[3]),
+        Math.max(0, B[i]!.req[4] - placedAff[4]),
+      ]);
+      const p = peakToReach(scaffoldPool, table, need, placedAff, peakNodeCap);
+      if (p < bestPeak) {
+        bestPeak = p;
+        bestDef = need;
+      }
+    }
+    if (bestPeak >= INF || !bestDef) return INF;
+    scaffoldDef = bestDef;
+    scaffoldPeak = bestPeak;
+  }
+  return INF;
+}
+
+/**
+ * Minimum construction peak (points held at once) to build the self-covering whole-constellation
+ * build `B`, with refundable scaffolding outside `B`. Returns INF if `B` is not self-covering (its
+ * pooled grant cannot cover every member's requirement) - such a build is never valid.
+ *
+ * Searches for the cheapest legal construction: place every member the build's own affinity already
+ * unlocks, then at each remaining lock (members blocking each other, e.g. the Affliction trio) try each
+ * blocked member as the one to bridge with a transient scaffold, held continuously until the build self-
+ * covers it, then refunded. The state is fully determined by (placed members, held scaffold deficit), so
+ * the search is memoized; a node cap falls back to a deterministic greedy. `peakToReach` charges each
+ * scaffold's own bootstrap, and zero-grant members never raise the peak above |B|.
+ *
+ * Sound: every branch is a real schedule and every peak charge is an upper bound on the instant it
+ * models, so the result never under-charges (no false-reach). Tightened against the BFS oracle.
+ */
+export function peakCost(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  nodeCap = 120_000,
+  peakNodeCap = 300_000,
+): number {
+  let tot = zero();
+  let mreq = zero();
+  let totalSize = 0;
+  for (const m of B) {
+    tot = addCap(tot, m.grant);
+    mreq = maxV(mreq, m.req);
+    totalSize += m.size;
+  }
+  if (!covers(tot, mreq)) return INF; // not self-covering: never a valid build
+  // Only granting members drive the construction peak. Zero-grant members never help unlock anything,
+  // so placing them early only inflates the peak; deferred to the end (when the build's full affinity is
+  // present and covers their requirement) they never raise the peak above the final build size. So the
+  // search runs over granting members and the result is maxed with the whole build's size.
+  const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
+  const G = B.filter(grants);
+  const n = G.length;
+  const inB = new Set(B.map((b) => b.id));
+  const scaffoldPool = cons.filter((c) => !inB.has(c.id));
+  const peakCache = new Map<string, number>();
+  const peakOf = (def: Vec, base: Vec): number => {
+    if (def[0] === 0 && def[1] === 0 && def[2] === 0 && def[3] === 0 && def[4] === 0) return 0;
+    const k = `${def[0]},${def[1]},${def[2]},${def[3]},${def[4]}|${base[0]},${base[1]},${base[2]},${base[3]},${base[4]}`;
+    let v = peakCache.get(k);
+    if (v === undefined) {
+      v = peakToReach(scaffoldPool, table, def, base, peakNodeCap);
+      peakCache.set(k, v);
+    }
+    return v;
+  };
+  const shortfall = (req: Vec, aff: Vec): Vec => [
+    Math.max(0, req[0] - aff[0]),
+    Math.max(0, req[1] - aff[1]),
+    Math.max(0, req[2] - aff[2]),
+    Math.max(0, req[3] - aff[3]),
+    Math.max(0, req[4] - aff[4]),
+  ];
+  // State (placedMask, scaffoldDef) is complete: the placed build's affinity, requirement, and size are
+  // functions of the mask. Free-unlocked members are placed first (sound; it bounds the branching), then
+  // we branch on which blocked member to bridge. Memoized; a node cap bails to the deterministic greedy.
+  const memo = new Map<string, number>();
+  let nodes = 0;
+  let bailed = false;
+  const NODE_CAP = nodeCap;
+  function dfs(mask0: number, aff0: Vec, req0: Vec, size0: number, def0: Vec): number {
+    let mask = mask0;
+    let aff = aff0;
+    let req = req0;
+    let size = size0;
+    for (;;) {
+      const avail = addCap(aff, def0);
+      let did = false;
+      for (let i = 0; i < n; i++) {
+        if (mask & (1 << i) || !covers(avail, G[i]!.req)) continue;
+        mask |= 1 << i;
+        aff = addCap(aff, G[i]!.grant);
+        req = maxV(req, G[i]!.req);
+        size += G[i]!.size;
+        did = true;
+      }
+      if (!did) break;
+    }
+    let def = def0;
+    const curPeak = size + peakOf(def, aff); // build and held scaffold coexist for an instant
+    if (covers(aff, req)) def = zero(); // build self-covers placed members: refund the scaffold
+    if (mask === (1 << n) - 1) return curPeak;
+    const key = `${mask}|${def[0]},${def[1]},${def[2]},${def[3]},${def[4]}`;
+    const cached = memo.get(key);
+    if (cached !== undefined) return cached;
+    if (nodes++ > NODE_CAP) {
+      bailed = true;
+      return INF;
+    }
+    let best = INF;
+    for (let i = 0; i < n; i++) {
+      if (mask & (1 << i)) continue;
+      const need = maxV(def, shortfall(G[i]!.req, aff));
+      if (peakOf(need, aff) >= INF) continue;
+      const r = dfs(mask, aff, req, size, need);
+      if (r < best) best = r;
+    }
+    const result = best >= INF ? INF : Math.max(curPeak, best);
+    memo.set(key, result);
+    return result;
+  }
+  const searched = dfs(0, zero(), zero(), 0, zero());
+  const peak = !bailed && searched < INF ? searched : greedyPeakCost(G, scaffoldPool, table, peakNodeCap);
+  return Math.max(peak, totalSize); // deferred zero-grant members fill up to the full build size
+}
+
+/**
  * Exact reachability decision (the "unknown" gap-closer). DFS over filler subsets, pruned by the
  * cover table as an admissible lower bound, early-exiting on the first valid build within budget.
  * For a reachable claim it stops at the first witness; for a dim claim it exhausts (the cover
@@ -481,7 +717,21 @@ export function setExactResolver(fn: ExactResolver | null): void {
 export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): Reach {
   if (lowerBoundFrom(table, st) > budget) return "dim";
   if (greedyFrom(cons, st, budget) <= budget) return "reachable";
-  return exactResolver(cons, table, st, budget) ? "reachable" : "dim";
+  if (exactResolver(cons, table, st, budget)) return "reachable";
+  // Peak-bounded witness for the exact resolver's blind spot. Its constructibility check models only
+  // the free crossroads seed, so it wrongly dims tight self-covering builds that are reachable only by
+  // holding transient refundable scaffolding (a crossroads or constellation beyond the seed) until the
+  // build self-covers, then refunding it. When the started set is itself a complete whole-constellation
+  // build (no partials), peakCost decides it soundly: a construction peak <= budget is a real build
+  // order, so this only ever flips a false-dim to reachable and never introduces a false-reach.
+  //
+  // Gated to near-budget self-covering states (the only place these locks bite - additive play never
+  // false-dims) and run under a tight node cap, so it stays off the early-game hot path the per-click
+  // sweep spends its time in. A capped search that cannot find a witness keeps the (conservative) dim.
+  if (st.partialFinish.length === 0 && st.own >= budget - PEAK_WITNESS_SLACK) {
+    if (peakCost(cons, table, st.built, PEAK_NODE_CAP, PEAK_TO_REACH_CAP) <= budget) return "reachable";
+  }
+  return "dim";
 }
 
 /** Like classify, but resolves the "unknown" gap with the exact resolver - always reachable or dim. */
@@ -570,8 +820,16 @@ export function reachabilityForSelection(
   const st = selectionSummary(model, selected);
   const completable = new Set<string>();
   const clickable = new Set<StarId>();
-  // completable: completing the whole constellation stays within budget (already-complete ones are trivially "completable").
+  // completable: completing the whole constellation stays within budget. A constellation already fully
+  // selected "completes" to the current selection unchanged, so its verdict is the current selection's -
+  // classify that once and reuse it instead of re-running the (sometimes costly) resolver per complete
+  // constellation. This collapses the redundant late-game sweep where most constellations are complete.
+  const selfReachable = classifyForSelection(cons, table, st, budget) === "reachable";
   for (const c of model.constellations.values()) {
+    if (c.starIds.every((sid) => selected.has(sid))) {
+      if (selfReachable) completable.add(c.id);
+      continue;
+    }
     const withCon = new Set(selected);
     for (const sid of c.starIds) withCon.add(sid);
     if (classifyForSelection(cons, table, selectionSummary(model, withCon), budget) === "reachable")

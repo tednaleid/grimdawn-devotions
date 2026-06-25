@@ -42,13 +42,22 @@ being sound by construction, is the tool to audit it. Guard: `web/test/reachabil
 (`test.failing`). FIX: make the resolver sound, or adopt the costed resolver for the cases that need
 it. First do the audit (run the sound constructor over the shipped engine's "reachable" verdicts).
 
-### B. Tight-build false-dims
-The resolver wrongly dims some constructor-confirmed-reachable TIGHT near-55-point builds (e.g.
-`thunder-warder-real-forum-build`, a real forum build, and Oklaine's Lantern). These are rare in
-normal additive play (0% on the harvest) but readily found among random self-covering 55-point
-builds (`just gen-reach-fixtures` finds 40+). Guards: `web/test/reachability-walk.test.ts`
-(`test.failing` half) and the Oklaine case in `web/test/reachability.test.ts`. FIX: a surgical
-witness-finder / dim-bound improvement for the tight self-covering region.
+### B. Tight-build false-dims (mostly fixed 2026-06-25; exact-peak residual remains)
+The resolver wrongly dimmed some constructor-confirmed-reachable TIGHT near-55-point builds. A
+sound bounded peak witness (`peakCost` in `web/src/core/reachability.ts`, wired into
+`classifyForSelection`) now closes most of this: real-model false-dims dropped 119 -> 23
+(`just validate-reach` Part B), and the named `thunder-warder-real-forum-build` and Affliction
+share-link builds are reachable, with per-click p99 within ~10% of baseline. See
+`docs/reachability-engine.md` "Update 2026-06-25".
+
+RESIDUAL (still `test.failing`): the tightest ~10 walk fixtures, the Oklaine case, and ~23
+real-model builds. `peakCost` is a no-refund UPPER bound on the construction peak and overshoots
+these by exactly one star; deciding them needs the EXACT min-peak (refund-aware / all-orders
+search - `minPeakCost`/`exactMinPeak` on branch `reachability-costed-scaffolding`), which costs
+1-5s per call on real 55-point builds and so cannot run on the per-click path within the latency
+budget. Guards: the `test.failing` half of `web/test/reachability-walk.test.ts` and the Oklaine
+case in `web/test/reachability.test.ts`. FIX options: precompute/scope a faster exact peak, or
+expose it only off the per-click path (e.g. a "verify this build" action / guided build order).
 
 ## Guided build order ("pick these in this order")
 

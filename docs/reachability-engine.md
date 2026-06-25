@@ -80,3 +80,31 @@ the shipped engine returns only a boolean). The `setExactResolver` seam in
 See BACKLOG "Reachability engine: current state and known gaps" for the follow-up work
 (audit real-model soundness with the costed oracle; surgical fix for the tight-build
 false-dims).
+
+## Update 2026-06-25: the tight-build false-dim peak witness (tier-1)
+
+The tight-build false-dim gap is now largely closed by a sound, bounded peak witness in the
+TS layer (`peakCost`, ported from the costed branch and wired into `classifyForSelection`).
+When the cheap bracket and the exact resolver both dim a state that is a complete
+self-covering build within a few points of the budget, `peakCost` decides it by the
+construction PEAK (final build plus the transient refundable scaffold a lock needs, held then
+refunded). A peak at or under budget is a real construction order, so it only ever flips a
+false-dim to reachable - never a false-reach. It runs only on near-budget self-covering dim
+states (additive play never false-dims) and under a node cap, so it stays off the early-game
+hot path; a redundant late-game re-classification of already-complete constellations was also
+collapsed.
+
+Measured (TS layer, so it applies to both the WASM and TS resolver paths):
+
+- Real-model false-dims (`just validate-reach` Part B): 119/6618 -> 23/6618 (about 81% closed).
+- Named builds now reachable: the real forum Thunder Warder build and the Affliction share link.
+- Soundness unchanged: false-reach stays 705/12000 vs the BFS oracle (the witness is sound).
+- Per-click WASM perf within budget: p99 ~198ms -> ~218ms, max ~300ms -> ~342ms, no >400ms clicks.
+
+Residual (still `test.failing`): the tightest ~10 walk fixtures, the Oklaine case, and the
+remaining 23 real-model builds need the EXACT minimum peak (a refund-aware / all-orders search),
+which `peakCost`'s no-refund upper bound overshoots by a star. That exact search (`minPeakCost`/
+`exactMinPeak` on the costed branch) costs 1-5s per call on real 55-point builds, so it cannot run
+on the per-click path within the latency budget; it is left for the costed engine / guided build
+order. The Gap A soundness (false-reach) gap is untouched - it is the opposite error direction and
+needs the expensive dim-proving search, not this witness.
