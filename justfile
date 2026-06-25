@@ -266,6 +266,12 @@ validate-reach *ARGS:
 validate-wasm:
     cd "{{justfile_directory()}}/web" && bun scripts/validate-wasm.ts
 
+# Audit the engine's false-reach (soundness) gap vs the BFS oracle: which classify path emits it, whether
+# the rate shrinks with budget, and a real-model upper bound via the sound peak witness. See
+# docs/reachability-engine.md "Update 2026-06-25: false-reach audit".
+audit-false-reach:
+    cd "{{justfile_directory()}}/web" && bun scripts/audit-false-reach.ts
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit

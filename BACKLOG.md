@@ -33,14 +33,19 @@ freezes. The shipped engine is the right default; the costed alternate (branch
 `reachability-costed-scaffolding`) is kept as a SOUND-by-construction oracle and as the substrate
 for guided build order, not as the per-click engine.
 
-### A. Soundness gap (false-reach on the resolver)
+### A. Soundness gap (false-reach on the resolver) - AUDITED 2026-06-25: does not manifest on real model
 Against the independent BFS oracle on random small models, the resolver false-reaches on a few dozen
-of the sampled models - it calls some unreachable selections reachable. A false-reach is the worse
-error class for a planner (it claims an unbuildable build is buildable). Whether this manifests on
-the real 109-constellation model is UNVERIFIED (no BFS oracle scales to it); the costed alternate,
-being sound by construction, is the tool to audit it. Guard: `web/test/reachability-oracle.test.ts`
-(`test.failing`). FIX: make the resolver sound, or adopt the costed resolver for the cases that need
-it. First do the audit (run the sound constructor over the shipped engine's "reachable" verdicts).
+of the sampled models - it calls some unreachable selections reachable. The audit (`just
+audit-false-reach`) localized it: `greedyFrom` (~79%) and the exact resolver (~21%) both treat the
+crossroads seed as free and always-held, so they ignore that scaffolding costs budget at the
+construction PEAK; the peak witness emits zero false-reaches. On random models the rate is
+budget-independent (~5-6% from budget 8 to 40), so the oracle test stays `test.failing` as a guard on
+the mechanism. BUT a real-model upper bound (4000 self-covering builds; the sound peak witness
+confirmed a real construction for all 3102 greedy-reachable ones, 0 suspects) puts the real-model
+false-reach rate at ~0% - the model's affinity abundance means the peak never binds. So this is a
+synthetic-model artifact; we do NOT plan the expensive sound dim-proving fix. See
+`docs/reachability-engine.md` "Update 2026-06-25: false-reach audit". Re-run the audit after any
+resolver change.
 
 ### B. Tight-build false-dims (FIXED 2026-06-25)
 The resolver wrongly dimmed some constructor-confirmed-reachable TIGHT near-55-point builds. A sound

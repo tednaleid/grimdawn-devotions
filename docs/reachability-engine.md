@@ -116,3 +116,31 @@ whether a non-self-covering 26-point selection can be EXTENDED with filler to a 
 containing Oklaine. That is a filler-search gap in the exact resolver, not a tight-build construction
 order, so the self-covering peak witness does not apply. The Gap A soundness (false-reach 705) gap is
 also untouched - it is the opposite error direction and needs the expensive dim-proving search.
+
+## Update 2026-06-25: false-reach audit (Gap A does not manifest on the real model)
+
+`just audit-false-reach` (`web/scripts/audit-false-reach.ts`) probes the soundness gap three ways:
+
+1. Mechanism (which classify path emits the unsound "reachable", at the oracle test's small scale):
+   of 43 false-reaches, 34 came from `greedyFrom` and 9 from the exact resolver; the peak witness
+   emitted ZERO. Both unsound paths model the crossroads seed as a free, always-held `[1,1,1,1,1]`,
+   so they ignore that holding scaffolding during construction costs budget at the PEAK - they call a
+   build reachable whose only real construction order overflows the budget. The witness is sound
+   because it scores a real, peak-charged order.
+
+2. Budget scaling (random k=8 models, BFS oracle): the false-reach rate is FLAT at ~5-6% from budget
+   8 to 40. So it is not a small-budget artifact - the mechanism is budget-independent on these
+   adversarial random models, which is why the oracle test stays `test.failing`.
+
+3. Real-model upper bound (no BFS oracle scales to 109 constellations): over 4000 generated
+   self-covering real-model builds, greedy called 3102 reachable, and the sound peak witness (400
+   sampled orders each) CONFIRMED a real peak-bounded construction for ALL of them - 0 suspects,
+   upper-bound false-reach rate 0.000%. The real model's affinity abundance (per-color supply is 4-9x
+   the caps, 22-33 providers per color) means the construction peak effectively never binds, so the
+   free-seed shortcut never lies here.
+
+Conclusion: the false-reach gap is real in MECHANISM but is a synthetic-random-model artifact - it
+does not appear to manifest on the real model (at least for self-covering builds; the witness is a
+sampler, so this is a strong upper bound, not a formal proof). We therefore do NOT invest in the
+expensive sound dim-proving fix. The oracle test (`reachability-oracle.test.ts`) stays `test.failing`
+as a guard on the small-model mechanism; re-run `just audit-false-reach` after any resolver change.
