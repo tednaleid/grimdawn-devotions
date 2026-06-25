@@ -1,0 +1,92 @@
+// ABOUTME: Tests the unified benefit row-model: one row per value, label roles, and compare cells.
+// ABOUTME: Uses the real devotions.json model; a subject's parts come from across the whole star set.
+import { test, expect } from "bun:test";
+import doc from "../../data/devotions.json";
+import { buildModel } from "../src/core/model";
+import { benefitRows } from "../src/core/benefitRows";
+
+const model = buildModel(doc as any);
+// A subject's flat and percent come from different stars, so build the multi-part shapes from the
+// full star set rather than a single star.
+const allStars = new Set([...model.stars.values()].map((s) => s.id));
+
+function starGranting(stat: string): string {
+  for (const s of model.stars.values()) if (s.bonuses[stat] !== undefined) return s.id;
+  throw new Error(`no star grants ${stat}`);
+}
+function starGrantingRange(): { star: string; partId: string } {
+  for (const s of model.stars.values())
+    for (const k of Object.keys(s.bonuses))
+      if (k.endsWith("Min") && s.bonuses[`${k.slice(0, -3)}Max`] !== undefined) return { star: s.id, partId: k };
+  throw new Error("no star grants a flat damage range");
+}
+const subjectsOf = (groups: ReturnType<typeof benefitRows>["player"]) => groups.flatMap((g) => g.subjects);
+const allRows = (groups: ReturnType<typeof benefitRows>["player"]) => subjectsOf(groups).flatMap((s) => s.rows);
+
+test("regular mode: a flat+percent subject yields a subject row then a bare continuation row", () => {
+  const { player } = benefitRows(model, allStars, null);
+  const phys = subjectsOf(player).find((s) => s.subject === "Physique")!;
+  expect(phys.rows[0]!.role).toBe("subject");
+  expect(phys.rows.some((r) => r.role === "cont" && r.subLabel === "")).toBe(true);
+  // regular mode leaves the compare cells empty
+  expect(phys.rows[0]!.base).toBe("");
+  expect(phys.rows[0]!.delta).toBe("");
+});
+
+test("regular mode: a resistance with pct + max yields a subject row then a 'max' sub-label row", () => {
+  const { player } = benefitRows(model, allStars, null);
+  const res = subjectsOf(player).find((s) => s.subject === "Aether Resistance")!;
+  const maxRow = res.rows.find((r) => r.subLabel === "max")!;
+  expect(maxRow.role).toBe("sub");
+  // the max value drops the "max " prefix (the sub-label conveys it)
+  expect(maxRow.now.startsWith("max")).toBe(false);
+});
+
+test("regular mode: a damage-over-time subject yields a 'duration' sub-label row", () => {
+  const { player } = benefitRows(model, allStars, null);
+  const bleed = subjectsOf(player).find((s) => s.subject === "Bleeding")!;
+  expect(bleed.rows[0]!.role).toBe("subject");
+  expect(bleed.rows.some((r) => r.role === "sub" && r.subLabel === "duration")).toBe(true);
+});
+
+test("regular mode: every value id is present once and the subject lists all its ids", () => {
+  const { player } = benefitRows(model, allStars, null);
+  const phys = subjectsOf(player).find((s) => s.subject === "Physique")!;
+  const rowIds = phys.rows.map((r) => r.id);
+  expect(new Set(rowIds).size).toBe(rowIds.length); // no duplicate rows
+  expect(phys.ids.slice().sort()).toEqual([...rowIds].sort()); // subject.ids covers exactly its rows
+});
+
+test("compare mode: a stat only in current is an up row with a dash base", () => {
+  const star = starGranting("offensiveTotalDamageModifier");
+  const { player } = benefitRows(model, new Set([star]), new Set());
+  const row = allRows(player).find((r) => r.id === "offensiveTotalDamageModifier")!;
+  expect(row.verdict).toBe("up");
+  expect(row.base).toBe("—"); // em dash
+  expect(row.now).not.toBe("—");
+});
+
+test("compare mode: an unchanged flat range is 'same' with a dash delta; a changed one colors with no number", () => {
+  const { star, partId } = starGrantingRange();
+  const sel = new Set([star]);
+  const same = allRows(benefitRows(model, sel, sel).player).find((r) => r.id === partId)!;
+  expect(same.verdict).toBe("same");
+  expect(same.delta).toBe("—");
+  const added = allRows(benefitRows(model, sel, new Set()).player).find((r) => r.id === partId)!;
+  expect(added.verdict).toBe("up");
+  expect(added.delta).toBe(""); // colored, no scalar
+});
+
+test("compare mode: a subject with one part up and one down rolls up to 'mixed'", () => {
+  const { player } = benefitRows(model, new Set(["akeron_s_scorpion:0"]), new Set(["hawk:2"]));
+  const subj = subjectsOf(player).find((s) => s.key === "Attributes:Offensive Ability")!;
+  expect(subj.rows.some((r) => r.verdict === "up")).toBe(true);
+  expect(subj.rows.some((r) => r.verdict === "down")).toBe(true);
+  expect(subj.verdict).toBe("mixed");
+});
+
+test("pet scope builds from pet bonuses independently of the player scope", () => {
+  const petStar = [...model.stars.values()].find((s) => s.petBonuses && Object.keys(s.petBonuses).length > 0)!;
+  const { pet } = benefitRows(model, new Set([petStar.id]), null);
+  expect(subjectsOf(pet).length).toBeGreaterThan(0);
+});
