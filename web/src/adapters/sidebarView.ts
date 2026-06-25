@@ -3,9 +3,9 @@
 import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "../core/types";
 import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
-import { condensedRows, type CondensedGroup, type CondensedPart, type CondensedSubject } from "../core/statFormat";
+import { condensedRows, type CondensedGroup, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
-import { compareBenefits, type CompareGroup } from "../core/compareBenefits";
+import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
 
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
 function changeClass(prev: Record<string, number> | undefined, key: string, cur: Record<string, number>): string {
@@ -15,41 +15,39 @@ function changeClass(prev: Record<string, number> | undefined, key: string, cur:
   return n > p ? " up" : n < p ? " down" : "";
 }
 
-// A condensed value's display text: the max-resist and duration-seconds get a hint.
-function partText(p: CondensedPart): string {
-  if (p.dim === "max") return `max ${p.value}`;
-  if (p.dim === "durFlat") return `${p.value}s`;
-  return p.value;
-}
-
-// Compare mode: one line per part with Base / Now / Delta cells. The subject and part LEFT labels
-// keep the same tag attributes as the normal view (data-gkey/data-ids, data-vid) so tagging is
-// unchanged; the value cells are inert. keyOf namespaces ids per scope (player vs pet).
-function compareListHtml(groups: CompareGroup[], keyOf: (id: string) => string, selectedBenefits: Set<string>): string {
-  const cell = (v: string, verdict: string) => `<span class="cmp-col ${verdict}">${v}</span>`;
-  const partRow = (p: CompareGroup["subjects"][number]["parts"][number]) => {
-    const vid = keyOf(p.id);
+// One unified row renderer for both modes. comparing=false -> a single value cell (+ flash);
+// comparing=true -> Base/Now/Delta cells. selectedBenefits drives the row highlight; flash adds the
+// per-render up/down change class (regular mode only).
+function benefitListHtml(
+  groups: BenefitGroup[],
+  comparing: boolean,
+  selectedBenefits: Set<string>,
+  keyOf: (id: string) => string,
+  flash: (id: string) => string,
+): string {
+  const cells = (r: BenefitGroup["subjects"][number]["rows"][number]) =>
+    comparing
+      ? `<span class="brow-v base">${r.base}</span><span class="brow-v ${r.verdict}">${r.now}</span><span class="brow-v ${r.verdict}">${r.delta}</span>`
+      : `<span class="brow-v${flash(r.id)}">${r.now}</span>`;
+  const rowHtml = (s: BenefitSubject, r: BenefitGroup["subjects"][number]["rows"][number]) => {
+    const vid = keyOf(r.id);
     const sel = selectedBenefits.has(vid) ? " vsel" : "";
-    return (
-      `<div class="cmp-part${sel}">` +
-      `<span class="cmp-lbl" data-vid="${vid}">${p.label}</span>` +
-      cell(p.base, "base") +
-      cell(p.now, p.verdict) +
-      cell(p.delta, p.verdict) +
-      `</div>`
-    );
+    if (r.role === "subject") {
+      const ids = s.ids.map(keyOf);
+      const vtint = comparing && s.verdict ? ` ${s.verdict}` : "";
+      return (
+        `<div class="brow${sel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}">` +
+        `<span class="brow-lbl subj${vtint}" data-gtoggle>${s.subject}</span>` +
+        `<span class="brow-vals" data-vid="${vid}">${cells(r)}</span></div>`
+      );
+    }
+    const lbl =
+      r.role === "sub" ? `<span class="brow-lbl sub">${r.subLabel}</span>` : `<span class="brow-lbl cont"></span>`;
+    return `<div class="brow${sel}" data-vid="${vid}">${lbl}<span class="brow-vals">${cells(r)}</span></div>`;
   };
-  const subjBlock = (s: CompareGroup["subjects"][number]) => {
-    const ids = s.ids.map(keyOf);
-    const gsel = ids.length > 0 && ids.every((k) => selectedBenefits.has(k)) ? " gsel" : "";
-    return (
-      `<div class="cmp-grp${gsel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}">` +
-      `<div class="cmp-subj ${s.verdict}"><span class="cmp-lbl" data-gtoggle>${s.subject}</span></div>` +
-      s.parts.map(partRow).join("") +
-      `</div>`
-    );
-  };
-  return groups.map((g) => `<h3>${g.group}</h3>${g.subjects.map(subjBlock).join("")}`).join("");
+  return groups
+    .map((g) => `<h3>${g.group}</h3>${g.subjects.map((s) => s.rows.map((r) => rowHtml(s, r)).join("")).join("")}`)
+    .join("");
 }
 
 // Renders the Benefits panel: the subjects the current selection grants, with condensed values,
@@ -77,13 +75,8 @@ export function renderBenefits(
 
   // A render scope (player or pet) over one catalog. keyOf namespaces a raw stat id into its tag
   // key (identity for player, "pet:"+id for pet). The scope closes over selectedBenefits for
-  // selection state and over flashPrev/totals for the per-render change flash.
-  function makeScope(
-    keyOf: (id: string) => string,
-    scopeCatalog: CondensedGroup[],
-    flashPrev: Record<string, number> | undefined,
-    totals: Record<string, number>,
-  ) {
+  // selection state.
+  function makeScope(keyOf: (id: string) => string, scopeCatalog: CondensedGroup[]) {
     const catIds = new Map<string, string[]>();
     for (const g of scopeCatalog)
       for (const s of g.subjects)
@@ -98,45 +91,28 @@ export function renderBenefits(
       const k = keys(s);
       return k.length > 0 && k.every((x) => selectedBenefits.has(x)) ? " gsel" : "";
     };
-    const chip = (p: CondensedPart) =>
-      `<span class="bchip${selectedBenefits.has(keyOf(p.id)) ? " vsel" : ""}${changeClass(flashPrev, p.id, totals)}" data-vid="${keyOf(p.id)}">${partText(p)}</span>`;
-    // Active subject (with values): damage types split into damage/duration sub-rows.
-    const activeSubject = (s: CondensedSubject) => {
-      const open = `<div class="bgroup${groupSel(s)}" data-gkey="${gkey(s)}" data-ids="${keys(s).join(",")}">`;
-      const main = s.parts.filter((p) => p.dim !== "durFlat" && p.dim !== "durPct");
-      const dur = s.parts.filter((p) => p.dim === "durFlat" || p.dim === "durPct");
-      if (dur.length) {
-        return (
-          `${open}<div class="bsubj" data-gtoggle>${s.subject}</div>` +
-          `<div class="bsub"><span class="blbl">damage</span><span class="bvals">${main.map(chip).join("")}</span></div>` +
-          `<div class="bsub"><span class="blbl">duration</span><span class="bvals">${dur.map(chip).join("")}</span></div></div>`
-        );
-      }
-      return `${open}<div class="bsingle"><span class="bsubj" data-gtoggle>${s.subject}</span><span class="bvals">${main.map(chip).join("")}</span></div></div>`;
-    };
-    return { keys, gkey, groupSel, activeSubject };
+    return { keys, gkey, groupSel };
   }
 
   type Scope = ReturnType<typeof makeScope>;
-  const player = makeScope((id) => id, catalog, prev, bonuses);
-  const pet = makeScope((id) => `pet:${id}`, petCatalog, prevPet, petBonuses);
+  const player = makeScope((id) => id, catalog);
+  const pet = makeScope((id) => `pet:${id}`, petCatalog);
 
-  // The benefits a selection grants, rendered as interactive value chips, per scope.
-  const activeListHtml = (groups: CondensedGroup[], scope: Scope) =>
-    groups.map((g) => `<h3>${g.group}</h3>${g.subjects.map(scope.activeSubject).join("")}`).join("");
   const activeKeysOf = (groups: CondensedGroup[]) => {
     const set = new Set<string>();
     for (const g of groups) for (const s of g.subjects) set.add(s.key);
     return set;
   };
 
-  const activeGroups = condensedRows(bonuses, { racialTarget: racialTargets(model, selected) });
-  const activeHtml = activeListHtml(activeGroups, player);
-  const activeKeys = activeKeysOf(activeGroups);
-
-  const petGroups = condensedRows(petBonuses);
-  const petActiveHtml = activeListHtml(petGroups, pet);
-  const petActiveKeys = activeKeysOf(petGroups);
+  // Active benefits: the unified one-row-per-value model, rendered for both modes.
+  const rows = benefitRows(model, selected, baselineSelected);
+  const flashPlayer = (id: string) => changeClass(prev, id, bonuses);
+  const flashPet = (id: string) => changeClass(prevPet, id, petBonuses);
+  const comparing = baselineSelected !== null;
+  const activeHtml = benefitListHtml(rows.player, comparing, selectedBenefits, (id) => id, flashPlayer);
+  const petActiveHtml = benefitListHtml(rows.pet, comparing, selectedBenefits, (id) => `pet:${id}`, flashPet);
+  const activeKeys = activeKeysOf(condensedRows(bonuses, { racialTarget: racialTargets(model, selected) }));
+  const petActiveKeys = activeKeysOf(condensedRows(petBonuses));
 
   // "Available to get": inactive catalog subjects still obtainable (a key in availKeys) or tagged
   // (so a tag can always be cleared). availKeys undefined disables the filter (permissive path).
@@ -170,19 +146,17 @@ export function renderBenefits(
   // data-star-id lets main.ts show the same rich tooltip as the power's map star on hover.
   const powerRows = powers.map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`).join("");
 
-  if (baselineSelected) {
-    const cmp = compareBenefits(model, baselineSelected, selected);
-    const bar =
-      `<div class="cmp-bar">Comparing to baseline` +
-      `<span class="cmp-actions"><button id="cmp-update" type="button">Update</button>` +
-      `<button id="cmp-clear" type="button">Clear</button></span></div>`;
-    const header = `<div class="cmp-head"><span class="cmp-lbl"></span><span class="cmp-col">Base</span><span class="cmp-col">Now</span><span class="cmp-col">&Delta;</span></div>`;
-    const playerHtml = compareListHtml(cmp.player, (id) => id, selectedBenefits);
-    const petHtml = compareListHtml(cmp.pet, (id) => `pet:${id}`, selectedBenefits);
+  if (comparing) {
+    const bar = `<div class="cmp-bar">Comparing to baseline</div>`;
+    const controls =
+      `<div class="cmp-controls"><span class="cmp-spacer"></span>` +
+      `<span class="cmp-keep-slot"><button id="cmp-keep" type="button">Keep</button></span>` +
+      `<span class="cmp-upd-slot"><button id="cmp-update" type="button">Update Baseline</button></span></div>`;
+    const head = `<div class="cmp-head"><span class="brow-lbl"></span><span class="brow-v">Base</span><span class="brow-v">Now</span><span class="brow-v">&Delta;</span></div>`;
     el.innerHTML =
-      `<h2>Benefits<button id="set-baseline" class="hidden" type="button"></button></h2>${bar}${header}` +
-      (playerHtml || '<div class="bempty">Select stars to gain benefits.</div>') +
-      (petHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petHtml}` : "") +
+      `<h2>Benefits<button id="set-baseline" class="hidden" type="button"></button></h2>${bar}${controls}${head}` +
+      (activeHtml || '<div class="bempty">Select stars to gain benefits.</div>') +
+      (petActiveHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petActiveHtml}` : "") +
       (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "");
   } else {
     el.innerHTML =

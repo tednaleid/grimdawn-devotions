@@ -230,7 +230,7 @@ main {
 .affinity.down .val {
   animation: flash-down 10s linear;
 }
-/* Condensed benefits: selectable subject groups + individually selectable value chips. */
+/* Condensed benefits: selectable subject groups (avail path only; active path uses .brow). */
 .bgroup {
   border-radius: 12px;
   padding: 1px 5px;
@@ -243,21 +243,6 @@ main {
   background: rgba(108, 182, 255, 0.08);
   box-shadow: 0 0 0 1.5px rgba(108, 182, 255, 0.6);
 }
-.bsingle {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  align-items: baseline;
-  padding: 1px 0;
-}
-.bsub {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  align-items: baseline;
-  padding-left: 0.9rem;
-  font-size: 0.82rem;
-}
 .bsubj {
   text-transform: capitalize;
   cursor: pointer;
@@ -265,38 +250,117 @@ main {
 .bsubj:hover {
   color: #6cb6ff;
 }
-.blbl {
-  color: #9aa4b2;
+/* Unified benefit rows: one value per row, compact, both modes */
+.brow {
+  display: flex;
+  align-items: center;
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.45;
 }
-.bvals {
+.brow.vsel {
+  background: #20313f;
+  box-shadow: inset 3px 0 0 #e3c97a;
+}
+.brow-lbl {
+  flex: 1;
   white-space: nowrap;
-  text-align: right;
 }
-.bchip {
-  display: inline-block;
-  padding: 0 5px;
-  border-radius: 8px;
-  box-shadow: inset 0 0 0 1px transparent;
-  color: #cdd6e3;
+.brow-lbl.subj {
+  color: #d7c89a;
   cursor: pointer;
+}
+.brow.vsel .brow-lbl.subj {
+  color: #eef2f8;
+}
+.brow-lbl.subj:hover {
+  text-decoration: underline;
+}
+.brow-lbl.subj.up {
+  color: #83c995;
+}
+.brow-lbl.subj.down {
+  color: #e0696a;
+}
+.brow-lbl.subj.mixed {
+  color: #6f9fc4;
+}
+.brow-lbl.sub {
+  color: #7e8aa0;
+  padding-left: 12px;
+  font-size: 0.78rem;
+}
+.brow-lbl.cont {
+  padding-left: 12px;
+}
+.brow-vals {
+  display: flex;
+  cursor: pointer;
+}
+.brow-v {
+  width: 64px;
+  text-align: right;
   font-variant-numeric: tabular-nums;
+  color: #c9d3e0;
 }
-.bchip + .bchip {
-  margin-left: 0.1rem;
+/* regular-mode flash reuses the same green/red via the ' up'/' down' class changeClass adds */
+.brow-v.base {
+  color: #7e8aa0;
 }
-.bchip:hover {
-  background: #1c2330;
+.brow-v.up {
+  color: #83c995;
 }
-.bchip.vsel {
-  background: rgba(108, 182, 255, 0.16);
-  box-shadow: inset 0 0 0 1px #6cb6ff;
-  color: #fff;
+.brow-v.down {
+  color: #e0696a;
 }
-.bchip.up {
-  animation: flash-up 10s linear;
+.brow-v.same {
+  color: #566175;
 }
-.bchip.down {
-  animation: flash-down 10s linear;
+/* compare control row: Keep over Base, Update Baseline over Now+Delta */
+.cmp-controls {
+  display: flex;
+  align-items: center;
+  padding: 0 5px 5px;
+}
+.cmp-controls .cmp-spacer {
+  flex: 1;
+}
+.cmp-controls .cmp-keep-slot {
+  width: 64px;
+  text-align: center;
+}
+.cmp-controls .cmp-upd-slot {
+  width: 128px;
+  text-align: center;
+}
+.cmp-controls button {
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 2px 0;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+#cmp-keep {
+  width: 60px;
+  color: #d7c89a;
+}
+#cmp-update {
+  width: 124px;
+  color: #83c995;
+}
+.cmp-head {
+  display: flex;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #7e8aa0;
+  border-bottom: 1px solid #283446;
+  padding: 0 5px 4px;
+  margin-bottom: 4px;
+}
+.cmp-head .brow-lbl {
+  flex: 1;
 }
 /* "Available to get": the rest of the catalog as compact, taggable pills. */
 .avail-head {
@@ -620,25 +684,6 @@ body.comparing main {
   font-size: 0.78rem;
   color: #d7c89a;
 }
-.cmp-actions {
-  margin-left: auto;
-  display: flex;
-  gap: 6px;
-}
-.cmp-actions button {
-  background: #161d27;
-  border: 1px solid #283446;
-  border-radius: 4px;
-  padding: 1px 8px;
-  font-size: 0.72rem;
-  cursor: pointer;
-}
-#cmp-update {
-  color: #83c995;
-}
-#cmp-clear {
-  color: #7e8aa0;
-}
 #set-baseline {
   float: right;
   background: #1b2531;
@@ -651,87 +696,6 @@ body.comparing main {
 }
 #set-baseline.hidden {
   display: none;
-}
-.cmp-head {
-  display: flex;
-  font-size: 0.62rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #7e8aa0;
-  border-bottom: 1px solid #283446;
-  padding-bottom: 4px;
-  margin-bottom: 5px;
-}
-.cmp-head .cmp-lbl {
-  flex: 1;
-}
-.cmp-grp {
-  border-radius: 6px;
-  margin: 5px 0;
-}
-.cmp-grp.gsel {
-  background: #20313f;
-  box-shadow: inset 3px 0 0 #e3c97a;
-}
-.cmp-subj .cmp-lbl {
-  color: #d7c89a;
-  cursor: pointer;
-}
-/* Subject label tinted by its roll-up: net better/worse, or a distinct blue when parts moved both ways. */
-.cmp-subj.up .cmp-lbl {
-  color: #83c995;
-}
-.cmp-subj.down .cmp-lbl {
-  color: #e0696a;
-}
-.cmp-subj.mixed .cmp-lbl {
-  color: #6f9fc4;
-}
-.cmp-part {
-  display: flex;
-  align-items: center;
-  font-size: 0.78rem;
-  padding: 2px 4px;
-}
-.cmp-part.vsel {
-  background: #20313f;
-  box-shadow: inset 3px 0 0 #e3c97a;
-  border-radius: 4px;
-}
-.cmp-subj {
-  display: flex;
-  padding: 3px 4px 1px;
-  font-size: 0.8rem;
-}
-.cmp-part .cmp-lbl {
-  flex: 1;
-  color: #7e8aa0;
-  padding-left: 12px;
-  cursor: pointer;
-}
-.cmp-subj .cmp-lbl {
-  flex: 1;
-}
-.cmp-lbl:hover {
-  text-decoration: underline;
-}
-.cmp-col {
-  width: 63px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  color: #c9d3e0;
-}
-.cmp-col.base {
-  color: #7e8aa0;
-}
-.cmp-col.up {
-  color: #83c995;
-}
-.cmp-col.down {
-  color: #e0696a;
-}
-.cmp-col.same {
-  color: #566175;
 }
 .star.cmp-add {
   stroke: #83c995;
