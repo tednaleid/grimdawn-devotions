@@ -606,7 +606,7 @@ main {
 /* Baseline comparison: widened benefits panel + Base/Now/Delta table */
 /* The panel is a grid track, so widen the track (not the item) to give the three value columns room. */
 body.comparing main {
-  grid-template-columns: 480px 1fr 250px;
+  grid-template-columns: 450px 1fr 250px;
 }
 .cmp-bar {
   display: flex;
@@ -716,7 +716,7 @@ body.comparing main {
   text-decoration: underline;
 }
 .cmp-col {
-  width: 70px;
+  width: 63px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: #c9d3e0;
