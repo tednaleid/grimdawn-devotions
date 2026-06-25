@@ -24,10 +24,10 @@ test("off mode renders the Set baseline button and value rows, no compare contro
   expect(html).toContain('data-vid="offensiveTotalDamageModifier"');
 });
 
-test("compare mode renders the bar, Keep / Update Baseline controls, and Base/Now/Delta cells", () => {
+test("compare mode renders the bar, Revert / Update Baseline controls, and Base/Now/Delta cells", () => {
   const html = render(new Set([starGranting("offensiveTotalDamageModifier")]), new Set());
   expect(html).toContain("cmp-bar");
-  expect(html).toContain('id="cmp-keep"');
+  expect(html).toContain('id="cmp-revert"');
   expect(html).toContain('id="cmp-update"');
   expect(html).not.toContain('id="cmp-clear"');
   expect(html).toContain("brow-v base"); // the Base cell

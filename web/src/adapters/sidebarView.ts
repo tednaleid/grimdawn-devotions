@@ -150,7 +150,7 @@ export function renderBenefits(
     const bar = `<div class="cmp-bar">Comparing to baseline</div>`;
     const controls =
       `<div class="cmp-controls"><span class="cmp-spacer"></span>` +
-      `<span class="cmp-keep-slot"><button id="cmp-keep" type="button">Keep</button></span>` +
+      `<span class="cmp-revert-slot"><button id="cmp-revert" type="button">Revert</button></span>` +
       `<span class="cmp-upd-slot"><button id="cmp-update" type="button">Update Baseline</button></span></div>`;
     const head = `<div class="cmp-head"><span class="brow-lbl"></span><span class="brow-v">Base</span><span class="brow-v">Now</span><span class="brow-v">&Delta;</span></div>`;
     el.innerHTML =

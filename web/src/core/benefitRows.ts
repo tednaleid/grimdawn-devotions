@@ -45,8 +45,9 @@ function fmtDelta(n: number): string {
   const r = Math.round(n * 100) / 100;
   return r > 0 ? `+${r}` : `${r}`;
 }
-// Row value text: keep the seconds suffix on a flat duration; drop the "max " prefix (the sub-label
-// already says "max"); everything else is the raw condensed value.
+// Row value text: keep the seconds suffix on a flat duration; everything else is the raw condensed
+// value. A max-resist is qualified at row-build time: by the "max" sub-label on a later row, or by a
+// "max " prefix when it is the subject's first/only row (see maxQualified in buildScope).
 function rowValue(dim: CondensedPart["dim"], value: string): string {
   return dim === "durFlat" ? `${value}s` : value;
 }
@@ -122,11 +123,23 @@ function buildScope(
       if (isDur) durLabeled = true;
       firstDone = true;
 
+      // A max-resist on the subject row has no "max" sub-label to qualify it, so prefix the value.
+      const maxFirst = role === "subject" && part.dim === "max";
+      const maxQualified = (s: string) => (maxFirst && s !== DASH ? `max ${s}` : s);
+
       if (!comparing) {
-        return { role, subLabel, id: part.id, base: "", now: nowVal.get(part.id) ?? DASH, delta: "", verdict: "" };
+        return {
+          role,
+          subLabel,
+          id: part.id,
+          base: "",
+          now: maxQualified(nowVal.get(part.id) ?? DASH),
+          delta: "",
+          verdict: "",
+        };
       }
-      const base = baseVal.get(part.id) ?? DASH;
-      const now = nowVal.get(part.id) ?? DASH;
+      const base = maxQualified(baseVal.get(part.id) ?? DASH);
+      const now = maxQualified(nowVal.get(part.id) ?? DASH);
       const maxId = rangeMaxId(part.id);
       let delta: string;
       let verdict: Verdict;
@@ -158,7 +171,12 @@ function buildScope(
     if (!byGroup.has(sm.group)) byGroup.set(sm.group, []);
     byGroup.get(sm.group)!.push(subj);
   }
-  return [...byGroup].map(([group, subjects]) => ({ group, subjects }));
+  // Sort subjects alphabetically within each group so both modes match. condensedRows already sorts,
+  // so this is a no-op in regular mode; in compare mode it reorders the base/now union into one order.
+  return [...byGroup].map(([group, subjects]) => ({
+    group,
+    subjects: subjects.sort((a, b) => a.subject.localeCompare(b.subject)),
+  }));
 }
 
 export function benefitRows(

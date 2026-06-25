@@ -210,8 +210,8 @@ async function boot() {
       refresh();
       return;
     }
-    if (t.id === "cmp-keep" && baseline) {
-      // Keep the Base build: revert the live edits to the snapshot and exit compare.
+    if (t.id === "cmp-revert" && baseline) {
+      // Revert: discard the live edits, restore the baseline snapshot, and exit compare.
       state = { selected: new Set(baseline.selected), pointCap: baseline.pointCap };
       baseline = null;
       refresh();

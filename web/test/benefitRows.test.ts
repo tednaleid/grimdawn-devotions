@@ -90,3 +90,21 @@ test("pet scope builds from pet bonuses independently of the player scope", () =
   const { pet } = benefitRows(model, new Set([petStar.id]), null);
   expect(subjectsOf(pet).length).toBeGreaterThan(0);
 });
+
+test("a max-resist that is the subject's only part keeps a 'max' qualifier on the value", () => {
+  // leviathan:5 grants only a maximum Cold Resistance (no base resist), so it is the subject row and
+  // must still read as a maximum, not as a base resistance.
+  const { player } = benefitRows(model, new Set(["leviathan:5"]), null);
+  const cold = subjectsOf(player).find((s) => s.subject === "Cold Resistance")!;
+  expect(cold.rows[0]!.role).toBe("subject");
+  expect(cold.rows[0]!.now.startsWith("max")).toBe(true);
+});
+
+test("compare mode sorts subjects alphabetically within each group (now-only subjects included)", () => {
+  // base and current share a group but contribute different subjects; the union must stay sorted.
+  const { player } = benefitRows(model, new Set(["light_of_empyrion:5"]), new Set(["obelisk_of_menhir:5"]));
+  for (const g of player) {
+    const names = g.subjects.map((s) => s.subject);
+    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+  }
+});

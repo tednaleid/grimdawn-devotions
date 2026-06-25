@@ -325,7 +325,7 @@ main {
 .cmp-controls .cmp-spacer {
   flex: 1;
 }
-.cmp-controls .cmp-keep-slot {
+.cmp-controls .cmp-revert-slot {
   width: 64px;
   text-align: center;
 }
@@ -341,7 +341,7 @@ main {
   font-size: 0.7rem;
   cursor: pointer;
 }
-#cmp-keep {
+#cmp-revert {
   width: 60px;
   color: #d7c89a;
 }

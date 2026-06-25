@@ -317,10 +317,29 @@ try {
   );
   check(
     await cdp.evaluate<boolean>(
-      "document.getElementById('cmp-keep') !== null && document.getElementById('cmp-update') !== null",
+      "document.getElementById('cmp-revert') !== null && document.getElementById('cmp-update') !== null",
     ),
-    "Keep and Update Baseline controls render",
+    "Revert and Update Baseline controls render",
   );
+  // Revert: restores the baseline snapshot and exits. With no edit the selection is unchanged, so the
+  // s= param must round-trip exactly while compare mode drops cs=.
+  const sBeforeRevert = await cdp.evaluate<string>("new URLSearchParams(location.hash.slice(1)).get('s') || ''");
+  await cdp.evaluate(`document.getElementById('cmp-revert').click()`);
+  await Bun.sleep(150);
+  check(
+    await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') === null && !location.hash.includes('cs=')"),
+    "Revert exits compare mode and drops cs= from the URL",
+  );
+  check(
+    (await cdp.evaluate<string>("new URLSearchParams(location.hash.slice(1)).get('s') || ''")) === sBeforeRevert,
+    "Revert restores the baseline selection (s= unchanged)",
+  );
+  // Re-enter, then Update Baseline adopts the live build and exits.
+  await cdp.evaluate(`document.getElementById('set-baseline').click()`);
+  for (let i = 0; i < 20; i++) {
+    await Bun.sleep(100);
+    if (await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') !== null")) break;
+  }
   await cdp.evaluate(`document.getElementById('cmp-update').click()`);
   check(
     await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') === null && !location.hash.includes('cs=')"),
