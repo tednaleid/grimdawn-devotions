@@ -24,7 +24,29 @@ test("buildOrderHtml renders complete and scaffold rows with held totals and con
   expect(html).toContain("6"); // a held total
 });
 
-test("buildOrderHtml null renders the empty state with a find-order button", () => {
+test("buildOrderHtml null (unsearched) renders the empty state with a find-order button", () => {
   const html = buildOrderHtml(model, null, null);
   expect(html).toContain("data-find-order");
+  expect(html).not.toContain("Incomplete build");
+});
+
+test("buildOrderHtml incomplete: names the affinity deficit and offers no search button", () => {
+  // deficit [asc, cha, eld, ord, pri] = needs 20 Ascendant + 7 Order (the Oleron-alone shape)
+  const html = buildOrderHtml(model, null, null, { kind: "incomplete", deficit: [20, 0, 0, 7, 0] });
+  expect(html).toContain("Incomplete build");
+  expect(html).toContain("20 more Ascendant");
+  expect(html).toContain("7 more Order");
+  expect(html).toContain("and"); // joins multiple deficits
+  expect(html).not.toContain("data-find-order"); // searching cannot help an incomplete selection
+});
+
+test("buildOrderHtml searched with a minCap reports the points floor", () => {
+  const html = buildOrderHtml(model, null, null, { kind: "searched", minCap: 13 });
+  expect(html).toContain("No path to this build in fewer than 13 points");
+  expect(html).not.toContain("data-find-order");
+});
+
+test("buildOrderHtml searched with null minCap reports no legal path", () => {
+  const html = buildOrderHtml(model, null, null, { kind: "searched", minCap: null });
+  expect(html).toContain("No legal path to this build exists");
 });

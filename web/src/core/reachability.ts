@@ -704,6 +704,28 @@ export function buildOrderEscalated(
 }
 
 /**
+ * The fewest points at which this selection has a sampled legal build order (>= fromCap, <= budget),
+ * or null if none up to budget. A build's construction can need a transient scaffold whose point cost
+ * pushes the running total above the selection's own size, so a selection valid at N points may only be
+ * assemblable at N+k. This reports that k on demand, to explain a missing order ("no path in fewer than
+ * M points") rather than leaving a bare null. Sampled, so the cap returned is an upper bound on the true
+ * minimum; heavy (it re-searches per cap), so never run it on the live per-click path.
+ */
+export function minBuildableCap(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  fromCap: number,
+  budget = BUDGET,
+  tries = 256,
+): number | null {
+  for (let cap = Math.max(fromCap, 0); cap <= budget; cap++) {
+    if (buildOrderPath(cons, table, B, cap, tries)) return cap;
+  }
+  return null;
+}
+
+/**
  * Exact reachability decision (the "unknown" gap-closer). DFS over filler subsets, pruned by the
  * cover table as an admissible lower bound, early-exiting on the first valid build within budget.
  * For a reachable claim it stops at the first witness; for a dim claim it exhausts (the cover

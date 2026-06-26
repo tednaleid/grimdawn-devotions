@@ -4,7 +4,7 @@ import { httpDataSource } from "../adapters/httpDataSource";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
-import { buildOrderHtml } from "../adapters/buildOrderView";
+import { buildOrderHtml, type NoOrderInfo } from "../adapters/buildOrderView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
 import {
@@ -13,11 +13,13 @@ import {
   completionMinCost,
   selectionSummary,
   buildOrderEscalated,
+  minBuildableCap,
   setExactResolver,
   INF,
   type ReachView,
   type ReachCon,
   type BuildStep,
+  type Vec,
 } from "../core/reachability";
 import { loadWasmResolver } from "../adapters/reachWasm";
 import {
@@ -349,13 +351,13 @@ async function boot() {
   let curBuildOrder: BuildStep[] | null = null; // live build order from selectionView; null in degraded path
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
-  function paintBuildOrder(steps: BuildStep[] | null) {
+  function paintBuildOrder(steps: BuildStep[] | null, noOrder?: NoOrderInfo | null) {
     let panel = document.getElementById("build-order-panel");
     if (!panel) {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><div id="build-order-panel"></div>`);
       panel = document.getElementById("build-order-panel")!;
     }
-    panel.innerHTML = buildOrderHtml(model, data.manifest, steps);
+    panel.innerHTML = buildOrderHtml(model, data.manifest, steps, noOrder);
     const findBtn = panel.querySelector<HTMLButtonElement>("[data-find-order]");
     findBtn?.addEventListener("click", () => {
       findBtn.disabled = true;
@@ -363,7 +365,17 @@ async function boot() {
       // defer one tick so the disabled/searching state paints before the synchronous escalation runs
       setTimeout(() => {
         const members = selectionSummary(model, state.selected).built;
-        paintBuildOrder(members.length && table ? buildOrderEscalated(cons, table, members, state.pointCap) : null);
+        if (!(members.length && table)) {
+          paintBuildOrder(null, { kind: "searched", minCap: null });
+          return;
+        }
+        const order = buildOrderEscalated(cons, table, members, state.pointCap);
+        if (order) {
+          paintBuildOrder(order);
+          return;
+        }
+        // No order at the current cap: find the fewest points at which it would assemble (or null).
+        paintBuildOrder(null, { kind: "searched", minCap: minBuildableCap(cons, table, members, state.pointCap) });
       }, 0);
     });
     // Hover-sync: build-order rows carry data-con-id; look up the art element on the map.
@@ -430,7 +442,14 @@ async function boot() {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
     if (petAvailHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Bonus to All Pets</h2>${petAvailHtml}`);
-    paintBuildOrder(curBuildOrder);
+    // Empty-state copy: a missing order is either an incomplete selection (does not cover its own affinity,
+    // so other constellations are needed) or a self-covering build the live search missed (offer escalation).
+    let boInfo: NoOrderInfo | null = null;
+    if (!curBuildOrder && reach.have && reach.need) {
+      const deficit = reach.need.map((n, i) => Math.max(0, n - reach.have[i]!)) as Vec;
+      boInfo = deficit.some((d) => d > 0) ? { kind: "incomplete", deficit } : { kind: "unsearched" };
+    }
+    paintBuildOrder(curBuildOrder, boInfo);
     const uncapped = !Number.isFinite(state.pointCap);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
     capToggle.title = uncapped ? "Click to restore the 55-point limit" : "Click to remove the point limit";

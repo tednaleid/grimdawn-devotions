@@ -756,6 +756,32 @@ body.comparing main {
   opacity: 0.8;
   font-size: 0.9em;
 }
+.bo-empty-sub {
+  margin-top: 4px;
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+.bo-btn {
+  margin-top: 6px;
+  background: #21262d;
+  color: #e6edf3;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s;
+}
+.bo-btn:hover {
+  background: #2d333b;
+  border-color: #444c56;
+}
+.bo-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
 .bo-highlight {
   outline: 2px solid #ffd479;
 }
