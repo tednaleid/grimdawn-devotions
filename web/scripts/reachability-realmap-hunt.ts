@@ -1,11 +1,11 @@
 // ABOUTME: Real-map false-reach hunt. Generates tight near-budget self-covering REAL Grim Dawn builds biased
 // ABOUTME: toward the Affliction-like shape (multi-color requirement that grants those colors back but not
-// ABOUTME: enough to self-pay), asks the SHIPPED engine (classifyForSelection) whether it lights them, and
-// ABOUTME: checks each against a sound construction-peak oracle. The oracle is exactMinPeak vendored from the
-// ABOUTME: costed-scaffolding branch (web/src/core/reachability.ts), adapted to a 3-way verdict so a PROVEN
-// ABOUTME: unreachable build can be told apart from a conservative bail. A build the shipped engine calls
-// ABOUTME: reachable but the oracle PROVES unconstructible within 55 is a confirmed real-map false-reach.
-// ABOUTME: Run `just realmap-hunt [--seeds N] [--start S] [--dump K]`.
+// ABOUTME: enough to self-pay), asks the SHIPPED engine (classifyForSelection) whether it lights them, then
+// ABOUTME: decides construction feasibility two-stage: minPeakSampled is a SOUND reachable-witness filter (a
+// ABOUTME: <=55 sampled order is a real construction), and only no-witness suspects hit the order-exact
+// ABOUTME: min-peak DP minPeakCost (vendored from branch reachability-costed-scaffolding). A build the engine
+// ABOUTME: lights whose exact min-peak exceeds 55 is a confirmed real-map false-reach. Run `just realmap-hunt`
+// ABOUTME: [--seeds N] [--start S] [--dump K] | --probe SEEDS [--tries N] | --url SEEDS].
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import {
@@ -20,6 +20,7 @@ import {
   type ReachCon,
   type Vec,
 } from "../src/core/reachability";
+import { canonicalStarIds, encodeHash } from "../src/core/urlState";
 import { stateFromCounts, mulberry32, type Counts } from "../test/support/reach-oracle";
 
 const argNum = (flag: string, def: number): number => {
@@ -195,6 +196,30 @@ function genTargetStack(rng: () => number): Counts | null {
 const membersOf = (c: Counts): ReachCon[] => cons.filter((_, i) => c[i] === cons[i]!.size);
 const fmtBuild = (c: Counts): string =>
   cons.map((cc, i) => (c[i] ? `${nameOf.get(cc.id) ?? cc.id}(${c[i]})` : "")).filter(Boolean).join(" + ");
+
+// Emit a shareable planner URL for specific seeds, so a confirmed false-reach can be opened in the
+// running app and seen directly. A fully-completed constellation selects all of its stars. `--url 5563`.
+const urlArg = (() => {
+  const i = process.argv.indexOf("--url");
+  return i >= 0 ? process.argv[i + 1] : null;
+})();
+if (urlArg) {
+  const canonical = canonicalStarIds(model);
+  for (const s of urlArg.split(",").map(Number)) {
+    const b = genTargetStack(mulberry32(s * 2654435761));
+    if (!b) {
+      console.log(`seed ${s}: did not regenerate; skipping`);
+      continue;
+    }
+    const selected = new Set<string>();
+    for (let i = 0; i < cons.length; i++)
+      if (b[i]) for (const sid of model.constellations.get(cons[i]!.id)!.starIds) selected.add(sid);
+    const tot = b.reduce((a, x) => a + x, 0);
+    console.log(`\nseed ${s} (${tot} pts): ${fmtBuild(b)}`);
+    console.log(`  http://localhost:5173/#${encodeHash(selected, BUDGET, canonical)}`);
+  }
+  process.exit(0);
+}
 
 // Deep probe of specific suspect seeds: regenerate the build and hammer the SOUND witness finder
 // (minPeakSampled samples real construction orders; peak <= 55 is a genuine construction). Resolves a

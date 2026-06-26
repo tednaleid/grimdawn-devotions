@@ -144,6 +144,57 @@ test("Imp is reachable from the user-reported Wraith state", () => {
   expect(urlCompletable(hash, "Imp")).toBe(true);
 }, 30_000);
 
+// Confirmed real-map FALSE-REACHES: the engine LIGHTS a 55-point build it cannot actually construct.
+// Both builds are self-covering and fit 55 points permanently, but their exact min construction peak is
+// 56 (off by one): every construction order must transiently hold one extra scaffold point to bootstrap
+// the stacked Affliction-like multi-color requirements. The engine lights them via the seed-only
+// constructible() fast path in reachableExactFrom, which ignores the construction peak. Ground truth from
+// `just realmap-hunt --probe 5563,41966` (order-exact minPeakCost = INF > 55). These stay test.failing
+// until the resolver gates the exact min-peak in for the suspect shape (BACKLOG gap A); the correct
+// verdict is "dim". When fixed they flip to passing - drop the .failing then.
+function classifyBuild(names: string[]): { reach: string; stars: number } {
+  const sel = new Set<string>();
+  for (const n of names) for (const sid of realModel.constellations.get(id(n))!.starIds) sel.add(sid);
+  return { reach: classifyForSelection(cons, cover, selectionSummary(realModel, sel), 55), stars: sel.size };
+}
+
+// Open in the app: http://localhost:5173/#p=55&s=HwAAAAAAAD4AAAAABzwAAAAAAAAAAACABwDAHwAAAAAA4AcAAAAAAACA_wMA8AEAAAAf
+test.failing("real-map false-reach (seed 5563): unconstructible 55-pt Affliction stack must NOT be reachable", () => {
+  const b = classifyBuild([
+    "Akeron's Scorpion",
+    "Fiend",
+    "Lion",
+    "Mantis",
+    "Wretch",
+    "Assassin",
+    "Dire Bear",
+    "Revenant",
+    "Rhowan's Crown",
+    "Solael's Witchblade",
+    "Ulo the Keeper of the Waters",
+  ]);
+  expect(b.stars).toBe(55); // a full 55-point build
+  expect(b.reach).toBe("dim"); // exact min-peak is 56; engine currently wrongly lights it (false-reach)
+}, 30_000);
+
+// Open in the app: http://localhost:5173/#p=55&s=AADwAQCADwAAAAAfAAAAAAAAAAAAAD4AAAAAAPADAAAA4AcAAAAAPwCA_wMAAMAP
+test.failing("real-map false-reach (seed 41966): unconstructible 55-pt Affliction stack must NOT be reachable", () => {
+  const b = classifyBuild([
+    "Bull",
+    "Eye of the Guardian",
+    "Imp",
+    "Vulture",
+    "Bard's Harp",
+    "Dire Bear",
+    "Manticore",
+    "Revenant",
+    "Rhowan's Crown",
+    "Staff of Rattosh",
+  ]);
+  expect(b.stars).toBe(55); // a full 55-point build
+  expect(b.reach).toBe("dim"); // exact min-peak is 56; engine currently wrongly lights it (false-reach)
+}, 30_000);
+
 test("a demanding constellation click stays responsive: selectionView under 400ms", () => {
   // The per-click engine cost (validity-floor search + dimming sweep, no DOM) for a whole non-self-covering
   // constellation from empty. main stays well under budget here (Murmur ~5ms); guards a per-click perf
