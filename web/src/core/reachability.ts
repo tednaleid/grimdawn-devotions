@@ -439,6 +439,9 @@ export function peakToReach(
   let best = INF;
   let nodes = 0;
   const NODE_CAP = peakNodeCap;
+  // `path` tracks the DFS pick order for collect; must reflect actual pick sequence so req-dependent
+  // scaffolds follow the scaffolds that supply their requirements (not just sorted-array order).
+  const path: ReachCon[] = [];
   // `a` is the scaffold affinity built so far; `base` is affinity already held from the permanent build,
   // which legally bootstraps a scaffold (covers its requirement) without counting toward the deficit.
   function dfs(a: Vec, size: number): void {
@@ -452,7 +455,7 @@ export function peakToReach(
     ];
     if (rem[0] === 0 && rem[1] === 0 && rem[2] === 0 && rem[3] === 0 && rem[4] === 0) {
       best = size;
-      if (opts?.collect) bestUsed = scaffolds.filter((_, i) => used[i] === true);
+      if (opts?.collect) bestUsed = [...path];
       return;
     }
     if (size + coverCostAt(table, rem) >= best) return; // cover table: cheapest extra subset, ignoring bootstrap
@@ -461,7 +464,9 @@ export function peakToReach(
       const c = scaffolds[i]!;
       if (used[i] || size + c.size >= best || !covers(avail, c.req)) continue;
       used[i] = true;
+      path.push(c);
       dfs(addCap(a, c.grant), size + c.size);
+      path.pop();
       used[i] = false;
     }
   }
@@ -608,6 +613,94 @@ export function minPeakSampledOrder(
 ): ReachCon[] | null {
   const { peak, order, tail } = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
   return peak <= budget ? [...order, ...tail] : null;
+}
+
+/** One step of a guided build order. `points` is the constellation's star count (negative on refund);
+ *  `heldAfter` is the running points held after the step, which never exceeds the cap. */
+export type BuildStep =
+  | { kind: "complete"; conId: string; points: number; heldAfter: number }
+  | { kind: "scaffold-add"; conId: string; points: number; heldAfter: number }
+  | { kind: "scaffold-refund"; conId: string; points: number; heldAfter: number };
+
+/**
+ * A legal constellation-level order that assembles the self-covering build `B` within `budget` points
+ * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
+ * grants cover it. Replays the sampled construction order (sampledConstruction) and, at each step, asks
+ * peakToReach for the actual scaffold SET to hold (crossroads-biased), diffing consecutive sets into
+ * add/refund events. Returns null when no sampled order fits the budget (B not self-covering, or the
+ * construction peak exceeds budget at the given `tries` - the honest "not validly buildable" signal).
+ */
+export function buildOrderPath(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  budget = BUDGET,
+  tries = 16,
+  peakNodeCap = 3000,
+): BuildStep[] | null {
+  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
+  if (sc.peak > budget) return null;
+  const parts = buildParts(cons, B);
+  if (!parts) return null; // not self-covering
+  const pool = parts.pool;
+  const REPLAY_CAP = 300_000; // cold path: find the exact min subset, immune to the sampling node cap
+  const steps: BuildStep[] = [];
+  let grant: Vec = zero();
+  let mreq: Vec = zero();
+  let held: ReachCon[] = [];
+  let running = 0;
+  for (const m of sc.order) {
+    mreq = maxV(mreq, m.req);
+    const def: Vec = [
+      Math.max(0, mreq[0] - grant[0]),
+      Math.max(0, mreq[1] - grant[1]),
+      Math.max(0, mreq[2] - grant[2]),
+      Math.max(0, mreq[3] - grant[3]),
+      Math.max(0, mreq[4] - grant[4]),
+    ];
+    const need: ReachCon[] = [];
+    const sz = peakToReach(pool, table, def, grant, REPLAY_CAP, { collect: need, preferSmall: true });
+    if (sz >= INF) return null;
+    const needIds = new Set(need.map((s) => s.id));
+    for (const s of held)
+      if (!needIds.has(s.id)) {
+        running -= s.size;
+        steps.push({ kind: "scaffold-refund", conId: s.id, points: -s.size, heldAfter: running });
+      }
+    const heldIds = new Set(held.map((s) => s.id));
+    for (const s of need)
+      if (!heldIds.has(s.id)) {
+        running += s.size;
+        steps.push({ kind: "scaffold-add", conId: s.id, points: s.size, heldAfter: running });
+      }
+    held = need;
+    if (running > budget) return null; // soundness guard
+    running += m.size;
+    steps.push({ kind: "complete", conId: m.id, points: m.size, heldAfter: running });
+    if (running > budget) return null;
+    grant = addCap(grant, m.grant);
+  }
+  for (const s of held) {
+    running -= s.size;
+    steps.push({ kind: "scaffold-refund", conId: s.id, points: -s.size, heldAfter: running });
+  }
+  for (const t of sc.tail) {
+    running += t.size;
+    steps.push({ kind: "complete", conId: t.id, points: t.size, heldAfter: running });
+    if (running > budget) return null;
+  }
+  return steps;
+}
+
+/** The on-demand escalation behind the "Find valid order" button: the same schedule at high tries, to
+ *  recover cliff builds the live tries=16 pass missed. Off the live/per-click path. */
+export function buildOrderEscalated(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  budget = BUDGET,
+): BuildStep[] | null {
+  return buildOrderPath(cons, table, B, budget, 4096, 3000);
 }
 
 /**
