@@ -378,12 +378,12 @@ async function boot() {
         paintBuildOrder(null, { kind: "searched", minCap: minBuildableCap(cons, table, members, state.pointCap) });
       }, 0);
     });
-    // Hover-sync: build-order rows carry data-con-id; look up the art element on the map.
+    // Hover-sync: build-order rows carry data-con-id; box that constellation on the map (drawn on top).
     panel.querySelectorAll<HTMLElement>(".bo-step[data-con-id]").forEach((row) => {
-      const art = mapContainer.querySelector<SVGElement>(`[data-con-id="${row.dataset.conId}"]`);
-      if (!art) return;
-      row.addEventListener("mouseenter", () => art.classList.add("bo-highlight"));
-      row.addEventListener("mouseleave", () => art.classList.remove("bo-highlight"));
+      const cid = row.dataset.conId;
+      if (!cid) return;
+      row.addEventListener("mouseenter", () => handle.highlightCon(cid));
+      row.addEventListener("mouseleave", () => handle.highlightCon(null));
     });
   }
   function renderBenefitsPanel() {

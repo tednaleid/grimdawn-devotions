@@ -249,6 +249,10 @@ export interface SvgHandle {
     diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
   ): void;
   svg: SVGSVGElement;
+  // Draw (or clear, with null) a box around a constellation's stars, on top of every layer. Used for
+  // build-order row hover-sync; an outline on the constellation's own art is buried under later-painted
+  // layers and traces the oversized texture rect, so a dedicated top overlay is drawn instead.
+  highlightCon(id: string | null): void;
 }
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
@@ -301,6 +305,30 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     deps.onHover(target, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
   });
 
+  // A box around a constellation's stars, drawn as the last SVG child so no layer paints over it. Sized to
+  // the star bounding box (plus padding) rather than the art texture rect, so it hugs the actual stars.
+  function highlightCon(id: string | null) {
+    const live = container.querySelector("svg") as SVGSVGElement | null;
+    if (!live) return;
+    live.querySelector(".con-highlight")?.remove();
+    if (!id) return;
+    const con = model.constellations.get(id);
+    const stars = con?.starIds.map((s) => model.stars.get(s)).filter((s): s is NonNullable<typeof s> => !!s) ?? [];
+    if (!stars.length) return;
+    const xs = stars.map((s) => s.position.x + STAR_CENTER);
+    const ys = stars.map((s) => s.position.y + STAR_CENTER);
+    const x0 = Math.min(...xs) - CON_PAD;
+    const y0 = Math.min(...ys) - CON_PAD;
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("class", "con-highlight");
+    rect.setAttribute("x", String(x0));
+    rect.setAttribute("y", String(y0));
+    rect.setAttribute("width", String(Math.max(...xs) + CON_PAD - x0));
+    rect.setAttribute("height", String(Math.max(...ys) + CON_PAD - y0));
+    rect.setAttribute("rx", "8");
+    live.appendChild(rect);
+  }
+
   return {
     svg,
     update(state, highlight, reach, diff) {
@@ -310,5 +338,6 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
       const next = container.querySelector("svg") as SVGSVGElement | null;
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },
+    highlightCon,
   };
 }

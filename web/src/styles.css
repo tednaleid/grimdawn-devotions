@@ -782,6 +782,10 @@ body.comparing main {
   opacity: 0.6;
   cursor: default;
 }
-.bo-highlight {
-  outline: 2px solid #ffd479;
+.con-highlight {
+  fill: none;
+  stroke: #ffd479;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
 }
