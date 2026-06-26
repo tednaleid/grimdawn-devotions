@@ -709,3 +709,53 @@ body.comparing main {
   stroke-width: 1.5;
   stroke-dasharray: 3 2;
 }
+.bo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bo-step {
+  display: grid;
+  grid-template-columns: 1.5em 1.4em 1fr auto auto;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+.bo-step:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.bo-n {
+  text-align: right;
+  opacity: 0.6;
+}
+.bo-art {
+  width: 1.4em;
+  height: 1.4em;
+  object-fit: contain;
+}
+.bo-add {
+  opacity: 0.85;
+  font-style: italic;
+}
+.bo-refund {
+  opacity: 0.6;
+  font-style: italic;
+}
+.bo-pts {
+  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+}
+.bo-held {
+  min-width: 2.2em;
+  text-align: right;
+  opacity: 0.5;
+  font-variant-numeric: tabular-nums;
+}
+.bo-empty {
+  opacity: 0.8;
+  font-size: 0.9em;
+}
+.bo-highlight {
+  outline: 2px solid #ffd479;
+}

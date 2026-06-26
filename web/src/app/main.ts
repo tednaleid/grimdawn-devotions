@@ -4,6 +4,7 @@ import { httpDataSource } from "../adapters/httpDataSource";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
+import { buildOrderHtml } from "../adapters/buildOrderView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
 import {
@@ -11,10 +12,12 @@ import {
   selectionView,
   completionMinCost,
   selectionSummary,
+  buildOrderEscalated,
   setExactResolver,
   INF,
   type ReachView,
   type ReachCon,
+  type BuildStep,
 } from "../core/reachability";
 import { loadWasmResolver } from "../adapters/reachWasm";
 import {
@@ -343,8 +346,34 @@ async function boot() {
   let prevAffinity: Record<Affinity, number> | undefined;
   let availHtml = ""; // "available to get" catalog HTML; rendered under the Affinity panel on the right
   let petAvailHtml = ""; // pet "available to get" catalog HTML; rendered below the player one on the right
+  let curBuildOrder: BuildStep[] | null = null; // live build order from selectionView; null in degraded path
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
+  function paintBuildOrder(steps: BuildStep[] | null) {
+    let panel = document.getElementById("build-order-panel");
+    if (!panel) {
+      affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><div id="build-order-panel"></div>`);
+      panel = document.getElementById("build-order-panel")!;
+    }
+    panel.innerHTML = buildOrderHtml(model, data.manifest, steps);
+    const findBtn = panel.querySelector<HTMLButtonElement>("[data-find-order]");
+    findBtn?.addEventListener("click", () => {
+      findBtn.disabled = true;
+      findBtn.textContent = "Searching...";
+      // defer one tick so the disabled/searching state paints before the synchronous escalation runs
+      setTimeout(() => {
+        const members = selectionSummary(model, state.selected).built;
+        paintBuildOrder(members.length && table ? buildOrderEscalated(cons, table, members, state.pointCap) : null);
+      }, 0);
+    });
+    // Hover-sync: build-order rows carry data-con-id; look up the art element on the map.
+    panel.querySelectorAll<HTMLElement>(".bo-step[data-con-id]").forEach((row) => {
+      const art = mapContainer.querySelector<SVGElement>(`[data-con-id="${row.dataset.conId}"]`);
+      if (!art) return;
+      row.addEventListener("mouseenter", () => art.classList.add("bo-highlight"));
+      row.addEventListener("mouseleave", () => art.classList.remove("bo-highlight"));
+    });
+  }
   function renderBenefitsPanel() {
     // "Available to get" lists only benefits still reachable from here: bonuses on unselected stars
     // in constellations that remain completable. In the permissive path completable is every
@@ -380,9 +409,11 @@ async function boot() {
       // The cap can never sit below the validity floor (raise a stale/over-tight restored link).
       if (state.pointCap < curMin) state = { selected: state.selected, pointCap: curMin };
       reach = view.reach;
+      curBuildOrder = view.buildOrder;
     } else {
       curMin = state.selected.size;
       reach = permissiveReach();
+      curBuildOrder = null;
     }
     document.body.classList.toggle("comparing", baseline !== null);
     const diff = baseline
@@ -399,6 +430,7 @@ async function boot() {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
     if (petAvailHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Bonus to All Pets</h2>${petAvailHtml}`);
+    paintBuildOrder(curBuildOrder);
     const uncapped = !Number.isFinite(state.pointCap);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
     capToggle.title = uncapped ? "Click to restore the 55-point limit" : "Click to remove the point limit";
