@@ -286,6 +286,12 @@ shape-fuzz *ARGS:
 realmap-hunt *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/reachability-realmap-hunt.ts {{ARGS}}
 
+# Validate the guided-build-order engine: measure buildOrderPath's false-negative rate (misses an order the
+# exact minPeakCost oracle proves exists) and false-positive rate (shows an illegal path) across typical
+# self-covering builds, single-constellation partials, and random subsets. Flags: --seeds N --subsets M.
+build-order-validate *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/build-order-validate.ts {{ARGS}}
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
