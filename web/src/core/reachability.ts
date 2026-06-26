@@ -995,6 +995,7 @@ export function reachabilityForSelection(
 export interface SelectionView {
   minCost: number; // selectionMinCost: fewest points that keep this selection a legal build (the slider floor)
   reach: ReachView; // reachabilityForSelection: dimming, clickable stars, and the affinity panel vectors
+  buildOrder: BuildStep[] | null; // live (tries=16) constellation-level order to assemble the selection, or null
 }
 
 /**
@@ -1014,5 +1015,7 @@ export function selectionView(
 ): SelectionView {
   const minCost = selectionMinCost(model, cons, table, selected);
   const reach = reachabilityForSelection(model, cons, table, selected, Math.max(cap, minCost));
-  return { minCost, reach };
+  const members = selectionSummary(model, selected).built;
+  const buildOrder = members.length ? buildOrderPath(cons, table, members, cap, 16) : null;
+  return { minCost, reach, buildOrder };
 }
