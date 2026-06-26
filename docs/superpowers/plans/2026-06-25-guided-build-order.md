@@ -163,7 +163,7 @@ Expected: PASS (3 tests).
 - [ ] **Step 5: Verify the hot path is unchanged**
 
 Run: `just validate-reach`
-Expected: `PASS` with `CONFIRMED false-dims ... =0` (real-model false-dims still 0). The existing `reach-peakcost.test.ts` must also still pass: `cd web && bun test reach-peakcost.test.ts` -> PASS.
+Expected: the numbers are UNCHANGED from baseline - `just validate-reach` reports the known guarded gaps (Part A synthetic falseDim=21, falseReach=705; Part B real-model `CONFIRMED false-dims=1`, the documented 1/6618 residual) and exits non-zero. That is the pre-existing baseline on this branch, not a regression: this task adds an unused-by-existing-callers `opts` param, so every engine verdict is identical. The real proof the hot path is unchanged is that `reach-peakcost.test.ts` still passes: `cd web && bun test reach-peakcost.test.ts` -> PASS. Do NOT expect validate-reach to exit 0.
 
 - [ ] **Step 6: Commit**
 
@@ -501,7 +501,7 @@ Run: `cd web && bun test reachability-perf-guard.test.ts`
 Expected: PASS, `worst.ms < 1500`. If it logs a slowest state, confirm it is well under 1500ms (build-order at tries=16 adds tens of ms at most).
 
 Run: `just validate-reach`
-Expected: `PASS` (real-model false-dims still 0 - the resolver is untouched).
+Expected: the numbers are UNCHANGED from baseline (Part A synthetic falseDim=21, falseReach=705; Part B real-model `CONFIRMED false-dims=1`, the pre-existing 1/6618 residual; exits non-zero). The resolver is untouched, so no verdict changes. Do NOT expect validate-reach to exit 0.
 
 - [ ] **Step 7: Commit**
 

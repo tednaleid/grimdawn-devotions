@@ -255,6 +255,48 @@ test("empty map: everything completable at 55, and Leviathan gated below its flo
   expect(classifyForSelection(cons, cover, levFirst, 19)).toBe("dim");
 });
 
+test("selectionView returns a legal buildOrder for a reachable build and null for a false-reach", () => {
+  // A self-covering reachable build (the affliction share-link state from the fixture): supply covers
+  // all requirements so buildOrderPath can find a valid construction order within 55 points.
+  const aflNames = [
+    "Scarab",
+    "Tortoise",
+    "Affliction",
+    "Autumn Boar",
+    "Behemoth",
+    "Messenger of War",
+    "Shieldmaiden",
+    "Solemn Watcher",
+    "Obelisk of Menhir",
+  ];
+  const sel = new Set<string>();
+  for (const n of aflNames) for (const sid of realModel.constellations.get(id(n))!.starIds) sel.add(sid);
+  const view = selectionView(realModel, cons, cover, sel, 55);
+  expect(view.buildOrder).not.toBeNull();
+  // every heldAfter is within the cap
+  for (const s of view.buildOrder!) expect(s.heldAfter).toBeLessThanOrEqual(55);
+
+  // The confirmed false-reach (seed 5563) classifies reachable but has no valid order within 55.
+  const names = [
+    "Akeron's Scorpion",
+    "Fiend",
+    "Lion",
+    "Mantis",
+    "Wretch",
+    "Assassin",
+    "Dire Bear",
+    "Revenant",
+    "Rhowan's Crown",
+    "Solael's Witchblade",
+    "Ulo the Keeper of the Waters",
+  ];
+  const fr = new Set<string>();
+  for (const n of names) for (const sid of realModel.constellations.get(id(n))!.starIds) fr.add(sid);
+  const frView = selectionView(realModel, cons, cover, fr, 55);
+  expect(frView.reach).toBeDefined();
+  expect(frView.buildOrder).toBeNull();
+}, 30_000);
+
 // SKIP pending the stronger dim lower bound: at this deep multi-capstone state most sweep candidates are
 // borderline-unreachable near 55, and the costed resolver flails proving each one dim (the per-member dim
 // bound does not catch multi-member structural unreachability). Normal play is fast (see `just perf`); only
