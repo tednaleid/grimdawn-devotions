@@ -94,8 +94,11 @@ order exists but the cheap sampler missed it - ~1.2% of reachable builds, per `r
 user over-selected, or it is a confirmed false-reach the engine wrongly lit). Three tiers tell them apart:
 
 1. Live, every selection change: sampled at `tries=16` (sub-ms). Found -> show steps.
-2. On a miss, escalate once: retry at high tries (~1024) - still a few ms, off the live render. Mops up
-   most cliff-misses. Found -> show steps.
+2. On a miss, escalate: retry at high tries. ADJUSTED 2026-06-25 (perf): the escalation does NOT run
+   live - on an unreachable selection the sampler never early-exits, so high tries can cost ~1s per
+   render (worst on the false-reach builds the engine wrongly lights). It moves to an on-demand "Find
+   valid order" button (the same affordance tier 3 will use), keeping the live path strictly tries=16.
+   Found -> show steps.
 3. Still nothing -> honest "No valid build order found within N points", with an opt-in [Verify] action
    that runs the BOUNDED exact DP (`minPeakCost` with a work/time cap so it returns in ~1-2s, never the
    25s tail). Outcomes: a real order (rare cliff case the escalation also missed) -> show it; proven
@@ -103,8 +106,8 @@ user over-selected, or it is a confirmed false-reach the engine wrongly lit). Th
 
 ### v1 cut
 
-v1 builds tiers 1-2 only: live sampled + escalation, with an honest "couldn't find a valid order within N
-points" when both miss. v1 is never wrong about a path it DOES show (the replay invariant below guards
+v1 builds tiers 1-2 only: live sampled (tries=16) plus an on-demand "Find valid order" escalation button,
+with an honest "couldn't find a valid order within N points" when both miss. v1 is never wrong about a path it DOES show (the replay invariant below guards
 that). Tier 3 - the bounded exact verify that turns "couldn't find" into a trustworthy "not buildable" and
 makes the false-reaches visible - is a fast-follow, because it requires porting `minPeakCost` (today on
 branch `reachability-costed-scaffolding`, vendored in `web/scripts/reachability-realmap-hunt.ts`) into
