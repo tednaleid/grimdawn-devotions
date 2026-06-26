@@ -441,7 +441,7 @@ export function peakToReach(
   const NODE_CAP = peakNodeCap;
   // `path` tracks the DFS pick order for collect; must reflect actual pick sequence so req-dependent
   // scaffolds follow the scaffolds that supply their requirements (not just sorted-array order).
-  const path: ReachCon[] = [];
+  const path = opts?.collect ? ([] as ReachCon[]) : null;
   // `a` is the scaffold affinity built so far; `base` is affinity already held from the permanent build,
   // which legally bootstraps a scaffold (covers its requirement) without counting toward the deficit.
   function dfs(a: Vec, size: number): void {
@@ -455,7 +455,7 @@ export function peakToReach(
     ];
     if (rem[0] === 0 && rem[1] === 0 && rem[2] === 0 && rem[3] === 0 && rem[4] === 0) {
       best = size;
-      if (opts?.collect) bestUsed = [...path];
+      if (path) bestUsed = [...path];
       return;
     }
     if (size + coverCostAt(table, rem) >= best) return; // cover table: cheapest extra subset, ignoring bootstrap
@@ -464,9 +464,9 @@ export function peakToReach(
       const c = scaffolds[i]!;
       if (used[i] || size + c.size >= best || !covers(avail, c.req)) continue;
       used[i] = true;
-      path.push(c);
+      if (path) path.push(c);
       dfs(addCap(a, c.grant), size + c.size);
-      path.pop();
+      if (path) path.pop();
       used[i] = false;
     }
   }
