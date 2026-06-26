@@ -22,6 +22,7 @@ import {
 } from "../src/core/reachability";
 import { canonicalStarIds, encodeHash } from "../src/core/urlState";
 import { stateFromCounts, mulberry32, type Counts } from "../test/support/reach-oracle";
+import { genSelfCovering } from "../test/support/walk-fuzzer";
 
 const argNum = (flag: string, def: number): number => {
   const i = process.argv.indexOf(flag);
@@ -196,6 +197,54 @@ function genTargetStack(rng: () => number): Counts | null {
 const membersOf = (c: Counts): ReachCon[] => cons.filter((_, i) => c[i] === cons[i]!.size);
 const fmtBuild = (c: Counts): string =>
   cons.map((cc, i) => (c[i] ? `${nameOf.get(cc.id) ?? cc.id}(${c[i]})` : "")).filter(Boolean).join(" + ");
+
+// Measure the cost of PRODUCING A BUILD PATH for a single build (the guided-build-order engine cost),
+// over typical user-like self-covering builds and over the pathological tight Affliction-stacks. For each
+// reachable build it times the cheap sampled order (minPeakSampledOrder) and the exact min-peak DP
+// (minPeakCost), and counts how often the sampled order fails to find a path that the exact DP proves
+// exists (the cliff misses). Answers: is this always cheap, or hang-prone on pathological cases?
+// `--perf [--seeds N]`.
+if (process.argv.includes("--perf")) {
+  const N = argNum("--seeds", 4000);
+  const pct = (arr: number[], p: number) => arr.length ? arr.slice().sort((a, b) => a - b)[Math.min(arr.length - 1, Math.floor((p / 100) * arr.length))]! : 0;
+  const summarize = (label: string, ts: number[]) =>
+    console.log(`    ${label.padEnd(26)} median ${pct(ts, 50).toFixed(2)}ms  p95 ${pct(ts, 95).toFixed(2)}ms  p99 ${pct(ts, 99).toFixed(2)}ms  max ${Math.max(0, ...ts).toFixed(2)}ms  (n=${ts.length})`);
+  const EXACT_CAP = argNum("--exact-cap", 120); // bound the multi-second exact-DP tail per set
+  const run = (label: string, gen: (rng: () => number) => Counts | null) => {
+    const sampledT: number[] = [];
+    const exactT: number[] = [];
+    let reach = 0;
+    let cliffMiss = 0;
+    let exactCalls = 0;
+    for (let seed = 1; seed <= N; seed++) {
+      const b = gen(mulberry32(seed * 2654435761));
+      if (!b) continue;
+      if (classifyForSelection(cons, table, stateFromCounts(b, cons), BUDGET) !== "reachable") continue;
+      const members = membersOf(b);
+      let t0 = performance.now();
+      const order = minPeakSampledOrder(cons, table, members, BUDGET, 16);
+      sampledT.push(performance.now() - t0);
+      if (exactCalls < EXACT_CAP) {
+        exactCalls++;
+        t0 = performance.now();
+        const exact = minPeakCost(cons, table, members, BUDGET);
+        exactT.push(performance.now() - t0);
+        if (exact <= BUDGET) {
+          reach++;
+          if (!order) cliffMiss++; // exact proves a path exists, but the cheap sampler did not find one
+        }
+      }
+    }
+    console.log(`\n  ${label}:`);
+    summarize("sampled order (tries=16)", sampledT);
+    summarize("exact min-peak DP", exactT);
+    console.log(`    sampler cliff-misses (exact says reachable, sampled found no path): ${cliffMiss}/${reach}`);
+  };
+  console.log(`Build-path engine cost over ${N} seeds each (single-build timings):`);
+  run("typical user-like self-covering builds", (rng) => genSelfCovering(cons, BUDGET, rng));
+  run("pathological tight Affliction-stacks", (rng) => genTargetStack(rng));
+  process.exit(0);
+}
 
 // Emit a shareable planner URL for specific seeds, so a confirmed false-reach can be opened in the
 // running app and seen directly. A fully-completed constellation selects all of its stars. `--url 5563`.
