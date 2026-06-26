@@ -99,11 +99,30 @@ the previously-exhaustive dim searches). The remaining synthetic-model false-rea
 Tell the user a legal click order that reaches their target build, including the non-obvious
 temporary scaffolding (e.g. add the Eldritch Crossroads + Quill to break the Affliction asc4/eld4
 lock, then refund them once the build covers its own requirement). These orders are not obvious by
-hand. This needs a resolver that finds a real CONSTRUCTION ORDER (a witness), not just a boolean - the
-shipped engine returns only reachable/dim. The costed-scaffolding resolver on branch
-`reachability-costed-scaffolding` produces witnesses (`minPeakSampled`/`orderPeak`/`peakToReach`); the
-work is to wire that resolver in for this feature (on demand, not per click) and capture+return the
-witness it already finds. Build on top of the costed engine when this is picked up.
+hand.
+
+v1 SHIPPED (branch `guided-build-order`, tiers 1-2): `buildOrderPath`/`buildOrderEscalated` in
+`web/src/core/reachability.ts` emit a constellation-level `BuildStep[]` schedule with scaffold
+add/refund; `selectionView` computes it live at tries=16 (folded into the perf-guard-timed throat);
+`buildOrderView.ts` renders the right-sidebar step list with art and a "Find valid order" escalation
+button; `main.ts` wires it with map hover-sync. A replay-legality invariant guarantees any path shown
+is a legal construction. The two confirmed false-reaches show the honest "no quick build order" empty
+state and escalation also returns null.
+
+Remaining follow-ups:
+- Tier 3 (bounded exact verify): port `minPeakCost` (branch `reachability-costed-scaffolding`, vendored
+  in `web/scripts/reachability-realmap-hunt.ts`) into `web/src/core` and run it from the "Find valid
+  order" button with a work/time cap, to turn "couldn't find" into a definitive "not buildable at N
+  points" and make the false-reaches provably so. Out of v1 by design.
+- Escalation-recovery test coverage (flagged in the v1 final review): the `buildOrderEscalated` path is
+  tested only for returning null on the genuine false-reach, never for RECOVERING an order that
+  tries=16 missed. Add a synthetic fixture where tries=16 returns null and a higher-tries search
+  returns a replay-legal order, so the escalation button is proven to do something beneficial. A crude
+  4000-seed random scan did not surface a natural cliff-miss; a constructed synthetic model is the
+  likely route.
+- Minor cleanups carried from v1 task reviews: extract the duplicated `esc` HTML helper into a shared
+  `web/src/adapters/html.ts`; tighten the `expect(frView.reach).toBeDefined()` no-op assertion in
+  `reachability.test.ts` to assert the engine actually lit the false-reach reachable.
 
 ## Performance
 
