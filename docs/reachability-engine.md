@@ -177,3 +177,37 @@ Results: real-model false-dims 0 (`just validate-reach` Part B); Vulture/Ghoul a
 35 ms (max 312 -> 55 ms) on `just perf` - the witness short-circuits the previously-exhaustive dim
 searches on now-reachable candidates. The remaining synthetic-model false-reach is the separate
 soundness gap A (the greedy/free-seed mechanism), untouched here.
+
+## Update 2026-06-25: shape-biased fuzz - the false-reach is NOT purely a scarcity artifact
+
+Earlier (the false-reach audit above) the working theory was that the engine's false-reach is a
+synthetic-random-model artifact that does not manifest on the real model, because the model's affinity
+abundance means the construction peak never binds. The shape-biased fuzzer (`just shape-fuzz`,
+`web/scripts/reachability-shape-fuzz.ts`) tests that theory directly. It generates small models the
+exhaustive BFS oracle can still verify, but biased so most constellations are the shape that caused our
+real-world false-DIMS - a MULTI-COLOR requirement that grants those same colors back but not enough to
+self-pay (Affliction, Vulture, Ghoul, Oklaine) - and tops up requirement-free providers so every
+requirement is genuinely achievable (real-map-like abundance, not scarcity).
+
+Finding: with selections biased to STACK two such constellations near a tight budget, the engine produces
+false-reaches that are NOT scarcity artifacts. Example (seed 8, budget 13): `b0` needs {A:4 E:3} gives
+{A:1 E:1}; `b1` needs {B:4 D:2 E:3} gives {B:1 D:1 E:2}; every color is abundantly provided. The full
+stack `b0+b1` has a valid 12-star completion within 13, but it cannot be CONSTRUCTED within budget: each
+constellation permanently needs external affinity it never fully pays back, and you must hold one's
+bootstrap scaffold while starting the other, so the construction peak exceeds the budget. The engine's
+free-seed model reasons about final totals and misses the peak, so it lights the build. The BFS oracle
+(which never exceeds budget at any step) confirms it is unreachable.
+
+So the gap-A false-reach mechanism (free seed / ignoring the construction peak) CAN fire in the abundance
+regime, specifically on tight builds that stack multiple multi-color partial-self-payback constellations -
+exactly the shape of our hardest real cases. This weakens the "synthetic-only" conclusion: the audit that
+reached it checked complete self-covering builds and did not compute an exact min-peak, so it did not
+cover partial-selection stackings. The open, decisive question is whether the REAL map has a tight
+~55-point build that stacks enough Affliction-like constellations to overflow the peak. Answering it
+needs an exact-min-peak oracle (the costed-scaffolding engine's `exactMinPeak`) run over tight real-map
+stacks - not the BFS oracle, which does not scale to the real model. Until that hunt runs, treat the
+real-map false-reach rate as "none found, but not established as zero for this pattern".
+
+The same fuzz run also shows residual false-DIMS on these stacked synthetic builds (the `tries=0` gate
+witness overshooting); real-model false-dims remain 0 (`just validate-reach` Part B), so this is a
+synthetic-model conservatism, not a real-map regression.

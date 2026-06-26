@@ -33,19 +33,27 @@ freezes. The shipped engine is the right default; the costed alternate (branch
 `reachability-costed-scaffolding`) is kept as a SOUND-by-construction oracle and as the substrate
 for guided build order, not as the per-click engine.
 
-### A. Soundness gap (false-reach on the resolver) - AUDITED 2026-06-25: does not manifest on real model
-Against the independent BFS oracle on random small models, the resolver false-reaches on a few dozen
-of the sampled models - it calls some unreachable selections reachable. The audit (`just
-audit-false-reach`) localized it: `greedyFrom` (~79%) and the exact resolver (~21%) both treat the
-crossroads seed as free and always-held, so they ignore that scaffolding costs budget at the
-construction PEAK; the peak witness emits zero false-reaches. On random models the rate is
-budget-independent (~5-6% from budget 8 to 40), so the oracle test stays `test.failing` as a guard on
-the mechanism. BUT a real-model upper bound (4000 self-covering builds; the sound peak witness
-confirmed a real construction for all 3102 greedy-reachable ones, 0 suspects) puts the real-model
-false-reach rate at ~0% - the model's affinity abundance means the peak never binds. So this is a
-synthetic-model artifact; we do NOT plan the expensive sound dim-proving fix. See
-`docs/reachability-engine.md` "Update 2026-06-25: false-reach audit". Re-run the audit after any
-resolver change.
+### A. Soundness gap (false-reach on the resolver) - real-map status NOT established as zero (revised)
+Against the independent BFS oracle on random small models, the resolver false-reaches on some sampled
+models - it calls some unreachable selections reachable. The audit (`just audit-false-reach`) localized
+it: `greedyFrom` (~79%) and the exact resolver (~21%) both treat the crossroads seed as free and
+always-held, so they ignore that scaffolding costs budget at the construction PEAK; the peak witness
+emits zero false-reaches. On random models the rate is budget-independent (~5-6%), so the oracle test
+stays `test.failing` as a guard on the mechanism. A first real-model upper bound (4000 self-covering
+COMPLETE builds, 0 suspects) suggested the rate was ~0% on the real model.
+
+REVISED 2026-06-25 (`just shape-fuzz`): that "synthetic-only" conclusion is too strong. The shape-biased
+fuzzer shows the SAME free-seed mechanism fires in the ABUNDANCE regime (every requirement achievable,
+not scarce) whenever two multi-color partial-self-payback constellations - the Affliction/Vulture shape -
+are stacked in a tight budget: their combined permanent + bootstrap scaffold overflows the construction
+peak, but the engine (final-totals reasoning) lights the build. The earlier audit missed this because it
+checked complete self-covering builds, not partial-selection stackings, and did not compute an exact
+min-peak. So the real-map false-reach rate is "none found yet, NOT established as zero for this pattern".
+The decisive next step is a targeted real-map hunt over tight builds that stack Affliction-like
+constellations, using the costed engine's exact `exactMinPeak` as the oracle (the BFS oracle does not
+scale to the real model). If it manifests, the fix is the expensive sound dim-proving (exact min-peak in
+the resolver) we previously deferred. See `docs/reachability-engine.md` "Update 2026-06-25: shape-biased
+fuzz". Re-run the audit + shape-fuzz after any resolver change.
 
 ### B. Tight-build false-dims (FIXED 2026-06-25)
 The resolver wrongly dimmed some constructor-confirmed-reachable TIGHT near-55-point builds. A sound

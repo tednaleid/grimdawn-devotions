@@ -272,6 +272,13 @@ validate-wasm:
 audit-false-reach:
     cd "{{justfile_directory()}}/web" && bun scripts/audit-false-reach.ts
 
+# Shape-biased reachability fuzz: stress the engine on the shape that caused our real trouble (multi-color
+# requirement, partial self-payback) at real-map-like abundance, against the BFS oracle in both directions.
+# Surfaces the construction-PEAK false-reach when two such constellations are stacked in a tight budget.
+# Flags: --seeds N --start S --dump K.  See docs/reachability-engine.md "shape-biased fuzz".
+shape-fuzz *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/reachability-shape-fuzz.ts {{ARGS}}
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
