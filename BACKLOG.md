@@ -33,27 +33,37 @@ freezes. The shipped engine is the right default; the costed alternate (branch
 `reachability-costed-scaffolding`) is kept as a SOUND-by-construction oracle and as the substrate
 for guided build order, not as the per-click engine.
 
-### A. Soundness gap (false-reach on the resolver) - real-map status NOT established as zero (revised)
+### A. Soundness gap (false-reach on the resolver) - CONFIRMED on the real map 2026-06-25
 Against the independent BFS oracle on random small models, the resolver false-reaches on some sampled
 models - it calls some unreachable selections reachable. The audit (`just audit-false-reach`) localized
 it: `greedyFrom` (~79%) and the exact resolver (~21%) both treat the crossroads seed as free and
 always-held, so they ignore that scaffolding costs budget at the construction PEAK; the peak witness
 emits zero false-reaches. On random models the rate is budget-independent (~5-6%), so the oracle test
 stays `test.failing` as a guard on the mechanism. A first real-model upper bound (4000 self-covering
-COMPLETE builds, 0 suspects) suggested the rate was ~0% on the real model.
+COMPLETE builds, 0 suspects) suggested the rate was ~0% on the real model - but that audit was too weak
+(complete builds only, no exact min-peak).
 
-REVISED 2026-06-25 (`just shape-fuzz`): that "synthetic-only" conclusion is too strong. The shape-biased
-fuzzer shows the SAME free-seed mechanism fires in the ABUNDANCE regime (every requirement achievable,
-not scarce) whenever two multi-color partial-self-payback constellations - the Affliction/Vulture shape -
-are stacked in a tight budget: their combined permanent + bootstrap scaffold overflows the construction
-peak, but the engine (final-totals reasoning) lights the build. The earlier audit missed this because it
-checked complete self-covering builds, not partial-selection stackings, and did not compute an exact
-min-peak. So the real-map false-reach rate is "none found yet, NOT established as zero for this pattern".
-The decisive next step is a targeted real-map hunt over tight builds that stack Affliction-like
-constellations, using the costed engine's exact `exactMinPeak` as the oracle (the BFS oracle does not
-scale to the real model). If it manifests, the fix is the expensive sound dim-proving (exact min-peak in
-the resolver) we previously deferred. See `docs/reachability-engine.md` "Update 2026-06-25: shape-biased
-fuzz". Re-run the audit + shape-fuzz after any resolver change.
+CONFIRMED 2026-06-25 (`just realmap-hunt`): the gap IS real on the Grim Dawn map, not synthetic-only.
+The hunt generates tight near-55-point self-covering real builds that stack the 8 Affliction-like target
+shapes (multi-color requirement, partial self-payback: Amatok, Assassin, Dire Bear, Rhowan's Crown,
+Rhowan's Scepter, Shieldmaiden, Solael's Witchblade, Ulo), checks which the shipped engine lights, and
+proves construction feasibility with the order-exact min-peak DP `minPeakCost` (vendored from branch
+`reachability-costed-scaffolding`). Over 50k seeds: 44,361 lit builds, 44,359 with a real <=55
+construction order (sound witnesses), and 2 CONFIRMED false-reaches - 55-point builds the engine lights
+whose exact min construction peak is 56 (off by one). Reproducible: `just realmap-hunt --probe 5563` and
+`--probe 41966`. Mechanism: the build is self-covering and fits 55 permanently, but every construction
+order must transiently hold one extra scaffold point to bootstrap the multi-color reqs, overflowing the
+peak; the engine lights it via the seed-only `constructible()` fast path that ignores the peak. Rate is
+low (~2 / 44k lit tight-stacks) but real and in-game-relevant.
+
+THE FIX (deferred decision): gate the order-exact min-peak into `reachableExactFrom` (and its Rust port
+`web/wasm/src/lib.rs`) for the suspect shape only - tight self-covering builds lit via the
+`constructible()` fast path - so the per-click cost stays bounded (the DP only fires on near-budget
+self-covering candidates, not the whole sweep). `minPeakCost` is the exact arbiter; the existing
+`minPeakSampled` is the cheap pre-filter. Re-run `just realmap-hunt` + `just shape-fuzz` + `just
+validate-reach` + `just validate-wasm` after any resolver change. See `docs/reachability-engine.md`
+"Update 2026-06-25". Note: this same exact oracle is also what guided-build-order needs
+(`docs/superpowers/specs/2026-06-25-guided-build-order-design.md`).
 
 ### B. Tight-build false-dims (FIXED 2026-06-25)
 The resolver wrongly dimmed some constructor-confirmed-reachable TIGHT near-55-point builds. A sound

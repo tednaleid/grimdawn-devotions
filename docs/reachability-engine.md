@@ -211,3 +211,44 @@ real-map false-reach rate as "none found, but not established as zero for this p
 The same fuzz run also shows residual false-DIMS on these stacked synthetic builds (the `tries=0` gate
 witness overshooting); real-model false-dims remain 0 (`just validate-reach` Part B), so this is a
 synthetic-model conservatism, not a real-map regression.
+
+## Update 2026-06-25: real-map hunt - the false-reach is CONFIRMED on the Grim Dawn map
+
+The open question above is now answered: YES, the real map has tight builds the engine wrongly lights.
+The hunt (`just realmap-hunt`, `web/scripts/reachability-realmap-hunt.ts`) generates tight near-55-point
+self-covering REAL builds that stack the 8 Affliction-like target shapes on the map (Amatok, Assassin,
+Dire Bear, Rhowan's Crown, Rhowan's Scepter, Shieldmaiden, Solael's Witchblade, Ulo), asks the shipped
+engine which it lights, and decides construction feasibility with an order-exact min-peak DP.
+
+It is a two-stage check. Stage 1, on every lit build: `minPeakSampled` (128 tries) samples real
+add/refund construction orders; a peak <= 55 is a SOUND reachability witness (the order is an actual
+construction), so the build is reachable and the engine is correct - it cannot be a false-reach. Only
+builds with no witnessing order are SUSPECTS. Stage 2, on suspects only (a handful): `minPeakCost` (the
+order-exact min-peak DP over the build's granting members, vendored from branch
+`reachability-costed-scaffolding`) decides definitively - peak <= 55 means the sampler merely missed a
+good order; peak > 55 means NO order builds it within budget, a confirmed false-reach. The exact DP is
+far too slow to run on every build (its `peakToReach` searches ~100 real scaffolds), which is why the
+sound sampled filter front-runs it.
+
+Result over 50,000 seeds: 45,656 tight stacks generated, 44,361 lit, 44,359 witnessed reachable, and
+2 CONFIRMED false-reaches - both 55-point builds whose exact min construction peak is 56 (off by one):
+
+- `--probe 5563`: Akeron's Scorpion + Fiend + Lion + Mantis + Wretch + Assassin + Dire Bear + Revenant
+  + Rhowan's Crown + Solael's Witchblade + Ulo
+- `--probe 41966`: Bull + Eye of the Guardian + Imp + Vulture + Bard's Harp + Dire Bear + Manticore +
+  Revenant + Rhowan's Crown + Staff of Rattosh
+
+Mechanism exactly as the shape fuzz predicted: the build is self-covering and fits 55 points permanently,
+but every construction order must transiently hold one extra scaffold point to bootstrap the stacked
+multi-color requirements, so the peak hits 56. The engine lights it via the seed-only `constructible()`
+fast path in `reachableExactFrom`, which reasons about final totals and ignores the construction peak.
+The rate is low (~2 / 44k lit tight-stacks) but the cases are real and in-game-reachable-looking.
+
+The fix (decision pending): gate `minPeakCost` into `reachableExactFrom` and its Rust port
+(`web/wasm/src/lib.rs`) for the suspect shape only - tight self-covering builds lit via the
+`constructible()` fast path - keeping the per-click cost bounded because the exact DP fires only on
+near-budget self-covering candidates, not the whole sweep. This is the "expensive sound dim-proving"
+previously deferred, now scoped tightly enough to be affordable. The same `minPeakCost` is also the
+oracle guided-build-order needs (a sampled order can miss the one valid sequence at the 55-point cliff;
+see `docs/superpowers/specs/2026-06-25-guided-build-order-design.md`). After any resolver change, re-run
+`just realmap-hunt`, `just shape-fuzz`, `just validate-reach`, and `just validate-wasm`.

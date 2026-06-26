@@ -279,6 +279,13 @@ audit-false-reach:
 shape-fuzz *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/reachability-shape-fuzz.ts {{ARGS}}
 
+# Real-map false-reach hunt: generate tight near-budget self-covering REAL builds that stack the
+# Affliction-like shape, ask the SHIPPED engine if it lights them, and PROVE which are unconstructible
+# within 55 via the costed branch's exactMinPeak (vendored as a 3-way oracle). A build the engine lights
+# that the oracle proves unreachable is a confirmed real-map false-reach. Flags: --seeds N --start S --dump K.
+realmap-hunt *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/reachability-realmap-hunt.ts {{ARGS}}
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
