@@ -41,3 +41,12 @@ test("peakToReach without opts is unchanged (no allocation, same size)", () => {
   const table = buildCoverTable(cons);
   expect(peakToReach(cons, table, v(1, 0, 1))).toBe(2);
 });
+
+test("peakToReach clears collect array on zero-deficit early return", () => {
+  const cons = [cx(0), cx(2), anchor(v(1, 0, 1))];
+  const table = buildCoverTable(cons);
+  const collect = [cx(0)]; // stale content
+  const size = peakToReach(cons, table, z(), z(), 300_000, { collect });
+  expect(size).toBe(0);
+  expect(collect.length).toBe(0);
+});

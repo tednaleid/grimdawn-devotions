@@ -419,18 +419,21 @@ export function peakToReach(
     Math.max(0, deficit[3]),
     Math.max(0, deficit[4]),
   ];
-  if (need[0] === 0 && need[1] === 0 && need[2] === 0 && need[3] === 0 && need[4] === 0) return 0;
+  if (need[0] === 0 && need[1] === 0 && need[2] === 0 && need[3] === 0 && need[4] === 0) {
+    if (opts?.collect) opts.collect.length = 0;
+    return 0;
+  }
   const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
   const ratio = (c: ReachCon) => (c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4]) / c.size;
-  const reqFree = (c: ReachCon) =>
-    c.req[0] === 0 && c.req[1] === 0 && c.req[2] === 0 && c.req[3] === 0 && c.req[4] === 0;
-  const scaffolds = cons
-    .filter(grants)
-    .sort(
-      opts?.preferSmall
-        ? (a, b) => (reqFree(b) ? 1 : 0) - (reqFree(a) ? 1 : 0) || a.size - b.size || ratio(b) - ratio(a)
-        : (a, b) => ratio(b) - ratio(a),
-    );
+  const scaffolds = cons.filter(grants).sort(
+    opts?.preferSmall
+      ? (a, b) => {
+          const reqFree = (c: ReachCon) =>
+            c.req[0] === 0 && c.req[1] === 0 && c.req[2] === 0 && c.req[3] === 0 && c.req[4] === 0;
+          return (reqFree(b) ? 1 : 0) - (reqFree(a) ? 1 : 0) || a.size - b.size || ratio(b) - ratio(a);
+        }
+      : (a, b) => ratio(b) - ratio(a),
+  );
   const used = new Array(scaffolds.length).fill(false);
   let bestUsed: ReachCon[] | null = null;
   let best = INF;
