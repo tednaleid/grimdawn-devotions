@@ -109,11 +109,39 @@ button; `main.ts` wires it with map hover-sync. A replay-legality invariant guar
 is a legal construction. The two confirmed false-reaches show the honest "no quick build order" empty
 state and escalation also returns null.
 
+Shipped after v1: a validation harness (`just build-order-validate`) measured buildOrderPath against the
+exact `minPeakCost` oracle (now shared in `web/test/support/costed-oracle.ts`): 0 false-negatives and 0
+false-positives across 12k self-covering builds, all 104 single-constellation partials, and 6k subsets, so
+the engine is sound and complete in practice where it applies. Honest empty-state copy was added: a
+not-self-covering selection (the Oleron class - 57% of single constellations) now reads "Incomplete build:
+needs N more <affinity>. Add supporting constellations." instead of a misleading "no legal path".
+
 Remaining follow-ups:
+- Supporting-set suggester (the principled Oleron fix): for a not-self-covering selection, suggest the
+  cheapest supporting constellations that complete it and order the whole build, turning "Incomplete build"
+  into actionable guidance. A spike proved this viable: an exact min-stars knapsack DP over the affinity
+  deficit (the capped affinity space is only ~917k states, so it is tractable, not NP-hard at our scale)
+  gives optimal, sensible support sets when correct (Oleron -> +24 support, 31-point total, matching the
+  engine `minCost` floor; same for Light of Empyrion, Ultos, Tsunami). TWO real problems to solve first:
+  (1) the deficit-DP ignores that a support constellation has its OWN affinity requirement, so it
+  undercounts when support needs support (Ulo, Blind Sage, Crab, Hydra came in below the engine floor) -
+  make it self-consistent (iterate: add support, fold in its requirement, re-solve) or extract the witness
+  from the engine's own `minCost` machinery, which already computes the correct total. (2) reconcile a
+  discrepancy the spike surfaced: for Ulo the deficit-DP says 9, `selectionMinCost` says 11, AND
+  `buildOrderPath` returned an order for the 9-point set - those three must agree; investigate whether the
+  9-point final state is genuinely self-covering (minCost loose) or not (buildOrderPath returning an order
+  for a non-self-covering final state would be a real bug). Also decide cheapest-vs-"productive" support
+  (a player wants support that grants stats they want, not just minimal stars - a heuristic layer on the
+  feasibility DP). This needs its own brainstorm/spec/plan.
 - Tier 3 (bounded exact verify): port `minPeakCost` (branch `reachability-costed-scaffolding`, vendored
   in `web/scripts/reachability-realmap-hunt.ts`) into `web/src/core` and run it from the "Find valid
   order" button with a work/time cap, to turn "couldn't find" into a definitive "not buildable at N
-  points" and make the false-reaches provably so. Out of v1 by design.
+  points" and make the false-reaches provably so. Out of v1 by design. NOTE: `minPeakCost` is now shared
+  in `web/test/support/costed-oracle.ts`; a core port can build on that.
+- Background-worker search (Ted's idea): move the escalation off the main thread into a Web Worker that
+  searches continuously, cancelling/restarting on selection change (generation token), bounded so
+  unbuildable selections do not spin forever. Would let the order appear/improve without the manual
+  button. Not started; the message + `minBuildableCap` logic move into the worker unchanged.
 - Escalation-recovery test coverage (flagged in the v1 final review): the `buildOrderEscalated` path is
   tested only for returning null on the genuine false-reach, never for RECOVERING an order that
   tries=16 missed. Add a synthetic fixture where tries=16 returns null and a higher-tries search
