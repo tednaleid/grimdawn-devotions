@@ -410,12 +410,14 @@ main {
 .affinity > span:first-child {
   text-transform: capitalize;
 }
-/* Affinity panel: two columns - current "have" total + wanted-max "need" (red unmet, green met). */
+/* Affinity panel: two columns - current "have" total + wanted-max "need" (red unmet, green met).
+   The rows are clickable grant-filter toggles, so they carry the pointer affordance always. */
 .affinity {
   display: grid;
   grid-template-columns: 1fr auto auto;
   gap: 0.6rem;
   align-items: baseline;
+  cursor: pointer;
 }
 .affinity-head {
   display: grid;
@@ -463,7 +465,6 @@ main {
 .affinity.vsel {
   box-shadow: inset 3px 0 0 #e3c97a;
   border-radius: 4px;
-  cursor: pointer;
 }
 /* Full-width divider between the Affinity panel and the "Available to get" list below it. */
 .panel-sep {
