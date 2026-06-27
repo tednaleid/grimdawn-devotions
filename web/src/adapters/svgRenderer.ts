@@ -257,8 +257,8 @@ export interface SvgHandle {
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
   manifest: AssetManifest | null;
-  onStarClick(id: StarId): void;
-  onConstellationClick(id: string): void;
+  onStarClick(id: StarId, clientX: number, clientY: number): void;
+  onConstellationClick(id: string, clientX: number, clientY: number): void;
   onHover(target: HoverTarget, clientX: number, clientY: number): void;
 }
 
@@ -289,13 +289,14 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
   }
 
   container.addEventListener("click", (e) => {
+    const me = e as MouseEvent;
     const sid = (e.target as Element)?.getAttribute?.("data-star-id");
     if (sid) {
-      deps.onStarClick(sid);
+      deps.onStarClick(sid, me.clientX, me.clientY);
       return;
     }
-    const cid = conAt((e as MouseEvent).clientX, (e as MouseEvent).clientY);
-    if (cid) deps.onConstellationClick(cid);
+    const cid = conAt(me.clientX, me.clientY);
+    if (cid) deps.onConstellationClick(cid, me.clientX, me.clientY);
   });
   container.addEventListener("mousemove", (e) => {
     const sid = (e.target as Element)?.getAttribute?.("data-star-id");

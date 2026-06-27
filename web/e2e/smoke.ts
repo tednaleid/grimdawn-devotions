@@ -425,6 +425,43 @@ try {
   await Bun.sleep(150);
   check((await vbWidth()) > afterPinch + 1, "double-tap refits the map (viewBox returns toward base)");
 
+  // Reset the point cap to max (the earlier "Available to get empties" check set it to curMin=1,
+  // which locks all other stars; End key restores the cap to 55 so stars are selectable again).
+  await cdp.evaluate(
+    `(() => { const b = document.getElementById('point-bar'); b.focus(); b.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true })); })()`,
+  );
+  await Bun.sleep(150);
+
+  // Tap-to-inspect: in touch mode a tap shows the popover with an Add button and does NOT change selection.
+  const tapStar = await cdp.evaluate<string>(
+    "document.querySelector('circle.hit.selectable:not(.selected)')?.getAttribute('data-star-id') || ''",
+  );
+  check(tapStar.length > 0, "found a selectable star to tap-inspect");
+  const selCountBefore = await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length");
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="${tapStar}"]').dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:195,clientY:300}))`,
+  );
+  await Bun.sleep(150);
+  check(
+    await cdp.evaluate<boolean>("!!document.querySelector('#tooltip .tip-commit')"),
+    "touch tap shows the popover with a commit button",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length")) === selCountBefore,
+    "a bare touch tap does not change the selection",
+  );
+  check(
+    await cdp.evaluate<boolean>("!document.querySelector('#tooltip .tip-commit').disabled"),
+    "the Add button is enabled for a clickable star",
+  );
+  // Pressing the commit button selects it.
+  await cdp.evaluate("document.querySelector('#tooltip .tip-commit').click()");
+  await Bun.sleep(200);
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length")) === selCountBefore + 1,
+    "the popover Add button commits the selection",
+  );
+
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
   if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log(`    console: ${e}`);
 

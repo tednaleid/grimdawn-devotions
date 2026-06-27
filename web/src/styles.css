@@ -828,3 +828,22 @@ body.narrow #drawer-scrim.show {
   z-index: 25;
   background: rgba(0, 0, 0, 0.5);
 }
+
+/* Touch popover commit button (only present in the interactive popover, not the passive hover tooltip). */
+.tip-commit {
+  display: block;
+  margin-top: 0.5rem;
+  width: 100%;
+  background: #21262d;
+  color: #e6edf3;
+  border: 1px solid #6cb6ff;
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.tip-commit:disabled {
+  border-color: #30363d;
+  color: #6e7681;
+  cursor: not-allowed;
+}

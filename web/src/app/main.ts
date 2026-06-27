@@ -8,6 +8,7 @@ import { buildOrderHtml, type NoOrderInfo } from "../adapters/buildOrderView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleDrawer, type DrawerState } from "../core/drawerState";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
+import { commitButton, type CommitTarget } from "../core/commitAction";
 import {
   buildReachCons,
   selectionView,
@@ -98,6 +99,8 @@ async function boot() {
   const rightBtn = document.getElementById("drawer-right-btn") as HTMLButtonElement;
   const scrim = document.getElementById("drawer-scrim") as HTMLElement;
   const tip = tooltipView(tooltipEl);
+  const isTouch = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
+  let popoverTarget: CommitTarget | null = null; // the star/constellation the open popover commits
   // Max devotion points = the bar's full extent; the slider floor is the validity minimum (curMin).
   const MAX_POINTS = 55;
   let curMin = 0; // selectionMinCost for the current selection, recomputed each refresh
@@ -172,14 +175,22 @@ async function boot() {
 
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
-    onStarClick: (id) => {
+    onStarClick: (id, x, y) => {
+      if (isTouch()) {
+        showCommitPopover({ kind: "star", id }, x, y);
+        return;
+      }
       const next = toggleStar(model, state, reach, id);
       if (next !== state) {
         state = next;
         refresh();
       }
     },
-    onConstellationClick: (id) => {
+    onConstellationClick: (id, x, y) => {
+      if (isTouch()) {
+        showCommitPopover({ kind: "constellation", id }, x, y);
+        return;
+      }
       const next = toggleConstellation(model, state, reach, id);
       if (next !== state) {
         state = next;
@@ -484,6 +495,38 @@ async function boot() {
   rightBtn.addEventListener("click", () => setDrawer(toggleDrawer(drawer, "right")));
   scrim.addEventListener("click", () => setDrawer("none"));
   updateNarrow();
+
+  // Touch popover: show the inspect tooltip with an Add/Remove button; commit only via that button.
+  function showCommitPopover(target: CommitTarget, x: number, y: number) {
+    popoverTarget = target;
+    const totals = affinityTotals(model, state.selected);
+    const btn = commitButton(model, state.selected, reach, target);
+    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn);
+    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn);
+  }
+  function commitPopover() {
+    if (!popoverTarget) return;
+    const next =
+      popoverTarget.kind === "star"
+        ? toggleStar(model, state, reach, popoverTarget.id)
+        : toggleConstellation(model, state, reach, popoverTarget.id);
+    popoverTarget = null;
+    tip.hide();
+    if (next !== state) {
+      state = next;
+      refresh();
+    }
+  }
+  // The button lives inside the tooltip; a tap anywhere else dismisses the popover.
+  tooltipEl.addEventListener("click", (e) => {
+    if ((e.target as Element)?.closest?.(".tip-commit")) commitPopover();
+  });
+  document.addEventListener("pointerdown", (e) => {
+    if (popoverTarget && !tooltipEl.contains(e.target as Node)) {
+      popoverTarget = null;
+      tip.hide();
+    }
+  });
 
   refresh();
 }

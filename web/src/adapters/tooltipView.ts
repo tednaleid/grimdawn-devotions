@@ -85,6 +85,12 @@ function affinitySections(con: Constellation, totals?: AffinityTotals): string {
   );
 }
 
+// The interactive commit button for the touch popover; empty in passive (hover) mode.
+function commitHtml(commit?: { label: string; enabled: boolean }): string {
+  if (!commit) return "";
+  return `<button class="tip-commit" type="button"${commit.enabled ? "" : " disabled"}>${commit.label}</button>`;
+}
+
 export function tooltipView(el: HTMLElement) {
   // Position near the cursor, but flip to the left/above and clamp so the tooltip
   // stays fully on screen (measured after it is shown so its size is known).
@@ -106,12 +112,20 @@ export function tooltipView(el: HTMLElement) {
     el.style.top = `${top}px`;
   }
   return {
-    show(model: DevotionModel, starId: StarId, clientX: number, clientY: number, totals?: AffinityTotals) {
+    show(
+      model: DevotionModel,
+      starId: StarId,
+      clientX: number,
+      clientY: number,
+      totals?: AffinityTotals,
+      commit?: { label: string; enabled: boolean },
+    ) {
       const star = model.stars.get(starId);
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? powerHtml(star.celestialPower) : "";
-      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${weaponReqHtml(star.weaponRequirement?.description)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}`;
+      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${weaponReqHtml(star.weaponRequirement?.description)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}${commitHtml(commit)}`;
+      el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
     showConstellation(
@@ -121,6 +135,7 @@ export function tooltipView(el: HTMLElement) {
       clientY: number,
       totals?: AffinityTotals,
       dim?: { needs?: number; cap: number },
+      commit?: { label: string; enabled: boolean },
     ) {
       const con = model.constellations.get(conId);
       if (!con) return;
@@ -149,11 +164,13 @@ export function tooltipView(el: HTMLElement) {
         : distinctReqs
             .map((d) => `<div class="tip-weapon-req">Some bonuses require ${d.replace(/^Requires\s+/i, "")}</div>`)
             .join("");
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${weaponReq}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}`;
+      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${weaponReq}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}${commitHtml(commit)}`;
+      el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
     hide() {
       el.style.display = "none";
+      el.style.pointerEvents = "";
     },
   };
 }
