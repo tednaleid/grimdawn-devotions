@@ -830,6 +830,14 @@ body.narrow #drawer-scrim.show {
   z-index: 25;
   background: rgba(0, 0, 0, 0.5);
 }
+/* Narrow top bar: let the slider shrink and drop the "total" word so the point count
+   (the cap-toggle) and Reset stay on-screen instead of overflowing off the right edge. */
+body.narrow #point-bar {
+  min-width: 90px;
+}
+body.narrow #total-word {
+  display: none;
+}
 
 /* Touch popover commit button (only present in the interactive popover, not the passive hover tooltip). */
 .tip-commit {

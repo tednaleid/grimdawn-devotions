@@ -367,6 +367,12 @@ try {
     "below the breakpoint the layout collapses (body.narrow)",
   );
   check(
+    await cdp.evaluate<boolean>(
+      "(() => { const r = document.getElementById('cap-toggle').getBoundingClientRect(); return r.width > 0 && r.right <= window.innerWidth; })()",
+    ),
+    "the point total stays on-screen in the narrow top bar",
+  );
+  check(
     (await cdp.evaluate<string>("getComputedStyle(document.getElementById('drawer-left-btn')).display")) !== "none",
     "corner toggle buttons are visible when narrow",
   );
