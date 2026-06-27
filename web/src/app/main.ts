@@ -519,8 +519,9 @@ async function boot() {
       refresh();
     }
   }
-  // The button lives inside the tooltip; a tap anywhere else dismisses the popover.
-  tooltipEl.addEventListener("click", (e) => {
+  // Commit on pointerup, not click: iOS Safari can swallow the synthetic click on a just-shown popover,
+  // but the low-level pointerup always fires. The button only exists in touch mode, so pointerup is safe.
+  tooltipEl.addEventListener("pointerup", (e) => {
     if ((e.target as Element)?.closest?.(".tip-commit")) commitPopover();
   });
   document.addEventListener("pointerdown", (e) => {

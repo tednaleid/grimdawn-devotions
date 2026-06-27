@@ -28,6 +28,9 @@ header {
   padding: 0.5rem 1rem;
   background: #161b22;
   border-bottom: 1px solid #30363d;
+  /* Dragging the slider must never select header text (-webkit- is required on iOS Safari). */
+  -webkit-user-select: none;
+  user-select: none;
 }
 /* Points group (label + bar + total) on the left, reset controls pushed to the right. */
 .plabel {
@@ -116,6 +119,7 @@ header button:active {
   background: #30363d;
   cursor: pointer;
   touch-action: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 #point-bar:focus-visible {
@@ -844,13 +848,16 @@ body.narrow #total-word {
   display: block;
   margin-top: 0.5rem;
   width: 100%;
+  min-height: 44px;
   background: #21262d;
   color: #e6edf3;
   border: 1px solid #6cb6ff;
   border-radius: 6px;
-  padding: 0.4rem 0.75rem;
-  font-size: 0.85rem;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
   cursor: pointer;
+  /* A comfortable touch target, and manipulation disables iOS double-tap-zoom delay on the button. */
+  touch-action: manipulation;
 }
 .tip-commit:disabled {
   border-color: #30363d;

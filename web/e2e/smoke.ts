@@ -447,8 +447,10 @@ try {
     await cdp.evaluate<boolean>("!document.querySelector('#tooltip .tip-commit').disabled"),
     "the Add button is enabled for a clickable star",
   );
-  // Pressing the commit button selects it.
-  await cdp.evaluate("document.querySelector('#tooltip .tip-commit').click()");
+  // Pressing the commit button selects it. The commit fires on pointerup (iOS can swallow click).
+  await cdp.evaluate(
+    "document.querySelector('#tooltip .tip-commit').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerType: 'touch' }))",
+  );
   await Bun.sleep(200);
   check(
     (await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length")) === selCountBefore + 1,
