@@ -304,6 +304,12 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     container.classList.toggle("con-hover", !sid && !!cid);
     deps.onHover(target, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
   });
+  // Leaving the map clears any hover so the tooltip never lingers over a sidebar (mousemove alone
+  // stops firing at the container edge, so it would otherwise stay painted).
+  container.addEventListener("mouseleave", (e) => {
+    container.classList.remove("con-hover");
+    deps.onHover(null, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
+  });
 
   // A box around a constellation's stars, drawn as the last SVG child so no layer paints over it. Sized to
   // the star bounding box (plus padding) rather than the art texture rect, so it hugs the actual stars.

@@ -249,6 +249,18 @@ try {
     "power tooltip shows the level-25 ability stat lines",
   );
 
+  // Tooltip must hide when the cursor leaves the map (otherwise it stays painted over the sidebar).
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="akeron_s_scorpion:4"]').dispatchEvent(new MouseEvent('mousemove',{bubbles:true,clientX:200,clientY:200}))`,
+  );
+  await cdp.evaluate(
+    `document.getElementById('map-container').dispatchEvent(new MouseEvent('mouseleave',{bubbles:false}))`,
+  );
+  check(
+    (await cdp.evaluate<string>("getComputedStyle(document.getElementById('tooltip')).display")) === "none",
+    "tooltip hides when the cursor leaves the map container",
+  );
+
   // "Available to get" is filtered to benefits still reachable from here: with points to spare it
   // lists items, and once every point is spent (cap lowered to the points used) it empties out.
   const availWithBudget = await cdp.evaluate<number>(
