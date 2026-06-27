@@ -43,33 +43,39 @@ instead of composing. Symptoms found in the current code:
 These are all the same root cause: no element has its final state computed in one
 place, and meaning is encoded in the implicit ordering of a stylesheet.
 
-## The core principle: two channels
+## The core principle: independent axes, each owning a channel
 
-**Brightness (opacity) answers exactly one question: "can I get this within my
-remaining points?"** Nothing else is allowed to move it. This is the
-*attainability* axis, a tri-state: `active` (have it) -> `attainable` (can get
-it) -> `unattainable` (cannot, within budget). Because only one concern owns the
-scalar, there is nothing left to collide.
+Each element resolves three things independently. Two are **axes** that each pick
+a single outcome, so they cannot collide within themselves; the third is a true
+union of additive cues.
 
-**Everything else is an effect, collected as a union.** Selection styling,
-click-immediacy, both filters, and compare-diff are effects in the
-color/saturation/scale/glow/outline channels - never opacity. A union means
-multiple effects coexist on one element (a selected star that is also a
-compare-add, for example).
+- **Brightness (opacity) <- attainability.** Answers exactly one question: "can I
+  get this within my remaining points?" A tri-state: `active` (have it) ->
+  `attainable` (can get it) -> `unattainable` (cannot, within budget). Owns the
+  opacity scalar; nothing else moves it.
+- **Color <- filter relevance.** Owns saturation and the match halo. A
+  priority-resolved outcome: `mute` (filtered out) > `match` (matches a filter) >
+  `identity` (no filter). Like opacity, exactly one outcome - the same discipline
+  generalized to the color channel.
+- **Emphasis <- a union of additive cues.** Active self-glow, selection styling,
+  taken gold, and the compare-diff outline genuinely stack, so these are a union
+  (a selected star that is also a compare-add, for example).
 
-The payoff is that filtering and reachability stop looking alike: reachability
-lives in the brightness channel, filtering lives in the color channel. A user
-reads them without a legend.
+Because the axes own different channels, they combine freely instead of fighting.
+An active constellation that does not match an active filter stays at opacity 1.0
+with its active self-glow (brightness) **and** desaturates (`mute`, color) - it
+reads as "active, but off-filter." No exemptions are needed; the channels just
+coexist. That is the property that cures the original muddiness: reachability and
+filtering can never look like each other, because they live in different
+channels.
 
 ## The model
 
-Opacity is **one value per element** (the matching attainability state). Effects
-are a **union** (every matching trigger contributes; none touch opacity). The
-values below are starting points for the retune, not frozen requirements.
+Values below are starting points for the retune, not frozen requirements.
 
-### Constellation (art image; the identity tint follows the same opacity)
+### Constellation (art image)
 
-Opacity - attainability tri-state:
+Brightness - attainability:
 
 | state | condition | opacity |
 | --- | --- | --- |
@@ -77,18 +83,19 @@ Opacity - attainability tri-state:
 | attainable | `completable` (whole constellation fits budget), not yet complete | ~0.25 |
 | unattainable | not completable within budget (old `unmet` + `unreachable` fold in here) | ~0.12 |
 
-Effects (union):
+Color - affinity-filter relevance (priority-resolved):
 
-| trigger | effect |
-| --- | --- |
-| identity affinity (what it grants) | gradient color wash (the tint) |
-| active | self-glow |
-| affinity-match (provides a filtered color) | colored halo, from the matched colors |
-| affinity non-match (filter on, not active) | `mute` |
+| outcome | condition | treatment |
+| --- | --- | --- |
+| mute | affinity filter on, does not provide a filtered color | desaturate |
+| match | provides a filtered color | colored halo, from the matched colors |
+| identity | no affinity filter | gradient tint (its granted colors) |
+
+Emphasis (union): `active` -> self-glow.
 
 ### Star
 
-Opacity - attainability tri-state:
+Brightness - attainability:
 
 | state | condition | opacity |
 | --- | --- | --- |
@@ -97,23 +104,26 @@ Opacity - attainability tri-state:
 | unattainable | otherwise | ~0.30 |
 
 `active` and `attainable` share brightness; "have it" vs "can get it" is carried
-by effects, not opacity.
+by the color and emphasis channels, not opacity.
 
-Effects (union):
+Color - filter relevance, benefit + affinity (priority-resolved):
 
-| trigger | effect |
-| --- | --- |
-| immediacy: `clickable` now | colored fill + self-glow |
-| immediacy: not clickable | grey fill |
-| selected | white fill + gradient stroke |
-| benefit-match | enlarge + halo, rendered as its own full-opacity layer |
-| benefit non-match (while filtering) | `mute` |
-| affinity non-match (filter on, not selected) | `mute` |
-| compare add / remove | add / remove outline |
+| outcome | condition | treatment |
+| --- | --- | --- |
+| mute | a filter is on and the star is relevant to none (not a benefit-match, not in an affinity-matching constellation) | desaturate |
+| match | grants a filtered benefit | enlarge + halo, rendered as its own full-opacity layer |
+| identity | no filter, or saved from mute by an affinity-matching constellation | colored when `clickable`, grey when locked |
+
+`mute` means "irrelevant to *every* active filter"; matching *any* filter wins,
+so a benefit-match in a constellation that lacks the filtered affinity is
+emphasized, not muted.
+
+Emphasis (union): `selected` -> white fill + gradient stroke; compare add /
+remove -> outline.
 
 ### Edge
 
-Opacity - attainability tri-state:
+Brightness - attainability:
 
 | state | condition | opacity |
 | --- | --- | --- |
@@ -121,12 +131,14 @@ Opacity - attainability tri-state:
 | attainable | in an attainable/completable constellation | 1.0 |
 | unattainable | in an unattainable constellation | ~0.30 |
 
-Effects (union):
+Color - affinity-filter relevance (priority-resolved):
 
-| trigger | effect |
-| --- | --- |
-| taken | gold stroke + glow |
-| affinity non-match (filter on, not taken) | `mute` |
+| outcome | condition | treatment |
+| --- | --- | --- |
+| mute | affinity filter on, its constellation does not provide a filtered color | desaturate |
+| identity | otherwise | normal stroke |
+
+Emphasis (union): `taken` -> gold stroke + glow.
 
 ## How attainability is determined (no reachability-engine changes)
 
@@ -154,10 +166,14 @@ deliberately avoid. Constellation and edge attainability come directly from
 - **`mute`**: drain color toward grey while keeping brightness. An SVG-native
   `feColorMatrix` saturate at a low value (WebKit-safe, like our other filters).
   It replaces every place we currently de-emphasize *for a filter* by dropping
-  opacity. If desaturate-alone reads too weakly, we push further **within the
-  color channel** (more desaturation, lower contrast, slight scale-down) rather
-  than borrowing opacity back - keeping the two channels clean. `active`/selected
-  elements are exempt: your own committed selections keep their identity color.
+  opacity. Because it lives in the saturation channel, it coexists with the
+  brightness and emphasis channels: an `active` or selected element that is
+  filtered out stays bright and glowing yet desaturated, reading as "active,
+  off-filter" - so nothing is exempt from `mute`. A star relevant to *any* active
+  filter (a benefit-match whose constellation lacks the filtered affinity) is
+  resolved as `match`, not `mute`. If desaturate-alone reads too weakly, we push
+  further **within the color channel** (more desaturation, lower contrast, slight
+  scale-down) rather than borrowing opacity back - keeping the channels clean.
 - **Halos as their own layer**: SVG `opacity` dims an element's entire output,
   glow included. So a benefit-match halo on an unattainable (dim) star is drawn
   as its own full-opacity element at the star, not as a filter on the dim dot.
@@ -170,9 +186,11 @@ deliberately avoid. Constellation and edge attainability come directly from
 
 - **Pure `core`** (new module, e.g. `core/displayState.ts`): given the model and
   the current settings (selection, `ReachView`, active filters, compare diff),
-  emits a per-element record: a resolved `opacity` number plus a semantic
-  `effects` union. Effects are semantic, not presentational - an affinity halo
-  carries `Affinity[]`, never hex; `mute` is a flag. Headless-testable.
+  emits a per-element record: a resolved `opacity` number, a resolved color
+  outcome (`mute` / `match` / `identity`, the match carrying its matched
+  `Affinity[]`), and a union of emphasis cues. These are semantic, not
+  presentational - the halo carries affinities, never hex; `mute` is a flag.
+  Headless-testable.
 - **Adapter** (`svgRenderer.ts` + `styles.css`): maps records to SVG. Applies the
   computed opacity directly (data-driven, not via colliding CSS rules), maps
   effect flags to the SVG filter defs / classes, and resolves affinities to
@@ -185,22 +203,26 @@ deliberately avoid. Constellation and edge attainability come directly from
 ## Evergreen documentation
 
 A new living reference under `docs/` (e.g. `docs/display-model.md`) explains the
-architecture in broad strokes: the two-channel principle (brightness =
-attainability, color = filtering/immediacy), why opacity is single-axis (the
-collision history), effects-as-union, the per-element responsibilities, and the
-pure-core/adapter split. It documents the *reasoning and structure*, not the
-specific tuned values (which change). It follows the project's evergreen-doc rule
-(kept current in place, not a change log).
+architecture in broad strokes: the axis principle (brightness <- attainability,
+color <- filter relevance, plus an emphasis union), why each axis owns its own
+channel so they combine without colliding (the collision history that motivated
+it), the per-element responsibilities, and the pure-core/adapter split. It
+documents the *reasoning and structure*, not the specific tuned values (which
+change). It follows the project's evergreen-doc rule (kept current in place, not
+a change log).
 
 ## Testing
 
 - **Pure `core` (`displayState`)**: the heart of the work. Assert each element's
-  opacity tri-state and effect union across signal combinations - reach states,
-  each filter alone and together, selection, compare diff. Specifically lock in:
-  reachability dominates (an unattainable non-matching element keeps its
-  attainability opacity, never a filter value); a benefit-match on an
-  unattainable star still emits its halo effect; `active`/selected elements are
-  exempt from `mute`; affinity halos carry the matched affinities, not colors.
+  brightness tri-state, color outcome, and emphasis union across signal
+  combinations - reach states, each filter alone and together, selection, compare
+  diff. Specifically lock in: brightness only ever reflects attainability (a
+  filter never changes opacity); the color axis resolves `mute` > `match` >
+  `identity`; a benefit-match on an unattainable star still resolves to `match`
+  (halo), and a benefit-match in an affinity-non-matching constellation is
+  `match`, not `mute`; an `active`/selected element that is filtered out still
+  resolves to `mute` while keeping its brightness and emphasis; match halos carry
+  the matched affinities, not colors.
 - **Adapter**: the record-to-SVG mapping - opacity applied as a value, effects to
   the right filters/classes, affinity resolved to color.
 - **e2e**: the existing affinity/benefit-filter smoke checks, retargeted from the
