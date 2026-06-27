@@ -203,9 +203,10 @@ export function renderAffinities(
       // Nothing requires this color: still render the cell (dimmed 0) so both columns stay aligned.
       needCell = `<span class="aff-need none">0</span>`;
     }
-    const vid = affinityTagId("grant", a);
-    const sel = selectedBenefits.has(vid) ? " vsel" : "";
-    return `<div class="affinity affinity-${a}${flash}${sel}" data-vid="${vid}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
+    const grantId = affinityTagId("grant", a);
+    const reqId = affinityTagId("req", a);
+    const sel = selectedBenefits.has(grantId) ? " vsel" : "";
+    return `<div class="affinity affinity-${a}${flash}${sel}" data-gkey="${grantId}" data-gtoggle data-ids="${grantId},${reqId}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
   }).join("");
   el.innerHTML = `<h2>Affinity</h2><div class="affinity-head"><span></span><span class="aff-have">have</span><span class="aff-need-h">need</span></div>${rows}`;
   return totals;

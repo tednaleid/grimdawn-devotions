@@ -55,13 +55,16 @@ test("colors with no requirement show only the current total", () => {
   expect(html).not.toContain("met");
 });
 
-test("every affinity row carries its grant data-vid", () => {
+test("affinity row is a group-toggle (data-gkey/gtoggle/ids) with no data-vid", () => {
   const html = render([0, 0, 0, 0, 0], [0, 0, 0, 0, 0], new Map());
-  expect(html).toContain('data-vid="aff:grant:order"');
-  expect(html).toContain('data-vid="aff:grant:eldritch"');
+  expect(html).toContain('data-gkey="aff:grant:order"');
+  expect(html).toContain("data-gtoggle");
+  expect(html).toContain('data-ids="aff:grant:order,aff:req:order"');
+  expect(html).not.toContain('data-vid="aff:grant:order"');
 });
 
-test("an active grant tag marks its affinity row selected", () => {
+test("an active grant tag marks its affinity row selected (no data-vid on row)", () => {
   const html = render([0, 0, 5, 0, 0], [0, 0, 0, 0, 0], new Map(), new Set(["aff:grant:eldritch"]));
   expect(html).toMatch(/class="affinity affinity-eldritch[^"]*vsel"/);
+  expect(html).not.toContain('data-vid="aff:grant:eldritch"');
 });

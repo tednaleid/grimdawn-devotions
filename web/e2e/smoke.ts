@@ -297,7 +297,7 @@ try {
   // Affinity filter (desktop): clicking an Affinity panel row tags its granted affinity and fades
   // constellations that do not grant it. Toggled off again so later checks see a clean filter state.
   await cdp.evaluate(
-    `document.querySelector('.affinity[data-vid="aff:grant:eldritch"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+    `document.querySelector('.affinity.affinity-eldritch').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
   );
   await Bun.sleep(120);
   check(
@@ -315,7 +315,7 @@ try {
     "an affinity grant filter glows matching constellations (.aff-glow)",
   );
   await cdp.evaluate(
-    `document.querySelector('.affinity[data-vid="aff:grant:eldritch"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+    `document.querySelector('.affinity.affinity-eldritch').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
   );
   await Bun.sleep(120);
   check(
