@@ -244,7 +244,13 @@ main {
     background 0.1s,
     box-shadow 0.1s;
 }
-.bgroup.gsel {
+/* The single "active filter tag" affordance: a light blue fill + squircle outline, matching the
+   Available-to-get pills. Each element keeps its own border-radius; hover rules light the label. */
+.bgroup.gsel,
+.brow.vsel,
+.affinity.vsel,
+.tip-bonus.vsel,
+.aff.vsel {
   background: rgba(108, 182, 255, 0.08);
   box-shadow: 0 0 0 1.5px rgba(108, 182, 255, 0.6);
 }
@@ -264,8 +270,7 @@ main {
   line-height: 1.45;
 }
 .brow.vsel {
-  background: #20313f;
-  box-shadow: inset 3px 0 0 #e3c97a;
+  border-radius: 4px;
 }
 .brow-lbl {
   flex: 1;
@@ -278,11 +283,9 @@ main {
   color: #d7c89a;
   cursor: pointer;
 }
+.brow-lbl.subj:hover,
 .brow.vsel .brow-lbl.subj {
-  color: #eef2f8;
-}
-.brow-lbl.subj:hover {
-  text-decoration: underline;
+  color: #6cb6ff;
 }
 .brow-lbl.subj.up {
   color: #83c995;
@@ -410,6 +413,9 @@ main {
 .affinity > span:first-child {
   text-transform: capitalize;
 }
+.affinity:hover > span:first-child {
+  color: #6cb6ff;
+}
 /* Affinity panel: two columns - current "have" total + wanted-max "need" (red unmet, green met).
    The rows are clickable grant-filter toggles, so they carry the pointer affordance always. */
 .affinity {
@@ -463,8 +469,7 @@ main {
   animation: flash-down 10s linear;
 }
 .affinity.vsel {
-  box-shadow: inset 3px 0 0 #e3c97a;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 /* Full-width divider between the Affinity panel and the "Available to get" list below it. */
 .panel-sep {
@@ -701,13 +706,11 @@ main {
 }
 /* Active filter tag inside the tooltip: mirror the sidebar's .brow.vsel selected look. */
 .tip-bonus.vsel {
-  background: #20313f;
-  box-shadow: inset 3px 0 0 #e3c97a;
   border-radius: 3px;
 }
 .aff.vsel {
-  background: #20313f;
   border-radius: 3px;
+  padding: 0 2px;
 }
 
 /* Baseline comparison: widened benefits panel + Base/Now/Delta table */
