@@ -1,7 +1,7 @@
 // ABOUTME: Headless tests for the pure display-state resolver.
 // ABOUTME: Synthetic constellations/stars + ReachView keep each case deterministic.
 import { test, expect } from "bun:test";
-import { constellationDisplay, starDisplay, type DisplaySettings } from "../src/core/displayState";
+import { constellationDisplay, starDisplay, edgeDisplay, type DisplaySettings } from "../src/core/displayState";
 import type { Affinity, Constellation, Star as StarT } from "../src/core/types";
 import type { ReachView } from "../src/core/reachability";
 
@@ -132,4 +132,24 @@ test("star diff add/remove flows through", () => {
   const c = con("c", ["c:0"]);
   const d = starDisplay(star("c:0", "c"), c, settings({ diff: { added: new Set(["c:0"]), removed: new Set() } }));
   expect(d.diff).toBe("add");
+});
+
+test("edge brightness: active when taken; else follows the constellation", () => {
+  const c = con("c", ["c:0", "c:1"]);
+  expect(edgeDisplay(c, "c:0", "c:1", settings({ selected: new Set(["c:0", "c:1"]), reach: reach() })).taken).toBe(
+    true,
+  );
+  expect(edgeDisplay(c, "c:0", "c:1", settings({ selected: new Set(["c:0", "c:1"]), reach: reach() })).brightness).toBe(
+    "active",
+  );
+  expect(edgeDisplay(c, "c:0", "c:1", settings({ reach: reach({ completable: new Set(["c"]) }) })).brightness).toBe(
+    "attainable",
+  );
+  expect(edgeDisplay(c, "c:0", "c:1", settings({ reach: reach() })).brightness).toBe("unattainable");
+});
+
+test("edge color: muted when its constellation fails the affinity filter", () => {
+  const c = con("c", ["c:0", "c:1"], { chaos: 2 });
+  const onOrder = settings({ affinityFilter: { grants: new Set<Affinity>(["order"]), requires: new Set() } });
+  expect(edgeDisplay(c, "c:0", "c:1", onOrder).color).toEqual({ kind: "mute" });
 });

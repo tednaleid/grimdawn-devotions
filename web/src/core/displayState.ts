@@ -67,3 +67,18 @@ export function starDisplay(star: Star, con: Constellation, s: DisplaySettings):
   const diff = s.diff ? (s.diff.added.has(star.id) ? "add" : s.diff.removed.has(star.id) ? "remove" : null) : null;
   return { brightness, color, clickable, selected, benefitMatch: s.benefitMatch?.has(star.id) ?? false, diff };
 }
+
+export interface EdgeDisplay {
+  brightness: Brightness;
+  color: { kind: "mute" } | { kind: "identity" };
+  taken: boolean;
+}
+
+export function edgeDisplay(con: Constellation, fromId: StarId, toId: StarId, s: DisplaySettings): EdgeDisplay {
+  const taken = s.selected.has(fromId) && s.selected.has(toId);
+  const conBright = constellationBrightness(con, s);
+  const brightness: Brightness = taken ? "active" : conBright === "unattainable" ? "unattainable" : "attainable";
+  const conColor = constellationColor(con, s);
+  const color: EdgeDisplay["color"] = conColor.kind === "mute" ? { kind: "mute" } : { kind: "identity" };
+  return { brightness, color, taken };
+}
