@@ -169,6 +169,22 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       `</filter>`,
   );
 
+  // Colored glows for active art, taken links, and selectable stars. Same WebKit reason as match-glow:
+  // CSS drop-shadow on SVG renders nothing on iOS. These blur the element's OWN paint (SourceGraphic),
+  // so a single filter glows in each element's own color with no per-color variants. self-glow-art also
+  // lifts brightness to replace the prior brightness(1.15).
+  defs.push(
+    `<filter id="self-glow" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">` +
+      `<feGaussianBlur in="SourceGraphic" stdDeviation="6" result="b"/>` +
+      `<feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>` +
+      `</filter>`,
+    `<filter id="self-glow-art" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">` +
+      `<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="b"/>` +
+      `<feComponentTransfer in="SourceGraphic" result="bright"><feFuncR type="linear" slope="1.15"/><feFuncG type="linear" slope="1.15"/><feFuncB type="linear" slope="1.15"/></feComponentTransfer>` +
+      `<feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="bright"/></feMerge>` +
+      `</filter>`,
+  );
+
   // Gradient defs for every constellation (used by both the star fills and the art tint).
   for (const c of model.constellations.values()) {
     defs.push(
@@ -188,14 +204,11 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const dim = conArtClass(c);
       const act = isActive(c);
       const active = act ? " active" : "";
-      // The active glow uses the constellation's own granted colors (1, or 2 for a gradient), so each
-      // active nebula glows in its identity colors rather than flat white; --glow2 is transparent for
-      // single-color constellations so they get one glow, not a doubled one.
-      const cols = gradColors(c);
-      const glow = act ? ` style="--glow1:${cols[0] ?? "#fff"};--glow2:${cols[1] ?? "transparent"}"` : "";
+      // An active constellation glows in its own art colors via the #self-glow-art SVG filter (see the
+      // .art.active CSS rule); the filter derives the color from the image, so no per-color style is needed.
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
       // data-con-id lets a blocked constellation deselect flash this icon (see main.ts).
-      parts.push(`<image ${img} class="art${dim}${active}"${glow} data-con-id="${c.id}"/>`);
+      parts.push(`<image ${img} class="art${dim}${active}" data-con-id="${c.id}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
         defs.push(`<mask id="${mid}"><image ${img}/></mask>`);

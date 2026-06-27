@@ -528,7 +528,8 @@ main {
 /* A fully-taken segment (both endpoint stars selected) glows gold, like grimtools. */
 .link.taken {
   stroke: var(--link-taken-color);
-  filter: drop-shadow(0 0 2px var(--link-taken-color));
+  /* SVG-native self-glow (#self-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
+  filter: url(#self-glow);
 }
 .art {
   opacity: var(--art-opacity);
@@ -556,7 +557,8 @@ main {
    constellations stand out when zoomed out (a calmer, steady version of the old blocked flash). */
 .art.active {
   opacity: 1;
-  filter: brightness(1.15) drop-shadow(0 0 4px var(--glow1, #fff)) drop-shadow(0 0 4px var(--glow2, transparent));
+  /* SVG-native self-glow + brightness (#self-glow-art); CSS drop-shadow on SVG fails on WebKit/iOS. */
+  filter: url(#self-glow-art);
 }
 .art-tint.active {
   opacity: calc(var(--art-tint-opacity) * 1.35);
@@ -581,7 +583,9 @@ main {
 .star.selectable {
   fill: var(--grad);
   opacity: 1;
-  filter: drop-shadow(0 0 4px var(--affinity));
+  /* SVG-native self-glow (#self-glow); CSS drop-shadow on SVG fails on WebKit/iOS. NOTE: this applies to
+     every selectable star (100+ from empty), so if it janks pan/zoom on mobile, drop the glow here. */
+  filter: url(#self-glow);
 }
 .star.selected {
   fill: #fff;
