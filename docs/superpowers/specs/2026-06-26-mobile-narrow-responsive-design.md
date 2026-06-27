@@ -31,6 +31,37 @@ Consequences of keeping them separate:
 - A phone gets drawers and the tap model.
 - A wide desktop touchscreen gets the tap model at full width.
 
+## Architecture (hexagonal boundaries)
+
+The planner is hexagonal: `core/` is pure domain logic, `ports/` are interfaces,
+`adapters/` do I/O and rendering, and `app/main.ts` is the composition root. This
+work stays inside the adapter and presentation layers; the core is untouched (no
+engine change, no URL-format change, no new ports). Touch is not a new external
+dependency for the core, so it needs no new port: the input adapter is a driving
+adapter, and the pointer-events migration unifies it so one set of gestures
+drives the same `toggleStar` / `toggleConstellation` core operations the mouse
+adapter already calls. One core, multiple driving adapters.
+
+Environment detection stays in adapters/CSS, never in `core/`: viewport width via
+media queries, input modality via `matchMedia('(hover: none) and (pointer:
+coarse)')`. Do not let viewport or touch detection leak into domain code.
+
+Two pieces of genuine logic are pure, DOM-free functions so they are unit
+testable without a browser; the adapters only reflect their output:
+
+- **Drawer view-state** -- the transition for "opening one closes the other;
+  scrim or close dismisses" is a pure function over a small state value. The
+  layout adapter maps its result to classes; it holds no logic of its own.
+- **Popover button legality** -- the Add/Remove label and enabled state are a
+  pure mapping from the engine's existing `clickable` / `completable` /
+  `selected` signals. The tooltip adapter renders that mapping and wires the
+  button to the existing toggle paths.
+
+This is the whole extent of the principle here. Do not introduce a view-state
+port, a modality abstraction, or any framework around a class toggle; that would
+be over-engineering. The payoff is a thin DOM-dependent surface and an honest
+testable surface, not added indirection.
+
 ## Breakpoint
 
 Collapse to drawers when the docked sidebars would take more than half the
