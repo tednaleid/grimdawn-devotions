@@ -8,6 +8,7 @@ import {
   affinityTotals,
   meetsRequirement,
   constellationsMatchingAffinity,
+  matchedAffinities,
 } from "../src/core/affinity";
 
 const model = buildModel(doc as any);
@@ -47,4 +48,15 @@ test("constellationsMatchingAffinity matches granted and required affinities", (
   for (const id of requirers) expect((model.constellations.get(id)!.affinityRequired.eldritch ?? 0) > 0).toBe(true);
 
   expect(constellationsMatchingAffinity(model, new Set(), new Set()).size).toBe(0);
+});
+
+test("matchedAffinities returns only the filter affinities the constellation provides, in canonical order", () => {
+  // Synthetic constellation: grants eldritch + order, requires chaos.
+  const con = { affinityBonus: { eldritch: 3, order: 2 }, affinityRequired: { chaos: 5 } } as any;
+  expect(matchedAffinities(con, new Set(["eldritch"]), new Set())).toEqual(["eldritch"]);
+  expect(matchedAffinities(con, new Set(["order", "eldritch"]), new Set())).toEqual(["eldritch", "order"]); // canonical order
+  expect(matchedAffinities(con, new Set(["chaos"]), new Set())).toEqual([]); // chaos is required, not granted -> no grant match
+  expect(matchedAffinities(con, new Set(), new Set(["chaos"]))).toEqual(["chaos"]);
+  expect(matchedAffinities(con, new Set(), new Set(["order"]))).toEqual([]); // order is granted, not required
+  expect(matchedAffinities(con, new Set(), new Set())).toEqual([]);
 });
