@@ -53,21 +53,34 @@ union of additive cues.
   get this within my remaining points?" A tri-state: `active` (have it) ->
   `attainable` (can get it) -> `unattainable` (cannot, within budget). Owns the
   opacity scalar; nothing else moves it.
-- **Color <- filter relevance.** Owns saturation and the match halo. A
-  priority-resolved outcome: `mute` (filtered out) > `match` (matches a filter) >
-  `identity` (no filter). Like opacity, exactly one outcome - the same discipline
-  generalized to the color channel.
+- **Color <- affinity-filter relevance.** Owns saturation and the match halo. A
+  priority-resolved outcome driven by the *affinity* filter alone: `mute`
+  (desaturate, fails the filter) > `match` (provides a filtered color) >
+  `identity` (no affinity filter). Like opacity, exactly one outcome - the same
+  discipline generalized to the color channel.
 - **Emphasis <- a union of additive cues.** Active self-glow, selection styling,
-  taken gold, and the compare-diff outline genuinely stack, so these are a union
-  (a selected star that is also a compare-add, for example).
+  taken gold, the **benefit-match** enlarge + glow, and the compare-diff outline
+  genuinely stack, so these are a union (a selected star that is also a
+  compare-add, for example).
+
+The two filters live in different channels and never compete: the **affinity
+filter** drives the color axis (mute/enhance), while the **benefit filter** is an
+emphasis (a star that grants the filtered benefit gets bigger and glows). So a
+benefit-matching star in a constellation that fails the affinity filter is simply
+*both at once* - desaturated by the affinity axis **and** enlarged + glowing from
+the benefit emphasis. You can still see it is a benefit match (size + glow) and
+that it is off the affinity filter (greyed); neither overrides the other. The
+benefit filter only *emphasizes* its matches - it does not de-emphasize
+non-matches (a deliberate change from the old behavior, where non-matching stars
+dimmed).
 
 Because the axes own different channels, they combine freely instead of fighting.
-An active constellation that does not match an active filter stays at opacity 1.0
-with its active self-glow (brightness) **and** desaturates (`mute`, color) - it
-reads as "active, but off-filter." No exemptions are needed; the channels just
-coexist. That is the property that cures the original muddiness: reachability and
-filtering can never look like each other, because they live in different
-channels.
+An active constellation that does not match an active affinity filter stays at
+opacity 1.0 with its active self-glow (brightness) **and** desaturates (`mute`,
+color) - it reads as "active, but off-filter." No exemptions are needed; the
+channels just coexist. That is the property that cures the original muddiness:
+reachability and filtering can never look like each other, because they live in
+different channels.
 
 ## The model
 
@@ -106,19 +119,20 @@ Brightness - attainability:
 `active` and `attainable` share brightness; "have it" vs "can get it" is carried
 by the color and emphasis channels, not opacity.
 
-Color - filter relevance, benefit + affinity (priority-resolved):
+Color - affinity-filter relevance (priority-resolved):
 
 | outcome | condition | treatment |
 | --- | --- | --- |
-| mute | a filter is on and the star is relevant to none (not a benefit-match, not in an affinity-matching constellation) | desaturate |
-| match | grants a filtered benefit | enlarge + halo, rendered as its own full-opacity layer |
-| identity | no filter, or saved from mute by an affinity-matching constellation | colored when `clickable`, grey when locked |
+| mute | affinity filter on, its constellation does not provide a filtered color | desaturate |
+| identity | otherwise | colored when `clickable`, grey when locked |
 
-`mute` means "irrelevant to *every* active filter"; matching *any* filter wins,
-so a benefit-match in a constellation that lacks the filtered affinity is
-emphasized, not muted.
+A star carries no affinity halo of its own (that is the constellation's job); the
+affinity axis only mutes its stars or leaves them at identity.
 
-Emphasis (union): `selected` -> white fill + gradient stroke; compare add /
+Emphasis (union): `selected` -> white fill + gradient stroke; `benefit-match`
+(grants a filtered benefit) -> enlarge + glow, rendered as its own full-opacity
+layer so it reads even on an unattainable star (its glow color may be desaturated
+by the affinity axis, but the enlarge + glow appears regardless); compare add /
 remove -> outline.
 
 ### Edge
@@ -166,14 +180,15 @@ deliberately avoid. Constellation and edge attainability come directly from
 - **`mute`**: drain color toward grey while keeping brightness. An SVG-native
   `feColorMatrix` saturate at a low value (WebKit-safe, like our other filters).
   It replaces every place we currently de-emphasize *for a filter* by dropping
-  opacity. Because it lives in the saturation channel, it coexists with the
-  brightness and emphasis channels: an `active` or selected element that is
-  filtered out stays bright and glowing yet desaturated, reading as "active,
-  off-filter" - so nothing is exempt from `mute`. A star relevant to *any* active
-  filter (a benefit-match whose constellation lacks the filtered affinity) is
-  resolved as `match`, not `mute`. If desaturate-alone reads too weakly, we push
-  further **within the color channel** (more desaturation, lower contrast, slight
-  scale-down) rather than borrowing opacity back - keeping the channels clean.
+  opacity (the affinity filter only). Because it lives in the saturation channel,
+  it coexists with the brightness and emphasis channels: an `active` or selected
+  element that fails the affinity filter stays bright and glowing yet desaturated,
+  reading as "active, off-filter" - so nothing is exempt from `mute`. Likewise a
+  benefit-matching star whose constellation fails the affinity filter is muted
+  *and* enlarged + glowing at the same time - the channels do not compete. If
+  desaturate-alone reads too weakly, we push further **within the color channel**
+  (more desaturation, lower contrast, slight scale-down) rather than borrowing
+  opacity back - keeping the channels clean.
 - **Halos as their own layer**: SVG `opacity` dims an element's entire output,
   glow included. So a benefit-match halo on an unattainable (dim) star is drawn
   as its own full-opacity element at the star, not as a filter on the dim dot.
@@ -204,7 +219,8 @@ deliberately avoid. Constellation and edge attainability come directly from
 
 A new living reference under `docs/` (e.g. `docs/display-model.md`) explains the
 architecture in broad strokes: the axis principle (brightness <- attainability,
-color <- filter relevance, plus an emphasis union), why each axis owns its own
+color <- affinity-filter relevance, benefit and other cues as an emphasis union),
+why each axis owns its own
 channel so they combine without colliding (the collision history that motivated
 it), the per-element responsibilities, and the pure-core/adapter split. It
 documents the *reasoning and structure*, not the specific tuned values (which
@@ -217,12 +233,13 @@ a change log).
   brightness tri-state, color outcome, and emphasis union across signal
   combinations - reach states, each filter alone and together, selection, compare
   diff. Specifically lock in: brightness only ever reflects attainability (a
-  filter never changes opacity); the color axis resolves `mute` > `match` >
-  `identity`; a benefit-match on an unattainable star still resolves to `match`
-  (halo), and a benefit-match in an affinity-non-matching constellation is
-  `match`, not `mute`; an `active`/selected element that is filtered out still
-  resolves to `mute` while keeping its brightness and emphasis; match halos carry
-  the matched affinities, not colors.
+  filter never changes opacity); the affinity color axis resolves `mute` >
+  `match` > `identity`; benefit-match is an emphasis independent of the color axis
+  (a benefit-match in an affinity-failing constellation is muted *and* emphasized,
+  and a benefit-match on an unattainable star still emits its enlarge + glow); an
+  `active`/selected element that fails the affinity filter still resolves to
+  `mute` while keeping its brightness and emphasis; match halos carry the matched
+  affinities, not colors.
 - **Adapter**: the record-to-SVG mapping - opacity applied as a value, effects to
   the right filters/classes, affinity resolved to color.
 - **e2e**: the existing affinity/benefit-filter smoke checks, retargeted from the
