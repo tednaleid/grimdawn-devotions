@@ -10,14 +10,14 @@ const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replac
 const AFFINITY = ["Ascendant", "Chaos", "Eldritch", "Order", "Primordial"];
 
 // Why no order is shown, for the empty-state copy:
+// - empty: nothing meaningful to order yet (no selection, or no point cap to assemble within).
 // - incomplete: the selection does not cover its own affinity (deficit per color); it needs other
-//   constellations, so searching cannot help. This is the common partial-selection case (e.g. a capstone alone).
-// - unsearched: the selection is self-covering but the live tries=16 search missed; offer the on-demand search.
-// - searched: the on-demand search ran and found nothing. minCap is the fewest points at which the build does
-//   assemble (<= 55), or null when no legal path exists even at the 55-point game max.
+//   constellations, so no order exists yet. This is the common partial-selection case (e.g. a capstone alone).
+// - searched: the selection is self-covering but no construction order assembles it within budget. minCap is
+//   the fewest points at which it would assemble (<= 55), or null when no legal path exists even at 55.
 export type NoOrderInfo =
+  | { kind: "empty" }
   | { kind: "incomplete"; deficit: Vec }
-  | { kind: "unsearched" }
   | { kind: "searched"; minCap: number | null };
 
 // "20 more Ascendant and 7 more Order" from a deficit vector.
@@ -34,7 +34,7 @@ export function buildOrderHtml(
   noOrder?: NoOrderInfo | null,
 ): string {
   if (!steps) {
-    const info: NoOrderInfo = noOrder ?? { kind: "unsearched" };
+    const info: NoOrderInfo = noOrder ?? { kind: "empty" };
     let body: string;
     if (info.kind === "incomplete") {
       body =
@@ -47,8 +47,8 @@ export function buildOrderHtml(
             `<div class="bo-empty-sub">Assembling it needs transient scaffolding that pushes the running total past your cap.</div>`
           : `<div class="bo-empty-msg">No legal path to this build exists.</div>`;
     } else {
-      // self-covering but the live search missed: offer the on-demand escalation.
-      body = `No quick build order found. <button type="button" class="bo-btn" data-find-order>Find valid order</button>`;
+      // nothing to order yet: the order appears once the selection covers its own affinity.
+      body = `<div class="bo-empty-msg">Select a self-covering build to see its order.</div>`;
     }
     return `<h2>Build order</h2><div class="bo-empty">${body}</div>`;
   }

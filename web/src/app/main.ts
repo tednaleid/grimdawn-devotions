@@ -12,8 +12,6 @@ import {
   selectionView,
   completionMinCost,
   selectionSummary,
-  buildOrderEscalated,
-  minBuildableCap,
   setExactResolver,
   INF,
   type ReachView,
@@ -358,26 +356,6 @@ async function boot() {
       panel = document.getElementById("build-order-panel")!;
     }
     panel.innerHTML = buildOrderHtml(model, data.manifest, steps, noOrder);
-    const findBtn = panel.querySelector<HTMLButtonElement>("[data-find-order]");
-    findBtn?.addEventListener("click", () => {
-      findBtn.disabled = true;
-      findBtn.textContent = "Searching...";
-      // defer one tick so the disabled/searching state paints before the synchronous escalation runs
-      setTimeout(() => {
-        const members = selectionSummary(model, state.selected).built;
-        if (!(members.length && table)) {
-          paintBuildOrder(null, { kind: "searched", minCap: null });
-          return;
-        }
-        const order = buildOrderEscalated(cons, table, members, state.pointCap);
-        if (order) {
-          paintBuildOrder(order);
-          return;
-        }
-        // No order at the current cap: find the fewest points at which it would assemble (or null).
-        paintBuildOrder(null, { kind: "searched", minCap: minBuildableCap(cons, table, members, state.pointCap) });
-      }, 0);
-    });
     // Hover-sync: build-order rows carry data-con-id; box that constellation on the map (drawn on top).
     panel.querySelectorAll<HTMLElement>(".bo-step[data-con-id]").forEach((row) => {
       const cid = row.dataset.conId;
@@ -442,12 +420,19 @@ async function boot() {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
     if (petAvailHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Bonus to All Pets</h2>${petAvailHtml}`);
-    // Empty-state copy: a missing order is either an incomplete selection (does not cover its own affinity,
-    // so other constellations are needed) or a self-covering build the live search missed (offer escalation).
+    // Empty-state copy. The build order shows whenever the selection is self-covering: the cap is auto-raised
+    // to the validity floor (above), so a self-covering selection that still has no order is genuinely
+    // unbuildable within 55, not merely under-budgeted. Otherwise show a prompt (nothing to order yet) or the
+    // affinity-deficit instructions for an incomplete selection.
     let boInfo: NoOrderInfo | null = null;
-    if (!curBuildOrder && reach.have && reach.need) {
-      const deficit = reach.need.map((n, i) => Math.max(0, n - reach.have[i]!)) as Vec;
-      boInfo = deficit.some((d) => d > 0) ? { kind: "incomplete", deficit } : { kind: "unsearched" };
+    if (!curBuildOrder) {
+      const capped = !!table && Number.isFinite(state.pointCap);
+      if (capped && state.selected.size > 0 && reach.have && reach.need) {
+        const deficit = reach.need.map((n, i) => Math.max(0, n - reach.have[i]!)) as Vec;
+        boInfo = deficit.some((d) => d > 0) ? { kind: "incomplete", deficit } : { kind: "searched", minCap: null };
+      } else {
+        boInfo = { kind: "empty" };
+      }
     }
     paintBuildOrder(curBuildOrder, boInfo);
     const uncapped = !Number.isFinite(state.pointCap);

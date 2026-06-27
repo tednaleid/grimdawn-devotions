@@ -1,6 +1,6 @@
 // ABOUTME: Tests buildOrderHtml - the right-sidebar build-order panel markup: numbered complete rows with
 // ABOUTME: constellation art, distinct scaffold add/refund rows with the running held total, and the
-// ABOUTME: null/empty state with the on-demand "Find valid order" button.
+// ABOUTME: empty states (prompt, incomplete-deficit, and the no-legal-path message).
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
@@ -24,9 +24,10 @@ test("buildOrderHtml renders complete and scaffold rows with held totals and con
   expect(html).toContain("6"); // a held total
 });
 
-test("buildOrderHtml null (unsearched) renders the empty state with a find-order button", () => {
+test("buildOrderHtml null defaults to the empty prompt with no button", () => {
   const html = buildOrderHtml(model, null, null);
-  expect(html).toContain("data-find-order");
+  expect(html).toContain("Select a self-covering build");
+  expect(html).not.toContain("data-find-order");
   expect(html).not.toContain("Incomplete build");
 });
 
