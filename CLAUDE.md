@@ -17,6 +17,17 @@ New ideas and backlog items go in [BACKLOG.md](BACKLOG.md) at the project root.
 When you think of an enhancement that isn't ready to build, capture it there
 (with implementation pointers) rather than starting it.
 
+## Living docs are evergreen
+
+The top-level reference docs in `docs/` (for example `devotion-system.md`,
+`reachability-engine.md`, `reachability-performance.md`) describe how the system
+works **now**. Keep them concise and current: when behavior changes, rewrite the
+affected part in place. Do not append chronological "Update YYYY-MM-DD" sections,
+leave superseded claims standing, or turn a reference doc into a change-log. A
+point-in-time design record belongs in a dated spec under
+`docs/superpowers/specs/`; those (and `docs/specs/`) are the historical artifacts,
+the top-level docs are not.
+
 ## URL state is shareable (invariant we maintain)
 
 Every planner state must be bookmarkable and shareable: the full state lives in

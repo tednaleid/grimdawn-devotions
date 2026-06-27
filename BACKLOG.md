@@ -33,7 +33,7 @@ freezes. The shipped engine is the right default; the costed alternate (branch
 `reachability-costed-scaffolding`) is kept as a SOUND-by-construction oracle and as the substrate
 for guided build order, not as the per-click engine.
 
-### A. Soundness gap (false-reach on the resolver) - CONFIRMED on the real map 2026-06-25
+### A. Construction-peak false-reach - FIXED 2026-06-26 (residual synthetic-model gap still open)
 Against the independent BFS oracle on random small models, the resolver false-reaches on some sampled
 models - it calls some unreachable selections reachable. The audit (`just audit-false-reach`) localized
 it: `greedyFrom` (~79%) and the exact resolver (~21%) both treat the crossroads seed as free and
@@ -56,43 +56,28 @@ order must transiently hold one extra scaffold point to bootstrap the multi-colo
 peak; the engine lights it via the seed-only `constructible()` fast path that ignores the peak. Rate is
 low (~2 / 44k lit tight-stacks) but real and in-game-relevant.
 
-THE FIX (deferred decision): gate the order-exact min-peak into `reachableExactFrom` (and its Rust port
-`web/wasm/src/lib.rs`) for the suspect shape only - tight self-covering builds lit via the
-`constructible()` fast path - so the per-click cost stays bounded (the DP only fires on near-budget
-self-covering candidates, not the whole sweep). `minPeakCost` is the exact arbiter; the existing
-`minPeakSampled` is the cheap pre-filter. Re-run `just realmap-hunt` + `just shape-fuzz` + `just
-validate-reach` + `just validate-wasm` after any resolver change. See `docs/reachability-engine.md`
-"Update 2026-06-25". Note: this same exact oracle is also what guided-build-order needs
-(`docs/superpowers/specs/2026-06-25-guided-build-order-design.md`).
+FIXED 2026-06-26: reachability is now decided on the construction peak, not the post-refund cost.
+`greedyFrom` charges the colors it bootstraps a crossroads for (`greedyCost + lastGreedyBootColors`), the
+sampled peak witness proves real orders, and the exact resolver (and its Rust port `web/wasm/src/lib.rs`)
+decides at every self-covering node and returns - pruning the post-covering filler search, so witnessing
+each covering node is affordable and TS/WASM stay verdict-equivalent. The two confirmed seeds and the
+eight tier-1 constellations at budget 3 now dim; `just realmap-hunt` reports 0. See
+`docs/reachability-engine.md`.
 
-### B. Tight-build false-dims (FIXED 2026-06-25)
-The resolver wrongly dimmed some constructor-confirmed-reachable TIGHT near-55-point builds. A sound
-peak witness (`minPeakSampled` in `web/src/core/reachability.ts`, wired into `classifyForSelection`)
-closes this: it samples real construction orders for a near-budget self-covering build and flips it
-reachable on the first order whose peak fits the budget. Real-model false-dims dropped 119 -> 1
-(`just validate-reach` Part B), all 42 tight walk fixtures classify reachable
-(`web/test/reachability-walk.test.ts` is no longer `test.failing`), soundness is unchanged
-(false-reach 705), and per-click p99 is unchanged from baseline (the hang state went 4.5s -> 85ms).
-See `docs/reachability-engine.md` "Update 2026-06-25" and the perf guard
-`web/test/reachability-perf-guard.test.ts`.
+STILL OPEN - residual synthetic false-reach: `just validate-reach` Part A shows ~450 false-reaches per
+12k random small models vs the BFS oracle (down from 705). The real-map hunt finds 0, but only for the
+Affliction-stack shape it generates. Open work: characterize the residual as synthetic-only, or broaden
+`just realmap-hunt` to other shapes. `reachability-oracle.test.ts` stays `test.failing` on the
+small-model mechanism; re-run `just realmap-hunt` + `just validate-reach` + `just validate-wasm` after
+any resolver change.
 
-### C. Affinity-bootstrap / filler-extension false-dims (FIXED 2026-06-25)
-The deeper gap behind B, Oklaine, and the 1/6618 residual: the exact resolver gated every covering
-build on `constructible()` - the seed-only fixpoint that cannot model holding transient refundable
-scaffolding (scaffold-then-refund) to bootstrap a build's own affinity. So builds reachable only via
-that move were dimmed even after filler was added (the Jackal/Vulture case: a self-covering build whose
-capstone needs chaos the build only supplies after a refundable crossroads bootstraps it; and Oklaine's
-filler-extension case). Fixed by gating the covering build on the peak witness instead
-(`reachableExactFrom` in `web/src/core/reachability.ts` and its Rust port `web/wasm/src/lib.rs`):
-`constructible()` stays the cheap fast path, falling back to `minPeakSampled() <= budget`, which models
-scaffold-then-refund. The gate uses the deterministic heuristic order (`GATE_WITNESS_TRIES=0`) so the
-Rust port is RNG-free and bit-for-bit verdict-equivalent (`just validate-wasm`: 0 mismatches). Two
-supporting fixes: finished partials count at full size in the witness members (a latent inconsistency
-that would otherwise undercount the peak and false-reach), and witness calls are capped per resolver
-invocation. Results: real-model false-dims 0 (`just validate-reach` Part B), the bootstrap-bug adds zero
-false-reaches (synthetic false-reach unchanged at 414 baseline), Vulture/Ghoul + Oklaine
-`test.failing` flipped to passing, and per-click p99 IMPROVED 199ms -> 35ms (the witness short-circuits
-the previously-exhaustive dim searches). The remaining synthetic-model false-reach is gap A, untouched.
+### B. Tight-build and affinity-bootstrap false-dims - FIXED
+The resolver once dimmed some constructor-confirmed tight near-55-point builds and filler-extension
+builds (the Oklaine and Vulture/Ghoul cases), because it gated covering builds on the seed-only
+`constructible()` fixpoint, which cannot model holding refundable scaffolding to bootstrap a build's own
+affinity. The sampled peak witness (`minPeakSampled`) and the construction-peak resolver (gap A) close
+these; real-model false-dims are now ~2/6,618 (the sampler tail, the safe direction). See
+`docs/reachability-engine.md`.
 
 ## Guided build order ("pick these in this order")
 

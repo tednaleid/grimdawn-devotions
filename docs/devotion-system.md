@@ -6,10 +6,9 @@ consequences of those rules for how a build is constructed, and the data
 structures this project uses to model it.
 
 For the reachability algorithm that decides which selections are legal within the
-budget, see
-`docs/superpowers/specs/2026-06-23-reachability-costed-scaffolding-design.md` and
-`docs/reachability-performance.md`. This document is about the domain, not the
-engine.
+budget, see [reachability-engine.md](reachability-engine.md) and
+[reachability-performance.md](reachability-performance.md). This document is about
+the domain, not the engine.
 
 ## What it is
 
@@ -238,8 +237,8 @@ constructible build within budget," not "is valid right now."
 A target selection is **reachable at budget P** iff there is a sequence of
 single-star adds and removes from the empty map to some valid build that contains
 it, where every intermediate state is valid and at or under P points. Refunding is
-just removal. This is the definition the reachability engine must implement, and the
-one the design spec builds the corrected engine around.
+just removal. This is the definition the reachability engine implements; see
+[reachability-engine.md](reachability-engine.md).
 
 ## Data structures
 
