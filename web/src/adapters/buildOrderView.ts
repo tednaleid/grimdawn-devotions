@@ -67,7 +67,9 @@ export function buildOrderHtml(
       }
       const label = s.kind === "scaffold-add" ? "Add" : "Refund";
       const cls = s.kind === "scaffold-add" ? "bo-add" : "bo-refund";
-      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span><span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
+      // Empty art-column cell so the five grid columns (n, art, name, pts, held) line up with the
+      // complete rows; without it the name lands in the 1.4em art column and the row shifts left.
+      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span><span class="bo-art"></span><span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
     })
     .join("");
   return `<h2>Build order</h2><div class="bo-list">${rows}</div>`;
