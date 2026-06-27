@@ -1,13 +1,24 @@
 // ABOUTME: Renders the guided build-order panel for the right sidebar: a numbered step list with
 // ABOUTME: constellation art on complete rows, distinct scaffold add/refund rows, and a running held
 // ABOUTME: total. Pure string output; the null state offers an on-demand "Find valid order" button.
-import type { DevotionModel } from "../core/types";
+import type { Affinity, DevotionModel } from "../core/types";
 import type { BuildStep, Vec } from "../core/reachability";
 import type { AssetManifest } from "../ports/DataSource";
+import { affinityOrb } from "./affinityColors";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 const AFFINITY = ["Ascendant", "Chaos", "Eldritch", "Order", "Primordial"];
+
+// The five Crossroads share the generic name "Crossroads" and have no art. Label each by its fixed
+// position on the devotion map (cardinal direction) and show a dot in the affinity it grants.
+const CROSSROADS: Record<string, { dir: string; affinity: Affinity }> = {
+  crossroads_primordial: { dir: "N", affinity: "primordial" },
+  crossroads_chaos: { dir: "NW", affinity: "chaos" },
+  crossroads_order: { dir: "NE", affinity: "order" },
+  crossroads_eldritch: { dir: "SW", affinity: "eldritch" },
+  crossroads_ascendant: { dir: "SE", affinity: "ascendant" },
+};
 
 // Why no order is shown, for the empty-state copy:
 // - empty: nothing meaningful to order yet (no selection, or no point cap to assemble within).
@@ -56,20 +67,24 @@ export function buildOrderHtml(
   const rows = steps
     .map((s) => {
       const c = model.constellations.get(s.conId);
-      const name = c ? c.name : s.conId;
+      const cr = CROSSROADS[s.conId];
+      const name = cr ? `${c?.name ?? "Crossroads"} (${cr.dir})` : c ? c.name : s.conId;
       const artName = c?.background?.image?.split("/").pop() ?? "";
       const art = manifest?.images[artName];
+      // Crossroads have no art; their art-column cell holds a dot in the granted affinity's color.
+      const dot = cr ? `<span class="bo-art">${affinityOrb(cr.affinity)}</span>` : "";
       const img = art && s.kind === "complete" ? `<img class="bo-art" src="${esc(art.url)}" alt=""/>` : "";
       const held = `<span class="bo-held">${s.heldAfter}</span>`;
       if (s.kind === "complete") {
         n++;
-        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${img}<span class="bo-name">${esc(name)}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
+        const artCell = img || dot;
+        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
       }
       const label = s.kind === "scaffold-add" ? "Add" : "Refund";
       const cls = s.kind === "scaffold-add" ? "bo-add" : "bo-refund";
-      // Empty art-column cell so the five grid columns (n, art, name, pts, held) line up with the
-      // complete rows; without it the name lands in the 1.4em art column and the row shifts left.
-      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span><span class="bo-art"></span><span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
+      // Empty art-column cell (or the crossroads dot) so the five grid columns line up with complete rows.
+      const artCell = dot || `<span class="bo-art"></span>`;
+      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span>${artCell}<span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
     })
     .join("");
   return `<h2>Build order</h2><div class="bo-list">${rows}</div>`;
