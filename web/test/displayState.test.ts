@@ -1,8 +1,8 @@
 // ABOUTME: Headless tests for the pure display-state resolver.
 // ABOUTME: Synthetic constellations/stars + ReachView keep each case deterministic.
 import { test, expect } from "bun:test";
-import { constellationDisplay, type DisplaySettings } from "../src/core/displayState";
-import type { Affinity, Constellation } from "../src/core/types";
+import { constellationDisplay, starDisplay, type DisplaySettings } from "../src/core/displayState";
+import type { Affinity, Constellation, Star as StarT } from "../src/core/types";
 import type { ReachView } from "../src/core/reachability";
 
 function con(id: string, starIds: string[], bonus: Partial<Record<Affinity, number>> = {}): Constellation {
@@ -27,6 +27,15 @@ function reach(over: Partial<ReachView> = {}): ReachView {
 }
 function settings(over: Partial<DisplaySettings> = {}): DisplaySettings {
   return { selected: new Set(), ...over };
+}
+function star(id: string, conId: string, preds: string[] = []): StarT {
+  return {
+    id,
+    constellationId: conId,
+    predecessors: preds,
+    celestialPower: null,
+    position: { x: 0, y: 0 },
+  } as unknown as StarT;
 }
 
 test("constellation brightness: active when every star selected", () => {
@@ -75,4 +84,52 @@ test("constellation: active and off-filter is active AND muted (no exemption)", 
   );
   expect(d.brightness).toBe("active");
   expect(d.color).toEqual({ kind: "mute" });
+});
+
+test("star brightness: active selected; attainable when clickable OR constellation completable; else unattainable", () => {
+  const c = con("c", ["c:0", "c:1"]);
+  const s0 = star("c:0", "c");
+  expect(starDisplay(s0, c, settings({ selected: new Set(["c:0"]), reach: reach() })).brightness).toBe("active");
+  expect(starDisplay(s0, c, settings({ reach: reach({ clickable: new Set(["c:0"]) }) })).brightness).toBe("attainable");
+  expect(starDisplay(star("c:1", "c"), c, settings({ reach: reach({ completable: new Set(["c"]) }) })).brightness).toBe(
+    "attainable",
+  );
+  expect(starDisplay(s0, c, settings({ reach: reach() })).brightness).toBe("unattainable");
+});
+
+test("star immediacy: clickable true only when clickable (or no reach)", () => {
+  const c = con("c", ["c:0"]);
+  expect(starDisplay(star("c:0", "c"), c, settings({ reach: reach({ clickable: new Set(["c:0"]) }) })).clickable).toBe(
+    true,
+  );
+  expect(starDisplay(star("c:0", "c"), c, settings({ reach: reach() })).clickable).toBe(false);
+  expect(starDisplay(star("c:0", "c"), c, settings()).clickable).toBe(true);
+});
+
+test("star color: muted when its constellation fails the affinity filter, identity when it passes", () => {
+  const c = con("c", ["c:0"], { chaos: 2 });
+  const onChaos = settings({ affinityFilter: { grants: new Set<Affinity>(["chaos"]), requires: new Set() } });
+  const onOrder = settings({ affinityFilter: { grants: new Set<Affinity>(["order"]), requires: new Set() } });
+  expect(starDisplay(star("c:0", "c"), c, onChaos).color).toEqual({ kind: "identity" });
+  expect(starDisplay(star("c:0", "c"), c, onOrder).color).toEqual({ kind: "mute" });
+});
+
+test("star benefit-match is emphasis, independent of color: muted AND benefitMatch at once", () => {
+  const c = con("c", ["c:0"], { chaos: 2 });
+  const d = starDisplay(
+    star("c:0", "c"),
+    c,
+    settings({
+      benefitMatch: new Set(["c:0"]),
+      affinityFilter: { grants: new Set<Affinity>(["order"]), requires: new Set() },
+    }),
+  );
+  expect(d.benefitMatch).toBe(true);
+  expect(d.color).toEqual({ kind: "mute" });
+});
+
+test("star diff add/remove flows through", () => {
+  const c = con("c", ["c:0"]);
+  const d = starDisplay(star("c:0", "c"), c, settings({ diff: { added: new Set(["c:0"]), removed: new Set() } }));
+  expect(d.diff).toBe("add");
 });
