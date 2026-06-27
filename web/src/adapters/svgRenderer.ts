@@ -1,8 +1,9 @@
 // ABOUTME: SVG renderer adapter for the devotion map - builds markup strings and mounts live DOM.
 // ABOUTME: renderSvgMarkup is a pure function; mountSvg wires it to a live HTMLElement with events.
-import type { Constellation, DevotionModel, SelectionState, StarId } from "../core/types";
+import type { Affinity, Constellation, DevotionModel, SelectionState, StarId } from "../core/types";
 import type { ReachView } from "../core/reachability";
 import { affinityColor, presentAffinities } from "./affinityColors";
+import { matchedAffinities } from "../core/affinity";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
 import type { AssetManifest } from "../ports/DataSource";
 
@@ -52,9 +53,10 @@ export interface RenderOpts {
   highlight?: Set<StarId>;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
-  // When present, an affinity filter is active: constellations NOT in this set fade (aff-off).
-  // Empty set means a filter is active but nothing matches, so every constellation fades.
-  affinityMatch?: Set<string>;
+  // When present, an affinity filter is active. A constellation matches when it provides any of these
+  // filter affinities (matchedAffinities); matching constellations glow (see the aff-glow layer) and
+  // the rest get a mild aff-dim fade.
+  affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
 }
 
 // A constellation's hover/click footprint in SVG world coords: its art bounds
@@ -156,10 +158,16 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   const dimCons = new Set<string>();
   for (const c of model.constellations.values()) if (conArtClass(c) !== "") dimCons.add(c.id);
 
-  // Affinity filter: when affinityMatch is present, constellations not in it fade their art, links,
-  // and stars (a stronger, separate fade from con-dim). A benefit match star is exempt (see below).
-  const affFiltering = opts.affinityMatch !== undefined;
-  const affOff = (conId: string): boolean => affFiltering && !opts.affinityMatch!.has(conId);
+  // Affinity filter: a constellation matches when it provides any filtered affinity. Matching
+  // constellations glow (aff-glow layer); the rest get a mild aff-dim fade (a benefit match star is
+  // exempt, see below). Precompute the matching set once for both the glow layer and the fade.
+  const affFilter = opts.affinityFilter;
+  const affMatchCons = new Set<string>();
+  if (affFilter) {
+    for (const c of model.constellations.values())
+      if (matchedAffinities(c, affFilter.grants, affFilter.requires).length > 0) affMatchCons.add(c.id);
+  }
+  const affDim = (conId: string): boolean => affFilter !== undefined && !affMatchCons.has(conId);
 
   // Constellation hover/click is resolved in JS against each constellation's art
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
@@ -216,7 +224,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       // .art.active CSS rule); the filter derives the color from the image, so no per-color style is needed.
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
       // data-con-id lets a blocked constellation deselect flash this icon (see main.ts).
-      const ao = affOff(c.id) ? " aff-off" : "";
+      const ao = affDim(c.id) ? " aff-dim" : "";
       parts.push(`<image ${img} class="art${dim}${active}${ao}" data-con-id="${c.id}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
         const mid = `mask-${c.id}`;
@@ -232,7 +240,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   // grimtools); a segment in a dim constellation is faded with "con-dim".
   for (const star of model.stars.values()) {
     const cd = dimCons.has(star.constellationId) ? " con-dim" : "";
-    const ao = affOff(star.constellationId) ? " aff-off" : "";
+    const ao = affDim(star.constellationId) ? " aff-dim" : "";
     for (const p of star.predecessors) {
       const a = model.stars.get(p);
       if (!a) continue;
@@ -262,7 +270,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     // Stars in a dim constellation fade too (CSS halves their brightness).
     const cd = dimCons.has(star.constellationId) ? " con-dim" : "";
     // Off-target for the affinity filter: fade, unless this star is a benefit match (matches stay lit).
-    const ao = !isMatch && affOff(star.constellationId) ? " aff-off" : "";
+    const ao = !isMatch && affDim(star.constellationId) ? " aff-dim" : "";
     // Compare diff: mark stars added or removed vs the baseline build.
     const cmp = diff ? (diff.added.has(star.id) ? " cmp-add" : diff.removed.has(star.id) ? " cmp-rm" : "") : "";
     // Celestial-power stars are diamonds; the rest are circles. Both share the .star styling.
@@ -285,7 +293,7 @@ export interface SvgHandle {
     highlight?: Set<StarId>,
     reach?: ReachView,
     diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
-    affinityMatch?: Set<string>,
+    affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> },
   ): void;
   svg: SVGSVGElement;
   // Draw (or clear, with null) a box around a constellation's stars, on top of every layer. Used for
@@ -308,14 +316,14 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     highlight?: Set<StarId>,
     reach?: ReachView,
     diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
-    affinityMatch?: Set<string>,
+    affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> },
   ) {
     container.innerHTML = renderSvgMarkup(model, state, {
       manifest: deps.manifest,
       highlight,
       reach,
       diff,
-      affinityMatch,
+      affinityFilter,
     });
   }
   render({ selected: new Set(), pointCap: 55 });
@@ -384,10 +392,10 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 
   return {
     svg,
-    update(state, highlight, reach, diff, affinityMatch) {
+    update(state, highlight, reach, diff, affinityFilter) {
       const live = container.querySelector("svg") as SVGSVGElement | null;
       const vb = live?.getAttribute("viewBox");
-      render(state, highlight, reach, diff, affinityMatch);
+      render(state, highlight, reach, diff, affinityFilter);
       const next = container.querySelector("svg") as SVGSVGElement | null;
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },

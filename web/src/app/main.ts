@@ -30,7 +30,7 @@ import {
   decodeHash,
   encodeHash,
 } from "../core/urlState";
-import { affinityTotals, constellationsMatchingAffinity } from "../core/affinity";
+import { affinityTotals } from "../core/affinity";
 import { starsGranting, availableBonusIds, starsGrantingPet, availablePetKeys } from "../core/aggregate";
 import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState, StarId } from "../core/types";
@@ -131,9 +131,9 @@ async function boot() {
     return out;
   }
 
-  // The constellations matching the active affinity tags, or undefined when none are active (so the
-  // renderer fades nothing). aff:grant:<a> and aff:req:<a> split into grant/require affinity sets.
-  function affinityMatchCons(): Set<string> | undefined {
+  // The active affinity filter as grant/require sets, or undefined when no affinity tag is selected.
+  // The renderer matches each constellation against these (matchedAffinities) to glow it or mild-fade it.
+  function affinityFilterSets(): { grants: Set<Affinity>; requires: Set<Affinity> } | undefined {
     const grants = new Set<Affinity>();
     const requires = new Set<Affinity>();
     for (const k of selectedBenefits) {
@@ -141,7 +141,7 @@ async function boot() {
       else if (k.startsWith("aff:req:")) requires.add(k.slice("aff:req:".length) as Affinity);
     }
     if (grants.size === 0 && requires.size === 0) return undefined;
-    return constellationsMatchingAffinity(model, grants, requires);
+    return { grants, requires };
   }
 
   // The permissive ReachView for the degraded path (uncapped, or no cover table): nothing dims, every
@@ -453,7 +453,7 @@ async function boot() {
           removed: new Set([...baseline.selected].filter((s) => !state.selected.has(s))),
         }
       : null;
-    handle.update(state, taggedStars(), reach, diff, affinityMatchCons());
+    handle.update(state, taggedStars(), reach, diff, affinityFilterSets());
     renderBenefitsPanel();
     prevAffinity = renderAffinities(
       affinityEl,

@@ -3,13 +3,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import {
-  completedConstellations,
-  affinityTotals,
-  meetsRequirement,
-  constellationsMatchingAffinity,
-  matchedAffinities,
-} from "../src/core/affinity";
+import { completedConstellations, affinityTotals, meetsRequirement, matchedAffinities } from "../src/core/affinity";
 
 const model = buildModel(doc as any);
 
@@ -36,18 +30,6 @@ test("meetsRequirement compares per-affinity", () => {
   expect(meetsRequirement({ ascendant: 0, chaos: 0, eldritch: 0, order: 0, primordial: 0 }, { eldritch: 1 })).toBe(
     false,
   );
-});
-
-test("constellationsMatchingAffinity matches granted and required affinities", () => {
-  const granters = constellationsMatchingAffinity(model, new Set(["eldritch"]), new Set());
-  expect(granters.size).toBeGreaterThan(0);
-  for (const id of granters) expect((model.constellations.get(id)!.affinityBonus.eldritch ?? 0) > 0).toBe(true);
-
-  const requirers = constellationsMatchingAffinity(model, new Set(), new Set(["eldritch"]));
-  expect(requirers.size).toBeGreaterThan(0);
-  for (const id of requirers) expect((model.constellations.get(id)!.affinityRequired.eldritch ?? 0) > 0).toBe(true);
-
-  expect(constellationsMatchingAffinity(model, new Set(), new Set()).size).toBe(0);
 });
 
 test("matchedAffinities returns only the filter affinities the constellation provides, in canonical order", () => {

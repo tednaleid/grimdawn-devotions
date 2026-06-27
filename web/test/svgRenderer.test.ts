@@ -5,6 +5,7 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { renderSvgMarkup } from "../src/adapters/svgRenderer";
 import type { ReachView } from "../src/core/reachability";
+import { AFFINITIES } from "../src/core/types";
 
 const model = buildModel(doc as any);
 
@@ -184,32 +185,40 @@ test("compare diff marks added stars cmp-add and removed stars cmp-rm", () => {
   expect(markup).toContain("cmp-rm");
 });
 
-test("no affinity filter leaves no aff-off classes", () => {
+test("no affinity filter leaves no aff-dim classes", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
-  expect(markup).not.toContain("aff-off");
+  expect(markup).not.toContain("aff-dim");
 });
 
-test("an affinity filter fades non-matching constellations but exempts benefit matches", () => {
-  const matchStar = "crossroads_eldritch:0";
+test("an affinity filter mild-fades non-matching constellations but exempts benefit matches", () => {
+  const matchStar = "crossroads_eldritch:0"; // crossroads grant no affinity, so this constellation never matches
   const markup = renderSvgMarkup(
     model,
     { selected: new Set(), pointCap: 55 },
     {
       manifest: null,
-      affinityMatch: new Set(), // nothing matches -> every constellation is off-target
+      affinityFilter: { grants: new Set(["eldritch"]), requires: new Set() },
       highlight: new Set([matchStar]),
     },
   );
-  expect(markup).toContain('class="star selectable match"'); // the benefit match keeps full treatment
-  expect(markup).not.toContain("match aff-off"); // a match is never faded
-  expect(markup).toContain(' aff-off"'); // other stars fade
-  expect(markup).toContain('class="link aff-off"'); // links fade too
+  expect(markup).toContain('class="star selectable match"'); // benefit match keeps full treatment
+  expect(markup).not.toContain("match aff-dim"); // a match is never faded by the affinity layer
+  expect(markup).toContain(' aff-dim"'); // non-matching stars fade
+  expect(markup).toContain('class="link aff-dim"'); // links fade too
 });
 
-test("affinity off-target fades the constellation art", () => {
+test("a non-matching constellation's art gets aff-dim", () => {
   const c = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null)!;
+  const notGranted = AFFINITIES.find((a) => (c.affinityBonus[a] ?? 0) === 0)!; // an affinity c does not grant
   const name = c.background!.image!.split("/").pop()!;
   const manifest = { images: { [name]: { url: "art.webp", w: 64, h: 64 } } };
-  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest, affinityMatch: new Set() });
-  expect(markup).toContain('class="art aff-off"');
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest,
+      affinityFilter: { grants: new Set([notGranted]), requires: new Set() },
+    },
+  );
+  expect(markup).toContain('class="art aff-dim"');
 });

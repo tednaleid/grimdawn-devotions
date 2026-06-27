@@ -307,15 +307,15 @@ try {
     "clicking an Affinity panel row activates its grant tag (URL b= + panel vsel)",
   );
   check(
-    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-off').length")) > 0,
-    "an affinity grant filter fades non-matching constellations (.star.aff-off)",
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) > 0,
+    "an affinity grant filter fades non-matching constellations (.star.aff-dim)",
   );
   await cdp.evaluate(
     `document.querySelector('.affinity[data-vid="aff:grant:eldritch"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
   );
   await Bun.sleep(120);
   check(
-    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-off').length")) === 0,
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) === 0,
     "toggling the affinity row off clears the fade",
   );
   // Spend every point: drive the point bar's cap to the validity floor (curMin == points used) so

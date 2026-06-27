@@ -46,24 +46,6 @@ export function meetsRequirement(have: Record<Affinity, number>, need: AffinityM
   return true;
 }
 
-// The constellations matching an affinity filter: those granting any affinity in `grants`
-// (affinityBonus > 0) or requiring any in `requires` (affinityRequired > 0). Constellation-level,
-// so the caller fades whole non-matching constellations rather than dimming individual stars.
-export function constellationsMatchingAffinity(
-  model: DevotionModel,
-  grants: Set<Affinity>,
-  requires: Set<Affinity>,
-): Set<string> {
-  const out = new Set<string>();
-  if (grants.size === 0 && requires.size === 0) return out;
-  for (const c of model.constellations.values()) {
-    const grantsHit = [...grants].some((a) => (c.affinityBonus[a] ?? 0) > 0);
-    const requiresHit = [...requires].some((a) => (c.affinityRequired[a] ?? 0) > 0);
-    if (grantsHit || requiresHit) out.add(c.id);
-  }
-  return out;
-}
-
 // The affinities a constellation provides for the active affinity filter: those in `grants` it grants
 // (affinityBonus > 0) or in `requires` it requires (affinityRequired > 0), in canonical order. Drives
 // the renderer's matched-color glow; empty means the constellation does not match the filter.
