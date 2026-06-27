@@ -635,7 +635,8 @@ main {
   border-radius: 6px;
   font-size: 0.8rem;
   max-width: 280px;
-  z-index: 10;
+  /* Above the narrow corner toggles (24), scrim (25), and drawers (30) so the popover is never occluded. */
+  z-index: 40;
 }
 #tooltip strong {
   color: #6cb6ff;
