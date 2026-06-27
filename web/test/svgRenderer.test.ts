@@ -208,6 +208,31 @@ test("an affinity filter mild-fades non-matching constellations but exempts bene
   expect(markup).toContain('class="link aff-dim"'); // links fade too
 });
 
+test("reachability dim dominates the affinity fade: an unreachable non-matching constellation keeps con-dim, not the lighter aff-dim", () => {
+  // A constellation with an intra-constellation link, made un-activatable (every OTHER one completable).
+  const dimCon = [...model.constellations.values()].find((c) =>
+    c.starIds.some((id) => (model.stars.get(id)?.predecessors.length ?? 0) > 0),
+  )!;
+  // Filter on an affinity this constellation does not grant, so it fails the filter (non-matching).
+  const notGranted = AFFINITIES.find((a) => (dimCon.affinityBonus[a] ?? 0) === 0)!;
+  const reach: ReachView = {
+    completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
+    clickable: new Set(),
+    have: [0, 0, 0, 0, 0],
+    need: [0, 0, 0, 0, 0],
+    needSource: new Map(),
+  };
+  const svg = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest: null, reach, affinityFilter: { grants: new Set([notGranted]), requires: new Set() } },
+  );
+  // It stays reachability-dimmed; aff-dim is never layered on (it would override con-dim and lighten it).
+  expect(svg).toMatch(/class="link con-dim"/);
+  expect(svg).not.toContain("con-dim aff-dim"); // link ordering: con-dim then aff-dim
+  expect(svg).not.toContain("aff-dim con-dim"); // star ordering: aff-dim then con-dim
+});
+
 test("a non-matching constellation's art gets aff-dim", () => {
   const c = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null)!;
   const notGranted = AFFINITIES.find((a) => (c.affinityBonus[a] ?? 0) === 0)!; // an affinity c does not grant

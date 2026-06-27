@@ -167,7 +167,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     for (const c of model.constellations.values())
       if (matchedAffinities(c, affFilter.grants, affFilter.requires).length > 0) affMatchCons.add(c.id);
   }
-  const affDim = (conId: string): boolean => affFilter !== undefined && !affMatchCons.has(conId);
+  // A constellation fails the affinity filter when it provides none of the filtered affinities, and is
+  // faded - but NOT if it is already reachability-dimmed. con-dim/unmet/unreachable is a stronger fade on
+  // the same opacity property; layering the lighter aff-dim on top would override it (equal CSS
+  // specificity, aff-dim wins by source order) and make an unreachable constellation read BRIGHTER under a
+  // filter. Reachability dominates: the affinity fade only differentiates among otherwise-interactable things.
+  const affDim = (conId: string): boolean => affFilter !== undefined && !affMatchCons.has(conId) && !dimCons.has(conId);
 
   // Constellation hover/click is resolved in JS against each constellation's art
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
