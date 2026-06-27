@@ -412,19 +412,6 @@ try {
   await Bun.sleep(150);
   check((await vbWidth()) < beforePinch - 1, "pinching two pointers apart zooms the map in (viewBox shrinks)");
 
-  // Double-tap-to-fit: after a zoom, two quick taps refit to the base view (viewBox width returns up).
-  const afterPinch = await vbWidth();
-  await cdp.evaluate(`(() => {
-    const c = document.getElementById('map-container');
-    const tap = () => {
-      c.dispatchEvent(new PointerEvent('pointerdown', { pointerId: 9, clientX: 195, clientY: 420, bubbles: true, pointerType: 'touch' }));
-      window.dispatchEvent(new PointerEvent('pointerup', { pointerId: 9, clientX: 195, clientY: 420, bubbles: true, pointerType: 'touch' }));
-    };
-    tap(); tap();
-  })()`);
-  await Bun.sleep(150);
-  check((await vbWidth()) > afterPinch + 1, "double-tap refits the map (viewBox returns toward base)");
-
   // Reset the point cap to max (the earlier "Available to get empties" check set it to curMin=1,
   // which locks all other stars; End key restores the cap to 55 so stars are selectable again).
   await cdp.evaluate(

@@ -1,4 +1,4 @@
-// ABOUTME: Navigation controller adapter for SVG pan, drag, wheel zoom, pinch-zoom, and double-tap-to-fit.
+// ABOUTME: Navigation controller adapter for SVG pan, drag, wheel zoom, and two-pointer pinch-zoom.
 // ABOUTME: Attaches pointermove/pointerup globally; caller wires wheel/down/click to the container.
 import { fitViewBox, panViewBox, toViewBoxString, zoomViewBox, type ViewBox } from "../core/viewbox";
 
@@ -50,10 +50,6 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
   // Active pointers by id (for pinch); the gesture is a pinch whenever two are down.
   const pointers = new Map<number, { x: number; y: number }>();
   let pinchPrevDist = 0;
-  // Double-tap-to-fit (replaces the old Reset view button): two quick taps near the same point refit.
-  let lastTapTime = 0,
-    lastTapX = 0,
-    lastTapY = 0;
 
   function onWheel(e: WheelEvent) {
     const svg = svgGetter();
@@ -116,24 +112,6 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
     if (pointers.size === 0 && dragging) {
       dragging = false;
       opts.onDragStateChange?.(false);
-    }
-    // A cancel is not a real tap: clear the first-tap anchor so a stale cancel can't pair with a later real tap.
-    if (e.type === "pointercancel") {
-      lastTapTime = 0;
-      return;
-    }
-    // A tap (no drag) on empty map: detect a double-tap and refit. Skip when the tap landed on a star,
-    // so double-tapping a star does not also reset the view.
-    if (!moved && !(e.target as Element)?.getAttribute?.("data-star-id")) {
-      const now = Date.now();
-      if (now - lastTapTime < 300 && Math.abs(e.clientX - lastTapX) + Math.abs(e.clientY - lastTapY) < 20) {
-        apply(baseVb);
-        lastTapTime = 0;
-      } else {
-        lastTapTime = now;
-        lastTapX = e.clientX;
-        lastTapY = e.clientY;
-      }
     }
   }
   function onClickCapture(e: MouseEvent) {
