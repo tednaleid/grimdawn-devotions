@@ -1,6 +1,6 @@
 // ABOUTME: Encodes/decodes planner state (point cap, selected stars, selected benefit tags) to a compact URL hash.
 // ABOUTME: Each selection is a trailing-trimmed bitset over a stable canonical id order, base64url-encoded.
-import type { DevotionModel, StarId } from "./types";
+import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "./types";
 
 const MIN_CAP = 1;
 const MAX_CAP = 55;
@@ -26,13 +26,28 @@ export function canonicalPetStatIds(model: DevotionModel): string[] {
   return [...set].sort();
 }
 
+/** The affinity filter tag for a grant/require of one affinity, e.g. `aff:grant:eldritch`. */
+export function affinityTagId(kind: "grant" | "req", a: Affinity): string {
+  return `aff:${kind}:${a}`;
+}
+
+/** The 10 affinity filter tags (each affinity x grant/require), in a stable order. */
+function canonicalAffinityIds(): string[] {
+  return AFFINITIES.flatMap((a) => [affinityTagId("grant", a), affinityTagId("req", a)]);
+}
+
 /**
- * The benefit-tag ordering for the URL bitset: the player stat ids (unchanged positions) followed
- * by the pet stat ids, each prefixed `pet:`. Because the player block is unchanged, an old
- * player-only `b=` payload decodes identically; pet tags extend the bitset only when present.
+ * The benefit-tag ordering for the URL bitset: the player stat ids (unchanged positions), then the
+ * pet stat ids prefixed `pet:`, then the 10 affinity tags. Each block is appended after the last, so
+ * an old player-only or player+pet `b=` payload decodes identically; affinity tags extend the bitset
+ * only when present.
  */
 export function canonicalBenefitIds(model: DevotionModel): string[] {
-  return [...canonicalStatIds(model), ...canonicalPetStatIds(model).map((id) => `pet:${id}`)];
+  return [
+    ...canonicalStatIds(model),
+    ...canonicalPetStatIds(model).map((id) => `pet:${id}`),
+    ...canonicalAffinityIds(),
+  ];
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {
