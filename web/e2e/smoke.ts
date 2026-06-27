@@ -294,6 +294,30 @@ try {
   await cdp.evaluate(
     `(() => { const g = document.querySelector('#affinity .bgroup.avail.gsel[data-ids^="pet:"]'); if (g) g.querySelector('[data-gtoggle]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})); })()`,
   );
+  // Affinity filter (desktop): clicking an Affinity panel row tags its granted affinity and fades
+  // constellations that do not grant it. Toggled off again so later checks see a clean filter state.
+  await cdp.evaluate(
+    `document.querySelector('.affinity[data-vid="aff:grant:eldritch"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
+  await Bun.sleep(120);
+  check(
+    await cdp.evaluate<boolean>(
+      "new URLSearchParams(location.hash.slice(1)).get('b') !== null && document.querySelector('.affinity-eldritch').classList.contains('vsel')",
+    ),
+    "clicking an Affinity panel row activates its grant tag (URL b= + panel vsel)",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-off').length")) > 0,
+    "an affinity grant filter fades non-matching constellations (.star.aff-off)",
+  );
+  await cdp.evaluate(
+    `document.querySelector('.affinity[data-vid="aff:grant:eldritch"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
+  await Bun.sleep(120);
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-off').length")) === 0,
+    "toggling the affinity row off clears the fade",
+  );
   // Spend every point: drive the point bar's cap to the validity floor (curMin == points used) so
   // nothing else stays completable. Home sets the cap to curMin via the bar's keydown handler.
   // The empties count below spans BOTH the player and pet avail lists and assumes no benefit tag is

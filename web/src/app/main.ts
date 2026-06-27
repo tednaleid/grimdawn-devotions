@@ -30,7 +30,7 @@ import {
   decodeHash,
   encodeHash,
 } from "../core/urlState";
-import { affinityTotals } from "../core/affinity";
+import { affinityTotals, constellationsMatchingAffinity } from "../core/affinity";
 import { starsGranting, availableBonusIds, starsGrantingPet, availablePetKeys } from "../core/aggregate";
 import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState, StarId } from "../core/types";
@@ -116,17 +116,31 @@ async function boot() {
   }
 
   // The map stars to emphasize for the current benefit tags: bare keys scan player bonuses,
-  // pet: keys scan pet bonuses; the map highlights the union.
+  // pet: keys scan pet bonuses; aff: keys are constellation-level (see affinityMatchCons) and skipped here.
   function taggedStars(): Set<StarId> {
     const playerTags = new Set<string>();
     const petTags = new Set<string>();
     for (const k of selectedBenefits) {
+      if (k.startsWith("aff:")) continue;
       if (k.startsWith("pet:")) petTags.add(k.slice(4));
       else playerTags.add(k);
     }
     const out = starsGranting(model, playerTags);
     for (const id of starsGrantingPet(model, petTags)) out.add(id);
     return out;
+  }
+
+  // The constellations matching the active affinity tags, or undefined when none are active (so the
+  // renderer fades nothing). aff:grant:<a> and aff:req:<a> split into grant/require affinity sets.
+  function affinityMatchCons(): Set<string> | undefined {
+    const grants = new Set<Affinity>();
+    const requires = new Set<Affinity>();
+    for (const k of selectedBenefits) {
+      if (k.startsWith("aff:grant:")) grants.add(k.slice("aff:grant:".length) as Affinity);
+      else if (k.startsWith("aff:req:")) requires.add(k.slice("aff:req:".length) as Affinity);
+    }
+    if (grants.size === 0 && requires.size === 0) return undefined;
+    return constellationsMatchingAffinity(model, grants, requires);
   }
 
   // The permissive ReachView for the degraded path (uncapped, or no cover table): nothing dims, every
@@ -204,8 +218,8 @@ async function boot() {
         return;
       }
       const totals = affinityTotals(model, state.selected);
-      if (t.kind === "star") tip.show(model, t.id, x, y, totals);
-      else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id));
+      if (t.kind === "star") tip.show(model, t.id, x, y, totals, undefined, selectedBenefits);
+      else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id), undefined, selectedBenefits);
     },
   });
 
@@ -214,7 +228,15 @@ async function boot() {
   benefitsEl.addEventListener("mousemove", (e) => {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
     if (sid)
-      tip.show(model, sid, (e as MouseEvent).clientX, (e as MouseEvent).clientY, affinityTotals(model, state.selected));
+      tip.show(
+        model,
+        sid,
+        (e as MouseEvent).clientX,
+        (e as MouseEvent).clientY,
+        affinityTotals(model, state.selected),
+        undefined,
+        selectedBenefits,
+      );
     else tip.hide();
   });
   benefitsEl.addEventListener("mouseleave", () => tip.hide());
@@ -430,9 +452,17 @@ async function boot() {
           removed: new Set([...baseline.selected].filter((s) => !state.selected.has(s))),
         }
       : null;
-    handle.update(state, taggedStars(), reach, diff);
+    handle.update(state, taggedStars(), reach, diff, affinityMatchCons());
     renderBenefitsPanel();
-    prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
+    prevAffinity = renderAffinities(
+      affinityEl,
+      model,
+      reach.have,
+      reach.need,
+      reach.needSource,
+      prevAffinity,
+      selectedBenefits,
+    );
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
     if (availHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
@@ -515,8 +545,8 @@ async function boot() {
     popoverTarget = target;
     const totals = affinityTotals(model, state.selected);
     const btn = commitButton(model, state.selected, reach, target);
-    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn);
-    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn);
+    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn, selectedBenefits);
+    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn, selectedBenefits);
   }
   function commitPopover() {
     if (!popoverTarget) return;
