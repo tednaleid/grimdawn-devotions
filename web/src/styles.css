@@ -237,7 +237,7 @@ main {
 }
 /* Condensed benefits: selectable subject groups (avail path only; active path uses .brow). */
 .bgroup {
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 1px 5px;
   margin: 1px -3px;
   transition:
@@ -395,7 +395,7 @@ main {
   display: inline-flex;
   margin: 0;
   padding: 1px 9px;
-  border-radius: 999px;
+  border-radius: 6px; /* squircle, matching the other selected-filter outlines (not a pill) */
   background: rgba(255, 255, 255, 0.045);
 }
 .bgroup.avail .bsubj {
