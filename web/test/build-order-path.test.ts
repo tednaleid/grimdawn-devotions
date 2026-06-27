@@ -166,4 +166,6 @@ test("buildOrderPath: the confirmed false-reach build has no order within 55", (
   const members = names.map((n) => byId.get(nameToId.get(n)!)!);
   expect(buildOrderPath(realCons, realTable, members, 55, 16)).toBeNull();
   expect(buildOrderEscalated(realCons, realTable, members, 55)).toBeNull();
-});
+  // buildOrderEscalated runs a heavy tries=4096 search (~5-7s on CI runners); raise the per-test
+  // timeout above bun's 5s default, matching the other heavy reachability tests.
+}, 30_000);
