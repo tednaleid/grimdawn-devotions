@@ -358,6 +358,41 @@ try {
     "Update Baseline exits compare mode and drops cs= from the URL",
   );
 
+  // --- Narrow viewport + touch emulation (responsive drawers, gestures, popover) ---
+  await cdp.send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
+  await Bun.sleep(200);
+  check(
+    await cdp.evaluate<boolean>("document.body.classList.contains('narrow')"),
+    "below the breakpoint the layout collapses (body.narrow)",
+  );
+  check(
+    (await cdp.evaluate<string>("getComputedStyle(document.getElementById('drawer-left-btn')).display")) !== "none",
+    "corner toggle buttons are visible when narrow",
+  );
+  await cdp.evaluate("document.getElementById('drawer-right-btn').click()");
+  await Bun.sleep(250);
+  check(
+    await cdp.evaluate<boolean>("document.getElementById('affinity').classList.contains('open')"),
+    "tapping the right toggle opens the affinity drawer",
+  );
+  await cdp.evaluate("document.getElementById('drawer-left-btn').click()");
+  await Bun.sleep(250);
+  check(
+    await cdp.evaluate<boolean>(
+      "document.getElementById('benefits').classList.contains('open') && !document.getElementById('affinity').classList.contains('open')",
+    ),
+    "opening the left drawer closes the right one",
+  );
+  await cdp.evaluate("document.getElementById('drawer-scrim').click()");
+  await Bun.sleep(250);
+  check(
+    await cdp.evaluate<boolean>(
+      "!document.getElementById('benefits').classList.contains('open') && !document.getElementById('affinity').classList.contains('open')",
+    ),
+    "tapping the scrim closes the open drawer",
+  );
+
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
   if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log(`    console: ${e}`);
 

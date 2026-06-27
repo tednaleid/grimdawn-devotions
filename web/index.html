@@ -14,13 +14,15 @@
     <div id="point-bar" tabindex="0" role="slider" aria-label="Point budget"></div>
     <span id="point-total"><button id="cap-toggle" type="button" title="Click to remove the point limit">55</button><span id="total-word"> total</span></span>
     <button id="reset-points">Reset points</button>
-    <button id="reset-view">Reset view</button>
   </header>
   <main>
     <aside id="benefits" class="sidebar"></aside>
     <div id="map-container"></div>
     <aside id="affinity" class="sidebar"></aside>
   </main>
+  <button id="drawer-left-btn" class="drawer-toggle drawer-left" type="button" aria-label="Show benefits">Benefits</button>
+  <button id="drawer-right-btn" class="drawer-toggle drawer-right" type="button" aria-label="Show affinity">Affinity</button>
+  <div id="drawer-scrim"></div>
   <div id="tooltip"></div>
   <script type="module" src="./main.js"></script>
 </body>

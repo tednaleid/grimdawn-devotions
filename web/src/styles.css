@@ -101,8 +101,8 @@ header button:hover {
 header button:active {
   background: #1a1e24;
 }
-/* Reset points stays next to the points group; only Reset view is pushed far right. */
-#reset-view {
+/* With Reset view removed, push Reset points to the far right of the top bar. */
+#reset-points {
   margin-left: auto;
 }
 /* Points budget bar: used (spent) / min (validity floor) / headroom, with a grey cap grabber. */
@@ -767,4 +767,64 @@ body.comparing main {
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
   pointer-events: none;
+}
+
+/* --- Narrow layout: overlay drawers + corner toggles (body.narrow set by JS via matchMedia) --- */
+.drawer-toggle {
+  display: none;
+}
+#drawer-scrim {
+  display: none;
+}
+body.narrow main {
+  grid-template-columns: 1fr;
+}
+body.narrow .sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 30;
+  width: 85vw;
+  transition: transform 0.2s ease;
+}
+body.narrow #benefits {
+  left: 0;
+  max-width: 380px;
+  transform: translateX(-110%);
+}
+body.narrow #affinity {
+  right: 0;
+  max-width: 320px;
+  transform: translateX(110%);
+}
+body.narrow #benefits.open,
+body.narrow #affinity.open {
+  transform: translateX(0);
+}
+body.narrow .drawer-toggle {
+  display: flex;
+  position: fixed;
+  top: calc(var(--header-h, 52px) + 8px);
+  z-index: 24;
+  align-items: center;
+  background: #21262d;
+  color: #e6edf3;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+body.narrow .drawer-left {
+  left: 8px;
+}
+body.narrow .drawer-right {
+  right: 8px;
+}
+body.narrow #drawer-scrim.show {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: rgba(0, 0, 0, 0.5);
 }

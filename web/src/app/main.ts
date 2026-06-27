@@ -6,6 +6,7 @@ import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { buildOrderHtml, type NoOrderInfo } from "../adapters/buildOrderView";
 import { tooltipView } from "../adapters/tooltipView";
+import { toggleDrawer, type DrawerState } from "../core/drawerState";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
 import {
   buildReachCons,
@@ -91,8 +92,11 @@ async function boot() {
   const barEl = document.getElementById("point-bar") as HTMLElement;
   const totalWord = document.getElementById("total-word") as HTMLElement;
   const capToggle = document.getElementById("cap-toggle") as HTMLButtonElement;
-  const resetBtn = document.getElementById("reset-view") as HTMLButtonElement;
   const resetPointsBtn = document.getElementById("reset-points") as HTMLButtonElement;
+  const headerEl = document.querySelector("header") as HTMLElement;
+  const leftBtn = document.getElementById("drawer-left-btn") as HTMLButtonElement;
+  const rightBtn = document.getElementById("drawer-right-btn") as HTMLButtonElement;
+  const scrim = document.getElementById("drawer-scrim") as HTMLElement;
   const tip = tooltipView(tooltipEl);
   // Max devotion points = the bar's full extent; the slider floor is the validity minimum (curMin).
   const MAX_POINTS = 55;
@@ -243,7 +247,7 @@ async function boot() {
   benefitsEl.addEventListener("click", onBenefitClick);
   affinityEl.addEventListener("click", onBenefitClick);
 
-  const nav = attachNav(() => mapContainer.querySelector("svg"), {
+  const _nav = attachNav(() => mapContainer.querySelector("svg"), {
     fitPoints: [...model.stars.values()].map((s) => s.position),
     onDragStateChange: (d) => mapContainer.classList.toggle("grabbing", d),
   });
@@ -251,7 +255,6 @@ async function boot() {
   mapContainer.addEventListener("wheel", h.onWheel, { passive: false });
   mapContainer.addEventListener("mousedown", h.onDown);
   mapContainer.addEventListener("click", h.onClickCapture, true);
-  resetBtn.addEventListener("click", () => nav.reset());
   resetPointsBtn.addEventListener("click", () => {
     state = { selected: new Set(), pointCap: state.pointCap };
     refresh();
@@ -406,6 +409,7 @@ async function boot() {
       curBuildOrder = null;
     }
     document.body.classList.toggle("comparing", baseline !== null);
+    updateNarrow();
     const diff = baseline
       ? {
           added: new Set([...state.selected].filter((s) => !baseline!.selected.has(s))),
@@ -446,6 +450,41 @@ async function boot() {
       `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline)}`,
     );
   }
+
+  // Expose the header height to CSS so the corner toggles sit just below the top bar.
+  function setHeaderH() {
+    document.body.style.setProperty("--header-h", `${headerEl.offsetHeight}px`);
+  }
+  setHeaderH();
+  window.addEventListener("resize", setHeaderH);
+
+  // Narrow layout: collapse when the docked sidebars would exceed half the viewport. The threshold is
+  // compare-mode-dependent (the left panel widens to 450px when comparing), so it is computed here from
+  // two width queries rather than duplicated across @media blocks. body.narrow gates all collapse CSS.
+  const mqNarrow = matchMedia("(max-width: 1060px)");
+  const mqNarrowCompare = matchMedia("(max-width: 1400px)");
+  let drawer: DrawerState = "none";
+  function renderDrawer() {
+    benefitsEl.classList.toggle("open", drawer === "left");
+    affinityEl.classList.toggle("open", drawer === "right");
+    scrim.classList.toggle("show", drawer !== "none");
+  }
+  function setDrawer(next: DrawerState) {
+    drawer = next;
+    renderDrawer();
+  }
+  function updateNarrow() {
+    const narrow = mqNarrow.matches || (baseline !== null && mqNarrowCompare.matches);
+    document.body.classList.toggle("narrow", narrow);
+    if (!narrow && drawer !== "none") setDrawer("none"); // docked layout must not keep a drawer/scrim open
+  }
+  mqNarrow.addEventListener("change", updateNarrow);
+  mqNarrowCompare.addEventListener("change", updateNarrow);
+  leftBtn.addEventListener("click", () => setDrawer(toggleDrawer(drawer, "left")));
+  rightBtn.addEventListener("click", () => setDrawer(toggleDrawer(drawer, "right")));
+  scrim.addEventListener("click", () => setDrawer("none"));
+  updateNarrow();
+
   refresh();
 }
 
