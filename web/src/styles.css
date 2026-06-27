@@ -621,6 +621,19 @@ main {
 .star.match.con-dim {
   opacity: 0.85;
 }
+/* Affinity filter active: constellations not matching the affinity fade hard (art, links, stars) so
+   matching ones stand out. Placed after con-dim so it wins; benefit matches never get aff-off, so
+   they keep their glow even inside a faded constellation. */
+.art.aff-off,
+.art-tint.aff-off {
+  opacity: 0.06;
+}
+.link.aff-off {
+  opacity: 0.05;
+}
+.star.aff-off {
+  opacity: 0.08;
+}
 .orb {
   display: inline-block;
   width: 0.7em;

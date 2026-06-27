@@ -183,3 +183,33 @@ test("compare diff marks added stars cmp-add and removed stars cmp-rm", () => {
   expect(markup).toContain("cmp-add");
   expect(markup).toContain("cmp-rm");
 });
+
+test("no affinity filter leaves no aff-off classes", () => {
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
+  expect(markup).not.toContain("aff-off");
+});
+
+test("an affinity filter fades non-matching constellations but exempts benefit matches", () => {
+  const matchStar = "crossroads_eldritch:0";
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest: null,
+      affinityMatch: new Set(), // nothing matches -> every constellation is off-target
+      highlight: new Set([matchStar]),
+    },
+  );
+  expect(markup).toContain('class="star selectable match"'); // the benefit match keeps full treatment
+  expect(markup).not.toContain("match aff-off"); // a match is never faded
+  expect(markup).toContain(' aff-off"'); // other stars fade
+  expect(markup).toContain('class="link aff-off"'); // links fade too
+});
+
+test("affinity off-target fades the constellation art", () => {
+  const c = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null)!;
+  const name = c.background!.image!.split("/").pop()!;
+  const manifest = { images: { [name]: { url: "art.webp", w: 64, h: 64 } } };
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest, affinityMatch: new Set() });
+  expect(markup).toContain('class="art aff-off"');
+});
