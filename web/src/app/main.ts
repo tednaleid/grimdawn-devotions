@@ -253,7 +253,7 @@ async function boot() {
   });
   const h = navHandlers();
   mapContainer.addEventListener("wheel", h.onWheel, { passive: false });
-  mapContainer.addEventListener("mousedown", h.onDown);
+  mapContainer.addEventListener("pointerdown", h.onDown);
   mapContainer.addEventListener("click", h.onClickCapture, true);
   resetPointsBtn.addEventListener("click", () => {
     state = { selected: new Set(), pointCap: state.pointCap };
@@ -296,20 +296,20 @@ async function boot() {
     barEl.setAttribute("aria-valuenow", String(cap));
   }
   let dragging = false;
-  const onBarMove = (e: MouseEvent) => {
+  const onBarMove = (e: PointerEvent) => {
     if (dragging) setCap(capFromClientX(e.clientX));
   };
   const onBarUp = () => {
     dragging = false;
-    window.removeEventListener("mousemove", onBarMove);
-    window.removeEventListener("mouseup", onBarUp);
+    window.removeEventListener("pointermove", onBarMove);
+    window.removeEventListener("pointerup", onBarUp);
   };
-  barEl.addEventListener("mousedown", (e) => {
+  barEl.addEventListener("pointerdown", (e) => {
     if (!Number.isFinite(state.pointCap)) return; // uncapped: the bar is read-only
     dragging = true;
     setCap(capFromClientX(e.clientX));
-    window.addEventListener("mousemove", onBarMove);
-    window.addEventListener("mouseup", onBarUp);
+    window.addEventListener("pointermove", onBarMove);
+    window.addEventListener("pointerup", onBarUp);
   });
   barEl.addEventListener("keydown", (e) => {
     if (!Number.isFinite(state.pointCap)) return;
