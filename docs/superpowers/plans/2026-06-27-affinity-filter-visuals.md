@@ -730,6 +730,98 @@ git commit -m "feat(ui): matched-color glow on constellations matching the affin
 
 ---
 
+### Task 5: Affinity panel click filters by the color (grant + require)
+
+**Files:**
+- Modify: `web/src/adapters/sidebarView.ts` (the `renderAffinities` row template, lines 206-208)
+- Modify: `web/test/sidebar-affinity.test.ts` (the two affinity-row tests)
+- Modify: `web/e2e/smoke.ts` (the two `.affinity[data-vid="aff:grant:eldritch"]` click selectors)
+
+**Context:** The desktop affinity panel only sets the `aff:grant:<a>` tag, so filtering a color glows the inner constellations that GRANT it but never the outer constellations that REQUIRE it (the payoff constellations). The renderer already matches and glows both grant and require (`matchedAffinities`); only the panel control needs to set both tags. The fix makes a panel row toggle the COLOR: both `aff:grant:<a>` and `aff:req:<a>` together, reusing the existing `onBenefitClick` group-toggle (no renderer or `main.ts` change).
+
+**Interfaces:**
+- Consumes: the existing `onBenefitClick` group branch (`closest("[data-gtoggle]")?.closest("[data-gkey]")`, toggles every id in `data-ids` together) and `affinityTagId`.
+- Produces: the affinity row carries `data-gkey`, `data-gtoggle`, and `data-ids="aff:grant:<a>,aff:req:<a>"` (no `data-vid`); selected (`vsel`) when the grant tag is active.
+
+- [ ] **Step 1: Update the panel tests (RED)**
+
+In `web/test/sidebar-affinity.test.ts`, REPLACE the test "every affinity row carries its grant data-vid" with:
+
+```ts
+test("every affinity row toggles both the grant and require tag for its color", () => {
+  const html = render([0, 0, 0, 0, 0], [0, 0, 0, 0, 0], new Map());
+  expect(html).toContain('data-ids="aff:grant:order,aff:req:order"');
+  expect(html).toContain('data-ids="aff:grant:eldritch,aff:req:eldritch"');
+  expect(html).toContain("data-gtoggle");
+  expect(html).not.toContain("data-vid"); // the row is a color group-toggle now, not a single-tag vid
+});
+```
+
+and REPLACE the test "an active grant tag marks its affinity row selected" with:
+
+```ts
+test("an active color filter marks its affinity row selected", () => {
+  const html = render([0, 0, 5, 0, 0], [0, 0, 0, 0, 0], new Map(), new Set(["aff:grant:eldritch", "aff:req:eldritch"]));
+  expect(html).toMatch(/class="affinity affinity-eldritch[^"]*vsel"/);
+});
+```
+
+- [ ] **Step 2: Run to verify they fail**
+
+Run: `cd web && bun test test/sidebar-affinity.test.ts`
+Expected: FAIL (row still emits `data-vid`, no `data-ids`/`data-gtoggle`).
+
+- [ ] **Step 3: Make the row a color group-toggle**
+
+In `web/src/adapters/sidebarView.ts`, REPLACE the row template (lines 206-208):
+
+```ts
+    const vid = affinityTagId("grant", a);
+    const sel = selectedBenefits.has(vid) ? " vsel" : "";
+    return `<div class="affinity affinity-${a}${flash}${sel}" data-vid="${vid}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
+```
+
+with:
+
+```ts
+    // The row toggles the COLOR: both the grant and require tags, so filtering a color glows the
+    // constellations that grant it AND the outer ones that require it. Reuses the group-toggle path
+    // (data-gtoggle on the row, data-ids the two tags); selected when the grant tag is active.
+    const grantId = affinityTagId("grant", a);
+    const reqId = affinityTagId("req", a);
+    const sel = selectedBenefits.has(grantId) ? " vsel" : "";
+    return `<div class="affinity affinity-${a}${flash}${sel}" data-gkey="aff:${a}" data-gtoggle data-ids="${grantId},${reqId}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
+```
+
+- [ ] **Step 4: Run to verify they pass**
+
+Run: `cd web && bun test test/sidebar-affinity.test.ts`
+Expected: PASS (the two existing tests, which use the defaulted `selectedBenefits`, still pass too).
+
+- [ ] **Step 5: Update the e2e selectors**
+
+In `web/e2e/smoke.ts`, the desktop affinity block dispatches a click on `.affinity[data-vid="aff:grant:eldritch"]` twice (toggle on, then off). Change BOTH selectors to `.affinity.affinity-eldritch` (the row no longer has `data-vid`):
+
+```ts
+`document.querySelector('.affinity.affinity-eldritch').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`
+```
+
+The surrounding assertions are unchanged: clicking still sets `b=` (now both tags), `.affinity-eldritch` still gains `vsel` (grant active), and `.star.aff-dim` / `.aff-glow` still go non-zero then back to zero on toggle off.
+
+- [ ] **Step 6: Verify**
+
+Run: `cd web && bunx tsc --noEmit` then `just e2e` then `just check`
+Expected: tsc clean; `E2E PASS` (the desktop affinity checks pass with the new selector and both tags set); full gate green.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add web/src/adapters/sidebarView.ts web/test/sidebar-affinity.test.ts web/e2e/smoke.ts
+git commit -m "feat(ui): affinity panel filters by color (grant and require together)"
+```
+
+---
+
 ## Notes for the implementer
 
 - The `affinityFilter` interface change (Task 3) is a coupled flip: `svgRenderer.ts` and `main.ts` change together, in one commit, so the build never sees a type mismatch. Do not split them.

@@ -209,9 +209,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   if (affFilter) {
     defs.push(
       `<filter id="aff-glow" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">` +
-        `<feGaussianBlur in="SourceGraphic" stdDeviation="40" result="b"/>` +
-        `<feComponentTransfer in="b" result="bright"><feFuncR type="linear" slope="1.4"/><feFuncG type="linear" slope="1.4"/><feFuncB type="linear" slope="1.4"/></feComponentTransfer>` +
-        `<feMerge><feMergeNode in="bright"/><feMergeNode in="bright"/></feMerge>` +
+        `<feGaussianBlur in="SourceGraphic" stdDeviation="55" result="b"/>` +
+        `<feComponentTransfer in="b" result="bright"><feFuncR type="linear" slope="2"/><feFuncG type="linear" slope="2"/><feFuncB type="linear" slope="2"/></feComponentTransfer>` +
+        `<feMerge><feMergeNode in="bright"/><feMergeNode in="bright"/><feMergeNode in="bright"/></feMerge>` +
         `</filter>`,
     );
   }

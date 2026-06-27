@@ -198,7 +198,7 @@ git commit -m "feat(core): constellationsMatchingAffinity for affinity filters"
 
 **Files:**
 - Modify: `web/src/core/statFormat.ts` (add an export after `formatBonusRows`, ~line 274)
-- Test: `web/test/statFormat.test.ts` (create)
+- Test: `web/test/statFormat.test.ts` (EXTEND — this file already exists with coverage for statRow/formatBonusRows/groupedBonusRows/formatPowerStats/formatPet; append the new tests, do not overwrite)
 
 **Interfaces:**
 - Consumes: the module-private `bonusEntries` (same file).
@@ -1133,6 +1133,107 @@ Expected: fmt-check, the full `bun test` suite, lint, and typecheck all pass.
 ```bash
 git add web/src/app/main.ts web/e2e/smoke.ts
 git commit -m "feat(ui): toggle benefit/affinity filters from the touch popover"
+```
+
+---
+
+### Task 9: Label Crossroads in the build order by direction + affinity dot
+
+**Files:**
+- Modify: `web/src/adapters/buildOrderView.ts` (imports line 4; add a constant near line 10; the row `.map` body lines 56-74)
+- Test: `web/test/build-order-view.test.ts` (EXTEND — append one test; do not overwrite)
+
+**Context:** The five Crossroads constellations are all named "Crossroads" and have no art, so a build-order row for one reads "Crossroads" with a blank art column. They sit in a fixed quincunx on the devotion map, and each grants exactly its namesake affinity. Label each row with its cardinal direction and a dot in its granted affinity's color (reusing `affinityOrb`, which already renders the `.orb` span the rest of the UI uses).
+
+**Interfaces:**
+- Consumes: `affinityOrb` from `./affinityColors`, `Affinity` from `../core/types`.
+- Produces: no new exports; `buildOrderHtml` output for a crossroads row now contains `Crossroads (<DIR>)` and an affinity-colored `.orb`.
+
+- [ ] **Step 1: Write the failing test**
+
+Append to `web/test/build-order-view.test.ts` (and add `import { affinityColor } from "../src/adapters/affinityColors";` to the imports at the top):
+
+```ts
+test("buildOrderHtml labels a crossroads with its cardinal direction and an affinity dot", () => {
+  const steps: BuildStep[] = [
+    { kind: "scaffold-add", conId: "crossroads_chaos", points: 1, heldAfter: 1 },
+    { kind: "complete", conId: "crossroads_eldritch", points: 1, heldAfter: 2 },
+  ];
+  const html = buildOrderHtml(model, null, steps);
+  expect(html).toContain("Crossroads (NW)"); // chaos crossroads sits NW
+  expect(html).toContain("Crossroads (SW)"); // eldritch crossroads sits SW
+  expect(html).toContain(`background:${affinityColor("chaos")}`); // colored dot in the art column
+  expect(html).toContain(`background:${affinityColor("eldritch")}`);
+});
+```
+
+- [ ] **Step 2: Run the test to verify it fails**
+
+Run: `cd web && bun test test/build-order-view.test.ts`
+Expected: FAIL (rows say "Crossroads" with no direction and no dot).
+
+- [ ] **Step 3: Implement**
+
+In `web/src/adapters/buildOrderView.ts`, change the imports. Line 4 is `import type { DevotionModel } from "../core/types";`; change it to:
+
+```ts
+import type { Affinity, DevotionModel } from "../core/types";
+```
+
+and add, with the other adapter imports (after the `AssetManifest` import on line 6):
+
+```ts
+import { affinityOrb } from "./affinityColors";
+```
+
+After the `AFFINITY` array (line 10), add:
+
+```ts
+// The five Crossroads share the generic name "Crossroads" and have no art. Label each by its fixed
+// position on the devotion map (cardinal direction) and show a dot in the affinity it grants.
+const CROSSROADS: Record<string, { dir: string; affinity: Affinity }> = {
+  crossroads_primordial: { dir: "N", affinity: "primordial" },
+  crossroads_chaos: { dir: "NW", affinity: "chaos" },
+  crossroads_order: { dir: "NE", affinity: "order" },
+  crossroads_eldritch: { dir: "SW", affinity: "eldritch" },
+  crossroads_ascendant: { dir: "SE", affinity: "ascendant" },
+};
+```
+
+REPLACE the row `.map` body (lines 56-74, from `const c = model.constellations.get(s.conId);` through the scaffold-row `return ...`) with:
+
+```ts
+      const c = model.constellations.get(s.conId);
+      const cr = CROSSROADS[s.conId];
+      const name = cr ? `${c?.name ?? "Crossroads"} (${cr.dir})` : c ? c.name : s.conId;
+      const artName = c?.background?.image?.split("/").pop() ?? "";
+      const art = manifest?.images[artName];
+      // Crossroads have no art; their art-column cell holds a dot in the granted affinity's color.
+      const dot = cr ? `<span class="bo-art">${affinityOrb(cr.affinity)}</span>` : "";
+      const img = art && s.kind === "complete" ? `<img class="bo-art" src="${esc(art.url)}" alt=""/>` : "";
+      const held = `<span class="bo-held">${s.heldAfter}</span>`;
+      if (s.kind === "complete") {
+        n++;
+        const artCell = img || dot;
+        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
+      }
+      const label = s.kind === "scaffold-add" ? "Add" : "Refund";
+      const cls = s.kind === "scaffold-add" ? "bo-add" : "bo-refund";
+      // Empty art-column cell (or the crossroads dot) so the five grid columns line up with complete rows.
+      const artCell = dot || `<span class="bo-art"></span>`;
+      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span>${artCell}<span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
+```
+
+- [ ] **Step 4: Run the test to verify it passes**
+
+Run: `cd web && bun test test/build-order-view.test.ts`
+Expected: PASS (the new test plus the existing build-order-view tests).
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add web/src/adapters/buildOrderView.ts web/test/build-order-view.test.ts
+git commit -m "feat(ui): label crossroads build-order rows by direction with an affinity dot"
 ```
 
 ---
