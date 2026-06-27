@@ -28,6 +28,9 @@ header {
   padding: 0.5rem 1rem;
   background: #161b22;
   border-bottom: 1px solid #30363d;
+  /* Dragging the slider must never select header text (-webkit- is required on iOS Safari). */
+  -webkit-user-select: none;
+  user-select: none;
 }
 /* Points group (label + bar + total) on the left, reset controls pushed to the right. */
 .plabel {
@@ -101,8 +104,8 @@ header button:hover {
 header button:active {
   background: #1a1e24;
 }
-/* Reset points stays next to the points group; only Reset view is pushed far right. */
-#reset-view {
+/* With Reset view removed, push Reset points to the far right of the top bar. */
+#reset-points {
   margin-left: auto;
 }
 /* Points budget bar: used (spent) / min (validity floor) / headroom, with a grey cap grabber. */
@@ -115,6 +118,8 @@ header button:active {
   border-radius: 7px;
   background: #30363d;
   cursor: pointer;
+  touch-action: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 #point-bar:focus-visible {
@@ -502,6 +507,7 @@ main {
   position: relative;
   overflow: hidden;
   cursor: grab;
+  touch-action: none;
   background: radial-gradient(circle at 50% 40%, #15203a, #0d1117 70%);
 }
 #map-container.con-hover {
@@ -588,8 +594,8 @@ main {
   transform-box: fill-box;
   transform-origin: center;
   transform: scale(1.45);
-  /* brightness() trails the glows so it lifts both the star and its halo ~25%. */
-  filter: drop-shadow(0 0 4px #cfe8ff) drop-shadow(0 0 10px #6cb6ff) drop-shadow(0 0 16px #6cb6ff) brightness(1.25);
+  /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
+  filter: url(#match-glow);
 }
 .star.dim {
   opacity: 0.4; /* non-matching stars on reachable constellations: visible but clearly below matches */
@@ -629,7 +635,8 @@ main {
   border-radius: 6px;
   font-size: 0.8rem;
   max-width: 280px;
-  z-index: 10;
+  /* Above the narrow corner toggles (24), scrim (25), and drawers (30) so the popover is never occluded. */
+  z-index: 40;
 }
 #tooltip strong {
   color: #6cb6ff;
@@ -767,4 +774,94 @@ body.comparing main {
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
   pointer-events: none;
+}
+
+/* --- Narrow layout: overlay drawers + corner toggles (body.narrow set by JS via matchMedia) --- */
+.drawer-toggle {
+  display: none;
+}
+#drawer-scrim {
+  display: none;
+}
+body.narrow main {
+  grid-template-columns: 1fr;
+}
+body.narrow .sidebar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 30;
+  width: 85vw;
+  transition: transform 0.2s ease;
+}
+body.narrow #benefits {
+  left: 0;
+  max-width: 380px;
+  transform: translateX(-110%);
+}
+body.narrow #affinity {
+  right: 0;
+  max-width: 320px;
+  transform: translateX(110%);
+}
+body.narrow #benefits.open,
+body.narrow #affinity.open {
+  transform: translateX(0);
+}
+body.narrow .drawer-toggle {
+  display: flex;
+  position: fixed;
+  top: calc(var(--header-h, 52px) + 8px);
+  z-index: 24;
+  align-items: center;
+  background: #21262d;
+  color: #e6edf3;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+body.narrow .drawer-left {
+  left: 8px;
+}
+body.narrow .drawer-right {
+  right: 8px;
+}
+body.narrow #drawer-scrim.show {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  background: rgba(0, 0, 0, 0.5);
+}
+/* Narrow top bar: let the slider shrink and drop the "total" word so the point count
+   (the cap-toggle) and Reset stay on-screen instead of overflowing off the right edge. */
+body.narrow #point-bar {
+  min-width: 90px;
+}
+body.narrow #total-word {
+  display: none;
+}
+
+/* Touch popover commit button (only present in the interactive popover, not the passive hover tooltip). */
+.tip-commit {
+  display: block;
+  margin-top: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  background: #21262d;
+  color: #e6edf3;
+  border: 1px solid #6cb6ff;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  /* A comfortable touch target, and manipulation disables iOS double-tap-zoom delay on the button. */
+  touch-action: manipulation;
+}
+.tip-commit:disabled {
+  border-color: #30363d;
+  color: #6e7681;
+  cursor: not-allowed;
 }

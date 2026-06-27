@@ -157,6 +157,18 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
   // even though art bounding boxes overlap. Star hit-circles take precedence.
 
+  // Benefit-match glow as an SVG-native filter. CSS `filter: drop-shadow()` on SVG shapes is
+  // unreliable on WebKit (iOS Safari/Firefox render nothing), so the halo is built from core SVG
+  // filter primitives the SVG engine rasterizes everywhere. Two flooded-blur layers (tight light +
+  // wide blue) under the star approximate the prior drop-shadow stack; sized in user units (~star r 12).
+  defs.push(
+    `<filter id="match-glow" x="-400%" y="-400%" width="900%" height="900%" color-interpolation-filters="sRGB">` +
+      `<feGaussianBlur in="SourceAlpha" stdDeviation="9" result="b1"/><feFlood flood-color="#e3f2ff" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
+      `<feGaussianBlur in="SourceAlpha" stdDeviation="22" result="b2"/><feFlood flood-color="#6cb6ff" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
+      `<feMerge><feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="SourceGraphic"/></feMerge>` +
+      `</filter>`,
+  );
+
   // Gradient defs for every constellation (used by both the star fills and the art tint).
   for (const c of model.constellations.values()) {
     defs.push(
@@ -257,8 +269,8 @@ export interface SvgHandle {
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
   manifest: AssetManifest | null;
-  onStarClick(id: StarId): void;
-  onConstellationClick(id: string): void;
+  onStarClick(id: StarId, clientX: number, clientY: number): void;
+  onConstellationClick(id: string, clientX: number, clientY: number): void;
   onHover(target: HoverTarget, clientX: number, clientY: number): void;
 }
 
@@ -289,13 +301,14 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
   }
 
   container.addEventListener("click", (e) => {
+    const me = e as MouseEvent;
     const sid = (e.target as Element)?.getAttribute?.("data-star-id");
     if (sid) {
-      deps.onStarClick(sid);
+      deps.onStarClick(sid, me.clientX, me.clientY);
       return;
     }
-    const cid = conAt((e as MouseEvent).clientX, (e as MouseEvent).clientY);
-    if (cid) deps.onConstellationClick(cid);
+    const cid = conAt(me.clientX, me.clientY);
+    if (cid) deps.onConstellationClick(cid, me.clientX, me.clientY);
   });
   container.addEventListener("mousemove", (e) => {
     const sid = (e.target as Element)?.getAttribute?.("data-star-id");
@@ -303,6 +316,12 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     const target: HoverTarget = sid ? { kind: "star", id: sid } : cid ? { kind: "constellation", id: cid } : null;
     container.classList.toggle("con-hover", !sid && !!cid);
     deps.onHover(target, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
+  });
+  // Leaving the map clears any hover so the tooltip never lingers over a sidebar (mousemove alone
+  // stops firing at the container edge, so it would otherwise stay painted).
+  container.addEventListener("mouseleave", (e) => {
+    container.classList.remove("con-hover");
+    deps.onHover(null, (e as MouseEvent).clientX, (e as MouseEvent).clientY);
   });
 
   // A box around a constellation's stars, drawn as the last SVG child so no layer paints over it. Sized to

@@ -6,7 +6,9 @@ import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
 import { buildOrderHtml, type NoOrderInfo } from "../adapters/buildOrderView";
 import { tooltipView } from "../adapters/tooltipView";
+import { toggleDrawer, type DrawerState } from "../core/drawerState";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
+import { commitButton, type CommitTarget } from "../core/commitAction";
 import {
   buildReachCons,
   selectionView,
@@ -91,9 +93,15 @@ async function boot() {
   const barEl = document.getElementById("point-bar") as HTMLElement;
   const totalWord = document.getElementById("total-word") as HTMLElement;
   const capToggle = document.getElementById("cap-toggle") as HTMLButtonElement;
-  const resetBtn = document.getElementById("reset-view") as HTMLButtonElement;
   const resetPointsBtn = document.getElementById("reset-points") as HTMLButtonElement;
+  const headerEl = document.querySelector("header") as HTMLElement;
+  const leftBtn = document.getElementById("drawer-left-btn") as HTMLButtonElement;
+  const rightBtn = document.getElementById("drawer-right-btn") as HTMLButtonElement;
+  const scrim = document.getElementById("drawer-scrim") as HTMLElement;
   const tip = tooltipView(tooltipEl);
+  const isTouch = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
+  let popoverTarget: CommitTarget | null = null; // the star/constellation the open popover commits
+  let dismissedPopoverTap = false; // a tap that just dismissed a popover; its click must not reopen one
   // Max devotion points = the bar's full extent; the slider floor is the validity minimum (curMin).
   const MAX_POINTS = 55;
   let curMin = 0; // selectionMinCost for the current selection, recomputed each refresh
@@ -168,14 +176,22 @@ async function boot() {
 
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
-    onStarClick: (id) => {
+    onStarClick: (id, x, y) => {
+      if (isTouch()) {
+        showCommitPopover({ kind: "star", id }, x, y);
+        return;
+      }
       const next = toggleStar(model, state, reach, id);
       if (next !== state) {
         state = next;
         refresh();
       }
     },
-    onConstellationClick: (id) => {
+    onConstellationClick: (id, x, y) => {
+      if (isTouch()) {
+        showCommitPopover({ kind: "constellation", id }, x, y);
+        return;
+      }
       const next = toggleConstellation(model, state, reach, id);
       if (next !== state) {
         state = next;
@@ -243,15 +259,14 @@ async function boot() {
   benefitsEl.addEventListener("click", onBenefitClick);
   affinityEl.addEventListener("click", onBenefitClick);
 
-  const nav = attachNav(() => mapContainer.querySelector("svg"), {
+  const _nav = attachNav(() => mapContainer.querySelector("svg"), {
     fitPoints: [...model.stars.values()].map((s) => s.position),
     onDragStateChange: (d) => mapContainer.classList.toggle("grabbing", d),
   });
   const h = navHandlers();
   mapContainer.addEventListener("wheel", h.onWheel, { passive: false });
-  mapContainer.addEventListener("mousedown", h.onDown);
+  mapContainer.addEventListener("pointerdown", h.onDown);
   mapContainer.addEventListener("click", h.onClickCapture, true);
-  resetBtn.addEventListener("click", () => nav.reset());
   resetPointsBtn.addEventListener("click", () => {
     state = { selected: new Set(), pointCap: state.pointCap };
     refresh();
@@ -293,20 +308,22 @@ async function boot() {
     barEl.setAttribute("aria-valuenow", String(cap));
   }
   let dragging = false;
-  const onBarMove = (e: MouseEvent) => {
+  const onBarMove = (e: PointerEvent) => {
     if (dragging) setCap(capFromClientX(e.clientX));
   };
   const onBarUp = () => {
     dragging = false;
-    window.removeEventListener("mousemove", onBarMove);
-    window.removeEventListener("mouseup", onBarUp);
+    window.removeEventListener("pointermove", onBarMove);
+    window.removeEventListener("pointerup", onBarUp);
+    window.removeEventListener("pointercancel", onBarUp);
   };
-  barEl.addEventListener("mousedown", (e) => {
+  barEl.addEventListener("pointerdown", (e) => {
     if (!Number.isFinite(state.pointCap)) return; // uncapped: the bar is read-only
     dragging = true;
     setCap(capFromClientX(e.clientX));
-    window.addEventListener("mousemove", onBarMove);
-    window.addEventListener("mouseup", onBarUp);
+    window.addEventListener("pointermove", onBarMove);
+    window.addEventListener("pointerup", onBarUp);
+    window.addEventListener("pointercancel", onBarUp);
   });
   barEl.addEventListener("keydown", (e) => {
     if (!Number.isFinite(state.pointCap)) return;
@@ -406,6 +423,7 @@ async function boot() {
       curBuildOrder = null;
     }
     document.body.classList.toggle("comparing", baseline !== null);
+    updateNarrow();
     const diff = baseline
       ? {
           added: new Set([...state.selected].filter((s) => !baseline!.selected.has(s))),
@@ -446,6 +464,87 @@ async function boot() {
       `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline)}`,
     );
   }
+
+  // Expose the header height to CSS so the corner toggles sit just below the top bar.
+  function setHeaderH() {
+    document.body.style.setProperty("--header-h", `${headerEl.offsetHeight}px`);
+  }
+  setHeaderH();
+  window.addEventListener("resize", setHeaderH);
+
+  // Narrow layout: collapse when the docked sidebars would exceed half the viewport. The threshold is
+  // compare-mode-dependent (the left panel widens to 450px when comparing), so it is computed here from
+  // two width queries rather than duplicated across @media blocks. body.narrow gates all collapse CSS.
+  const mqNarrow = matchMedia("(max-width: 1060px)");
+  const mqNarrowCompare = matchMedia("(max-width: 1400px)");
+  let drawer: DrawerState = "none";
+  function renderDrawer() {
+    benefitsEl.classList.toggle("open", drawer === "left");
+    affinityEl.classList.toggle("open", drawer === "right");
+    scrim.classList.toggle("show", drawer !== "none");
+  }
+  function setDrawer(next: DrawerState) {
+    drawer = next;
+    renderDrawer();
+  }
+  function updateNarrow() {
+    const narrow = mqNarrow.matches || (baseline !== null && mqNarrowCompare.matches);
+    document.body.classList.toggle("narrow", narrow);
+    if (!narrow && drawer !== "none") setDrawer("none"); // docked layout must not keep a drawer/scrim open
+  }
+  mqNarrow.addEventListener("change", updateNarrow);
+  mqNarrowCompare.addEventListener("change", updateNarrow);
+  leftBtn.addEventListener("click", () => setDrawer(toggleDrawer(drawer, "left")));
+  rightBtn.addEventListener("click", () => setDrawer(toggleDrawer(drawer, "right")));
+  scrim.addEventListener("click", () => setDrawer("none"));
+  updateNarrow();
+
+  // Touch popover: show the inspect tooltip with an Add/Remove button; commit only via that button.
+  function showCommitPopover(target: CommitTarget, x: number, y: number) {
+    popoverTarget = target;
+    const totals = affinityTotals(model, state.selected);
+    const btn = commitButton(model, state.selected, reach, target);
+    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn);
+    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn);
+  }
+  function commitPopover() {
+    if (!popoverTarget) return;
+    const next =
+      popoverTarget.kind === "star"
+        ? toggleStar(model, state, reach, popoverTarget.id)
+        : toggleConstellation(model, state, reach, popoverTarget.id);
+    popoverTarget = null;
+    tip.hide();
+    if (next !== state) {
+      state = next;
+      refresh();
+    }
+  }
+  // Commit on pointerup, not click: iOS Safari can swallow the synthetic click on a just-shown popover,
+  // but the low-level pointerup always fires. The button only exists in touch mode, so pointerup is safe.
+  tooltipEl.addEventListener("pointerup", (e) => {
+    if ((e.target as Element)?.closest?.(".tip-commit")) commitPopover();
+  });
+  document.addEventListener("pointerdown", (e) => {
+    if (popoverTarget && !tooltipEl.contains(e.target as Node)) {
+      popoverTarget = null;
+      tip.hide();
+      dismissedPopoverTap = true; // swallow this tap's click so it does not open a new popover
+    }
+  });
+  // On mobile it is hard to find empty space, so a dismissing tap often lands on a constellation. Stop
+  // that tap's click from reaching the map (capture phase runs before the map's bubble click handler).
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (dismissedPopoverTap) {
+        dismissedPopoverTap = false;
+        if (mapContainer.contains(e.target as Node)) e.stopPropagation();
+      }
+    },
+    true,
+  );
+
   refresh();
 }
 

@@ -249,6 +249,18 @@ try {
     "power tooltip shows the level-25 ability stat lines",
   );
 
+  // Tooltip must hide when the cursor leaves the map (otherwise it stays painted over the sidebar).
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="akeron_s_scorpion:4"]').dispatchEvent(new MouseEvent('mousemove',{bubbles:true,clientX:200,clientY:200}))`,
+  );
+  await cdp.evaluate(
+    `document.getElementById('map-container').dispatchEvent(new MouseEvent('mouseleave',{bubbles:false}))`,
+  );
+  check(
+    (await cdp.evaluate<string>("getComputedStyle(document.getElementById('tooltip')).display")) === "none",
+    "tooltip hides when the cursor leaves the map container",
+  );
+
   // "Available to get" is filtered to benefits still reachable from here: with points to spare it
   // lists items, and once every point is spent (cap lowered to the points used) it empties out.
   const availWithBudget = await cdp.evaluate<number>(
@@ -344,6 +356,105 @@ try {
   check(
     await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') === null && !location.hash.includes('cs=')"),
     "Update Baseline exits compare mode and drops cs= from the URL",
+  );
+
+  // --- Narrow viewport + touch emulation (responsive drawers, gestures, popover) ---
+  await cdp.send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
+  await Bun.sleep(200);
+  check(
+    await cdp.evaluate<boolean>("document.body.classList.contains('narrow')"),
+    "below the breakpoint the layout collapses (body.narrow)",
+  );
+  check(
+    await cdp.evaluate<boolean>(
+      "(() => { const r = document.getElementById('cap-toggle').getBoundingClientRect(); return r.width > 0 && r.right <= window.innerWidth; })()",
+    ),
+    "the point total stays on-screen in the narrow top bar",
+  );
+  check(
+    (await cdp.evaluate<string>("getComputedStyle(document.getElementById('drawer-left-btn')).display")) !== "none",
+    "corner toggle buttons are visible when narrow",
+  );
+  await cdp.evaluate("document.getElementById('drawer-right-btn').click()");
+  await Bun.sleep(250);
+  check(
+    await cdp.evaluate<boolean>("document.getElementById('affinity').classList.contains('open')"),
+    "tapping the right toggle opens the affinity drawer",
+  );
+  await cdp.evaluate("document.getElementById('drawer-left-btn').click()");
+  await Bun.sleep(250);
+  check(
+    await cdp.evaluate<boolean>(
+      "document.getElementById('benefits').classList.contains('open') && !document.getElementById('affinity').classList.contains('open')",
+    ),
+    "opening the left drawer closes the right one",
+  );
+  await cdp.evaluate("document.getElementById('drawer-scrim').click()");
+  await Bun.sleep(250);
+  check(
+    await cdp.evaluate<boolean>(
+      "!document.getElementById('benefits').classList.contains('open') && !document.getElementById('affinity').classList.contains('open')",
+    ),
+    "tapping the scrim closes the open drawer",
+  );
+
+  // Pinch-zoom: two pointers spreading apart must zoom in (shrink the viewBox width).
+  const vbWidth = () =>
+    cdp.evaluate<number>(
+      "parseFloat(document.querySelector('#map-container svg').getAttribute('viewBox').split(' ')[2])",
+    );
+  const beforePinch = await vbWidth();
+  await cdp.evaluate(`(() => {
+    const c = document.getElementById('map-container');
+    const down = (id, x, y) => c.dispatchEvent(new PointerEvent('pointerdown', { pointerId: id, clientX: x, clientY: y, bubbles: true, pointerType: 'touch' }));
+    const move = (id, x, y) => window.dispatchEvent(new PointerEvent('pointermove', { pointerId: id, clientX: x, clientY: y, bubbles: true, pointerType: 'touch' }));
+    const up = (id, x, y) => window.dispatchEvent(new PointerEvent('pointerup', { pointerId: id, clientX: x, clientY: y, bubbles: true, pointerType: 'touch' }));
+    down(1, 180, 400); down(2, 210, 400);
+    move(1, 120, 400); move(2, 270, 400);
+    move(1, 60, 400); move(2, 330, 400);
+    up(1, 60, 400); up(2, 330, 400);
+  })()`);
+  await Bun.sleep(150);
+  check((await vbWidth()) < beforePinch - 1, "pinching two pointers apart zooms the map in (viewBox shrinks)");
+
+  // Reset the point cap to max (the earlier "Available to get empties" check set it to curMin=1,
+  // which locks all other stars; End key restores the cap to 55 so stars are selectable again).
+  await cdp.evaluate(
+    `(() => { const b = document.getElementById('point-bar'); b.focus(); b.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true })); })()`,
+  );
+  await Bun.sleep(150);
+
+  // Tap-to-inspect: in touch mode a tap shows the popover with an Add button and does NOT change selection.
+  const tapStar = await cdp.evaluate<string>(
+    "document.querySelector('circle.hit.selectable:not(.selected)')?.getAttribute('data-star-id') || ''",
+  );
+  check(tapStar.length > 0, "found a selectable star to tap-inspect");
+  const selCountBefore = await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length");
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="${tapStar}"]').dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:195,clientY:300}))`,
+  );
+  await Bun.sleep(150);
+  check(
+    await cdp.evaluate<boolean>("!!document.querySelector('#tooltip .tip-commit')"),
+    "touch tap shows the popover with a commit button",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length")) === selCountBefore,
+    "a bare touch tap does not change the selection",
+  );
+  check(
+    await cdp.evaluate<boolean>("!document.querySelector('#tooltip .tip-commit').disabled"),
+    "the Add button is enabled for a clickable star",
+  );
+  // Pressing the commit button selects it. The commit fires on pointerup (iOS can swallow click).
+  await cdp.evaluate(
+    "document.querySelector('#tooltip .tip-commit').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerType: 'touch' }))",
+  );
+  await Bun.sleep(200);
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length")) === selCountBefore + 1,
+    "the popover Add button commits the selection",
   );
 
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
