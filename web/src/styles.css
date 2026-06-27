@@ -460,6 +460,11 @@ main {
 .affinity.down .aff-have {
   animation: flash-down 10s linear;
 }
+.affinity.vsel {
+  box-shadow: inset 3px 0 0 #e3c97a;
+  border-radius: 4px;
+  cursor: pointer;
+}
 /* Full-width divider between the Affinity panel and the "Available to get" list below it. */
 .panel-sep {
   border: 0;

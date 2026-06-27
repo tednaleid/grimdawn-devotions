@@ -5,6 +5,7 @@ import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { condensedRows, type CondensedGroup, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
+import { affinityTagId } from "../core/urlState";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
 
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
@@ -181,6 +182,7 @@ export function renderAffinities(
   need: Vec,
   needSource: Map<number, string[]>,
   prev?: Record<Affinity, number>,
+  selectedBenefits: Set<string> = new Set(),
 ): Record<Affinity, number> {
   const totals = {
     ascendant: have[0],
@@ -201,7 +203,9 @@ export function renderAffinities(
       // Nothing requires this color: still render the cell (dimmed 0) so both columns stay aligned.
       needCell = `<span class="aff-need none">0</span>`;
     }
-    return `<div class="affinity affinity-${a}${flash}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
+    const vid = affinityTagId("grant", a);
+    const sel = selectedBenefits.has(vid) ? " vsel" : "";
+    return `<div class="affinity affinity-${a}${flash}${sel}" data-vid="${vid}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
   }).join("");
   el.innerHTML = `<h2>Affinity</h2><div class="affinity-head"><span></span><span class="aff-have">have</span><span class="aff-need-h">need</span></div>${rows}`;
   return totals;
