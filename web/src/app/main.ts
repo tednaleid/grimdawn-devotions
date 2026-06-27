@@ -314,6 +314,7 @@ async function boot() {
     dragging = false;
     window.removeEventListener("pointermove", onBarMove);
     window.removeEventListener("pointerup", onBarUp);
+    window.removeEventListener("pointercancel", onBarUp);
   };
   barEl.addEventListener("pointerdown", (e) => {
     if (!Number.isFinite(state.pointCap)) return; // uncapped: the bar is read-only
@@ -321,6 +322,7 @@ async function boot() {
     setCap(capFromClientX(e.clientX));
     window.addEventListener("pointermove", onBarMove);
     window.addEventListener("pointerup", onBarUp);
+    window.addEventListener("pointercancel", onBarUp);
   });
   barEl.addEventListener("keydown", (e) => {
     if (!Number.isFinite(state.pointCap)) return;

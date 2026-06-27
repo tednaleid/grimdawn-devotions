@@ -115,6 +115,7 @@ header button:active {
   border-radius: 7px;
   background: #30363d;
   cursor: pointer;
+  touch-action: none;
   user-select: none;
 }
 #point-bar:focus-visible {
@@ -502,6 +503,7 @@ main {
   position: relative;
   overflow: hidden;
   cursor: grab;
+  touch-action: none;
   background: radial-gradient(circle at 50% 40%, #15203a, #0d1117 70%);
 }
 #map-container.con-hover {

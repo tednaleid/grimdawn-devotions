@@ -117,6 +117,11 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
       dragging = false;
       opts.onDragStateChange?.(false);
     }
+    // A cancel is not a real tap: clear the first-tap anchor so a stale cancel can't pair with a later real tap.
+    if (e.type === "pointercancel") {
+      lastTapTime = 0;
+      return;
+    }
     // A tap (no drag) on empty map: detect a double-tap and refit. Skip when the tap landed on a star,
     // so double-tapping a star does not also reset the view.
     if (!moved && !(e.target as Element)?.getAttribute?.("data-star-id")) {
