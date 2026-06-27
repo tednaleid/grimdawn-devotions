@@ -5,6 +5,61 @@ Each item includes implementation pointers for whoever picks it up. This file
 is future work ONLY: shipped features and their history live in the code, in
 git history, and in the reference docs under `docs/`.
 
+## Map / List view toggle
+
+A header button at top-center toggles the planner between "Map" (the current
+pan/zoom SVG) and "List" view. List view lays the constellations out as a single
+vertically-scrollable column at constant zoom (Crossroads first, then the rest):
+a "tall vertical map" that only scrolls vertically. Every constellation/star is
+interacted with exactly as in map view (same tap/click to select, same
+tooltip/popover). Especially good on mobile, where pan/zoom is fiddly. When a
+benefit filter is active, constellations that grant nothing matching the filter
+are hidden from the list.
+
+Pointers: a new ephemeral view-mode flag (Map | List), not URL-encoded (view
+chrome, like the drawer state). The renderer (`web/src/adapters/svgRenderer.ts`)
+already builds per-constellation art/star/link markup; List view can render each
+constellation into its own small fixed-viewBox SVG stacked in a scroll container,
+reusing the same `data-star-id` / `data-con-id` hooks so `main.ts`'s click/hover
+wiring works unchanged. Hidden-when-filtered uses the same match set the map uses
+(`opts.highlight`). Needs its own brainstorm/spec: the layout of a constellation
+"row" (art + stars + name?) and how selection/dimming read at constant zoom are
+the open questions.
+
+## Filtered benefits highlighted (and toggleable) in the tooltip/popover
+
+In the star/constellation tooltip, mark the bonus rows that are part of the
+active benefit filter with the same circled/selected styling the right sidebar
+uses when a benefit is picked, so it is easy to see WHICH of a node's bonuses are
+being filtered on. On touch, where the tooltip is an interactive popover, make
+those rows clickable to toggle their filter membership (add/remove the tag),
+mirroring the sidebar's `onBenefitClick`.
+
+Pointers: `web/src/adapters/tooltipView.ts` renders the bonus rows
+(`bonusRowsHtml`) - tag each row with its benefit id (`data-vid`, the same id
+space as `selectedBenefits` / `benefitCanonical`) and add the selected class when
+the id is in `selectedBenefits`. `main.ts` holds `selectedBenefits` and the
+`onBenefitClick` toggle; in touch mode, delegate clicks on tooltip benefit rows
+to the same toggle (the popover already commits via a `pointerup` delegate on
+`tooltipEl`). Reuse the sidebar's selected-benefit CSS class for consistency.
+
+## Affinities as filter values
+
+Let affinities be filter values too - both GRANTED and REQUIRED affinities count
+(e.g. "filter to constellations that grant Eldritch" or "that require Chaos").
+The Requires:/Grants: lines in the tooltip become clickable filter toggles on
+touch, and active affinity filters are highlighted in popovers the same way as
+the benefit rows above.
+
+Pointers: extend the tag system with an affinity namespace distinct from stat ids
+(e.g. `aff:grant:<affinity>` / `aff:req:<affinity>`), carried in the `b=` URL
+param alongside benefit tags (extend the canonical in `web/src/core/urlState.ts`
+and `main.ts`'s `taggedStars()` so a node matches when its constellation
+grants/requires the tagged affinity). The Requires/Grants rendering lives in
+`tooltipView.ts` (`affinitySections` / `requiresLine` / `affinityLine`); add the
+ids + selected class there and the click-toggle in `main.ts`. Builds on the
+tooltip-filter work above.
+
 ## Reachability engine: residual synthetic false-reach
 
 `just validate-reach` Part A shows ~450 false-reaches per 12k random small
