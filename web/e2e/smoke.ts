@@ -310,6 +310,10 @@ try {
     (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) > 0,
     "an affinity grant filter fades non-matching constellations (.star.aff-dim)",
   );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.aff-glow').length")) > 0,
+    "an affinity grant filter glows matching constellations (.aff-glow)",
+  );
   await cdp.evaluate(
     `document.querySelector('.affinity[data-vid="aff:grant:eldritch"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
   );
@@ -317,6 +321,10 @@ try {
   check(
     (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) === 0,
     "toggling the affinity row off clears the fade",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.aff-glow').length")) === 0,
+    "toggling the affinity filter off removes the glow",
   );
   // Spend every point: drive the point bar's cap to the validity floor (curMin == points used) so
   // nothing else stays completable. Home sets the cap to curMin via the bar's keydown handler.

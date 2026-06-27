@@ -645,6 +645,11 @@ main {
 .star.aff-dim {
   opacity: 0.5;
 }
+/* The affinity match halo (see #aff-glow in the renderer). Non-interactive so it never intercepts a
+   click meant for the art/stars beneath or around it. */
+.aff-glow {
+  pointer-events: none;
+}
 .orb {
   display: inline-block;
   width: 0.7em;

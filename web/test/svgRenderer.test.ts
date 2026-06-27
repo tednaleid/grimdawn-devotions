@@ -6,6 +6,7 @@ import { buildModel } from "../src/core/model";
 import { renderSvgMarkup } from "../src/adapters/svgRenderer";
 import type { ReachView } from "../src/core/reachability";
 import { AFFINITIES } from "../src/core/types";
+import { affinityColor, presentAffinities } from "../src/adapters/affinityColors";
 
 const model = buildModel(doc as any);
 
@@ -221,4 +222,31 @@ test("a non-matching constellation's art gets aff-dim", () => {
     },
   );
   expect(markup).toContain('class="art aff-dim"');
+});
+
+test("a matching constellation emits a colored glow with its matched-color gradient", () => {
+  const c = [...model.constellations.values()].find(
+    (c) => c.background?.image && c.background.x != null && presentAffinities(c.affinityBonus).length > 0,
+  )!;
+  const a = presentAffinities(c.affinityBonus)[0]!; // an affinity c grants
+  const name = c.background!.image!.split("/").pop()!;
+  const manifest = { images: { [name]: { url: "art.webp", w: 64, h: 64 } } };
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest,
+      affinityFilter: { grants: new Set([a]), requires: new Set() },
+    },
+  );
+  expect(markup).toContain(`<linearGradient id="aff-grad-${c.id}"`);
+  expect(markup).toContain('class="aff-glow"');
+  expect(markup).toContain(`mask="url(#mask-${c.id})"`);
+  expect(markup).toContain('filter="url(#aff-glow)"');
+  expect(markup).toContain(affinityColor(a)); // glow uses the matched color
+});
+
+test("no glow without an affinity filter", () => {
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
+  expect(markup).not.toContain("aff-glow");
 });

@@ -201,11 +201,56 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       `</filter>`,
   );
 
+  // Affinity match glow: a diffuse colored halo. The source is a gradient-filled, art-masked rect (the
+  // constellation's MATCHED affinity colors), blurred and brightened into a soft halo. SVG-native (CSS
+  // drop-shadow on SVG fails on WebKit). stdDeviation is in user units, so the halo scales with zoom;
+  // start diffuse and tune. The filter region is expanded so the blur is not clipped.
+  // Only emitted when an affinity filter is active (no filter -> no glow layer -> no def needed).
+  if (affFilter) {
+    defs.push(
+      `<filter id="aff-glow" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">` +
+        `<feGaussianBlur in="SourceGraphic" stdDeviation="40" result="b"/>` +
+        `<feComponentTransfer in="b" result="bright"><feFuncR type="linear" slope="1.4"/><feFuncG type="linear" slope="1.4"/><feFuncB type="linear" slope="1.4"/></feComponentTransfer>` +
+        `<feMerge><feMergeNode in="bright"/><feMergeNode in="bright"/></feMerge>` +
+        `</filter>`,
+    );
+  }
+
   // Gradient defs for every constellation (used by both the star fills and the art tint).
   for (const c of model.constellations.values()) {
     defs.push(
       `<linearGradient id="grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(gradColors(c))}</linearGradient>`,
     );
+  }
+
+  // Art-silhouette masks, built once per constellation and shared by the glow halo (Layer 0) and the
+  // art tint (Layer 1). A constellation needs one only if it has art AND it either matches the filter
+  // or carries an affinity-requirement tint.
+  const maskBuilt = new Set<string>();
+  const ensureMask = (cid: string, url: string, x: number, y: number, w: number, h: number) => {
+    if (maskBuilt.has(cid)) return;
+    maskBuilt.add(cid);
+    defs.push(`<mask id="mask-${cid}"><image href="${url}" x="${x}" y="${y}" width="${w}" height="${h}"/></mask>`);
+  };
+
+  // Layer 0: affinity match glow, drawn beneath the art so the colored halo bleeds out around matching
+  // constellations. The gradient is built from ONLY the matched affinity colors (solid when one matches).
+  if (opts.manifest && affFilter) {
+    for (const c of model.constellations.values()) {
+      if (!affMatchCons.has(c.id)) continue;
+      const name = c.background?.image?.split("/").pop() ?? "";
+      const art = opts.manifest.images[name];
+      if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
+      const { x, y } = c.background;
+      const cols = matchedAffinities(c, affFilter.grants, affFilter.requires).map(affinityColor);
+      defs.push(
+        `<linearGradient id="aff-grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(cols)}</linearGradient>`,
+      );
+      ensureMask(c.id, art.url, x, y, art.w, art.h);
+      parts.push(
+        `<rect class="aff-glow" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`,
+      );
+    }
   }
 
   // Layer 1: optional art, tinted by the constellation's identity (granted) colors.
@@ -227,10 +272,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const ao = affDim(c.id) ? " aff-dim" : "";
       parts.push(`<image ${img} class="art${dim}${active}${ao}" data-con-id="${c.id}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
-        const mid = `mask-${c.id}`;
-        defs.push(`<mask id="${mid}"><image ${img}/></mask>`);
+        ensureMask(c.id, art.url, x, y, art.w, art.h);
         parts.push(
-          `<rect class="art-tint${dim}${active}${ao}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#${mid})"/>`,
+          `<rect class="art-tint${dim}${active}${ao}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#mask-${c.id})"/>`,
         );
       }
     }
