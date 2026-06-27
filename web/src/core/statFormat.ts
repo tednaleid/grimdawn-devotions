@@ -273,6 +273,16 @@ export function formatBonusRows(bonuses: Record<string, number>, opts: { racialT
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
+/** Like formatBonusRows, but each row keeps its representative stat id (for tagging tooltip rows). */
+export function formatBonusRowsWithIds(
+  bonuses: Record<string, number>,
+  opts: { racialTarget?: string[] } = {},
+): { id: string; label: string; value: string }[] {
+  return bonusEntries(bonuses, opts)
+    .map((e) => ({ id: e.id, label: e.row.label, value: e.row.value }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
 // A grouped row keeps its representative stat id so callers can diff it (highlight changes).
 export interface GroupedRow extends StatRow {
   id: string;

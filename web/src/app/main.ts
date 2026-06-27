@@ -101,6 +101,7 @@ async function boot() {
   const tip = tooltipView(tooltipEl);
   const isTouch = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
   let popoverTarget: CommitTarget | null = null; // the star/constellation the open popover commits
+  let popoverXY = { x: 0, y: 0 }; // last popover anchor, so a tag toggle can re-show it in place
   let dismissedPopoverTap = false; // a tap that just dismissed a popover; its click must not reopen one
   // Max devotion points = the bar's full extent; the slider floor is the validity minimum (curMin).
   const MAX_POINTS = 55;
@@ -116,17 +117,31 @@ async function boot() {
   }
 
   // The map stars to emphasize for the current benefit tags: bare keys scan player bonuses,
-  // pet: keys scan pet bonuses; the map highlights the union.
+  // pet: keys scan pet bonuses; aff: keys are constellation-level (see affinityMatchCons) and skipped here.
   function taggedStars(): Set<StarId> {
     const playerTags = new Set<string>();
     const petTags = new Set<string>();
     for (const k of selectedBenefits) {
+      if (k.startsWith("aff:")) continue;
       if (k.startsWith("pet:")) petTags.add(k.slice(4));
       else playerTags.add(k);
     }
     const out = starsGranting(model, playerTags);
     for (const id of starsGrantingPet(model, petTags)) out.add(id);
     return out;
+  }
+
+  // The active affinity filter as grant/require sets, or undefined when no affinity tag is selected.
+  // The renderer matches each constellation against these (matchedAffinities) to glow it or mild-fade it.
+  function affinityFilterSets(): { grants: Set<Affinity>; requires: Set<Affinity> } | undefined {
+    const grants = new Set<Affinity>();
+    const requires = new Set<Affinity>();
+    for (const k of selectedBenefits) {
+      if (k.startsWith("aff:grant:")) grants.add(k.slice("aff:grant:".length) as Affinity);
+      else if (k.startsWith("aff:req:")) requires.add(k.slice("aff:req:".length) as Affinity);
+    }
+    if (grants.size === 0 && requires.size === 0) return undefined;
+    return { grants, requires };
   }
 
   // The permissive ReachView for the degraded path (uncapped, or no cover table): nothing dims, every
@@ -204,8 +219,8 @@ async function boot() {
         return;
       }
       const totals = affinityTotals(model, state.selected);
-      if (t.kind === "star") tip.show(model, t.id, x, y, totals);
-      else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id));
+      if (t.kind === "star") tip.show(model, t.id, x, y, totals, undefined, selectedBenefits);
+      else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id), undefined, selectedBenefits);
     },
   });
 
@@ -214,7 +229,15 @@ async function boot() {
   benefitsEl.addEventListener("mousemove", (e) => {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
     if (sid)
-      tip.show(model, sid, (e as MouseEvent).clientX, (e as MouseEvent).clientY, affinityTotals(model, state.selected));
+      tip.show(
+        model,
+        sid,
+        (e as MouseEvent).clientX,
+        (e as MouseEvent).clientY,
+        affinityTotals(model, state.selected),
+        undefined,
+        selectedBenefits,
+      );
     else tip.hide();
   });
   benefitsEl.addEventListener("mouseleave", () => tip.hide());
@@ -430,9 +453,17 @@ async function boot() {
           removed: new Set([...baseline.selected].filter((s) => !state.selected.has(s))),
         }
       : null;
-    handle.update(state, taggedStars(), reach, diff);
+    handle.update(state, taggedStars(), reach, diff, affinityFilterSets());
     renderBenefitsPanel();
-    prevAffinity = renderAffinities(affinityEl, model, reach.have, reach.need, reach.needSource, prevAffinity);
+    prevAffinity = renderAffinities(
+      affinityEl,
+      model,
+      reach.have,
+      reach.need,
+      reach.needSource,
+      prevAffinity,
+      selectedBenefits,
+    );
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
     if (availHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
@@ -513,10 +544,11 @@ async function boot() {
   // Touch popover: show the inspect tooltip with an Add/Remove button; commit only via that button.
   function showCommitPopover(target: CommitTarget, x: number, y: number) {
     popoverTarget = target;
+    popoverXY = { x, y };
     const totals = affinityTotals(model, state.selected);
     const btn = commitButton(model, state.selected, reach, target);
-    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn);
-    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn);
+    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn, selectedBenefits);
+    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn, selectedBenefits);
   }
   function commitPopover() {
     if (!popoverTarget) return;
@@ -534,7 +566,20 @@ async function boot() {
   // Commit on pointerup, not click: iOS Safari can swallow the synthetic click on a just-shown popover,
   // but the low-level pointerup always fires. The button only exists in touch mode, so pointerup is safe.
   tooltipEl.addEventListener("pointerup", (e) => {
-    if ((e.target as Element)?.closest?.(".tip-commit")) commitPopover();
+    const t = e.target as Element;
+    if (t?.closest?.(".tip-commit")) {
+      commitPopover();
+      return;
+    }
+    // Tapping a tagged benefit/affinity row toggles that filter and keeps the popover open (re-shown in
+    // place with the new highlight). Guarded by popoverTarget so it only acts in the touch popover.
+    const vidEl = t?.closest?.("[data-vid]");
+    if (vidEl && popoverTarget) {
+      const id = vidEl.getAttribute("data-vid")!;
+      selectedBenefits.has(id) ? selectedBenefits.delete(id) : selectedBenefits.add(id);
+      refresh();
+      showCommitPopover(popoverTarget, popoverXY.x, popoverXY.y);
+    }
   });
   document.addEventListener("pointerdown", (e) => {
     if (popoverTarget && !tooltipEl.contains(e.target as Node)) {

@@ -20,9 +20,9 @@ const doc = {
 } as any;
 const model = buildModel(doc);
 
-function render(have: Vec, need: Vec, src: Map<number, string[]>) {
+function render(have: Vec, need: Vec, src: Map<number, string[]>, selectedBenefits: Set<string> = new Set()) {
   const el = { innerHTML: "" } as any as HTMLElement;
-  renderAffinities(el, model, have, need, src, undefined);
+  renderAffinities(el, model, have, need, src, undefined, selectedBenefits);
   return (el as any).innerHTML as string;
 }
 
@@ -53,4 +53,18 @@ test("colors with no requirement show only the current total", () => {
   const html = render([0, 0, 0, 0, 0], [0, 0, 0, 0, 0], new Map());
   expect(html).not.toContain("missing");
   expect(html).not.toContain("met");
+});
+
+test("affinity row is a group-toggle (data-gkey/gtoggle/ids) with no data-vid", () => {
+  const html = render([0, 0, 0, 0, 0], [0, 0, 0, 0, 0], new Map());
+  expect(html).toContain('data-gkey="aff:grant:order"');
+  expect(html).toContain("data-gtoggle");
+  expect(html).toContain('data-ids="aff:grant:order,aff:req:order"');
+  expect(html).not.toContain('data-vid="aff:grant:order"');
+});
+
+test("an active grant tag marks its affinity row selected (no data-vid on row)", () => {
+  const html = render([0, 0, 5, 0, 0], [0, 0, 0, 0, 0], new Map(), new Set(["aff:grant:eldritch"]));
+  expect(html).toMatch(/class="affinity affinity-eldritch[^"]*vsel"/);
+  expect(html).not.toContain('data-vid="aff:grant:eldritch"');
 });

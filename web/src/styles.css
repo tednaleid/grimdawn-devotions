@@ -237,14 +237,20 @@ main {
 }
 /* Condensed benefits: selectable subject groups (avail path only; active path uses .brow). */
 .bgroup {
-  border-radius: 12px;
+  border-radius: 6px;
   padding: 1px 5px;
   margin: 1px -3px;
   transition:
     background 0.1s,
     box-shadow 0.1s;
 }
-.bgroup.gsel {
+/* The single "active filter tag" affordance: a light blue fill + squircle outline, matching the
+   Available-to-get pills. Each element keeps its own border-radius; hover rules light the label. */
+.bgroup.gsel,
+.brow.vsel,
+.affinity.vsel,
+.tip-bonus.vsel,
+.aff.vsel {
   background: rgba(108, 182, 255, 0.08);
   box-shadow: 0 0 0 1.5px rgba(108, 182, 255, 0.6);
 }
@@ -264,8 +270,7 @@ main {
   line-height: 1.45;
 }
 .brow.vsel {
-  background: #20313f;
-  box-shadow: inset 3px 0 0 #e3c97a;
+  border-radius: 4px;
 }
 .brow-lbl {
   flex: 1;
@@ -278,11 +283,9 @@ main {
   color: #d7c89a;
   cursor: pointer;
 }
+.brow-lbl.subj:hover,
 .brow.vsel .brow-lbl.subj {
-  color: #eef2f8;
-}
-.brow-lbl.subj:hover {
-  text-decoration: underline;
+  color: #6cb6ff;
 }
 .brow-lbl.subj.up {
   color: #83c995;
@@ -392,7 +395,7 @@ main {
   display: inline-flex;
   margin: 0;
   padding: 1px 9px;
-  border-radius: 999px;
+  border-radius: 6px; /* squircle, matching the other selected-filter outlines (not a pill) */
   background: rgba(255, 255, 255, 0.045);
 }
 .bgroup.avail .bsubj {
@@ -410,12 +413,17 @@ main {
 .affinity > span:first-child {
   text-transform: capitalize;
 }
-/* Affinity panel: two columns - current "have" total + wanted-max "need" (red unmet, green met). */
+.affinity:hover > span:first-child {
+  color: #6cb6ff;
+}
+/* Affinity panel: two columns - current "have" total + wanted-max "need" (red unmet, green met).
+   The rows are clickable grant-filter toggles, so they carry the pointer affordance always. */
 .affinity {
   display: grid;
   grid-template-columns: 1fr auto auto;
   gap: 0.6rem;
   align-items: baseline;
+  cursor: pointer;
 }
 .affinity-head {
   display: grid;
@@ -459,6 +467,9 @@ main {
 }
 .affinity.down .aff-have {
   animation: flash-down 10s linear;
+}
+.affinity.vsel {
+  border-radius: 6px;
 }
 /* Full-width divider between the Affinity panel and the "Available to get" list below it. */
 .panel-sep {
@@ -621,6 +632,24 @@ main {
 .star.match.con-dim {
   opacity: 0.85;
 }
+/* Affinity filter active: non-matching constellations get a MILD fade (matching ones glow, see the
+   aff-glow layer). Deliberately lighter than the reachability con-dim so the two read differently;
+   benefit matches never get aff-dim, so they keep their glow. */
+.art.aff-dim,
+.art-tint.aff-dim {
+  opacity: 0.45;
+}
+.link.aff-dim {
+  opacity: 0.5;
+}
+.star.aff-dim {
+  opacity: 0.5;
+}
+/* The affinity match halo (see #aff-glow in the renderer). Non-interactive so it never intercepts a
+   click meant for the art/stars beneath or around it. */
+.aff-glow {
+  pointer-events: none;
+}
 .orb {
   display: inline-block;
   width: 0.7em;
@@ -679,6 +708,14 @@ main {
   text-transform: capitalize;
   white-space: nowrap;
   margin-right: 0.4em;
+}
+/* Active filter tag inside the tooltip: mirror the sidebar's .brow.vsel selected look. */
+.tip-bonus.vsel {
+  border-radius: 3px;
+}
+.aff.vsel {
+  border-radius: 3px;
+  padding: 0 2px;
 }
 
 /* Baseline comparison: widened benefits panel + Base/Now/Delta table */

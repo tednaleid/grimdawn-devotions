@@ -1,7 +1,14 @@
 // ABOUTME: Tests for the devotion stat formatter (label + percent/flat value rendering).
 // ABOUTME: Anchored on grimtools-confirmed cases (Falcon, Shepherd's Crook) plus family rules.
 import { expect, test, describe } from "bun:test";
-import { statRow, formatBonusRows, groupedBonusRows, formatPowerStats, formatPet } from "../src/core/statFormat";
+import {
+  statRow,
+  formatBonusRows,
+  formatBonusRowsWithIds,
+  groupedBonusRows,
+  formatPowerStats,
+  formatPet,
+} from "../src/core/statFormat";
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
@@ -275,4 +282,19 @@ describe("formatPet renders a summon proc's summary + base attack", () => {
       "Summons Elemental Seeker for 3 Seconds",
     );
   });
+});
+
+test("formatBonusRowsWithIds keeps each row's stat id, merging a flat damage range to its Min id", () => {
+  const rows = formatBonusRowsWithIds({ offensiveFireMin: 10, offensiveFireMax: 20, characterStrength: 5 });
+  const ids = rows.map((r) => r.id);
+  expect(ids).toContain("offensiveFireMin");
+  expect(ids).toContain("characterStrength");
+  expect(ids).not.toContain("offensiveFireMax"); // merged into the Min row
+});
+
+test("formatBonusRowsWithIds rows carry the correct label and value", () => {
+  const bonuses = { characterStrength: 5, offensiveFireModifier: 12 };
+  const withIds = formatBonusRowsWithIds(bonuses);
+  expect(withIds.find((r) => r.id === "characterStrength")!.label).toBe("Physique");
+  expect(withIds.find((r) => r.id === "offensiveFireModifier")!.value).toBe("+12%");
 });

@@ -163,6 +163,47 @@ The responsive + touch pass shipped. Remaining considerations:
   (100+ from an empty map). If it janks pan/zoom on low-end phones, drop the
   `filter` from `.star.selectable` in `web/src/styles.css`.
 
+## Pure visual-state model for the map (display language)
+
+Today the map's display logic is split between `svgRenderer.ts` (which CSS
+classes each element gets, derived from raw inputs: `reach`, `state.selected`,
+`affinityFilter`, `highlight`, `diff`) and `styles.css` (what each class means,
+and - by source order - which one wins when two set the same property). There is
+no single place that computes an element's final visual status, so independent
+signals collide. The concrete symptom that motivated this: reachability dim
+(`con-dim`, opacity 0.15) and the affinity-filter fade (`aff-dim`, 0.5) are
+equal-specificity class rules on the same `opacity` property, so an unreachable
+non-matching constellation took the later/lighter `aff-dim` and read BRIGHTER
+under a filter. (Patched directly by making reachability dominate the fade in
+`affDim`; the structural issue remains.)
+
+Goal: a clean model that supports a visual language which is easy to tweak,
+reason about, and clearly communicates each star/constellation/edge's status to
+users. A pure `core` module that, given the model + current settings, emits a
+per-element status record (the orthogonal facts: `reach` state, `active`,
+`affinity: match | fade | none` + matched colors, `benefit: match | dim | none`,
+compare `added/removed`) AND the composed final treatment (e.g. a single opacity
+that multiplies the independent factors instead of letting the CSS cascade pick a
+winner). The adapter (`svgRenderer.ts` + `styles.css`) maps records to SVG/CSS;
+the SVG glow *filters* themselves stay adapter-side (not pure), but *which*
+effects apply and *what color* become pure and headless-testable.
+
+Confirmed current visual language (verify before building): identity affinity ->
+constellation art gradient tint (only when the constellation has a *requirement*)
++ star gradient outline; active (all stars selected) -> art opacity 1 +
+self-glow, selected star white fill + gradient stroke, edge gold only when both
+endpoints selected; reachable=false -> `con-dim`/`unmet`/`unreachable` strong
+fade on art/stars/edges; passes affinity filter -> constellation-level saturated
+glow (no star/edge effect); fails affinity filter -> mild `aff-dim` on
+art/stars/edges; passes benefit filter -> matching *stars* enlarge + halo, other
+*stars* dim (edges/constellations untouched).
+
+Pointers: inputs already pure (`ReachView` from `reachability.ts`,
+`matchedAffinities` in `core/affinity.ts`). New module would live in `core/`
+(e.g. `displayState.ts`), consumed by `svgRenderer.ts`'s render loop. Needs its
+own brainstorm/spec: the exact record shape, how the orthogonal opacity factors
+compose, and how much of the CSS-class language moves to computed values.
+
 ## Known limitations (accepted)
 
 - `racialBonusPercentDamage` aggregation in the sidebar uses the union of all

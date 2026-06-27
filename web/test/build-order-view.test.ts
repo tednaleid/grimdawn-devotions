@@ -5,6 +5,7 @@ import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { buildOrderHtml } from "../src/adapters/buildOrderView";
+import { affinityColor } from "../src/adapters/affinityColors";
 import type { BuildStep } from "../src/core/reachability";
 
 const model = buildModel(doc as any);
@@ -50,4 +51,16 @@ test("buildOrderHtml searched with a minCap reports the points floor", () => {
 test("buildOrderHtml searched with null minCap reports no legal path", () => {
   const html = buildOrderHtml(model, null, null, { kind: "searched", minCap: null });
   expect(html).toContain("No legal path to this build exists");
+});
+
+test("buildOrderHtml labels a crossroads with its cardinal direction and an affinity dot", () => {
+  const steps: BuildStep[] = [
+    { kind: "scaffold-add", conId: "crossroads_chaos", points: 1, heldAfter: 1 },
+    { kind: "complete", conId: "crossroads_eldritch", points: 1, heldAfter: 2 },
+  ];
+  const html = buildOrderHtml(model, null, steps);
+  expect(html).toContain("Crossroads (NW)"); // chaos crossroads sits NW
+  expect(html).toContain("Crossroads (SW)"); // eldritch crossroads sits SW
+  expect(html).toContain(`background:${affinityColor("chaos")}`); // colored dot in the art column
+  expect(html).toContain(`background:${affinityColor("eldritch")}`);
 });

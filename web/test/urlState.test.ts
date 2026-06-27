@@ -65,12 +65,25 @@ test("encodes an uncapped (Infinity) cap as the p=0 sentinel and round-trips it"
   expect(decodeHash(`#${hash}`, canonical)!.pointCap).toBe(Infinity);
 });
 
-test("canonicalBenefitIds keeps the player block first, then pet: ids", () => {
+test("canonicalBenefitIds is player ids, then pet: ids, then 10 aff: ids", () => {
   const player = canonicalStatIds(model);
   const all = canonicalBenefitIds(model);
   expect(all.slice(0, player.length)).toEqual(player);
-  expect(all.length).toBeGreaterThan(player.length);
-  expect(all.slice(player.length).every((k) => k.startsWith("pet:"))).toBe(true);
+  const tail = all.slice(-10);
+  expect(tail.every((k) => k.startsWith("aff:"))).toBe(true);
+  expect(tail).toContain("aff:grant:eldritch");
+  expect(tail).toContain("aff:req:eldritch");
+  const middle = all.slice(player.length, all.length - 10);
+  expect(middle.length).toBeGreaterThan(0);
+  expect(middle.every((k) => k.startsWith("pet:"))).toBe(true);
+});
+
+test("affinity tags round-trip via b=", () => {
+  const benefitCanonical = canonicalBenefitIds(model);
+  const benefits = new Set(["aff:grant:eldritch", "aff:req:chaos"]);
+  const hash = encodeHash(new Set([canonical[0]!]), 30, canonical, benefits, benefitCanonical);
+  const decoded = decodeHash(`#${hash}`, canonical, benefitCanonical)!;
+  expect([...decoded.benefits].sort()).toEqual([...benefits].sort());
 });
 
 test("an old player-only b= payload still decodes under the extended canonical", () => {

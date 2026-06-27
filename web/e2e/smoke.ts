@@ -294,6 +294,38 @@ try {
   await cdp.evaluate(
     `(() => { const g = document.querySelector('#affinity .bgroup.avail.gsel[data-ids^="pet:"]'); if (g) g.querySelector('[data-gtoggle]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})); })()`,
   );
+  // Affinity filter (desktop): clicking an Affinity panel row tags its granted affinity and fades
+  // constellations that do not grant it. Toggled off again so later checks see a clean filter state.
+  await cdp.evaluate(
+    `document.querySelector('.affinity.affinity-eldritch').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
+  await Bun.sleep(120);
+  check(
+    await cdp.evaluate<boolean>(
+      "new URLSearchParams(location.hash.slice(1)).get('b') !== null && document.querySelector('.affinity-eldritch').classList.contains('vsel')",
+    ),
+    "clicking an Affinity panel row activates its grant tag (URL b= + panel vsel)",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) > 0,
+    "an affinity grant filter fades non-matching constellations (.star.aff-dim)",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.aff-glow').length")) > 0,
+    "an affinity grant filter glows matching constellations (.aff-glow)",
+  );
+  await cdp.evaluate(
+    `document.querySelector('.affinity.affinity-eldritch').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
+  await Bun.sleep(120);
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) === 0,
+    "toggling the affinity row off clears the fade",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.aff-glow').length")) === 0,
+    "toggling the affinity filter off removes the glow",
+  );
   // Spend every point: drive the point bar's cap to the validity floor (curMin == points used) so
   // nothing else stays completable. Home sets the cap to curMin via the bar's keydown handler.
   // The empties count below spans BOTH the player and pet avail lists and assumes no benefit tag is
@@ -471,6 +503,35 @@ try {
   check(
     (await cdp.evaluate<number>("document.querySelectorAll('.star.selected').length")) === selCountBefore + 1,
     "the popover Add button commits the selection",
+  );
+
+  // Touch: re-open a popover and tap a tagged benefit row. It toggles the filter and the popover stays
+  // open (the commit button is still present), and the tag is reflected in the URL b= param.
+  const tapStar2 = await cdp.evaluate<string>(
+    "document.querySelector('circle.hit.selectable:not(.selected)')?.getAttribute('data-star-id') || ''",
+  );
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="${tapStar2}"]').dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:195,clientY:300}))`,
+  );
+  await Bun.sleep(150);
+  // Any tagged row works (a Crossroads has only an affinity Grants line, no stat bonuses); pick the first.
+  const tagVid = await cdp.evaluate<string>(
+    "document.querySelector('#tooltip [data-vid]')?.getAttribute('data-vid') || ''",
+  );
+  check(tagVid.length > 0, "the touch popover shows a tagged filter row");
+  await cdp.evaluate(
+    `document.querySelector('#tooltip [data-vid="${tagVid}"]').dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerType: 'touch' }))`,
+  );
+  await Bun.sleep(150);
+  check(
+    await cdp.evaluate<boolean>(
+      `new URLSearchParams(location.hash.slice(1)).get('b') !== null && !!document.querySelector('#tooltip .tip-commit')`,
+    ),
+    "tapping a filter row in the popover toggles the filter and the popover stays open",
+  );
+  check(
+    await cdp.evaluate<boolean>(`!!document.querySelector('#tooltip [data-vid="${tagVid}"].vsel')`),
+    "the tapped filter row shows as selected in the re-shown popover",
   );
 
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);

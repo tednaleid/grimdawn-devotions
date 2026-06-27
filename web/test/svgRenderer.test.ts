@@ -5,6 +5,8 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { renderSvgMarkup } from "../src/adapters/svgRenderer";
 import type { ReachView } from "../src/core/reachability";
+import { AFFINITIES } from "../src/core/types";
+import { affinityColor, presentAffinities } from "../src/adapters/affinityColors";
 
 const model = buildModel(doc as any);
 
@@ -182,4 +184,94 @@ test("compare diff marks added stars cmp-add and removed stars cmp-rm", () => {
   // the added star is selected -> selected marker + cmp-add; the removed star is unselected + cmp-rm
   expect(markup).toContain("cmp-add");
   expect(markup).toContain("cmp-rm");
+});
+
+test("no affinity filter leaves no aff-dim classes", () => {
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
+  expect(markup).not.toContain("aff-dim");
+});
+
+test("an affinity filter mild-fades non-matching constellations but exempts benefit matches", () => {
+  const matchStar = "crossroads_eldritch:0"; // crossroads grant no affinity, so this constellation never matches
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest: null,
+      affinityFilter: { grants: new Set(["eldritch"]), requires: new Set() },
+      highlight: new Set([matchStar]),
+    },
+  );
+  expect(markup).toContain('class="star selectable match"'); // benefit match keeps full treatment
+  expect(markup).not.toContain("match aff-dim"); // a match is never faded by the affinity layer
+  expect(markup).toContain(' aff-dim"'); // non-matching stars fade
+  expect(markup).toContain('class="link aff-dim"'); // links fade too
+});
+
+test("reachability dim dominates the affinity fade: an unreachable non-matching constellation keeps con-dim, not the lighter aff-dim", () => {
+  // A constellation with an intra-constellation link, made un-activatable (every OTHER one completable).
+  const dimCon = [...model.constellations.values()].find((c) =>
+    c.starIds.some((id) => (model.stars.get(id)?.predecessors.length ?? 0) > 0),
+  )!;
+  // Filter on an affinity this constellation does not grant, so it fails the filter (non-matching).
+  const notGranted = AFFINITIES.find((a) => (dimCon.affinityBonus[a] ?? 0) === 0)!;
+  const reach: ReachView = {
+    completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
+    clickable: new Set(),
+    have: [0, 0, 0, 0, 0],
+    need: [0, 0, 0, 0, 0],
+    needSource: new Map(),
+  };
+  const svg = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest: null, reach, affinityFilter: { grants: new Set([notGranted]), requires: new Set() } },
+  );
+  // It stays reachability-dimmed; aff-dim is never layered on (it would override con-dim and lighten it).
+  expect(svg).toMatch(/class="link con-dim"/);
+  expect(svg).not.toContain("con-dim aff-dim"); // link ordering: con-dim then aff-dim
+  expect(svg).not.toContain("aff-dim con-dim"); // star ordering: aff-dim then con-dim
+});
+
+test("a non-matching constellation's art gets aff-dim", () => {
+  const c = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null)!;
+  const notGranted = AFFINITIES.find((a) => (c.affinityBonus[a] ?? 0) === 0)!; // an affinity c does not grant
+  const name = c.background!.image!.split("/").pop()!;
+  const manifest = { images: { [name]: { url: "art.webp", w: 64, h: 64 } } };
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest,
+      affinityFilter: { grants: new Set([notGranted]), requires: new Set() },
+    },
+  );
+  expect(markup).toContain('class="art aff-dim"');
+});
+
+test("a matching constellation emits a colored glow with its matched-color gradient", () => {
+  const c = [...model.constellations.values()].find(
+    (c) => c.background?.image && c.background.x != null && presentAffinities(c.affinityBonus).length > 0,
+  )!;
+  const a = presentAffinities(c.affinityBonus)[0]!; // an affinity c grants
+  const name = c.background!.image!.split("/").pop()!;
+  const manifest = { images: { [name]: { url: "art.webp", w: 64, h: 64 } } };
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest,
+      affinityFilter: { grants: new Set([a]), requires: new Set() },
+    },
+  );
+  expect(markup).toContain(`<linearGradient id="aff-grad-${c.id}"`);
+  expect(markup).toContain('class="aff-glow"');
+  expect(markup).toContain(`mask="url(#mask-${c.id})"`);
+  expect(markup).toContain('filter="url(#aff-glow)"');
+  expect(markup).toContain(affinityColor(a)); // glow uses the matched color
+});
+
+test("no glow without an affinity filter", () => {
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
+  expect(markup).not.toContain("aff-glow");
 });
