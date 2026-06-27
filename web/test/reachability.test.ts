@@ -149,9 +149,9 @@ test("Imp is reachable from the user-reported Wraith state", () => {
 // 56 (off by one): every construction order must transiently hold one extra scaffold point to bootstrap
 // the stacked Affliction-like multi-color requirements. The engine lights them via the seed-only
 // constructible() fast path in reachableExactFrom, which ignores the construction peak. Ground truth from
-// `just realmap-hunt --probe 5563,41966` (order-exact minPeakCost = INF > 55). These stay test.failing
-// until the resolver gates the exact min-peak in for the suspect shape (BACKLOG gap A); the correct
-// verdict is "dim". When fixed they flip to passing - drop the .failing then.
+// `just realmap-hunt --probe 5563,41966` (order-exact minPeakCost = INF > 55). The resolver now decides
+// covering nodes on the construction peak (peakGateReachable + the peak witness) instead of the seed-only
+// constructible fast path, so the correct verdict "dim" is returned.
 function classifyBuild(names: string[]): { reach: string; stars: number } {
   const sel = new Set<string>();
   for (const n of names) for (const sid of realModel.constellations.get(id(n))!.starIds) sel.add(sid);
@@ -159,7 +159,7 @@ function classifyBuild(names: string[]): { reach: string; stars: number } {
 }
 
 // Open in the app: http://localhost:5173/#p=55&s=HwAAAAAAAD4AAAAABzwAAAAAAAAAAACABwDAHwAAAAAA4AcAAAAAAACA_wMA8AEAAAAf
-test.failing("real-map false-reach (seed 5563): unconstructible 55-pt Affliction stack must NOT be reachable", () => {
+test("real-map false-reach (seed 5563): unconstructible 55-pt Affliction stack must NOT be reachable", () => {
   const b = classifyBuild([
     "Akeron's Scorpion",
     "Fiend",
@@ -178,7 +178,7 @@ test.failing("real-map false-reach (seed 5563): unconstructible 55-pt Affliction
 }, 30_000);
 
 // Open in the app: http://localhost:5173/#p=55&s=AADwAQCADwAAAAAfAAAAAAAAAAAAAD4AAAAAAPADAAAA4AcAAAAAPwCA_wMAAMAP
-test.failing("real-map false-reach (seed 41966): unconstructible 55-pt Affliction stack must NOT be reachable", () => {
+test("real-map false-reach (seed 41966): unconstructible 55-pt Affliction stack must NOT be reachable", () => {
   const b = classifyBuild([
     "Bull",
     "Eye of the Guardian",
@@ -194,6 +194,33 @@ test.failing("real-map false-reach (seed 41966): unconstructible 55-pt Afflictio
   expect(b.stars).toBe(55); // a full 55-point build
   expect(b.reach).toBe("dim"); // exact min-peak is 56; engine currently wrongly lights it (false-reach)
 }, 30_000);
+
+// Cheap, human-checkable false-reach anchor. At budget 3 the planner used to LIGHT every tier-1
+// single-affinity constellation (3 stars, requires 1 of a color) as completable. None are: the only
+// source of that first point of color is a crossroads you must HOLD while placing the constellation,
+// so the true construction peak is 4, not 3. The refunded cost (3) fits, the peak (4) does not -
+// reachability is a question about the peak. The 5 crossroads (req 0, peak 1) stay correctly lit.
+const TIER1_SINGLE = ["Eel", "Hammer", "Hawk", "Hound", "Jackal", "Lion", "Lizard", "Scholar's Light"];
+function classifySingle(conName: string, budget: number): string {
+  const sel = new Set(realModel.constellations.get(id(conName))!.starIds);
+  return classifyForSelection(cons, cover, selectionSummary(realModel, sel), budget);
+}
+
+test("tier-1 single-affinity constellations are dim at budget 3 (peak 4), reachable at budget 4", () => {
+  for (const name of TIER1_SINGLE) {
+    expect(classifySingle(name, 3)).toBe("dim"); // refunded cost 3, but construction peak 4 > 3
+    expect(classifySingle(name, 4)).toBe("reachable"); // peak 4 fits
+  }
+});
+
+test("crossroads stay reachable at budget 3 (req 0, peak 1)", () => {
+  const crossroads = cons.filter((c) => c.size === 1 && c.req.every((v) => v === 0) && c.grant.some((v) => v > 0));
+  expect(crossroads.length).toBe(5); // one per color
+  for (const c of crossroads) {
+    const sel = new Set(realModel.constellations.get(c.id)!.starIds);
+    expect(classifyForSelection(cons, cover, selectionSummary(realModel, sel), 3)).toBe("reachable");
+  }
+});
 
 test("a demanding constellation click stays responsive: selectionView under 400ms", () => {
   // The per-click engine cost (validity-floor search + dimming sweep, no DOM) for a whole non-self-covering

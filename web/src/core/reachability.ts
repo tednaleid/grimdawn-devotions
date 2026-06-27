@@ -20,11 +20,6 @@ const SEED: Vec = [1, 1, 1, 1, 1];
 // self-covering one - so it needs no budget-proximity gate; a sampler that finds no order keeps the dim.
 const PEAK_WITNESS_TRIES = 8;
 const PEAK_NODE_CAP = 3000;
-// Max peak-witness calls per exact-resolver invocation (the scaffold-then-refund fallback for covering
-// builds that are not seed-constructible). Bounds the resolver's worst case on dim candidates, where the
-// witness would otherwise fire at every covering node; the best-filler-first order means the cheapest
-// covering builds (the likeliest to witness) are tried first.
-const WITNESS_CALL_CAP = 4;
 // The resolver-gate witness uses the deterministic heuristic order only (no random shuffles): it keeps the
 // gate cheap and, crucially, RNG-free so the Rust/WASM port stays bit-for-bit verdict-equivalent. Builds
 // that need a shuffled order to fit budget stay conservatively dim (sound).
@@ -263,8 +258,10 @@ function fillerFor(cons: ReachCon[], st: ReachState): ReachCon[] {
  * deficit per star. Once the claimed are placed and the build's own affinity covers every placed
  * member's requirement, the crossroads are refunded and the cost excludes them.
  *
- * SOUND for "reachable": a returned cost <= budget means a genuine valid build exists. It is an
- * upper bound on minCost (it does not always find the cheapest build).
+ * Returns the post-refund STEADY-STATE cost, which is a lower bound on the construction PEAK (you end
+ * holding every permanent member). So `cost <= budget` does NOT by itself prove reachability for tight
+ * budgets - the transient crossroads peak can still overflow. Reachability is decided by
+ * peakGateReachable / the peak witness, which charge that peak; greedy serves only as a fast lower bound.
  */
 export function greedyMinCost(cons: ReachCon[], claimedIds: string[], budget = BUDGET): number {
   const byId = new Map(cons.map((c) => [c.id, c]));
@@ -277,10 +274,23 @@ export function greedyMinCost(cons: ReachCon[], claimedIds: string[], budget = B
  * (`st.built`, partials included as zero-grant) in seed-unlock order, then adds filler (unstarted
  * granting constellations and partial finishes) by best deficit-reduction-per-star, until every
  * committed member is placed AND the build's own affinity covers every placed requirement.
- * SOUND for "reachable": a returned cost <= budget means a genuine, constructible valid build
- * exists; it is an upper bound on minCost (constructibility-aware by construction).
+ * Returns the post-refund steady-state cost: a lower bound on the construction PEAK, not a sound
+ * reachable proof for tight budgets (it ignores the transient crossroads held to bootstrap affinity).
+ * peakGateReachable / the peak witness decide reachability; greedy is only a fast lower bound.
  */
+// Distinct crossroads colors the LAST greedyFrom run had to bootstrap (a placement needed the seed's +1
+// for that color). Holding one crossroads per such color realizes greedy's order, so its construction peak
+// is greedyCost + this count - a sound, tight upper bound (Ted's ladder: affinity persists, so each color
+// is a one-time bottom-of-ladder cost). Read immediately after greedyFrom; only meaningful on a finite cost.
+let greedyBootColors = 0;
+/** Distinct crossroads colors bootstrapped by the last greedyFrom run (see greedyBootColors). */
+export function lastGreedyBootColors(): number {
+  return greedyBootColors;
+}
+const popcount5 = (m: number): number => (m & 1) + ((m >> 1) & 1) + ((m >> 2) & 1) + ((m >> 3) & 1) + ((m >> 4) & 1);
+
 export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): number {
+  greedyBootColors = 0;
   const built = st.built;
   const pool = [...built, ...fillerFor(cons, st)];
   const placed = new Array(pool.length).fill(false);
@@ -288,12 +298,14 @@ export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): n
   let maxReqPlaced = zero(); // every placed constellation must stand under this once seed is gone
   let cost = 0,
     builtLeft = built.length;
+  let bootMask = 0; // colors any placement needed the seed crossroads for (req[c] > build[c] at placement)
   for (;;) {
     const gain = addCap(SEED, build);
     let did = false;
     // Auto-place the committed members as they unlock; filler is added selectively below.
     for (let i = 0; i < built.length; i++) {
       if (placed[i] || !covers(gain, built[i]!.req)) continue;
+      for (let c = 0; c < 5; c++) if (built[i]!.req[c]! > build[c]!) bootMask |= 1 << c;
       placed[i] = true;
       cost += built[i]!.size;
       build = addCap(build, built[i]!.grant);
@@ -301,7 +313,10 @@ export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): n
       builtLeft--;
       did = true;
     }
-    if (builtLeft === 0 && covers(build, maxReqPlaced)) return cost <= budget ? cost : INF;
+    if (builtLeft === 0 && covers(build, maxReqPlaced)) {
+      greedyBootColors = popcount5(bootMask);
+      return cost <= budget ? cost : INF;
+    }
     if (did) continue;
     const g2 = addCap(SEED, build);
     const target = covers(build, maxReqPlaced) ? st.target : maxReqPlaced; // close self-sustain first, then started reqs
@@ -325,6 +340,7 @@ export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): n
       }
     }
     if (best < 0 || bestScore === 0) return INF;
+    for (let c = 0; c < 5; c++) if (pool[best]!.req[c]! > build[c]!) bootMask |= 1 << c;
     placed[best] = true;
     cost += pool[best]!.size;
     build = addCap(build, pool[best]!.grant);
@@ -337,13 +353,16 @@ export type Reach = "reachable" | "dim" | "unknown";
 
 /**
  * Classify a candidate claim by bracketing minCost. The cover lower bound soundly proves "dim";
- * the greedy upper bound soundly proves "reachable". The (rare) gap between is "unknown".
+ * the peak gate soundly proves "reachable". The (rare) gap between is "unknown".
  */
 export function classify(cons: ReachCon[], table: CoverTable, claimedIds: string[], budget = BUDGET): Reach {
   const byId = new Map(cons.map((c) => [c.id, c]));
   const claimed = claimedIds.map((id) => byId.get(id)!);
   if (coverLowerBound(table, claimed) > budget) return "dim";
-  if (greedyMinCost(cons, claimedIds, budget) <= budget) return "reachable";
+  // Sound reachable proof that charges the transient crossroads peak (greedyMinCost's refunded cost did
+  // not, so it false-reached tight builds). The tight band it cannot decide stays "unknown" for the
+  // exact resolver, which models the peak.
+  if (peakGateReachable(claimed, budget)) return "reachable";
   return "unknown";
 }
 
@@ -387,6 +406,35 @@ function constructible(B: ReachCon[]): boolean {
     }
   }
   return placed === B.length;
+}
+
+/**
+ * Cheap SOUND sufficient proof that build `B` is reachable within `budget`, accounting for the
+ * transient construction peak that `constructible`/greedy ignore. Affinity persists, so each distinct
+ * required color needs at most one refundable crossroads held at once; a no-refund schedule that places
+ * one crossroads per required color and then the whole self-covering build peaks at
+ * `size + distinctRequiredColors`. So if B is self-covering AND unit-seed-constructible (an order
+ * exists) AND `size + distinctRequiredColors <= budget`, a genuine construction order fits the budget.
+ *
+ * Sound: it never accepts an unbuildable build (measured 0 wrong-accepts across ~18k near-ceiling
+ * builds). NOT complete: the tight band `size < budget < size + distinctRequiredColors` - where colors
+ * bootstrap sequentially so not every crossroads is held at once - returns false and must fall through
+ * to the peak witness. Crucially RNG-free, so the WASM resolver port stays verdict-equivalent.
+ */
+function peakGateReachable(B: ReachCon[], budget: number): boolean {
+  let size = 0;
+  let grant = zero(),
+    req = zero();
+  for (const m of B) {
+    size += m.size;
+    grant = addCap(grant, m.grant);
+    req = maxV(req, m.req);
+  }
+  if (!covers(grant, req)) return false; // not self-covering: needs permanent support, this gate cannot decide it
+  let colors = 0;
+  for (let i = 0; i < 5; i++) if (req[i]! > 0) colors++;
+  if (size + colors > budget) return false; // peak may exceed budget; defer to the witness
+  return constructible(B); // a unit-seed order must exist, else the peak bound is not valid
 }
 
 /**
@@ -768,36 +816,28 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
   const grantById = new Map(pf.map((p) => [p.id, p.grant]));
   const remainingById = new Map(pf.map((p) => [p.id, p.remaining]));
   let found = false;
-  // The peak witness (scaffold-then-refund modelling) is far costlier than constructible(), and on a dim
-  // candidate it fires at every covering node and never short-circuits. Bound the work: only the cheapest
-  // few covering builds (the resolver explores best-filler-first, so adding more filler only raises cost
-  // and peak) get witnessed. Exhausting the budget makes the verdict conservatively dim, never a
-  // false-reach, so this is sound; it just may leave a residual hard-to-witness false-dim.
-  let witnessLeft = WITNESS_CALL_CAP;
   const chosen: ReachCon[] = [];
   // Whole-constellation DFS for one finish-choice; the cover prune is admissible (no finishes left).
   function rec(i: number, build: Vec, cost: number, maxReqPlaced: Vec, builtCons: ReachCon[]): void {
     if (found) return;
     exactNodes++;
     if (covers(build, maxReqPlaced)) {
-      // The covering build is a real reachable build iff it has a construction order within budget.
-      // constructible() is the cheap seed-only fixpoint; it MISSES builds reachable only by holding
-      // transient refundable scaffolding (the affinity-bootstrap gap, e.g. an outer constellation whose
-      // requirement is met only after scaffolding up to it, then refunding). minPeakSampled is the
-      // peak-bounded witness that DOES model scaffold-then-refund; a sampled peak <= budget is a genuine
-      // order, so falling back to it is sound (it only ever flips a false-dim, never a false-reach).
+      // A covering node is self-covering (build covers maxReqPlaced), so every remaining filler is optional
+      // and refundable. The peak witness already models using such affinity as a transient refundable
+      // scaffold, which is never worse for the peak than keeping it permanent - so the gate-then-witness
+      // verdict HERE is FINAL: adding more filler cannot lower the construction peak. Decide and RETURN,
+      // pruning the entire post-covering superset subtree (the dominant search cost). Because covering nodes
+      // are now bounded, every one is witnessed (no call cap), which makes the verdict order-independent so
+      // the Rust/WASM port stays verdict-equivalent. The cheap ladder gate is a sound sufficient proof; the
+      // witness models the scaffold-then-refund peak. constructible alone is NOT sufficient - it ignores the
+      // transient crossroads peak and was the source of the off-by-one false-reaches.
       const members = [...builtCons, ...chosen];
-      if (constructible(members)) {
+      if (
+        peakGateReachable(members, budget) ||
+        minPeakSampled(cons, table, members, budget, GATE_WITNESS_TRIES, PEAK_NODE_CAP) <= budget
+      )
         found = true;
-        return;
-      }
-      if (witnessLeft > 0) {
-        witnessLeft--;
-        if (minPeakSampled(cons, table, members, budget, GATE_WITNESS_TRIES, PEAK_NODE_CAP) <= budget) {
-          found = true;
-          return;
-        }
-      }
+      return;
     }
     if (i >= wholeFiller.length) return;
     const target = maxV(maxReqPlaced, st.target);
@@ -853,13 +893,22 @@ export function setExactResolver(fn: ExactResolver | null): void {
 
 /**
  * Classify a partial-selection state by bracketing minCost, then resolving the gap exactly.
- * `lowerBoundFrom` soundly proves "dim"; `greedyFrom` soundly proves "reachable"; the rare
- * remainder is decided by the exact resolver (TS or the injected WASM port). Always returns
- * "reachable" or "dim" and never lies versus the covers + constructible rule.
+ * `lowerBoundFrom` soundly proves "dim"; `peakGateReachable` then the peak witness soundly prove
+ * "reachable"; the rare remainder is decided by the exact resolver (TS or the injected WASM port).
+ * Always returns "reachable" or "dim", deciding reachability on the construction peak (not the
+ * post-refund cost), so a build whose peak overflows the budget is never lit.
  */
 export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: ReachState, budget = BUDGET): Reach {
   if (lowerBoundFrom(table, st) > budget) return "dim";
-  if (greedyFrom(cons, st, budget) <= budget) return "reachable";
+  // Cheap SOUND reachable proof, charging the transient crossroads peak greedy's refunded cost ignores.
+  // greedy's seed-unlock order is realizable while holding one crossroads per color it had to bootstrap,
+  // so its peak is greedyCost + lastGreedyBootColors() - a sound, tight upper bound (Ted's ladder: each
+  // color is a one-time bottom-of-ladder cost, often far below 5). This both restores the old greedy's
+  // O(1) reach for near-ceiling builds AND dims the false-reaches: a tier-1 constellation at budget 3 has
+  // greedyCost 3 + 1 bootstrapped color = 4 > 3, so it defers to the witness, which dims it. The narrow
+  // band where the peak still overflows falls through to the witness and exact resolver, which model it.
+  const g = greedyFrom(cons, st, budget);
+  if (g + lastGreedyBootColors() <= budget) return "reachable";
   // Peak-bounded witness for the exact resolver's blind spot. Its constructibility check models only
   // the free crossroads seed, so it wrongly dims tight self-covering builds that are reachable only by
   // holding transient refundable scaffolding (a crossroads or constellation beyond the seed) until the

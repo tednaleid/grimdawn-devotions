@@ -147,6 +147,24 @@ capstones like Abomination and Azrakaa). These can never be self-sustaining or p
 of a self-sustaining group. Their requirement must be met permanently by other
 constellations in the final build.
 
+### The affinity ladder
+
+Affinity you have already built **persists** as you keep constructing, so a
+Crossroads is a one-time cost at the bottom of the ladder, not a recurring tax. The
+first source of a color is the expensive step: to field **Eel** (3 stars, requires
+1 primordial, grants 5 primordial) you must temporarily hold the primordial
+Crossroads to activate it. But once Eel is complete and supplying 5 primordial,
+every later constellation that needs up to 5 primordial activates for just the cost
+of its own stars, with no Crossroads at all. **Gallows** (4 stars, requires 1
+primordial) costs only its 4 points once Eel is down, and you never need the
+primordial Crossroads again for any primordial demand Eel already covers.
+
+This is the broader meaning of "individually self-sustaining" above: such a
+constellation does not merely pay back the one point it borrowed, it raises the
+whole ladder for its color, and the rest of the build climbs it for free. A color
+only forces another Crossroads when a constellation needs more of it than any
+single completed source supplies, which is where the group locks below come in.
+
 ### Temporary scaffolding and the refund
 
 The way to activate a group like Affliction's is to **temporarily** add an affinity
@@ -181,6 +199,30 @@ that can make a self-covering build unreachable is **budget**: whether the tempo
 scaffolding fits inside 55 points at the tightest moment of construction. A build
 near the 55-point ceiling can be impossible purely because there is no room to hold
 the scaffolding it needs to activate its hardest constellation.
+
+### The construction peak, not the final total, is the cost
+
+Because every intermediate state must stay under budget, the points that gate a
+build are the **most you hold at any single instant** during a legal construction,
+not the size of the finished selection. Transient scaffolding you will later refund
+still counts while you hold it, so the peak can sit above the final total, and it is
+the peak that has to fit the budget.
+
+The simplest example in the whole system is a single tier-1 constellation. **Eel**
+is 3 stars and requires 1 primordial. It looks like a 3-point pickup, but to place
+its first star you must already hold 1 primordial, and the only source with no
+prerequisite is the primordial Crossroads. So a legal construction is: hold the
+Crossroads (1 point), complete Eel's 3 stars (the peak is now Crossroads plus 3
+stars = **4 points**), then let Eel's own +5 primordial cover the requirement and
+refund the Crossroads back down to 3. Eel is therefore unbuildable at a 3-point
+budget and only becomes reachable at 4, even though the finished constellation is
+3 points.
+
+The same gap scales to the ceiling: a self-covering build that fits 55 points in its
+final form is still unreachable if no construction order keeps the peak at or under
+55, because some constellation can only be activated while extra scaffolding is held.
+This is why "reachable" is decided on the construction peak, not on the point total
+of the finished build.
 
 ### A legal selection need not be valid on its own
 

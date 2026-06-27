@@ -139,6 +139,35 @@ fn constructible(members: &[([i32; 5], [i32; 5], i32)]) -> bool {
     placed == members.len()
 }
 
+// Cheap SOUND reachable proof, mirroring the TS peakGateReachable. Affinity persists, so a self-covering,
+// unit-seed-constructible build holds at most one refundable crossroads per required color: a no-refund
+// schedule peaks at size + distinct_required_colors. If that fits the budget a genuine construction order
+// exists. Sound (never accepts an unbuildable build); the tight band falls through to the peak witness.
+// constructible alone is NOT sufficient - it ignores the transient crossroads peak (the false-reach bug).
+fn peak_gate_reachable(members: &[([i32; 5], [i32; 5], i32)], budget: i32) -> bool {
+    let mut size = 0i32;
+    let mut grant = [0i32; 5];
+    let mut req = [0i32; 5];
+    for m in members {
+        size += m.2;
+        grant = add_cap(&grant, &m.1);
+        req = max_v(&req, &m.0);
+    }
+    if !covers(&grant, &req) {
+        return false; // not self-covering: needs permanent support, this gate cannot decide it
+    }
+    let mut colors = 0i32;
+    for i in 0..5 {
+        if req[i] > 0 {
+            colors += 1;
+        }
+    }
+    if size + colors > budget {
+        return false; // peak may exceed budget; defer to the witness
+    }
+    constructible(members)
+}
+
 // --- peak witness (scaffold-then-refund construction), the TS minPeakSampled with GATE_WITNESS_TRIES=0 ---
 // Sound peak-bounded construction check: it can only flip a false-dim to reachable, never a false-reach.
 // Verdict-identical to the TS gate witness (deterministic heuristic order, no RNG).
@@ -273,7 +302,6 @@ fn min_peak(members: &[([i32; 5], [i32; 5], i32)], gsorted: &[usize], in_b: &[bo
     peak
 }
 
-const WITNESS_CALL_CAP: i32 = 4;
 const PEAK_NODE_CAP: i32 = 3000;
 
 struct Ctx<'a> {
@@ -288,7 +316,6 @@ struct Ctx<'a> {
     started: &'a [bool], // B's own constellations (started), masked out of the scaffold pool
     filler: &'a [usize], // filler index -> constellation index, to mask chosen filler too
     gsorted: &'a [usize], // every granting constellation, ratio-sorted: the scaffold pool source
-    witness_left: i32,
     seen: FxMap,
     found: bool,
 }
@@ -298,29 +325,28 @@ impl<'a> Ctx<'a> {
             return;
         }
         if covers(&build, &maxreq) {
-            // A covering build is reachable iff it has a construction order within budget. constructible()
-            // is the cheap seed-only fixpoint; it misses builds reachable only by holding transient
-            // refundable scaffolding. min_peak() is the peak-bounded witness that models scaffold-then-
-            // refund (sound: it only flips a false-dim, never a false-reach). Bounded by witness_left.
+            // A covering node is self-covering, so every remaining filler is optional and refundable. The
+            // peak witness already models using such affinity as a transient refundable scaffold (never worse
+            // for the peak than keeping it permanent), so the gate-then-witness verdict HERE is FINAL: more
+            // filler cannot lower the peak. Decide and RETURN, pruning the post-covering superset subtree (the
+            // dominant cost). Every covering node is witnessed (no call cap), keeping the verdict order-
+            // independent so this stays verdict-equivalent to the TS reachableExactFrom.
             let mut members: Vec<([i32; 5], [i32; 5], i32)> = self.bcons.to_vec();
             for &c in &self.chosen {
                 members.push((self.fr[c], self.fg[c], self.fs[c]));
             }
-            if constructible(&members) {
+            if peak_gate_reachable(&members, self.budget) {
                 self.found = true;
                 return;
             }
-            if self.witness_left > 0 {
-                self.witness_left -= 1;
-                let mut in_b = self.started.to_vec();
-                for &c in &self.chosen {
-                    in_b[self.filler[c]] = true;
-                }
-                if min_peak(&members, self.gsorted, &in_b, self.budget, PEAK_NODE_CAP) <= self.budget {
-                    self.found = true;
-                    return;
-                }
+            let mut in_b = self.started.to_vec();
+            for &c in &self.chosen {
+                in_b[self.filler[c]] = true;
             }
+            if min_peak(&members, self.gsorted, &in_b, self.budget, PEAK_NODE_CAP) <= self.budget {
+                self.found = true;
+            }
+            return;
         }
         if i >= self.nf {
             return;
@@ -465,7 +491,6 @@ pub extern "C" fn reachable_exact(ptr: *const i32, _len: usize, budget: i32) -> 
                 started: &started,
                 filler: &filler,
                 gsorted: &gsorted,
-                witness_left: WITNESS_CALL_CAP,
                 seen: FxMap::default(),
                 found: false,
             };
