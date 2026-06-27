@@ -249,9 +249,13 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
         `<linearGradient id="aff-grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(cols)}</linearGradient>`,
       );
       ensureMask(c.id, art.url, x, y, art.w, art.h);
-      parts.push(
-        `<rect class="aff-glow" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`,
-      );
+      const glow = `<rect class="aff-glow" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`;
+      // A selected constellation also carries its own #self-glow-art bloom (Layer 1), which raises the
+      // local brightness and would swallow a single faint halo - so a selected match showed no color.
+      // Stack the halo for active ones so the matched color still reads as a ring around them, while they
+      // stay the brightest thing via the self-glow. Unselected matches keep the single, softer pass.
+      parts.push(glow);
+      if (isActive(c)) parts.push(glow);
     }
   }
 
