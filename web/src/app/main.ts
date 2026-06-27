@@ -101,6 +101,7 @@ async function boot() {
   const tip = tooltipView(tooltipEl);
   const isTouch = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
   let popoverTarget: CommitTarget | null = null; // the star/constellation the open popover commits
+  let dismissedPopoverTap = false; // a tap that just dismissed a popover; its click must not reopen one
   // Max devotion points = the bar's full extent; the slider floor is the validity minimum (curMin).
   const MAX_POINTS = 55;
   let curMin = 0; // selectionMinCost for the current selection, recomputed each refresh
@@ -528,8 +529,21 @@ async function boot() {
     if (popoverTarget && !tooltipEl.contains(e.target as Node)) {
       popoverTarget = null;
       tip.hide();
+      dismissedPopoverTap = true; // swallow this tap's click so it does not open a new popover
     }
   });
+  // On mobile it is hard to find empty space, so a dismissing tap often lands on a constellation. Stop
+  // that tap's click from reaching the map (capture phase runs before the map's bubble click handler).
+  document.addEventListener(
+    "click",
+    (e) => {
+      if (dismissedPopoverTap) {
+        dismissedPopoverTap = false;
+        if (mapContainer.contains(e.target as Node)) e.stopPropagation();
+      }
+    },
+    true,
+  );
 
   refresh();
 }

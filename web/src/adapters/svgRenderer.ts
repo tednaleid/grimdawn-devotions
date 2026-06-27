@@ -163,9 +163,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   // wide blue) under the star approximate the prior drop-shadow stack; sized in user units (~star r 12).
   defs.push(
     `<filter id="match-glow" x="-400%" y="-400%" width="900%" height="900%" color-interpolation-filters="sRGB">` +
-      `<feGaussianBlur in="SourceAlpha" stdDeviation="9" result="b1"/><feFlood flood-color="#cfe8ff" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
+      `<feGaussianBlur in="SourceAlpha" stdDeviation="9" result="b1"/><feFlood flood-color="#e3f2ff" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
       `<feGaussianBlur in="SourceAlpha" stdDeviation="22" result="b2"/><feFlood flood-color="#6cb6ff" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
-      `<feMerge><feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g1"/><feMergeNode in="SourceGraphic"/></feMerge>` +
+      `<feMerge><feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="SourceGraphic"/></feMerge>` +
       `</filter>`,
   );
 
