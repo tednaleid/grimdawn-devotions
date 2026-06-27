@@ -202,7 +202,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   );
 
   // Affinity match glow: a diffuse colored halo. The source is a gradient-filled, art-masked rect (the
-  // constellation's MATCHED affinity colors), blurred and brightened into a soft halo. SVG-native (CSS
+  // constellation's MATCHED affinity colors), blurred, saturated, and stacked into a soft halo. The
+  // intensity comes from saturation plus alpha density (the repeated merge), not an RGB brightness lift:
+  // multiplying the channels clips the strong colors toward white (purple suffers most). SVG-native (CSS
   // drop-shadow on SVG fails on WebKit). stdDeviation is in user units, so the halo scales with zoom;
   // start diffuse and tune. The filter region is expanded so the blur is not clipped.
   // Only emitted when an affinity filter is active (no filter -> no glow layer -> no def needed).
@@ -210,8 +212,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     defs.push(
       `<filter id="aff-glow" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">` +
         `<feGaussianBlur in="SourceGraphic" stdDeviation="55" result="b"/>` +
-        `<feComponentTransfer in="b" result="bright"><feFuncR type="linear" slope="2"/><feFuncG type="linear" slope="2"/><feFuncB type="linear" slope="2"/></feComponentTransfer>` +
-        `<feMerge><feMergeNode in="bright"/><feMergeNode in="bright"/><feMergeNode in="bright"/></feMerge>` +
+        `<feColorMatrix in="b" type="saturate" values="1.8" result="sat"/>` +
+        `<feMerge><feMergeNode in="sat"/><feMergeNode in="sat"/><feMergeNode in="sat"/><feMergeNode in="sat"/></feMerge>` +
         `</filter>`,
     );
   }
