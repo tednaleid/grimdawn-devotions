@@ -19,7 +19,7 @@ type NavHandlerStore = { _handlers?: NavHandlers };
 
 const DRAG_THRESHOLD = 4;
 
-export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts): { reset(): void } {
+export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts): void {
   const baseVb: ViewBox = fitViewBox(opts.fitPoints, 60);
 
   function current(): ViewBox {
@@ -126,12 +126,6 @@ export function attachNav(svgGetter: () => SVGSVGElement | null, opts: NavOpts):
   window.addEventListener("pointercancel", onUp);
   // Caller attaches these to the container in main.ts:
   (attachNav as unknown as NavHandlerStore)._handlers = { onWheel, onDown, onClickCapture };
-
-  return {
-    reset() {
-      apply(baseVb);
-    },
-  };
 }
 
 export function navHandlers(): NavHandlers {

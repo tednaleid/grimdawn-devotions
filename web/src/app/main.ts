@@ -259,7 +259,7 @@ async function boot() {
   benefitsEl.addEventListener("click", onBenefitClick);
   affinityEl.addEventListener("click", onBenefitClick);
 
-  const _nav = attachNav(() => mapContainer.querySelector("svg"), {
+  attachNav(() => mapContainer.querySelector("svg"), {
     fitPoints: [...model.stars.values()].map((s) => s.position),
     onDragStateChange: (d) => mapContainer.classList.toggle("grabbing", d),
   });
@@ -482,6 +482,8 @@ async function boot() {
     benefitsEl.classList.toggle("open", drawer === "left");
     affinityEl.classList.toggle("open", drawer === "right");
     scrim.classList.toggle("show", drawer !== "none");
+    leftBtn.setAttribute("aria-expanded", String(drawer === "left"));
+    rightBtn.setAttribute("aria-expanded", String(drawer === "right"));
   }
   function setDrawer(next: DrawerState) {
     drawer = next;
@@ -497,6 +499,15 @@ async function boot() {
   leftBtn.addEventListener("click", () => setDrawer(toggleDrawer(drawer, "left")));
   rightBtn.addEventListener("click", () => setDrawer(toggleDrawer(drawer, "right")));
   scrim.addEventListener("click", () => setDrawer("none"));
+  // Escape closes an open drawer or popover (keyboard dismiss; the scrim handles pointer dismiss).
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (drawer !== "none") setDrawer("none");
+    if (popoverTarget) {
+      popoverTarget = null;
+      tip.hide();
+    }
+  });
   updateNarrow();
 
   // Touch popover: show the inspect tooltip with an Add/Remove button; commit only via that button.

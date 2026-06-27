@@ -382,6 +382,22 @@ try {
     await cdp.evaluate<boolean>("document.getElementById('affinity').classList.contains('open')"),
     "tapping the right toggle opens the affinity drawer",
   );
+  check(
+    (await cdp.evaluate<string | null>("document.getElementById('drawer-right-btn').getAttribute('aria-expanded')")) ===
+      "true",
+    "the open toggle reports aria-expanded=true",
+  );
+  // Escape closes the open drawer (keyboard dismiss).
+  await cdp.evaluate("document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))");
+  await Bun.sleep(250);
+  check(
+    await cdp.evaluate<boolean>(
+      "!document.getElementById('affinity').classList.contains('open') && document.getElementById('drawer-right-btn').getAttribute('aria-expanded') === 'false'",
+    ),
+    "Escape closes the drawer and clears aria-expanded",
+  );
+  await cdp.evaluate("document.getElementById('drawer-right-btn').click()");
+  await Bun.sleep(250);
   await cdp.evaluate("document.getElementById('drawer-left-btn').click()");
   await Bun.sleep(250);
   check(

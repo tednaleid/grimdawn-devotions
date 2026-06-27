@@ -816,7 +816,8 @@ body.narrow .drawer-toggle {
   display: flex;
   position: fixed;
   top: calc(var(--header-h, 52px) + 8px);
-  z-index: 24;
+  /* Above the scrim (25) so the opposite toggle stays tappable to switch drawers directly while one is open. */
+  z-index: 26;
   align-items: center;
   background: #21262d;
   color: #e6edf3;
