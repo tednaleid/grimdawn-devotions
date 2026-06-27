@@ -594,8 +594,8 @@ main {
   transform-box: fill-box;
   transform-origin: center;
   transform: scale(1.45);
-  /* brightness() trails the glows so it lifts both the star and its halo ~25%. */
-  filter: drop-shadow(0 0 4px #cfe8ff) drop-shadow(0 0 10px #6cb6ff) drop-shadow(0 0 16px #6cb6ff) brightness(1.25);
+  /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
+  filter: url(#match-glow);
 }
 .star.dim {
   opacity: 0.4; /* non-matching stars on reachable constellations: visible but clearly below matches */
