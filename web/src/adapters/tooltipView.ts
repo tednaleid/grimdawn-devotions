@@ -9,32 +9,50 @@ import type {
   PetInfo,
   StarId,
 } from "../core/types";
-import { formatBonusRows, formatPet, formatPowerStats } from "../core/statFormat";
+import { formatBonusRowsWithIds, formatPet, formatPowerStats } from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
+import { affinityTagId } from "../core/urlState";
 
 type AffinityTotals = Record<Affinity, number>;
 
-function affinityLine(map: AffinityMap): string {
-  return presentAffinities(map)
-    .map((a) => `<span class="aff">${affinityOrb(a)}${a} ${map[a]}</span>`)
-    .join(" ");
-}
-
-// Required affinities: only the ones the player is still short on are flagged missing (red).
-function requiresLine(map: AffinityMap, totals?: AffinityTotals): string {
+function affinityLine(map: AffinityMap, selectedBenefits: Set<string>): string {
   return presentAffinities(map)
     .map((a) => {
-      const need = map[a]!;
-      const met = !totals || (totals[a] ?? 0) >= need;
-      return `<span class="aff ${met ? "met" : "missing"}">${affinityOrb(a)}${a} ${need}</span>`;
+      const vid = affinityTagId("grant", a);
+      const sel = selectedBenefits.has(vid) ? " vsel" : "";
+      return `<span class="aff${sel}" data-vid="${vid}">${affinityOrb(a)}${a} ${map[a]}</span>`;
     })
     .join(" ");
 }
 
-function bonusRowsHtml(bonuses: Record<string, number>, racialTarget?: string[]): string {
-  return formatBonusRows(bonuses, { racialTarget })
-    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
+// Required affinities: only the ones the player is still short on are flagged missing (red).
+function requiresLine(map: AffinityMap, totals: AffinityTotals | undefined, selectedBenefits: Set<string>): string {
+  return presentAffinities(map)
+    .map((a) => {
+      const need = map[a]!;
+      const met = !totals || (totals[a] ?? 0) >= need;
+      const vid = affinityTagId("req", a);
+      const sel = selectedBenefits.has(vid) ? " vsel" : "";
+      return `<span class="aff ${met ? "met" : "missing"}${sel}" data-vid="${vid}">${affinityOrb(a)}${a} ${need}</span>`;
+    })
+    .join(" ");
+}
+
+// Bonus rows tagged with their filter id (`scope` is "" for player bonuses, "pet:" for pet bonuses);
+// a row whose tag is in selectedBenefits is marked selected (vsel) so it reads like the sidebar.
+function bonusRowsHtml(
+  bonuses: Record<string, number>,
+  selectedBenefits: Set<string>,
+  scope: string,
+  racialTarget?: string[],
+): string {
+  return formatBonusRowsWithIds(bonuses, { racialTarget })
+    .map((r) => {
+      const vid = `${scope}${r.id}`;
+      const sel = selectedBenefits.has(vid) ? " vsel" : "";
+      return `<div class="tip-bonus${sel}" data-vid="${vid}"><span class="val">${r.value}</span> ${r.label}</div>`;
+    })
     .join("");
 }
 
@@ -44,11 +62,10 @@ function weaponReqHtml(description: string | null | undefined): string {
   return description ? `<div class="tip-weapon-req">${description}</div>` : "";
 }
 
-// "Bonus to All Pets": the same stat lines as a player bonus, under a header (GD shows
-// these in a distinct block). Empty when the star/constellation grants no pet bonuses.
-function petBonusHtml(petBonuses?: Record<string, number>): string {
+// "Bonus to All Pets": the same stat lines as a player bonus, under a header, tagged with pet: ids.
+function petBonusHtml(petBonuses: Record<string, number> | undefined, selectedBenefits: Set<string>): string {
   if (!petBonuses || Object.keys(petBonuses).length === 0) return "";
-  return `<div class="tip-pet-bonus-head">Bonus to All Pets</div>${bonusRowsHtml(petBonuses)}`;
+  return `<div class="tip-pet-bonus-head">Bonus to All Pets</div>${bonusRowsHtml(petBonuses, selectedBenefits, "pet:")}`;
 }
 
 // Star tooltip: power name + proc trigger ("Scorpion Sting (25% Chance on Attack)"),
@@ -76,9 +93,13 @@ function petHtml(pet: PetInfo): string {
   return `<div class="tip-pet">${summon}</div>${lines}`;
 }
 
-function affinitySections(con: Constellation, totals?: AffinityTotals): string {
-  const req = requiresLine(con.affinityRequired, totals);
-  const grant = affinityLine(con.affinityBonus);
+function affinitySections(
+  con: Constellation,
+  totals: AffinityTotals | undefined,
+  selectedBenefits: Set<string>,
+): string {
+  const req = requiresLine(con.affinityRequired, totals, selectedBenefits);
+  const grant = affinityLine(con.affinityBonus, selectedBenefits);
   return (
     (req ? `<div class="tip-req">Requires: ${req}</div>` : "") +
     (grant ? `<div class="tip-grant">Grants: ${grant}</div>` : "")
@@ -119,12 +140,13 @@ export function tooltipView(el: HTMLElement) {
       clientY: number,
       totals?: AffinityTotals,
       commit?: { label: string; enabled: boolean },
+      selectedBenefits: Set<string> = new Set(),
     ) {
       const star = model.stars.get(starId);
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? powerHtml(star.celestialPower) : "";
-      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, star.racialTarget)}${weaponReqHtml(star.weaponRequirement?.description)}${petBonusHtml(star.petBonuses)}${affinitySections(con, totals)}${commitHtml(commit)}`;
+      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, selectedBenefits, "", star.racialTarget)}${weaponReqHtml(star.weaponRequirement?.description)}${petBonusHtml(star.petBonuses, selectedBenefits)}${affinitySections(con, totals, selectedBenefits)}${commitHtml(commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
@@ -136,6 +158,7 @@ export function tooltipView(el: HTMLElement) {
       totals?: AffinityTotals,
       dim?: { needs?: number; cap: number },
       commit?: { label: string; enabled: boolean },
+      selectedBenefits: Set<string> = new Set(),
     ) {
       const con = model.constellations.get(conId);
       if (!con) return;
@@ -164,7 +187,7 @@ export function tooltipView(el: HTMLElement) {
         : distinctReqs
             .map((d) => `<div class="tip-weapon-req">Some bonuses require ${d.replace(/^Requires\s+/i, "")}</div>`)
             .join("");
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), racialTargets(model, stars))}${weaponReq}${petBonusHtml(sumPetBonuses(model, stars))}${affinitySections(con, totals)}${dimLine}${commitHtml(commit)}`;
+      el.innerHTML = `${head}${powers}${bonusRowsHtml(sumBonuses(model, stars), selectedBenefits, "", racialTargets(model, stars))}${weaponReq}${petBonusHtml(sumPetBonuses(model, stars), selectedBenefits)}${affinitySections(con, totals, selectedBenefits)}${dimLine}${commitHtml(commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },

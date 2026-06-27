@@ -680,6 +680,16 @@ main {
   white-space: nowrap;
   margin-right: 0.4em;
 }
+/* Active filter tag inside the tooltip: mirror the sidebar's .brow.vsel selected look. */
+.tip-bonus.vsel {
+  background: #20313f;
+  box-shadow: inset 3px 0 0 #e3c97a;
+  border-radius: 3px;
+}
+.aff.vsel {
+  background: #20313f;
+  border-radius: 3px;
+}
 
 /* Baseline comparison: widened benefits panel + Base/Now/Delta table */
 /* The panel is a grid track, so widen the track (not the item) to give the three value columns room. */
