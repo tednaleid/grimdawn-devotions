@@ -61,6 +61,28 @@ test("a single-dimension stat is its own one-part subject", () => {
   expect(s.parts[0]!.value).toBe("+5%");
 });
 
+test("resistance reduction stats group under Resistance Reduction with distinct flat/percent subjects", () => {
+  const g = condensedRows({
+    offensiveTotalResistanceReductionAbsoluteMin: 24,
+    offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
+    offensiveElementalResistanceReductionAbsoluteMin: 32,
+    offensiveElementalResistanceReductionPercentMin: 20,
+    offensivePhysicalReductionPercentMin: 18,
+  });
+  const rr = g.find((x) => x.group === "Resistance Reduction");
+  expect(rr).toBeTruthy();
+  const subjects = rr!.subjects.map((s) => s.subject).sort();
+  expect(subjects).toEqual([
+    "Reduced target's Elemental Resistances",
+    "Reduced target's Elemental Resistances (flat)",
+    "Reduced target's Physical Resistance",
+    "Reduced target's Resistances",
+  ]);
+  // The flat all-res subject carries its magnitude (flat) and a duration facet.
+  const all = rr!.subjects.find((s) => s.subject === "Reduced target's Resistances")!;
+  expect(all.parts.map((p) => p.dim).sort()).toEqual(["durFlat", "flat"]);
+});
+
 test("retaliation stats group under Retaliation and collapse by concept", () => {
   const g = condensedRows({
     retaliationFireMin: 100,

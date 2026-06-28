@@ -245,6 +245,7 @@ function groupFor(id: string): StatGroup {
   if (id === "racialBonusPercentDamage") return "Offense";
   if (id === "racialBonusPercentDefense") return "Armor & Mitigation";
   if (/^retaliation/.test(id)) return "Retaliation";
+  if (/ResistanceReduction/.test(id) || /^offensivePhysicalReductionPercent/.test(id)) return "Resistance Reduction";
   if (/^offensive/.test(id)) return "Offense";
   // Defensive split. Order matters: damage-type resistances first, then the
   // status/effect protections, then everything else defensive (armor, block, reflect).
@@ -497,6 +498,19 @@ function decompose(id: string): { group: StatGroup; subject: string; dim: StatDi
   }
   if (id === "defensiveProtection") return { group, subject: "Armor", dim: "flat" };
   if (id === "defensiveProtectionModifier") return { group, subject: "Armor", dim: "pct" };
+  // Resistance reduction: flat and percent are distinct subjects (they stack differently in game).
+  if (id.match(/^offensiveTotalResistanceReductionAbsolute(Duration)?Min$/))
+    return { group, subject: "Reduced target's Resistances", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveElementalResistanceReductionAbsolute(Duration)?Min$/))
+    return {
+      group,
+      subject: "Reduced target's Elemental Resistances (flat)",
+      dim: /Duration/.test(id) ? "durFlat" : "flat",
+    };
+  if (id.match(/^offensiveElementalResistanceReductionPercent(Duration)?Min$/))
+    return { group, subject: "Reduced target's Elemental Resistances", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensivePhysicalReductionPercent(Duration)?Min$/))
+    return { group, subject: "Reduced target's Physical Resistance", dim: /Duration/.test(id) ? "durFlat" : "pct" };
   // Standalone stat: its own one-line subject.
   return { group, subject: c.label, dim: c.percent ? "pct" : "flat" };
 }
