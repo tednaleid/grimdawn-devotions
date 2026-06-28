@@ -64,7 +64,7 @@ export interface RenderOpts {
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   // When present, an affinity filter is active. A constellation matches when it provides any of these
   // filter affinities (matchedAffinities); matching constellations glow (see the aff-glow layer) and
-  // the rest get a mild aff-dim fade.
+  // the rest desaturate (the mute color outcome) - the filter never changes brightness.
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
 }
 

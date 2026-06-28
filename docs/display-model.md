@@ -16,7 +16,7 @@ The root cause: no place computed an element's final state as a whole. Meaning w
 
 Each element resolves three independent dimensions:
 
-1. **Brightness** (opacity) <- attainability: "Can I get this within my remaining points?" A tri-state: active (have it), attainable (can get it), or unattainable. This channel answers a binary yes-or-no question, so it owns the opacity property and nothing else touches it.
+1. **Brightness** (opacity) <- attainability: "Can I get this within my remaining points?" A tri-state: active (have it), attainable (can get it), or unattainable. This channel answers that one question, so it owns the opacity property and nothing else touches it.
 
 2. **Color** (saturation) <- affinity-filter relevance: "Does this match the active affinity filter?" Also a tri-state outcome: mute (off-filter, desaturate), match (provides a filtered color, glow in matched colors), or identity (no filter active). Color and saturation are their own channel, separate from brightness.
 
@@ -88,7 +88,7 @@ The halo brightness also respects the brightness channel: a matching constellati
 
 ## Architecture: Pure Core, Thin Adapter
 
-- **Core** (`web/src/core/displayState.ts`): a pure, headless-testable module that resolves all signals for each element into a semantic record. The record carries an opacity number (brightness tri-state), a color outcome (the mute/match/identity flag, with match carrying its matched affinities as semantic data, not colors), and a union of emphasis flags. No presentation logic; no CSS class names; affinities as `Affinity[]` values, not hex colors.
+- **Core** (`web/src/core/displayState.ts`): a pure, headless-testable module that resolves all signals for each element into a semantic record. The record carries a brightness enum (the attainability tri-state), a color outcome (the mute/match/identity flag, with match carrying its matched affinities as semantic data, not colors), and a union of emphasis flags. No presentation logic; no CSS class names; affinities as `Affinity[]` values, not hex colors; the adapter maps the brightness enum to an opacity value. No pixel numbers in the core.
 
 - **Adapter** (`web/src/adapters/svgRenderer.ts` + `styles.css`): maps semantic records to SVG. Applies computed opacity directly as an attribute (data-driven, not via colliding CSS rules). Maps emphasis flags to SVG filter defs and classes. Resolves affinities to colors. The SVG engine rasterizes the filters. CSS applies tunable visual properties (opacity ramps, saturation strength, blur radii, stroke widths, halo colors) but no collision-prone logic.
 

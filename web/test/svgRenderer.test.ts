@@ -81,7 +81,7 @@ test("a fully-selected constellation's art gets the 'active' class; a partial on
   expect(partial).not.toMatch(new RegExp(`class="art[^"]*active"[^>]*data-con-id="${withArt.id}"`));
 });
 
-test("two-layer dimming: completable normal, startable faded, unstartable dark", () => {
+test("immediacy state: a clickable star is selectable, an unreachable one is locked", () => {
   const ids = [...model.constellations.keys()];
   // ids[0]=akeron_s_scorpion, ids[1]=anvil, ids[2]=assassin_s_blade
   const reach: ReachView = {
@@ -110,7 +110,7 @@ test("two-layer dimming: completable normal, startable faded, unstartable dark",
   expect(svg).toContain(`data-star-id="${firstStar}" class="hit selectable"`);
 });
 
-test("two-layer dimming art: completable has no dim class, un-startable gets unreachable", () => {
+test("brightness as opacity on art: a completable constellation is at the attainable opacity", () => {
   const ids = [...model.constellations.keys()];
   // Find a constellation with art
   const withArt = [...model.constellations.values()].find((c) => c.background?.image && c.background.x != null)!;
@@ -118,7 +118,7 @@ test("two-layer dimming art: completable has no dim class, un-startable gets unr
   const name = withArt.background!.image!.split("/").pop()!;
   const manifest = { images: { [name]: { url: "art.webp", w: 640, h: 480 } } };
 
-  // withArtId is completable; pick a different constellation as the unreachable one
+  // withArtId is completable; pick a different constellation as the unattainable one
   const otherId = ids.find((id) => id !== withArtId)!;
 
   const reach: ReachView = {
@@ -131,12 +131,11 @@ test("two-layer dimming art: completable has no dim class, un-startable gets unr
 
   const svg = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest, reach });
 
-  // The completable constellation's art must NOT have the unmet or unreachable class
-  expect(svg).toContain(`data-con-id="${withArtId}"`);
-  expect(svg).not.toMatch(new RegExp(`class="art unreachable"[^>]*data-con-id="${withArtId}"`));
-  expect(svg).not.toMatch(new RegExp(`class="art unmet"[^>]*data-con-id="${withArtId}"`));
+  // A completable (attainable) constellation's art renders at the attainable opacity, not the dimmer
+  // unattainable one - brightness is the inline opacity attribute, no dim class.
+  expect(svg).toMatch(new RegExp(`class="art" opacity="0\\.25" data-con-id="${withArtId}"`));
 
-  // otherId has no clickable stars -> if it has art it gets unreachable; if not, verify star is locked
+  // otherId has no clickable stars -> unattainable; its first star is locked.
   if (model.constellations.get(otherId)!.starIds[0]) {
     expect(svg).toContain(`data-star-id="${otherId}:0" class="hit locked"`);
   }
