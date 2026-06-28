@@ -246,6 +246,12 @@ function groupFor(id: string): StatGroup {
   if (id === "racialBonusPercentDefense") return "Armor & Mitigation";
   if (/^retaliation/.test(id)) return "Retaliation";
   if (/ResistanceReduction/.test(id) || /^offensivePhysicalReductionPercent/.test(id)) return "Resistance Reduction";
+  if (
+    /^offensive(Stun|Freeze|Petrify|Knockdown|Confusion|Fumble|ProjectileFumble|SlowRunSpeed|SlowTotalSpeed|SlowAttackSpeed|SlowOffensiveAbility|SlowDefensiveAbility|TotalDamageReductionPercent)/.test(
+      id,
+    )
+  )
+    return "Crowd Control";
   if (/^offensive/.test(id)) return "Offense";
   // Defensive split. Order matters: damage-type resistances first, then the
   // status/effect protections, then everything else defensive (armor, block, reflect).
@@ -511,6 +517,26 @@ function decompose(id: string): { group: StatGroup; subject: string; dim: StatDi
     return { group, subject: "Reduced target's Elemental Resistances", dim: /Duration/.test(id) ? "durFlat" : "pct" };
   if (id.match(/^offensivePhysicalReductionPercent(Duration)?Min$/))
     return { group, subject: "Reduced target's Physical Resistance", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  // Crowd control: a status effect (magnitude Min + a Chance facet).
+  let cc: RegExpMatchArray | null;
+  if ((cc = id.match(/^offensive(Stun|Freeze|Petrify|Knockdown|Confusion)(Chance)?(Min|Max)?$/)))
+    return { group, subject: cc[1]!, dim: cc[2] ? "pct" : "flat" };
+  if (id.match(/^offensiveFumble(Duration)?Min$/))
+    return { group, subject: "Fumble", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveProjectileFumble(Duration)?Min$/))
+    return { group, subject: "Impaired Aim", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveSlowRunSpeed(Duration)?Min$/))
+    return { group, subject: "Slow target's Movement", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensiveSlowTotalSpeed(Duration)?Min$/))
+    return { group, subject: "Slow target's Total Speed", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensiveSlowAttackSpeed(Duration)?Min$/))
+    return { group, subject: "Slow target's Attack Speed", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensiveSlowOffensiveAbility(Duration)?Min$/))
+    return { group, subject: "Reduced target's Offensive Ability", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveSlowDefensiveAbility(Duration)?Min$/))
+    return { group, subject: "Reduced target's Defensive Ability", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveTotalDamageReductionPercent(Duration)?Min$/))
+    return { group, subject: "Reduced target's Damage", dim: /Duration/.test(id) ? "durFlat" : "pct" };
   // Standalone stat: its own one-line subject.
   return { group, subject: c.label, dim: c.percent ? "pct" : "flat" };
 }

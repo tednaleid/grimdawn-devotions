@@ -103,3 +103,40 @@ test("retaliation stats group under Retaliation and collapse by concept", () => 
   const fear = ret!.subjects.find((s) => s.subject === "Fear")!;
   expect(fear.parts.length).toBe(2);
 });
+
+test("crowd-control stats group under Crowd Control with one subject per effect", () => {
+  const g = condensedRows({
+    offensiveStunMin: 1,
+    offensiveStunChance: 50,
+    offensiveFreezeMin: 1,
+    offensiveFreezeChance: 50,
+    offensiveSlowDefensiveAbilityMin: 150,
+    offensiveSlowDefensiveAbilityDurationMin: 5,
+    offensiveSlowRunSpeedMin: 45,
+    offensiveSlowRunSpeedDurationMin: 3,
+    offensiveTotalDamageReductionPercentMin: 15,
+    offensiveProjectileFumbleMin: 30,
+  });
+  const cc = g.find((x) => x.group === "Crowd Control");
+  expect(cc).toBeTruthy();
+  const subjects = cc!.subjects.map((s) => s.subject).sort();
+  expect(subjects).toEqual(
+    [
+      "Impaired Aim",
+      "Reduced target's Damage",
+      "Reduced target's Defensive Ability",
+      "Slow target's Movement",
+      "Stun",
+      "Freeze",
+    ].sort(),
+  );
+  // Stun's magnitude (flat) and chance (pct) collapse onto one subject.
+  const stun = cc!.subjects.find((s) => s.subject === "Stun")!;
+  expect(stun.parts.map((p) => p.dim).sort()).toEqual(["flat", "pct"]);
+});
+
+test("DoT damage stays in Offense, not Crowd Control (offensiveSlowFire is Burn)", () => {
+  const g = condensedRows({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 });
+  expect(g.find((x) => x.group === "Offense")?.subjects.map((s) => s.subject)).toContain("Burn");
+  expect(g.find((x) => x.group === "Crowd Control")).toBeUndefined();
+});
