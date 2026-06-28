@@ -268,6 +268,12 @@ function groupFor(id: string): StatGroup {
   return "Other";
 }
 
+/** Whether a raw stat id belongs in the benefit filter vocabulary: any group except "Other".
+ *  Used to admit recognized celestial-power stats and exclude ability-meta (cooldown, projectiles, etc.). */
+export function isFilterableStat(id: string): boolean {
+  return groupFor(id) !== "Other";
+}
+
 // Build display rows paired with a representative stat id (for grouping). Merges
 // flat <base>Min/<base>Max damage pairs into one "+min-max" row, drops weapon tokens.
 function bonusEntries(

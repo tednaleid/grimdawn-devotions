@@ -3,7 +3,14 @@ import { test, expect } from "bun:test";
 import type { StarId } from "../src/core/types";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { canonicalStarIds, canonicalStatIds, canonicalBenefitIds, encodeHash, decodeHash } from "../src/core/urlState";
+import {
+  canonicalStarIds,
+  canonicalStatIds,
+  canonicalBenefitIds,
+  canonicalPowerStatIds,
+  encodeHash,
+  decodeHash,
+} from "../src/core/urlState";
 
 const model = buildModel(doc as any);
 const canonical = canonicalStarIds(model);
@@ -65,17 +72,24 @@ test("encodes an uncapped (Infinity) cap as the p=0 sentinel and round-trips it"
   expect(decodeHash(`#${hash}`, canonical)!.pointCap).toBe(Infinity);
 });
 
-test("canonicalBenefitIds is player ids, then pet: ids, then 10 aff: ids", () => {
+test("canonicalBenefitIds is player ids, then pet: ids, then 10 aff: ids, then power-stat ids", () => {
   const player = canonicalStatIds(model);
   const all = canonicalBenefitIds(model);
   expect(all.slice(0, player.length)).toEqual(player);
-  const tail = all.slice(-10);
-  expect(tail.every((k) => k.startsWith("aff:"))).toBe(true);
-  expect(tail).toContain("aff:grant:eldritch");
-  expect(tail).toContain("aff:req:eldritch");
-  const middle = all.slice(player.length, all.length - 10);
+  // aff: block is 10 entries; find it by its first index
+  const affStart = all.findIndex((k) => k.startsWith("aff:"));
+  const affBlock = all.slice(affStart, affStart + 10);
+  expect(affBlock.every((k) => k.startsWith("aff:"))).toBe(true);
+  expect(affBlock).toContain("aff:grant:eldritch");
+  expect(affBlock).toContain("aff:req:eldritch");
+  // pet: ids sit between the player block and the aff: block
+  const middle = all.slice(player.length, affStart);
   expect(middle.length).toBeGreaterThan(0);
   expect(middle.every((k) => k.startsWith("pet:"))).toBe(true);
+  // power-stat ids are appended last, after the aff: block
+  const powerBlock = all.slice(affStart + 10);
+  expect(powerBlock.length).toBeGreaterThan(0);
+  expect(powerBlock.every((k) => !k.startsWith("aff:") && !k.startsWith("pet:"))).toBe(true);
 });
 
 test("affinity tags round-trip via b=", () => {
@@ -129,4 +143,20 @@ test("a malformed cs= decodes to a null baseline without throwing", () => {
   const canon = canonicalStarIds(model);
   const decoded = decodeHash("p=55&s=&cs=@@@not-base64@@@&cp=40", canon)!;
   expect(decoded.baseline).toBeNull();
+});
+
+test("canonicalPowerStatIds: recognized power-only stat ids, excluding bonuses and meta", () => {
+  const ids = canonicalPowerStatIds(model);
+  const bonusIds = new Set(statCanonical);
+  expect(ids).toContain("offensiveStunMin");
+  expect(ids.every((id) => !bonusIds.has(id))).toBe(true);
+  expect(ids).not.toContain("skillCooldownTime");
+});
+
+test("a power-only benefit tag round-trips through the URL without disturbing old positions", () => {
+  const benefitCanonical = canonicalBenefitIds(model);
+  const tag = "offensiveStunMin"; // a power-only tag (appended block)
+  const hash = encodeHash(new Set(), 55, canonical, new Set([tag]), benefitCanonical);
+  const decoded = decodeHash(`#${hash}`, canonical, benefitCanonical);
+  expect(decoded!.benefits.has(tag)).toBe(true);
 });

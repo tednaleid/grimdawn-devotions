@@ -27,6 +27,7 @@ import {
   canonicalStatIds,
   canonicalPetStatIds,
   canonicalBenefitIds,
+  canonicalPowerStatIds,
   decodeHash,
   encodeHash,
 } from "../core/urlState";
@@ -79,6 +80,7 @@ async function boot() {
   // benefits the current build does not grant yet. Static per model, computed once.
   const allBonuses: Record<string, number> = {};
   for (const id of statCanonical) allBonuses[id] = 1;
+  for (const id of canonicalPowerStatIds(model)) allBonuses[id] = 1;
   const benefitCatalog = condensedRows(allBonuses);
   // The pet benefit catalog (every pet subject + its stat ids), for the pet "Available to get" list.
   // Static per model, computed once. Pet stat ids are raw here; the renderer scopes them.
