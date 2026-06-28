@@ -10,9 +10,13 @@ import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/ben
 
 // One row per celestial power: the name plus a data-star-id hook so a hover shows the power's full
 // tooltip (proc, level, stats, requires/grants). Shared by the left "gained" list and the right
-// "still pickable" list.
+// "still pickable" list. Sorted by power name (the only text shown) - the source constellation order
+// is meaningless here since the constellation only appears on hover.
 export function powersListHtml(powers: { starId: StarId; power: CelestialPower }[]): string {
-  return powers.map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`).join("");
+  return [...powers]
+    .sort((a, b) => a.power.name.localeCompare(b.power.name))
+    .map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`)
+    .join("");
 }
 
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
