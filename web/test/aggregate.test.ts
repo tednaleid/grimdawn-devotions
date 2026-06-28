@@ -3,6 +3,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
+import { isFilterableStat } from "../src/core/statFormat";
 import {
   sumBonuses,
   sumPetBonuses,
@@ -11,6 +12,7 @@ import {
   starsGrantingPet,
   availableBonusIds,
   availablePetKeys,
+  availablePowers,
   weaponRequirements,
 } from "../src/core/aggregate";
 
@@ -23,17 +25,36 @@ const bonusIdsOf = (starIds: Iterable<string>, skip: Set<string> = new Set()): S
   return out;
 };
 
+// Filterable power stat ids for a set of stars (mirrors what availableBonusIds now collects).
+const filtPowerIdsOf = (starIds: Iterable<string>, skip: Set<string> = new Set()): Set<string> => {
+  const out = new Set<string>();
+  for (const sid of starIds) {
+    if (skip.has(sid)) continue;
+    const p = model.stars.get(sid)!.celestialPower;
+    if (p) for (const k of Object.keys(p.stats)) if (isFilterableStat(k)) out.add(k);
+  }
+  return out;
+};
+
+// Union of bonus ids and filterable power stat ids for a set of stars.
+const availableIdsOf = (starIds: Iterable<string>, skip: Set<string> = new Set()): Set<string> => {
+  const ids = [...starIds];
+  const out = bonusIdsOf(ids, skip);
+  for (const k of filtPowerIdsOf(ids, skip)) out.add(k);
+  return out;
+};
+
 test("availableBonusIds: union of bonus ids of unselected stars in completable constellations", () => {
   const bat = conByName("Bat");
   const got = availableBonusIds(model, new Set(), new Set([bat.id]));
-  expect([...got].sort()).toEqual([...bonusIdsOf(bat.starIds)].sort());
+  expect([...got].sort()).toEqual([...availableIdsOf(bat.starIds)].sort());
 });
 
 test("availableBonusIds: skips already-selected stars, keeps the rest of the constellation", () => {
   const bat = conByName("Bat");
   const selected = new Set([bat.starIds[0]!]);
   const got = availableBonusIds(model, selected, new Set([bat.id]));
-  expect([...got].sort()).toEqual([...bonusIdsOf(bat.starIds, selected)].sort());
+  expect([...got].sort()).toEqual([...availableIdsOf(bat.starIds, selected)].sort());
 });
 
 test("availableBonusIds: ignores constellations not in the completable set", () => {
@@ -163,6 +184,45 @@ test("availablePetKeys returns pet: keys for unselected stars' petBonuses in com
 test("availablePetKeys skips already-selected stars", () => {
   const con = conWithPet();
   expect(availablePetKeys(model, new Set(con.starIds), new Set([con.id])).size).toBe(0);
+});
+
+test("availableBonusIds includes recognized power stats of unselected stars in completable cons", () => {
+  // Find a constellation whose power grants a recognized stat that no star bonus in that con grants.
+  let conId: string | undefined;
+  let powerStat: string | undefined;
+  for (const c of model.constellations.values()) {
+    const bonusIds = bonusIdsOf(c.starIds);
+    for (const sid of c.starIds) {
+      const p = model.stars.get(sid)!.celestialPower;
+      if (!p) continue;
+      const k = Object.keys(p.stats).find(
+        (key) => !bonusIds.has(key) && /^offensive|^defensive|^character|^retaliation/.test(key),
+      );
+      if (k) {
+        conId = c.id;
+        powerStat = k;
+        break;
+      }
+    }
+    if (conId) break;
+  }
+  expect(powerStat).toBeTruthy();
+  const got = availableBonusIds(model, new Set(), new Set([conId!]));
+  expect(got.has(powerStat!)).toBe(true);
+});
+
+test("availablePowers lists completable, not-yet-gained powers and excludes gained ones", () => {
+  const bat = conByName("Bat");
+  const powerStar = bat.starIds.map((id) => model.stars.get(id)!).find((s) => s.celestialPower)!;
+  // Not selected -> listed.
+  const avail = availablePowers(model, new Set(), new Set([bat.id]));
+  expect(avail.map((p) => p.starId)).toContain(powerStar.id);
+  expect(avail.find((p) => p.starId === powerStar.id)!.power.name).toBe(powerStar.celestialPower!.name);
+  // Power star selected (gained) -> excluded.
+  const gained = availablePowers(model, new Set([powerStar.id]), new Set([bat.id]));
+  expect(gained.map((p) => p.starId)).not.toContain(powerStar.id);
+  // Not completable -> excluded.
+  expect(availablePowers(model, new Set(), new Set()).length).toBe(0);
 });
 
 test("weaponRequirements carries each gated star's description", () => {

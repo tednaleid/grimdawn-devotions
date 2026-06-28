@@ -1,6 +1,7 @@
 // ABOUTME: Aggregation functions over a set of selected star ids.
 // ABOUTME: Computes summed stat bonuses, celestial powers gained, and weapon requirements.
 import type { CelestialPower, DevotionModel, StarId } from "./types";
+import { isFilterableStat } from "./statFormat";
 
 export function sumBonuses(model: DevotionModel, selected: Set<StarId>): Record<string, number> {
   const out: Record<string, number> = {};
@@ -109,6 +110,8 @@ export function availableBonusIds(model: DevotionModel, selected: Set<StarId>, c
       const star = model.stars.get(sid);
       if (!star) continue;
       for (const k of Object.keys(star.bonuses)) out.add(k);
+      const power = star.celestialPower;
+      if (power) for (const k of Object.keys(power.stats)) if (isFilterableStat(k)) out.add(k);
     }
   }
   return out;
@@ -127,6 +130,26 @@ export function availablePetKeys(model: DevotionModel, selected: Set<StarId>, co
       const pet = model.stars.get(sid)?.petBonuses;
       if (!pet) continue;
       for (const k of Object.keys(pet)) out.add(`pet:${k}`);
+    }
+  }
+  return out;
+}
+
+// The celestial powers still validly pickable from the current selection: the power star of every
+// completable constellation whose power is not already gained (its power star not yet selected).
+// Drives the right-side "Celestial Powers" list. `completable` comes from reachabilityForSelection.
+export function availablePowers(
+  model: DevotionModel,
+  selected: Set<StarId>,
+  completable: Set<string>,
+): { starId: StarId; power: CelestialPower }[] {
+  const out: { starId: StarId; power: CelestialPower }[] = [];
+  for (const conId of completable) {
+    const con = model.constellations.get(conId);
+    if (!con) continue;
+    for (const sid of con.starIds) {
+      const star = model.stars.get(sid);
+      if (star?.celestialPower && !selected.has(sid)) out.push({ starId: sid, power: star.celestialPower });
     }
   }
   return out;
