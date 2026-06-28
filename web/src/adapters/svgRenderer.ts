@@ -404,7 +404,12 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     const cid = conAt(me.clientX, me.clientY);
     if (cid) deps.onConstellationClick(cid, me.clientX, me.clientY);
   });
+  // No hover on touch devices: a tap synthesizes a single mousemove at the tap point, which would
+  // otherwise paint the passive (no-commit) hover tooltip over whatever the dismissing tap landed on.
+  // The touch affordance is the commit popover (onStarClick/onConstellationClick), not hover.
+  const noHover = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
   container.addEventListener("mousemove", (e) => {
+    if (noHover()) return;
     const sid = (e.target as Element)?.getAttribute?.("data-star-id");
     const cid = sid ? null : conAt((e as MouseEvent).clientX, (e as MouseEvent).clientY);
     const target: HoverTarget = sid ? { kind: "star", id: sid } : cid ? { kind: "constellation", id: cid } : null;
