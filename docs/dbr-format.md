@@ -25,8 +25,8 @@ Two parallel trees, joined by `skillName` references:
 | `records/ui/skills/devotion/tierT_NN{a..}.dbr` | a **star button** (UI): `skillName` → the real skill |
 | `records/skills/devotion/tierT_NN{a..}.dbr` | the **star skill** (the actual stats / power) |
 
-In v1.2 there are **86 constellations**: 42 Tier‑1 (incl. 5 Crossroads),
-31 Tier‑2, 13 Tier‑3. 438 stars total. Note: the `constellationNN` numbers are
+In v1.2.1.x there are **109 constellations**: 50 Tier‑1 (incl. 5 Crossroads),
+38 Tier‑2, 21 Tier‑3. 559 stars total. Note: the `constellationNN` numbers are
 **not** contiguous with tier or display order; discover by reading each record.
 
 ## Constellation record (`constellationNN.dbr`)
@@ -57,7 +57,7 @@ devotionLinks3,2,    # → predecessor chain, 1-based indices
 
 - Each **star button** record (`records/ui/skills/devotion/tierT_NN{a..}.dbr`)
   carries `bitmapPositionX` / `bitmapPositionY`: the star's `(x, y)` on a single
-  shared map canvas (negative origin, spanning all 86 constellations). Captured
+  shared map canvas (negative origin, spanning all 109 constellations). Captured
   as `position`. (`skillOffsetX/Y` exist too but are the icon offset, not the
   star location.) The button also names the generic star sprites
   (`devotion_star_up/down/over/disabled.tex`).

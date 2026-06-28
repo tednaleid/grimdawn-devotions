@@ -1,26 +1,47 @@
 # Grim Dawn Devotions
 
-A free, open-source toolkit for **[Grim Dawn](https://www.grimdawn.com/)**'s
-Devotion constellation system, built by a fan, for players.
+A free, open-source devotion planner and dataset for
+**[Grim Dawn](https://www.grimdawn.com/)**, built by a fan, for players.
 
-The goal is to make the Devotion system open, queryable, and straightforward to
-plan against: turn the game's own data into a clean, well-documented dataset and
-build tools on top of it. No ads, no paywall, no account, just data and
-tools you can read, fork, and run yourself.
+## Try it: https://tednaleid.github.io/grimdawn-devotions/
 
-### What's here & where it's going
+The planner runs entirely in your browser. No ads, no paywall, no account. Every
+part of it (the planner, the dataset, and the parser that builds the dataset) is
+open source you can read, fork, and run yourself.
 
-- Done: **Parser + dataset**. `scripts/parse_devotions.py` reads the game's
-  extracted `.dbr` records into one clean [`data/devotions.json`](data/devotions.json):
-  every constellation, its affinity unlock cost and the affinity it grants, and
-  each star's stat bonuses, celestial power, weapon requirement, map position, and
-  intra-constellation pick order. Current output: **86 constellations, 438 stars**
-  (game build `19149150`, ~v1.2.1.x). Re-runnable after every patch.
-- Planned: **Devotion-path optimizer**. Find star routes for a given build/goal,
-  using `devotions.json` as its input.
-- Planned: **Interactive starmap**. An in-browser constellation map (the data already
-  carries each star's coordinates and each constellation's artwork reference; see
-  [docs/assets-and-textures.md](docs/assets-and-textures.md)).
+## Features
+
+- **Interactive devotion starmap.** Pan and zoom the full constellation map; click
+  or tap a star to take or refund it. Works on desktop and on mobile/touch.
+- **Knows the real rules.** Models affinity gating, activation-before-self-sustain,
+  refundable Crossroads, and the temporary scaffolding/refund pattern that decides
+  whether a build is actually constructible within your point budget. See
+  [docs/devotion-system.md](docs/devotion-system.md).
+- **Reachability-aware.** A Rust/WASM core (with a TypeScript fallback) dims the
+  constellations you can no longer complete under your current selection and point
+  cap, so you only see legal moves.
+- **Guided build order.** For a self-covering selection, the planner shows a legal
+  order to construct it, including when to borrow and refund scaffolding.
+- **Benefit filters.** Highlight the stars that grant a stat, damage type, or
+  affinity you care about. Celestial-power effects participate too: filtering on
+  Burn, Resistance Reduction, Stun, and the like lights up the powers that grant
+  them.
+- **Celestial powers surfaced.** See the powers a build grants and the powers still
+  validly pickable, each with its full description.
+- **Build comparison.** Set a baseline and diff any build against it.
+- **Shareable links.** The entire build state lives in the URL, so a copied link
+  restores exactly what you saw. Nothing is stored server-side.
+
+## Dataset
+
+Under the planner is a clean, queryable dataset. `scripts/parse_devotions.py`
+reads the game's extracted `.dbr` records into one
+[`data/devotions.json`](data/devotions.json): every constellation, its affinity
+unlock cost and the affinity it grants, and each star's stat bonuses, celestial
+power, weapon requirement, map position, and intra-constellation pick order.
+Current output: **109 constellations, 559 stars** (game build `19149150`,
+v1.2.1.x). It is committed to the repo and re-runnable after every patch, so the
+planner builds anywhere without touching the game.
 
 Everything is reproducible from your own game install; see Quick start below.
 
@@ -133,7 +154,7 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-06-20T00:00:00Z",
+    "generated_utc": "2026-06-21T19:06:05Z",
     "affinities": ["ascendant","chaos","eldritch","order","primordial"]
   },
   "constellations": [
@@ -154,7 +175,7 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
           "predecessors": [],                // star indices within THIS constellation
           "position": { "x": -968, "y": 80 },// (x,y) on the shared devotion-map canvas
           "bonuses": { "offensiveLifeModifier": 15, "offensiveSlowBleedingModifier": 15 },
-          "celestial_power": null,           // or { name, dbr, skill_class, description }
+          "celestial_power": null,           // or { name, description, proc, level, stats, pet } on the last star
           "weapon_requirement": null         // or { weapons: ["Sword","Sword2h"], description }
         }
         // … the celestial-power star looks like:
@@ -208,13 +229,19 @@ and the swapped-in `devotions.json` is current. Bump `GD_VERSION` to taste.
 ## Layout
 
 ```
-LICENSE                     # MIT (covers our code only; game content is Crate's)
-justfile                    # doctor / install / build / serve / test / extract / parse
-scripts/parse_devotions.py  # the parser (uv self-executable, stdlib only)
-docs/dbr-format.md          # the reverse-engineered data model
-docs/assets-and-textures.md # how to extract + convert the .tex artwork to PNG
-data/devotions.json         # output (committed)
-data/stat_labels.json       # output (--stat-labels, committed)
-data/devotion_records.csv   # output (--duckdb, git-ignored)
-extracted/                  # game files, git-ignored — `just extract` to rebuild
+LICENSE                      # MIT (covers our code only; game content is Crate's)
+justfile                     # doctor / install / build / serve / test / extract / parse
+ONBOARDING.md                # stack, commands, architecture, key paths (start here as a contributor)
+scripts/parse_devotions.py   # the parser (uv self-executable, stdlib only)
+web/                         # the in-browser planner (hexagonal TS: core / ports / adapters / app)
+web/wasm/                    # Rust reachability core, built to data/reach.wasm
+docs/devotion-system.md      # the devotion rules + non-obvious construction consequences
+docs/dbr-format.md           # the reverse-engineered game data model
+docs/reachability-engine.md  # reachability resolver design + tradeoffs
+docs/display-model.md        # the map's display language (brightness / color / emphasis)
+docs/assets-and-textures.md  # how to extract + convert the .tex artwork to PNG
+data/devotions.json          # parser output (committed; the planner's source of truth)
+data/stat_labels.json        # parser output (--stat-labels, committed)
+data/devotion_records.csv    # parser output (--duckdb, git-ignored)
+extracted/                   # game files, git-ignored; `just extract` to rebuild
 ```

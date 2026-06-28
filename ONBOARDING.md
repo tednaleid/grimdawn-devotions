@@ -57,7 +57,9 @@ hash (`core/urlState.ts`) so links are shareable.
 - `web/e2e/smoke.ts` -- headless-Chromium smoke test driven over CDP
 
 ## How to run
-`just serve`, then open http://localhost:5173
+`just serve`, then open http://localhost:5173. The deployed site is at
+https://tednaleid.github.io/grimdawn-devotions/ (GitHub Pages, auto-deployed from
+`main`).
 
 ## Dig deeper
 - `README.md` -- project overview, `devotions.json` schema, extraction steps
