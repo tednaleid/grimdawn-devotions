@@ -53,6 +53,9 @@ const CON_PAD = 24;
 const ART_OPACITY = { active: 1, attainable: 0.25, unattainable: 0.12 } as const;
 const STAR_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
+// The affinity match halo glows full strength on a reachable constellation and dimmer on an unreachable
+// one, so the brightness channel still reads under a filter (reachable matches are not just colored).
+const HALO_UNREACHABLE_OPACITY = 0.25;
 
 export interface RenderOpts {
   manifest: AssetManifest | null;
@@ -238,7 +241,10 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
         `<linearGradient id="aff-grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(cols)}</linearGradient>`,
       );
       ensureMask(c.id, art.url, x, y, art.w, art.h);
-      const glow = `<rect class="aff-glow" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`;
+      // The halo feels the brightness channel like every other layer: a matching constellation you cannot
+      // reach glows in its color but dimmer than a reachable one, so reachability still reads under a filter.
+      const haloOp = cd0.brightness === "unattainable" ? HALO_UNREACHABLE_OPACITY : 1;
+      const glow = `<rect class="aff-glow" opacity="${haloOp}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`;
       // A selected constellation also carries its own #self-glow-art bloom (Layer 1), which raises the
       // local brightness and would swallow a single faint halo - so a selected match showed no color.
       // Stack the halo for active ones so the matched color still reads as a ring around them, while they
