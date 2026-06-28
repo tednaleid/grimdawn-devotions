@@ -47,18 +47,31 @@ export function powersGained(model: DevotionModel, selected: Set<StarId>): { sta
   return out;
 }
 
-// The stars whose bonuses include ANY of the given raw stat ids - used to highlight
-// on the map where a selected benefit can still be picked up. Empty for an empty set.
+// The stars whose bonuses OR celestial power grant ANY of the given raw stat ids - used to highlight
+// on the map where a selected benefit can still be picked up. A power's diamond star lights up when the
+// filter matches its celestial power. Pet attack stats are intentionally not scanned. Empty for an empty set.
 export function starsGranting(model: DevotionModel, ids: Set<string>): Set<StarId> {
   const out = new Set<StarId>();
   if (ids.size === 0) return out;
   for (const star of model.stars.values()) {
+    let hit = false;
     for (const k of Object.keys(star.bonuses)) {
       if (ids.has(k)) {
-        out.add(star.id);
+        hit = true;
         break;
       }
     }
+    if (!hit) {
+      const power = star.celestialPower;
+      if (power)
+        for (const k of Object.keys(power.stats)) {
+          if (ids.has(k)) {
+            hit = true;
+            break;
+          }
+        }
+    }
+    if (hit) out.add(star.id);
   }
   return out;
 }

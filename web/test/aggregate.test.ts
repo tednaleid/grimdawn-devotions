@@ -77,6 +77,44 @@ test("starsGranting unions multiple ids and is empty for an empty set", () => {
   expect(starsGranting(model, new Set()).size).toBe(0);
 });
 
+test("starsGranting matches a star whose celestial power grants the stat", () => {
+  const bonusIds = new Set<string>();
+  for (const s of model.stars.values()) for (const k of Object.keys(s.bonuses)) bonusIds.add(k);
+  let powerStarId: string | undefined;
+  let powerOnlyId: string | undefined;
+  for (const s of model.stars.values()) {
+    const p = s.celestialPower;
+    if (!p) continue;
+    const k = Object.keys(p.stats).find((key) => !bonusIds.has(key));
+    if (k) {
+      powerStarId = s.id;
+      powerOnlyId = k;
+      break;
+    }
+  }
+  expect(powerOnlyId).toBeTruthy();
+  const got = starsGranting(model, new Set([powerOnlyId!]));
+  expect(got.has(powerStarId!)).toBe(true);
+});
+
+test("starsGranting ignores summon-pet attack stats", () => {
+  let petPowerStarId: string | undefined;
+  let attackOnlyId: string | undefined;
+  for (const s of model.stars.values()) {
+    const p = s.celestialPower;
+    if (!p?.pet) continue;
+    const k = Object.keys(p.pet.attackStats).find((key) => !(key in p.stats) && !(key in s.bonuses));
+    if (k) {
+      petPowerStarId = s.id;
+      attackOnlyId = k;
+      break;
+    }
+  }
+  expect(attackOnlyId).toBeTruthy();
+  // The pet-summoning star itself must NOT match on a stat only its pet's attack carries.
+  expect(starsGranting(model, new Set([attackOnlyId!])).has(petPowerStarId!)).toBe(false);
+});
+
 test("sums like stat ids additively across stars", () => {
   // bat:0 offensiveLifeModifier=15, bat:2 offensiveLifeModifier=24 -> 39
   const totals = sumBonuses(model, new Set(["bat:0", "bat:2"]));
