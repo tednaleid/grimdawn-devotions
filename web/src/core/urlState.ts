@@ -54,9 +54,9 @@ function canonicalAffinityIds(): string[] {
 
 /**
  * The benefit-tag ordering for the URL bitset: the player stat ids (unchanged positions), then the
- * pet stat ids prefixed `pet:`, then the 10 affinity tags. Each block is appended after the last, so
- * an old player-only or player+pet `b=` payload decodes identically; affinity tags extend the bitset
- * only when present.
+ * pet stat ids prefixed `pet:`, then the 10 affinity tags, then the recognized power-only stat ids.
+ * Each block is appended after the last, so an older player/pet/affinity `b=` payload decodes
+ * identically; a later block extends the bitset only when one of its tags is set.
  */
 export function canonicalBenefitIds(model: DevotionModel): string[] {
   return [
