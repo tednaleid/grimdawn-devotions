@@ -233,11 +233,12 @@ async function boot() {
   });
 
   // A hovered power row (left "gained" list or right "still pickable" list) shows the power's full
-  // tooltip - the same rich tooltip as its map star. Attached to both sidebar containers; both survive
-  // innerHTML re-renders because the listener is on the container, not the rows.
+  // tooltip - the same rich tooltip as its map star - and boxes the power's constellation on the map so
+  // it is obvious where that power lives. Attached to both sidebar containers; both survive innerHTML
+  // re-renders because the listener is on the container, not the rows.
   const powerRowHover = (e: Event) => {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
-    if (sid)
+    if (sid) {
       tip.show(
         model,
         sid,
@@ -247,12 +248,20 @@ async function boot() {
         undefined,
         selectedBenefits,
       );
-    else tip.hide();
+      handle.highlightCon(model.stars.get(sid)?.constellationId ?? null);
+    } else {
+      tip.hide();
+      handle.highlightCon(null);
+    }
+  };
+  const powerRowLeave = () => {
+    tip.hide();
+    handle.highlightCon(null);
   };
   benefitsEl.addEventListener("mousemove", powerRowHover);
   affinityEl.addEventListener("mousemove", powerRowHover);
-  benefitsEl.addEventListener("mouseleave", () => tip.hide());
-  affinityEl.addEventListener("mouseleave", () => tip.hide());
+  benefitsEl.addEventListener("mouseleave", powerRowLeave);
+  affinityEl.addEventListener("mouseleave", powerRowLeave);
 
   // Benefit selection: click a value to toggle just it; click a subject to toggle
   // all of its values (so the group reads as selected only when every value is). Attached to both
