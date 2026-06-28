@@ -6,7 +6,7 @@ import { buildModel } from "../src/core/model";
 import { renderSvgMarkup } from "../src/adapters/svgRenderer";
 import type { ReachView } from "../src/core/reachability";
 import { AFFINITIES } from "../src/core/types";
-import { affinityColor, presentAffinities } from "../src/adapters/affinityColors";
+import { glowColor, presentAffinities } from "../src/adapters/affinityColors";
 
 const model = buildModel(doc as any);
 
@@ -279,7 +279,10 @@ test("a matching constellation emits a colored glow with its matched-color gradi
   expect(markup).toContain('class="aff-glow"');
   expect(markup).toContain(`mask="url(#mask-${c.id})"`);
   expect(markup).toContain('filter="url(#aff-glow)"');
-  expect(markup).toContain(affinityColor(a)); // glow uses the matched color
+  expect(markup).toContain(glowColor(a)); // halo uses the deeper glow color (the affinity color axis)
+  // The halo is drawn ON TOP of the art so its color reads through the bright line-art without washing
+  // to pastel: the aff-glow rect must appear after this constellation's art <image> in document order.
+  expect(markup.indexOf('class="aff-glow"')).toBeGreaterThan(markup.indexOf(`data-con-id="${c.id}"`));
 });
 
 test("no glow without an affinity filter", () => {

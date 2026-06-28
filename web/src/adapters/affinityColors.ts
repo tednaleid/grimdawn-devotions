@@ -14,6 +14,22 @@ export function affinityColor(a: Affinity): string {
   return AFFINITY_COLORS[a];
 }
 
+// Deeper, purer variants used only for the affinity-match glow halo. The halo is blurred and drawn over
+// the constellation's bright (near-white) line art; a mid-tone source still reads washed against it, so
+// a #d8453a chaos red would look pink. These darker, more-saturated sources read as the true affinity
+// color through the linework. Identity tints/orbs/stars keep AFFINITY_COLORS.
+const GLOW_COLORS: Record<Affinity, string> = {
+  ascendant: "#9a2fe0", // purple
+  chaos: "#d00000", // red
+  eldritch: "#14a848", // green
+  order: "#f0bd14", // gold
+  primordial: "#1f7be8", // blue
+};
+
+export function glowColor(a: Affinity): string {
+  return GLOW_COLORS[a];
+}
+
 /** Affinities present in a map (value > 0), in canonical order. */
 export function presentAffinities(map: Partial<Record<Affinity, number>>): Affinity[] {
   return AFFINITIES.filter((a) => (map[a] ?? 0) > 0);

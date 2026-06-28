@@ -2,7 +2,7 @@
 // ABOUTME: renderSvgMarkup is a pure function; mountSvg wires it to a live HTMLElement with events.
 import type { Affinity, Constellation, DevotionModel, SelectionState, StarId } from "../core/types";
 import type { ReachView } from "../core/reachability";
-import { affinityColor, presentAffinities } from "./affinityColors";
+import { affinityColor, glowColor, presentAffinities } from "./affinityColors";
 import { constellationDisplay, starDisplay, edgeDisplay } from "../core/displayState";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
 import type { AssetManifest } from "../ports/DataSource";
@@ -204,8 +204,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     // same desaturation with an expanded region, used to wrap a benefit-match glow layer (whose halo
     // spreads well past the marker) so the whole glow desaturates without the halo being clipped.
     defs.push(
-      `<filter id="mute" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.18"/></filter>`,
-      `<filter id="mute-wide" x="-400%" y="-400%" width="900%" height="900%" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.18"/></filter>`,
+      `<filter id="mute" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/></filter>`,
+      `<filter id="mute-wide" x="-400%" y="-400%" width="900%" height="900%" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/></filter>`,
     );
   }
 
@@ -226,8 +226,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     defs.push(`<mask id="mask-${cid}"><image href="${url}" x="${x}" y="${y}" width="${w}" height="${h}"/></mask>`);
   };
 
-  // Layer 0: affinity match glow, drawn beneath the art so the colored halo bleeds out around matching
-  // constellations. The gradient is built from ONLY the matched affinity colors (solid when one matches).
+  // Affinity match glow: a colored halo for matching constellations. Drawn ON TOP of the art (flushed
+  // after the art layer below) so the halo's color reads through the bright near-white line-art instead
+  // of being washed to a pastel from underneath. The gradient is built from ONLY the matched affinity
+  // colors (solid when one matches). This is the color axis (affinity) expressing "match"; it never
+  // touches opacity (attainability), so the two channels stay independent.
+  const haloParts: string[] = [];
   if (opts.manifest && affFilter) {
     for (const c of model.constellations.values()) {
       const cd0 = constellationDisplay(c, settings);
@@ -236,7 +240,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const art = opts.manifest.images[name];
       if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
       const { x, y } = c.background;
-      const cols = cd0.color.affinities.map(affinityColor);
+      const cols = cd0.color.affinities.map(glowColor);
       defs.push(
         `<linearGradient id="aff-grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(cols)}</linearGradient>`,
       );
@@ -245,12 +249,11 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       // reach glows in its color but dimmer than a reachable one, so reachability still reads under a filter.
       const haloOp = cd0.brightness === "unattainable" ? HALO_UNREACHABLE_OPACITY : 1;
       const glow = `<rect class="aff-glow" opacity="${haloOp}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`;
-      // A selected constellation also carries its own #self-glow-art bloom (Layer 1), which raises the
-      // local brightness and would swallow a single faint halo - so a selected match showed no color.
-      // Stack the halo for active ones so the matched color still reads as a ring around them, while they
-      // stay the brightest thing via the self-glow. Unselected matches keep the single, softer pass.
-      parts.push(glow);
-      if (cd0.selfGlow) parts.push(glow);
+      // A selected constellation also carries its own #self-glow-art bloom, which raises the local
+      // brightness and would swallow a single faint halo - so a selected match showed no color. Stack the
+      // halo for active ones so the matched color still reads, while they stay bright via the self-glow.
+      haloParts.push(glow);
+      if (cd0.selfGlow) haloParts.push(glow);
     }
   }
 
@@ -280,6 +283,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       }
     }
   }
+  // Flush the match halos on top of the art (see the haloParts note above).
+  parts.push(...haloParts);
 
   // Layer 2: links. A segment whose both endpoints are selected is "taken" (drawn gold, like
   // grimtools); brightness and color come from the edge display record.
