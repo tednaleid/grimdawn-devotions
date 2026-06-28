@@ -100,6 +100,9 @@ const OVERRIDES: Record<string, Classified> = {
   },
   offensiveLightningModifierChance: { label: "Chance for Lightning Damage", percent: true, sign: 1 },
   retaliationTotalDamageModifier: { label: "Total Retaliation Damage", percent: true, sign: 1 },
+  retaliationDamagePct: { label: "% Retaliation added to Attack", percent: true, sign: 1 },
+  retaliationFearMin: { label: "Fear", percent: false, sign: 1 },
+  retaliationFearChance: { label: "Fear", percent: true, sign: 1 },
 
   racialBonusPercentDamage: { label: "Damage to specific enemy types", percent: true, sign: 1 },
   racialBonusPercentDefense: { label: "Less damage from specific enemy types", percent: true, sign: 1 },
@@ -175,10 +178,10 @@ export function classify(id: string): Classified | null {
     const type = RESIST[m[1]!];
     if (type) return { label: `${type} Resistance`, percent: true, sign: 1 };
   }
-  // Retaliation damage: retaliation<Type>[Min|Max]
-  if ((m = id.match(/^retaliation([A-Za-z]+?)(Min|Max)?$/))) {
+  // Retaliation damage: retaliation<Type>[Modifier|Min|Max]. Modifier is the percent form.
+  if ((m = id.match(/^retaliation([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
     const type = INSTANT_DAMAGE[m[1]!];
-    if (type) return { label: `${type} Retaliation`, percent: false, sign: 1 };
+    if (type) return { label: `${type} Retaliation`, percent: m[2] === "Modifier", sign: 1 };
   }
   // Character attribute: character<Attr>[Modifier]
   if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/))) {
@@ -241,7 +244,8 @@ export type StatGroup = (typeof GROUP_ORDER)[number];
 function groupFor(id: string): StatGroup {
   if (id === "racialBonusPercentDamage") return "Offense";
   if (id === "racialBonusPercentDefense") return "Armor & Mitigation";
-  if (/^offensive|^retaliation/.test(id)) return "Offense";
+  if (/^retaliation/.test(id)) return "Retaliation";
+  if (/^offensive/.test(id)) return "Offense";
   // Defensive split. Order matters: damage-type resistances first, then the
   // status/effect protections, then everything else defensive (armor, block, reflect).
   if (

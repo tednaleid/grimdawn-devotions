@@ -60,3 +60,24 @@ test("a single-dimension stat is its own one-part subject", () => {
   expect(s.parts.map((p) => p.dim)).toEqual(["pct"]);
   expect(s.parts[0]!.value).toBe("+5%");
 });
+
+test("retaliation stats group under Retaliation and collapse by concept", () => {
+  const g = condensedRows({
+    retaliationFireMin: 100,
+    retaliationFireModifier: 20,
+    retaliationDamagePct: 17,
+    retaliationFearMin: 3,
+    retaliationFearChance: 70,
+  });
+  const ret = g.find((x) => x.group === "Retaliation");
+  expect(ret).toBeTruthy();
+  const subjects = ret!.subjects.map((s) => s.subject).sort();
+  expect(subjects).toContain("Fire Retaliation");
+  expect(subjects).toContain("% Retaliation added to Attack");
+  expect(subjects).toContain("Fear");
+  // Fire flat + Fire % collapse onto one subject; Fear min + chance onto one.
+  const fire = ret!.subjects.find((s) => s.subject === "Fire Retaliation")!;
+  expect(fire.parts.map((p) => p.dim).sort()).toEqual(["flat", "pct"]);
+  const fear = ret!.subjects.find((s) => s.subject === "Fear")!;
+  expect(fear.parts.length).toBe(2);
+});
