@@ -3,7 +3,7 @@
 import { httpDataSource } from "../adapters/httpDataSource";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
-import { renderBenefits, renderAffinities } from "../adapters/sidebarView";
+import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
 import { buildOrderHtml, type NoOrderInfo } from "../adapters/buildOrderView";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleDrawer, type DrawerState } from "../core/drawerState";
@@ -27,11 +27,18 @@ import {
   canonicalStatIds,
   canonicalPetStatIds,
   canonicalBenefitIds,
+  canonicalPowerStatIds,
   decodeHash,
   encodeHash,
 } from "../core/urlState";
 import { affinityTotals } from "../core/affinity";
-import { starsGranting, availableBonusIds, starsGrantingPet, availablePetKeys } from "../core/aggregate";
+import {
+  starsGranting,
+  availableBonusIds,
+  starsGrantingPet,
+  availablePetKeys,
+  availablePowers,
+} from "../core/aggregate";
 import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState, StarId } from "../core/types";
 
@@ -79,6 +86,7 @@ async function boot() {
   // benefits the current build does not grant yet. Static per model, computed once.
   const allBonuses: Record<string, number> = {};
   for (const id of statCanonical) allBonuses[id] = 1;
+  for (const id of canonicalPowerStatIds(model)) allBonuses[id] = 1;
   const benefitCatalog = condensedRows(allBonuses);
   // The pet benefit catalog (every pet subject + its stat ids), for the pet "Available to get" list.
   // Static per model, computed once. Pet stat ids are raw here; the renderer scopes them.
@@ -224,9 +232,10 @@ async function boot() {
     },
   });
 
-  // The sidebar "Celestial Powers" list shows the same rich tooltip as the power's
-  // map star (proc, level, stats, requires/grants) when a row is hovered.
-  benefitsEl.addEventListener("mousemove", (e) => {
+  // A hovered power row (left "gained" list or right "still pickable" list) shows the power's full
+  // tooltip - the same rich tooltip as its map star. Attached to both sidebar containers; both survive
+  // innerHTML re-renders because the listener is on the container, not the rows.
+  const powerRowHover = (e: Event) => {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
     if (sid)
       tip.show(
@@ -239,8 +248,11 @@ async function boot() {
         selectedBenefits,
       );
     else tip.hide();
-  });
+  };
+  benefitsEl.addEventListener("mousemove", powerRowHover);
+  affinityEl.addEventListener("mousemove", powerRowHover);
   benefitsEl.addEventListener("mouseleave", () => tip.hide());
+  affinityEl.addEventListener("mouseleave", () => tip.hide());
 
   // Benefit selection: click a value to toggle just it; click a subject to toggle
   // all of its values (so the group reads as selected only when every value is). Attached to both
@@ -469,6 +481,12 @@ async function boot() {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
     if (petAvailHtml)
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Bonus to All Pets</h2>${petAvailHtml}`);
+    const availPowers = availablePowers(model, state.selected, reach.completable);
+    if (availPowers.length)
+      affinityEl.insertAdjacentHTML(
+        "beforeend",
+        `<hr class="panel-sep"/><h2>Celestial Powers</h2>${powersListHtml(availPowers)}`,
+      );
     // Empty-state copy. The build order shows whenever the selection is self-covering: the cap is auto-raised
     // to the validity floor (above), so a self-covering selection that still has no order is genuinely
     // unbuildable within 55, not merely under-budgeted. Otherwise show a prompt (nothing to order yet) or the

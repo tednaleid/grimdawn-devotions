@@ -8,6 +8,7 @@ import {
   groupedBonusRows,
   formatPowerStats,
   formatPet,
+  isFilterableStat,
 } from "../src/core/statFormat";
 
 describe("statRow attributes (GD internal -> display names)", () => {
@@ -132,7 +133,7 @@ describe("groupedBonusRows groups by category in render order", () => {
       defensivePhysical: 12,
       skillManaCostReduction: 5,
     });
-    expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Defense", "Other"]);
+    expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Resistances", "Other"]);
     expect(groups[0]!.rows).toEqual([{ id: "characterStrength", label: "Physique", value: "+10" }]);
     expect(groups[1]!.rows).toEqual([{ id: "offensivePhysicalModifier", label: "Physical Damage", value: "+15%" }]);
   });
@@ -297,4 +298,19 @@ test("formatBonusRowsWithIds rows carry the correct label and value", () => {
   const withIds = formatBonusRowsWithIds(bonuses);
   expect(withIds.find((r) => r.id === "characterStrength")!.label).toBe("Physique");
   expect(withIds.find((r) => r.id === "offensiveFireModifier")!.value).toBe("+12%");
+});
+
+describe("isFilterableStat: the in/out boundary for power stats", () => {
+  test("recognized damage/debuff stats are filterable", () => {
+    expect(isFilterableStat("offensiveStunMin")).toBe(true);
+    expect(isFilterableStat("offensiveTotalResistanceReductionAbsoluteMin")).toBe(true);
+    expect(isFilterableStat("offensiveColdMax")).toBe(true);
+  });
+  test("ability-meta stats are NOT filterable (group Other)", () => {
+    expect(isFilterableStat("skillCooldownTime")).toBe(false);
+    expect(isFilterableStat("projectileLaunchNumber")).toBe(false);
+    expect(isFilterableStat("weaponDamagePct")).toBe(false);
+    expect(isFilterableStat("skillTargetRadius")).toBe(false);
+    expect(isFilterableStat("damageAbsorption")).toBe(false);
+  });
 });

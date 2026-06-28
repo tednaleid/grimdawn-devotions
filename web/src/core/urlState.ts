@@ -1,6 +1,7 @@
 // ABOUTME: Encodes/decodes planner state (point cap, selected stars, selected benefit tags) to a compact URL hash.
 // ABOUTME: Each selection is a trailing-trimmed bitset over a stable canonical id order, base64url-encoded.
 import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "./types";
+import { isFilterableStat } from "./statFormat";
 
 const MIN_CAP = 1;
 const MAX_CAP = 55;
@@ -26,6 +27,21 @@ export function canonicalPetStatIds(model: DevotionModel): string[] {
   return [...set].sort();
 }
 
+/**
+ * Recognized celestial-power stat ids that are NOT already player-bonus ids. These extend the benefit
+ * vocabulary so powers' debuff/CC/RR subjects become filterable. "Other" (ability-meta) ids are excluded.
+ */
+export function canonicalPowerStatIds(model: DevotionModel): string[] {
+  const bonus = new Set(canonicalStatIds(model));
+  const set = new Set<string>();
+  for (const s of model.stars.values()) {
+    const p = s.celestialPower;
+    if (!p) continue;
+    for (const k of Object.keys(p.stats)) if (!bonus.has(k) && isFilterableStat(k)) set.add(k);
+  }
+  return [...set].sort();
+}
+
 /** The affinity filter tag for a grant/require of one affinity, e.g. `aff:grant:eldritch`. */
 export function affinityTagId(kind: "grant" | "req", a: Affinity): string {
   return `aff:${kind}:${a}`;
@@ -38,15 +54,16 @@ function canonicalAffinityIds(): string[] {
 
 /**
  * The benefit-tag ordering for the URL bitset: the player stat ids (unchanged positions), then the
- * pet stat ids prefixed `pet:`, then the 10 affinity tags. Each block is appended after the last, so
- * an old player-only or player+pet `b=` payload decodes identically; affinity tags extend the bitset
- * only when present.
+ * pet stat ids prefixed `pet:`, then the 10 affinity tags, then the recognized power-only stat ids.
+ * Each block is appended after the last, so an older player/pet/affinity `b=` payload decodes
+ * identically; a later block extends the bitset only when one of its tags is set.
  */
 export function canonicalBenefitIds(model: DevotionModel): string[] {
   return [
     ...canonicalStatIds(model),
     ...canonicalPetStatIds(model).map((id) => `pet:${id}`),
     ...canonicalAffinityIds(),
+    ...canonicalPowerStatIds(model), // appended LAST so older player/pet/affinity payloads decode unchanged
   ];
 }
 

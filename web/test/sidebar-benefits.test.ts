@@ -1,7 +1,7 @@
 // ABOUTME: The Benefits panel's "Available to get" list is filtered to obtainable subjects.
 // ABOUTME: A subject shows only when one of its stat ids is in the supplied availableIds set.
 import { test, expect } from "bun:test";
-import { renderBenefits } from "../src/adapters/sidebarView";
+import { renderBenefits, powersListHtml } from "../src/adapters/sidebarView";
 import type { CondensedGroup } from "../src/core/statFormat";
 import type { DevotionModel } from "../src/core/types";
 import doc from "../../data/devotions.json";
@@ -67,7 +67,7 @@ const realModel = buildModel(doc as any);
 const petStar = [...realModel.stars.values()].find((s) => s.petBonuses && Object.keys(s.petBonuses).length > 0)!;
 const petCat: CondensedGroup[] = [
   {
-    group: "Defense",
+    group: "Resistances",
     subjects: [
       {
         subject: "Fire Resistance",
@@ -110,4 +110,14 @@ test("pet 'available to get' is empty when nothing is obtainable", () => {
 test("a tagged pet subject stays listed even when it is no longer obtainable", () => {
   const html = petAvailOf(new Set(["pet:defensiveFire"]), new Set(["pet:defensiveCold"]));
   expect(html).toContain("Cold Resistance");
+});
+
+test("powersListHtml renders each power with its star-id hook and name", () => {
+  const powers = [
+    { starId: "bat:4", power: { name: "Twin Fangs", description: "x", proc: null, level: 1, stats: {}, pet: null } },
+  ];
+  const html = powersListHtml(powers as any);
+  expect(html).toContain('data-star-id="bat:4"');
+  expect(html).toContain("Twin Fangs");
+  expect(html).toContain('class="power"');
 });

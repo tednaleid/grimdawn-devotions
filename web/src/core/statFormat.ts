@@ -100,6 +100,9 @@ const OVERRIDES: Record<string, Classified> = {
   },
   offensiveLightningModifierChance: { label: "Chance for Lightning Damage", percent: true, sign: 1 },
   retaliationTotalDamageModifier: { label: "Total Retaliation Damage", percent: true, sign: 1 },
+  retaliationDamagePct: { label: "% Retaliation added to Attack", percent: true, sign: 1 },
+  retaliationFearMin: { label: "Fear", percent: false, sign: 1 },
+  retaliationFearChance: { label: "Fear", percent: true, sign: 1 },
 
   racialBonusPercentDamage: { label: "Damage to specific enemy types", percent: true, sign: 1 },
   racialBonusPercentDefense: { label: "Less damage from specific enemy types", percent: true, sign: 1 },
@@ -175,10 +178,10 @@ export function classify(id: string): Classified | null {
     const type = RESIST[m[1]!];
     if (type) return { label: `${type} Resistance`, percent: true, sign: 1 };
   }
-  // Retaliation damage: retaliation<Type>[Min|Max]
-  if ((m = id.match(/^retaliation([A-Za-z]+?)(Min|Max)?$/))) {
+  // Retaliation damage: retaliation<Type>[Modifier|Min|Max]. Modifier is the percent form.
+  if ((m = id.match(/^retaliation([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
     const type = INSTANT_DAMAGE[m[1]!];
-    if (type) return { label: `${type} Retaliation`, percent: false, sign: 1 };
+    if (type) return { label: `${type} Retaliation`, percent: m[2] === "Modifier", sign: 1 };
   }
   // Character attribute: character<Attr>[Modifier]
   if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/))) {
@@ -222,17 +225,53 @@ export function statRow(id: string, value: number, racialTarget?: string[]): Sta
   return { label, value: fmtValue(value, c.percent, c.sign) };
 }
 
-// Display groups for the benefits sidebar, in render order.
-export const GROUP_ORDER = ["Attributes", "Offense", "Defense", "Other"] as const;
+// Display groups for the benefits sidebar, in render order. Offense-side debuff sections
+// (Resistance Reduction, Crowd Control, Retaliation) and the three-way Defense split keep the
+// high-value concepts from being buried in one giant section. Routing lives in groupFor.
+export const GROUP_ORDER = [
+  "Attributes",
+  "Offense",
+  "Resistance Reduction",
+  "Crowd Control",
+  "Retaliation",
+  "Resistances",
+  "Status Protection",
+  "Armor & Mitigation",
+  "Other",
+] as const;
 export type StatGroup = (typeof GROUP_ORDER)[number];
 
 function groupFor(id: string): StatGroup {
   if (id === "racialBonusPercentDamage") return "Offense";
-  if (id === "racialBonusPercentDefense") return "Defense";
-  if (/^offensive|^retaliation/.test(id)) return "Offense";
-  if (/^defensive/.test(id)) return "Defense";
+  if (id === "racialBonusPercentDefense") return "Armor & Mitigation";
+  if (/^retaliation/.test(id)) return "Retaliation";
+  if (/ResistanceReduction/.test(id) || /^offensivePhysicalReductionPercent/.test(id)) return "Resistance Reduction";
+  if (
+    /^offensive(Stun|Freeze|Petrify|Knockdown|Confusion|Fumble|ProjectileFumble|SlowRunSpeed|SlowTotalSpeed|SlowAttackSpeed|SlowOffensiveAbility|SlowDefensiveAbility|TotalDamageReductionPercent)/.test(
+      id,
+    )
+  )
+    return "Crowd Control";
+  if (/^offensive/.test(id)) return "Offense";
+  // Defensive split. Order matters: damage-type resistances first, then the
+  // status/effect protections, then everything else defensive (armor, block, reflect).
+  if (
+    /^defensive(Physical|Pierce|Fire|Cold|Lightning|Aether|Chaos|Poison|Life|Bleeding)(MaxResist)?$/.test(id) ||
+    id === "defensiveElementalResistance"
+  )
+    return "Resistances";
+  if (/^defensive(Physical|Fire|Cold|Lightning|Poison|Life|Bleeding)Duration$/.test(id)) return "Status Protection";
+  if (/^defensive(Stun|Freeze|Petrify|Trap|Disruption)$/.test(id)) return "Status Protection";
+  if (id === "defensiveTotalSpeedResistance" || /^defensiveSlow(Life|Mana)Leach/.test(id)) return "Status Protection";
+  if (/^defensive/.test(id)) return "Armor & Mitigation";
   if (/^character/.test(id)) return "Attributes";
   return "Other";
+}
+
+/** Whether a raw stat id belongs in the benefit filter vocabulary: any group except "Other".
+ *  Used to admit recognized celestial-power stats and exclude ability-meta (cooldown, projectiles, etc.). */
+export function isFilterableStat(id: string): boolean {
+  return groupFor(id) !== "Other";
 }
 
 // Build display rows paired with a representative stat id (for grouping). Merges
@@ -471,6 +510,39 @@ function decompose(id: string): { group: StatGroup; subject: string; dim: StatDi
   }
   if (id === "defensiveProtection") return { group, subject: "Armor", dim: "flat" };
   if (id === "defensiveProtectionModifier") return { group, subject: "Armor", dim: "pct" };
+  // Resistance reduction: flat and percent are distinct subjects (they stack differently in game).
+  if (id.match(/^offensiveTotalResistanceReductionAbsolute(Duration)?Min$/))
+    return { group, subject: "Reduced target's Resistances", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveElementalResistanceReductionAbsolute(Duration)?Min$/))
+    return {
+      group,
+      subject: "Reduced target's Elemental Resistances (flat)",
+      dim: /Duration/.test(id) ? "durFlat" : "flat",
+    };
+  if (id.match(/^offensiveElementalResistanceReductionPercent(Duration)?Min$/))
+    return { group, subject: "Reduced target's Elemental Resistances", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensivePhysicalReductionPercent(Duration)?Min$/))
+    return { group, subject: "Reduced target's Physical Resistance", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  // Crowd control: a status effect (magnitude Min + a Chance facet).
+  let cc: RegExpMatchArray | null;
+  if ((cc = id.match(/^offensive(Stun|Freeze|Petrify|Knockdown|Confusion)(Chance)?(Min|Max)?$/)))
+    return { group, subject: cc[1]!, dim: cc[2] ? "pct" : "flat" };
+  if (id.match(/^offensiveFumble(Duration)?Min$/))
+    return { group, subject: "Fumble", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveProjectileFumble(Duration)?Min$/))
+    return { group, subject: "Impaired Aim", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveSlowRunSpeed(Duration)?Min$/))
+    return { group, subject: "Slow target's Movement", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensiveSlowTotalSpeed(Duration)?Min$/))
+    return { group, subject: "Slow target's Total Speed", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensiveSlowAttackSpeed(Duration)?Min$/))
+    return { group, subject: "Slow target's Attack Speed", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+  if (id.match(/^offensiveSlowOffensiveAbility(Duration)?Min$/))
+    return { group, subject: "Reduced target's Offensive Ability", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveSlowDefensiveAbility(Duration)?Min$/))
+    return { group, subject: "Reduced target's Defensive Ability", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+  if (id.match(/^offensiveTotalDamageReductionPercent(Duration)?Min$/))
+    return { group, subject: "Reduced target's Damage", dim: /Duration/.test(id) ? "durFlat" : "pct" };
   // Standalone stat: its own one-line subject.
   return { group, subject: c.label, dim: c.percent ? "pct" : "flat" };
 }

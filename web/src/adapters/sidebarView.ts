@@ -1,12 +1,19 @@
 // ABOUTME: DOM adapter that renders the benefits and affinity sidebar panels.
 // ABOUTME: Formats summed stat totals via statFormat and shows affinity totals with colored orbs.
-import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "../core/types";
+import { AFFINITIES, type Affinity, type CelestialPower, type DevotionModel, type StarId } from "../core/types";
 import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { condensedRows, type CondensedGroup, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
+
+// One row per celestial power: the name plus a data-star-id hook so a hover shows the power's full
+// tooltip (proc, level, stats, requires/grants). Shared by the left "gained" list and the right
+// "still pickable" list.
+export function powersListHtml(powers: { starId: StarId; power: CelestialPower }[]): string {
+  return powers.map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`).join("");
+}
 
 // "up"/"down"/"" depending on how a value changed since the previous render (drives the flash).
 function changeClass(prev: Record<string, number> | undefined, key: string, cur: Record<string, number>): string {
@@ -145,7 +152,7 @@ export function renderBenefits(
   const petAvailHtml = availListHtml(petCatalog, pet, petActiveKeys, availablePetKeys);
 
   // data-star-id lets main.ts show the same rich tooltip as the power's map star on hover.
-  const powerRows = powers.map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`).join("");
+  const powerRows = powersListHtml(powers);
 
   if (comparing) {
     const bar = `<div class="cmp-bar">Comparing to baseline</div>`;
