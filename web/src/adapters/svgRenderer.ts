@@ -197,9 +197,12 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
         `</filter>`,
     );
     // mute: drain color toward grey (the affinity-filter de-emphasis). SVG-native feColorMatrix
-    // because CSS filter: saturate() renders nothing on WebKit, like our other glows.
+    // because CSS filter: saturate() renders nothing on WebKit, like our other glows. `mute-wide` is the
+    // same desaturation with an expanded region, used to wrap a benefit-match glow layer (whose halo
+    // spreads well past the marker) so the whole glow desaturates without the halo being clipped.
     defs.push(
       `<filter id="mute" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.18"/></filter>`,
+      `<filter id="mute-wide" x="-400%" y="-400%" width="900%" height="900%" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.18"/></filter>`,
     );
   }
 
@@ -300,15 +303,25 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     // Immediacy: a non-selected star is "selectable" (colored) when clickable, else "locked" (grey).
     const st = sd.selected ? "selected" : sd.clickable ? "selectable" : "locked";
     const muted = sd.color.kind === "mute" ? " mute" : "";
-    const benefit = sd.benefitMatch ? " match" : "";
     const cmp = sd.diff === "add" ? " cmp-add" : sd.diff === "remove" ? " cmp-rm" : "";
     const op = STAR_OPACITY[sd.brightness];
-    const cls = `star ${st}${benefit}${muted}${cmp}`;
-    const visible = star.celestialPower
+    const cls = `star ${st}${muted}${cmp}`;
+    const dot = star.celestialPower
       ? `<polygon class="${cls}" opacity="${op}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
       : `<circle class="${cls}" opacity="${op}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+    // Benefit-match emphasis is a SEPARATE full-opacity layer (enlarged + halo) so it reads even on an
+    // unattainable (dim) star, whose dot keeps its attainability opacity. When the star's constellation is
+    // off the affinity filter, the glow is wrapped in #mute-wide so the whole glow desaturates too - the
+    // match then reads as "benefit match, off-filter" without the dot's opacity bleeding into the glow.
+    let marker = "";
+    if (sd.benefitMatch) {
+      const shape = star.celestialPower
+        ? `<polygon class="benefit-glow" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
+        : `<circle class="benefit-glow" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+      marker = muted ? `<g filter="url(#mute-wide)">${shape}</g>` : shape;
+    }
     parts.push(
-      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`,
+      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${dot}${marker}`,
     );
   }
 

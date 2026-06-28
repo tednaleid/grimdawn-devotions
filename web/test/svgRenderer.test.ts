@@ -185,8 +185,10 @@ test("no affinity filter leaves no mute", () => {
   expect(markup).not.toContain("mute");
 });
 
-test("an affinity filter mild-fades non-matching constellations but exempts benefit matches", () => {
-  const matchStar = "crossroads_eldritch:0"; // crossroads grant no affinity, so this constellation never matches
+test("an affinity filter mutes non-matching constellations; a benefit match in a matching con stays un-muted", () => {
+  // crossroads_eldritch GRANTS eldritch, so under an eldritch filter its constellation matches: the
+  // highlighted star is identity (not muted) and its benefit-glow layer is NOT mute-wrapped.
+  const matchStar = "crossroads_eldritch:0";
   const markup = renderSvgMarkup(
     model,
     { selected: new Set(), pointCap: 55 },
@@ -196,10 +198,30 @@ test("an affinity filter mild-fades non-matching constellations but exempts bene
       highlight: new Set([matchStar]),
     },
   );
-  expect(markup).toContain('class="star selectable match"'); // benefit match in matching con is identity (not muted)
-  expect(markup).not.toContain("match mute"); // a match star whose constellation matches the filter is never muted
+  expect(markup).toContain('class="star selectable"'); // the matched star's dot is identity (not muted)
+  expect(markup).toContain('<circle class="benefit-glow"'); // benefit emphasis is a separate glow layer
+  expect(markup).not.toContain('<g filter="url(#mute-wide)"'); // a matching con's glow is never mute-wrapped
   expect(markup).toContain(' mute"'); // non-matching stars get mute
   expect(markup).toContain('class="link mute"'); // links get mute
+});
+
+test("a benefit match in an off-affinity constellation: muted dot AND a mute-wrapped benefit glow", () => {
+  // A constellation that does NOT grant the filtered affinity, so it fails the filter (non-matching).
+  const offCon = [...model.constellations.values()].find((c) => (c.affinityBonus.chaos ?? 0) === 0)!;
+  const markStar = offCon.starIds[0]!;
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest: null,
+      affinityFilter: { grants: new Set(["chaos"]), requires: new Set() },
+      highlight: new Set([markStar]),
+    },
+  );
+  // Two independent channels both fire: the dot desaturates (mute) AND the benefit glow is wrapped in
+  // #mute-wide so the whole emphasis greys, reading as "benefit match, off the affinity filter".
+  expect(markup).toMatch(/<g filter="url\(#mute-wide\)"><(circle|polygon) class="benefit-glow"/);
+  expect(markup).toMatch(/class="star [^"]*mute[^"]*"/); // the dot itself carries mute too
 });
 
 test("an unattainable, non-matching constellation carries both mute class and unattainable opacity", () => {
@@ -219,8 +241,8 @@ test("an unattainable, non-matching constellation carries both mute class and un
     { selected: new Set(), pointCap: 55 },
     { manifest: null, reach, affinityFilter: { grants: new Set([notGranted]), requires: new Set() } },
   );
-  // Color (mute) and brightness (opacity) are independent channels - both apply simultaneously.
-  expect(svg).toMatch(/class="[^"]*mute[^"]*"[^>]*opacity="0\.3"/);
+  // Color (mute) and brightness (opacity) are independent channels - both apply simultaneously on a star.
+  expect(svg).toMatch(/class="star [^"]*mute[^"]*"[^>]*opacity="0\.3"/);
 });
 
 test("a non-matching constellation's art gets aff-dim", () => {

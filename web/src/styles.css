@@ -579,19 +579,18 @@ main {
   stroke: var(--grad);
   stroke-width: 7;
 }
-/* Benefit filter active: matching stars are enlarged with a bold halo. Defined after the state rules so they win. */
-.star.match {
+/* Benefit-match emphasis: a separate full-opacity layer the renderer draws as its own element
+   (enlarged + bold halo), so the emphasis reads even on a dim star without overriding the dot's
+   attainability opacity. When the star is off the affinity filter the renderer wraps this in
+   #mute-wide so the whole glow desaturates. */
+.benefit-glow {
+  fill: var(--grad);
+  pointer-events: none;
   transform-box: fill-box;
   transform-origin: center;
   transform: scale(1.45);
   /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#match-glow);
-}
-/* A benefit match is emphasized at full strength even on an unattainable (dim) star: the size
-   and glow must read, so the matched marker ignores the attainability opacity. */
-.star.match {
-  /* biome-ignore lint/complexity/noImportantStyles: intentional — overrides the inline opacity set by the renderer for brightness (attainability); without this, a dim matched star's halo is also dimmed */
-  opacity: 1 !important;
 }
 /* Affinity-filter de-emphasis: drain color, never brightness (see #mute in the renderer). */
 .mute {
