@@ -3,7 +3,7 @@
 :root {
   /* Tunable map visuals. */
   --link-color: #6f82ad; /* constellation lines (brighter than the art) */
-  --link-width: 4;
+  --link-width: 4px; /* carries a unit so calc(var(--link-width) * N) resolves for SVG stroke-width */
   --link-taken-color: #f0c14b; /* gold, like grimtools, for a segment whose both ends are taken */
 }
 * {
@@ -539,11 +539,12 @@ main {
    used here. */
 .link.taken {
   stroke: var(--link-taken-color);
+  stroke-width: calc(var(--link-width) * 1.35);
 }
 .link-glow {
   /* gold at low alpha (faintness in the color, so the inline opacity stays free for brightness) */
-  stroke: rgba(240, 193, 75, 0.32);
-  stroke-width: calc(var(--link-width) * 2.6);
+  stroke: rgba(240, 193, 75, 0.5);
+  stroke-width: calc(var(--link-width) * 3.4);
   stroke-linecap: round;
   pointer-events: none;
 }

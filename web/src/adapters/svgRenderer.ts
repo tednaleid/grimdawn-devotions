@@ -50,7 +50,7 @@ const CON_PAD = 24;
 
 // Brightness -> opacity, per element type. The only place these tunable values live (the spec's
 // "resolved opacity number"); brightness itself is resolved purely in core, so nothing collides here.
-const ART_OPACITY = { active: 1, attainable: 0.25, unattainable: 0.12 } as const;
+const ART_OPACITY = { active: 1, attainable: 0.5, unattainable: 0.12 } as const;
 const STAR_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 // The affinity match halo glows full strength on a reachable constellation and dimmer on an unreachable
@@ -179,7 +179,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       `</filter>`,
     `<filter id="self-glow-art" x="-40%" y="-40%" width="180%" height="180%" color-interpolation-filters="sRGB">` +
       `<feGaussianBlur in="SourceGraphic" stdDeviation="10" result="b"/>` +
-      `<feComponentTransfer in="SourceGraphic" result="bright"><feFuncR type="linear" slope="1.15"/><feFuncG type="linear" slope="1.15"/><feFuncB type="linear" slope="1.15"/></feComponentTransfer>` +
+      `<feComponentTransfer in="SourceGraphic" result="bright"><feFuncR type="linear" slope="1.35"/><feFuncG type="linear" slope="1.35"/><feFuncB type="linear" slope="1.35"/></feComponentTransfer>` +
       `<feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="bright"/></feMerge>` +
       `</filter>`,
   );

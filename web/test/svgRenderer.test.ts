@@ -133,7 +133,7 @@ test("brightness as opacity on art: a completable constellation is at the attain
 
   // A completable (attainable) constellation's art renders at the attainable opacity, not the dimmer
   // unattainable one - brightness is the inline opacity attribute, no dim class.
-  expect(svg).toMatch(new RegExp(`class="art" opacity="0\\.25" data-con-id="${withArtId}"`));
+  expect(svg).toMatch(new RegExp(`class="art" opacity="0\\.5" data-con-id="${withArtId}"`));
 
   // otherId has no clickable stars -> unattainable; its first star is locked.
   if (model.constellations.get(otherId)!.starIds[0]) {
