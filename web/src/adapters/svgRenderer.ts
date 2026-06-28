@@ -3,7 +3,7 @@
 import type { Affinity, Constellation, DevotionModel, SelectionState, StarId } from "../core/types";
 import type { ReachView } from "../core/reachability";
 import { affinityColor, presentAffinities } from "./affinityColors";
-import { matchedAffinities } from "../core/affinity";
+import { constellationDisplay, starDisplay, edgeDisplay } from "../core/displayState";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
 import type { AssetManifest } from "../ports/DataSource";
 
@@ -48,6 +48,15 @@ const HIT_RADIUS = 22;
 // Padding around a constellation's star bounding box for its hover/click region.
 const CON_PAD = 24;
 
+// Brightness -> opacity, per element type. The only place these tunable values live (the spec's
+// "resolved opacity number"); brightness itself is resolved purely in core, so nothing collides here.
+const ART_OPACITY = { active: 1, attainable: 0.25, unattainable: 0.12 } as const;
+const STAR_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
+const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
+// The affinity match halo glows full strength on a reachable constellation and dimmer on an unreachable
+// one, so the brightness channel still reads under a filter (reachable matches are not just colored).
+const HALO_UNREACHABLE_OPACITY = 0.25;
+
 export interface RenderOpts {
   manifest: AssetManifest | null;
   highlight?: Set<StarId>;
@@ -55,7 +64,7 @@ export interface RenderOpts {
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   // When present, an affinity filter is active. A constellation matches when it provides any of these
   // filter affinities (matchedAffinities); matching constellations glow (see the aff-glow layer) and
-  // the rest get a mild aff-dim fade.
+  // the rest desaturate (the mute color outcome) - the filter never changes brightness.
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
 }
 
@@ -131,48 +140,17 @@ export function constellationAt(regions: ConRegion[], wx: number, wy: number): s
 export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
   const reach = opts.reach;
   const diff = opts.diff ?? null;
+  const settings = {
+    selected: state.selected,
+    reach,
+    affinityFilter: opts.affinityFilter,
+    benefitMatch: opts.highlight,
+    diff,
+  };
   const defs: string[] = [];
   const parts: string[] = [];
 
-  // Constellation art class based on reachability:
-  //   "" (no class suffix) - completable, or you already have a star in it
-  //   " unmet"             - can start (a clickable star exists) but cannot complete
-  //   " unreachable"       - cannot even start (no clickable star)
-  // When reach is absent, nothing dims (permissive default).
-  const conArtClass = (c: Constellation): string => {
-    if (!reach) return "";
-    if (c.starIds.some((id) => state.selected.has(id))) return "";
-    if (reach.completable.has(c.id)) return "";
-    if (c.starIds.some((id) => reach.clickable.has(id))) return " unmet";
-    return " unreachable";
-  };
-
-  // A fully-selected (active) constellation gets a brighter, glowing art so active ones stand out
-  // when zoomed out. Only complete constellations qualify (a partial pick does not).
-  const isActive = (c: Constellation): boolean =>
-    c.starIds.length > 0 && c.starIds.every((id) => state.selected.has(id));
-
-  // Constellations whose art is dimmed (cannot be activated) also fade their links and star
-  // symbols (CSS halves their brightness), so a dim constellation reads as dim end to end while
-  // its symbols stay clearer than the much fainter background art.
-  const dimCons = new Set<string>();
-  for (const c of model.constellations.values()) if (conArtClass(c) !== "") dimCons.add(c.id);
-
-  // Affinity filter: a constellation matches when it provides any filtered affinity. Matching
-  // constellations glow (aff-glow layer); the rest get a mild aff-dim fade (a benefit match star is
-  // exempt, see below). Precompute the matching set once for both the glow layer and the fade.
   const affFilter = opts.affinityFilter;
-  const affMatchCons = new Set<string>();
-  if (affFilter) {
-    for (const c of model.constellations.values())
-      if (matchedAffinities(c, affFilter.grants, affFilter.requires).length > 0) affMatchCons.add(c.id);
-  }
-  // A constellation fails the affinity filter when it provides none of the filtered affinities, and is
-  // faded - but NOT if it is already reachability-dimmed. con-dim/unmet/unreachable is a stronger fade on
-  // the same opacity property; layering the lighter aff-dim on top would override it (equal CSS
-  // specificity, aff-dim wins by source order) and make an unreachable constellation read BRIGHTER under a
-  // filter. Reachability dominates: the affinity fade only differentiates among otherwise-interactable things.
-  const affDim = (conId: string): boolean => affFilter !== undefined && !affMatchCons.has(conId) && !dimCons.has(conId);
 
   // Constellation hover/click is resolved in JS against each constellation's art
   // bounds (see buildConRegions / constellationAt), so the whole image is hoverable
@@ -221,6 +199,14 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
         `<feMerge><feMergeNode in="sat"/><feMergeNode in="sat"/><feMergeNode in="sat"/><feMergeNode in="sat"/></feMerge>` +
         `</filter>`,
     );
+    // mute: drain color toward grey (the affinity-filter de-emphasis). SVG-native feColorMatrix
+    // because CSS filter: saturate() renders nothing on WebKit, like our other glows. `mute-wide` is the
+    // same desaturation with an expanded region, used to wrap a benefit-match glow layer (whose halo
+    // spreads well past the marker) so the whole glow desaturates without the halo being clipped.
+    defs.push(
+      `<filter id="mute" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.18"/></filter>`,
+      `<filter id="mute-wide" x="-400%" y="-400%" width="900%" height="900%" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0.18"/></filter>`,
+    );
   }
 
   // Gradient defs for every constellation (used by both the star fills and the art tint).
@@ -244,23 +230,27 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   // constellations. The gradient is built from ONLY the matched affinity colors (solid when one matches).
   if (opts.manifest && affFilter) {
     for (const c of model.constellations.values()) {
-      if (!affMatchCons.has(c.id)) continue;
+      const cd0 = constellationDisplay(c, settings);
+      if (cd0.color.kind !== "match") continue;
       const name = c.background?.image?.split("/").pop() ?? "";
       const art = opts.manifest.images[name];
       if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
       const { x, y } = c.background;
-      const cols = matchedAffinities(c, affFilter.grants, affFilter.requires).map(affinityColor);
+      const cols = cd0.color.affinities.map(affinityColor);
       defs.push(
         `<linearGradient id="aff-grad-${c.id}" x1="0" y1="0" x2="1" y2="0">${gradientStops(cols)}</linearGradient>`,
       );
       ensureMask(c.id, art.url, x, y, art.w, art.h);
-      const glow = `<rect class="aff-glow" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`;
+      // The halo feels the brightness channel like every other layer: a matching constellation you cannot
+      // reach glows in its color but dimmer than a reachable one, so reachability still reads under a filter.
+      const haloOp = cd0.brightness === "unattainable" ? HALO_UNREACHABLE_OPACITY : 1;
+      const glow = `<rect class="aff-glow" opacity="${haloOp}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#aff-grad-${c.id})" mask="url(#mask-${c.id})" filter="url(#aff-glow)"/>`;
       // A selected constellation also carries its own #self-glow-art bloom (Layer 1), which raises the
       // local brightness and would swallow a single faint halo - so a selected match showed no color.
       // Stack the halo for active ones so the matched color still reads as a ring around them, while they
       // stay the brightest thing via the self-glow. Unselected matches keep the single, softer pass.
       parts.push(glow);
-      if (isActive(c)) parts.push(glow);
+      if (cd0.selfGlow) parts.push(glow);
     }
   }
 
@@ -273,67 +263,74 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const art = opts.manifest.images[name];
       if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
       const { x, y } = c.background;
-      const dim = conArtClass(c);
-      const act = isActive(c);
-      const active = act ? " active" : "";
+      const cd = constellationDisplay(c, settings);
+      const op = ART_OPACITY[cd.brightness];
+      const muted = cd.color.kind === "mute" ? " mute" : "";
+      const active = cd.selfGlow ? " active" : "";
       // An active constellation glows in its own art colors via the #self-glow-art SVG filter (see the
       // .art.active CSS rule); the filter derives the color from the image, so no per-color style is needed.
       const img = `href="${art.url}" x="${x}" y="${y}" width="${art.w}" height="${art.h}"`;
       // data-con-id lets a blocked constellation deselect flash this icon (see main.ts).
-      const ao = affDim(c.id) ? " aff-dim" : "";
-      parts.push(`<image ${img} class="art${dim}${active}${ao}" data-con-id="${c.id}"/>`);
+      parts.push(`<image ${img} class="art${active}${muted}" opacity="${op}" data-con-id="${c.id}"/>`);
       if (presentAffinities(c.affinityRequired).length > 0) {
         ensureMask(c.id, art.url, x, y, art.w, art.h);
         parts.push(
-          `<rect class="art-tint${dim}${active}${ao}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#mask-${c.id})"/>`,
+          `<rect class="art-tint${active}${muted}" opacity="${op}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" fill="url(#grad-${c.id})" mask="url(#mask-${c.id})"/>`,
         );
       }
     }
   }
 
   // Layer 2: links. A segment whose both endpoints are selected is "taken" (drawn gold, like
-  // grimtools); a segment in a dim constellation is faded with "con-dim".
+  // grimtools); brightness and color come from the edge display record.
   for (const star of model.stars.values()) {
-    const cd = dimCons.has(star.constellationId) ? " con-dim" : "";
-    const ao = affDim(star.constellationId) ? " aff-dim" : "";
+    const con = model.constellations.get(star.constellationId)!;
     for (const p of star.predecessors) {
       const a = model.stars.get(p);
       if (!a) continue;
-      const taken = state.selected.has(p) && state.selected.has(star.id) ? " taken" : "";
-      parts.push(
-        `<line class="link${taken}${cd}${ao}" x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"/>`,
-      );
+      const ed = edgeDisplay(con, p, star.id, settings);
+      const muted = ed.color.kind === "mute" ? " mute" : "";
+      const op = EDGE_OPACITY[ed.brightness];
+      const coords = `x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"`;
+      // A taken segment gets a soft gold bloom from a wide, faint underlay line rather than an SVG filter:
+      // an objectBoundingBox filter region collapses to nothing on a perfectly horizontal or vertical line
+      // (its bounding box has zero height or width), which made axis-aligned taken links render invisibly.
+      if (ed.taken) parts.push(`<line class="link-glow" opacity="${op}" ${coords}/>`);
+      parts.push(`<line class="link${ed.taken ? " taken" : ""}${muted}" opacity="${op}" ${coords}/>`);
     }
   }
 
   // Layer 3: stars. Each is an invisible large hit target (carries data-star-id)
   // plus a small visible dot (pointer-events:none) so the click/hover area is generous.
-  // When a benefit filter is active, matching stars are emphasized and the rest dimmed.
-  const filtering = (opts.highlight?.size ?? 0) > 0;
   for (const star of model.stars.values()) {
     const con = model.constellations.get(star.constellationId)!;
-    const solid = gradColors(con)[0] ?? "#9aa3b2"; // solid color for the glow shadow
-    let st = "locked";
-    if (state.selected.has(star.id)) st = "selected";
-    else if (!reach || reach.clickable.has(star.id)) st = "selectable";
+    const sd = starDisplay(star, con, settings);
+    const solid = gradColors(con)[0] ?? "#9aa3b2";
     const cx = star.position.x + STAR_CENTER;
     const cy = star.position.y + STAR_CENTER;
     const style = `--affinity:${solid};--grad:url(#grad-${con.id})`;
-    const isMatch = opts.highlight?.has(star.id) ?? false;
-    // A star granting a selected benefit is emphasized; the rest are dimmed while benefit-filtering.
-    const m = isMatch ? " match" : filtering ? " dim" : "";
-    // Stars in a dim constellation fade too (CSS halves their brightness).
-    const cd = dimCons.has(star.constellationId) ? " con-dim" : "";
-    // Off-target for the affinity filter: fade, unless this star is a benefit match (matches stay lit).
-    const ao = !isMatch && affDim(star.constellationId) ? " aff-dim" : "";
-    // Compare diff: mark stars added or removed vs the baseline build.
-    const cmp = diff ? (diff.added.has(star.id) ? " cmp-add" : diff.removed.has(star.id) ? " cmp-rm" : "") : "";
-    // Celestial-power stars are diamonds; the rest are circles. Both share the .star styling.
-    const visible = star.celestialPower
-      ? `<polygon class="star power ${st}${m}${ao}${cd}${cmp}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
-      : `<circle class="star ${st}${m}${ao}${cd}${cmp}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+    // Immediacy: a non-selected star is "selectable" (colored) when clickable, else "locked" (grey).
+    const st = sd.selected ? "selected" : sd.clickable ? "selectable" : "locked";
+    const muted = sd.color.kind === "mute" ? " mute" : "";
+    const cmp = sd.diff === "add" ? " cmp-add" : sd.diff === "remove" ? " cmp-rm" : "";
+    const op = STAR_OPACITY[sd.brightness];
+    const cls = `star ${st}${muted}${cmp}`;
+    const dot = star.celestialPower
+      ? `<polygon class="${cls}" opacity="${op}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
+      : `<circle class="${cls}" opacity="${op}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+    // Benefit-match emphasis is a SEPARATE full-opacity layer (enlarged + halo) so it reads even on an
+    // unattainable (dim) star, whose dot keeps its attainability opacity. When the star's constellation is
+    // off the affinity filter, the glow is wrapped in #mute-wide so the whole glow desaturates too - the
+    // match then reads as "benefit match, off-filter" without the dot's opacity bleeding into the glow.
+    let marker = "";
+    if (sd.benefitMatch) {
+      const shape = star.celestialPower
+        ? `<polygon class="benefit-glow" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
+        : `<circle class="benefit-glow" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+      marker = muted ? `<g filter="url(#mute-wide)">${shape}</g>` : shape;
+    }
     parts.push(
-      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${visible}`,
+      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${dot}${marker}`,
     );
   }
 

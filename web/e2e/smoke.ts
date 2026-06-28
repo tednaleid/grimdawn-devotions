@@ -284,7 +284,7 @@ try {
   let petMatched = false;
   for (let i = 0; i < 20; i++) {
     await Bun.sleep(100);
-    if ((await cdp.evaluate<number>("document.querySelectorAll('.star.match').length")) > 0) {
+    if ((await cdp.evaluate<number>("document.querySelectorAll('.benefit-glow').length")) > 0) {
       petMatched = true;
       break;
     }
@@ -307,8 +307,8 @@ try {
     "clicking an Affinity panel row activates its grant tag (URL b= + panel vsel)",
   );
   check(
-    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) > 0,
-    "an affinity grant filter fades non-matching constellations (.star.aff-dim)",
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.mute').length")) > 0,
+    "an affinity grant filter mutes non-matching constellations (.star.mute)",
   );
   check(
     (await cdp.evaluate<number>("document.querySelectorAll('.aff-glow').length")) > 0,
@@ -319,8 +319,8 @@ try {
   );
   await Bun.sleep(120);
   check(
-    (await cdp.evaluate<number>("document.querySelectorAll('.star.aff-dim').length")) === 0,
-    "toggling the affinity row off clears the fade",
+    (await cdp.evaluate<number>("document.querySelectorAll('.star.mute').length")) === 0,
+    "toggling the affinity row off clears the mute",
   );
   check(
     (await cdp.evaluate<number>("document.querySelectorAll('.aff-glow').length")) === 0,
