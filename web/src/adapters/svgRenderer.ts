@@ -289,11 +289,14 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const a = model.stars.get(p);
       if (!a) continue;
       const ed = edgeDisplay(con, p, star.id, settings);
-      const taken = ed.taken ? " taken" : "";
       const muted = ed.color.kind === "mute" ? " mute" : "";
-      parts.push(
-        `<line class="link${taken}${muted}" opacity="${EDGE_OPACITY[ed.brightness]}" x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"/>`,
-      );
+      const op = EDGE_OPACITY[ed.brightness];
+      const coords = `x1="${a.position.x + STAR_CENTER}" y1="${a.position.y + STAR_CENTER}" x2="${star.position.x + STAR_CENTER}" y2="${star.position.y + STAR_CENTER}"`;
+      // A taken segment gets a soft gold bloom from a wide, faint underlay line rather than an SVG filter:
+      // an objectBoundingBox filter region collapses to nothing on a perfectly horizontal or vertical line
+      // (its bounding box has zero height or width), which made axis-aligned taken links render invisibly.
+      if (ed.taken) parts.push(`<line class="link-glow" opacity="${op}" ${coords}/>`);
+      parts.push(`<line class="link${ed.taken ? " taken" : ""}${muted}" opacity="${op}" ${coords}/>`);
     }
   }
 

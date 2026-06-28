@@ -533,11 +533,19 @@ main {
   stroke-width: var(--link-width);
   pointer-events: none;
 }
-/* A fully-taken segment (both endpoint stars selected) glows gold, like grimtools. */
+/* A fully-taken segment (both endpoint stars selected) glows gold, like grimtools. The bloom is a
+   separate wide, faint underlay line (.link-glow, drawn by the renderer just beneath this one): an SVG
+   filter glow collapses to nothing on a perfectly horizontal or vertical line, so a filter cannot be
+   used here. */
 .link.taken {
   stroke: var(--link-taken-color);
-  /* SVG-native self-glow (#self-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
-  filter: url(#self-glow);
+}
+.link-glow {
+  /* gold at low alpha (faintness in the color, so the inline opacity stays free for brightness) */
+  stroke: rgba(240, 193, 75, 0.32);
+  stroke-width: calc(var(--link-width) * 2.6);
+  stroke-linecap: round;
+  pointer-events: none;
 }
 .art {
   pointer-events: none;
