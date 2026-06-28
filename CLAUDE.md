@@ -20,7 +20,7 @@ When you think of an enhancement that isn't ready to build, capture it there
 ## Living docs are evergreen
 
 The top-level reference docs in `docs/` (for example `devotion-system.md`,
-`reachability-engine.md`, `reachability-performance.md`) describe how the system
+`reachability-engine.md`, `reachability-performance.md`, `display-model.md`) describe how the system
 works **now**. Keep them concise and current: when behavior changes, rewrite the
 affected part in place. Do not append chronological "Update YYYY-MM-DD" sections,
 leave superseded claims standing, or turn a reference doc into a change-log. A
