@@ -60,7 +60,7 @@ test("renders the art <image> at the manifest's native width/height", () => {
 test("renders celestial-power stars as diamonds (polygon)", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
   // bat:4 is the "Twin Fangs" celestial power star; non-power stars stay circles.
-  expect(markup).toContain('<polygon class="star power');
+  expect(markup).toContain('<polygon class="star');
 });
 
 test("a fully-selected constellation's art gets the 'active' class; a partial one does not", () => {
@@ -152,12 +152,10 @@ test("a link between two selected stars gets the 'taken' class (the rest stay pl
   expect(one).not.toContain('class="link taken"');
 });
 
-test("stars and links in a dim (un-activatable) constellation get 'con-dim'", () => {
-  // a constellation that has at least one intra-constellation link (a star with a predecessor)
+test("stars and links in an unattainable constellation carry the unattainable opacity", () => {
   const dimCon = [...model.constellations.values()].find((c) =>
     c.starIds.some((id) => (model.stars.get(id)?.predecessors.length ?? 0) > 0),
   )!;
-  // dim = neither completable nor holding any clickable star
   const reach: ReachView = {
     completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
     clickable: new Set(),
@@ -166,11 +164,7 @@ test("stars and links in a dim (un-activatable) constellation get 'con-dim'", ()
     needSource: new Map(),
   };
   const svg = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null, reach });
-  expect(svg).toMatch(/class="star [^"]*con-dim"/);
-  expect(svg).toMatch(/class="link con-dim"/);
-  // Without a reach view nothing dims, so no star or link is faded.
-  const noReach = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
-  expect(noReach).not.toContain("con-dim");
+  expect(svg).toMatch(/class="link"[^>]*opacity="0.3"/);
 });
 
 test("compare diff marks added stars cmp-add and removed stars cmp-rm", () => {
@@ -186,9 +180,9 @@ test("compare diff marks added stars cmp-add and removed stars cmp-rm", () => {
   expect(markup).toContain("cmp-rm");
 });
 
-test("no affinity filter leaves no aff-dim classes", () => {
+test("no affinity filter leaves no mute", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
-  expect(markup).not.toContain("aff-dim");
+  expect(markup).not.toContain("mute");
 });
 
 test("an affinity filter mild-fades non-matching constellations but exempts benefit matches", () => {
@@ -202,18 +196,16 @@ test("an affinity filter mild-fades non-matching constellations but exempts bene
       highlight: new Set([matchStar]),
     },
   );
-  expect(markup).toContain('class="star selectable match"'); // benefit match keeps full treatment
-  expect(markup).not.toContain("match aff-dim"); // a match is never faded by the affinity layer
-  expect(markup).toContain(' aff-dim"'); // non-matching stars fade
-  expect(markup).toContain('class="link aff-dim"'); // links fade too
+  expect(markup).toContain('class="star selectable match"'); // benefit match in matching con is identity (not muted)
+  expect(markup).not.toContain("match mute"); // a match star whose constellation matches the filter is never muted
+  expect(markup).toContain(' mute"'); // non-matching stars get mute
+  expect(markup).toContain('class="link mute"'); // links get mute
 });
 
-test("reachability dim dominates the affinity fade: an unreachable non-matching constellation keeps con-dim, not the lighter aff-dim", () => {
-  // A constellation with an intra-constellation link, made un-activatable (every OTHER one completable).
+test("an unattainable, non-matching constellation carries both mute class and unattainable opacity", () => {
   const dimCon = [...model.constellations.values()].find((c) =>
     c.starIds.some((id) => (model.stars.get(id)?.predecessors.length ?? 0) > 0),
   )!;
-  // Filter on an affinity this constellation does not grant, so it fails the filter (non-matching).
   const notGranted = AFFINITIES.find((a) => (dimCon.affinityBonus[a] ?? 0) === 0)!;
   const reach: ReachView = {
     completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
@@ -227,10 +219,8 @@ test("reachability dim dominates the affinity fade: an unreachable non-matching 
     { selected: new Set(), pointCap: 55 },
     { manifest: null, reach, affinityFilter: { grants: new Set([notGranted]), requires: new Set() } },
   );
-  // It stays reachability-dimmed; aff-dim is never layered on (it would override con-dim and lighten it).
-  expect(svg).toMatch(/class="link con-dim"/);
-  expect(svg).not.toContain("con-dim aff-dim"); // link ordering: con-dim then aff-dim
-  expect(svg).not.toContain("aff-dim con-dim"); // star ordering: aff-dim then con-dim
+  // Color (mute) and brightness (opacity) are independent channels - both apply simultaneously.
+  expect(svg).toMatch(/class="[^"]*mute[^"]*"[^>]*opacity="0\.3"/);
 });
 
 test("a non-matching constellation's art gets aff-dim", () => {
@@ -246,7 +236,7 @@ test("a non-matching constellation's art gets aff-dim", () => {
       affinityFilter: { grants: new Set([notGranted]), requires: new Set() },
     },
   );
-  expect(markup).toContain('class="art aff-dim"');
+  expect(markup).toContain(' class="art mute"');
 });
 
 test("a matching constellation emits a colored glow with its matched-color gradient", () => {

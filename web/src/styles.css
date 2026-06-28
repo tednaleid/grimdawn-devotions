@@ -5,9 +5,6 @@
   --link-color: #6f82ad; /* constellation lines (brighter than the art) */
   --link-width: 4;
   --link-taken-color: #f0c14b; /* gold, like grimtools, for a segment whose both ends are taken */
-  --art-opacity: 0.25; /* dim the constellation art (was ~0.9) */
-  --art-tint-opacity: 0.6; /* strength of the affinity-requirement color wash */
-  --art-unmet-factor: 0.25; /* extra fade for constellations you cannot yet start */
 }
 * {
   box-sizing: border-box;
@@ -543,36 +540,17 @@ main {
   filter: url(#self-glow);
 }
 .art {
-  opacity: var(--art-opacity);
   pointer-events: none;
-}
-.art.unmet {
-  opacity: calc(var(--art-opacity) * var(--art-unmet-factor));
 }
 .art-tint {
-  opacity: var(--art-tint-opacity);
   mix-blend-mode: screen;
   pointer-events: none;
-}
-.art-tint.unmet {
-  opacity: calc(var(--art-tint-opacity) * var(--art-unmet-factor));
-}
-/* Second dimming layer: un-completable AND unstartable constellations, darker than .unmet. */
-.art.unreachable {
-  opacity: calc(var(--art-opacity) * 0.4);
-}
-.art-tint.unreachable {
-  opacity: 0;
 }
 /* A fully-selected (active) constellation: full-opacity, brighter art with a warm glow so active
    constellations stand out when zoomed out (a calmer, steady version of the old blocked flash). */
 .art.active {
-  opacity: 1;
   /* SVG-native self-glow + brightness (#self-glow-art); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#self-glow-art);
-}
-.art-tint.active {
-  opacity: calc(var(--art-tint-opacity) * 1.35);
 }
 .hit {
   fill: transparent;
@@ -589,11 +567,9 @@ main {
 }
 .star.locked {
   fill: #9aa3b2;
-  opacity: 0.8;
 }
 .star.selectable {
   fill: var(--grad);
-  opacity: 1;
   /* SVG-native self-glow (#self-glow); CSS drop-shadow on SVG fails on WebKit/iOS. NOTE: this applies to
      every selectable star (100+ from empty), so if it janks pan/zoom on mobile, drop the glow here. */
   filter: url(#self-glow);
@@ -603,8 +579,7 @@ main {
   stroke: var(--grad);
   stroke-width: 7;
 }
-/* Benefit filter active: matching stars are enlarged with a bold halo, the rest are
-   dimmed so the matches stand out. Defined after the state rules so they win. */
+/* Benefit filter active: matching stars are enlarged with a bold halo. Defined after the state rules so they win. */
 .star.match {
   transform-box: fill-box;
   transform-origin: center;
@@ -612,38 +587,15 @@ main {
   /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#match-glow);
 }
-.star.dim {
-  opacity: 0.4; /* non-matching stars on reachable constellations: visible but clearly below matches */
+/* A benefit match is emphasized at full strength even on an unattainable (dim) star: the size
+   and glow must read, so the matched marker ignores the attainability opacity. */
+.star.match {
+  /* biome-ignore lint/complexity/noImportantStyles: intentional — overrides the inline opacity set by the renderer for brightness (attainability); without this, a dim matched star's halo is also dimmed */
+  opacity: 1 !important;
 }
-/* Stars and links of a dim (un-activatable) constellation fade well below normal brightness:
-   still above the much fainter background art, but clearly subdued. */
-.link.con-dim {
-  opacity: 0.15;
-}
-.star.con-dim {
-  opacity: 0.15; /* selectable stars (normally 1) */
-}
-.star.locked.con-dim {
-  opacity: 0.1; /* locked stars (normally 0.8) */
-}
-/* A search match on an un-activatable constellation keeps nearly full brightness (and its
-   glow) so matches stay findable even where the constellation itself is faded out. Placed
-   after .star.locked.con-dim so it wins the specificity tie for locked stars. */
-.star.match.con-dim {
-  opacity: 0.85;
-}
-/* Affinity filter active: non-matching constellations get a MILD fade (matching ones glow, see the
-   aff-glow layer). Deliberately lighter than the reachability con-dim so the two read differently;
-   benefit matches never get aff-dim, so they keep their glow. */
-.art.aff-dim,
-.art-tint.aff-dim {
-  opacity: 0.45;
-}
-.link.aff-dim {
-  opacity: 0.5;
-}
-.star.aff-dim {
-  opacity: 0.5;
+/* Affinity-filter de-emphasis: drain color, never brightness (see #mute in the renderer). */
+.mute {
+  filter: url(#mute);
 }
 /* The affinity match halo (see #aff-glow in the renderer). Non-interactive so it never intercepts a
    click meant for the art/stars beneath or around it. */
