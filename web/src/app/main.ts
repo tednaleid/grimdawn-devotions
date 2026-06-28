@@ -233,9 +233,9 @@ async function boot() {
   });
 
   // A hovered power row (left "gained" list or right "still pickable" list) shows the power's full
-  // tooltip - the same rich tooltip as its map star - and boxes the power's constellation on the map so
-  // it is obvious where that power lives. Attached to both sidebar containers; both survive innerHTML
-  // re-renders because the listener is on the container, not the rows.
+  // tooltip - the same rich tooltip as its map star - and lights up the power's own star on the map with
+  // the benefit-match treatment (enlarged + halo) so it is obvious which node grants it. Attached to both
+  // sidebar containers; both survive innerHTML re-renders because the listener is on the container.
   const powerRowHover = (e: Event) => {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
     if (sid) {
@@ -248,15 +248,15 @@ async function boot() {
         undefined,
         selectedBenefits,
       );
-      handle.highlightCon(model.stars.get(sid)?.constellationId ?? null);
+      handle.highlightStar(sid);
     } else {
       tip.hide();
-      handle.highlightCon(null);
+      handle.highlightStar(null);
     }
   };
   const powerRowLeave = () => {
     tip.hide();
-    handle.highlightCon(null);
+    handle.highlightStar(null);
   };
   benefitsEl.addEventListener("mousemove", powerRowHover);
   affinityEl.addEventListener("mousemove", powerRowHover);

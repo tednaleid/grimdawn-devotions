@@ -357,6 +357,9 @@ export interface SvgHandle {
   // build-order row hover-sync; an outline on the constellation's own art is buried under later-painted
   // layers and traces the oversized texture rect, so a dedicated top overlay is drawn instead.
   highlightCon(id: string | null): void;
+  // Emphasize (or clear, with null) a single star with the benefit-match treatment (enlarged + halo),
+  // on top of every layer. Used for side-panel power-row hover so the power's own star pops on the map.
+  highlightStar(id: string | null): void;
 }
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
@@ -452,6 +455,34 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     live.appendChild(rect);
   }
 
+  // Emphasize a single star with the same enlarged + halo treatment a benefit-filter match gets
+  // (the `.benefit-glow` class), drawn as the last SVG child so it sits on top. A power star is a
+  // diamond like its dot. Clears any prior highlight; null clears without drawing.
+  function highlightStar(id: string | null) {
+    const live = container.querySelector("svg") as SVGSVGElement | null;
+    if (!live) return;
+    live.querySelector(".star-highlight")?.remove();
+    if (!id) return;
+    const star = model.stars.get(id);
+    if (!star) return;
+    const con = model.constellations.get(star.constellationId);
+    const cx = star.position.x + STAR_CENTER;
+    const cy = star.position.y + STAR_CENTER;
+    const solid = (con && gradColors(con)[0]) || "#9aa3b2";
+    const ns = "http://www.w3.org/2000/svg";
+    const shape = document.createElementNS(ns, star.celestialPower ? "polygon" : "circle");
+    if (star.celestialPower) {
+      shape.setAttribute("points", diamondPoints(cx, cy, POWER_RADIUS));
+    } else {
+      shape.setAttribute("cx", String(cx));
+      shape.setAttribute("cy", String(cy));
+      shape.setAttribute("r", String(STAR_RADIUS));
+    }
+    shape.setAttribute("class", "benefit-glow star-highlight");
+    shape.setAttribute("style", `--affinity:${solid};--grad:url(#grad-${con?.id})`);
+    live.appendChild(shape);
+  }
+
   return {
     svg,
     update(state, highlight, reach, diff, affinityFilter) {
@@ -462,5 +493,6 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },
     highlightCon,
+    highlightStar,
   };
 }
