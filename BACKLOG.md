@@ -60,6 +60,26 @@ grants/requires the tagged affinity). The Requires/Grants rendering lives in
 ids + selected class there and the click-toggle in `main.ts`. Builds on the
 tooltip-filter work above.
 
+## Celestial powers in filters: deferred follow-ups
+
+Shipped: celestial-power stats participate in benefit filters (match the power's
+diamond star), curated debuff/CC/RR subjects, finer sidebar sections, and a
+right-side still-pickable Celestial Powers list. See
+`docs/superpowers/specs/2026-06-28-celestial-powers-in-filters-design.md`.
+
+Deferred:
+- Pet attack-stat filtering: a summon power's pet `attack_stats` (the summoned
+  creature's own damage) do not match damage filters. Would need a decision on
+  whether they map to the player damage filters or the `pet:` namespace.
+- Narrow the right-side Celestial Powers list by the active benefit filter (show
+  only still-pickable powers whose stats match). Currently filter-independent,
+  mirroring the "Available to get" list. Pointer: `availablePowers` +
+  `taggedStars`/`selectedBenefits` in `main.ts`.
+- Finer Attributes section: ~7 of the Attributes subjects are weapon/armor
+  requirement reductions that could split into their own subsection.
+- Distinct map treatment for a power match vs a bonus match (today both reuse the
+  benefit-match highlight on the diamond).
+
 ## Reachability engine: residual synthetic false-reach
 
 `just validate-reach` Part A shows ~450 false-reaches per 12k random small
