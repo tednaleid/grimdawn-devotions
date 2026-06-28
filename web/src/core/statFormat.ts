@@ -222,15 +222,37 @@ export function statRow(id: string, value: number, racialTarget?: string[]): Sta
   return { label, value: fmtValue(value, c.percent, c.sign) };
 }
 
-// Display groups for the benefits sidebar, in render order.
-export const GROUP_ORDER = ["Attributes", "Offense", "Defense", "Other"] as const;
+// Display groups for the benefits sidebar, in render order. Offense-side debuff sections
+// (Resistance Reduction, Crowd Control, Retaliation) and the three-way Defense split keep the
+// high-value concepts from being buried in one giant section. Routing lives in groupFor.
+export const GROUP_ORDER = [
+  "Attributes",
+  "Offense",
+  "Resistance Reduction",
+  "Crowd Control",
+  "Retaliation",
+  "Resistances",
+  "Status Protection",
+  "Armor & Mitigation",
+  "Other",
+] as const;
 export type StatGroup = (typeof GROUP_ORDER)[number];
 
 function groupFor(id: string): StatGroup {
   if (id === "racialBonusPercentDamage") return "Offense";
-  if (id === "racialBonusPercentDefense") return "Defense";
+  if (id === "racialBonusPercentDefense") return "Armor & Mitigation";
   if (/^offensive|^retaliation/.test(id)) return "Offense";
-  if (/^defensive/.test(id)) return "Defense";
+  // Defensive split. Order matters: damage-type resistances first, then the
+  // status/effect protections, then everything else defensive (armor, block, reflect).
+  if (
+    /^defensive(Physical|Pierce|Fire|Cold|Lightning|Aether|Chaos|Poison|Life|Bleeding)(MaxResist)?$/.test(id) ||
+    id === "defensiveElementalResistance"
+  )
+    return "Resistances";
+  if (/^defensive(Physical|Fire|Cold|Lightning|Poison|Life|Bleeding)Duration$/.test(id)) return "Status Protection";
+  if (/^defensive(Stun|Freeze|Petrify|Trap|Disruption)$/.test(id)) return "Status Protection";
+  if (id === "defensiveTotalSpeedResistance" || /^defensiveSlow(Life|Mana)Leach/.test(id)) return "Status Protection";
+  if (/^defensive/.test(id)) return "Armor & Mitigation";
   if (/^character/.test(id)) return "Attributes";
   return "Other";
 }

@@ -132,7 +132,7 @@ describe("groupedBonusRows groups by category in render order", () => {
       defensivePhysical: 12,
       skillManaCostReduction: 5,
     });
-    expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Defense", "Other"]);
+    expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Resistances", "Other"]);
     expect(groups[0]!.rows).toEqual([{ id: "characterStrength", label: "Physique", value: "+10" }]);
     expect(groups[1]!.rows).toEqual([{ id: "offensivePhysicalModifier", label: "Physical Damage", value: "+15%" }]);
   });

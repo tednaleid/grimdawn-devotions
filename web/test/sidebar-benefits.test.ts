@@ -67,7 +67,7 @@ const realModel = buildModel(doc as any);
 const petStar = [...realModel.stars.values()].find((s) => s.petBonuses && Object.keys(s.petBonuses).length > 0)!;
 const petCat: CondensedGroup[] = [
   {
-    group: "Defense",
+    group: "Resistances",
     subjects: [
       {
         subject: "Fire Resistance",

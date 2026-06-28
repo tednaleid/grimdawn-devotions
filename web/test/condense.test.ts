@@ -29,7 +29,7 @@ const subj = (group: string, subject: string) =>
   groups.find((g) => g.group === group)?.subjects.find((s) => s.subject === subject);
 
 test("groups are returned in GROUP_ORDER", () => {
-  expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Defense"]);
+  expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Resistances"]);
 });
 
 test("a DoT damage type collapses to one subject with flat/pct/durFlat/durPct in order", () => {
@@ -44,7 +44,7 @@ test("flat comes before percent for instant damage and attributes", () => {
 });
 
 test("resistance collapses base + max onto one subject", () => {
-  const s = subj("Defense", "Fire Resistance")!;
+  const s = subj("Resistances", "Fire Resistance")!;
   expect(s.parts.map((p) => p.dim)).toEqual(["pct", "max"]);
   expect(s.parts.map((p) => p.value)).toEqual(["+13%", "+3%"]);
 });
