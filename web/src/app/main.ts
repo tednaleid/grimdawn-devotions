@@ -43,6 +43,11 @@ import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState, StarId } from "../core/types";
 
 async function boot() {
+  // A prior failed load may have set this guard (see bootFailed() in index.html). The module has now
+  // loaded, so clear it — a later same-session deploy mismatch can then auto-recover again.
+  try {
+    sessionStorage.removeItem("bootReloaded");
+  } catch {}
   const data = await httpDataSource(".").load();
   const model = data.model;
   const cons: ReachCon[] = buildReachCons(model);

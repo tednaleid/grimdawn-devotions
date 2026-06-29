@@ -34,6 +34,9 @@ html = html.replace('src="./main.js"', `src="./${jsName}"`).replace('href="./sty
 if (html.includes('"./main.js"') || html.includes('"./styles.css"')) {
   throw new Error("bundle: index.html still has un-hashed asset refs after rewrite (did the markup change?)");
 }
+if (!html.includes(jsName) || !html.includes(cssName)) {
+  throw new Error("bundle: hashed asset refs not present after rewrite (did index.html markup change?)");
+}
 await Bun.write("dist/index.html", html);
 
 console.log(`bundled dist: ${jsName}, ${cssName} (buildId ${buildId})`);
