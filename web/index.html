@@ -7,6 +7,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Grim Dawn Devotion Planner</title>
   <link rel="stylesheet" href="./styles.css" />
+  <script>
+    // The hashed entry script (below) can 404 when a cached index.html outlives the deploy that replaced
+    // its hash (GitHub Pages caps caching at 600s and keeps no old builds). A reload revalidates index.html
+    // and picks up the new hash; sessionStorage guards against an infinite reload loop on a real failure.
+    function bootFailed() {
+      try {
+        if (!sessionStorage.getItem("bootReloaded")) {
+          sessionStorage.setItem("bootReloaded", "1");
+          location.reload();
+          return;
+        }
+      } catch (e) {}
+      var el = document.getElementById("boot-loading");
+      if (el)
+        el.innerHTML =
+          '<p>Couldn\'t load the planner.</p><button type="button" onclick="location.reload()">Reload</button>';
+    }
+  </script>
 </head>
 <body>
   <header>
@@ -17,13 +35,15 @@
   </header>
   <main>
     <aside id="benefits" class="sidebar"></aside>
-    <div id="map-container"></div>
+    <div id="map-container">
+      <div id="boot-loading" role="status"><div class="boot-spinner" aria-hidden="true"></div><p>Loading the devotion map…</p></div>
+    </div>
     <aside id="affinity" class="sidebar"></aside>
   </main>
   <button id="drawer-left-btn" class="drawer-toggle drawer-left" type="button" aria-label="Show benefits" aria-controls="benefits" aria-expanded="false">Benefits</button>
   <button id="drawer-right-btn" class="drawer-toggle drawer-right" type="button" aria-label="Show affinity" aria-controls="affinity" aria-expanded="false">Affinity</button>
   <div id="drawer-scrim"></div>
   <div id="tooltip"></div>
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="./main.js" onerror="bootFailed()"></script>
 </body>
 </html>

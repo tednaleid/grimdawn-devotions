@@ -867,3 +867,37 @@ body.narrow #total-word {
   color: #6e7681;
   cursor: not-allowed;
 }
+
+/* First-load indicator: absolutely positioned inside #map-container (which is position:relative).
+   The map's first render replaces #map-container's innerHTML, removing it. It fades in after a short
+   delay so a fast load never flashes it. */
+#boot-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #e6edf3;
+  opacity: 0;
+  animation: boot-fade-in 0.3s ease 0.2s forwards;
+}
+.boot-spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 3px solid #6f82ad;
+  border-top-color: #f0c14b;
+  border-radius: 50%;
+  animation: boot-spin 0.8s linear infinite;
+}
+@keyframes boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes boot-fade-in {
+  to {
+    opacity: 1;
+  }
+}
