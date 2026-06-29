@@ -85,6 +85,35 @@ test("compare mode: a subject with one part up and one down rolls up to 'mixed'"
   expect(subj.verdict).toBe("mixed");
 });
 
+test("compare mode: increasing a reduction (sign -1) reads as 'up', not 'down'", () => {
+  // Shield Recovery is stored positive but displayed negative; more reduction is better (faster).
+  // The verdict must rank goodness, not the displayed (signed) order, so -50% -> -60% is an improvement.
+  const stat = "characterDefensiveBlockRecoveryReduction";
+  const granting = [...model.stars.values()]
+    .filter((s) => s.bonuses[stat] !== undefined)
+    .sort((a, b) => a.bonuses[stat]! - b.bonuses[stat]!);
+  const low = granting[0]!;
+  const high = granting[granting.length - 1]!;
+  expect(high.bonuses[stat]!).toBeGreaterThan(low.bonuses[stat]!); // sanity: distinct magnitudes
+  // current = the larger reduction, baseline = the smaller one => an improvement.
+  const row = allRows(benefitRows(model, new Set([high.id]), new Set([low.id])).player).find((r) => r.id === stat)!;
+  expect(row.verdict).toBe("up");
+  // the delta stays the literal change in the displayed (negative) value, so base + delta = now holds.
+  expect(row.delta.startsWith("-")).toBe(true);
+});
+
+test("compare mode: decreasing a reduction (sign -1) reads as 'down'", () => {
+  const stat = "characterDefensiveBlockRecoveryReduction";
+  const granting = [...model.stars.values()]
+    .filter((s) => s.bonuses[stat] !== undefined)
+    .sort((a, b) => a.bonuses[stat]! - b.bonuses[stat]!);
+  const low = granting[0]!;
+  const high = granting[granting.length - 1]!;
+  // current = the smaller reduction, baseline = the larger one => a regression.
+  const row = allRows(benefitRows(model, new Set([low.id]), new Set([high.id])).player).find((r) => r.id === stat)!;
+  expect(row.verdict).toBe("down");
+});
+
 test("pet scope builds from pet bonuses independently of the player scope", () => {
   const petStar = [...model.stars.values()].find((s) => s.petBonuses && Object.keys(s.petBonuses).length > 0)!;
   const { pet } = benefitRows(model, new Set([petStar.id]), null);

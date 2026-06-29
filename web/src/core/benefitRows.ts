@@ -151,7 +151,13 @@ function buildScope(
       } else {
         const b = displayed(baseMap, part.id) ?? 0;
         const n = displayed(nowMap, part.id) ?? 0;
-        verdict = n > b ? "up" : n < b ? "down" : "same";
+        // Verdict ranks goodness, not the displayed order: the raw value IS the goodness score
+        // (more of a benefit or more of a reduction is better; a negative raw is a penalty), whereas
+        // displayed() applies the reduction sign and would rank "more reduction" as worse. The delta
+        // stays the change in the displayed value so base + delta = now still reads consistently.
+        const bRaw = baseMap[part.id] ?? 0;
+        const nRaw = nowMap[part.id] ?? 0;
+        verdict = nRaw > bRaw ? "up" : nRaw < bRaw ? "down" : "same";
         delta = fmtDelta(n - b);
       }
       return { role, subLabel, id: part.id, base, now, delta, verdict };
