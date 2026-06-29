@@ -280,6 +280,110 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ---
 
+### Task 4: Recover from a stale-deploy entry-script 404
+
+**Files:**
+- Modify: `web/index.html` (add an inline `bootFailed()` helper + `onerror` on the module tag + `role="status"` on `#boot-loading`)
+- Modify: `web/src/app/main.ts` (clear the reload guard at the top of `boot()`)
+- Modify: `web/scripts/bundle.ts` (add a positive-presence rewrite guard)
+
+**Interfaces:**
+- Consumes: the content-hashed `index.html`/`bundle.ts` from Task 1 and the `#boot-loading` element from Task 2.
+- Produces: no code interface. A global `bootFailed()` (inline in `index.html`) and a `sessionStorage` key `"bootReloaded"` shared between `index.html` and `boot()`.
+
+**Background:** Content-hashed filenames mean a cached `index.html` that outlives the deploy which replaced its hash will reference a now-deleted `main-<oldhash>.js`. On GitHub Pages (forced `max-age=600`, no old-build retention) that JS 404s, `boot()` never runs, and the Task 2 spinner spins forever. This is the framework-standard "reload on chunk-load error" safety net (e.g. Vite's `vite:preloadError` → `location.reload()`), adapted. An empirical Chrome probe confirmed `location.reload()` revalidates the `max-age=600` document and recovers; the `sessionStorage` guard prevents an infinite loop on a genuine failure (offline / broken deploy).
+
+- [ ] **Step 1: Add the inline failure handler and wire the module tag**
+
+In `web/index.html`, add this inline script inside `<head>` (after the stylesheet `<link>`):
+
+```html
+  <script>
+    // The hashed entry script (below) can 404 when a cached index.html outlives the deploy that replaced
+    // its hash (GitHub Pages caps caching at 600s and keeps no old builds). A reload revalidates index.html
+    // and picks up the new hash; sessionStorage guards against an infinite reload loop on a real failure.
+    function bootFailed() {
+      try {
+        if (!sessionStorage.getItem("bootReloaded")) {
+          sessionStorage.setItem("bootReloaded", "1");
+          location.reload();
+          return;
+        }
+      } catch (e) {}
+      var el = document.getElementById("boot-loading");
+      if (el)
+        el.innerHTML =
+          '<p>Couldn\'t load the planner.</p><button type="button" onclick="location.reload()">Reload</button>';
+    }
+  </script>
+```
+
+Change the `#boot-loading` opening tag (from Task 2) to add `role="status"`:
+
+```html
+      <div id="boot-loading" role="status"><div class="boot-spinner" aria-hidden="true"></div><p>Loading the devotion map…</p></div>
+```
+
+Change the module script tag to add the `onerror` hook (the `src` stays `./main.js`; Task 1's `bundle.ts` rewrites it to the hashed name, and the substring match still works with the extra attribute):
+
+```html
+  <script type="module" src="./main.js" onerror="bootFailed()"></script>
+```
+
+- [ ] **Step 2: Clear the guard on a successful module load**
+
+In `web/src/app/main.ts`, add as the first statements inside `async function boot() {` (before `const data = await httpDataSource(".").load();`):
+
+```ts
+  // A prior failed load may have set this guard (see bootFailed() in index.html). The module has now
+  // loaded, so clear it — a later same-session deploy mismatch can then auto-recover again.
+  try {
+    sessionStorage.removeItem("bootReloaded");
+  } catch {}
+```
+
+- [ ] **Step 3: Add the positive-presence rewrite guard to `bundle.ts`**
+
+In `web/scripts/bundle.ts`, immediately after the existing guard that throws if bare refs remain, add:
+
+```ts
+if (!html.includes(jsName) || !html.includes(cssName)) {
+  throw new Error("bundle: hashed asset refs not present after rewrite (did index.html markup change?)");
+}
+```
+
+- [ ] **Step 4: Build and verify the wiring survives the hash rewrite**
+
+Run: `just build`
+Expected: completes (the new positive guard passes, proving the hashed refs are present).
+
+Run: `grep -c 'function bootFailed' web/dist/index.html`
+Expected: `1` (the inline handler shipped).
+
+Run: `grep -oE 'src="\./main-[^"]+" onerror="bootFailed\(\)"' web/dist/index.html`
+Expected: one line — the hashed `src` and the `onerror` hook are both present on the module tag after the rewrite.
+
+Run: `grep -c 'id="boot-loading" role="status"' web/dist/index.html`
+Expected: `1`.
+
+- [ ] **Step 5: Confirm the normal boot path is unaffected**
+
+Run: `just e2e`
+Expected: PASS. The inline script and `onerror` must not interfere with a normal successful load (no `bootFailed()` call when the JS loads fine).
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add web/index.html web/src/app/main.ts web/scripts/bundle.ts
+git commit -m "feat: recover from a stale-deploy entry-script 404
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
+```
+
+**Controller-side behavioral verification (not the implementer's job):** after this task, the controller runs an adapted headless-Chrome probe against the real `dist` with the hashed JS forced to 404, confirming: first load triggers one guarded `location.reload()`, and the second failure replaces the spinner with the Reload button (no infinite loop).
+
+---
+
 ## Self-Review
 
 **Spec coverage:**

@@ -93,6 +93,36 @@ two build-and-copy lines (the `bun -e` BUILD_ID computation, the `bun build`
 call, and the `cp index.html` / `cp src/styles.css` lines) collapse into a single
 `bun scripts/bundle.ts` invocation.
 
+### 4. Recover from a stale-deploy entry-script 404
+
+Content-hashing has one failure mode on GitHub Pages. The standard content-hash
+pattern relies on two host behaviors: serving the HTML entry point `no-cache`
+(always revalidated, so it always references current hashes) and retaining a
+previous build's hashed assets across a deploy. GitHub Pages provides neither —
+it forces `Cache-Control: max-age=600` on everything and fully replaces the site
+each deploy. So a cached `index.html` can outlive the deploy that replaced its
+hash and reference a now-deleted `main-<oldhash>.js`, which 404s. Because `boot()`
+lives in that file, it never runs, and the §1 loading spinner would spin forever
+(a hang, arguably worse than the old inert page).
+
+The fix is the framework-standard "reload on chunk-load error" safety net (e.g.
+Vite's `vite:preloadError` → `location.reload()`), adapted: since the orphaned
+script is the entry point, the handler is an inline `bootFailed()` in
+`index.html` (the inline script runs because the HTML itself loaded), wired via
+`onerror` on the module tag. It attempts one `sessionStorage`-guarded
+`location.reload()`; on a repeat failure it replaces the spinner with a "Reload"
+button. A headless-Chrome probe confirmed `location.reload()` revalidates the
+`max-age=600` document (Chrome re-fetches `/`, gets the new hash, and recovers) —
+so the auto-reload silently heals the common case, and the guard plus button
+cover a genuine failure (offline / broken deploy) without an infinite loop. The
+guard key is cleared at the top of `boot()` so a later same-session deploy
+mismatch can auto-recover again.
+
+This is why hashed filenames (not a `?v=` query) is the one place GitHub Pages is
+awkward: a stable `main.js?v=` filename never 404s (stale-but-works), whereas a
+hashed filename trades that for a 404 the safety net above must catch. The
+hashed-filename choice stands (the 2026 standard); §4 closes its gap.
+
 ### `buildId` stays as-is (decision)
 
 `buildId` remains `sha256(devotions.json)`, derived from data only. It is a
@@ -106,9 +136,13 @@ code-only releases and blur its meaning. So there are two tokens with two jobs:
 
 ## Affected files
 
-- `web/index.html` — add `#boot-loading` markup; references become hashed at build time.
+- `web/index.html` — add `#boot-loading` markup (`role="status"`), the inline
+  `bootFailed()` handler, and `onerror` on the module tag; references become
+  hashed at build time.
 - `web/src/styles.css` — add `#boot-loading` / `.boot-spinner` styles.
-- `web/scripts/bundle.ts` — new; build + hash + template.
+- `web/src/app/main.ts` — clear the `bootReloaded` guard at the top of `boot()` (§4).
+- `web/scripts/bundle.ts` — new; build + hash + template, with negative and
+  positive rewrite guards.
 - `justfile` — `build` recipe calls `bundle.ts` in place of the inline build/copy lines.
 - `BACKLOG.md` — note the deferred parallel-fetch optimization.
 
@@ -125,3 +159,7 @@ code-only releases and blur its meaning. So there are two tokens with two jobs:
   boots and the `__reachResolver` global is intact after minification.
 - Manual: throttle to slow 3G in devtools and confirm the loading indicator
   appears and is replaced by the map; confirm it does not flash on a fast load.
+- §4: a headless-Chrome probe against the built `dist` with the hashed entry JS
+  forced to 404 confirms one guarded `location.reload()`, then the Reload button
+  on the second failure (no infinite loop), and that a normal load never calls
+  `bootFailed()`.
