@@ -335,10 +335,7 @@ build: cover-table
     mkdir -p dist
     rm -rf dist/* dist/.[!.]* 2>/dev/null || true
     mkdir -p dist/data
-    BUILD_ID=$(bun -e 'import {computeBuildId} from "./src/adapters/coverTableBlob"; console.log(computeBuildId(await Bun.file("../data/devotions.json").text()))')
-    bun build src/app/main.ts --outdir dist --target browser --define __BUILD_ID__="\"$BUILD_ID\""
-    cp index.html dist/index.html
-    cp src/styles.css dist/styles.css
+    bun scripts/bundle.ts
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
     # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that
@@ -358,7 +355,7 @@ build: cover-table
     fi
     if [ -f "{{justfile_directory()}}/data/reach.wasm" ]; then cp "{{justfile_directory()}}/data/reach.wasm" dist/data/reach.wasm; else echo "(no data/reach.wasm; run 'just wasm' for the fast resolver - the page falls back to TS)"; fi
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
-    echo "Built web/dist (buildId $BUILD_ID)"
+    echo "Built web/dist"
 
 # Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)
 serve: build
