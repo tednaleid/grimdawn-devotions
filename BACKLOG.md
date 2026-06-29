@@ -238,3 +238,19 @@ compose, and how much of the CSS-class language moves to computed values.
   lowered the cap below 55; at cap 55 the message is exact. Fuller fix: search to
   `BUDGET` (55) in `completionMinCost` and render the cap-raise hint when
   `cap < N <= 55`.
+
+## Parallelize first-load data fetches
+
+`httpDataSource.load()` (`web/src/adapters/httpDataSource.ts`) fetches
+`devotions.json`, `manifest.json`, `cover-table.bin`, and `reach.wasm`
+serially. Only `devotions.json` must come first: it builds the model the cover
+blob decode and the WASM resolver need. The other three could fire in parallel
+after it to shave round-trips on slow links. Deferred from the first-load UX
+work because it is small and touches a careful degrade path.
+
+Pointers: the `load()` method in `web/src/adapters/httpDataSource.ts` chains
+`await`s; `manifest.json` is independent of the model, and the `cover-table.bin`
+/ `reach.wasm` fetches can overlap the `buildModel(doc)` call (only their decode
+needs the model). Re-verify the existing fallbacks after: a missing/mismatched
+cover blob must still disable dimming, and a missing `reach.wasm` must still fall
+back to the TS resolver.
