@@ -1,60 +1,69 @@
 // ABOUTME: Formats raw Grim Dawn devotion stat ids + values into player-facing rows.
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
+import { translate } from "./localization";
+
 export interface StatRow {
   label: string;
   value: string;
 }
 
-// Instant damage type segment -> display name. GD quirks: internal Life = Vitality, Poison = Acid.
-const INSTANT_DAMAGE: Record<string, string> = {
-  Physical: "Physical",
-  Pierce: "Pierce",
-  Fire: "Fire",
-  Cold: "Cold",
-  Lightning: "Lightning",
-  Elemental: "Elemental",
-  Aether: "Aether",
-  Chaos: "Chaos",
-  Poison: "Acid",
-  Life: "Vitality",
-};
-// "Slow" (damage-over-time) type segment -> display name.
-const DOT_DAMAGE: Record<string, string> = {
-  Bleeding: "Bleeding",
-  Physical: "Internal Trauma",
-  Fire: "Burn",
-  Cold: "Frostburn",
-  Lightning: "Electrocute",
-  Poison: "Poison",
-  Life: "Vitality Decay",
-};
-// Resistance type segment -> display name. (Status effects like Stun/Freeze are NOT
-// resistances in GD - they are duration-reduction stats, handled in OVERRIDES.)
-const RESIST: Record<string, string> = {
-  Physical: "Physical",
-  Pierce: "Pierce",
-  Fire: "Fire",
-  Cold: "Cold",
-  Lightning: "Lightning",
-  Aether: "Aether",
-  Chaos: "Chaos",
-  Poison: "Poison & Acid",
-  Life: "Vitality",
-  Bleeding: "Bleeding",
-};
-// Character attribute segment -> display name (GD renamed the classic attributes).
-const ATTR: Record<string, string> = {
-  Strength: "Physique",
-  Dexterity: "Cunning",
-  Intelligence: "Spirit",
-  Life: "Health",
-  Mana: "Energy",
-  OffensiveAbility: "Offensive Ability",
-  DefensiveAbility: "Defensive Ability",
-  LifeRegen: "Health Regeneration",
-  ManaRegen: "Energy Regeneration",
-};
+// Instant damage type segments recognized in ids. GD quirks: internal Life = Vitality, Poison = Acid.
+// Display names live in the catalog under stat.damage.<Segment>, resolved at the read site (never at
+// module load, since the localization singleton is installed after this module evaluates).
+const INSTANT_DAMAGE_SEGMENTS = new Set([
+  "Physical",
+  "Pierce",
+  "Fire",
+  "Cold",
+  "Lightning",
+  "Elemental",
+  "Aether",
+  "Chaos",
+  "Poison",
+  "Life",
+]);
+function instantDamageLabel(segment: string): string | undefined {
+  return INSTANT_DAMAGE_SEGMENTS.has(segment) ? translate(`stat.damage.${segment}`) : undefined;
+}
+// "Slow" (damage-over-time) type segments. Display names live under stat.dot.<Segment>.
+const DOT_DAMAGE_SEGMENTS = new Set(["Bleeding", "Physical", "Fire", "Cold", "Lightning", "Poison", "Life"]);
+function dotDamageLabel(segment: string): string | undefined {
+  return DOT_DAMAGE_SEGMENTS.has(segment) ? translate(`stat.dot.${segment}`) : undefined;
+}
+// Resistance type segments. (Status effects like Stun/Freeze are NOT resistances in GD - they are
+// duration-reduction stats, handled in OVERRIDES.) Display names live under stat.resist.<Segment>.
+const RESIST_SEGMENTS = new Set([
+  "Physical",
+  "Pierce",
+  "Fire",
+  "Cold",
+  "Lightning",
+  "Aether",
+  "Chaos",
+  "Poison",
+  "Life",
+  "Bleeding",
+]);
+function resistLabel(segment: string): string | undefined {
+  return RESIST_SEGMENTS.has(segment) ? translate(`stat.resist.${segment}`) : undefined;
+}
+// Character attribute segments (GD renamed the classic attributes). Display names live under
+// stat.attr.<Segment>.
+const ATTR_SEGMENTS = new Set([
+  "Strength",
+  "Dexterity",
+  "Intelligence",
+  "Life",
+  "Mana",
+  "OffensiveAbility",
+  "DefensiveAbility",
+  "LifeRegen",
+  "ManaRegen",
+]);
+function attrLabel(segment: string): string | undefined {
+  return ATTR_SEGMENTS.has(segment) ? translate(`stat.attr.${segment}`) : undefined;
+}
 
 interface Classified {
   label: string;
@@ -62,71 +71,64 @@ interface Classified {
   sign: number; // 1 normal, -1 for reductions shown as negative
 }
 
-// Irregular keys that do not follow the family rules below.
-const OVERRIDES: Record<string, Classified> = {
-  defensiveProtection: { label: "Armor", percent: false, sign: 1 },
-  defensiveProtectionModifier: { label: "Armor", percent: true, sign: 1 },
-  defensiveAbsorptionModifier: { label: "Armor Absorption", percent: true, sign: 1 },
-  defensiveBlockModifier: { label: "Shield Block Chance", percent: true, sign: 1 },
-  defensiveBlockAmountModifier: { label: "Shield Damage Blocked", percent: true, sign: 1 },
-  defensiveElementalResistance: { label: "Elemental Resistance", percent: true, sign: 1 },
-  defensiveTotalSpeedResistance: { label: "Slow Resistance", percent: true, sign: 1 },
-  defensivePercentReflectionResistance: { label: "Reflected Damage Reduction", percent: true, sign: 1 },
-  defensiveSlowLifeLeach: { label: "Life Leech Resistance", percent: true, sign: 1 },
-  defensiveSlowManaLeach: { label: "Energy Leech Resistance", percent: true, sign: 1 },
-  defensiveSlowLifeLeachDuration: { label: "Reduced Life Leech Duration", percent: true, sign: 1 },
+// Irregular keys that do not follow the family rules below. percent/sign are structural; the display
+// label is resolved from the catalog at the read site (stat.override.<id>).
+const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
+  defensiveProtection: { percent: false, sign: 1 },
+  defensiveProtectionModifier: { percent: true, sign: 1 },
+  defensiveAbsorptionModifier: { percent: true, sign: 1 },
+  defensiveBlockModifier: { percent: true, sign: 1 },
+  defensiveBlockAmountModifier: { percent: true, sign: 1 },
+  defensiveElementalResistance: { percent: true, sign: 1 },
+  defensiveTotalSpeedResistance: { percent: true, sign: 1 },
+  defensivePercentReflectionResistance: { percent: true, sign: 1 },
+  defensiveSlowLifeLeach: { percent: true, sign: 1 },
+  defensiveSlowManaLeach: { percent: true, sign: 1 },
+  defensiveSlowLifeLeachDuration: { percent: true, sign: 1 },
   // Status effects: duration-reduction / protection stats, NOT resistances.
-  defensiveStun: { label: "Reduced Stun Duration", percent: true, sign: 1 },
-  defensiveFreeze: { label: "Reduced Freeze Duration", percent: true, sign: 1 },
-  defensivePetrify: { label: "Reduced Petrify Duration", percent: true, sign: 1 },
-  defensiveTrap: { label: "Reduced Entrapment Duration", percent: true, sign: 1 },
-  defensiveDisruption: { label: "Skill Disruption Protection", percent: true, sign: 1 },
+  defensiveStun: { percent: true, sign: 1 },
+  defensiveFreeze: { percent: true, sign: 1 },
+  defensivePetrify: { percent: true, sign: 1 },
+  defensiveTrap: { percent: true, sign: 1 },
+  defensiveDisruption: { percent: true, sign: 1 },
 
-  offensiveTotalDamageModifier: { label: "Total Damage", percent: true, sign: 1 },
-  offensiveCritDamageModifier: { label: "Crit Damage", percent: true, sign: 1 },
-  offensiveLifeLeechMin: { label: "of Attack Damage converted to Health", percent: true, sign: 1 },
-  offensiveSlowManaLeachMin: { label: "Energy Leech", percent: false, sign: 1 },
-  offensiveSlowManaLeachChance: { label: "Energy Leech Chance", percent: true, sign: 1 },
-  offensiveSlowManaLeachDurationMin: { label: "Energy Leech Duration", percent: false, sign: 1 },
-  offensiveElementalResistanceReductionPercentMin: {
-    label: "Reduced target's Elemental Resistances",
-    percent: true,
-    sign: 1,
-  },
-  offensiveElementalResistanceReductionPercentDurationMin: {
-    label: "Reduced Elemental Resistance Duration",
-    percent: false,
-    sign: 1,
-  },
-  offensiveLightningModifierChance: { label: "Chance for Lightning Damage", percent: true, sign: 1 },
-  retaliationTotalDamageModifier: { label: "Total Retaliation Damage", percent: true, sign: 1 },
-  retaliationDamagePct: { label: "% Retaliation added to Attack", percent: true, sign: 1 },
-  retaliationFearMin: { label: "Fear", percent: false, sign: 1 },
-  retaliationFearChance: { label: "Fear", percent: true, sign: 1 },
+  offensiveTotalDamageModifier: { percent: true, sign: 1 },
+  offensiveCritDamageModifier: { percent: true, sign: 1 },
+  offensiveLifeLeechMin: { percent: true, sign: 1 },
+  offensiveSlowManaLeachMin: { percent: false, sign: 1 },
+  offensiveSlowManaLeachChance: { percent: true, sign: 1 },
+  offensiveSlowManaLeachDurationMin: { percent: false, sign: 1 },
+  offensiveElementalResistanceReductionPercentMin: { percent: true, sign: 1 },
+  offensiveElementalResistanceReductionPercentDurationMin: { percent: false, sign: 1 },
+  offensiveLightningModifierChance: { percent: true, sign: 1 },
+  retaliationTotalDamageModifier: { percent: true, sign: 1 },
+  retaliationDamagePct: { percent: true, sign: 1 },
+  retaliationFearMin: { percent: false, sign: 1 },
+  retaliationFearChance: { percent: true, sign: 1 },
 
-  racialBonusPercentDamage: { label: "Damage to specific enemy types", percent: true, sign: 1 },
-  racialBonusPercentDefense: { label: "Less damage from specific enemy types", percent: true, sign: 1 },
-  skillManaCostReduction: { label: "Skill Energy Cost", percent: true, sign: -1 },
+  racialBonusPercentDamage: { percent: true, sign: 1 },
+  racialBonusPercentDefense: { percent: true, sign: 1 },
+  skillManaCostReduction: { percent: true, sign: -1 },
 
-  characterAttackSpeedModifier: { label: "Attack Speed", percent: true, sign: 1 },
-  characterSpellCastSpeedModifier: { label: "Casting Speed", percent: true, sign: 1 },
-  characterRunSpeedModifier: { label: "Movement Speed", percent: true, sign: 1 },
-  characterRunSpeedMaxModifier: { label: "Maximum Movement Speed", percent: true, sign: 1 },
-  characterTotalSpeedModifier: { label: "Total Speed", percent: true, sign: 1 },
-  characterConstitutionModifier: { label: "Constitution", percent: true, sign: 1 },
-  characterDodgePercent: { label: "Chance to Avoid Melee Attacks", percent: true, sign: 1 },
-  characterDeflectProjectile: { label: "Chance to Avoid Projectiles", percent: true, sign: 1 },
-  characterEnergyAbsorptionPercent: { label: "Energy Absorbed from Enemy Spells", percent: true, sign: 1 },
-  characterDefensiveBlockRecoveryReduction: { label: "Shield Recovery", percent: true, sign: -1 },
+  characterAttackSpeedModifier: { percent: true, sign: 1 },
+  characterSpellCastSpeedModifier: { percent: true, sign: 1 },
+  characterRunSpeedModifier: { percent: true, sign: 1 },
+  characterRunSpeedMaxModifier: { percent: true, sign: 1 },
+  characterTotalSpeedModifier: { percent: true, sign: 1 },
+  characterConstitutionModifier: { percent: true, sign: 1 },
+  characterDodgePercent: { percent: true, sign: 1 },
+  characterDeflectProjectile: { percent: true, sign: 1 },
+  characterEnergyAbsorptionPercent: { percent: true, sign: 1 },
+  characterDefensiveBlockRecoveryReduction: { percent: true, sign: -1 },
 
   // Attribute/requirement reductions (official game labels; shown as a negative percent).
-  characterArmorStrengthReqReduction: { label: "Physique Requirement for Armor", percent: true, sign: -1 },
-  characterMeleeStrengthReqReduction: { label: "Physique Requirement for Melee Weapons", percent: true, sign: -1 },
-  characterShieldStrengthReqReduction: { label: "Physique Requirement for Shields", percent: true, sign: -1 },
-  characterMeleeDexterityReqReduction: { label: "Cunning Requirement for Melee Weapons", percent: true, sign: -1 },
-  characterHuntingDexterityReqReduction: { label: "Cunning Requirement for Ranged Weapons", percent: true, sign: -1 },
-  characterWeaponIntelligenceReqReduction: { label: "Spirit Requirement for all Weapons", percent: true, sign: -1 },
-  characterJewelryIntelligenceReqReduction: { label: "Spirit Requirement for Jewelry", percent: true, sign: -1 },
+  characterArmorStrengthReqReduction: { percent: true, sign: -1 },
+  characterMeleeStrengthReqReduction: { percent: true, sign: -1 },
+  characterShieldStrengthReqReduction: { percent: true, sign: -1 },
+  characterMeleeDexterityReqReduction: { percent: true, sign: -1 },
+  characterHuntingDexterityReqReduction: { percent: true, sign: -1 },
+  characterWeaponIntelligenceReqReduction: { percent: true, sign: -1 },
+  characterJewelryIntelligenceReqReduction: { percent: true, sign: -1 },
 };
 
 function humanize(id: string): string {
@@ -145,47 +147,48 @@ function humanize(id: string): string {
 export function classify(id: string): Classified | null {
   if (/^[A-Z]/.test(id)) return null; // weapon-class token (Spear2h, Dagger, ...) - shown via weapon requirement
   const o = OVERRIDES[id];
-  if (o) return o;
+  if (o) return { label: translate(`stat.override.${id}`), percent: o.percent, sign: o.sign };
 
   let m: RegExpMatchArray | null;
 
   // Offensive damage-over-time: offensiveSlow<Type>[Duration][Modifier|Min|Max]
   if ((m = id.match(/^offensiveSlow([A-Za-z]+?)(Duration)?(Modifier|Min|Max)?$/))) {
-    const type = DOT_DAMAGE[m[1]!];
+    const type = dotDamageLabel(m[1]!);
     if (type) {
       const percent = m[3] === "Modifier";
-      return { label: m[2] ? `${type} Duration` : `${type} Damage`, percent, sign: 1 };
+      const label = m[2] ? translate("stat.template.duration", { type }) : translate("stat.template.damage", { type });
+      return { label, percent, sign: 1 };
     }
   }
   // Offensive instant damage: offensive<Type>[Modifier|Min|Max]
   if ((m = id.match(/^offensive([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
-    const type = INSTANT_DAMAGE[m[1]!];
-    if (type) return { label: `${type} Damage`, percent: m[2] === "Modifier", sign: 1 };
+    const type = instantDamageLabel(m[1]!);
+    if (type) return { label: translate("stat.template.damage", { type }), percent: m[2] === "Modifier", sign: 1 };
   }
   // Defensive maximum resistance: defensive<Type>MaxResist
   if ((m = id.match(/^defensive([A-Za-z]+?)MaxResist$/))) {
-    const type = RESIST[m[1]!];
-    if (type) return { label: `Maximum ${type} Resistance`, percent: true, sign: 1 };
+    const type = resistLabel(m[1]!);
+    if (type) return { label: translate("stat.template.maxResistance", { type }), percent: true, sign: 1 };
   }
   // Defensive reduced damage-over-time duration: defensive<Type>Duration.
   // GD names these by the DoT (Internal Trauma/Burn/Frostburn/...) and shows them as a positive percent.
   if ((m = id.match(/^defensive([A-Za-z]+?)Duration$/))) {
-    const type = DOT_DAMAGE[m[1]!];
-    if (type) return { label: `Reduced ${type} Duration`, percent: true, sign: 1 };
+    const type = dotDamageLabel(m[1]!);
+    if (type) return { label: translate("stat.template.reducedDuration", { type }), percent: true, sign: 1 };
   }
   // Defensive base resistance: defensive<Type>
   if ((m = id.match(/^defensive([A-Za-z]+?)$/))) {
-    const type = RESIST[m[1]!];
-    if (type) return { label: `${type} Resistance`, percent: true, sign: 1 };
+    const type = resistLabel(m[1]!);
+    if (type) return { label: translate("stat.template.resistance", { type }), percent: true, sign: 1 };
   }
   // Retaliation damage: retaliation<Type>[Modifier|Min|Max]. Modifier is the percent form.
   if ((m = id.match(/^retaliation([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
-    const type = INSTANT_DAMAGE[m[1]!];
-    if (type) return { label: `${type} Retaliation`, percent: m[2] === "Modifier", sign: 1 };
+    const type = instantDamageLabel(m[1]!);
+    if (type) return { label: translate("stat.template.retaliation", { type }), percent: m[2] === "Modifier", sign: 1 };
   }
   // Character attribute: character<Attr>[Modifier]
   if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/))) {
-    const name = ATTR[m[1]!];
+    const name = attrLabel(m[1]!);
     if (name) return { label: name, percent: m[2] === "Modifier", sign: 1 };
   }
 
@@ -200,16 +203,12 @@ function fmtValue(value: number, percent: boolean, sign: number): string {
   return percent ? `${s}%` : s;
 }
 
-// Internal race name -> player-facing (GD shows the plural, except Undead).
-const RACE_LABEL: Record<string, string> = {
-  Beast: "Beasts",
-  Chthonic: "Chthonics",
-  Human: "Humans",
-  Undead: "Undead",
-};
+// Internal race name -> player-facing (GD shows the plural, except Undead). Display names and the
+// multi-race join separator live in the catalog under stat.race.<Race> / stat.race.join.
+const RACE_SEGMENTS = new Set(["Beast", "Chthonic", "Human", "Undead"]);
 function raceLabel(targets?: string[]): string | null {
   if (!targets || targets.length === 0) return null;
-  return targets.map((t) => RACE_LABEL[t] ?? t).join(" & ");
+  return targets.map((t) => (RACE_SEGMENTS.has(t) ? translate(`stat.race.${t}`) : t)).join(translate("stat.race.join"));
 }
 
 /** Format a single stat id + value into a display row, or null if it is not a stat (weapon token). */
@@ -219,8 +218,8 @@ export function statRow(id: string, value: number, racialTarget?: string[]): Sta
   let label = c.label;
   const race = raceLabel(racialTarget);
   if (race) {
-    if (id === "racialBonusPercentDamage") label = `Damage to ${race}`;
-    else if (id === "racialBonusPercentDefense") label = `Less Damage from ${race}`;
+    if (id === "racialBonusPercentDamage") label = translate("stat.subject.damageToRace", { race });
+    else if (id === "racialBonusPercentDefense") label = translate("stat.subject.lessDamageFromRace", { race });
   }
   return { label, value: fmtValue(value, c.percent, c.sign) };
 }
@@ -228,6 +227,11 @@ export function statRow(id: string, value: number, racialTarget?: string[]): Sta
 // Display groups for the benefits sidebar, in render order. Offense-side debuff sections
 // (Resistance Reduction, Crowd Control, Retaliation) and the three-way Defense split keep the
 // high-value concepts from being buried in one giant section. Routing lives in groupFor.
+// These act as internal identifiers (Map keys in this file and in benefitRows.ts, and asserted
+// directly by statFormat.test.ts / condense.test.ts) as well as the sidebar's rendered headers, so
+// they stay plain English here. The catalog mirrors them under stat.group.<key> for the sidebar
+// render site (sidebarView.ts's `<h3>${g.group}</h3>`) to resolve through translate in a follow-up,
+// the same way Task 5 deferred that exact call site.
 export const GROUP_ORDER = [
   "Attributes",
   "Offense",
@@ -337,6 +341,11 @@ function fmtNum(n: number): string {
   return String(n);
 }
 
+// Shared " for N Seconds" suffix used by several ability-debuff lines below and by formatPet.
+function forSecondsSuffix(seconds: number): string {
+  return translate("stat.power.forSeconds", { seconds: fmtNum(seconds) });
+}
+
 /**
  * Format a celestial power's level-selected stat map into GD-style ability rows.
  * Ability meta fields (recharge, projectiles, pass-through, radius, weapon %) and
@@ -356,86 +365,98 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
   };
 
   const cd = take("skillCooldownTime");
-  if (cd !== undefined) rows.push({ value: fmtNum(cd), label: "Second Skill Recharge" });
+  if (cd !== undefined) rows.push({ value: fmtNum(cd), label: translate("stat.power.secondSkillRecharge") });
 
   const dur = take("skillActiveDuration");
-  if (dur !== undefined) rows.push({ value: fmtNum(dur), label: "Second Duration" });
+  if (dur !== undefined) rows.push({ value: fmtNum(dur), label: translate("stat.power.secondDuration") });
 
   const proj = take("projectileLaunchNumber");
-  if (proj !== undefined) rows.push({ value: fmtNum(proj), label: "Projectile(s)" });
+  if (proj !== undefined) rows.push({ value: fmtNum(proj), label: translate("stat.power.projectiles") });
 
   const pierce = take("projectilePiercingChance");
-  if (pierce !== undefined) rows.push({ value: `${fmtNum(pierce)}%`, label: "Chance to pass through Enemies" });
+  if (pierce !== undefined) rows.push({ value: `${fmtNum(pierce)}%`, label: translate("stat.power.passThrough") });
 
   const radius = take("projectileExplosionRadius") ?? take("skillTargetRadius");
-  if (radius !== undefined) rows.push({ value: fmtNum(radius), label: "Meter Radius" });
+  if (radius !== undefined) rows.push({ value: fmtNum(radius), label: translate("stat.power.meterRadius") });
 
   const absorb = take("damageAbsorption");
-  if (absorb !== undefined) rows.push({ value: fmtNum(absorb), label: "Damage Absorption" });
+  if (absorb !== undefined) rows.push({ value: fmtNum(absorb), label: translate("stat.power.damageAbsorption") });
 
   // Heal / restore procs (Dryad's Blessing, Giant's Blood, Inspiration): a flat and a
   // percent health restore, plus a percent energy restore. Value carries the unit.
   const healFlat = take("skillLifeBonus");
-  if (healFlat !== undefined) rows.push({ value: fmtNum(healFlat), label: "Health Restored" });
+  if (healFlat !== undefined) rows.push({ value: fmtNum(healFlat), label: translate("stat.power.healthRestored") });
   const healPct = take("skillLifePercent");
-  if (healPct !== undefined) rows.push({ value: `${fmtNum(healPct)}%`, label: "Health Restored" });
+  if (healPct !== undefined) rows.push({ value: `${fmtNum(healPct)}%`, label: translate("stat.power.healthRestored") });
   const energyPct = take("skillManaPercent");
-  if (energyPct !== undefined) rows.push({ value: `${fmtNum(energyPct)}%`, label: "Energy Restored" });
+  if (energyPct !== undefined)
+    rows.push({ value: `${fmtNum(energyPct)}%`, label: translate("stat.power.energyRestored") });
 
   const weapon = take("weaponDamagePct");
-  if (weapon !== undefined) rows.push({ value: `${fmtNum(weapon)}%`, label: "Weapon Damage" });
+  if (weapon !== undefined) rows.push({ value: `${fmtNum(weapon)}%`, label: translate("stat.power.weaponDamage") });
 
   // Damage-over-time: offensiveSlow<Type>Min holds per-second damage paired with a
   // duration; grimtools shows the total over the listed duration.
-  for (const [seg, name] of Object.entries(DOT_DAMAGE)) {
+  for (const seg of DOT_DAMAGE_SEGMENTS) {
     const minK = `offensiveSlow${seg}Min`;
     const durK = `offensiveSlow${seg}DurationMin`;
     if (minK in stats && durK in stats) {
       used.add(minK);
       used.add(durK);
       const total = Math.round(stats[minK]! * stats[durK]!);
-      rows.push({ value: fmtNum(total), label: `${name} Damage over ${fmtNum(stats[durK]!)} Seconds` });
+      const name = translate(`stat.dot.${seg}`);
+      rows.push({
+        value: fmtNum(total),
+        label: translate("stat.power.dotDamageOverSeconds", { name, seconds: fmtNum(stats[durK]!) }),
+      });
     }
   }
 
   // Offensive/Defensive Ability debuffs (e.g. Scorpion Sting's reduced DA).
-  for (const [seg, name] of [
-    ["DefensiveAbility", "Reduced target's Defensive Ability"],
-    ["OffensiveAbility", "Reduced target's Offensive Ability"],
-  ] as const) {
+  const abilityDebuffs: [string, string][] = [
+    ["DefensiveAbility", translate("stat.power.reducedDefensiveAbility")],
+    ["OffensiveAbility", translate("stat.power.reducedOffensiveAbility")],
+  ];
+  for (const [seg, name] of abilityDebuffs) {
     const minK = `offensiveSlow${seg}Min`;
     const durK = `offensiveSlow${seg}DurationMin`;
     if (minK in stats) {
       used.add(minK);
       const dur = stats[durK];
       if (durK in stats) used.add(durK);
-      const suffix = dur !== undefined ? ` for ${fmtNum(dur)} Seconds` : "";
+      const suffix = dur !== undefined ? forSecondsSuffix(dur) : "";
       rows.push({ value: fmtNum(stats[minK]!), label: `${name}${suffix}` });
     }
   }
 
   // Other timed target debuffs: a percent movement slow, plus flat/percent resistance
   // and damage reductions (which lack the "Slow" infix the ability debuffs use).
-  for (const [minK, durK, label, pct] of [
-    ["offensiveSlowRunSpeedMin", "offensiveSlowRunSpeedDurationMin", "Slower target Movement", true],
+  const timedDebuffs: [string, string, string, boolean][] = [
+    [
+      "offensiveSlowRunSpeedMin",
+      "offensiveSlowRunSpeedDurationMin",
+      translate("stat.power.slowerTargetMovement"),
+      true,
+    ],
     [
       "offensiveTotalResistanceReductionAbsoluteMin",
       "offensiveTotalResistanceReductionAbsoluteDurationMin",
-      "Reduced target's Resistances",
+      translate("stat.power.reducedTargetResistances"),
       false,
     ],
     [
       "offensiveTotalDamageReductionPercentMin",
       "offensiveTotalDamageReductionPercentDurationMin",
-      "Reduced target's Damage",
+      translate("stat.power.reducedTargetDamage"),
       true,
     ],
-  ] as const) {
+  ];
+  for (const [minK, durK, label, pct] of timedDebuffs) {
     if (minK in stats) {
       used.add(minK);
       const dur = stats[durK];
       if (durK in stats) used.add(durK);
-      const suffix = dur !== undefined ? ` for ${fmtNum(dur)} Seconds` : "";
+      const suffix = dur !== undefined ? forSecondsSuffix(dur) : "";
       rows.push({ value: pct ? `${fmtNum(stats[minK]!)}%` : fmtNum(stats[minK]!), label: `${label}${suffix}` });
     }
   }
@@ -457,9 +478,9 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
 export function formatPet(pet: PetInfo): { summon: string; attack: StatRow[] } {
   const plural = (pet.count ?? 1) > 1;
   const num = plural ? `${fmtNum(pet.count!)} ` : "";
-  const name = `${pet.name ?? "minion"}${plural ? "s" : ""}`;
-  const dur = pet.duration ? ` for ${fmtNum(pet.duration)} Seconds` : "";
-  return { summon: `Summons ${num}${name}${dur}`, attack: formatPowerStats(pet.attackStats) };
+  const name = `${pet.name ?? translate("stat.pet.minion")}${plural ? "s" : ""}`;
+  const dur = pet.duration ? forSecondsSuffix(pet.duration) : "";
+  return { summon: translate("stat.pet.summons", { num, name, dur }), attack: formatPowerStats(pet.attackStats) };
 }
 
 // --- Condensed view: one line per concept (subject), carrying its dimensions ---
@@ -491,58 +512,91 @@ function decompose(id: string): { group: StatGroup; subject: string; dim: StatDi
   if (!c) return null;
   const group = groupFor(id);
   let m: RegExpMatchArray | null;
-  if ((m = id.match(/^offensiveSlow([A-Za-z]+?)(Duration)?(Modifier|Min|Max)?$/)) && DOT_DAMAGE[m[1]!]) {
-    const pct = m[3] === "Modifier";
-    const dim: StatDim = m[2] ? (pct ? "durPct" : "durFlat") : pct ? "pct" : "flat";
-    return { group, subject: DOT_DAMAGE[m[1]!]!, dim };
+  if ((m = id.match(/^offensiveSlow([A-Za-z]+?)(Duration)?(Modifier|Min|Max)?$/))) {
+    const type = dotDamageLabel(m[1]!);
+    if (type) {
+      const pct = m[3] === "Modifier";
+      const dim: StatDim = m[2] ? (pct ? "durPct" : "durFlat") : pct ? "pct" : "flat";
+      return { group, subject: type, dim };
+    }
   }
-  if ((m = id.match(/^offensive([A-Za-z]+?)(Modifier|Min|Max)?$/)) && INSTANT_DAMAGE[m[1]!]) {
-    return { group, subject: INSTANT_DAMAGE[m[1]!]!, dim: m[2] === "Modifier" ? "pct" : "flat" };
+  if ((m = id.match(/^offensive([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
+    const type = instantDamageLabel(m[1]!);
+    if (type) return { group, subject: type, dim: m[2] === "Modifier" ? "pct" : "flat" };
   }
-  if ((m = id.match(/^defensive([A-Za-z]+?)MaxResist$/)) && RESIST[m[1]!]) {
-    return { group, subject: `${RESIST[m[1]!]} Resistance`, dim: "max" };
+  if ((m = id.match(/^defensive([A-Za-z]+?)MaxResist$/))) {
+    const type = resistLabel(m[1]!);
+    if (type) return { group, subject: translate("stat.template.resistance", { type }), dim: "max" };
   }
-  if ((m = id.match(/^defensive([A-Za-z]+?)$/)) && RESIST[m[1]!]) {
-    return { group, subject: `${RESIST[m[1]!]} Resistance`, dim: "pct" };
+  if ((m = id.match(/^defensive([A-Za-z]+?)$/))) {
+    const type = resistLabel(m[1]!);
+    if (type) return { group, subject: translate("stat.template.resistance", { type }), dim: "pct" };
   }
-  if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/)) && ATTR[m[1]!]) {
-    return { group, subject: ATTR[m[1]!]!, dim: m[2] ? "pct" : "flat" };
+  if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/))) {
+    const name = attrLabel(m[1]!);
+    if (name) return { group, subject: name, dim: m[2] ? "pct" : "flat" };
   }
-  if (id === "defensiveProtection") return { group, subject: "Armor", dim: "flat" };
-  if (id === "defensiveProtectionModifier") return { group, subject: "Armor", dim: "pct" };
+  if (id === "defensiveProtection")
+    return { group, subject: translate("stat.override.defensiveProtection"), dim: "flat" };
+  if (id === "defensiveProtectionModifier")
+    return { group, subject: translate("stat.override.defensiveProtectionModifier"), dim: "pct" };
   // Resistance reduction: flat and percent are distinct subjects (they stack differently in game).
   if (id.match(/^offensiveTotalResistanceReductionAbsolute(Duration)?Min$/))
-    return { group, subject: "Reduced target's Resistances", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+    return {
+      group,
+      subject: translate("stat.power.reducedTargetResistances"),
+      dim: /Duration/.test(id) ? "durFlat" : "flat",
+    };
   if (id.match(/^offensiveElementalResistanceReductionAbsolute(Duration)?Min$/))
     return {
       group,
-      subject: "Reduced target's Elemental Resistances (flat)",
+      subject: translate("stat.subject.reducedElementalResistancesFlat"),
       dim: /Duration/.test(id) ? "durFlat" : "flat",
     };
   if (id.match(/^offensiveElementalResistanceReductionPercent(Duration)?Min$/))
-    return { group, subject: "Reduced target's Elemental Resistances", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return {
+      group,
+      subject: translate("stat.override.offensiveElementalResistanceReductionPercentMin"),
+      dim: /Duration/.test(id) ? "durFlat" : "pct",
+    };
   if (id.match(/^offensivePhysicalReductionPercent(Duration)?Min$/))
-    return { group, subject: "Reduced target's Physical Resistance", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return {
+      group,
+      subject: translate("stat.subject.reducedPhysicalResistance"),
+      dim: /Duration/.test(id) ? "durFlat" : "pct",
+    };
   // Crowd control: a status effect (magnitude Min + a Chance facet).
   let cc: RegExpMatchArray | null;
   if ((cc = id.match(/^offensive(Stun|Freeze|Petrify|Knockdown|Confusion)(Chance)?(Min|Max)?$/)))
-    return { group, subject: cc[1]!, dim: cc[2] ? "pct" : "flat" };
+    return { group, subject: translate(`stat.subject.cc${cc[1]}`), dim: cc[2] ? "pct" : "flat" };
   if (id.match(/^offensiveFumble(Duration)?Min$/))
-    return { group, subject: "Fumble", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+    return { group, subject: translate("stat.subject.fumble"), dim: /Duration/.test(id) ? "durFlat" : "flat" };
   if (id.match(/^offensiveProjectileFumble(Duration)?Min$/))
-    return { group, subject: "Impaired Aim", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+    return { group, subject: translate("stat.subject.impairedAim"), dim: /Duration/.test(id) ? "durFlat" : "flat" };
   if (id.match(/^offensiveSlowRunSpeed(Duration)?Min$/))
-    return { group, subject: "Slow target's Movement", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return { group, subject: translate("stat.subject.slowMovement"), dim: /Duration/.test(id) ? "durFlat" : "pct" };
   if (id.match(/^offensiveSlowTotalSpeed(Duration)?Min$/))
-    return { group, subject: "Slow target's Total Speed", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return { group, subject: translate("stat.subject.slowTotalSpeed"), dim: /Duration/.test(id) ? "durFlat" : "pct" };
   if (id.match(/^offensiveSlowAttackSpeed(Duration)?Min$/))
-    return { group, subject: "Slow target's Attack Speed", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return { group, subject: translate("stat.subject.slowAttackSpeed"), dim: /Duration/.test(id) ? "durFlat" : "pct" };
   if (id.match(/^offensiveSlowOffensiveAbility(Duration)?Min$/))
-    return { group, subject: "Reduced target's Offensive Ability", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+    return {
+      group,
+      subject: translate("stat.power.reducedOffensiveAbility"),
+      dim: /Duration/.test(id) ? "durFlat" : "flat",
+    };
   if (id.match(/^offensiveSlowDefensiveAbility(Duration)?Min$/))
-    return { group, subject: "Reduced target's Defensive Ability", dim: /Duration/.test(id) ? "durFlat" : "flat" };
+    return {
+      group,
+      subject: translate("stat.power.reducedDefensiveAbility"),
+      dim: /Duration/.test(id) ? "durFlat" : "flat",
+    };
   if (id.match(/^offensiveTotalDamageReductionPercent(Duration)?Min$/))
-    return { group, subject: "Reduced target's Damage", dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return {
+      group,
+      subject: translate("stat.power.reducedTargetDamage"),
+      dim: /Duration/.test(id) ? "durFlat" : "pct",
+    };
   // Standalone stat: its own one-line subject.
   return { group, subject: c.label, dim: c.percent ? "pct" : "flat" };
 }

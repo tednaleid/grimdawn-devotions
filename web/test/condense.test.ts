@@ -2,6 +2,9 @@
 // ABOUTME: Verifies subject grouping, dimension order (flat before percent), and per-part ids for selection.
 import { test, expect } from "bun:test";
 import { condensedRows } from "../src/core/statFormat";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const bonuses = {
   // Frostburn (Cold DoT): flat dmg, % dmg, flat duration, % duration.

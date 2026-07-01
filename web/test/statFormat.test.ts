@@ -10,6 +10,9 @@ import {
   formatPet,
   isFilterableStat,
 } from "../src/core/statFormat";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {

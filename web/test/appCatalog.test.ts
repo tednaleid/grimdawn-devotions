@@ -79,3 +79,14 @@ test("every required chrome key exists in app.en.json", () => {
   const cat = en as Record<string, string>;
   for (const key of REQUIRED) expect(cat[key]).toBeDefined();
 });
+
+test("stat keys referenced by statFormat exist", () => {
+  const cat = en as Record<string, string>;
+  for (const key of [
+    "stat.dot.Cold",
+    "stat.attr.Strength",
+    "stat.group.offense",
+    "stat.override.defensiveAbsorptionModifier",
+  ])
+    expect(cat[key]).toBeDefined();
+});
