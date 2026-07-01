@@ -355,6 +355,7 @@ build: cover-table
     fi
     if [ -f "{{justfile_directory()}}/data/reach.wasm" ]; then cp "{{justfile_directory()}}/data/reach.wasm" dist/data/reach.wasm; else echo "(no data/reach.wasm; run 'just wasm' for the fast resolver - the page falls back to TS)"; fi
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
+    cp -r "{{justfile_directory()}}/web/src/i18n" dist/i18n
     echo "Built web/dist"
 
 # Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)
