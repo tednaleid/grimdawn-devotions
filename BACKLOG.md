@@ -239,58 +239,38 @@ compose, and how much of the CSS-class language moves to computed values.
   `BUDGET` (55) in `completionMinCost` and render the cap-raise hint when
   `cap < N <= 55`.
 
-## Internationalization: remaining phases and deferred items
+## Internationalization: remaining follow-ups
 
-Phase 1a (the localization seam and app-owned chrome/statFormat strings) is
-done; see [docs/i18n.md](docs/i18n.md) and
+Phases 1a, 1b, 2, and 3 are all done: the localization seam, app-owned
+chrome/statFormat strings, game-data tags resolved via `gameText`, the
+curated stat-tag mapping, and 12 shipped locales (`en de fr ru zh pl it cs ja
+ko pt vi`). See [docs/i18n.md](docs/i18n.md) and
 `docs/superpowers/specs/2026-06-30-i18n-localization-design.md` for the full
-design and phasing. Remaining work:
+design. Remaining work:
 
-- **Visible language picker.** v1 auto-detects the locale from
+- **Add Spanish once `Text_ES.arc` is repaired.** ArchiveTool fails to open
+  `Text_ES.arc` ("Failed to open") on the machine used for extraction, while
+  all 11 other bundled non-English languages (CS, DE, FR, IT, JA, KO, PL, PT,
+  RU, VI, ZH) extract fine. Fix: run Steam's "verify integrity of game files"
+  on Grim Dawn to repair the archive, then run `just i18n-tables` (add `es`
+  to its language loop), author `web/src/i18n/app.es.json`, and add `es` to
+  `SUPPORTED_LOCALES` in `web/src/adapters/localizationAdapter.ts`.
+- **Visible language picker.** The app auto-detects the locale from
   `navigator.languages` with no in-app control to override it. Adding one is
-  non-breaking because locale is a viewer preference, never in the URL hash.
-  Pointer: a new UI control that calls `loadLocalization` again with a forced
-  `preferred` locale and re-renders the current selection (all real state is
-  already in the hash and language independent).
-- **ICU-style plural handling.** v1 uses simple named-placeholder
-  interpolation (`web/src/core/localization.ts`). Add narrowly only if a
+  optional and non-breaking because locale is a viewer preference, never in
+  the URL hash. Pointer: a new UI control that calls `loadLocalization` again
+  with a forced `preferred` locale and re-renders the current selection (all
+  real state is already in the hash and language independent).
+- **Community correction of authored translations.** The 11 non-English
+  `app.<locale>.json` catalogs (`web/src/i18n/app.*.json`) are LLM-authored
+  best-effort translations, not reviewed by native speakers. Corrections are
+  welcome via per-language PRs. The authors flagged the `aff.*` affinity
+  names and some race/composed terms as the most uncertain and worth
+  prioritizing for review.
+- **ICU-style plural handling.** Simple named-placeholder interpolation
+  (`web/src/core/localization.ts`) is used today. Add narrowly only if a
   target language's grammar needs real plural rules, not preemptively.
-- **Phase 1b: game-data tags and `gameText`.** `scripts/parse_devotions.py`
-  preserves tags instead of baking English into `data/devotions.json`
-  (constellation `name` -> `name_tag`, power `name`/`description` ->
-  `name_tag`/`description_tag`, `racial_target`, `weapon_requirement`,
-  `pet.name`); extraction emits `data/i18n/game.<lang>.json` per language,
-  filtered to referenced tags; the validator inverts (today it errors on a
-  surviving `tag...`, it should instead assert every referenced tag resolves
-  in the English table); `gameText(tag)` is added to `Localization` and wired
-  into the views that render game-sourced names/descriptions.
-- **Phase 2 (done): stat-tag mapping.** `data/stat-tags.json` maps 36
-  `statFormat` catalog keys (attributes, instant damage types,
-  damage-over-time types, resistances) to a game tag, chosen so the game's
-  English matches the app's authored English exactly and verified present in
-  the German table; `statFormat` pulls the exact in-game term via `gameText`
-  for mapped keys, and keeps its authored `app.<locale>.json` fallback for
-  everything else. See [docs/i18n.md](docs/i18n.md). The remaining ~100 stat
-  strings (section headers, the `stat.template.*`/`stat.power.*` composed
-  phrases, `stat.subject.*`/`stat.override.*` one-off and irregular terms,
-  and pet labels) are intentionally left app-authored rather than a gap to
-  close: they are templates, composed phrases, or ambiguous single terms with
-  no one clean game tag to point at, so there is no further mapping work
-  here.
-- **`Text_ES.arc` unreadable on the current machine.** ArchiveTool fails to
-  open `Text_ES.arc` ("Failed to open"), while all 11 other bundled languages
-  (CS, DE, FR, IT, JA, KO, PL, PT, RU, VI, ZH) extract fine. Before adding
-  Spanish in Phase 3, run Steam's "verify integrity of game files" on Grim
-  Dawn to repair the archive, then re-run `just extract`.
-- **Phase 3: extract all 13 languages and author `app.<locale>.json`.** The
-  install ships EN, CS, DE, ES, FR, IT, JA, KO, PL, PT, RU, VI, ZH. Extract
-  `game.<lang>.json` for all 13 (`just extract`, Windows only for the
-  ArchiveTool step, but committed outputs build anywhere) and author the
-  `app.<lang>.json` chrome/statFormat catalogs for each; each language appears
-  as its bundles land, with English filling any gap.
-
-- **Code-hardening follow-ups** (Phase 3 blockers and minor safety improvements):
-  - Empty-string fallback in resolver (`web/src/core/localization.ts`): `translate` uses `active[key] ?? fallback[key] ?? key`, which returns an empty string if a catalog value is literally `""`, contradicting the "never returns blank" behavior. Harmless today (the English catalog has no empty values), but once non-English `app.<locale>.json` catalogs land in Phase 3, a translator authoring `""` would render blank instead of falling back to English. Fix: switch to an `||` chain or an explicit `Object.hasOwn` check that treats empty string as absent.
+- **Code-hardening follow-ups** (minor safety improvements, not blockers):
   - Prototype pollution in interpolation (`web/src/core/localization.ts`): `interpolate` checks `name in params`, which matches inherited prototype properties (e.g. a placeholder literally named `constructor`). Author-controlled today so not a real exposure, but harden with `Object.hasOwn(params, name)` if convenient.
   - Silent fetch failures in catalog loading (`web/src/adapters/localizationAdapter.ts`): `getJson` swallows fetch/parse errors and returns `{}` with no log, unlike the sibling `web/src/adapters/httpDataSource.ts` which `console.warn`s on failed data fetches. Consider a matching `console.warn` to aid diagnosing missing or mistyped catalogs. Silent degrade-to-English is the intended UX.
   - Guard test coverage (`web/test/appCatalog.test.ts`): the REQUIRED list explicitly guards chrome and `stat.group.*` keys but only spot-checks the ~130 other `stat.*` keys; `statFormat.test.ts` effectively covers them today. Consider deriving referenced keys programmatically so the guard enforces its own contract ("every key referenced by the app exists in the catalog").
