@@ -54,3 +54,33 @@ test("singleton gameText returns the tag until installed, then resolves", () => 
   setLocalization(makeLocalization({}, {}, "en", {}, { tagX: "Resolved" }));
   expect(gameText("tagX")).toBe("Resolved");
 });
+
+test("translate treats an empty active value as absent and falls back to English", () => {
+  const loc = makeLocalization({ "ui.x": "" }, { "ui.x": "Hello" }, "es");
+  expect(loc.translate("ui.x")).toBe("Hello");
+});
+
+test("translate falls back to the raw key when active and English are both empty", () => {
+  const loc = makeLocalization({ "ui.x": "" }, { "ui.x": "" }, "es");
+  expect(loc.translate("ui.x")).toBe("ui.x");
+});
+
+test("translate still prefers a non-empty active value over English (regression guard)", () => {
+  const loc = makeLocalization({ "ui.x": "Hola" }, { "ui.x": "Hello" }, "es");
+  expect(loc.translate("ui.x")).toBe("Hola");
+});
+
+test("gameText treats an empty active value as absent and falls back to English", () => {
+  const loc = makeLocalization({}, {}, "es", { tagX: "" }, { tagX: "Ge" });
+  expect(loc.gameText("tagX")).toBe("Ge");
+});
+
+test("gameText falls back to the raw tag when active and English are both empty", () => {
+  const loc = makeLocalization({}, {}, "es", { tagX: "" }, { tagX: "" });
+  expect(loc.gameText("tagX")).toBe("tagX");
+});
+
+test("gameText still prefers a non-empty active value over English (regression guard)", () => {
+  const loc = makeLocalization({}, {}, "es", { tagX: "Activo" }, { tagX: "Active" });
+  expect(loc.gameText("tagX")).toBe("Activo");
+});

@@ -7,6 +7,14 @@ function interpolate(template: string, params?: Record<string, string | number>)
   return template.replace(/\{(\w+)\}/g, (whole, name) => (name in params ? String(params[name]) : whole));
 }
 
+// An empty string is treated as "not authored" so an untranslated catalog entry
+// falls back to English instead of rendering blank.
+function pick(active: string | undefined, fallback: string | undefined, last: string): string {
+  if (active !== undefined && active !== "") return active;
+  if (fallback !== undefined && fallback !== "") return fallback;
+  return last;
+}
+
 export function makeLocalization(
   active: Record<string, string>,
   fallback: Record<string, string>,
@@ -17,11 +25,11 @@ export function makeLocalization(
   return {
     locale,
     translate(key, params) {
-      const template = active[key] ?? fallback[key] ?? key;
+      const template = pick(active[key], fallback[key], key);
       return interpolate(template, params);
     },
     gameText(tag) {
-      return gameActive[tag] ?? gameFallback[tag] ?? tag;
+      return pick(gameActive[tag], gameFallback[tag], tag);
     },
   };
 }
