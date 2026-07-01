@@ -2,10 +2,20 @@
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
 import { translate, gameText } from "./localization";
+import { STAT_TAGS } from "./statTags";
 
 export interface StatRow {
   label: string;
   value: string;
+}
+
+// Resolve a stat catalog key to display text: mapped keys (data/stat-tags.json) go through the
+// authoritative game term (gameText); unmapped keys fall back to the app catalog (translate).
+// Resolved at call time, never at module load (the localization singleton installs after this
+// module evaluates).
+function statLabel(key: string): string {
+  const tag = STAT_TAGS[key];
+  return tag ? gameText(tag) : translate(key);
 }
 
 // Instant damage type segments recognized in ids. GD quirks: internal Life = Vitality, Poison = Acid.
@@ -24,12 +34,12 @@ const INSTANT_DAMAGE_SEGMENTS = new Set([
   "Life",
 ]);
 function instantDamageLabel(segment: string): string | undefined {
-  return INSTANT_DAMAGE_SEGMENTS.has(segment) ? translate(`stat.damage.${segment}`) : undefined;
+  return INSTANT_DAMAGE_SEGMENTS.has(segment) ? statLabel(`stat.damage.${segment}`) : undefined;
 }
 // "Slow" (damage-over-time) type segments. Display names live under stat.dot.<Segment>.
 const DOT_DAMAGE_SEGMENTS = new Set(["Bleeding", "Physical", "Fire", "Cold", "Lightning", "Poison", "Life"]);
 function dotDamageLabel(segment: string): string | undefined {
-  return DOT_DAMAGE_SEGMENTS.has(segment) ? translate(`stat.dot.${segment}`) : undefined;
+  return DOT_DAMAGE_SEGMENTS.has(segment) ? statLabel(`stat.dot.${segment}`) : undefined;
 }
 // Resistance type segments. (Status effects like Stun/Freeze are NOT resistances in GD - they are
 // duration-reduction stats, handled in OVERRIDES.) Display names live under stat.resist.<Segment>.
@@ -46,7 +56,7 @@ const RESIST_SEGMENTS = new Set([
   "Bleeding",
 ]);
 function resistLabel(segment: string): string | undefined {
-  return RESIST_SEGMENTS.has(segment) ? translate(`stat.resist.${segment}`) : undefined;
+  return RESIST_SEGMENTS.has(segment) ? statLabel(`stat.resist.${segment}`) : undefined;
 }
 // Character attribute segments (GD renamed the classic attributes). Display names live under
 // stat.attr.<Segment>.
@@ -62,7 +72,7 @@ const ATTR_SEGMENTS = new Set([
   "ManaRegen",
 ]);
 function attrLabel(segment: string): string | undefined {
-  return ATTR_SEGMENTS.has(segment) ? translate(`stat.attr.${segment}`) : undefined;
+  return ATTR_SEGMENTS.has(segment) ? statLabel(`stat.attr.${segment}`) : undefined;
 }
 
 interface Classified {
@@ -416,7 +426,7 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
       used.add(minK);
       used.add(durK);
       const total = Math.round(stats[minK]! * stats[durK]!);
-      const name = translate(`stat.dot.${seg}`);
+      const name = statLabel(`stat.dot.${seg}`);
       rows.push({
         value: fmtNum(total),
         label: translate("stat.power.dotDamageOverSeconds", { name, seconds: fmtNum(stats[durK]!) }),

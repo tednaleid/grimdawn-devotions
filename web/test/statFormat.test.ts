@@ -11,6 +11,8 @@ import {
   isFilterableStat,
 } from "../src/core/statFormat";
 import { installEnglish } from "./helpers/localizeEn";
+import { gameText } from "../src/core/localization";
+import { STAT_TAGS } from "../src/core/statTags";
 
 installEnglish();
 
@@ -301,6 +303,13 @@ test("formatBonusRowsWithIds rows carry the correct label and value", () => {
   const withIds = formatBonusRowsWithIds(bonuses);
   expect(withIds.find((r) => r.id === "characterStrength")!.label).toBe("Physique");
   expect(withIds.find((r) => r.id === "offensiveFireModifier")!.value).toBe("+12%");
+});
+
+describe("mapped stat labels resolve via gameText", () => {
+  test('Fire damage label comes from gameText(STAT_TAGS["stat.damage.Fire"])', () => {
+    const row = statRow("offensiveFireModifier", 10);
+    expect(row?.label).toBe(`${gameText(STAT_TAGS["stat.damage.Fire"]!)} Damage`);
+  });
 });
 
 describe("isFilterableStat: the in/out boundary for power stats", () => {
