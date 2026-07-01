@@ -264,12 +264,24 @@ design and phasing. Remaining work:
   surviving `tag...`, it should instead assert every referenced tag resolves
   in the English table); `gameText(tag)` is added to `Localization` and wired
   into the views that render game-sourced names/descriptions.
-- **Phase 2: stat spike and `stat-tags.json`.** Map the app's internal stat
-  ids to game tags where a clean tag exists (spike: extract `Text_EN.arc` and
-  `Text_ES.arc`, confirm ~40 devotion-relevant stat ids resolve in both), so
-  `statFormat` pulls the exact in-game term via `gameText` instead of an
-  authored guess; stats with no clean tag keep their authored
-  `app.<locale>.json` fallback.
+- **Phase 2 (done): stat-tag mapping.** `data/stat-tags.json` maps 36
+  `statFormat` catalog keys (attributes, instant damage types,
+  damage-over-time types, resistances) to a game tag, chosen so the game's
+  English matches the app's authored English exactly and verified present in
+  the German table; `statFormat` pulls the exact in-game term via `gameText`
+  for mapped keys, and keeps its authored `app.<locale>.json` fallback for
+  everything else. See [docs/i18n.md](docs/i18n.md). The remaining ~100 stat
+  strings (section headers, the `stat.template.*`/`stat.power.*` composed
+  phrases, `stat.subject.*`/`stat.override.*` one-off and irregular terms,
+  and pet labels) are intentionally left app-authored rather than a gap to
+  close: they are templates, composed phrases, or ambiguous single terms with
+  no one clean game tag to point at, so there is no further mapping work
+  here.
+- **`Text_ES.arc` unreadable on the current machine.** ArchiveTool fails to
+  open `Text_ES.arc` ("Failed to open"), while all 11 other bundled languages
+  (CS, DE, FR, IT, JA, KO, PL, PT, RU, VI, ZH) extract fine. Before adding
+  Spanish in Phase 3, run Steam's "verify integrity of game files" on Grim
+  Dawn to repair the archive, then re-run `just extract`.
 - **Phase 3: extract all 13 languages and author `app.<locale>.json`.** The
   install ships EN, CS, DE, ES, FR, IT, JA, KO, PL, PT, RU, VI, ZH. Extract
   `game.<lang>.json` for all 13 (`just extract`, Windows only for the
