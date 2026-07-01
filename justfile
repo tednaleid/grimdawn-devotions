@@ -182,6 +182,25 @@ assets *ARGS: _require-game-closed
     uv run scripts/build_assets.py --gd-dir "{{gd_dir}}" \
         --out-dir "{{justfile_directory()}}/assets/devotions" {{ARGS}}
 
+# Extract each shipped language's Text_<LANG>.arc and build its game.<lang>.json (Windows-only; ArchiveTool)
+i18n-tables:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    GD="{{gd_dir}}"
+    AT="$GD/ArchiveTool.exe"
+    for L in de fr ru zh pl it cs ja ko pt vi; do
+      U=$(echo "$L" | tr '[:lower:]' '[:upper:]')
+      arc="$GD/resources/Text_$U.arc"
+      [ -f "$arc" ] || { echo "skip $L (no $arc)"; continue; }
+      tmp="{{justfile_directory()}}/extracted/text_$L"
+      rm -rf "$tmp" && mkdir -p "$tmp"
+      echo "extracting $U ..."
+      "$AT" "$arc" -extract "$tmp" < /dev/null >/dev/null
+      uv run scripts/build_game_tables.py --devotions data/devotions.json --stat-tags data/stat-tags.json \
+        --text-dir "$tmp/text_$L" --lang "$L" --out "data/i18n/game.$L.json"
+    done
+    echo "built game tables for all in-scope languages"
+
 # Install web dependencies (bun)
 web-install:
     cd "{{justfile_directory()}}/web" && bun install
