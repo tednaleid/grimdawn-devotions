@@ -4,6 +4,7 @@ import { test, expect } from "bun:test";
 import en from "../src/i18n/app.en.json";
 import cs from "../src/i18n/app.cs.json";
 import de from "../src/i18n/app.de.json";
+import es from "../src/i18n/app.es.json";
 import fr from "../src/i18n/app.fr.json";
 import it from "../src/i18n/app.it.json";
 import ja from "../src/i18n/app.ja.json";
@@ -17,6 +18,7 @@ import zh from "../src/i18n/app.zh.json";
 const LOCALE_CATALOGS: Record<string, Record<string, string>> = {
   cs,
   de,
+  es,
   fr,
   it,
   ja,

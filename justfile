@@ -148,8 +148,8 @@ extract: _require-game-closed
     done < <(ls -d "$GD"/gdx*/ 2>/dev/null | sort -V)
     echo "Done."
 
-# Parse extracted records into devotions.json (passes version + steam build id), then build the
-# English game text table (devotion tags + data/stat-tags.json's stat tags).
+# Parse extracted records into devotions.json (passes version + steam build id). Game text tables
+# (including English) are built separately by `just i18n-tables`, the single generic builder.
 parse *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -160,12 +160,9 @@ parse *ARGS:
     uv run scripts/parse_devotions.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out}}" \
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
-    uv run scripts/build_game_tables.py \
-        --devotions "{{out}}" --stat-tags data/stat-tags.json --text-dir "{{text_dir}}" \
-        --lang en --out data/i18n/game.en.json
 
 # Full pipeline: extract then parse
-all: extract parse
+all: extract parse i18n-tables
 
 # KEEPS the committed dataset (data/devotions.json, data/stat_labels.json) — those only
 # regenerate via `just parse` on Windows, so clean must never delete them.
@@ -182,24 +179,56 @@ assets *ARGS: _require-game-closed
     uv run scripts/build_assets.py --gd-dir "{{gd_dir}}" \
         --out-dir "{{justfile_directory()}}/assets/devotions" {{ARGS}}
 
-# Extract each shipped language's Text_<LANG>.arc and build its game.<lang>.json (Windows-only; ArchiveTool)
-i18n-tables:
+# Build data/i18n/game.<lang>.json for every installed language, or just the ones you name:
+#   `just i18n-tables`  (all)  |  `just i18n-tables es fr`  (some)  |  `just i18n-tables en`  (english).
+# This is the single, generic builder of ALL game text tables. English is special only in WHERE its
+# text comes from: it is merged across the base game + expansions into extracted/text_en by
+# `just extract`, so `en` reuses that (run `just extract` first). Each non-English language ships as
+# one consolidated resources/Text_<LANG>.arc, extracted here (Windows-only; needs ArchiveTool). New
+# languages Crate adds are picked up automatically by discovery.
+# ArchiveTool needs an ABSOLUTE -extract path (a relative one fails to open the output file: it prints
+# progress and exits 0 but writes zero files, and pops an archivewriter.cpp assert on debug builds) and
+# stdin redirected (`< /dev/null`, else it blocks). Both are handled below.
+i18n-tables *LANGS:
     #!/usr/bin/env bash
     set -euo pipefail
     GD="{{gd_dir}}"
     AT="$GD/ArchiveTool.exe"
-    for L in de fr ru zh pl it cs ja ko pt vi; do
-      U=$(echo "$L" | tr '[:lower:]' '[:upper:]')
-      arc="$GD/resources/Text_$U.arc"
-      [ -f "$arc" ] || { echo "skip $L (no $arc)"; continue; }
-      tmp="{{justfile_directory()}}/extracted/text_$L"
-      rm -rf "$tmp" && mkdir -p "$tmp"
-      echo "extracting $U ..."
-      "$AT" "$arc" -extract "$tmp" < /dev/null >/dev/null
-      uv run scripts/build_game_tables.py --devotions data/devotions.json --stat-tags data/stat-tags.json \
-        --text-dir "$tmp/text_$L" --lang "$L" --out "data/i18n/game.$L.json"
+    # Named languages, or every installed resources/Text_*.arc discovered.
+    langs="{{LANGS}}"
+    if [ -z "$langs" ]; then
+      langs=$(ls "$GD"/resources/Text_*.arc 2>/dev/null \
+        | sed -E 's#.*/Text_(.*)\.arc#\1#' | tr '[:upper:]' '[:lower:]' | sort | tr '\n' ' ')
+    fi
+    built=""; skipped=""
+    for L in $langs; do
+      L=$(echo "$L" | tr '[:upper:]' '[:lower:]')
+      if [ "$L" = "en" ]; then
+        # English text is the merged base+expansion table produced by `just extract`, not a single arc.
+        tdir="{{text_dir}}"
+        if [ "$(find "$tdir" -name '*.txt' 2>/dev/null | wc -l)" -eq 0 ]; then
+          echo "skip en (no {{text_dir}}; run 'just extract' first)"; skipped="$skipped en"; continue
+        fi
+      else
+        [ -x "$AT" ] || { echo "ArchiveTool not found at $AT (set GD_DIR; needs a local Grim Dawn install)"; exit 1; }
+        U=$(echo "$L" | tr '[:lower:]' '[:upper:]')
+        arc="$GD/resources/Text_$U.arc"
+        [ -f "$arc" ] || { echo "skip $L (no $arc)"; skipped="$skipped $L"; continue; }
+        tdir="{{justfile_directory()}}/extracted/text_$L"   # absolute path is required (see header)
+        rm -rf "$tdir" && mkdir -p "$tdir"
+        echo "extracting $U ..."
+        "$AT" "$arc" -extract "$tdir" < /dev/null >/dev/null 2>&1 || true
+        if [ "$(find "$tdir" -name '*.txt' | wc -l)" -eq 0 ]; then
+          echo "skip $L (extracted 0 files - arc unreadable? try Steam 'verify integrity of game files')"
+          skipped="$skipped $L"; continue
+        fi
+      fi
+      uv run scripts/build_game_tables.py --devotions "{{out}}" --stat-tags data/stat-tags.json \
+        --text-dir "$tdir" --lang "$L" --out "data/i18n/game.$L.json"
+      built="$built $L"
     done
-    echo "built game tables for all in-scope languages"
+    echo "built:$built"
+    [ -n "$skipped" ] && echo "skipped:$skipped" || true
 
 # Install web dependencies (bun)
 web-install:
