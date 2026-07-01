@@ -16,11 +16,15 @@ test("loads English and resolves a key", async () => {
   const loc = await loadLocalization({
     available: ["en"],
     preferred: ["en"],
-    fetchImpl: fakeFetch({ "app.en.json": { "ui.a": "Active" } }),
+    fetchImpl: fakeFetch({
+      "app.en.json": { "ui.a": "Active" },
+      "game.en.json": { "tag.a": "Twin Fangs" },
+    }),
   });
   expect(loc.locale).toBe("en");
   expect(loc.translate("ui.a")).toBe("Active");
   expect(translate("ui.a")).toBe("Active"); // singleton installed
+  expect(loc.gameText("tag.a")).toBe("Twin Fangs");
 });
 
 test("degrades to English fallback when the active-locale file is missing", async () => {

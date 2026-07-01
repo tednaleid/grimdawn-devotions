@@ -1,7 +1,7 @@
 // ABOUTME: Tests the pure localization resolver: fallback chain, interpolation, singleton accessor.
 // ABOUTME: No DOM or fetch; exercises makeLocalization / translate / setLocalization directly.
 import { test, expect } from "bun:test";
-import { makeLocalization, translate, setLocalization } from "../src/core/localization";
+import { makeLocalization, translate, gameText, setLocalization } from "../src/core/localization";
 
 test("prefers the active-locale value", () => {
   const loc = makeLocalization({ "ui.a": "Activo" }, { "ui.a": "Active" }, "es");
@@ -32,4 +32,25 @@ test("singleton translate returns the key until installed, then resolves", () =>
   expect(translate("ui.a")).toBe("ui.a");
   setLocalization(makeLocalization({}, { "ui.a": "Active" }, "en"));
   expect(translate("ui.a")).toBe("Active");
+});
+
+test("gameText prefers the active game map", () => {
+  const loc = makeLocalization({}, {}, "es", { "tag.a": "Activo" }, { "tag.a": "Active" });
+  expect(loc.gameText("tag.a")).toBe("Activo");
+});
+
+test("gameText falls back to the English game map", () => {
+  const loc = makeLocalization({}, {}, "es", {}, { "tag.a": "Active" });
+  expect(loc.gameText("tag.a")).toBe("Active");
+});
+
+test("gameText falls back to the raw tag when neither game map has it", () => {
+  const loc = makeLocalization({}, {}, "es");
+  expect(loc.gameText("tag.missing")).toBe("tag.missing");
+});
+
+test("singleton gameText returns the tag until installed, then resolves", () => {
+  expect(gameText("tagX")).toBe("tagX");
+  setLocalization(makeLocalization({}, {}, "en", {}, { tagX: "Resolved" }));
+  expect(gameText("tagX")).toBe("Resolved");
 });

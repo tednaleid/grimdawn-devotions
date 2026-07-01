@@ -11,12 +11,17 @@ export function makeLocalization(
   active: Record<string, string>,
   fallback: Record<string, string>,
   locale: string,
+  gameActive: Record<string, string> = {},
+  gameFallback: Record<string, string> = {},
 ): Localization {
   return {
     locale,
     translate(key, params) {
       const template = active[key] ?? fallback[key] ?? key;
       return interpolate(template, params);
+    },
+    gameText(tag) {
+      return gameActive[tag] ?? gameFallback[tag] ?? tag;
     },
   };
 }
@@ -27,4 +32,7 @@ export function setLocalization(loc: Localization): void {
 }
 export function translate(key: string, params?: Record<string, string | number>): string {
   return current ? current.translate(key, params) : key;
+}
+export function gameText(tag: string): string {
+  return current ? current.gameText(tag) : tag;
 }

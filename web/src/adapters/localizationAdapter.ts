@@ -24,7 +24,9 @@ export async function loadLocalization(
   const locale = pickLocale(preferred, available);
   const fallback = await getJson(fetchImpl, `${base}/i18n/app.en.json`);
   const active = locale === "en" ? fallback : await getJson(fetchImpl, `${base}/i18n/app.${locale}.json`);
-  const loc = makeLocalization(active, fallback, locale);
+  const gameFallback = await getJson(fetchImpl, `${base}/data/i18n/game.en.json`);
+  const gameActive = locale === "en" ? gameFallback : await getJson(fetchImpl, `${base}/data/i18n/game.${locale}.json`);
+  const loc = makeLocalization(active, fallback, locale, gameActive, gameFallback);
   setLocalization(loc);
   return loc;
 }
