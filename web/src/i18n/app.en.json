@@ -30,5 +30,14 @@
   "ui.benefits.empty": "Select stars to gain benefits.",
   "ui.affinity.have": "have",
   "ui.affinity.need": "need",
-  "ui.affinity.neededBy": "needed by {names}"
+  "ui.affinity.neededBy": "needed by {names}",
+  "ui.tooltip.petBonus": "Bonus to All Pets",
+  "ui.tooltip.currentLevel": "Current Level: {level}",
+  "ui.tooltip.procQualifier": "({chance}% Chance on {trigger})",
+  "ui.tooltip.requires": "Requires: ",
+  "ui.tooltip.grants": "Grants: ",
+  "ui.tooltip.pts": "{count} pts",
+  "ui.tooltip.needsPoints": "Needs {needs} of your {cap} points",
+  "ui.tooltip.cannotComplete": "Cannot be completed within {cap} points",
+  "ui.tooltip.partialGate": "Some bonuses require {req}"
 }

@@ -36,6 +36,15 @@ const REQUIRED = [
   "ui.affinity.have",
   "ui.affinity.need",
   "ui.affinity.neededBy",
+  "ui.tooltip.petBonus",
+  "ui.tooltip.currentLevel",
+  "ui.tooltip.procQualifier",
+  "ui.tooltip.requires",
+  "ui.tooltip.grants",
+  "ui.tooltip.pts",
+  "ui.tooltip.needsPoints",
+  "ui.tooltip.cannotComplete",
+  "ui.tooltip.partialGate",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

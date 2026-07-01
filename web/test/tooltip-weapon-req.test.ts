@@ -4,6 +4,9 @@ import { test, expect, beforeEach } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { tooltipView } from "../src/adapters/tooltipView";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 

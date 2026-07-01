@@ -6,10 +6,9 @@ import type { CondensedGroup } from "../src/core/statFormat";
 import type { DevotionModel } from "../src/core/types";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { makeLocalization, setLocalization } from "../src/core/localization";
-import en from "../src/i18n/app.en.json";
+import { installEnglish } from "./helpers/localizeEn";
 
-setLocalization(makeLocalization(en, en, "en"));
+installEnglish();
 
 const emptyModel = { stars: new Map(), constellations: new Map() } as unknown as DevotionModel;
 const catalog: CondensedGroup[] = [
