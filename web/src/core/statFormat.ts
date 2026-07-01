@@ -1,7 +1,7 @@
 // ABOUTME: Formats raw Grim Dawn devotion stat ids + values into player-facing rows.
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
-import { translate } from "./localization";
+import { translate, gameText } from "./localization";
 
 export interface StatRow {
   label: string;
@@ -490,7 +490,7 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
 export function formatPet(pet: PetInfo): { summon: string; attack: StatRow[] } {
   const plural = (pet.count ?? 1) > 1;
   const num = plural ? `${fmtNum(pet.count!)} ` : "";
-  const name = `${pet.name ?? translate("stat.pet.minion")}${plural ? "s" : ""}`;
+  const name = `${(pet.nameTag ? gameText(pet.nameTag) : null) ?? translate("stat.pet.minion")}${plural ? "s" : ""}`;
   const dur = pet.duration ? forSecondsSuffix(pet.duration) : "";
   return { summon: translate("stat.pet.summons", { num, name, dur }), attack: formatPowerStats(pet.attackStats) };
 }

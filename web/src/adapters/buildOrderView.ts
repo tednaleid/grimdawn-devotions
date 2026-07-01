@@ -5,7 +5,7 @@ import type { Affinity, DevotionModel } from "../core/types";
 import type { BuildStep, Vec } from "../core/reachability";
 import type { AssetManifest } from "../ports/DataSource";
 import { affinityOrb } from "./affinityColors";
-import { translate } from "../core/localization";
+import { translate, gameText } from "../core/localization";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -77,9 +77,9 @@ export function buildOrderHtml(
       const c = model.constellations.get(s.conId);
       const cr = CROSSROADS[s.conId];
       const name = cr
-        ? `${c?.name ?? translate("ui.buildOrder.crossroads")} (${translate(`ui.buildOrder.dir.${cr.dirKey}`)})`
+        ? `${c ? gameText(c.nameTag) : translate("ui.buildOrder.crossroads")} (${translate(`ui.buildOrder.dir.${cr.dirKey}`)})`
         : c
-          ? c.name
+          ? gameText(c.nameTag)
           : s.conId;
       const artName = c?.background?.image?.split("/").pop() ?? "";
       const art = manifest?.images[artName];

@@ -13,7 +13,7 @@ import { formatBonusRowsWithIds, formatPet, formatPowerStats } from "../core/sta
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
-import { translate } from "../core/localization";
+import { translate, gameText } from "../core/localization";
 
 type AffinityTotals = Record<Affinity, number>;
 
@@ -73,9 +73,9 @@ function petBonusHtml(petBonuses: Record<string, number> | undefined, selectedBe
 // description, granted level, then the ability's stat lines GD-style.
 function powerHtml(power: CelestialPower): string {
   const proc = power.proc
-    ? ` <span class="tip-proc">${translate("ui.tooltip.procQualifier", { chance: power.proc.chance, trigger: power.proc.trigger })}</span>`
+    ? ` <span class="tip-proc">${translate("ui.tooltip.procQualifier", { chance: power.proc.chance, trigger: translate(`trigger.${power.proc.triggerKey}`) })}</span>`
     : "";
-  const desc = power.description ? `<div class="tip-power-desc">${power.description}</div>` : "";
+  const desc = power.descriptionTag ? `<div class="tip-power-desc">${gameText(power.descriptionTag)}</div>` : "";
   const level = power.level
     ? `<div class="tip-power-level">${translate("ui.tooltip.currentLevel", { level: power.level })}</div>`
     : "";
@@ -83,7 +83,7 @@ function powerHtml(power: CelestialPower): string {
     .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
     .join("");
   const pet = power.pet ? petHtml(power.pet) : "";
-  return `<div class="tip-power">${power.name}${proc}</div>${desc}${level}${stats}${pet}`;
+  return `<div class="tip-power">${gameText(power.nameTag)}${proc}</div>${desc}${level}${stats}${pet}`;
 }
 
 // A summon proc's pet: the "Summons N <Pet>..." line, then the pet's base attack
@@ -149,7 +149,8 @@ export function tooltipView(el: HTMLElement) {
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? powerHtml(star.celestialPower) : "";
-      el.innerHTML = `<strong>${con.name}</strong>${power}${bonusRowsHtml(star.bonuses, selectedBenefits, "", star.racialTarget)}${weaponReqHtml(star.weaponRequirement?.description)}${petBonusHtml(star.petBonuses, selectedBenefits)}${affinitySections(con, totals, selectedBenefits)}${commitHtml(commit)}`;
+      const weaponReqTag = star.weaponRequirement?.descriptionTag;
+      el.innerHTML = `<strong>${gameText(con.nameTag)}</strong>${power}${bonusRowsHtml(star.bonuses, selectedBenefits, "", star.racialTarget)}${weaponReqHtml(weaponReqTag ? gameText(weaponReqTag) : null)}${petBonusHtml(star.petBonuses, selectedBenefits)}${affinitySections(con, totals, selectedBenefits)}${commitHtml(commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
@@ -167,9 +168,9 @@ export function tooltipView(el: HTMLElement) {
       if (!con) return;
       const stars = new Set(con.starIds);
       const powers = powersGained(model, stars)
-        .map((p) => `<div class="tip-power">${p.power.name}</div>`)
+        .map((p) => `<div class="tip-power">${gameText(p.power.nameTag)}</div>`)
         .join("");
-      const head = `<strong>${con.name}</strong> <span class="tip-cost">${translate("ui.tooltip.pts", { count: con.starIds.length })}</span>`;
+      const head = `<strong>${gameText(con.nameTag)}</strong> <span class="tip-cost">${translate("ui.tooltip.pts", { count: con.starIds.length })}</span>`;
       // `dim` with a `needs` count: how many points would complete it. `dim` without one: the engine
       // found no completion within the cap (do not leak the INF sentinel as a giant point count).
       const dimLine = dim
@@ -181,7 +182,7 @@ export function tooltipView(el: HTMLElement) {
       // requirement (true of every gated constellation in the data today), show it verbatim like
       // the star tooltip; only hedge with "Some bonuses require ..." if the gating is partial or mixed.
       const reqDescs = weaponRequirements(model, stars)
-        .map((r) => r.description)
+        .map((r) => (r.descriptionTag ? gameText(r.descriptionTag) : null))
         .filter((d): d is string => !!d);
       const distinctReqs = [...new Set(reqDescs)];
       const fullyGated = distinctReqs.length === 1 && reqDescs.length === stars.size;

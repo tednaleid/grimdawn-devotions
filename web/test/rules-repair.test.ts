@@ -4,11 +4,15 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { buildReachCons, buildCoverTable } from "../src/core/reachability";
 import { repairSelection } from "../src/core/rules";
+import { gameText } from "../src/core/localization";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 const cons = buildReachCons(model);
 const table = buildCoverTable(cons);
-const nameToId = new Map([...model.constellations.values()].map((c) => [c.name, c.id]));
+const nameToId = new Map([...model.constellations.values()].map((c) => [gameText(c.nameTag), c.id]));
 const lev = model.constellations.get(nameToId.get("Leviathan")!)!;
 
 test("keeps a reachable selection unchanged", () => {

@@ -82,6 +82,18 @@ const REQUIRED = [
   "stat.group.statusProtection",
   "stat.group.armorAndMitigation",
   "stat.group.other",
+  "trigger.AttackEnemy",
+  "trigger.AttackEnemyCrit",
+  "trigger.Block",
+  "trigger.HitByEnemy",
+  "trigger.HitByMelee",
+  "trigger.HitByProjectile",
+  "trigger.HitByCrit",
+  "trigger.OnKill",
+  "trigger.LowHealth",
+  "trigger.LowMana",
+  "trigger.CastBuff",
+  "trigger.OnEquip",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

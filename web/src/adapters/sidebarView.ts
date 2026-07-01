@@ -7,7 +7,7 @@ import { condensedRows, GROUP_KEY, type CondensedGroup, type CondensedSubject } 
 import { affinityOrb } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
-import { translate } from "../core/localization";
+import { translate, gameText } from "../core/localization";
 
 // One row per celestial power: the name plus a data-star-id hook so a hover shows the power's full
 // tooltip (proc, level, stats, requires/grants). Shared by the left "gained" list and the right
@@ -15,8 +15,8 @@ import { translate } from "../core/localization";
 // is meaningless here since the constellation only appears on hover.
 export function powersListHtml(powers: { starId: StarId; power: CelestialPower }[]): string {
   return [...powers]
-    .sort((a, b) => a.power.name.localeCompare(b.power.name))
-    .map((p) => `<div class="power" data-star-id="${p.starId}">${p.power.name}</div>`)
+    .sort((a, b) => gameText(a.power.nameTag).localeCompare(gameText(b.power.nameTag)))
+    .map((p) => `<div class="power" data-star-id="${p.starId}">${gameText(p.power.nameTag)}</div>`)
     .join("");
 }
 
@@ -212,7 +212,12 @@ export function renderAffinities(
     let needCell: string;
     if (n > 0) {
       const met = have[i]! >= n;
-      const names = (needSource.get(i) ?? []).map((cid) => model.constellations.get(cid)?.name ?? cid).join(", ");
+      const names = (needSource.get(i) ?? [])
+        .map((cid) => {
+          const tag = model.constellations.get(cid)?.nameTag;
+          return tag ? gameText(tag) : cid;
+        })
+        .join(", ");
       needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${names ? translate("ui.affinity.neededBy", { names }) : ""}">${n}</span>`;
     } else {
       // Nothing requires this color: still render the cell (dimmed 0) so both columns stay aligned.

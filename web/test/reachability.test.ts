@@ -16,6 +16,10 @@ import {
 } from "../src/core/reachability";
 import type { DevotionModel } from "../src/core/types";
 import { decodeHash, canonicalStarIds } from "../src/core/urlState";
+import { gameText } from "../src/core/localization";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 // Build a synthetic DevotionModel from a list of constellation specs (for testing).
 // Each constellation gets stars with proper predecessors: star k has predecessors [ConId:(k-1)] for k>0.
@@ -41,7 +45,7 @@ function modelFromCons(conSpecs: Array<{ id: string; size: number; req: Vec; gra
     }
     constellations.set(spec.id, {
       id: spec.id,
-      name: spec.id,
+      nameTag: spec.id,
       tier: null,
       affinityRequired: {},
       affinityBonus: {},
@@ -67,7 +71,7 @@ function modelFromCons(conSpecs: Array<{ id: string; size: number; req: Vec; gra
 const realModel = buildModel(doc as any);
 const cons = buildReachCons(realModel);
 const cover = buildCoverTable(cons);
-const nameToId = new Map([...realModel.constellations.values()].map((c) => [c.name, c.id]));
+const nameToId = new Map([...realModel.constellations.values()].map((c) => [gameText(c.nameTag), c.id]));
 const id = (name: string) => nameToId.get(name)!;
 const starCanon = canonicalStarIds(realModel);
 // Is `conName` completable from a user-reported share-URL state? (decode the selection, add the whole

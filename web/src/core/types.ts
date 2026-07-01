@@ -12,16 +12,16 @@ export type StarId = string; // `${constellationId}:${index}`
 // granted level; attackStats is the pet's base attack damage (its other stats scale
 // with the player's pet bonuses, so they are not fixed and not surfaced).
 export interface PetInfo {
-  name: string | null;
+  nameTag: string | null;
   count: number | null;
   duration: number | null;
   attackStats: Record<string, number>;
 }
 
 export interface CelestialPower {
-  name: string;
-  description: string | null;
-  proc: { chance: number; trigger: string } | null;
+  nameTag: string;
+  descriptionTag: string | null;
+  proc: { chance: number; triggerKey: string } | null;
   level: number;
   stats: Record<string, number>;
   pet: PetInfo | null;
@@ -36,13 +36,13 @@ export interface Star {
   bonuses: Record<string, number>;
   petBonuses?: Record<string, number>; // "Bonus to All Pets" stats, same ids as bonuses
   celestialPower: CelestialPower | null;
-  weaponRequirement: { weapons: string[]; description: string | null } | null;
+  weaponRequirement: { weapons: string[]; descriptionTag: string | null } | null;
   racialTarget?: string[]; // races a racialBonus* stat applies to, e.g. ["Beast"]
 }
 
 export interface Constellation {
   id: string;
-  name: string;
+  nameTag: string;
   tier: number | null;
   affinityRequired: AffinityMap;
   affinityBonus: AffinityMap;

@@ -204,5 +204,17 @@
   "stat.power.reducedTargetResistances": "Reduced target's Resistances",
   "stat.power.reducedTargetDamage": "Reduced target's Damage",
   "stat.pet.summons": "Summons {num}{name}{dur}",
-  "stat.pet.minion": "minion"
+  "stat.pet.minion": "minion",
+  "trigger.AttackEnemy": "Attack",
+  "trigger.AttackEnemyCrit": "Critical Hit",
+  "trigger.Block": "Block",
+  "trigger.HitByEnemy": "Hit",
+  "trigger.HitByMelee": "Melee Hit",
+  "trigger.HitByProjectile": "Projectile Hit",
+  "trigger.HitByCrit": "Critical Hit",
+  "trigger.OnKill": "Kill",
+  "trigger.LowHealth": "Low Health",
+  "trigger.LowMana": "Low Energy",
+  "trigger.CastBuff": "Cast",
+  "trigger.OnEquip": "Equip"
 }

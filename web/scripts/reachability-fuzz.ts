@@ -104,7 +104,7 @@ if (import.meta.main) {
   }
   console.log(`\n\n${builds} builds (avg ${(sizeSum / builds).toFixed(0)} stars), generator-invalid ${genBad}.`);
   console.log(`VIOLATIONS (engine dimmed a valid-build member; must be 0): ${violations.length}`);
-  for (const x of violations.slice(0, 20)) console.log(`  seed ${x.seed} [${x.order}] after {${x.claimed.map((id) => model.constellations.get(id)?.name ?? id).join(", ")}}: dimmed ${x.kind} ${model.constellations.get(x.dimmed.split(":")[0]!)?.name ?? x.dimmed}`);
+  for (const x of violations.slice(0, 20)) console.log(`  seed ${x.seed} [${x.order}] after {${x.claimed.map((id) => model.constellations.get(id)?.nameTag ?? id).join(", ")}}: dimmed ${x.kind} ${model.constellations.get(x.dimmed.split(":")[0]!)?.nameTag ?? x.dimmed}`);
   if (genBad > builds / 2) console.log("WARNING: many generator-invalid builds; the forward generator may be too strict.");
   process.exit(violations.length ? 1 : 0);
 }
