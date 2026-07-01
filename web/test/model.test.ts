@@ -23,7 +23,8 @@ test("star global ids and predecessor links resolve to ids", () => {
 test("celestial power carries proc, granted level and level-selected stats", () => {
   const scorpion = [...model.stars.values()].find((s) => s.celestialPower?.name === "Scorpion Sting");
   const power = scorpion!.celestialPower!;
-  expect(power.proc).toEqual({ chance: 25, trigger: "Attack" });
+  expect(power.proc?.chance).toBe(25);
+  expect(power.proc?.trigger).toBe("Attack");
   expect(power.level).toBe(25);
   expect(power.stats.weaponDamagePct).toBe(40);
   expect(power.stats.offensiveSlowPoisonMin).toBe(225);

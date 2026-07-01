@@ -139,6 +139,19 @@ def clean_text(s: str) -> str:
     return s.strip()
 
 
+def register(key: str, text: str | None, table: dict[str, str]) -> str:
+    """Record `text` (cleaned) under `key` in `table` when `text` is truthy.
+
+    `key` is the game tag when one resolved, else a synthesized stable key (see
+    callers). Always returns `key`, so callers can inline this while building a
+    field's `*_tag`/`*_key` sibling. `table` is the accumulated game_en table
+    written to data/i18n/game.en.json.
+    """
+    if text:
+        table[key] = clean_text(text)
+    return key
+
+
 # ---------------------------------------------------------------------------
 # Reference resolution
 # ---------------------------------------------------------------------------
@@ -293,7 +306,7 @@ def extract_proc(db: DB, chain: list[dict[str, str]]):
         trig = ctrl.get("triggerType", "").strip()
         if chance is None or not trig:
             continue
-        return {"chance": chance, "trigger": TRIGGER_DISPLAY.get(trig, trig)}
+        return {"chance": chance, "trigger": TRIGGER_DISPLAY.get(trig, trig), "trigger_key": trig}
     return None
 
 
@@ -316,7 +329,8 @@ def extract_power_stats(chain: list[dict[str, str]], level: int) -> dict[str, fl
     return stats
 
 
-def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int):
+def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int,
+                 skill_ref: str, game_en: dict[str, str]):
     """Summon info for a spawn-pet power, or None.
 
     A Skill_*SpawnPet power summons a temporary creature. We surface the fixed
@@ -333,7 +347,9 @@ def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int)
     if not objs:
         return None
     creature = db.get(objs[min(level, len(objs)) - 1])
-    pet_name = clean_text(tags.get(creature.get("description", "").strip(), "")) or None
+    name_tag = creature.get("description", "").strip()
+    pet_name = clean_text(tags.get(name_tag, "")) or None
+    name_key = register(name_tag or f"x:pet:{skill_ref}", pet_name, game_en)
     count = level_array_value(skill.get("petLimit", ""), level)
     duration = level_array_value(skill.get("spawnObjectsTimeToLive", ""), level)
     # Base attack: the creature's basic attack, falling back to its special attack
@@ -346,19 +362,23 @@ def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int)
                         if k not in POWER_META_FIELDS}
     return {
         "name": pet_name,
+        "name_tag": name_key,
         "count": int(count) if count else None,
         "duration": duration,
         "attack_stats": attack_stats,
     }
 
 
-def extract_weapon_requirement(skill: dict[str, str], tags: dict[str, str]):
+def extract_weapon_requirement(skill: dict[str, str], tags: dict[str, str],
+                                skill_ref: str, game_en: dict[str, str]):
     weapons = [w for w in WEAPON_FLAGS if skill.get(w, "0").strip() not in ("0", "")]
     if not weapons:
         return None
     desc_tag = skill.get("skillBaseDescription", "")
-    desc = clean_text(tags.get(desc_tag, "")) if desc_tag.startswith("tagDevotion_Requires") else ""
-    return {"weapons": weapons, "description": desc or None}
+    is_requires_tag = desc_tag.startswith("tagDevotion_Requires")
+    desc = clean_text(tags.get(desc_tag, "")) if is_requires_tag else ""
+    desc_key = register(desc_tag if is_requires_tag and desc_tag else f"x:weap:{skill_ref}", desc, game_en)
+    return {"weapons": weapons, "description": desc or None, "description_tag": desc_key}
 
 
 def read_position(rec: dict[str, str]):
@@ -392,7 +412,8 @@ def slugify(name: str) -> str:
     return s or "constellation"
 
 
-def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str]):
+def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str],
+                game_en: dict[str, str]):
     """Resolve a devotionButton -> UI button -> skill record -> star dict."""
     button = db.get(button_ref)
     skill_ref = button.get("skillName", "").strip()
@@ -409,7 +430,7 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
         "position": read_position(button),  # star's (x,y) on the shared map canvas
         "bonuses": {},
         "celestial_power": None,
-        "weapon_requirement": extract_weapon_requirement(skill, tags),
+        "weapon_requirement": extract_weapon_requirement(skill, tags, skill_ref, game_en),
     }
 
     if is_passive:
@@ -434,17 +455,21 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
         # ability (proc trigger + per-level stats) is read across the skill chain
         # at the fixed granted level; see CELESTIAL_POWER_LEVEL.
         chain = power_skill_chain(db, skill)
-        name, desc = resolve_power_name(tags, chain)
+        name, desc, name_tag_raw, desc_tag_raw = resolve_power_name(tags, chain)
         level = granted_level(chain)
+        name_key = register(name_tag_raw or f"x:pow:{skill_ref}:name", name, game_en)
+        desc_key = register(desc_tag_raw or f"x:pow:{skill_ref}:desc", desc, game_en)
         star["celestial_power"] = {
             "name": name,
+            "name_tag": name_key,
             "dbr": skill_ref,
             "skill_class": cls,
             "description": desc,
+            "description_tag": desc_key,
             "proc": extract_proc(db, chain),
             "level": level,
             "stats": extract_power_stats(chain, level),
-            "pet": extract_pet(db, tags, skill, level),
+            "pet": extract_pet(db, tags, skill, level, skill_ref, game_en),
         }
     return star, skill_ref
 
@@ -455,26 +480,34 @@ def resolve_power_name(tags: dict[str, str], chain: list[dict[str, str]]):
     Direct attack skills carry skillDisplayName themselves; buff/aura skills
     (Skill_BuffRadius, etc.) put it on the child skill referenced by
     buffSkillName / petSkillName. Fall back to FileDescription's "X - Power".
+
+    Returns (name, desc, name_tag, desc_tag); the two tags are the game tags
+    that resolved (or None, e.g. when name falls back to FileDescription).
     """
     name = ""
     desc = ""
+    name_tag = ""
+    desc_tag = ""
     for rec in chain:
         tag = rec.get("skillDisplayName", "").strip()
         if tag and tag in tags and not name:
             name = clean_text(tags[tag])
+            name_tag = tag
         dtag = rec.get("skillBaseDescription", "").strip()
         if dtag and dtag in tags and not desc:
             desc = clean_text(tags[dtag])
+            desc_tag = dtag
         if name:
             break
 
     if not name:
         fd = chain[0].get("FileDescription", "").strip()
         name = fd.split(" - ", 1)[1].strip() if " - " in fd else fd
-    return name or None, desc or None
+    return name or None, desc or None, name_tag or None, desc_tag or None
 
 
-def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: list[str]):
+def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: list[str],
+                         game_en: dict[str, str]):
     rec = read_dbr(con_path)
     tpl = rec.get("templateName", "")
     if not tpl.endswith("devotionconstellation.tpl"):
@@ -524,7 +557,7 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
 
     stars = []
     for ref in button_refs:
-        star, _ = parse_star(db, tags, ref, warnings)
+        star, _ = parse_star(db, tags, ref, warnings, game_en)
         if star is None:
             star = {"dbr": ref, "predecessors": [], "position": None, "bonuses": {},
                     "celestial_power": None, "weapon_requirement": None}
@@ -552,9 +585,13 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
         star_obj.update(star)
         stars[idx] = star_obj
 
+    con_id = slugify(name)
+    resolved_name_tag = register(name_tag or f"x:con:{con_id}:name", name, game_en)
+
     return {
-        "id": slugify(name),
+        "id": con_id,
         "name": name,
+        "name_tag": resolved_name_tag,
         "tier": tier,
         "dbr": str(con_path.relative_to(db.root)).replace("\\", "/"),
         "affinity_required": affinity_required,
@@ -709,6 +746,8 @@ def main(argv=None) -> int:
     ap.add_argument("--text-dir", required=True, type=Path,
                     help="Extracted text_en dir (containing tags_*.txt)")
     ap.add_argument("--out", default=Path("devotions.json"), type=Path)
+    ap.add_argument("--game-out", default=Path("data/i18n/game.en.json"), type=Path,
+                    help="Where to write the tag -> English text table")
     ap.add_argument("--game-version", default="unknown",
                     help="Game version string to stamp into meta")
     ap.add_argument("--steam-buildid", default=None,
@@ -735,10 +774,11 @@ def main(argv=None) -> int:
 
     warnings: list[str] = []
     constellations: list[dict] = []
+    game_en: dict[str, str] = {}
     for con_path in sorted(con_dir.glob("constellation*.dbr")):
         if "_background" in con_path.name:
             continue
-        c = parse_constellation(db, tags, con_path, warnings)
+        c = parse_constellation(db, tags, con_path, warnings, game_en)
         if c:
             constellations.append(c)
 
@@ -755,6 +795,10 @@ def main(argv=None) -> int:
     doc = {"meta": meta, "constellations": constellations}
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Wrote {args.out}  ({len(constellations)} constellations)")
+
+    args.game_out.parent.mkdir(parents=True, exist_ok=True)
+    args.game_out.write_text(json.dumps(game_en, indent=2, ensure_ascii=False, sort_keys=True), encoding="utf-8")
+    print(f"Wrote {args.game_out}  ({len(game_en)} keys)")
 
     if args.stat_labels:
         labels = build_stat_labels(constellations)
