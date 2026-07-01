@@ -17,5 +17,18 @@
   "ui.drawer.affinity": "Affinity",
   "ui.panel.availableToGet": "Available to get",
   "ui.panel.petBonus": "Bonus to All Pets",
-  "ui.panel.celestialPowers": "Celestial Powers"
+  "ui.panel.celestialPowers": "Celestial Powers",
+  "ui.panel.benefits": "Benefits",
+  "ui.panel.affinity": "Affinity",
+  "ui.compare.banner": "Comparing to baseline",
+  "ui.compare.revert": "Revert",
+  "ui.compare.updateBaseline": "Update Baseline",
+  "ui.compare.setBaseline": "Set baseline",
+  "ui.compare.base": "Base",
+  "ui.compare.now": "Now",
+  "ui.compare.delta": "Δ",
+  "ui.benefits.empty": "Select stars to gain benefits.",
+  "ui.affinity.have": "have",
+  "ui.affinity.need": "need",
+  "ui.affinity.neededBy": "needed by {names}"
 }

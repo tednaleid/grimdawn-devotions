@@ -7,6 +7,7 @@ import { condensedRows, type CondensedGroup, type CondensedSubject } from "../co
 import { affinityOrb } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
+import { translate } from "../core/localization";
 
 // One row per celestial power: the name plus a data-star-id hook so a hover shows the power's full
 // tooltip (proc, level, stats, requires/grants). Shared by the left "gained" list and the right
@@ -159,23 +160,23 @@ export function renderBenefits(
   const powerRows = powersListHtml(powers);
 
   if (comparing) {
-    const bar = `<div class="cmp-bar">Comparing to baseline</div>`;
+    const bar = `<div class="cmp-bar">${translate("ui.compare.banner")}</div>`;
     const controls =
       `<div class="cmp-controls"><span class="cmp-spacer"></span>` +
-      `<span class="cmp-revert-slot"><button id="cmp-revert" type="button">Revert</button></span>` +
-      `<span class="cmp-upd-slot"><button id="cmp-update" type="button">Update Baseline</button></span></div>`;
-    const head = `<div class="cmp-head"><span class="brow-lbl"></span><span class="brow-v">Base</span><span class="brow-v">Now</span><span class="brow-v">&Delta;</span></div>`;
+      `<span class="cmp-revert-slot"><button id="cmp-revert" type="button">${translate("ui.compare.revert")}</button></span>` +
+      `<span class="cmp-upd-slot"><button id="cmp-update" type="button">${translate("ui.compare.updateBaseline")}</button></span></div>`;
+    const head = `<div class="cmp-head"><span class="brow-lbl"></span><span class="brow-v">${translate("ui.compare.base")}</span><span class="brow-v">${translate("ui.compare.now")}</span><span class="brow-v">${translate("ui.compare.delta")}</span></div>`;
     el.innerHTML =
-      `<h2>Benefits<button id="set-baseline" class="hidden" type="button"></button></h2>${bar}${controls}${head}` +
-      (activeHtml || '<div class="bempty">Select stars to gain benefits.</div>') +
-      (petActiveHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petActiveHtml}` : "") +
-      (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "");
+      `<h2>${translate("ui.panel.benefits")}<button id="set-baseline" class="hidden" type="button"></button></h2>${bar}${controls}${head}` +
+      (activeHtml || `<div class="bempty">${translate("ui.benefits.empty")}</div>`) +
+      (petActiveHtml ? `<h2 class="avail-head">${translate("ui.panel.petBonus")}</h2>${petActiveHtml}` : "") +
+      (powers.length ? `<h3>${translate("ui.panel.celestialPowers")}</h3>${powerRows}` : "");
   } else {
     el.innerHTML =
-      `<h2>Benefits<button id="set-baseline" type="button">Set baseline</button></h2>` +
-      `${activeHtml || '<div class="bempty">Select stars to gain benefits.</div>'}` +
-      (petActiveHtml ? `<h2 class="avail-head">Bonus to All Pets</h2>${petActiveHtml}` : "") +
-      (powers.length ? `<h3>Celestial Powers</h3>${powerRows}` : "");
+      `<h2>${translate("ui.panel.benefits")}<button id="set-baseline" type="button">${translate("ui.compare.setBaseline")}</button></h2>` +
+      `${activeHtml || `<div class="bempty">${translate("ui.benefits.empty")}</div>`}` +
+      (petActiveHtml ? `<h2 class="avail-head">${translate("ui.panel.petBonus")}</h2>${petActiveHtml}` : "") +
+      (powers.length ? `<h3>${translate("ui.panel.celestialPowers")}</h3>${powerRows}` : "");
   }
   // availHtml and petAvailHtml are returned, not rendered here - the caller places them under the
   // Affinity panel on the right.
@@ -209,7 +210,7 @@ export function renderAffinities(
     if (n > 0) {
       const met = have[i]! >= n;
       const names = (needSource.get(i) ?? []).map((cid) => model.constellations.get(cid)?.name ?? cid).join(", ");
-      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${names ? `needed by ${names}` : ""}">${n}</span>`;
+      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${names ? translate("ui.affinity.neededBy", { names }) : ""}">${n}</span>`;
     } else {
       // Nothing requires this color: still render the cell (dimmed 0) so both columns stay aligned.
       needCell = `<span class="aff-need none">0</span>`;
@@ -219,6 +220,6 @@ export function renderAffinities(
     const sel = selectedBenefits.has(grantId) ? " vsel" : "";
     return `<div class="affinity affinity-${a}${flash}${sel}" data-gkey="${grantId}" data-gtoggle data-ids="${grantId},${reqId}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
   }).join("");
-  el.innerHTML = `<h2>Affinity</h2><div class="affinity-head"><span></span><span class="aff-have">have</span><span class="aff-need-h">need</span></div>${rows}`;
+  el.innerHTML = `<h2>${translate("ui.panel.affinity")}</h2><div class="affinity-head"><span></span><span class="aff-have">${translate("ui.affinity.have")}</span><span class="aff-need-h">${translate("ui.affinity.need")}</span></div>${rows}`;
   return totals;
 }

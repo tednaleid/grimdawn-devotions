@@ -3,6 +3,10 @@ import { test, expect } from "bun:test";
 import { buildModel } from "../src/core/model";
 import { renderAffinities } from "../src/adapters/sidebarView";
 import type { Vec } from "../src/core/reachability";
+import { makeLocalization, setLocalization } from "../src/core/localization";
+import en from "../src/i18n/app.en.json";
+
+setLocalization(makeLocalization(en, en, "en"));
 
 const doc = {
   meta: { affinities: ["ascendant", "chaos", "eldritch", "order", "primordial"] },

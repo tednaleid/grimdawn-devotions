@@ -23,6 +23,19 @@ const REQUIRED = [
   "ui.panel.availableToGet",
   "ui.panel.petBonus",
   "ui.panel.celestialPowers",
+  "ui.panel.benefits",
+  "ui.panel.affinity",
+  "ui.compare.banner",
+  "ui.compare.revert",
+  "ui.compare.updateBaseline",
+  "ui.compare.setBaseline",
+  "ui.compare.base",
+  "ui.compare.now",
+  "ui.compare.delta",
+  "ui.benefits.empty",
+  "ui.affinity.have",
+  "ui.affinity.need",
+  "ui.affinity.neededBy",
 ];
 
 test("every required chrome key exists in app.en.json", () => {
