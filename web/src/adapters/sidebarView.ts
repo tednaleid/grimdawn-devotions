@@ -218,7 +218,7 @@ export function renderAffinities(
     const grantId = affinityTagId("grant", a);
     const reqId = affinityTagId("req", a);
     const sel = selectedBenefits.has(grantId) ? " vsel" : "";
-    return `<div class="affinity affinity-${a}${flash}${sel}" data-gkey="${grantId}" data-gtoggle data-ids="${grantId},${reqId}"><span>${affinityOrb(a)}${a}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
+    return `<div class="affinity affinity-${a}${flash}${sel}" data-gkey="${grantId}" data-gtoggle data-ids="${grantId},${reqId}"><span>${affinityOrb(a)}${translate(`aff.${a}`)}</span><span class="aff-have">${have[i]}</span>${needCell}</div>`;
   }).join("");
   el.innerHTML = `<h2>${translate("ui.panel.affinity")}</h2><div class="affinity-head"><span></span><span class="aff-have">${translate("ui.affinity.have")}</span><span class="aff-need-h">${translate("ui.affinity.need")}</span></div>${rows}`;
   return totals;

@@ -67,6 +67,12 @@ const REQUIRED = [
   "aff.eldritch",
   "aff.order",
   "aff.primordial",
+  "ui.commit.add",
+  "ui.commit.remove",
+  "ui.benefit.max",
+  "ui.benefit.duration",
+  "ui.benefit.maxPrefix",
+  "ui.benefit.seconds",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

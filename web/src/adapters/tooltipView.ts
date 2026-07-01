@@ -22,7 +22,7 @@ function affinityLine(map: AffinityMap, selectedBenefits: Set<string>): string {
     .map((a) => {
       const vid = affinityTagId("grant", a);
       const sel = selectedBenefits.has(vid) ? " vsel" : "";
-      return `<span class="aff${sel}" data-vid="${vid}">${affinityOrb(a)}${a} ${map[a]}</span>`;
+      return `<span class="aff${sel}" data-vid="${vid}">${affinityOrb(a)}${translate(`aff.${a}`)} ${map[a]}</span>`;
     })
     .join(" ");
 }
@@ -35,7 +35,7 @@ function requiresLine(map: AffinityMap, totals: AffinityTotals | undefined, sele
       const met = !totals || (totals[a] ?? 0) >= need;
       const vid = affinityTagId("req", a);
       const sel = selectedBenefits.has(vid) ? " vsel" : "";
-      return `<span class="aff ${met ? "met" : "missing"}${sel}" data-vid="${vid}">${affinityOrb(a)}${a} ${need}</span>`;
+      return `<span class="aff ${met ? "met" : "missing"}${sel}" data-vid="${vid}">${affinityOrb(a)}${translate(`aff.${a}`)} ${need}</span>`;
     })
     .join(" ");
 }

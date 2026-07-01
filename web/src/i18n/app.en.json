@@ -61,5 +61,11 @@
   "aff.chaos": "Chaos",
   "aff.eldritch": "Eldritch",
   "aff.order": "Order",
-  "aff.primordial": "Primordial"
+  "aff.primordial": "Primordial",
+  "ui.commit.add": "Add",
+  "ui.commit.remove": "Remove",
+  "ui.benefit.max": "max",
+  "ui.benefit.duration": "duration",
+  "ui.benefit.maxPrefix": "max {subject}",
+  "ui.benefit.seconds": "{value}s"
 }
