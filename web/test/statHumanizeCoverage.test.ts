@@ -60,6 +60,12 @@ for (const id of allIds) {
   forbidden.add(humanize(id));
 }
 
+// Scope, deliberately: this catches humanize() leaks specifically, not raw-tag leaks. A
+// STAT_FORMAT_TAGS tag that resolves nowhere would render its raw tag ("DefenseConvert"), which is not
+// a humanize(id) output and so is not in `forbidden` - statFormat.test.ts pins those English labels
+// instead. Driving groupedBonusRows + formatPowerStats covers every path: the condensed view's
+// decompose() reuses classify().label (already exercised by groupedBonusRows), and every other
+// decompose subject uses translate(), never humanize().
 test("no devotion stat renders via humanize() in any view", () => {
   const leaks: string[] = [];
   const scan = (label: string) => {
