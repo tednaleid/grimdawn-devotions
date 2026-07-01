@@ -158,15 +158,15 @@ export function availablePowers(
 export function weaponRequirements(
   model: DevotionModel,
   selected: Set<StarId>,
-): { starId: StarId; weapons: string[]; description: string | null }[] {
-  const out: { starId: StarId; weapons: string[]; description: string | null }[] = [];
+): { starId: StarId; weapons: string[]; descriptionTag: string | null }[] {
+  const out: { starId: StarId; weapons: string[]; descriptionTag: string | null }[] = [];
   for (const id of selected) {
     const star = model.stars.get(id);
     if (star?.weaponRequirement)
       out.push({
         starId: id,
         weapons: star.weaponRequirement.weapons,
-        description: star.weaponRequirement.description,
+        descriptionTag: star.weaponRequirement.descriptionTag,
       });
   }
   return out;

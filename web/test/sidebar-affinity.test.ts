@@ -3,13 +3,16 @@ import { test, expect } from "bun:test";
 import { buildModel } from "../src/core/model";
 import { renderAffinities } from "../src/adapters/sidebarView";
 import type { Vec } from "../src/core/reachability";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const doc = {
   meta: { affinities: ["ascendant", "chaos", "eldritch", "order", "primordial"] },
   constellations: [
     {
       id: "Lev",
-      name: "Leviathan",
+      name_tag: "tagDevotion_C12", // real Leviathan tag, so gameText resolves it to "Leviathan" under installEnglish()
       tier: null,
       affinityRequired: { eldritch: 13, ascendant: 13 },
       affinityBonus: {},

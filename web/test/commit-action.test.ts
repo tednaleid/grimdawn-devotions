@@ -5,6 +5,9 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { commitButton } from "../src/core/commitAction";
 import type { ReachView } from "../src/core/reachability";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 const con = [...model.constellations.values()].find((c) => c.starIds.length >= 2)!;

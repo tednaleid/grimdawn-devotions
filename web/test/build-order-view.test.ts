@@ -7,6 +7,10 @@ import { buildModel } from "../src/core/model";
 import { buildOrderHtml } from "../src/adapters/buildOrderView";
 import { affinityColor } from "../src/adapters/affinityColors";
 import type { BuildStep } from "../src/core/reachability";
+import { installEnglish } from "./helpers/localizeEn";
+import { gameText } from "../src/core/localization";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 const firstCon = [...model.constellations.values()][0]!;
@@ -19,7 +23,7 @@ test("buildOrderHtml renders complete and scaffold rows with held totals and con
   ];
   const html = buildOrderHtml(model, null, steps);
   expect(html).toContain(`data-con-id="${firstCon.id}"`);
-  expect(html).toContain(firstCon.name);
+  expect(html).toContain(gameText(firstCon.nameTag));
   expect(html).toContain("bo-add");
   expect(html).toContain("bo-refund");
   expect(html).toContain("6"); // a held total

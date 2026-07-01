@@ -72,7 +72,7 @@ function firstViolation(seed: number, maxPts = 30): string | null {
     const cur = new Map(watch.map((id) => [id, completable(sel, id)]));
     for (const id of watch)
       if (!prev.get(id) && cur.get(id))
-        return `${model.constellations.get(id)!.name} viable after an additive pick (seed ${seed}, step ${step})`;
+        return `${model.constellations.get(id)!.nameTag} viable after an additive pick (seed ${seed}, step ${step})`;
     prev = cur;
   }
   return null;

@@ -10,6 +10,11 @@ import {
   formatPet,
   isFilterableStat,
 } from "../src/core/statFormat";
+import { installEnglish } from "./helpers/localizeEn";
+import { makeLocalization, setLocalization } from "../src/core/localization";
+import { STAT_TAGS } from "../src/core/statTags";
+
+installEnglish();
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
@@ -262,7 +267,7 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
 describe("formatPet renders a summon proc's summary + base attack", () => {
   test("plural count + duration + base-attack damage (Raise the Dead)", () => {
     const r = formatPet({
-      name: "Skeleton",
+      nameTag: "tagDevotionPet_Skeleton",
       count: 6,
       duration: 20,
       attackStats: { offensiveAetherMin: 230, offensiveLifeMin: 230 },
@@ -274,14 +279,14 @@ describe("formatPet renders a summon proc's summary + base attack", () => {
     ]);
   });
   test("single pet shows no count or plural (Bysmiel's Command)", () => {
-    expect(formatPet({ name: "Eldritch Hound", count: 1, duration: 20, attackStats: {} }).summon).toBe(
+    expect(formatPet({ nameTag: "tagDevotionPet_Hound", count: 1, duration: 20, attackStats: {} }).summon).toBe(
       "Summons Eldritch Hound for 20 Seconds",
     );
   });
   test("missing count omits the number (Elemental Seeker)", () => {
-    expect(formatPet({ name: "Elemental Seeker", count: null, duration: 3, attackStats: {} }).summon).toBe(
-      "Summons Elemental Seeker for 3 Seconds",
-    );
+    expect(
+      formatPet({ nameTag: "tagDevotionPet_ElementalSeeker", count: null, duration: 3, attackStats: {} }).summon,
+    ).toBe("Summons Elemental Seeker for 3 Seconds");
   });
 });
 
@@ -298,6 +303,30 @@ test("formatBonusRowsWithIds rows carry the correct label and value", () => {
   const withIds = formatBonusRowsWithIds(bonuses);
   expect(withIds.find((r) => r.id === "characterStrength")!.label).toBe("Physique");
   expect(withIds.find((r) => r.id === "offensiveFireModifier")!.value).toBe("+12%");
+});
+
+describe("mapped stat labels resolve via gameText, not translate", () => {
+  test("Fire damage label uses the game catalog term even when it diverges from the app catalog", () => {
+    // Deliberately divergent catalogs: if statLabel ever regressed to translate(key) for a
+    // mapped key, the rendered label would contain "APP_FIRE" instead of "GAME_FIRE".
+    const fireTag = STAT_TAGS["stat.damage.Fire"]!;
+    setLocalization(
+      makeLocalization(
+        { "stat.damage.Fire": "APP_FIRE", "stat.template.damage": "{type} Damage" },
+        {},
+        "en",
+        { [fireTag]: "GAME_FIRE" },
+        {},
+      ),
+    );
+    try {
+      const row = statRow("offensiveFireModifier", 10);
+      expect(row?.label).toContain("GAME_FIRE");
+      expect(row?.label).not.toContain("APP_FIRE");
+    } finally {
+      installEnglish();
+    }
+  });
 });
 
 describe("isFilterableStat: the in/out boundary for power stats", () => {

@@ -15,6 +15,10 @@ import {
 import doc from "../../data/devotions.json";
 import fixtureJson from "./fixtures/reachable-builds.json";
 import { buildModel } from "../src/core/model";
+import { gameText } from "../src/core/localization";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const fixture = fixtureJson as unknown as { cases: { label: string; sel: Record<string, number> }[] };
 const model = buildModel(doc as any);
@@ -162,7 +166,7 @@ test("buildOrderPath: the confirmed false-reach build has no order within 55", (
     "Solael's Witchblade",
     "Ulo the Keeper of the Waters",
   ];
-  const nameToId = new Map([...model.constellations.values()].map((c) => [c.name, c.id]));
+  const nameToId = new Map([...model.constellations.values()].map((c) => [gameText(c.nameTag), c.id]));
   const members = names.map((n) => byId.get(nameToId.get(n)!)!);
   expect(buildOrderPath(realCons, realTable, members, 55, 16)).toBeNull();
   expect(buildOrderEscalated(realCons, realTable, members, 55)).toBeNull();

@@ -148,7 +148,8 @@ extract: _require-game-closed
     done < <(ls -d "$GD"/gdx*/ 2>/dev/null | sort -V)
     echo "Done."
 
-# Parse extracted records into devotions.json (passes version + steam build id)
+# Parse extracted records into devotions.json (passes version + steam build id), then build the
+# English game text table (devotion tags + data/stat-tags.json's stat tags).
 parse *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -159,6 +160,9 @@ parse *ARGS:
     uv run scripts/parse_devotions.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out}}" \
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
+    uv run scripts/build_game_tables.py \
+        --devotions "{{out}}" --stat-tags data/stat-tags.json --text-dir "{{text_dir}}" \
+        --lang en --out data/i18n/game.en.json
 
 # Full pipeline: extract then parse
 all: extract parse
@@ -177,6 +181,25 @@ clean:
 assets *ARGS: _require-game-closed
     uv run scripts/build_assets.py --gd-dir "{{gd_dir}}" \
         --out-dir "{{justfile_directory()}}/assets/devotions" {{ARGS}}
+
+# Extract each shipped language's Text_<LANG>.arc and build its game.<lang>.json (Windows-only; ArchiveTool)
+i18n-tables:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    GD="{{gd_dir}}"
+    AT="$GD/ArchiveTool.exe"
+    for L in de fr ru zh pl it cs ja ko pt vi; do
+      U=$(echo "$L" | tr '[:lower:]' '[:upper:]')
+      arc="$GD/resources/Text_$U.arc"
+      [ -f "$arc" ] || { echo "skip $L (no $arc)"; continue; }
+      tmp="{{justfile_directory()}}/extracted/text_$L"
+      rm -rf "$tmp" && mkdir -p "$tmp"
+      echo "extracting $U ..."
+      "$AT" "$arc" -extract "$tmp" < /dev/null >/dev/null
+      uv run scripts/build_game_tables.py --devotions data/devotions.json --stat-tags data/stat-tags.json \
+        --text-dir "$tmp/text_$L" --lang "$L" --out "data/i18n/game.$L.json"
+    done
+    echo "built game tables for all in-scope languages"
 
 # Install web dependencies (bun)
 web-install:
@@ -338,6 +361,7 @@ build: cover-table
     bun scripts/bundle.ts
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
+    mkdir -p dist/data/i18n && cp "{{justfile_directory()}}/data/i18n/"*.json dist/data/i18n/
     # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that
     # `build` only copies, so a stale binary ships silently (correct but slow) unless we rebuild it.
     # Rebuild when it is missing or older than web/wasm/src/lib.rs AND cargo is available; without a
@@ -355,6 +379,7 @@ build: cover-table
     fi
     if [ -f "{{justfile_directory()}}/data/reach.wasm" ]; then cp "{{justfile_directory()}}/data/reach.wasm" dist/data/reach.wasm; else echo "(no data/reach.wasm; run 'just wasm' for the fast resolver - the page falls back to TS)"; fi
     if [ -d "{{justfile_directory()}}/assets" ]; then cp -r "{{justfile_directory()}}/assets" dist/assets; fi
+    cp -r "{{justfile_directory()}}/web/src/i18n" dist/i18n
     echo "Built web/dist"
 
 # Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)

@@ -4,6 +4,9 @@ import { test, expect, beforeEach } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { tooltipView } from "../src/adapters/tooltipView";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 
@@ -44,7 +47,7 @@ test("constellation tooltip hedges with 'Some bonuses require' when only some st
     constellations: [
       {
         id: "partialcon",
-        name: "Partial",
+        name_tag: "tagPartial",
         tier: 1,
         affinity_required: {},
         affinity_bonus: {},
@@ -56,7 +59,7 @@ test("constellation tooltip hedges with 'Some bonuses require' when only some st
             position: { x: 0, y: 0 },
             bonuses: { offensiveFireModifier: 10 },
             celestial_power: null,
-            weapon_requirement: { weapons: ["Sword"], description: "Requires a sword." },
+            weapon_requirement: { weapons: ["Sword"], description_tag: "tagDevotion_RequiresSword" }, // real tag: "Requires a sword."
           },
           {
             index: 1,

@@ -3,6 +3,7 @@
 import type { DevotionModel, StarId } from "./types";
 import { sumBonuses, sumPetBonuses, racialTargets } from "./aggregate";
 import { condensedRows, classify, type CondensedPart, type StatGroup } from "./statFormat";
+import { translate } from "./localization";
 
 export type Verdict = "up" | "down" | "same" | "mixed";
 export type RowRole = "subject" | "sub" | "cont";
@@ -49,7 +50,7 @@ function fmtDelta(n: number): string {
 // value. A max-resist is qualified at row-build time: by the "max" sub-label on a later row, or by a
 // "max " prefix when it is the subject's first/only row (see maxQualified in buildScope).
 function rowValue(dim: CondensedPart["dim"], value: string): string {
-  return dim === "durFlat" ? `${value}s` : value;
+  return dim === "durFlat" ? translate("ui.benefit.seconds", { value }) : value;
 }
 
 interface PartMeta {
@@ -115,17 +116,18 @@ function buildScope(
       if (!firstDone) role = "subject";
       else if (part.dim === "max") {
         role = "sub";
-        subLabel = "max";
+        subLabel = translate("ui.benefit.max");
       } else if (isDur && !durLabeled) {
         role = "sub";
-        subLabel = "duration";
+        subLabel = translate("ui.benefit.duration");
       } else role = "cont";
       if (isDur) durLabeled = true;
       firstDone = true;
 
       // A max-resist on the subject row has no "max" sub-label to qualify it, so prefix the value.
       const maxFirst = role === "subject" && part.dim === "max";
-      const maxQualified = (s: string) => (maxFirst && s !== DASH ? `max ${s}` : s);
+      const maxQualified = (s: string) =>
+        maxFirst && s !== DASH ? translate("ui.benefit.maxPrefix", { subject: s }) : s;
 
       if (!comparing) {
         return {

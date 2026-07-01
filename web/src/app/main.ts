@@ -1,6 +1,8 @@
 // ABOUTME: Application entry point for the Grim Dawn Devotion Planner.
 // ABOUTME: Owns SelectionState and wires every adapter (data, svg, nav, sidebars, tooltip) to the core.
 import { httpDataSource } from "../adapters/httpDataSource";
+import { loadLocalization, SUPPORTED_LOCALES } from "../adapters/localizationAdapter";
+import { translate } from "../core/localization";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
@@ -49,6 +51,7 @@ async function boot() {
     sessionStorage.removeItem("bootReloaded");
   } catch {}
   const data = await httpDataSource(".").load();
+  await loadLocalization({ base: ".", available: SUPPORTED_LOCALES });
   const model = data.model;
   const cons: ReachCon[] = buildReachCons(model);
   const table = data.coverTable; // null -> dimming disabled (degraded)
@@ -111,6 +114,15 @@ async function boot() {
   const leftBtn = document.getElementById("drawer-left-btn") as HTMLButtonElement;
   const rightBtn = document.getElementById("drawer-right-btn") as HTMLButtonElement;
   const scrim = document.getElementById("drawer-scrim") as HTMLElement;
+  document.title = translate("ui.title");
+  (document.querySelector(".plabel") as HTMLElement).textContent = translate("ui.points.label");
+  totalWord.textContent = ` ${translate("ui.points.total")}`;
+  resetPointsBtn.textContent = translate("ui.points.reset");
+  leftBtn.setAttribute("aria-label", translate("ui.drawer.benefitsAria"));
+  rightBtn.setAttribute("aria-label", translate("ui.drawer.affinityAria"));
+  leftBtn.textContent = translate("ui.drawer.benefits");
+  rightBtn.textContent = translate("ui.drawer.affinity");
+  barEl.setAttribute("aria-label", translate("ui.points.budgetAria"));
   const tip = tooltipView(tooltipEl);
   const isTouch = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
   let popoverTarget: CommitTarget | null = null; // the star/constellation the open popover commits
@@ -347,8 +359,9 @@ async function boot() {
     if (showMin)
       html += `<div class="pb-seg pb-min" style="left:${pct(used)}%;width:${pct(curMin) - pct(used)}%"></div>`;
     html += `<div class="pb-seg pb-head" style="left:${pct(headStart)}%;width:${pct(cap) - pct(headStart)}%"></div>`;
-    html += `<span class="pb-lab" style="left:0">${used} used</span>`;
-    if (showMin && !hideMinLabel) html += `<span class="pb-lab" style="left:${pct(used)}%">${curMin} min</span>`;
+    html += `<span class="pb-lab" style="left:0">${translate("ui.points.used", { count: used })}</span>`;
+    if (showMin && !hideMinLabel)
+      html += `<span class="pb-lab" style="left:${pct(used)}%">${translate("ui.points.min", { count: curMin })}</span>`;
     if (!uncapped) html += `<div class="pb-grab" style="left:${pct(cap)}%"></div>`;
     barEl.innerHTML = html;
     barEl.classList.toggle("uncapped", uncapped);
@@ -492,14 +505,20 @@ async function boot() {
     );
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
     if (availHtml)
-      affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Available to get</h2>${availHtml}`);
+      affinityEl.insertAdjacentHTML(
+        "beforeend",
+        `<hr class="panel-sep"/><h2>${translate("ui.panel.availableToGet")}</h2>${availHtml}`,
+      );
     if (petAvailHtml)
-      affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><h2>Bonus to All Pets</h2>${petAvailHtml}`);
+      affinityEl.insertAdjacentHTML(
+        "beforeend",
+        `<hr class="panel-sep"/><h2>${translate("ui.panel.petBonus")}</h2>${petAvailHtml}`,
+      );
     const availPowers = availablePowers(model, state.selected, reach.completable);
     if (availPowers.length)
       affinityEl.insertAdjacentHTML(
         "beforeend",
-        `<hr class="panel-sep"/><h2>Celestial Powers</h2>${powersListHtml(availPowers)}`,
+        `<hr class="panel-sep"/><h2>${translate("ui.panel.celestialPowers")}</h2>${powersListHtml(availPowers)}`,
       );
     // Empty-state copy. The build order shows whenever the selection is self-covering: the cap is auto-raised
     // to the validity floor (above), so a self-covering selection that still has no order is genuinely
@@ -518,7 +537,7 @@ async function boot() {
     paintBuildOrder(curBuildOrder, boInfo);
     const uncapped = !Number.isFinite(state.pointCap);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
-    capToggle.title = uncapped ? "Click to restore the 55-point limit" : "Click to remove the point limit";
+    capToggle.title = uncapped ? translate("ui.points.capRestoreTitle") : translate("ui.points.capRemoveTitle");
     totalWord.style.display = uncapped ? "none" : "";
     renderPointBar();
     history.replaceState(

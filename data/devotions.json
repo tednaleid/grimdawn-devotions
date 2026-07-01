@@ -3,7 +3,7 @@
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-06-21T19:06:05Z",
+    "generated_utc": "2026-07-01T05:46:25Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -15,7 +15,7 @@
   "constellations": [
     {
       "id": "akeron_s_scorpion",
-      "name": "Akeron's Scorpion",
+      "name_tag": "tagDevotion_A02",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation02.dbr",
       "affinity_required": {
@@ -110,13 +110,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Scorpion Sting",
+            "name_tag": "tagDevotionEffectA02",
             "dbr": "records/skills/devotion/tier1_02e_skill.dbr",
             "skill_class": "Skill_AttackProjectileRing",
-            "description": "Spines coated with deadly toxin erupt around you.",
+            "description_tag": "tagDevotionEffectA02Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -138,7 +138,7 @@
     },
     {
       "id": "anvil",
-      "name": "Anvil",
+      "name_tag": "tagDevotion_A05",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation05.dbr",
       "affinity_required": {
@@ -234,13 +234,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Targo's Hammer",
+            "name_tag": "tagDevotionEffectA05",
             "dbr": "records/skills/devotion/tier1_05e_skill.dbr",
             "skill_class": "Skill_AttackProjectileOrbiting",
-            "description": "Targo's celestial hammer orbits around you, striking down nearby foes.",
+            "description_tag": "tagDevotionEffectA05Desc",
             "proc": {
               "chance": 50,
-              "trigger": "Block"
+              "trigger_key": "Block"
             },
             "level": 25,
             "stats": {
@@ -263,7 +263,7 @@
     },
     {
       "id": "assassin_s_blade",
-      "name": "Assassin's Blade",
+      "name_tag": "tagDevotion_A08",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation08.dbr",
       "affinity_required": {
@@ -357,13 +357,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Assassin's Mark",
+            "name_tag": "tagDevotionEffectA08",
             "dbr": "records/skills/devotion/tier1_08e_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "Mark your target for a swift and painful death.",
+            "description_tag": "tagDevotionEffectA08Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 25,
             "stats": {
@@ -379,7 +379,7 @@
     },
     {
       "id": "bat",
-      "name": "Bat",
+      "name_tag": "tagDevotion_A01",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation01.dbr",
       "affinity_required": {
@@ -476,13 +476,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Twin Fangs",
+            "name_tag": "tagDevotionEffectA01",
             "dbr": "records/skills/devotion/tier1_01e_skill.dbr",
             "skill_class": "Skill_AttackProjectileBurst",
-            "description": "Vampiric fangs assault your foes and sap them of vitality.",
+            "description_tag": "tagDevotionEffectA01Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -503,7 +503,7 @@
     },
     {
       "id": "bull",
-      "name": "Bull",
+      "name_tag": "tagDevotion_A21",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation21.dbr",
       "affinity_required": {
@@ -603,13 +603,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Bull Rush",
+            "name_tag": "tagDevotionEffectA21",
             "dbr": "records/skills/devotion/tier1_21e_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "Strike nearby foes in a rush of physical force, like a charging bull.",
+            "description_tag": "tagDevotionEffectA21Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -629,7 +629,7 @@
     },
     {
       "id": "crane",
-      "name": "Crane",
+      "name_tag": "tagDevotion_A31",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation31.dbr",
       "affinity_required": {
@@ -740,7 +740,7 @@
     },
     {
       "id": "crossroads_primordial",
-      "name": "Crossroads",
+      "name_tag": "tagDevotion_A15",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation15.dbr",
       "affinity_required": {},
@@ -773,7 +773,7 @@
     },
     {
       "id": "crossroads_chaos",
-      "name": "Crossroads",
+      "name_tag": "tagDevotion_A15",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation80.dbr",
       "affinity_required": {},
@@ -806,7 +806,7 @@
     },
     {
       "id": "crossroads_order",
-      "name": "Crossroads",
+      "name_tag": "tagDevotion_A15",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation81.dbr",
       "affinity_required": {},
@@ -839,7 +839,7 @@
     },
     {
       "id": "crossroads_eldritch",
-      "name": "Crossroads",
+      "name_tag": "tagDevotion_A15",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation82.dbr",
       "affinity_required": {},
@@ -872,7 +872,7 @@
     },
     {
       "id": "crossroads_ascendant",
-      "name": "Crossroads",
+      "name_tag": "tagDevotion_A15",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation83.dbr",
       "affinity_required": {},
@@ -905,7 +905,7 @@
     },
     {
       "id": "dryad",
-      "name": "Dryad",
+      "name_tag": "tagDevotion_A26",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation26.dbr",
       "affinity_required": {
@@ -1003,13 +1003,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Dryad's Blessing",
+            "name_tag": "tagDevotionEffectA26",
             "dbr": "records/skills/devotion/tier1_26e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "The dryad's blessing cleanses your wounds and wards you against poison.",
+            "description_tag": "tagDevotionEffectA26Desc",
             "proc": {
               "chance": 33,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -1029,7 +1029,7 @@
     },
     {
       "id": "eel",
-      "name": "Eel",
+      "name_tag": "tagDevotion_A11",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation11.dbr",
       "affinity_required": {
@@ -1100,7 +1100,7 @@
     },
     {
       "id": "empty_throne",
-      "name": "Empty Throne",
+      "name_tag": "tagDevotion_A16",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation16.dbr",
       "affinity_required": {
@@ -1201,7 +1201,7 @@
     },
     {
       "id": "eye_of_the_guardian",
-      "name": "Eye of the Guardian",
+      "name_tag": "tagDevotion_A09",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation09.dbr",
       "affinity_required": {
@@ -1298,13 +1298,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Guardian's Gaze",
+            "name_tag": "tagDevotionEffectA09",
             "dbr": "records/skills/devotion/tier1_09e_skill.dbr",
             "skill_class": "Skill_AttackProjectileOrbiting",
-            "description": "A peerless eye of the Great Guardian circles around you.",
+            "description_tag": "tagDevotionEffectA09Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -1326,7 +1326,7 @@
     },
     {
       "id": "falcon",
-      "name": "Falcon",
+      "name_tag": "tagDevotion_A10",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation10.dbr",
       "affinity_required": {
@@ -1421,13 +1421,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Falcon Swoop",
+            "name_tag": "tagDevotionEffectA10",
             "dbr": "records/skills/devotion/tier1_10e_skill.dbr",
             "skill_class": "Skill_AttackProjectileBurst",
-            "description": "A cast of celestial falcons swoops down upon your foes.",
+            "description_tag": "tagDevotionEffectA10Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -1448,7 +1448,7 @@
     },
     {
       "id": "fiend",
-      "name": "Fiend",
+      "name_tag": "tagDevotion_A20",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation20.dbr",
       "affinity_required": {
@@ -1550,13 +1550,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Flame Torrent",
+            "name_tag": "tagDevotionEffectA20",
             "dbr": "records/skills/devotion/tier1_20e_skill.dbr",
             "skill_class": "Skill_AttackProjectileOrbiting",
-            "description": "Devilish flames swirl around you, incinerating all they touch.",
+            "description_tag": "tagDevotionEffectA20Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -1577,7 +1577,7 @@
     },
     {
       "id": "fox",
-      "name": "Fox",
+      "name_tag": "tagDevotion_A24",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation24.dbr",
       "affinity_required": {
@@ -1668,7 +1668,7 @@
     },
     {
       "id": "gallows",
-      "name": "Gallows",
+      "name_tag": "tagDevotion_A14",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation14.dbr",
       "affinity_required": {
@@ -1761,7 +1761,7 @@
     },
     {
       "id": "ghoul",
-      "name": "Ghoul",
+      "name_tag": "tagDevotion_A25",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation25.dbr",
       "affinity_required": {
@@ -1857,13 +1857,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Ghoulish Hunger",
+            "name_tag": "tagDevotionEffectA25",
             "dbr": "records/skills/devotion/tier1_25e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "When cornered, you are thrown into a ghoulish fervor, desperate for a morsel of flesh.",
+            "description_tag": "tagDevotionEffectA25Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Low Health"
+              "trigger_key": "LowHealth"
             },
             "level": 25,
             "stats": {
@@ -1883,7 +1883,7 @@
     },
     {
       "id": "hammer",
-      "name": "Hammer",
+      "name_tag": "tagDevotion_A04",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation04.dbr",
       "affinity_required": {
@@ -1955,7 +1955,7 @@
     },
     {
       "id": "harpy",
-      "name": "Harpy",
+      "name_tag": "tagDevotion_A23",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation23.dbr",
       "affinity_required": {
@@ -2045,7 +2045,7 @@
     },
     {
       "id": "hawk",
-      "name": "Hawk",
+      "name_tag": "tagDevotion_A27",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation27.dbr",
       "affinity_required": {
@@ -2121,7 +2121,7 @@
     },
     {
       "id": "hound",
-      "name": "Hound",
+      "name_tag": "tagDevotion_A33",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation33.dbr",
       "affinity_required": {
@@ -2200,7 +2200,7 @@
     },
     {
       "id": "imp",
-      "name": "Imp",
+      "name_tag": "tagDevotion_A19",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation19.dbr",
       "affinity_required": {
@@ -2296,13 +2296,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Aetherfire",
+            "name_tag": "tagDevotionEffectA19",
             "dbr": "records/skills/devotion/tier1_19e_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A small burst of aetherfire erupts at your target's feet.",
+            "description_tag": "tagDevotionEffectA19Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -2321,7 +2321,7 @@
     },
     {
       "id": "jackal",
-      "name": "Jackal",
+      "name_tag": "tagDevotion_A38",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation86.dbr",
       "affinity_required": {
@@ -2398,7 +2398,7 @@
     },
     {
       "id": "lion",
-      "name": "Lion",
+      "name_tag": "tagDevotion_A37",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation85.dbr",
       "affinity_required": {
@@ -2477,7 +2477,7 @@
     },
     {
       "id": "lizard",
-      "name": "Lizard",
+      "name_tag": "tagDevotion_A35",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation35.dbr",
       "affinity_required": {
@@ -2549,7 +2549,7 @@
     },
     {
       "id": "lotus",
-      "name": "Lotus",
+      "name_tag": "tagGDX2Devotion_A204",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation105.dbr",
       "affinity_required": {
@@ -2639,7 +2639,7 @@
     },
     {
       "id": "mantis",
-      "name": "Mantis",
+      "name_tag": "tagGDX2Devotion_A202",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation103.dbr",
       "affinity_required": {
@@ -2728,7 +2728,7 @@
     },
     {
       "id": "nighttalon",
-      "name": "Nighttalon",
+      "name_tag": "tagGDX2Devotion_A201",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation102.dbr",
       "affinity_required": {
@@ -2832,7 +2832,7 @@
     },
     {
       "id": "owl",
-      "name": "Owl",
+      "name_tag": "tagDevotion_A12",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation12.dbr",
       "affinity_required": {
@@ -2932,7 +2932,7 @@
     },
     {
       "id": "panther",
-      "name": "Panther",
+      "name_tag": "tagDevotion_A30",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation30.dbr",
       "affinity_required": {
@@ -3036,7 +3036,7 @@
     },
     {
       "id": "quill",
-      "name": "Quill",
+      "name_tag": "tagGDX1Devotion_A103",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation90.dbr",
       "affinity_required": {
@@ -3123,7 +3123,7 @@
     },
     {
       "id": "rat",
-      "name": "Rat",
+      "name_tag": "tagDevotion_A17",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation17.dbr",
       "affinity_required": {
@@ -3218,7 +3218,7 @@
     },
     {
       "id": "raven",
-      "name": "Raven",
+      "name_tag": "tagDevotion_A03",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation03.dbr",
       "affinity_required": {
@@ -3315,7 +3315,7 @@
     },
     {
       "id": "sailor_s_guide",
-      "name": "Sailor's Guide",
+      "name_tag": "tagDevotion_A07",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation07.dbr",
       "affinity_required": {
@@ -3402,7 +3402,7 @@
     },
     {
       "id": "scarab",
-      "name": "Scarab",
+      "name_tag": "tagGDX2Devotion_A203",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation104.dbr",
       "affinity_required": {
@@ -3492,7 +3492,7 @@
     },
     {
       "id": "scholar_s_light",
-      "name": "Scholar's Light",
+      "name_tag": "tagDevotion_A36",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation84.dbr",
       "affinity_required": {
@@ -3563,7 +3563,7 @@
     },
     {
       "id": "shepherd_s_crook",
-      "name": "Shepherd's Crook",
+      "name_tag": "tagDevotion_A06",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation06.dbr",
       "affinity_required": {
@@ -3668,13 +3668,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Shepherd's Call",
+            "name_tag": "tagDevotionEffectA06",
             "dbr": "records/skills/devotion/tier1_06e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Call upon your minions to join you in battle.",
+            "description_tag": "tagDevotionEffectA06Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -3690,7 +3690,7 @@
     },
     {
       "id": "spider",
-      "name": "Spider",
+      "name_tag": "tagDevotion_A34",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation34.dbr",
       "affinity_required": {
@@ -3794,7 +3794,7 @@
     },
     {
       "id": "stag",
-      "name": "Stag",
+      "name_tag": "tagGDX1Devotion_A101",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation88.dbr",
       "affinity_required": {
@@ -3903,7 +3903,7 @@
     },
     {
       "id": "toad",
-      "name": "Toad",
+      "name_tag": "tagGDX1Devotion_A104",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation91.dbr",
       "affinity_required": {
@@ -4008,7 +4008,7 @@
     },
     {
       "id": "tortoise",
-      "name": "Tortoise",
+      "name_tag": "tagDevotion_A29",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation29.dbr",
       "affinity_required": {
@@ -4106,13 +4106,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Turtle Shell",
+            "name_tag": "tagDevotionEffectA29",
             "dbr": "records/skills/devotion/tier1_29e_skill.dbr",
             "skill_class": "Skill_BuffSelfShield",
-            "description": "When threatened, a protective barrier forms around you, negating further harm.",
+            "description_tag": "tagDevotionEffectA29Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Low Health"
+              "trigger_key": "LowHealth"
             },
             "level": 25,
             "stats": {
@@ -4127,7 +4127,7 @@
     },
     {
       "id": "tsunami",
-      "name": "Tsunami",
+      "name_tag": "tagDevotion_A18",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation18.dbr",
       "affinity_required": {
@@ -4223,13 +4223,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Tsunami",
+            "name_tag": "tagDevotionEffectA18",
             "dbr": "records/skills/devotion/tier1_18e_skill.dbr",
             "skill_class": "Skill_AttackWave",
-            "description": "A torrent of water crashes down upon any foes unfortunate enough to be standing in front of you.",
+            "description_tag": "tagDevotionEffectA18Desc",
             "proc": {
               "chance": 35,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 25,
             "stats": {
@@ -4254,7 +4254,7 @@
     },
     {
       "id": "viper",
-      "name": "Viper",
+      "name_tag": "tagDevotion_A13",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation13.dbr",
       "affinity_required": {
@@ -4344,7 +4344,7 @@
     },
     {
       "id": "vulture",
-      "name": "Vulture",
+      "name_tag": "tagDevotion_A32",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation32.dbr",
       "affinity_required": {
@@ -4452,7 +4452,7 @@
     },
     {
       "id": "wolverine",
-      "name": "Wolverine",
+      "name_tag": "tagDevotion_A28",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation28.dbr",
       "affinity_required": {
@@ -4576,7 +4576,7 @@
     },
     {
       "id": "wraith",
-      "name": "Wraith",
+      "name_tag": "tagDevotion_A22",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation22.dbr",
       "affinity_required": {
@@ -4672,7 +4672,7 @@
     },
     {
       "id": "wretch",
-      "name": "Wretch",
+      "name_tag": "tagGDX1Devotion_A102",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation89.dbr",
       "affinity_required": {
@@ -4765,7 +4765,7 @@
     },
     {
       "id": "affliction",
-      "name": "Affliction",
+      "name_tag": "tagDevotion_B16",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation51.dbr",
       "affinity_required": {
@@ -4831,13 +4831,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Fetid Pool",
+            "name_tag": "tagDevotionEffectB16",
             "dbr": "records/skills/devotion/tier2_16c_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A festering pool erupts beneath your enemies, corrupting the ground.",
+            "description_tag": "tagDevotionEffectB16Desc",
             "proc": {
               "chance": 33,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 20,
             "stats": {
@@ -4937,7 +4937,7 @@
     },
     {
       "id": "alladrah_s_phoenix",
-      "name": "Alladrah's Phoenix",
+      "name_tag": "tagGDX1Devotion_B103",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation94.dbr",
       "affinity_required": {
@@ -5040,13 +5040,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Phoenix Fire",
+            "name_tag": "tagGDX1DevotionEffectB102",
             "dbr": "records/skills/devotion/tier2_34e_skill.dbr",
             "skill_class": "Skill_BuffAttackRadiusDuration",
-            "description": "The blazing feathers of the phoenix swirl around you, encasing you in a protective barrier while incinerating all that come too near.",
+            "description_tag": "tagGDX1DevotionEffectB102Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 20,
             "stats": {
@@ -5069,7 +5069,7 @@
     },
     {
       "id": "amatok_the_spirit_of_winter",
-      "name": "Amatok the Spirit of Winter",
+      "name_tag": "tagDevotion_B15",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation50.dbr",
       "affinity_required": {
@@ -5203,13 +5203,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Blizzard",
+            "name_tag": "tagDevotionEffectB15",
             "dbr": "records/skills/devotion/tier2_15g_skill.dbr",
             "skill_class": "Skill_AttackProjectileDrop",
-            "description": "Shards of razor-sharp ice rain down from the sky upon your foes.",
+            "description_tag": "tagDevotionEffectB15Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 20,
             "stats": {
@@ -5234,7 +5234,7 @@
     },
     {
       "id": "assassin",
-      "name": "Assassin",
+      "name_tag": "tagDevotion_B06",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation41.dbr",
       "affinity_required": {
@@ -5370,13 +5370,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Blades of Wrath",
+            "name_tag": "tagDevotionEffectB06",
             "dbr": "records/skills/devotion/tier2_06g_skill.dbr",
             "skill_class": "Skill_AttackProjectileRing",
-            "description": "Push the advantage by unleashing a burst of phantasmal blades that pass through enemies with ease. Blades initially deal 30% reduced damage before reaching their full strength as they expand outward.",
+            "description_tag": "tagDevotionEffectB06Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 20,
             "stats": {
@@ -5395,7 +5395,7 @@
     },
     {
       "id": "autumn_boar",
-      "name": "Autumn Boar",
+      "name_tag": "tagDevotion_B08",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation43.dbr",
       "affinity_required": {
@@ -5531,13 +5531,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Trample",
+            "name_tag": "tagDevotionEffectB08",
             "dbr": "records/skills/devotion/tier2_08g_skill.dbr",
             "skill_class": "Skill_AttackProjectile",
-            "description": "Unleash a wave of force from your shield that shatters the very earth and scatters your foes.",
+            "description_tag": "tagDevotionEffectB08Desc",
             "proc": {
               "chance": 50,
-              "trigger": "Block"
+              "trigger_key": "Block"
             },
             "level": 20,
             "stats": {
@@ -5560,7 +5560,7 @@
     },
     {
       "id": "bard_s_harp",
-      "name": "Bard's Harp",
+      "name_tag": "tagGDX1Devotion_B105",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation96.dbr",
       "affinity_required": {
@@ -5682,13 +5682,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Inspiration",
+            "name_tag": "tagGDX1DevotionEffectB103",
             "dbr": "records/skills/devotion/tier2_36f_skill.dbr",
             "skill_class": "Skill_BuffRadius",
-            "description": "Gallia's melody inspires you and your allies to push onward against impossible odds.",
+            "description_tag": "tagGDX1DevotionEffectB103Desc",
             "proc": {
               "chance": 30,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 20,
             "stats": {
@@ -5710,7 +5710,7 @@
     },
     {
       "id": "behemoth",
-      "name": "Behemoth",
+      "name_tag": "tagDevotion_B28",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation63.dbr",
       "affinity_required": {
@@ -5834,13 +5834,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Giant's Blood",
+            "name_tag": "tagDevotionEffectB28",
             "dbr": "records/skills/devotion/tier2_28f_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Giant's blood flows through your veins, incurring improved regeneration and healing.",
+            "description_tag": "tagDevotionEffectB28Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 20,
             "stats": {
@@ -5858,7 +5858,7 @@
     },
     {
       "id": "berserker",
-      "name": "Berserker",
+      "name_tag": "tagDevotion_B25",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation60.dbr",
       "affinity_required": {
@@ -5896,7 +5896,7 @@
               "Axe",
               "Axe2h"
             ],
-            "description": "Requires an axe or spear."
+            "description_tag": "tagDevotion_RequiresAxeSpear"
           }
         },
         {
@@ -5921,7 +5921,7 @@
               "Axe",
               "Axe2h"
             ],
-            "description": "Requires an axe or spear."
+            "description_tag": "tagDevotion_RequiresAxeSpear"
           }
         },
         {
@@ -5945,7 +5945,7 @@
               "Axe",
               "Axe2h"
             ],
-            "description": "Requires an axe or spear."
+            "description_tag": "tagDevotion_RequiresAxeSpear"
           }
         },
         {
@@ -5970,7 +5970,7 @@
               "Axe",
               "Axe2h"
             ],
-            "description": "Requires an axe or spear."
+            "description_tag": "tagDevotion_RequiresAxeSpear"
           }
         },
         {
@@ -5996,7 +5996,7 @@
               "Axe",
               "Axe2h"
             ],
-            "description": "Requires an axe or spear."
+            "description_tag": "tagDevotion_RequiresAxeSpear"
           }
         },
         {
@@ -6022,14 +6022,14 @@
               "Axe",
               "Axe2h"
             ],
-            "description": "Requires an axe or spear."
+            "description_tag": "tagDevotion_RequiresAxeSpear"
           }
         }
       ]
     },
     {
       "id": "blades_of_nadaan",
-      "name": "Blades of Nadaan",
+      "name_tag": "tagDevotion_B23",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation58.dbr",
       "affinity_required": {
@@ -6065,7 +6065,7 @@
               "Sword",
               "Sword2h"
             ],
-            "description": "Requires a sword."
+            "description_tag": "tagDevotion_RequiresSword"
           }
         },
         {
@@ -6087,7 +6087,7 @@
               "Sword",
               "Sword2h"
             ],
-            "description": "Requires a sword."
+            "description_tag": "tagDevotion_RequiresSword"
           }
         },
         {
@@ -6109,7 +6109,7 @@
               "Sword",
               "Sword2h"
             ],
-            "description": "Requires a sword."
+            "description_tag": "tagDevotion_RequiresSword"
           }
         },
         {
@@ -6132,7 +6132,7 @@
               "Sword",
               "Sword2h"
             ],
-            "description": "Requires a sword."
+            "description_tag": "tagDevotion_RequiresSword"
           }
         },
         {
@@ -6155,7 +6155,7 @@
               "Sword",
               "Sword2h"
             ],
-            "description": "Requires a sword."
+            "description_tag": "tagDevotion_RequiresSword"
           }
         },
         {
@@ -6178,14 +6178,14 @@
               "Sword",
               "Sword2h"
             ],
-            "description": "Requires a sword."
+            "description_tag": "tagDevotion_RequiresSword"
           }
         }
       ]
     },
     {
       "id": "bysmiel_s_bonds",
-      "name": "Bysmiel's Bonds",
+      "name_tag": "tagDevotion_B12",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation47.dbr",
       "affinity_required": {
@@ -6296,20 +6296,20 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Bysmiel's Command",
+            "name_tag": "tagDevotionEffectB12",
             "dbr": "records/skills/devotion/tier2_12e_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Call forth an eldritch hound to snap and tear at your foes. The hound's presence in the physical realm is unstable and it will only remain at your side for a limited time. The hound scales with Pet Bonuses.",
+            "description_tag": "tagDevotionEffectB12Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
               "skillCooldownTime": 30
             },
             "pet": {
-              "name": "Eldritch Hound",
+              "name_tag": "tagDevotionPet_Hound",
               "count": 1,
               "duration": 20,
               "attack_stats": {
@@ -6330,7 +6330,7 @@
     },
     {
       "id": "chariot_of_the_dead",
-      "name": "Chariot of the Dead",
+      "name_tag": "tagDevotion_B29",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation64.dbr",
       "affinity_required": {
@@ -6461,13 +6461,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Wayward Soul",
+            "name_tag": "tagDevotionEffectB29",
             "dbr": "records/skills/devotion/tier2_29g_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Sacrifice a wayward soul to ward yourself against the specter of death.",
+            "description_tag": "tagDevotionEffectB29Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 20,
             "stats": {
@@ -6486,7 +6486,7 @@
     },
     {
       "id": "crab",
-      "name": "Crab",
+      "name_tag": "tagDevotion_B17",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation52.dbr",
       "affinity_required": {
@@ -6549,13 +6549,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Arcane Barrier",
+            "name_tag": "tagDevotionEffectB17",
             "dbr": "records/skills/devotion/tier2_17c_skill.dbr",
             "skill_class": "Skill_BuffSelfShield",
-            "description": "A barrier to the forces of magic forms around you.",
+            "description_tag": "tagDevotionEffectB17Desc",
             "proc": {
               "chance": 30,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 20,
             "stats": {
@@ -6609,7 +6609,7 @@
     },
     {
       "id": "dire_bear",
-      "name": "Dire Bear",
+      "name_tag": "tagDevotion_B05",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation40.dbr",
       "affinity_required": {
@@ -6724,13 +6724,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Maul",
+            "name_tag": "tagDevotionEffectB05",
             "dbr": "records/skills/devotion/tier2_05f_skill.dbr",
             "skill_class": "Skill_AttackBuffRadius",
-            "description": "Maul nearby foes with the might of a dire bear, feasting on their exposed insides.",
+            "description_tag": "tagDevotionEffectB05Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -6748,7 +6748,7 @@
     },
     {
       "id": "harvestman_s_scythe",
-      "name": "Harvestman's Scythe",
+      "name_tag": "tagDevotion_B31",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation79.dbr",
       "affinity_required": {
@@ -6876,7 +6876,7 @@
     },
     {
       "id": "huntress",
-      "name": "Huntress",
+      "name_tag": "tagDevotion_B04",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation39.dbr",
       "affinity_required": {
@@ -7028,13 +7028,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Rend",
+            "name_tag": "tagDevotionEffectB04",
             "dbr": "records/skills/devotion/tier2_04g_skill.dbr",
             "skill_class": "Skill_AttackBuffRadius",
-            "description": "Shred your foes, exposing delicate arteries and inducing intense bleeding.",
+            "description_tag": "tagDevotionEffectB04Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -7053,7 +7053,7 @@
     },
     {
       "id": "hydra",
-      "name": "Hydra",
+      "name_tag": "tagDevotion_B22",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation57.dbr",
       "affinity_required": {
@@ -7090,7 +7090,7 @@
               "Ranged1h",
               "Ranged2h"
             ],
-            "description": "Requires a ranged weapon."
+            "description_tag": "tagDevotion_RequiresRange"
           }
         },
         {
@@ -7113,7 +7113,7 @@
               "Ranged1h",
               "Ranged2h"
             ],
-            "description": "Requires a ranged weapon."
+            "description_tag": "tagDevotion_RequiresRange"
           }
         },
         {
@@ -7138,7 +7138,7 @@
               "Ranged1h",
               "Ranged2h"
             ],
-            "description": "Requires a ranged weapon."
+            "description_tag": "tagDevotion_RequiresRange"
           }
         },
         {
@@ -7161,7 +7161,7 @@
               "Ranged1h",
               "Ranged2h"
             ],
-            "description": "Requires a ranged weapon."
+            "description_tag": "tagDevotion_RequiresRange"
           }
         },
         {
@@ -7185,7 +7185,7 @@
               "Ranged1h",
               "Ranged2h"
             ],
-            "description": "Requires a ranged weapon."
+            "description_tag": "tagDevotion_RequiresRange"
           }
         },
         {
@@ -7210,14 +7210,14 @@
               "Ranged1h",
               "Ranged2h"
             ],
-            "description": "Requires a ranged weapon."
+            "description_tag": "tagDevotion_RequiresRange"
           }
         }
       ]
     },
     {
       "id": "hyrian_guardian_of_the_celestial_gates",
-      "name": "Hyrian, Guardian of the Celestial Gates",
+      "name_tag": "tagGDX2Devotion_B202",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation107.dbr",
       "affinity_required": {
@@ -7320,13 +7320,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Hyrian's Glare",
+            "name_tag": "tagGDX2DevotionEffectB202",
             "dbr": "records/skills/devotion/tier2_38e_skill.dbr",
             "skill_class": "Skill_AttackWave",
-            "description": "The blinding glare of the celestial guardian falls upon your foes, sowing confusion among their ranks.",
+            "description_tag": "tagGDX2DevotionEffectB202Desc",
             "proc": {
               "chance": 30,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 20,
             "stats": {
@@ -7369,7 +7369,7 @@
     },
     {
       "id": "kraken",
-      "name": "Kraken",
+      "name_tag": "tagDevotion_B21",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation56.dbr",
       "affinity_required": {
@@ -7409,7 +7409,7 @@
               "Sword2h",
               "Ranged2h"
             ],
-            "description": "Requires a two-handed melee or two-handed ranged weapon."
+            "description_tag": "tagDevotion_Requires2h"
           }
         },
         {
@@ -7436,7 +7436,7 @@
               "Sword2h",
               "Ranged2h"
             ],
-            "description": "Requires a two-handed melee or two-handed ranged weapon."
+            "description_tag": "tagDevotion_Requires2h"
           }
         },
         {
@@ -7463,7 +7463,7 @@
               "Sword2h",
               "Ranged2h"
             ],
-            "description": "Requires a two-handed melee or two-handed ranged weapon."
+            "description_tag": "tagDevotion_Requires2h"
           }
         },
         {
@@ -7490,7 +7490,7 @@
               "Sword2h",
               "Ranged2h"
             ],
-            "description": "Requires a two-handed melee or two-handed ranged weapon."
+            "description_tag": "tagDevotion_Requires2h"
           }
         },
         {
@@ -7516,14 +7516,14 @@
               "Sword2h",
               "Ranged2h"
             ],
-            "description": "Requires a two-handed melee or two-handed ranged weapon."
+            "description_tag": "tagDevotion_Requires2h"
           }
         }
       ]
     },
     {
       "id": "magi",
-      "name": "Magi",
+      "name_tag": "tagDevotion_B07",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation42.dbr",
       "affinity_required": {
@@ -7658,13 +7658,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Fissure",
+            "name_tag": "tagDevotionEffectB07",
             "dbr": "records/skills/devotion/tier2_07g_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A fissure opens in the earth, spewing lava and brimstone upon nearby foes.",
+            "description_tag": "tagDevotionEffectB07Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -7686,7 +7686,7 @@
     },
     {
       "id": "manticore",
-      "name": "Manticore",
+      "name_tag": "tagDevotion_B18",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation53.dbr",
       "affinity_required": {
@@ -7822,13 +7822,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Acid Spray",
+            "name_tag": "tagDevotionEffectB18",
             "dbr": "records/skills/devotion/tier2_18f_skill.dbr",
             "skill_class": "Skill_AttackWave",
-            "description": "The manticore's sting pierces through your target, creating a spray of caustic acid behind them.",
+            "description_tag": "tagDevotionEffectB18Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -7847,7 +7847,7 @@
     },
     {
       "id": "messenger_of_war",
-      "name": "Messenger of War",
+      "name_tag": "tagDevotion_B20",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation55.dbr",
       "affinity_required": {
@@ -7962,13 +7962,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Messenger of War",
+            "name_tag": "tagDevotionEffectB20",
             "dbr": "records/skills/devotion/tier2_20f_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Carry on your message of conquest, rebuking any foe daring enough to try and stop you.",
+            "description_tag": "tagDevotionEffectB20Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Melee Hit"
+              "trigger_key": "HitByMelee"
             },
             "level": 20,
             "stats": {
@@ -7988,7 +7988,7 @@
     },
     {
       "id": "murmur_mistress_of_rumors",
-      "name": "Murmur, Mistress of Rumors",
+      "name_tag": "tagGDX1Devotion_B101",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation92.dbr",
       "affinity_required": {
@@ -8069,13 +8069,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Rumor",
+            "name_tag": "tagGDX1DevotionEffectB101",
             "dbr": "records/skills/devotion/tier2_32d_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "The chilling truths of Murmur's words spread amongst your foes, like a rumor that refuses to die, and shatter their minds.",
+            "description_tag": "tagGDX1DevotionEffectB101Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -8130,7 +8130,7 @@
     },
     {
       "id": "oklaine_s_lantern",
-      "name": "Oklaine's Lantern",
+      "name_tag": "tagDevotion_B26",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation61.dbr",
       "affinity_required": {
@@ -8166,7 +8166,7 @@
             "weapons": [
               "Offhand"
             ],
-            "description": "Requires a scepter, dagger or caster off-hand."
+            "description_tag": "tagDevotion_RequiresMagic"
           }
         },
         {
@@ -8190,7 +8190,7 @@
             "weapons": [
               "Offhand"
             ],
-            "description": "Requires a scepter, dagger or caster off-hand."
+            "description_tag": "tagDevotion_RequiresMagic"
           }
         },
         {
@@ -8214,7 +8214,7 @@
             "weapons": [
               "Offhand"
             ],
-            "description": "Requires a scepter, dagger or caster off-hand."
+            "description_tag": "tagDevotion_RequiresMagic"
           }
         },
         {
@@ -8238,7 +8238,7 @@
             "weapons": [
               "Offhand"
             ],
-            "description": "Requires a scepter, dagger or caster off-hand."
+            "description_tag": "tagDevotion_RequiresMagic"
           }
         },
         {
@@ -8263,14 +8263,14 @@
             "weapons": [
               "Offhand"
             ],
-            "description": "Requires a scepter, dagger or caster off-hand."
+            "description_tag": "tagDevotion_RequiresMagic"
           }
         }
       ]
     },
     {
       "id": "revenant",
-      "name": "Revenant",
+      "name_tag": "tagDevotion_B10",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation45.dbr",
       "affinity_required": {
@@ -8390,20 +8390,20 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Raise the Dead",
+            "name_tag": "tagDevotionEffectB10",
             "dbr": "records/skills/devotion/tier2_10f_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Raise the dead to serve you. The necrotic energies required for this ritual are very unstable however, and the undead minions will only exist for a limited time. The dead scale with player damage bonuses.",
+            "description_tag": "tagDevotionEffectB10Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
               "skillCooldownTime": 2
             },
             "pet": {
-              "name": "Skeleton",
+              "name_tag": "tagDevotionPet_Skeleton",
               "count": 6,
               "duration": 20,
               "attack_stats": {
@@ -8422,7 +8422,7 @@
     },
     {
       "id": "rhowan_s_crown",
-      "name": "Rhowan's Crown",
+      "name_tag": "tagDevotion_B01",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation36.dbr",
       "affinity_required": {
@@ -8490,13 +8490,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Elemental Storm",
+            "name_tag": "tagDevotionEffectB01",
             "dbr": "records/skills/devotion/tier2_01c_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "A crackling whirlwind of flame and ice manifests itself at your command.",
+            "description_tag": "tagDevotionEffectB01Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -8562,7 +8562,7 @@
     },
     {
       "id": "rhowan_s_scepter",
-      "name": "Rhowan's Scepter",
+      "name_tag": "tagDevotion_B24",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation59.dbr",
       "affinity_required": {
@@ -8599,7 +8599,7 @@
               "Mace",
               "Mace2h"
             ],
-            "description": "Requires a mace."
+            "description_tag": "tagDevotion_RequiresMace"
           }
         },
         {
@@ -8622,7 +8622,7 @@
               "Mace",
               "Mace2h"
             ],
-            "description": "Requires a mace."
+            "description_tag": "tagDevotion_RequiresMace"
           }
         },
         {
@@ -8645,7 +8645,7 @@
               "Mace",
               "Mace2h"
             ],
-            "description": "Requires a mace."
+            "description_tag": "tagDevotion_RequiresMace"
           }
         },
         {
@@ -8670,7 +8670,7 @@
               "Mace",
               "Mace2h"
             ],
-            "description": "Requires a mace."
+            "description_tag": "tagDevotion_RequiresMace"
           }
         },
         {
@@ -8693,7 +8693,7 @@
               "Mace",
               "Mace2h"
             ],
-            "description": "Requires a mace."
+            "description_tag": "tagDevotion_RequiresMace"
           }
         },
         {
@@ -8719,14 +8719,14 @@
               "Mace",
               "Mace2h"
             ],
-            "description": "Requires a mace."
+            "description_tag": "tagDevotion_RequiresMace"
           }
         }
       ]
     },
     {
       "id": "scales_of_ulcama",
-      "name": "Scales of Ulcama",
+      "name_tag": "tagDevotion_B02",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation37.dbr",
       "affinity_required": {
@@ -8839,13 +8839,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Tip the Scales",
+            "name_tag": "tagDevotionEffectB02",
             "dbr": "records/skills/devotion/tier2_02f_skill.dbr",
             "skill_class": "Skill_AttackSpell",
-            "description": "Tip the scales in your favor, sapping your attackers of vitality and transferring it to you.",
+            "description_tag": "tagDevotionEffectB02Desc",
             "proc": {
               "chance": 33,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 20,
             "stats": {
@@ -8866,7 +8866,7 @@
     },
     {
       "id": "shieldmaiden",
-      "name": "Shieldmaiden",
+      "name_tag": "tagDevotion_B27",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation62.dbr",
       "affinity_required": {
@@ -8902,7 +8902,7 @@
             "weapons": [
               "Shield"
             ],
-            "description": "Requires a shield."
+            "description_tag": "tagDevotion_RequiresShield"
           }
         },
         {
@@ -8924,7 +8924,7 @@
             "weapons": [
               "Shield"
             ],
-            "description": "Requires a shield."
+            "description_tag": "tagDevotion_RequiresShield"
           }
         },
         {
@@ -8946,7 +8946,7 @@
             "weapons": [
               "Shield"
             ],
-            "description": "Requires a shield."
+            "description_tag": "tagDevotion_RequiresShield"
           }
         },
         {
@@ -8970,7 +8970,7 @@
             "weapons": [
               "Shield"
             ],
-            "description": "Requires a shield."
+            "description_tag": "tagDevotion_RequiresShield"
           }
         },
         {
@@ -8992,7 +8992,7 @@
             "weapons": [
               "Shield"
             ],
-            "description": "Requires a shield."
+            "description_tag": "tagDevotion_RequiresShield"
           }
         },
         {
@@ -9014,14 +9014,14 @@
             "weapons": [
               "Shield"
             ],
-            "description": "Requires a shield."
+            "description_tag": "tagDevotion_RequiresShield"
           }
         }
       ]
     },
     {
       "id": "solael_s_witchblade",
-      "name": "Solael's Witchblade",
+      "name_tag": "tagDevotion_B11",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation46.dbr",
       "affinity_required": {
@@ -9120,13 +9120,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Eldritch Fire",
+            "name_tag": "tagDevotionEffectB11",
             "dbr": "records/skills/devotion/tier2_11e_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "Eldritch flames erupt from your blows and spread wildly among your foes.",
+            "description_tag": "tagDevotionEffectB11Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -9146,7 +9146,7 @@
     },
     {
       "id": "solemn_watcher",
-      "name": "Solemn Watcher",
+      "name_tag": "tagDevotion_B19",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation54.dbr",
       "affinity_required": {
@@ -9250,7 +9250,7 @@
     },
     {
       "id": "staff_of_rattosh",
-      "name": "Staff of Rattosh",
+      "name_tag": "tagGDX1Devotion_B102",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation93.dbr",
       "affinity_required": {
@@ -9396,7 +9396,7 @@
     },
     {
       "id": "targo_the_builder",
-      "name": "Targo the Builder",
+      "name_tag": "tagDevotion_B14",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation49.dbr",
       "affinity_required": {
@@ -9527,13 +9527,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Shield Wall",
+            "name_tag": "tagDevotionEffectB14",
             "dbr": "records/skills/devotion/tier2_14g_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "A metaphysical barrier forms around you.",
+            "description_tag": "tagDevotionEffectB14Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -9551,7 +9551,7 @@
     },
     {
       "id": "tempest",
-      "name": "Tempest",
+      "name_tag": "tagDevotion_B13",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation48.dbr",
       "affinity_required": {
@@ -9686,13 +9686,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Reckless Tempest",
+            "name_tag": "tagDevotionEffectB13",
             "dbr": "records/skills/devotion/tier2_13g_skill.dbr",
             "skill_class": "Skill_BuffAttackRadiusLightning",
-            "description": "Static energy swells within you, unleashed upon nearby foes in the form of destructive bolts of lightning.",
+            "description_tag": "tagDevotionEffectB13Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 20,
             "stats": {
@@ -9714,7 +9714,7 @@
     },
     {
       "id": "typhos_the_jailor_of_souls",
-      "name": "Typhos, the Jailor of Souls",
+      "name_tag": "tagGDX1Devotion_B104",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation95.dbr",
       "affinity_required": {
@@ -9863,7 +9863,7 @@
     },
     {
       "id": "ulo_the_keeper_of_the_waters",
-      "name": "Ulo the Keeper of the Waters",
+      "name_tag": "tagDevotion_B30",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation65.dbr",
       "affinity_required": {
@@ -9979,13 +9979,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Cleansing Waters",
+            "name_tag": "tagDevotionEffectB30",
             "dbr": "records/skills/devotion/tier2_30e_skill.dbr",
             "skill_class": "Skill_DispelMagic",
-            "description": "Ulo's cleansing waters purge all foul magic from the area, removing beneficial auras and spells from foes while allies are cleansed of negative ailments, including damage over time effects.",
+            "description_tag": "tagDevotionEffectB30Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -10003,7 +10003,7 @@
     },
     {
       "id": "ulzaad_herald_of_korvaak",
-      "name": "Ulzaad, Herald of Korvaak",
+      "name_tag": "tagGDX2Devotion_B201",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation106.dbr",
       "affinity_required": {
@@ -10084,13 +10084,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Ulzaad's Decree",
+            "name_tag": "tagGDX2DevotionEffectB201",
             "dbr": "records/skills/devotion/tier2_37d_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "The decree of Korvaak's Herald fills you with stone focus and determination.",
+            "description_tag": "tagGDX2DevotionEffectB201Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -10149,7 +10149,7 @@
     },
     {
       "id": "wendigo",
-      "name": "Wendigo",
+      "name_tag": "tagDevotion_B03",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation38.dbr",
       "affinity_required": {
@@ -10268,13 +10268,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Wendigo's Mark",
+            "name_tag": "tagDevotionEffectB03",
             "dbr": "records/skills/devotion/tier2_03f_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "You mark your foes with the sign of the wendigo, sapping them of what little there is left of their vitality and transferring it to you.",
+            "description_tag": "tagDevotionEffectB03Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -10290,7 +10290,7 @@
     },
     {
       "id": "widow",
-      "name": "Widow",
+      "name_tag": "tagDevotion_B09",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation44.dbr",
       "affinity_required": {
@@ -10405,13 +10405,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Arcane Bomb",
+            "name_tag": "tagDevotionEffectB09",
             "dbr": "records/skills/devotion/tier2_09f_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Mark the ground with an arcane sigil that erupts upon coming in contact with an enemy. Arcane Bombs take 1 second to arm.",
+            "description_tag": "tagDevotionEffectB09Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 20,
             "stats": {
@@ -10419,7 +10419,7 @@
               "skillCooldownTime": 1
             },
             "pet": {
-              "name": "Arcane Bomb",
+              "name_tag": "tagDevotionPet_ArcaneBomb",
               "count": 6,
               "duration": 24,
               "attack_stats": {}
@@ -10431,7 +10431,7 @@
     },
     {
       "id": "abomination",
-      "name": "Abomination",
+      "name_tag": "tagDevotion_C02",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation67.dbr",
       "affinity_required": {
@@ -10529,13 +10529,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Abominable Might",
+            "name_tag": "tagDevotionEffectC03",
             "dbr": "records/skills/devotion/tier3_02e_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "The chaotic powers of the Void flow through you, turning your weapons into conduits for your fiendish might.",
+            "description_tag": "tagDevotionEffectC03Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -10601,13 +10601,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Tainted Eruption",
+            "name_tag": "tagDevotionEffectC02",
             "dbr": "records/skills/devotion/tier3_02h_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "The corruption trapped within you is unleashed in a massive explosion of vile toxins.",
+            "description_tag": "tagDevotionEffectC02Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -10625,7 +10625,7 @@
     },
     {
       "id": "aeon_s_hourglass",
-      "name": "Aeon's Hourglass",
+      "name_tag": "tagDevotion_C01",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation66.dbr",
       "affinity_required": {
@@ -10746,13 +10746,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Time Dilation",
+            "name_tag": "tagDevotionEffectC01",
             "dbr": "records/skills/devotion/tier3_01f_skill.dbr",
             "skill_class": "Skill_RefreshCooldown",
-            "description": "The sands of the hourglass spin in an untamed whirlwind. The laws of time itself no longer apply to you.",
+            "description_tag": "tagDevotionEffectC01Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 10,
             "stats": {
@@ -10766,7 +10766,7 @@
     },
     {
       "id": "attak_seru_the_mirage",
-      "name": "Attak Seru, the Mirage",
+      "name_tag": "tagGDX1Devotion_C104",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation100.dbr",
       "affinity_required": {
@@ -10880,20 +10880,20 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Arcane Currents",
+            "name_tag": "tagGDX1DevotionEffectC104",
             "dbr": "records/skills/devotion/tier3_17f_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Carve an eldritch symbol into the ground that rapidly emits currents of arcane energy at nearby foes. Arcane Currents scale with player damage bonuses.",
+            "description_tag": "tagGDX1DevotionEffectC104Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
               "skillCooldownTime": 0.7
             },
             "pet": {
-              "name": "Arcane Current",
+              "name_tag": "tagGDX1DevotionPet_ArcaneCurrent",
               "count": 5,
               "duration": 4.5,
               "attack_stats": {
@@ -10909,7 +10909,7 @@
     },
     {
       "id": "azrakaa_the_eternal_sands",
-      "name": "Azrakaa, the Eternal Sands",
+      "name_tag": "tagGDX2Devotion_C202",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation109.dbr",
       "affinity_required": {
@@ -11007,13 +11007,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Shifting Sands",
+            "name_tag": "tagGDX2DevotionEffectC202",
             "dbr": "records/skills/devotion/tier3_20e_skill.dbr",
             "skill_class": "Skill_AttackProjectile",
-            "description": "The sands of Azrakaa ebb and flow across the battlefield, piercing through foes before returning to your position.",
+            "description_tag": "tagGDX2DevotionEffectC202Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -11056,7 +11056,7 @@
     },
     {
       "id": "blind_sage",
-      "name": "Blind Sage",
+      "name_tag": "tagDevotion_C11",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation76.dbr",
       "affinity_required": {
@@ -11193,13 +11193,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Elemental Seeker",
+            "name_tag": "tagDevotionEffectC12",
             "dbr": "records/skills/devotion/tier3_11g_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "Conjure an eldritch creature of pure energy that seeks out and burns nearby foes with its very presence before returning to the Aether in an explosion of energy. Elemental Seekers scale with player damage bonuses.",
+            "description_tag": "tagDevotionEffectC12Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -11207,7 +11207,7 @@
               "skillCooldownTime": 0.8
             },
             "pet": {
-              "name": "Elemental Seeker",
+              "name_tag": "tagDevotionPet_ElementalSeeker",
               "count": null,
               "duration": 3,
               "attack_stats": {}
@@ -11219,7 +11219,7 @@
     },
     {
       "id": "dying_god",
-      "name": "Dying God",
+      "name_tag": "tagDevotion_C08",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation73.dbr",
       "affinity_required": {
@@ -11360,13 +11360,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Hungering Void",
+            "name_tag": "tagDevotionEffectC09",
             "dbr": "records/skills/devotion/tier3_08g_skill.dbr",
             "skill_class": "Skill_BuffRadius",
-            "description": "The hungering void empowers you, your allies and your minions, but the power gained comes at a heavy toll to the body.",
+            "description_tag": "tagDevotionEffectC09Desc",
             "proc": {
               "chance": 33,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -11390,7 +11390,7 @@
     },
     {
       "id": "ishtak_the_spring_maiden",
-      "name": "Ishtak, the Spring Maiden",
+      "name_tag": "tagGDX1Devotion_C102",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation98.dbr",
       "affinity_required": {
@@ -11523,13 +11523,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Nature's Guardians",
+            "name_tag": "tagGDX1DevotionEffectC102",
             "dbr": "records/skills/devotion/tier3_15f_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "The soothing winds of spring envelop you in a protective barrier while your minions rise up to defend the natural order.",
+            "description_tag": "tagGDX1DevotionEffectC102Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 15,
             "stats": {
@@ -11544,7 +11544,7 @@
     },
     {
       "id": "korvaak_the_eldritch_sun",
-      "name": "Korvaak, the Eldritch Sun",
+      "name_tag": "tagGDX2Devotion_C201",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation108.dbr",
       "affinity_required": {
@@ -11654,13 +11654,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Eye of Korvaak",
+            "name_tag": "tagGDX2DevotionEffectC201",
             "dbr": "records/skills/devotion/tier3_19e_skill.dbr",
             "skill_class": "Skill_AttackProjectileRing",
-            "description": "The eldritch gaze of Korvaak falls upon you in an expanding ring, piercing through any foes unfortunate enough to be in the way.",
+            "description_tag": "tagGDX2DevotionEffectC201Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 15,
             "stats": {
@@ -11706,7 +11706,7 @@
     },
     {
       "id": "leviathan",
-      "name": "Leviathan",
+      "name_tag": "tagDevotion_C12",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation77.dbr",
       "affinity_required": {
@@ -11838,13 +11838,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Whirlpool",
+            "name_tag": "tagDevotionEffectC13",
             "dbr": "records/skills/devotion/tier3_12g_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "The stirring depths are unleashed as a hungering whirlpool appears to devastate your foes.",
+            "description_tag": "tagDevotionEffectC13Desc",
             "proc": {
               "chance": 30,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -11865,7 +11865,7 @@
     },
     {
       "id": "light_of_empyrion",
-      "name": "Light of Empyrion",
+      "name_tag": "tagDevotion_C03",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation68.dbr",
       "affinity_required": {
@@ -12001,13 +12001,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Light of Empyrion",
+            "name_tag": "tagDevotionEffectC04",
             "dbr": "records/skills/devotion/tier3_03g_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "The divine light of Empyrion banishes the darkness and sears your foes.",
+            "description_tag": "tagDevotionEffectC04Desc",
             "proc": {
               "chance": 30,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 15,
             "stats": {
@@ -12032,7 +12032,7 @@
     },
     {
       "id": "mogdrogen_the_wolf",
-      "name": "Mogdrogen the Wolf",
+      "name_tag": "tagDevotion_C10",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation75.dbr",
       "affinity_required": {
@@ -12169,13 +12169,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Howl of Mogdrogen",
+            "name_tag": "tagDevotionEffectC11",
             "dbr": "records/skills/devotion/tier3_10f_skill.dbr",
             "skill_class": "Skill_BuffSelfDuration",
-            "description": "Driven by the thrill of a fresh kill, you and your minions enter a fervent rage.",
+            "description_tag": "tagDevotionEffectC11Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -12198,7 +12198,7 @@
     },
     {
       "id": "obelisk_of_menhir",
-      "name": "Obelisk of Menhir",
+      "name_tag": "tagDevotion_C05",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation70.dbr",
       "affinity_required": {
@@ -12327,13 +12327,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Stone Form",
+            "name_tag": "tagDevotionEffectC06",
             "dbr": "records/skills/devotion/tier3_05g_skill.dbr",
             "skill_class": "Skill_BuffRadius",
-            "description": "Your flesh becomes as stone, nearly impervious to all but the toughest blows.",
+            "description_tag": "tagDevotionEffectC06Desc",
             "proc": {
               "chance": 33,
-              "trigger": "Block"
+              "trigger_key": "Block"
             },
             "level": 15,
             "stats": {
@@ -12353,7 +12353,7 @@
     },
     {
       "id": "oleron",
-      "name": "Oleron",
+      "name_tag": "tagDevotion_C04",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation69.dbr",
       "affinity_required": {
@@ -12489,13 +12489,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Blind Fury",
+            "name_tag": "tagDevotionEffectC05",
             "dbr": "records/skills/devotion/tier3_04g_skill.dbr",
             "skill_class": "Skill_AttackRadius",
-            "description": "Exhilarated by the blood and gore you spill, you violently assault all nearby foes in a flurry of vicious blows.",
+            "description_tag": "tagDevotionEffectC05Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 15,
             "stats": {
@@ -12518,7 +12518,7 @@
     },
     {
       "id": "rattosh_the_veilwarden",
-      "name": "Rattosh, the Veilwarden",
+      "name_tag": "tagGDX1Devotion_C105",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation101.dbr",
       "affinity_required": {
@@ -12636,13 +12636,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Will of Rattosh",
+            "name_tag": "tagGDX1DevotionEffectC105",
             "dbr": "records/skills/devotion/tier3_18f_skill.dbr",
             "skill_class": "Skill_AttackBuff",
-            "description": "Mark the souls of your foes with the symbol of Rattosh. Their lives and fates sealed, left at the mercy of Rattosh's servant, Typhos.",
+            "description_tag": "tagGDX1DevotionEffectC105Desc",
             "proc": {
               "chance": 15,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -12660,7 +12660,7 @@
     },
     {
       "id": "spear_of_the_heavens",
-      "name": "Spear of the Heavens",
+      "name_tag": "tagDevotion_C06",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation71.dbr",
       "affinity_required": {
@@ -12773,13 +12773,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Spear of the Heavens",
+            "name_tag": "tagDevotionEffectC07",
             "dbr": "records/skills/devotion/tier3_06f_skill.dbr",
             "skill_class": "Skill_AttackProjectileDrop",
-            "description": "A celestial spear smites foes who dare strike you.",
+            "description_tag": "tagDevotionEffectC07Desc",
             "proc": {
               "chance": 50,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 15,
             "stats": {
@@ -12802,7 +12802,7 @@
     },
     {
       "id": "tree_of_life",
-      "name": "Tree of Life",
+      "name_tag": "tagDevotion_C09",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation74.dbr",
       "affinity_required": {
@@ -12931,13 +12931,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Healing Rain",
+            "name_tag": "tagDevotionEffectC10",
             "dbr": "records/skills/devotion/tier3_09f_skill.dbr",
             "skill_class": "Skill_BuffRadius",
-            "description": "A soothing mist emanates from you, mending wounds and curing ailments.",
+            "description_tag": "tagDevotionEffectC10Desc",
             "proc": {
               "chance": 25,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 15,
             "stats": {
@@ -12959,7 +12959,7 @@
     },
     {
       "id": "ultos_shepherd_of_storms",
-      "name": "Ultos, Shepherd of Storms",
+      "name_tag": "tagGDX1Devotion_C101",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation97.dbr",
       "affinity_required": {
@@ -13075,13 +13075,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Hand of Ultos",
+            "name_tag": "tagGDX1DevotionEffectC101",
             "dbr": "records/skills/devotion/tier3_14f_skill.dbr",
             "skill_class": "Skill_AttackChain",
-            "description": "The Storm Shepherd's fury emits from your fingertips, cascading through entire armies with devastating electrical force.",
+            "description_tag": "tagGDX1DevotionEffectC101Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 15,
             "stats": {
@@ -13103,7 +13103,7 @@
     },
     {
       "id": "ulzuin_s_torch",
-      "name": "Ulzuin's Torch",
+      "name_tag": "tagDevotion_C07",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation72.dbr",
       "affinity_required": {
@@ -13236,13 +13236,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Meteor Shower",
+            "name_tag": "tagDevotionEffectC08",
             "dbr": "records/skills/devotion/tier3_07g_skill.dbr",
             "skill_class": "Skill_BuffAttackRadiusDrop",
-            "description": "At your behest, the sky splits open to unleash several barrages of molten rock. Only one Meteor Shower can be cast at any one time.",
+            "description_tag": "tagDevotionEffectC08Desc",
             "proc": {
               "chance": 30,
-              "trigger": "Attack"
+              "trigger_key": "AttackEnemy"
             },
             "level": 15,
             "stats": {
@@ -13266,7 +13266,7 @@
     },
     {
       "id": "unknown_soldier",
-      "name": "Unknown Soldier",
+      "name_tag": "tagDevotion_C13",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation78.dbr",
       "affinity_required": {
@@ -13398,20 +13398,20 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Living Shadow",
+            "name_tag": "tagDevotionEffectC14",
             "dbr": "records/skills/devotion/tier3_13g_skill.dbr",
             "skill_class": "Skill_SpawnPet",
-            "description": "A manifestation of a nameless hero rises to fight alongside you and restore your vitality with every blow. Living Shadows scale with player damage bonuses.",
+            "description_tag": "tagDevotionEffectC14Desc",
             "proc": {
               "chance": 100,
-              "trigger": "Critical Hit"
+              "trigger_key": "AttackEnemyCrit"
             },
             "level": 15,
             "stats": {
               "skillCooldownTime": 6
             },
             "pet": {
-              "name": "Living Shadow",
+              "name_tag": "tagDevotionPet_LivingShadow",
               "count": 3,
               "duration": 24,
               "attack_stats": {
@@ -13431,7 +13431,7 @@
     },
     {
       "id": "vire_the_stone_matron",
-      "name": "Vire, the Stone Matron",
+      "name_tag": "tagGDX1Devotion_C103",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation99.dbr",
       "affinity_required": {
@@ -13548,13 +13548,13 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Fist of Vire",
+            "name_tag": "tagGDX1DevotionEffectC103",
             "dbr": "records/skills/devotion/tier3_16f_skill.dbr",
             "skill_class": "Skill_AttackProjectileAreaEffect",
-            "description": "The crushing fist of Vire rises up from the earth to subdue your foes with the strength of the earth.",
+            "description_tag": "tagGDX1DevotionEffectC103Desc",
             "proc": {
               "chance": 20,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 15,
             "stats": {
@@ -13578,7 +13578,7 @@
     },
     {
       "id": "yugol_the_insatiable_night",
-      "name": "Yugol, the Insatiable Night",
+      "name_tag": "tagGDX2Devotion_C203",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation110.dbr",
       "affinity_required": {
@@ -13694,20 +13694,20 @@
           },
           "bonuses": {},
           "celestial_power": {
-            "name": "Black Blood of Yugol",
+            "name_tag": "tagGDX2DevotionEffectC203",
             "dbr": "records/skills/devotion/tier3_21f_skill.dbr",
             "skill_class": "Skill_TargetedSpawnPet",
-            "description": "The black blood of Yugol spills from your wounds, festering upon the battlefield and seeking out foes to consume within its eternal darkness.",
+            "description_tag": "tagGDX2DevotionEffectC203Desc",
             "proc": {
               "chance": 30,
-              "trigger": "Hit"
+              "trigger_key": "HitByEnemy"
             },
             "level": 15,
             "stats": {
               "skillCooldownTime": 0.8
             },
             "pet": {
-              "name": "Black Blood of Yugol",
+              "name_tag": "tagGDX2Pet_Devotion_BlackBlood",
               "count": 6,
               "duration": 8,
               "attack_stats": {}

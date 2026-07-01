@@ -3,6 +3,10 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
+import { gameText } from "../src/core/localization";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 
@@ -21,9 +25,12 @@ test("star global ids and predecessor links resolve to ids", () => {
 });
 
 test("celestial power carries proc, granted level and level-selected stats", () => {
-  const scorpion = [...model.stars.values()].find((s) => s.celestialPower?.name === "Scorpion Sting");
+  const scorpion = [...model.stars.values()].find(
+    (s) => s.celestialPower?.nameTag && gameText(s.celestialPower.nameTag) === "Scorpion Sting",
+  );
   const power = scorpion!.celestialPower!;
-  expect(power.proc).toEqual({ chance: 25, trigger: "Attack" });
+  expect(power.proc?.chance).toBe(25);
+  expect(power.proc?.triggerKey).toBe("AttackEnemy");
   expect(power.level).toBe(25);
   expect(power.stats.weaponDamagePct).toBe(40);
   expect(power.stats.offensiveSlowPoisonMin).toBe(225);
@@ -38,9 +45,8 @@ test("constellation carries affinity req/bonus and member ids", () => {
 });
 
 test("carries a star's weapon-requirement description through the model", () => {
-  expect(model.stars.get("kraken:0")?.weaponRequirement?.description).toBe(
-    "Requires a two-handed melee or two-handed ranged weapon.",
-  );
+  const tag = model.stars.get("kraken:0")?.weaponRequirement?.descriptionTag;
+  expect(gameText(tag!)).toBe("Requires a two-handed melee or two-handed ranged weapon.");
   // an ungated star has no requirement at all
   expect(model.stars.get("anvil:0")?.weaponRequirement).toBeNull();
 });

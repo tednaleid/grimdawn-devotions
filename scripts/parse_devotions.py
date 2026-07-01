@@ -55,22 +55,6 @@ POINT_CAP = 55  # devotion points available at max (sanity ceiling)
 # powers and extrapolated past shorter arrays, inflating ~49 of 63 powers.)
 CELESTIAL_POWER_LEVEL = 25
 
-# GD's internal proc trigger enum -> the word grimtools shows after "<n>% Chance on ".
-TRIGGER_DISPLAY = {
-    "AttackEnemy": "Attack",
-    "AttackEnemyCrit": "Critical Hit",
-    "Block": "Block",
-    "HitByEnemy": "Hit",
-    "HitByMelee": "Melee Hit",
-    "HitByProjectile": "Projectile Hit",
-    "HitByCrit": "Critical Hit",
-    "OnKill": "Kill",
-    "LowHealth": "Low Health",
-    "LowMana": "Low Energy",
-    "CastBuff": "Cast",
-    "OnEquip": "Equip",
-}
-
 # Ability fields that are not "stat" ids but are shown on the power tooltip; the
 # web layer (statFormat) maps these raw ids to GD-style lines. A power carries at
 # most one of the two radius ids.
@@ -137,6 +121,19 @@ def clean_text(s: str) -> str:
     s = re.sub(r"\{\^[a-zA-Z]\}", "", s)
     s = re.sub(r"\^[a-zA-Z]", "", s)
     return s.strip()
+
+
+def register(key: str, text: str | None, table: dict[str, str]) -> str:
+    """Record `text` (cleaned) under `key` in `table` when `text` is truthy.
+
+    `key` is the game tag when one resolved, else a synthesized stable key (see
+    callers). Always returns `key`, so callers can inline this while building a
+    field's `*_tag`/`*_key` sibling. `table` is the accumulated game_en table
+    written to data/i18n/game.en.json.
+    """
+    if text:
+        table[key] = clean_text(text)
+    return key
 
 
 # ---------------------------------------------------------------------------
@@ -293,7 +290,7 @@ def extract_proc(db: DB, chain: list[dict[str, str]]):
         trig = ctrl.get("triggerType", "").strip()
         if chance is None or not trig:
             continue
-        return {"chance": chance, "trigger": TRIGGER_DISPLAY.get(trig, trig)}
+        return {"chance": chance, "trigger_key": trig}
     return None
 
 
@@ -316,7 +313,8 @@ def extract_power_stats(chain: list[dict[str, str]], level: int) -> dict[str, fl
     return stats
 
 
-def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int):
+def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int,
+                 skill_ref: str, game_en: dict[str, str]):
     """Summon info for a spawn-pet power, or None.
 
     A Skill_*SpawnPet power summons a temporary creature. We surface the fixed
@@ -333,7 +331,10 @@ def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int)
     if not objs:
         return None
     creature = db.get(objs[min(level, len(objs)) - 1])
-    pet_name = clean_text(tags.get(creature.get("description", "").strip(), "")) or None
+    name_tag_raw = creature.get("description", "").strip()
+    name_tag = name_tag_raw if name_tag_raw in tags else None
+    pet_name = clean_text(tags[name_tag]) if name_tag else None
+    name_key = register(name_tag or f"x:pet:{skill_ref}", pet_name, game_en)
     count = level_array_value(skill.get("petLimit", ""), level)
     duration = level_array_value(skill.get("spawnObjectsTimeToLive", ""), level)
     # Base attack: the creature's basic attack, falling back to its special attack
@@ -345,20 +346,24 @@ def extract_pet(db: DB, tags: dict[str, str], skill: dict[str, str], level: int)
         attack_stats = {k: v for k, v in extract_power_stats(atk_chain, level).items()
                         if k not in POWER_META_FIELDS}
     return {
-        "name": pet_name,
+        "name_tag": name_key,
         "count": int(count) if count else None,
         "duration": duration,
         "attack_stats": attack_stats,
     }
 
 
-def extract_weapon_requirement(skill: dict[str, str], tags: dict[str, str]):
+def extract_weapon_requirement(skill: dict[str, str], tags: dict[str, str],
+                                skill_ref: str, game_en: dict[str, str]):
     weapons = [w for w in WEAPON_FLAGS if skill.get(w, "0").strip() not in ("0", "")]
     if not weapons:
         return None
     desc_tag = skill.get("skillBaseDescription", "")
-    desc = clean_text(tags.get(desc_tag, "")) if desc_tag.startswith("tagDevotion_Requires") else ""
-    return {"weapons": weapons, "description": desc or None}
+    is_requires_tag = desc_tag.startswith("tagDevotion_Requires")
+    resolved_desc_tag = desc_tag if is_requires_tag and desc_tag in tags else None
+    desc = clean_text(tags[resolved_desc_tag]) if resolved_desc_tag else None
+    desc_key = register(resolved_desc_tag or f"x:weap:{skill_ref}", desc, game_en)
+    return {"weapons": weapons, "description_tag": desc_key}
 
 
 def read_position(rec: dict[str, str]):
@@ -392,7 +397,8 @@ def slugify(name: str) -> str:
     return s or "constellation"
 
 
-def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str]):
+def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str],
+                game_en: dict[str, str]):
     """Resolve a devotionButton -> UI button -> skill record -> star dict."""
     button = db.get(button_ref)
     skill_ref = button.get("skillName", "").strip()
@@ -409,7 +415,7 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
         "position": read_position(button),  # star's (x,y) on the shared map canvas
         "bonuses": {},
         "celestial_power": None,
-        "weapon_requirement": extract_weapon_requirement(skill, tags),
+        "weapon_requirement": extract_weapon_requirement(skill, tags, skill_ref, game_en),
     }
 
     if is_passive:
@@ -434,17 +440,19 @@ def parse_star(db: DB, tags: dict[str, str], button_ref: str, warnings: list[str
         # ability (proc trigger + per-level stats) is read across the skill chain
         # at the fixed granted level; see CELESTIAL_POWER_LEVEL.
         chain = power_skill_chain(db, skill)
-        name, desc = resolve_power_name(tags, chain)
+        name, desc, name_tag_raw, desc_tag_raw = resolve_power_name(tags, chain)
         level = granted_level(chain)
+        name_key = register(name_tag_raw or f"x:pow:{skill_ref}:name", name, game_en)
+        desc_key = register(desc_tag_raw or f"x:pow:{skill_ref}:desc", desc, game_en)
         star["celestial_power"] = {
-            "name": name,
+            "name_tag": name_key,
             "dbr": skill_ref,
             "skill_class": cls,
-            "description": desc,
+            "description_tag": desc_key,
             "proc": extract_proc(db, chain),
             "level": level,
             "stats": extract_power_stats(chain, level),
-            "pet": extract_pet(db, tags, skill, level),
+            "pet": extract_pet(db, tags, skill, level, skill_ref, game_en),
         }
     return star, skill_ref
 
@@ -455,26 +463,34 @@ def resolve_power_name(tags: dict[str, str], chain: list[dict[str, str]]):
     Direct attack skills carry skillDisplayName themselves; buff/aura skills
     (Skill_BuffRadius, etc.) put it on the child skill referenced by
     buffSkillName / petSkillName. Fall back to FileDescription's "X - Power".
+
+    Returns (name, desc, name_tag, desc_tag); the two tags are the game tags
+    that resolved (or None, e.g. when name falls back to FileDescription).
     """
     name = ""
     desc = ""
+    name_tag = ""
+    desc_tag = ""
     for rec in chain:
         tag = rec.get("skillDisplayName", "").strip()
         if tag and tag in tags and not name:
             name = clean_text(tags[tag])
+            name_tag = tag
         dtag = rec.get("skillBaseDescription", "").strip()
         if dtag and dtag in tags and not desc:
             desc = clean_text(tags[dtag])
+            desc_tag = dtag
         if name:
             break
 
     if not name:
         fd = chain[0].get("FileDescription", "").strip()
         name = fd.split(" - ", 1)[1].strip() if " - " in fd else fd
-    return name or None, desc or None
+    return name or None, desc or None, name_tag or None, desc_tag or None
 
 
-def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: list[str]):
+def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: list[str],
+                         game_en: dict[str, str]):
     rec = read_dbr(con_path)
     tpl = rec.get("templateName", "")
     if not tpl.endswith("devotionconstellation.tpl"):
@@ -524,7 +540,7 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
 
     stars = []
     for ref in button_refs:
-        star, _ = parse_star(db, tags, ref, warnings)
+        star, _ = parse_star(db, tags, ref, warnings, game_en)
         if star is None:
             star = {"dbr": ref, "predecessors": [], "position": None, "bonuses": {},
                     "celestial_power": None, "weapon_requirement": None}
@@ -552,9 +568,12 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
         star_obj.update(star)
         stars[idx] = star_obj
 
+    con_id = slugify(name)
+    resolved_name_tag = register(name_tag or f"x:con:{con_id}:name", name, game_en)
+
     return {
-        "id": slugify(name),
-        "name": name,
+        "id": con_id,
+        "name_tag": resolved_name_tag,
         "tier": tier,
         "dbr": str(con_path.relative_to(db.root)).replace("\\", "/"),
         "affinity_required": affinity_required,
@@ -586,7 +605,7 @@ def ensure_unique_ids(constellations: list[dict]):
         used.add(c["id"])
 
 
-def validate(constellations: list[dict], tags: dict[str, str], warnings: list[str]) -> list[str]:
+def validate(constellations: list[dict], game_en: dict[str, str], warnings: list[str]) -> list[str]:
     report: list[str] = []
     report.append(f"Constellations parsed: {len(constellations)}")
     if len(constellations) < 40:
@@ -609,7 +628,11 @@ def validate(constellations: list[dict], tags: dict[str, str], warnings: list[st
     else:
         report.append("Affinity keys: all within the five known affinities. OK")
 
-    leak = 0
+    # Every *_tag/key referenced anywhere in the output must resolve to non-empty
+    # English text in game_en - this is the tag-completeness check that replaced
+    # the old "unresolved tag... leaking" scan (that scan is now moot: there is no
+    # baked English left to leak from, only tags).
+    referenced_tags: list[tuple[str, str]] = []
     bad_pred = 0
     powers = 0
     powers_with_proc = 0
@@ -619,8 +642,7 @@ def validate(constellations: list[dict], tags: dict[str, str], warnings: list[st
     stars_no_pos = 0
     cons_no_bg = 0
     for c in constellations:
-        if c["name"].startswith("tag"):
-            leak += 1
+        referenced_tags.append((f"constellation {c['id']}", c["name_tag"]))
         if not c.get("background"):
             cons_no_bg += 1
         n = len(c["stars"])
@@ -634,16 +656,21 @@ def validate(constellations: list[dict], tags: dict[str, str], warnings: list[st
             if s["celestial_power"]:
                 powers += 1
                 cp = s["celestial_power"]
-                if (cp["name"] or "").startswith("tag"):
-                    leak += 1
+                referenced_tags.append((f"power {cp['dbr']} name", cp["name_tag"]))
+                referenced_tags.append((f"power {cp['dbr']} description", cp["description_tag"]))
                 if cp.get("proc"):
                     powers_with_proc += 1
                 if cp.get("stats"):
                     powers_with_stats += 1
                 else:
-                    warnings.append(f"power '{cp['name']}' ({cp['dbr']}) parsed no stats")
+                    warnings.append(f"power {cp['name_tag']} ({cp['dbr']}) parsed no stats")
+                pet = cp.get("pet")
+                if pet:
+                    referenced_tags.append((f"pet {cp['dbr']}", pet["name_tag"]))
             if s["weapon_requirement"]:
                 weapon_reqs += 1
+                referenced_tags.append((f"weapon requirement {s['dbr']}",
+                                        s["weapon_requirement"]["description_tag"]))
     report.append(f"Celestial powers found: {powers}")
     report.append(f"Celestial powers with a proc trigger: {powers_with_proc}/{powers}")
     report.append(f"Celestial powers with parsed stats: {powers_with_stats}/{powers}"
@@ -655,8 +682,10 @@ def validate(constellations: list[dict], tags: dict[str, str], warnings: list[st
                   + ("  WARNING" if cons_no_bg else "  OK"))
     report.append(f"Predecessor indices out of range: {bad_pred}"
                   + ("  ERROR" if bad_pred else "  OK"))
-    report.append(f"Unresolved tag... names leaking: {leak}"
-                  + ("  ERROR" if leak else "  OK"))
+
+    miss = sum(1 for _, tag in referenced_tags if not game_en.get(tag))
+    report.append(f"Referenced tags missing from game table: {miss}"
+                  + ("  ERROR" if miss else "  OK"))
 
     by_tier: dict = {}
     for c in constellations:
@@ -735,14 +764,15 @@ def main(argv=None) -> int:
 
     warnings: list[str] = []
     constellations: list[dict] = []
+    game_en: dict[str, str] = {}
     for con_path in sorted(con_dir.glob("constellation*.dbr")):
         if "_background" in con_path.name:
             continue
-        c = parse_constellation(db, tags, con_path, warnings)
+        c = parse_constellation(db, tags, con_path, warnings, game_en)
         if c:
             constellations.append(c)
 
-    constellations.sort(key=lambda c: (c["tier"] is None, c["tier"], c["name"]))
+    constellations.sort(key=lambda c: (c["tier"] is None, c["tier"], game_en.get(c["name_tag"], c["id"])))
     ensure_unique_ids(constellations)
 
     meta = {
@@ -768,7 +798,7 @@ def main(argv=None) -> int:
         print(f"Wrote {cp}  ({rows} rows)")
 
     print("\n=== VALIDATION REPORT ===")
-    report = validate(constellations, tags, warnings)
+    report = validate(constellations, game_en, warnings)
     for line in report:
         print("  " + line)
     if warnings:

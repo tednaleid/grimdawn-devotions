@@ -239,6 +239,45 @@ compose, and how much of the CSS-class language moves to computed values.
   `BUDGET` (55) in `completionMinCost` and render the cap-raise hint when
   `cap < N <= 55`.
 
+## Internationalization: remaining follow-ups
+
+Phases 1a, 1b, 2, and 3 are all done: the localization seam, app-owned
+chrome/statFormat strings, game-data tags resolved via `gameText`, the
+curated stat-tag mapping, and 12 shipped locales (`en de fr ru zh pl it cs ja
+ko pt vi`). See [docs/i18n.md](docs/i18n.md) and
+`docs/superpowers/specs/2026-06-30-i18n-localization-design.md` for the full
+design. Remaining work:
+
+- **Add Spanish once `Text_ES.arc` is repaired.** ArchiveTool fails to open
+  `Text_ES.arc` ("Failed to open") on the machine used for extraction, while
+  all 11 other bundled non-English languages (CS, DE, FR, IT, JA, KO, PL, PT,
+  RU, VI, ZH) extract fine. Fix: run Steam's "verify integrity of game files"
+  on Grim Dawn to repair the archive, then run `just i18n-tables` (add `es`
+  to its language loop), author `web/src/i18n/app.es.json`, and add `es` to
+  `SUPPORTED_LOCALES` in `web/src/adapters/localizationAdapter.ts`.
+- **Visible language picker.** The app auto-detects the locale from
+  `navigator.languages` with no in-app control to override it. Adding one is
+  optional and non-breaking because locale is a viewer preference, never in
+  the URL hash. Pointer: a new UI control that calls `loadLocalization` again
+  with a forced `preferred` locale and re-renders the current selection (all
+  real state is already in the hash and language independent).
+- **Community correction of authored translations.** The 11 non-English
+  `app.<locale>.json` catalogs (`web/src/i18n/app.*.json`) are LLM-authored
+  best-effort translations, not reviewed by native speakers. Corrections are
+  welcome via per-language PRs. The authors flagged the `aff.*` affinity
+  names and some race/composed terms as the most uncertain and worth
+  prioritizing for review.
+- **ICU-style plural handling.** Simple named-placeholder interpolation
+  (`web/src/core/localization.ts`) is used today. Add narrowly only if a
+  target language's grammar needs real plural rules, not preemptively.
+- **Code-hardening follow-ups** (minor safety improvements, not blockers):
+  - Prototype pollution in interpolation (`web/src/core/localization.ts`): `interpolate` checks `name in params`, which matches inherited prototype properties (e.g. a placeholder literally named `constructor`). Author-controlled today so not a real exposure, but harden with `Object.hasOwn(params, name)` if convenient.
+  - Silent fetch failures in catalog loading (`web/src/adapters/localizationAdapter.ts`): `getJson` swallows fetch/parse errors and returns `{}` with no log, unlike the sibling `web/src/adapters/httpDataSource.ts` which `console.warn`s on failed data fetches. Consider a matching `console.warn` to aid diagnosing missing or mistyped catalogs. Silent degrade-to-English is the intended UX.
+  - Guard test coverage (`web/test/appCatalog.test.ts`): the REQUIRED list explicitly guards chrome and `stat.group.*` keys but only spot-checks the ~130 other `stat.*` keys; `statFormat.test.ts` effectively covers them today. Consider deriving referenced keys programmatically so the guard enforces its own contract ("every key referenced by the app exists in the catalog").
+  - Dead boot keys in catalog (`web/src/i18n/app.en.json`): `ui.boot.failed` / `ui.boot.reload` / `ui.boot.loading` exist in the catalog and appCatalog REQUIRED but nothing consumes them; the boot markup in `web/index.html` renders before catalogs load (the intentional pre-bundle exception). Either wire them if the boot shell becomes JS-rendered later, or note them as reserved for that exception.
+- i18n pet-name pluralization is English-only. `web/src/core/statFormat.ts` `formatPet` appends a Latin "s" to a pluralized pet name (`` `${name}${plural ? "s" : ""}` ``) where `name` is a `gameText`-resolved (localized) pet name. In non-English locales this appends "s" to a localized noun, which is grammatically wrong. English is unaffected. Fix later via a catalog-driven plural form or a count-aware template.
+- i18n partial-gate weapon-requirement prefix strip is English-only. `web/src/adapters/tooltipView.ts` strips `/^Requires\s+/i` from the localized weapon-requirement description before wrapping it in `ui.tooltip.partialGate`. In non-English the prefix will not match, so the full localized string passes through (readable, just not de-prefixed). Currently latent: no constellation in the present data hits this partial-gate branch (all gating is fully-gated). Fix later by sourcing the bare requirement subject rather than string-stripping.
+
 ## Parallelize first-load data fetches
 
 `httpDataSource.load()` (`web/src/adapters/httpDataSource.ts`) fetches

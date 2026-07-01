@@ -4,6 +4,9 @@ import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { benefitRows } from "../src/core/benefitRows";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 // A subject's flat and percent come from different stars, so build the multi-part shapes from the

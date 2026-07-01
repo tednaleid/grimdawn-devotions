@@ -6,6 +6,9 @@ import type { CondensedGroup } from "../src/core/statFormat";
 import type { DevotionModel } from "../src/core/types";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const emptyModel = { stars: new Map(), constellations: new Map() } as unknown as DevotionModel;
 const catalog: CondensedGroup[] = [
@@ -114,7 +117,10 @@ test("a tagged pet subject stays listed even when it is no longer obtainable", (
 
 test("powersListHtml renders each power with its star-id hook and name", () => {
   const powers = [
-    { starId: "bat:4", power: { name: "Twin Fangs", description: "x", proc: null, level: 1, stats: {}, pet: null } },
+    {
+      starId: "bat:4",
+      power: { nameTag: "Twin Fangs", descriptionTag: "x", proc: null, level: 1, stats: {}, pet: null },
+    },
   ];
   const html = powersListHtml(powers as any);
   expect(html).toContain('data-star-id="bat:4"');
@@ -125,7 +131,7 @@ test("powersListHtml renders each power with its star-id hook and name", () => {
 test("powersListHtml sorts rows by power name, not input/constellation order", () => {
   const mk = (starId: string, name: string) => ({
     starId,
-    power: { name, description: null, proc: null, level: 1, stats: {}, pet: null },
+    power: { nameTag: name, descriptionTag: null, proc: null, level: 1, stats: {}, pet: null },
   });
   // Input ordered by constellation/star id; output must read alphabetically by power name.
   const html = powersListHtml([mk("aaa:1", "Wendigo's Mark"), mk("bbb:1", "Arcane Bomb")] as any);
