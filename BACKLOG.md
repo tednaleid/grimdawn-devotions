@@ -277,6 +277,13 @@ design and phasing. Remaining work:
   `app.<lang>.json` chrome/statFormat catalogs for each; each language appears
   as its bundles land, with English filling any gap.
 
+- **Code-hardening follow-ups** (Phase 3 blockers and minor safety improvements):
+  - Empty-string fallback in resolver (`web/src/core/localization.ts`): `translate` uses `active[key] ?? fallback[key] ?? key`, which returns an empty string if a catalog value is literally `""`, contradicting the "never returns blank" behavior. Harmless today (the English catalog has no empty values), but once non-English `app.<locale>.json` catalogs land in Phase 3, a translator authoring `""` would render blank instead of falling back to English. Fix: switch to an `||` chain or an explicit `Object.hasOwn` check that treats empty string as absent.
+  - Prototype pollution in interpolation (`web/src/core/localization.ts`): `interpolate` checks `name in params`, which matches inherited prototype properties (e.g. a placeholder literally named `constructor`). Author-controlled today so not a real exposure, but harden with `Object.hasOwn(params, name)` if convenient.
+  - Silent fetch failures in catalog loading (`web/src/adapters/localizationAdapter.ts`): `getJson` swallows fetch/parse errors and returns `{}` with no log, unlike the sibling `web/src/adapters/httpDataSource.ts` which `console.warn`s on failed data fetches. Consider a matching `console.warn` to aid diagnosing missing or mistyped catalogs. Silent degrade-to-English is the intended UX.
+  - Guard test coverage (`web/test/appCatalog.test.ts`): the REQUIRED list explicitly guards chrome and `stat.group.*` keys but only spot-checks the ~130 other `stat.*` keys; `statFormat.test.ts` effectively covers them today. Consider deriving referenced keys programmatically so the guard enforces its own contract ("every key referenced by the app exists in the catalog").
+  - Dead boot keys in catalog (`web/src/i18n/app.en.json`): `ui.boot.failed` / `ui.boot.reload` / `ui.boot.loading` exist in the catalog and appCatalog REQUIRED but nothing consumes them; the boot markup in `web/index.html` renders before catalogs load (the intentional pre-bundle exception). Either wire them if the boot shell becomes JS-rendered later, or note them as reserved for that exception.
+
 ## Parallelize first-load data fetches
 
 `httpDataSource.load()` (`web/src/adapters/httpDataSource.ts`) fetches
