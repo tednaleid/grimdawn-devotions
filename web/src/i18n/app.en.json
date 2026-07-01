@@ -1,1 +1,21 @@
-{}
+{
+  "ui.title": "Grim Dawn Devotion Planner",
+  "ui.boot.failed": "Couldn't load the planner.",
+  "ui.boot.reload": "Reload",
+  "ui.boot.loading": "Loading the devotion map…",
+  "ui.points.label": "Points",
+  "ui.points.budgetAria": "Point budget",
+  "ui.points.capRemoveTitle": "Click to remove the point limit",
+  "ui.points.capRestoreTitle": "Click to restore the 55-point limit",
+  "ui.points.total": "total",
+  "ui.points.reset": "Reset",
+  "ui.points.used": "{count} used",
+  "ui.points.min": "{count} min",
+  "ui.drawer.benefitsAria": "Show benefits",
+  "ui.drawer.benefits": "Benefits",
+  "ui.drawer.affinityAria": "Show affinity",
+  "ui.drawer.affinity": "Affinity",
+  "ui.panel.availableToGet": "Available to get",
+  "ui.panel.petBonus": "Bonus to All Pets",
+  "ui.panel.celestialPowers": "Celestial Powers"
+}
