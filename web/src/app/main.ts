@@ -1,7 +1,7 @@
 // ABOUTME: Application entry point for the Grim Dawn Devotion Planner.
 // ABOUTME: Owns SelectionState and wires every adapter (data, svg, nav, sidebars, tooltip) to the core.
 import { httpDataSource } from "../adapters/httpDataSource";
-import { loadLocalization } from "../adapters/localizationAdapter";
+import { loadLocalization, SUPPORTED_LOCALES } from "../adapters/localizationAdapter";
 import { translate } from "../core/localization";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
@@ -51,7 +51,7 @@ async function boot() {
     sessionStorage.removeItem("bootReloaded");
   } catch {}
   const data = await httpDataSource(".").load();
-  await loadLocalization({ base: ".", available: ["en"] });
+  await loadLocalization({ base: ".", available: SUPPORTED_LOCALES });
   const model = data.model;
   const cons: ReachCon[] = buildReachCons(model);
   const table = data.coverTable; // null -> dimming disabled (degraded)

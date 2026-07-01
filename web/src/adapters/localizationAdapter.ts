@@ -4,6 +4,23 @@ import { makeLocalization, setLocalization } from "../core/localization";
 import { pickLocale } from "../core/locale";
 import type { Localization } from "../ports/Localization";
 
+// The 12 locales shipped in Phase 3 (game + app catalogs both exist). "es" is excluded:
+// Text_ES.arc is unreadable, so no game catalog could be extracted for it.
+export const SUPPORTED_LOCALES: readonly string[] = [
+  "en",
+  "de",
+  "fr",
+  "ru",
+  "zh",
+  "pl",
+  "it",
+  "cs",
+  "ja",
+  "ko",
+  "pt",
+  "vi",
+];
+
 async function getJson(fetchImpl: typeof fetch, url: string): Promise<Record<string, string>> {
   try {
     const res = await fetchImpl(url);
@@ -18,7 +35,7 @@ export async function loadLocalization(
   opts: { base?: string; available?: readonly string[]; preferred?: readonly string[]; fetchImpl?: typeof fetch } = {},
 ): Promise<Localization> {
   const base = opts.base ?? ".";
-  const available = opts.available ?? ["en"];
+  const available = opts.available ?? SUPPORTED_LOCALES;
   const preferred = opts.preferred ?? (typeof navigator !== "undefined" ? navigator.languages : ["en"]);
   const fetchImpl = opts.fetchImpl ?? fetch;
   const locale = pickLocale(preferred, available);
