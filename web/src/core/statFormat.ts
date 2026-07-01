@@ -491,6 +491,38 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
       translate("stat.power.reducedTargetDamage"),
       true,
     ],
+    // Magnitude + duration status debuffs, reusing the condensed-view subject vocabulary.
+    ["offensiveFumbleMin", "offensiveFumbleDurationMin", translate("stat.subject.fumble"), true],
+    [
+      "offensiveProjectileFumbleMin",
+      "offensiveProjectileFumbleDurationMin",
+      translate("stat.subject.impairedAim"),
+      true,
+    ],
+    [
+      "offensiveSlowAttackSpeedMin",
+      "offensiveSlowAttackSpeedDurationMin",
+      translate("stat.subject.slowAttackSpeed"),
+      true,
+    ],
+    [
+      "offensiveSlowTotalSpeedMin",
+      "offensiveSlowTotalSpeedDurationMin",
+      translate("stat.subject.slowTotalSpeed"),
+      true,
+    ],
+    [
+      "offensiveElementalResistanceReductionAbsoluteMin",
+      "offensiveElementalResistanceReductionAbsoluteDurationMin",
+      translate("stat.subject.reducedElementalResistancesFlat"),
+      false,
+    ],
+    [
+      "offensivePhysicalReductionPercentMin",
+      "offensivePhysicalReductionPercentDurationMin",
+      translate("stat.subject.reducedPhysicalResistance"),
+      true,
+    ],
   ];
   for (const [minK, durK, label, pct] of timedDebuffs) {
     if (minK in stats) {
@@ -500,6 +532,29 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
       const suffix = dur !== undefined ? forSecondsSuffix(dur) : "";
       rows.push({ value: pct ? `${fmtNum(stats[minK]!)}%` : fmtNum(stats[minK]!), label: `${label}${suffix}` });
     }
+  }
+
+  // Crowd-control procs (Stun/Freeze/Petrify/Knockdown/Confusion): a duration (Min, with an optional
+  // Min-Max range) and an optional Chance. Rendered grimtools-style ("50% Chance of 1 Seconds of Stun",
+  // or "1.8 Seconds of Confusion" when guaranteed), reusing the condensed-view stat.subject.cc* nouns.
+  const ccEffects: [string, string][] = [
+    ["Stun", "stat.subject.ccStun"],
+    ["Freeze", "stat.subject.ccFreeze"],
+    ["Petrify", "stat.subject.ccPetrify"],
+    ["Knockdown", "stat.subject.ccKnockdown"],
+    ["Confusion", "stat.subject.ccConfusion"],
+  ];
+  for (const [seg, key] of ccEffects) {
+    const minK = `offensive${seg}Min`;
+    if (!(minK in stats)) continue;
+    const min = take(minK)!;
+    const max = take(`offensive${seg}Max`);
+    const chance = take(`offensive${seg}Chance`);
+    const seconds = max !== undefined && max !== min ? `${fmtNum(min)}-${fmtNum(max)}` : fmtNum(min);
+    const effect = translate(key);
+    if (chance !== undefined)
+      rows.push({ value: `${fmtNum(chance)}%`, label: translate("stat.power.ccChanceDuration", { seconds, effect }) });
+    else rows.push({ value: seconds, label: translate("stat.power.ccDuration", { effect }) });
   }
 
   // Anything else (instant damage ranges, leech, resist reductions): reuse the

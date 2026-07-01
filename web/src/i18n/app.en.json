@@ -204,6 +204,8 @@
   "stat.power.slowerTargetMovement": "Slower target Movement",
   "stat.power.reducedTargetResistances": "Reduced target's Resistances",
   "stat.power.reducedTargetDamage": "Reduced target's Damage",
+  "stat.power.ccChanceDuration": "Chance of {seconds} Seconds of {effect}",
+  "stat.power.ccDuration": "Seconds of {effect}",
   "stat.pet.summons": "Summons {num}{name}{dur}",
   "stat.pet.minion": "minion",
   "trigger.AttackEnemy": "Attack",
