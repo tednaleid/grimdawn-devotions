@@ -4,12 +4,12 @@ import { makeLocalization, setLocalization } from "../core/localization";
 import { pickLocale } from "../core/locale";
 import type { Localization } from "../ports/Localization";
 
-// The 12 locales shipped in Phase 3 (game + app catalogs both exist). "es" is excluded:
-// Text_ES.arc is unreadable, so no game catalog could be extracted for it.
+// The 13 locales shipped (game + app catalogs both exist for each).
 export const SUPPORTED_LOCALES: readonly string[] = [
   "en",
   "de",
   "fr",
+  "es",
   "ru",
   "zh",
   "pl",

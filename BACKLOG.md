@@ -243,25 +243,19 @@ compose, and how much of the CSS-class language moves to computed values.
 
 Phases 1a, 1b, 2, and 3 are all done: the localization seam, app-owned
 chrome/statFormat strings, game-data tags resolved via `gameText`, the
-curated stat-tag mapping, and 12 shipped locales (`en de fr ru zh pl it cs ja
-ko pt vi`). See [docs/i18n.md](docs/i18n.md) and
+curated stat-tag mapping, and 13 shipped locales (`en de fr es ru zh pl it cs
+ja ko pt vi`, Spanish added in a follow-on once the `Text_ES.arc` extraction
+issue was resolved). See [docs/i18n.md](docs/i18n.md) and
 `docs/superpowers/specs/2026-06-30-i18n-localization-design.md` for the full
 design. Remaining work:
 
-- **Add Spanish once `Text_ES.arc` is repaired.** ArchiveTool fails to open
-  `Text_ES.arc` ("Failed to open") on the machine used for extraction, while
-  all 11 other bundled non-English languages (CS, DE, FR, IT, JA, KO, PL, PT,
-  RU, VI, ZH) extract fine. Fix: run Steam's "verify integrity of game files"
-  on Grim Dawn to repair the archive, then run `just i18n-tables` (add `es`
-  to its language loop), author `web/src/i18n/app.es.json`, and add `es` to
-  `SUPPORTED_LOCALES` in `web/src/adapters/localizationAdapter.ts`.
 - **Visible language picker.** The app auto-detects the locale from
   `navigator.languages` with no in-app control to override it. Adding one is
   optional and non-breaking because locale is a viewer preference, never in
   the URL hash. Pointer: a new UI control that calls `loadLocalization` again
   with a forced `preferred` locale and re-renders the current selection (all
   real state is already in the hash and language independent).
-- **Community correction of authored translations.** The 11 non-English
+- **Community correction of authored translations.** The 12 non-English
   `app.<locale>.json` catalogs (`web/src/i18n/app.*.json`) are LLM-authored
   best-effort translations, not reviewed by native speakers. Corrections are
   welcome via per-language PRs. The authors flagged the `aff.*` affinity
