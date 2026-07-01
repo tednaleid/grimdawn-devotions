@@ -148,7 +148,8 @@ extract: _require-game-closed
     done < <(ls -d "$GD"/gdx*/ 2>/dev/null | sort -V)
     echo "Done."
 
-# Parse extracted records into devotions.json (passes version + steam build id)
+# Parse extracted records into devotions.json (passes version + steam build id), then build the
+# English game text table (devotion tags + data/stat-tags.json's stat tags).
 parse *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -159,6 +160,9 @@ parse *ARGS:
     uv run scripts/parse_devotions.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out}}" \
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
+    uv run scripts/build_game_tables.py \
+        --devotions "{{out}}" --stat-tags data/stat-tags.json --text-dir "{{text_dir}}" \
+        --lang en --out data/i18n/game.en.json
 
 # Full pipeline: extract then parse
 all: extract parse

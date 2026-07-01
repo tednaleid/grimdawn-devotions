@@ -738,8 +738,6 @@ def main(argv=None) -> int:
     ap.add_argument("--text-dir", required=True, type=Path,
                     help="Extracted text_en dir (containing tags_*.txt)")
     ap.add_argument("--out", default=Path("devotions.json"), type=Path)
-    ap.add_argument("--game-out", default=Path("data/i18n/game.en.json"), type=Path,
-                    help="Where to write the tag -> English text table")
     ap.add_argument("--game-version", default="unknown",
                     help="Game version string to stamp into meta")
     ap.add_argument("--steam-buildid", default=None,
@@ -787,10 +785,6 @@ def main(argv=None) -> int:
     doc = {"meta": meta, "constellations": constellations}
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Wrote {args.out}  ({len(constellations)} constellations)")
-
-    args.game_out.parent.mkdir(parents=True, exist_ok=True)
-    args.game_out.write_text(json.dumps(game_en, indent=2, ensure_ascii=False, sort_keys=True), encoding="utf-8")
-    print(f"Wrote {args.game_out}  ({len(game_en)} keys)")
 
     if args.stat_labels:
         labels = build_stat_labels(constellations)
