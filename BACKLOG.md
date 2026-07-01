@@ -239,6 +239,44 @@ compose, and how much of the CSS-class language moves to computed values.
   `BUDGET` (55) in `completionMinCost` and render the cap-raise hint when
   `cap < N <= 55`.
 
+## Internationalization: remaining phases and deferred items
+
+Phase 1a (the localization seam and app-owned chrome/statFormat strings) is
+done; see [docs/i18n.md](docs/i18n.md) and
+`docs/superpowers/specs/2026-06-30-i18n-localization-design.md` for the full
+design and phasing. Remaining work:
+
+- **Visible language picker.** v1 auto-detects the locale from
+  `navigator.languages` with no in-app control to override it. Adding one is
+  non-breaking because locale is a viewer preference, never in the URL hash.
+  Pointer: a new UI control that calls `loadLocalization` again with a forced
+  `preferred` locale and re-renders the current selection (all real state is
+  already in the hash and language independent).
+- **ICU-style plural handling.** v1 uses simple named-placeholder
+  interpolation (`web/src/core/localization.ts`). Add narrowly only if a
+  target language's grammar needs real plural rules, not preemptively.
+- **Phase 1b: game-data tags and `gameText`.** `scripts/parse_devotions.py`
+  preserves tags instead of baking English into `data/devotions.json`
+  (constellation `name` -> `name_tag`, power `name`/`description` ->
+  `name_tag`/`description_tag`, `racial_target`, `weapon_requirement`,
+  `pet.name`); extraction emits `data/i18n/game.<lang>.json` per language,
+  filtered to referenced tags; the validator inverts (today it errors on a
+  surviving `tag...`, it should instead assert every referenced tag resolves
+  in the English table); `gameText(tag)` is added to `Localization` and wired
+  into the views that render game-sourced names/descriptions.
+- **Phase 2: stat spike and `stat-tags.json`.** Map the app's internal stat
+  ids to game tags where a clean tag exists (spike: extract `Text_EN.arc` and
+  `Text_ES.arc`, confirm ~40 devotion-relevant stat ids resolve in both), so
+  `statFormat` pulls the exact in-game term via `gameText` instead of an
+  authored guess; stats with no clean tag keep their authored
+  `app.<locale>.json` fallback.
+- **Phase 3: extract all 13 languages and author `app.<locale>.json`.** The
+  install ships EN, CS, DE, ES, FR, IT, JA, KO, PL, PT, RU, VI, ZH. Extract
+  `game.<lang>.json` for all 13 (`just extract`, Windows only for the
+  ArchiveTool step, but committed outputs build anywhere) and author the
+  `app.<lang>.json` chrome/statFormat catalogs for each; each language appears
+  as its bundles land, with English filling any gap.
+
 ## Parallelize first-load data fetches
 
 `httpDataSource.load()` (`web/src/adapters/httpDataSource.ts`) fetches

@@ -35,3 +35,14 @@ the URL hash so a copied link restores exactly what the user saw. Any new
 state-bearing feature must round-trip through `web/src/core/urlState.ts`
 (`encodeHash`/`decodeHash`) and tolerate stale or malformed links. Do not add
 client state that only lives in memory or the DOM.
+
+## Internationalization (invariant we maintain)
+
+This is a fully internationalized app. No user-facing string is hardcoded in app
+code: every app-authored string resolves through `translate(key, params?)` against
+`web/src/i18n/app.<locale>.json`, with a per-key fallback of active locale, then
+English, then the raw key. Game-data text resolves from extracted per-language tag
+tables (authoritative, see docs/i18n.md). Locale is a viewer preference detected
+from the browser and is never in the URL hash; selection ids stay language
+independent. When you add a user-facing string, add a catalog key (never a literal)
+and add it to the `web/test/appCatalog.test.ts` guard.
