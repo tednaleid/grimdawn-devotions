@@ -5,6 +5,7 @@ import type { Affinity, DevotionModel } from "../core/types";
 import type { BuildStep, Vec } from "../core/reachability";
 import type { AssetManifest } from "../ports/DataSource";
 import { affinityOrb } from "./affinityColors";
+import { translate } from "../core/localization";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -12,12 +13,12 @@ const AFFINITY = ["Ascendant", "Chaos", "Eldritch", "Order", "Primordial"];
 
 // The five Crossroads share the generic name "Crossroads" and have no art. Label each by its fixed
 // position on the devotion map (cardinal direction) and show a dot in the affinity it grants.
-const CROSSROADS: Record<string, { dir: string; affinity: Affinity }> = {
-  crossroads_primordial: { dir: "N", affinity: "primordial" },
-  crossroads_chaos: { dir: "NW", affinity: "chaos" },
-  crossroads_order: { dir: "NE", affinity: "order" },
-  crossroads_eldritch: { dir: "SW", affinity: "eldritch" },
-  crossroads_ascendant: { dir: "SE", affinity: "ascendant" },
+const CROSSROADS: Record<string, { dirKey: string; affinity: Affinity }> = {
+  crossroads_primordial: { dirKey: "n", affinity: "primordial" },
+  crossroads_chaos: { dirKey: "nw", affinity: "chaos" },
+  crossroads_order: { dirKey: "ne", affinity: "order" },
+  crossroads_eldritch: { dirKey: "sw", affinity: "eldritch" },
+  crossroads_ascendant: { dirKey: "se", affinity: "ascendant" },
 };
 
 // Why no order is shown, for the empty-state copy:
@@ -33,9 +34,15 @@ export type NoOrderInfo =
 
 // "20 more Ascendant and 7 more Order" from a deficit vector.
 function deficitPhrase(deficit: Vec): string {
-  const parts = deficit.map((d, i) => (d > 0 ? `${d} more ${AFFINITY[i]}` : "")).filter(Boolean);
+  const parts = deficit
+    .map((d, i) =>
+      d > 0
+        ? translate("ui.buildOrder.deficitMore", { count: d, affinity: translate(`aff.${AFFINITY[i]!.toLowerCase()}`) })
+        : "",
+    )
+    .filter(Boolean);
   if (parts.length <= 1) return parts[0] ?? "";
-  return `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+  return `${parts.slice(0, -1).join(", ")}${translate("ui.buildOrder.deficitJoin")}${parts[parts.length - 1]}`;
 }
 
 export function buildOrderHtml(
@@ -48,27 +55,32 @@ export function buildOrderHtml(
     const info: NoOrderInfo = noOrder ?? { kind: "empty" };
     let body: string;
     if (info.kind === "incomplete") {
+      const deficit = esc(deficitPhrase(info.deficit));
       body =
-        `<div class="bo-empty-msg">Incomplete build: needs ${esc(deficitPhrase(info.deficit))} affinity.</div>` +
-        `<div class="bo-empty-sub">Add supporting constellations that grant it.</div>`;
+        `<div class="bo-empty-msg">${translate("ui.buildOrder.incompleteAffinity", { deficit })}</div>` +
+        `<div class="bo-empty-sub">${translate("ui.buildOrder.addSupporting")}</div>`;
     } else if (info.kind === "searched") {
       body =
         info.minCap != null
-          ? `<div class="bo-empty-msg">No path to this build in fewer than ${info.minCap} points.</div>` +
-            `<div class="bo-empty-sub">Assembling it needs transient scaffolding that pushes the running total past your cap.</div>`
-          : `<div class="bo-empty-msg">No legal path to this build exists.</div>`;
+          ? `<div class="bo-empty-msg">${translate("ui.buildOrder.noPathCap", { minCap: info.minCap })}</div>` +
+            `<div class="bo-empty-sub">${translate("ui.buildOrder.scaffoldingNote")}</div>`
+          : `<div class="bo-empty-msg">${translate("ui.buildOrder.noLegalPath")}</div>`;
     } else {
       // nothing to order yet: the order appears once the selection covers its own affinity.
-      body = `<div class="bo-empty-msg">Select a self-covering build to see its order.</div>`;
+      body = `<div class="bo-empty-msg">${translate("ui.buildOrder.selectPrompt")}</div>`;
     }
-    return `<h2>Build order</h2><div class="bo-empty">${body}</div>`;
+    return `<h2>${translate("ui.panel.buildOrder")}</h2><div class="bo-empty">${body}</div>`;
   }
   let n = 0;
   const rows = steps
     .map((s) => {
       const c = model.constellations.get(s.conId);
       const cr = CROSSROADS[s.conId];
-      const name = cr ? `${c?.name ?? "Crossroads"} (${cr.dir})` : c ? c.name : s.conId;
+      const name = cr
+        ? `${c?.name ?? translate("ui.buildOrder.crossroads")} (${translate(`ui.buildOrder.dir.${cr.dirKey}`)})`
+        : c
+          ? c.name
+          : s.conId;
       const artName = c?.background?.image?.split("/").pop() ?? "";
       const art = manifest?.images[artName];
       // Crossroads have no art; their art-column cell holds a dot in the granted affinity's color.
@@ -80,12 +92,12 @@ export function buildOrderHtml(
         const artCell = img || dot;
         return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
       }
-      const label = s.kind === "scaffold-add" ? "Add" : "Refund";
+      const label = s.kind === "scaffold-add" ? translate("ui.buildOrder.add") : translate("ui.buildOrder.refund");
       const cls = s.kind === "scaffold-add" ? "bo-add" : "bo-refund";
       // Empty art-column cell (or the crossroads dot) so the five grid columns line up with complete rows.
       const artCell = dot || `<span class="bo-art"></span>`;
       return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span>${artCell}<span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
     })
     .join("");
-  return `<h2>Build order</h2><div class="bo-list">${rows}</div>`;
+  return `<h2>${translate("ui.panel.buildOrder")}</h2><div class="bo-list">${rows}</div>`;
 }

@@ -7,6 +7,9 @@ import { buildModel } from "../src/core/model";
 import { buildOrderHtml } from "../src/adapters/buildOrderView";
 import { affinityColor } from "../src/adapters/affinityColors";
 import type { BuildStep } from "../src/core/reachability";
+import { installEnglish } from "./helpers/localizeEn";
+
+installEnglish();
 
 const model = buildModel(doc as any);
 const firstCon = [...model.constellations.values()][0]!;
