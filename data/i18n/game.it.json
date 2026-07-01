@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% Riduzione Durata del Controllo Mentale",
+  "DefensePercentCurrentLife": "{%.0f0}% Resistenza alla Riduzione della Salute",
   "Dexterity": "Acume",
   "Intelligence": "Spirito",
   "Life": "Salute",

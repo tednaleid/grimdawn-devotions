@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% снижения длительности контроля разума",
+  "DefensePercentCurrentLife": "{%.0f0}% сопротивления снижению здоровья",
   "Dexterity": "Искусность",
   "Intelligence": "Дух",
   "Life": "Здоровье",

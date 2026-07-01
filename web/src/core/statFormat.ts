@@ -2,7 +2,7 @@
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
 import { translate, gameText } from "./localization";
-import { STAT_TAGS } from "./statTags";
+import { STAT_TAGS, STAT_FORMAT_TAGS } from "./statTags";
 
 export interface StatRow {
   label: string;
@@ -126,6 +126,9 @@ const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
   characterRunSpeedMaxModifier: { percent: true, sign: 1 },
   characterTotalSpeedModifier: { percent: true, sign: 1 },
   characterConstitutionModifier: { percent: true, sign: 1 },
+  // Value-suffix game format ("Healing Effects Increased by {v}%") - the value cannot be stripped to a
+  // clean prefix label across languages, so the label is app-authored (see stat.override.<id>).
+  characterHealIncreasePercent: { percent: true, sign: 1 },
   characterDodgePercent: { percent: true, sign: 1 },
   characterDeflectProjectile: { percent: true, sign: 1 },
   characterEnergyAbsorptionPercent: { percent: true, sign: 1 },
@@ -140,6 +143,18 @@ const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
   characterWeaponIntelligenceReqReduction: { percent: true, sign: -1 },
   characterJewelryIntelligenceReqReduction: { percent: true, sign: -1 },
 };
+
+// Strip Grim Dawn value placeholders ("{%.0f0}%", ranges "{%.0f0}-{%.0f1}%") and the leading/trailing
+// "%"/dash/space they leave behind, so a value-embedded stat format tag reduces to its bare noun. A
+// no-op on the plain-noun tags in STAT_TAGS. Used only for value-PREFIX stats (value leads the noun in
+// every language); value-suffix stats are app-authored instead.
+function stripValueTokens(s: string): string {
+  return s
+    .replace(/\{%[^}]*\}/g, "")
+    .replace(/^[\s%-]+|[\s%-]+$/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
 
 function humanize(id: string): string {
   const s = id
@@ -201,6 +216,10 @@ export function classify(id: string): Classified | null {
     const name = attrLabel(m[1]!);
     if (name) return { label: name, percent: m[2] === "Modifier", sign: 1 };
   }
+
+  // Value-embedded game format stats ("{v}% <noun>"): source the noun from the game tag, strip the value.
+  const fmtTag = STAT_FORMAT_TAGS[id];
+  if (fmtTag) return { label: stripValueTokens(gameText(fmtTag)), percent: true, sign: 1 };
 
   // Fallback: humanize, treating Modifier/Percent/Resistance/Chance as percent and Reduction as a negative percent.
   const percent = /Modifier$|Percent|Reduction$|Resistance$|Chance$/.test(id);
@@ -400,6 +419,9 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
 
   const radius = take("projectileExplosionRadius") ?? take("skillTargetRadius");
   if (radius !== undefined) rows.push({ value: fmtNum(radius), label: translate("stat.power.meterRadius") });
+  // When an explosion radius already supplied the line, consume the skill's internal target-selection
+  // radius too, so it does not fall through to humanize() as a raw "Skill Target Radius" line.
+  take("skillTargetRadius");
 
   const absorb = take("damageAbsorption");
   if (absorb !== undefined) rows.push({ value: fmtNum(absorb), label: translate("stat.power.damageAbsorption") });
@@ -472,6 +494,38 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
       translate("stat.power.reducedTargetDamage"),
       true,
     ],
+    // Magnitude + duration status debuffs, reusing the condensed-view subject vocabulary.
+    ["offensiveFumbleMin", "offensiveFumbleDurationMin", translate("stat.subject.fumble"), true],
+    [
+      "offensiveProjectileFumbleMin",
+      "offensiveProjectileFumbleDurationMin",
+      translate("stat.subject.impairedAim"),
+      true,
+    ],
+    [
+      "offensiveSlowAttackSpeedMin",
+      "offensiveSlowAttackSpeedDurationMin",
+      translate("stat.subject.slowAttackSpeed"),
+      true,
+    ],
+    [
+      "offensiveSlowTotalSpeedMin",
+      "offensiveSlowTotalSpeedDurationMin",
+      translate("stat.subject.slowTotalSpeed"),
+      true,
+    ],
+    [
+      "offensiveElementalResistanceReductionAbsoluteMin",
+      "offensiveElementalResistanceReductionAbsoluteDurationMin",
+      translate("stat.subject.reducedElementalResistancesFlat"),
+      false,
+    ],
+    [
+      "offensivePhysicalReductionPercentMin",
+      "offensivePhysicalReductionPercentDurationMin",
+      translate("stat.subject.reducedPhysicalResistance"),
+      true,
+    ],
   ];
   for (const [minK, durK, label, pct] of timedDebuffs) {
     if (minK in stats) {
@@ -481,6 +535,29 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
       const suffix = dur !== undefined ? forSecondsSuffix(dur) : "";
       rows.push({ value: pct ? `${fmtNum(stats[minK]!)}%` : fmtNum(stats[minK]!), label: `${label}${suffix}` });
     }
+  }
+
+  // Crowd-control procs (Stun/Freeze/Petrify/Knockdown/Confusion): a duration (Min, with an optional
+  // Min-Max range) and an optional Chance. Rendered grimtools-style ("50% Chance of 1 Seconds of Stun",
+  // or "1.8 Seconds of Confusion" when guaranteed), reusing the condensed-view stat.subject.cc* nouns.
+  const ccEffects: [string, string][] = [
+    ["Stun", "stat.subject.ccStun"],
+    ["Freeze", "stat.subject.ccFreeze"],
+    ["Petrify", "stat.subject.ccPetrify"],
+    ["Knockdown", "stat.subject.ccKnockdown"],
+    ["Confusion", "stat.subject.ccConfusion"],
+  ];
+  for (const [seg, key] of ccEffects) {
+    const minK = `offensive${seg}Min`;
+    if (!(minK in stats)) continue;
+    const min = take(minK)!;
+    const max = take(`offensive${seg}Max`);
+    const chance = take(`offensive${seg}Chance`);
+    const seconds = max !== undefined && max !== min ? `${fmtNum(min)}-${fmtNum(max)}` : fmtNum(min);
+    const effect = translate(key);
+    if (chance !== undefined)
+      rows.push({ value: `${fmtNum(chance)}%`, label: translate("stat.power.ccChanceDuration", { seconds, effect }) });
+    else rows.push({ value: seconds, label: translate("stat.power.ccDuration", { effect }) });
   }
 
   // Anything else (instant damage ranges, leech, resist reductions): reuse the

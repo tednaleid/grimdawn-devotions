@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% Reduced Mind Control Duration",
+  "DefensePercentCurrentLife": "{%.0f0}% Resistance to Life Reduction",
   "Dexterity": "Cunning",
   "Intelligence": "Spirit",
   "Life": "Health",

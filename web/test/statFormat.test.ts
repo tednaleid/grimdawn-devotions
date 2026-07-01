@@ -37,6 +37,29 @@ describe("statRow attributes (GD internal -> display names)", () => {
   });
 });
 
+describe("statRow format-string stats (game-sourced term, value stripped)", () => {
+  // These GD stats store their display as a value-embedded format string ("{v}% <noun>").
+  // We source the noun from the game tag and strip the value token; the value renders separately.
+  test("defensivePercentCurrentLife is Resistance to Life Reduction, percent", () => {
+    expect(statRow("defensivePercentCurrentLife", 20)).toEqual({
+      label: "Resistance to Life Reduction",
+      value: "+20%",
+    });
+  });
+  test("defensiveConvert is Reduced Mind Control Duration, percent (not stun, not flat +50)", () => {
+    expect(statRow("defensiveConvert", 50)).toEqual({
+      label: "Reduced Mind Control Duration",
+      value: "+50%",
+    });
+  });
+  test("characterHealIncreasePercent is an authored percent label (value-suffix game format)", () => {
+    expect(statRow("characterHealIncreasePercent", 20)).toEqual({
+      label: "Increased Healing",
+      value: "+20%",
+    });
+  });
+});
+
 describe("statRow offensive damage (percent vs flat)", () => {
   test("physical modifier is percent damage", () => {
     expect(statRow("offensivePhysicalModifier", 15)).toEqual({ label: "Physical Damage", value: "+15%" });
@@ -236,6 +259,46 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
       { value: "24", label: "Reduced target's Resistances for 1 Seconds" },
       { value: "15%", label: "Reduced target's Damage for 2 Seconds" },
     ]);
+  });
+
+  test("crowd-control procs render as chance/duration, not raw offensive ids", () => {
+    // Stun with a chance: "50% Chance of 1 Seconds of Stun".
+    expect(formatPowerStats({ offensiveStunChance: 50, offensiveStunMin: 1 })).toEqual([
+      { value: "50%", label: "Chance of 1 Seconds of Stun" },
+    ]);
+    // Guaranteed (no chance facet): "1.8 Seconds of Confusion".
+    expect(formatPowerStats({ offensiveConfusionMin: 1.8 })).toEqual([{ value: "1.8", label: "Seconds of Confusion" }]);
+    // Knockdown carries a Min-Max duration range.
+    expect(
+      formatPowerStats({ offensiveKnockdownChance: 100, offensiveKnockdownMin: 0.8, offensiveKnockdownMax: 1.5 }),
+    ).toEqual([{ value: "100%", label: "Chance of 0.8-1.5 Seconds of Knockdown" }]);
+    // No raw humanized "Offensive ..." label survives.
+    const petrify = formatPowerStats({ offensivePetrifyChance: 50, offensivePetrifyMin: 1.5 });
+    expect(petrify).toEqual([{ value: "50%", label: "Chance of 1.5 Seconds of Petrify" }]);
+  });
+
+  test("timed magnitude debuffs (fumble, slows, resist reductions) render as reused subject phrases", () => {
+    expect(formatPowerStats({ offensiveFumbleMin: 14, offensiveFumbleDurationMin: 2 })).toEqual([
+      { value: "14%", label: "Fumble for 2 Seconds" },
+    ]);
+    expect(formatPowerStats({ offensiveProjectileFumbleMin: 25, offensiveProjectileFumbleDurationMin: 3 })).toEqual([
+      { value: "25%", label: "Impaired Aim for 3 Seconds" },
+    ]);
+    expect(formatPowerStats({ offensiveSlowAttackSpeedMin: 30, offensiveSlowAttackSpeedDurationMin: 5 })).toEqual([
+      { value: "30%", label: "Slow target's Attack Speed for 5 Seconds" },
+    ]);
+    expect(formatPowerStats({ offensiveSlowTotalSpeedMin: 50, offensiveSlowTotalSpeedDurationMin: 8 })).toEqual([
+      { value: "50%", label: "Slow target's Total Speed for 8 Seconds" },
+    ]);
+    expect(
+      formatPowerStats({
+        offensiveElementalResistanceReductionAbsoluteMin: 32,
+        offensiveElementalResistanceReductionAbsoluteDurationMin: 2,
+      }),
+    ).toEqual([{ value: "32", label: "Reduced target's Elemental Resistances (flat) for 2 Seconds" }]);
+    expect(
+      formatPowerStats({ offensivePhysicalReductionPercentMin: 20, offensivePhysicalReductionPercentDurationMin: 5 }),
+    ).toEqual([{ value: "20%", label: "Reduced target's Physical Resistance for 5 Seconds" }]);
   });
 
   test("radius falls back to skillTargetRadius when there is no projectile radius", () => {

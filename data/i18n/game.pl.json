@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% odporności na kontrolę umysłu",
+  "DefensePercentCurrentLife": "{%.0f0}% odporności na redukcję życia",
   "Dexterity": "Przebiegłości",
   "Intelligence": "Duchowości",
   "Life": "Zdrowia",

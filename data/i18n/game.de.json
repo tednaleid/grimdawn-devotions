@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% kürzere Dauer der Gedankenkontrolle",
+  "DefensePercentCurrentLife": "{%.0f0}% Widerstand gegen Lebensreduzierung",
   "Dexterity": "Raffinesse",
   "Intelligence": "Geist",
   "Life": "Leben",

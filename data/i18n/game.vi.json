@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% Giảm Thời Gian Bị Thôi Miên",
+  "DefensePercentCurrentLife": "{%.0f0}% Kháng Đòn Đánh Trừ % Máu",
   "Dexterity": "Khéo Léo",
   "Intelligence": "Tinh Thần",
   "Life": "Máu",

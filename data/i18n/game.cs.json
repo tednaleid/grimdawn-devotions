@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% snížení doby trvání ovládnutí mysli",
+  "DefensePercentCurrentLife": "{%.0f0}% odolnost vůči ztrátě života",
   "Dexterity": "Rafinovanost",
   "Intelligence": "Duchovno",
   "Life": "Zdraví",

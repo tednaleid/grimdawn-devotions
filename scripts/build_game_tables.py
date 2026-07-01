@@ -33,9 +33,9 @@ def _add(tags: set[str], tag: str | None) -> None:
         tags.add(tag)
 
 
-def collect_referenced_tags(devotions: dict, stat_tags: dict) -> set[str]:
+def collect_referenced_tags(devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None) -> set[str]:
     """Every *_tag value referenced in devotions.json (constellation/power/pet/weapon),
-    plus every game tag value in stat-tags.json."""
+    plus every game tag value in stat-tags.json and stat-format-tags.json."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
@@ -51,6 +51,7 @@ def collect_referenced_tags(devotions: dict, stat_tags: dict) -> set[str]:
             if wr:
                 _add(tags, wr.get("description_tag"))
     tags.update(stat_tags.values())
+    tags.update((stat_format_tags or {}).values())
     return tags
 
 
@@ -69,6 +70,8 @@ def main(argv=None) -> int:
         description="Build a per-language game text table (tag -> text) for devotion + stat tags")
     ap.add_argument("--devotions", required=True, type=Path)
     ap.add_argument("--stat-tags", required=True, type=Path)
+    ap.add_argument("--stat-format-tags", type=Path,
+                    help="Optional stat-format-tags.json (raw stat id -> value-embedded game tag)")
     ap.add_argument("--text-dir", required=True, type=Path)
     ap.add_argument("--lang", required=True, help="Language code, e.g. en (used only for logging)")
     ap.add_argument("--out", required=True, type=Path)
@@ -76,7 +79,8 @@ def main(argv=None) -> int:
 
     devotions = json.loads(args.devotions.read_text(encoding="utf-8"))
     stat_tags = json.loads(args.stat_tags.read_text(encoding="utf-8"))
-    referenced = collect_referenced_tags(devotions, stat_tags)
+    stat_format_tags = json.loads(args.stat_format_tags.read_text(encoding="utf-8")) if args.stat_format_tags else {}
+    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags)
 
     text_table = load_translations(args.text_dir)
     table = build_table(referenced, text_table)
