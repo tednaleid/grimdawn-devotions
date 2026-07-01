@@ -338,6 +338,7 @@ build: cover-table
     bun scripts/bundle.ts
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
+    mkdir -p dist/data/i18n && cp "{{justfile_directory()}}/data/i18n/"*.json dist/data/i18n/
     # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that
     # `build` only copies, so a stale binary ships silently (correct but slow) unless we rebuild it.
     # Rebuild when it is missing or older than web/wasm/src/lib.rs AND cargo is available; without a
