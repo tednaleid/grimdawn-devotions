@@ -11,7 +11,7 @@ import {
   isFilterableStat,
 } from "../src/core/statFormat";
 import { installEnglish } from "./helpers/localizeEn";
-import { gameText } from "../src/core/localization";
+import { makeLocalization, setLocalization } from "../src/core/localization";
 import { STAT_TAGS } from "../src/core/statTags";
 
 installEnglish();
@@ -305,10 +305,27 @@ test("formatBonusRowsWithIds rows carry the correct label and value", () => {
   expect(withIds.find((r) => r.id === "offensiveFireModifier")!.value).toBe("+12%");
 });
 
-describe("mapped stat labels resolve via gameText", () => {
-  test('Fire damage label comes from gameText(STAT_TAGS["stat.damage.Fire"])', () => {
-    const row = statRow("offensiveFireModifier", 10);
-    expect(row?.label).toBe(`${gameText(STAT_TAGS["stat.damage.Fire"]!)} Damage`);
+describe("mapped stat labels resolve via gameText, not translate", () => {
+  test("Fire damage label uses the game catalog term even when it diverges from the app catalog", () => {
+    // Deliberately divergent catalogs: if statLabel ever regressed to translate(key) for a
+    // mapped key, the rendered label would contain "APP_FIRE" instead of "GAME_FIRE".
+    const fireTag = STAT_TAGS["stat.damage.Fire"]!;
+    setLocalization(
+      makeLocalization(
+        { "stat.damage.Fire": "APP_FIRE", "stat.template.damage": "{type} Damage" },
+        {},
+        "en",
+        { [fireTag]: "GAME_FIRE" },
+        {},
+      ),
+    );
+    try {
+      const row = statRow("offensiveFireModifier", 10);
+      expect(row?.label).toContain("GAME_FIRE");
+      expect(row?.label).not.toContain("APP_FIRE");
+    } finally {
+      installEnglish();
+    }
   });
 });
 
