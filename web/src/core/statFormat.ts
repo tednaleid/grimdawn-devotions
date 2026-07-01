@@ -419,6 +419,9 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
 
   const radius = take("projectileExplosionRadius") ?? take("skillTargetRadius");
   if (radius !== undefined) rows.push({ value: fmtNum(radius), label: translate("stat.power.meterRadius") });
+  // When an explosion radius already supplied the line, consume the skill's internal target-selection
+  // radius too, so it does not fall through to humanize() as a raw "Skill Target Radius" line.
+  take("skillTargetRadius");
 
   const absorb = take("damageAbsorption");
   if (absorb !== undefined) rows.push({ value: fmtNum(absorb), label: translate("stat.power.damageAbsorption") });

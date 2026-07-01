@@ -261,6 +261,31 @@ design. Remaining work:
   welcome via per-language PRs. The authors flagged the `aff.*` affinity
   names and some race/composed terms as the most uncertain and worth
   prioritizing for review.
+- **Crowd-control wrapper templates need translation.** The two composed
+  templates `stat.power.ccChanceDuration` / `stat.power.ccDuration`
+  (`web/src/i18n/app.en.json`, used by `formatPowerStats` for celestial-power
+  Stun/Freeze/Petrify/Knockdown/Confusion procs) are English-authored only;
+  non-English locales fall back to English for the wrapper while the effect
+  noun (`stat.subject.cc*`) is localized. Add per-language translations (same
+  community-correction stream as above). The magnitude/duration debuffs
+  (fumble, slows, resistance reductions) reuse already-translated
+  `stat.subject.*` keys and need no new translation.
+- **Align authored English stat labels to exact game terms (bounded).** A
+  handful of app-authored `stat.override.*` labels use our wording rather than
+  the game's exact character-sheet term, so they read fine but do not match
+  in-game text (for example `defensiveStun` renders "Reduced Stun Duration"
+  where the game says "Stun Resistance"). A one-time pass could map these to
+  the game tag (like `data/stat-format-tags.json` does for the value-embedded
+  ones) or re-author them to the game's wording. Distinct from the open-ended
+  translation-quality stream: this is a small, enumerable English-correctness
+  pass.
+- **Heal label full-template upgrade.** `characterHealIncreasePercent` is
+  app-authored as the bare label "Increased Healing" because its game format
+  string is value-suffix ("Healing Effects Increased by {v}%") and cannot
+  reduce to a clean prefix label in the value+label row model. If a
+  value-templated row shape is added later, it could render the game's exact
+  string (authoritative in every language) instead. Pointer: `OVERRIDES` +
+  `stat.override.characterHealIncreasePercent` in `web/src/core/statFormat.ts`.
 - **ICU-style plural handling.** Simple named-placeholder interpolation
   (`web/src/core/localization.ts`) is used today. Add narrowly only if a
   target language's grammar needs real plural rules, not preemptively.
