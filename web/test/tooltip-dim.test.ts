@@ -3,6 +3,12 @@ import { test, expect, beforeEach } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { tooltipView } from "../src/adapters/tooltipView";
+import { installEnglish } from "./helpers/localizeEn";
+
+// This tooltip renders localized text; install the English catalog so it does not
+// depend on another test file having installed the localization singleton first
+// (test-file order differs across platforms).
+installEnglish();
 
 const model = buildModel(doc as any);
 
