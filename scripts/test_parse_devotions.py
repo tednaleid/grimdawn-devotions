@@ -103,8 +103,12 @@ else:
         check("found a power with a proc trigger", proc_power is not None, True)
         if proc_power:
             proc = proc_power["proc"]
-            check("proc keeps trigger_key as the raw enum", proc.get("trigger_key") in pd.TRIGGER_DISPLAY
-                  or bool(proc.get("trigger_key")), True)
+            # Bat's celestial power (Twin Fangs, tagDevotionEffectA01) is the first
+            # proc found in sorted-constellation order; its autocast controller's
+            # triggerType is the raw enum "AttackEnemy". Asserting the exact raw
+            # value (not just non-empty) catches a regression that bakes in a
+            # display word like "Attack" instead of the game's enum.
+            check("proc trigger_key is Twin Fangs's raw source enum", proc.get("trigger_key"), "AttackEnemy")
             check("proc has no baked english trigger", "trigger" in proc, False)
 
         check("found a weapon requirement", weapon_req is not None, True)

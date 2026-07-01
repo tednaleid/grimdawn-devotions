@@ -160,7 +160,7 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
   "constellations": [
     {
       "id": "bat",
-      "name": "Bat",
+      "name_tag": "tagDevotion_A01",         // -> "Bat", resolved via data/i18n/game.en.json
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation01.dbr",
       "affinity_required": { "eldritch": 1 },
@@ -175,11 +175,11 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
           "predecessors": [],                // star indices within THIS constellation
           "position": { "x": -968, "y": 80 },// (x,y) on the shared devotion-map canvas
           "bonuses": { "offensiveLifeModifier": 15, "offensiveSlowBleedingModifier": 15 },
-          "celestial_power": null,           // or { name, description, proc, level, stats, pet } on the last star
-          "weapon_requirement": null         // or { weapons: ["Sword","Sword2h"], description }
+          "celestial_power": null,           // or { name_tag, description_tag, proc, level, stats, pet } on the last star
+          "weapon_requirement": null         // or { weapons: ["Sword","Sword2h"], description_tag }
         }
         // … the celestial-power star looks like:
-        // { "index": 4, "celestial_power": { "name": "Twin Fangs", ... }, "bonuses": {} }
+        // { "index": 4, "celestial_power": { "name_tag": "tagDevotionEffectA01", ... }, "bonuses": {} }
       ]
     }
   ]
@@ -187,6 +187,11 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
 ```
 
 Notes:
+- Fields ending in `_tag` (`name_tag`, `description_tag`) are game-data tags
+  (e.g. `tagDevotion_A01`), not English text. The parser resolves each tag to
+  English at parse time to build `data/i18n/game.en.json`, then writes the tag
+  itself, not the resolved text, into `devotions.json`; look the tag up in
+  that table (or a translated `game.<locale>.json`) to display it.
 - `bonuses` keys are **raw internal stat ids** (stable; the optimizer needs
   these). `--stat-labels` also writes `stat_labels.json` mapping each id to a
   best-effort human label. Note a GD quirk: internal `Life` = **Vitality**.
@@ -241,6 +246,7 @@ docs/reachability-engine.md  # reachability resolver design + tradeoffs
 docs/display-model.md        # the map's display language (brightness / color / emphasis)
 docs/assets-and-textures.md  # how to extract + convert the .tex artwork to PNG
 data/devotions.json          # parser output (committed; the planner's source of truth)
+data/i18n/game.en.json       # parser output (committed; tag -> English text for devotions.json's *_tag fields)
 data/stat_labels.json        # parser output (--stat-labels, committed)
 data/devotion_records.csv    # parser output (--duckdb, git-ignored)
 extracted/                   # game files, git-ignored; `just extract` to rebuild

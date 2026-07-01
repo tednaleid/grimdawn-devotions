@@ -55,22 +55,6 @@ POINT_CAP = 55  # devotion points available at max (sanity ceiling)
 # powers and extrapolated past shorter arrays, inflating ~49 of 63 powers.)
 CELESTIAL_POWER_LEVEL = 25
 
-# GD's internal proc trigger enum -> the word grimtools shows after "<n>% Chance on ".
-TRIGGER_DISPLAY = {
-    "AttackEnemy": "Attack",
-    "AttackEnemyCrit": "Critical Hit",
-    "Block": "Block",
-    "HitByEnemy": "Hit",
-    "HitByMelee": "Melee Hit",
-    "HitByProjectile": "Projectile Hit",
-    "HitByCrit": "Critical Hit",
-    "OnKill": "Kill",
-    "LowHealth": "Low Health",
-    "LowMana": "Low Energy",
-    "CastBuff": "Cast",
-    "OnEquip": "Equip",
-}
-
 # Ability fields that are not "stat" ids but are shown on the power tooltip; the
 # web layer (statFormat) maps these raw ids to GD-style lines. A power carries at
 # most one of the two radius ids.
