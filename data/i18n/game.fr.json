@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% de durée de Contrôle de l'esprit réduite",
+  "DefensePercentCurrentLife": "{%.0f0}% de résistance à la réduction de vie",
   "Dexterity": "Malice",
   "Intelligence": "Esprit",
   "Life": "Santé",

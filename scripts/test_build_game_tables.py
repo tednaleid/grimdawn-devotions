@@ -44,14 +44,18 @@ devotions = {
 }
 stat_tags = {"stat.attr.DefensiveAbility": "tagCharStatsDA", "stat.attr.Life": "Life"}
 
-referenced = bgt.collect_referenced_tags(devotions, stat_tags)
+stat_format_tags = {"defensiveConvert": "DefenseConvert"}
+
+referenced = bgt.collect_referenced_tags(devotions, stat_tags, stat_format_tags)
 check("collects constellation name_tag", "tagConA" in referenced, True)
 check("collects power name_tag", "tagPowerName" in referenced, True)
 check("collects power description_tag", "tagPowerDesc" in referenced, True)
 check("collects pet name_tag", "tagPetName" in referenced, True)
 check("collects weapon description_tag", "tagWeaponDesc" in referenced, True)
 check("collects stat-tags values", {"tagCharStatsDA", "Life"} <= referenced, True)
-check("referenced tag count", len(referenced), 7)
+check("collects stat-format-tags values", "DefenseConvert" in referenced, True)
+check("referenced tag count", len(referenced), 8)
+check("collect works without stat-format-tags", "tagConA" in bgt.collect_referenced_tags(devotions, stat_tags), True)
 
 # --- build_table: resolves against a text table, cleans control codes, omits unresolved tags
 text_table = {
@@ -77,6 +81,8 @@ with tempfile.TemporaryDirectory() as tmp:
     dev_path.write_text(json.dumps(devotions), encoding="utf-8")
     stat_path = tmp / "stat-tags.json"
     stat_path.write_text(json.dumps(stat_tags), encoding="utf-8")
+    fmt_path = tmp / "stat-format-tags.json"
+    fmt_path.write_text(json.dumps(stat_format_tags), encoding="utf-8")
     text_dir = tmp / "text"
     text_dir.mkdir()
     (text_dir / "tags.txt").write_text(
@@ -87,6 +93,7 @@ with tempfile.TemporaryDirectory() as tmp:
     rc = bgt.main([
         "--devotions", str(dev_path),
         "--stat-tags", str(stat_path),
+        "--stat-format-tags", str(fmt_path),
         "--text-dir", str(text_dir),
         "--lang", "en",
         "--out", str(out_path),

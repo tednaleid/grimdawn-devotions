@@ -20,6 +20,7 @@
   "stat.override.characterDeflectProjectile": "Chance, Projektilen auszuweichen",
   "stat.override.characterDodgePercent": "Chance, Nahkampfangriffen auszuweichen",
   "stat.override.characterEnergyAbsorptionPercent": "Absorbierte Energie von gegnerischen Zaubern",
+  "stat.override.characterHealIncreasePercent": "Erhöhte Heilungseffekte",
   "stat.override.characterHuntingDexterityReqReduction": "Gerissenheit-Anforderung für Fernkampfwaffen",
   "stat.override.characterJewelryIntelligenceReqReduction": "Geist-Anforderung für Schmuck",
   "stat.override.characterMeleeDexterityReqReduction": "Gerissenheit-Anforderung für Nahkampfwaffen",

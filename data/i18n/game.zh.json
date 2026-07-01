@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "减少 {%.0f0}% 思维控制时间",
+  "DefensePercentCurrentLife": "+{%.0f0}% 生命值百分比减少抗性",
   "Dexterity": "灵巧",
   "Intelligence": "精神",
   "Life": "生命",

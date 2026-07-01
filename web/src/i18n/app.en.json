@@ -142,6 +142,7 @@
   "stat.override.characterRunSpeedMaxModifier": "Maximum Movement Speed",
   "stat.override.characterTotalSpeedModifier": "Total Speed",
   "stat.override.characterConstitutionModifier": "Constitution",
+  "stat.override.characterHealIncreasePercent": "Increased Healing",
   "stat.override.characterDodgePercent": "Chance to Avoid Melee Attacks",
   "stat.override.characterDeflectProjectile": "Chance to Avoid Projectiles",
   "stat.override.characterEnergyAbsorptionPercent": "Energy Absorbed from Enemy Spells",

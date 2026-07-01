@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% 정신조종 지속시간 단축",
+  "DefensePercentCurrentLife": "{%.0f0}% 체력 감소 저항",
   "Dexterity": "민첩",
   "Intelligence": "정신",
   "Life": "체력",

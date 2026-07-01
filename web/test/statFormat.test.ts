@@ -37,6 +37,29 @@ describe("statRow attributes (GD internal -> display names)", () => {
   });
 });
 
+describe("statRow format-string stats (game-sourced term, value stripped)", () => {
+  // These GD stats store their display as a value-embedded format string ("{v}% <noun>").
+  // We source the noun from the game tag and strip the value token; the value renders separately.
+  test("defensivePercentCurrentLife is Resistance to Life Reduction, percent", () => {
+    expect(statRow("defensivePercentCurrentLife", 20)).toEqual({
+      label: "Resistance to Life Reduction",
+      value: "+20%",
+    });
+  });
+  test("defensiveConvert is Reduced Mind Control Duration, percent (not stun, not flat +50)", () => {
+    expect(statRow("defensiveConvert", 50)).toEqual({
+      label: "Reduced Mind Control Duration",
+      value: "+50%",
+    });
+  });
+  test("characterHealIncreasePercent is an authored percent label (value-suffix game format)", () => {
+    expect(statRow("characterHealIncreasePercent", 20)).toEqual({
+      label: "Increased Healing",
+      value: "+20%",
+    });
+  });
+});
+
 describe("statRow offensive damage (percent vs flat)", () => {
   test("physical modifier is percent damage", () => {
     expect(statRow("offensivePhysicalModifier", 15)).toEqual({ label: "Physical Damage", value: "+15%" });

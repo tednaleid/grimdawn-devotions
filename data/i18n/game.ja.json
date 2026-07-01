@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% 精神支配時間短縮",
+  "DefensePercentCurrentLife": "{%.0f0}% ヘルス減少耐性",
   "Dexterity": "狡猾性",
   "Intelligence": "精神力",
   "Life": "ヘルス",

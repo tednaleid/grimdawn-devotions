@@ -2,7 +2,7 @@
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
 import { translate, gameText } from "./localization";
-import { STAT_TAGS } from "./statTags";
+import { STAT_TAGS, STAT_FORMAT_TAGS } from "./statTags";
 
 export interface StatRow {
   label: string;
@@ -126,6 +126,9 @@ const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
   characterRunSpeedMaxModifier: { percent: true, sign: 1 },
   characterTotalSpeedModifier: { percent: true, sign: 1 },
   characterConstitutionModifier: { percent: true, sign: 1 },
+  // Value-suffix game format ("Healing Effects Increased by {v}%") - the value cannot be stripped to a
+  // clean prefix label across languages, so the label is app-authored (see stat.override.<id>).
+  characterHealIncreasePercent: { percent: true, sign: 1 },
   characterDodgePercent: { percent: true, sign: 1 },
   characterDeflectProjectile: { percent: true, sign: 1 },
   characterEnergyAbsorptionPercent: { percent: true, sign: 1 },
@@ -140,6 +143,18 @@ const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
   characterWeaponIntelligenceReqReduction: { percent: true, sign: -1 },
   characterJewelryIntelligenceReqReduction: { percent: true, sign: -1 },
 };
+
+// Strip Grim Dawn value placeholders ("{%.0f0}%", ranges "{%.0f0}-{%.0f1}%") and the leading/trailing
+// "%"/dash/space they leave behind, so a value-embedded stat format tag reduces to its bare noun. A
+// no-op on the plain-noun tags in STAT_TAGS. Used only for value-PREFIX stats (value leads the noun in
+// every language); value-suffix stats are app-authored instead.
+function stripValueTokens(s: string): string {
+  return s
+    .replace(/\{%[^}]*\}/g, "")
+    .replace(/^[\s%-]+|[\s%-]+$/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
 
 function humanize(id: string): string {
   const s = id
@@ -201,6 +216,10 @@ export function classify(id: string): Classified | null {
     const name = attrLabel(m[1]!);
     if (name) return { label: name, percent: m[2] === "Modifier", sign: 1 };
   }
+
+  // Value-embedded game format stats ("{v}% <noun>"): source the noun from the game tag, strip the value.
+  const fmtTag = STAT_FORMAT_TAGS[id];
+  if (fmtTag) return { label: stripValueTokens(gameText(fmtTag)), percent: true, sign: 1 };
 
   // Fallback: humanize, treating Modifier/Percent/Resistance/Chance as percent and Reduction as a negative percent.
   const percent = /Modifier$|Percent|Reduction$|Resistance$|Chance$/.test(id);

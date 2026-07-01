@@ -1,4 +1,6 @@
 {
+  "DefenseConvert": "{%.0f0}% de reducción de la duración de control mental",
+  "DefensePercentCurrentLife": "{%.0f0}% de resistencia a la reducción de vida",
   "Dexterity": "Astucia",
   "Intelligence": "Espíritu",
   "Life": "Vida",
