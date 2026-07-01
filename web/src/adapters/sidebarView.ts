@@ -3,7 +3,7 @@
 import { AFFINITIES, type Affinity, type CelestialPower, type DevotionModel, type StarId } from "../core/types";
 import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
-import { condensedRows, type CondensedGroup, type CondensedSubject } from "../core/statFormat";
+import { condensedRows, GROUP_KEY, type CondensedGroup, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
@@ -59,7 +59,10 @@ function benefitListHtml(
     return `<div class="brow${sel}" data-vid="${vid}">${lbl}<span class="brow-vals">${cells(r)}</span></div>`;
   };
   return groups
-    .map((g) => `<h3>${g.group}</h3>${g.subjects.map((s) => s.rows.map((r) => rowHtml(s, r)).join("")).join("")}`)
+    .map(
+      (g) =>
+        `<h3>${translate(GROUP_KEY[g.group])}</h3>${g.subjects.map((s) => s.rows.map((r) => rowHtml(s, r)).join("")).join("")}`,
+    )
     .join("");
 }
 
@@ -149,7 +152,7 @@ export function renderBenefits(
               `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`,
           )
           .join("");
-        return subs ? `<h3>${g.group}</h3><div class="avail-list">${subs}</div>` : "";
+        return subs ? `<h3>${translate(GROUP_KEY[g.group])}</h3><div class="avail-list">${subs}</div>` : "";
       })
       .join("");
 

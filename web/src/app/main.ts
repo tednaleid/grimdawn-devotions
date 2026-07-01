@@ -120,6 +120,9 @@ async function boot() {
   resetPointsBtn.textContent = translate("ui.points.reset");
   leftBtn.setAttribute("aria-label", translate("ui.drawer.benefitsAria"));
   rightBtn.setAttribute("aria-label", translate("ui.drawer.affinityAria"));
+  leftBtn.textContent = translate("ui.drawer.benefits");
+  rightBtn.textContent = translate("ui.drawer.affinity");
+  barEl.setAttribute("aria-label", translate("ui.points.budgetAria"));
   const tip = tooltipView(tooltipEl);
   const isTouch = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
   let popoverTarget: CommitTarget | null = null; // the star/constellation the open popover commits

@@ -228,10 +228,9 @@ export function statRow(id: string, value: number, racialTarget?: string[]): Sta
 // (Resistance Reduction, Crowd Control, Retaliation) and the three-way Defense split keep the
 // high-value concepts from being buried in one giant section. Routing lives in groupFor.
 // These act as internal identifiers (Map keys in this file and in benefitRows.ts, and asserted
-// directly by statFormat.test.ts / condense.test.ts) as well as the sidebar's rendered headers, so
-// they stay plain English here. The catalog mirrors them under stat.group.<key> for the sidebar
-// render site (sidebarView.ts's `<h3>${g.group}</h3>`) to resolve through translate in a follow-up,
-// the same way Task 5 deferred that exact call site.
+// directly by statFormat.test.ts / condense.test.ts), so they stay plain English here. The
+// sidebar's rendered header resolves the display text via GROUP_KEY + translate (see
+// sidebarView.ts), never this raw value.
 export const GROUP_ORDER = [
   "Attributes",
   "Offense",
@@ -244,6 +243,19 @@ export const GROUP_ORDER = [
   "Other",
 ] as const;
 export type StatGroup = (typeof GROUP_ORDER)[number];
+
+// Maps a StatGroup identifier to its catalog key, for the sidebar header render site.
+export const GROUP_KEY: Record<StatGroup, string> = {
+  Attributes: "stat.group.attributes",
+  Offense: "stat.group.offense",
+  "Resistance Reduction": "stat.group.resistanceReduction",
+  "Crowd Control": "stat.group.crowdControl",
+  Retaliation: "stat.group.retaliation",
+  Resistances: "stat.group.resistances",
+  "Status Protection": "stat.group.statusProtection",
+  "Armor & Mitigation": "stat.group.armorAndMitigation",
+  Other: "stat.group.other",
+};
 
 function groupFor(id: string): StatGroup {
   if (id === "racialBonusPercentDamage") return "Offense";

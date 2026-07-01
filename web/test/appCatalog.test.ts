@@ -73,6 +73,15 @@ const REQUIRED = [
   "ui.benefit.duration",
   "ui.benefit.maxPrefix",
   "ui.benefit.seconds",
+  "stat.group.attributes",
+  "stat.group.offense",
+  "stat.group.resistanceReduction",
+  "stat.group.crowdControl",
+  "stat.group.retaliation",
+  "stat.group.resistances",
+  "stat.group.statusProtection",
+  "stat.group.armorAndMitigation",
+  "stat.group.other",
 ];
 
 test("every required chrome key exists in app.en.json", () => {
