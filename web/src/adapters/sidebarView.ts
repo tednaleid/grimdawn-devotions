@@ -150,14 +150,16 @@ export function renderBenefits(
   ) =>
     scopeCatalog
       .map((g) => {
-        const subs = g.subjects
-          .filter((s) => {
+        const subs = sortByResolved(
+          loc,
+          g.subjects.filter((s) => {
             if (scopeActiveKeys.has(s.key)) return false;
             const ks = scope.keys(s);
             const obtainable = availKeys === undefined || ks.some((k) => availKeys.has(k));
             return obtainable || ks.some((k) => selectedBenefits.has(k));
-          })
-          .sort((a, b) => resolveText(loc, a.subject).localeCompare(resolveText(loc, b.subject)))
+          }),
+          (s) => s.subject,
+        )
           .map(
             (s) =>
               `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"><span class="bsubj" data-gtoggle>${resolveText(loc, s.subject)}</span></div>`,
