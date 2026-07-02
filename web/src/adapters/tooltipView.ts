@@ -9,11 +9,11 @@ import type {
   PetInfo,
   StarId,
 } from "../core/types";
-import { formatBonusRowsWithIds, formatPet, formatPowerStats } from "../core/statFormat";
+import { formatBonusRowsWithIds, formatPet, formatPowerStats, type PowerRows } from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
-import { translate, gameText, resolveTextGlobal } from "../core/localization";
+import { translate, gameText, resolveTextGlobal, type Text } from "../core/localization";
 
 type AffinityTotals = Record<Affinity, number>;
 
@@ -71,6 +71,20 @@ function petBonusHtml(petBonuses: Record<string, number> | undefined, selectedBe
   return `<div class="tip-pet-bonus-head">${translate("ui.tooltip.petBonus")}</div>${bonusRowsHtml(petBonuses, selectedBenefits, "pet:")}`;
 }
 
+// Ability stat lines: the semantic rows render in core's order, untouched; the
+// fallthrough segment is resolved, sorted by resolved label, and appended.
+function powerRowsHtml(power: PowerRows): string {
+  const resolve = (r: { label: Text; value: Text }) => ({
+    label: resolveTextGlobal(r.label),
+    value: resolveTextGlobal(r.value),
+  });
+  return power.rows
+    .map(resolve)
+    .concat(power.fallthrough.map(resolve).sort((a, b) => a.label.localeCompare(b.label)))
+    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
+    .join("");
+}
+
 // Star tooltip: power name + proc trigger ("Scorpion Sting (25% Chance on Attack)"),
 // description, granted level, then the ability's stat lines GD-style.
 function powerHtml(power: CelestialPower): string {
@@ -81,9 +95,7 @@ function powerHtml(power: CelestialPower): string {
   const level = power.level
     ? `<div class="tip-power-level">${translate("ui.tooltip.currentLevel", { level: power.level })}</div>`
     : "";
-  const stats = formatPowerStats(power.stats)
-    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
-    .join("");
+  const stats = powerRowsHtml(formatPowerStats(power.stats));
   const pet = power.pet ? petHtml(power.pet) : "";
   return `<div class="tip-power">${gameText(power.nameTag)}${proc}</div>${desc}${level}${stats}${pet}`;
 }
@@ -92,10 +104,7 @@ function powerHtml(power: CelestialPower): string {
 // rendered like the power's own ability stat lines.
 function petHtml(pet: PetInfo): string {
   const { summon, attack } = formatPet(pet);
-  const lines = attack
-    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
-    .join("");
-  return `<div class="tip-pet">${summon}</div>${lines}`;
+  return `<div class="tip-pet">${resolveTextGlobal(summon)}</div>${powerRowsHtml(attack)}`;
 }
 
 function affinitySections(

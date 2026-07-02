@@ -1,7 +1,7 @@
 // ABOUTME: Formats raw Grim Dawn devotion stat ids + values into player-facing rows.
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
-import { translate, gameText, appT, gameT, gameStrippedT, litT, resolveTextGlobal, type Text } from "./localization";
+import { translate, appT, gameT, gameStrippedT, litT, joinT, resolveTextGlobal, type Text } from "./localization";
 import { STAT_TAGS, STAT_FORMAT_TAGS } from "./statTags";
 
 export interface StatRow {
@@ -367,10 +367,12 @@ export interface GroupedRow {
 // own stat lines the way grimtools shows them ("1.5 Second Skill Recharge",
 // "1125 Poison Damage over 5 Seconds"). These render with the same value+label
 // shape as bonus rows, but the value carries the unit and no leading sign.
-// TODO(Task 5): converts to Text like StatRow; still resolved strings for now.
-interface PowerRow {
-  label: string;
-  value: string;
+// `rows` carry grimtools' semantic order and must never be re-sorted; `fallthrough`
+// holds the leftover stats in stable input order, and adapters sort that segment
+// alphabetically by resolved label before appending it.
+export interface PowerRows {
+  rows: StatRow[];
+  fallthrough: StatRow[];
 }
 
 function fmtNum(n: number): string {
@@ -378,8 +380,8 @@ function fmtNum(n: number): string {
 }
 
 // Shared " for N Seconds" suffix used by several ability-debuff lines below and by formatPet.
-function forSecondsSuffix(seconds: number): string {
-  return translate("stat.power.forSeconds", { seconds: fmtNum(seconds) });
+function forSecondsSuffix(seconds: number): Text {
+  return appT("stat.power.forSeconds", { seconds: fmtNum(seconds) });
 }
 
 /**
@@ -389,8 +391,8 @@ function forSecondsSuffix(seconds: number): string {
  * grimtools' order; any remaining raw stat ids fall through to bonus formatting
  * (sign stripped, since an ability grants the value rather than a +/- modifier).
  */
-export function formatPowerStats(stats: Record<string, number>): PowerRow[] {
-  const rows: PowerRow[] = [];
+export function formatPowerStats(stats: Record<string, number>): PowerRows {
+  const rows: StatRow[] = [];
   const used = new Set<string>();
   const take = (k: string): number | undefined => {
     if (k in stats) {
@@ -401,38 +403,39 @@ export function formatPowerStats(stats: Record<string, number>): PowerRow[] {
   };
 
   const cd = take("skillCooldownTime");
-  if (cd !== undefined) rows.push({ value: fmtNum(cd), label: translate("stat.power.secondSkillRecharge") });
+  if (cd !== undefined) rows.push({ value: litT(fmtNum(cd)), label: appT("stat.power.secondSkillRecharge") });
 
   const dur = take("skillActiveDuration");
-  if (dur !== undefined) rows.push({ value: fmtNum(dur), label: translate("stat.power.secondDuration") });
+  if (dur !== undefined) rows.push({ value: litT(fmtNum(dur)), label: appT("stat.power.secondDuration") });
 
   const proj = take("projectileLaunchNumber");
-  if (proj !== undefined) rows.push({ value: fmtNum(proj), label: translate("stat.power.projectiles") });
+  if (proj !== undefined) rows.push({ value: litT(fmtNum(proj)), label: appT("stat.power.projectiles") });
 
   const pierce = take("projectilePiercingChance");
-  if (pierce !== undefined) rows.push({ value: `${fmtNum(pierce)}%`, label: translate("stat.power.passThrough") });
+  if (pierce !== undefined) rows.push({ value: litT(`${fmtNum(pierce)}%`), label: appT("stat.power.passThrough") });
 
   const radius = take("projectileExplosionRadius") ?? take("skillTargetRadius");
-  if (radius !== undefined) rows.push({ value: fmtNum(radius), label: translate("stat.power.meterRadius") });
+  if (radius !== undefined) rows.push({ value: litT(fmtNum(radius)), label: appT("stat.power.meterRadius") });
   // When an explosion radius already supplied the line, consume the skill's internal target-selection
   // radius too, so it does not fall through to humanize() as a raw "Skill Target Radius" line.
   take("skillTargetRadius");
 
   const absorb = take("damageAbsorption");
-  if (absorb !== undefined) rows.push({ value: fmtNum(absorb), label: translate("stat.power.damageAbsorption") });
+  if (absorb !== undefined) rows.push({ value: litT(fmtNum(absorb)), label: appT("stat.power.damageAbsorption") });
 
   // Heal / restore procs (Dryad's Blessing, Giant's Blood, Inspiration): a flat and a
   // percent health restore, plus a percent energy restore. Value carries the unit.
   const healFlat = take("skillLifeBonus");
-  if (healFlat !== undefined) rows.push({ value: fmtNum(healFlat), label: translate("stat.power.healthRestored") });
+  if (healFlat !== undefined) rows.push({ value: litT(fmtNum(healFlat)), label: appT("stat.power.healthRestored") });
   const healPct = take("skillLifePercent");
-  if (healPct !== undefined) rows.push({ value: `${fmtNum(healPct)}%`, label: translate("stat.power.healthRestored") });
+  if (healPct !== undefined)
+    rows.push({ value: litT(`${fmtNum(healPct)}%`), label: appT("stat.power.healthRestored") });
   const energyPct = take("skillManaPercent");
   if (energyPct !== undefined)
-    rows.push({ value: `${fmtNum(energyPct)}%`, label: translate("stat.power.energyRestored") });
+    rows.push({ value: litT(`${fmtNum(energyPct)}%`), label: appT("stat.power.energyRestored") });
 
   const weapon = take("weaponDamagePct");
-  if (weapon !== undefined) rows.push({ value: `${fmtNum(weapon)}%`, label: translate("stat.power.weaponDamage") });
+  if (weapon !== undefined) rows.push({ value: litT(`${fmtNum(weapon)}%`), label: appT("stat.power.weaponDamage") });
 
   // Damage-over-time: offensiveSlow<Type>Min holds per-second damage paired with a
   // duration; grimtools shows the total over the listed duration.
@@ -443,93 +446,75 @@ export function formatPowerStats(stats: Record<string, number>): PowerRow[] {
       used.add(minK);
       used.add(durK);
       const total = Math.round(stats[minK]! * stats[durK]!);
-      // Bridge: statLabel now returns a Text; formatPowerStats stays string-based until Task 5.
-      const name = resolveTextGlobal(statLabel(`stat.dot.${seg}`));
       rows.push({
-        value: fmtNum(total),
-        label: translate("stat.power.dotDamageOverSeconds", { name, seconds: fmtNum(stats[durK]!) }),
+        value: litT(fmtNum(total)),
+        label: appT("stat.power.dotDamageOverSeconds", {
+          name: statLabel(`stat.dot.${seg}`),
+          seconds: fmtNum(stats[durK]!),
+        }),
       });
     }
   }
 
   // Offensive/Defensive Ability debuffs (e.g. Scorpion Sting's reduced DA).
   const abilityDebuffs: [string, string][] = [
-    ["DefensiveAbility", translate("stat.power.reducedDefensiveAbility")],
-    ["OffensiveAbility", translate("stat.power.reducedOffensiveAbility")],
+    ["DefensiveAbility", "stat.power.reducedDefensiveAbility"],
+    ["OffensiveAbility", "stat.power.reducedOffensiveAbility"],
   ];
-  for (const [seg, name] of abilityDebuffs) {
+  for (const [seg, key] of abilityDebuffs) {
     const minK = `offensiveSlow${seg}Min`;
     const durK = `offensiveSlow${seg}DurationMin`;
     if (minK in stats) {
       used.add(minK);
       const dur = stats[durK];
       if (durK in stats) used.add(durK);
-      const suffix = dur !== undefined ? forSecondsSuffix(dur) : "";
-      rows.push({ value: fmtNum(stats[minK]!), label: `${name}${suffix}` });
+      const label = dur !== undefined ? joinT(appT(key), forSecondsSuffix(dur)) : appT(key);
+      rows.push({ value: litT(fmtNum(stats[minK]!)), label });
     }
   }
 
   // Other timed target debuffs: a percent movement slow, plus flat/percent resistance
   // and damage reductions (which lack the "Slow" infix the ability debuffs use).
   const timedDebuffs: [string, string, string, boolean][] = [
-    [
-      "offensiveSlowRunSpeedMin",
-      "offensiveSlowRunSpeedDurationMin",
-      translate("stat.power.slowerTargetMovement"),
-      true,
-    ],
+    ["offensiveSlowRunSpeedMin", "offensiveSlowRunSpeedDurationMin", "stat.power.slowerTargetMovement", true],
     [
       "offensiveTotalResistanceReductionAbsoluteMin",
       "offensiveTotalResistanceReductionAbsoluteDurationMin",
-      translate("stat.power.reducedTargetResistances"),
+      "stat.power.reducedTargetResistances",
       false,
     ],
     [
       "offensiveTotalDamageReductionPercentMin",
       "offensiveTotalDamageReductionPercentDurationMin",
-      translate("stat.power.reducedTargetDamage"),
+      "stat.power.reducedTargetDamage",
       true,
     ],
     // Magnitude + duration status debuffs, reusing the condensed-view subject vocabulary.
-    ["offensiveFumbleMin", "offensiveFumbleDurationMin", translate("stat.subject.fumble"), true],
-    [
-      "offensiveProjectileFumbleMin",
-      "offensiveProjectileFumbleDurationMin",
-      translate("stat.subject.impairedAim"),
-      true,
-    ],
-    [
-      "offensiveSlowAttackSpeedMin",
-      "offensiveSlowAttackSpeedDurationMin",
-      translate("stat.subject.slowAttackSpeed"),
-      true,
-    ],
-    [
-      "offensiveSlowTotalSpeedMin",
-      "offensiveSlowTotalSpeedDurationMin",
-      translate("stat.subject.slowTotalSpeed"),
-      true,
-    ],
+    ["offensiveFumbleMin", "offensiveFumbleDurationMin", "stat.subject.fumble", true],
+    ["offensiveProjectileFumbleMin", "offensiveProjectileFumbleDurationMin", "stat.subject.impairedAim", true],
+    ["offensiveSlowAttackSpeedMin", "offensiveSlowAttackSpeedDurationMin", "stat.subject.slowAttackSpeed", true],
+    ["offensiveSlowTotalSpeedMin", "offensiveSlowTotalSpeedDurationMin", "stat.subject.slowTotalSpeed", true],
     [
       "offensiveElementalResistanceReductionAbsoluteMin",
       "offensiveElementalResistanceReductionAbsoluteDurationMin",
-      translate("stat.subject.reducedElementalResistancesFlat"),
+      "stat.subject.reducedElementalResistancesFlat",
       false,
     ],
     [
       "offensivePhysicalReductionPercentMin",
       "offensivePhysicalReductionPercentDurationMin",
-      translate("stat.subject.reducedPhysicalResistance"),
+      "stat.subject.reducedPhysicalResistance",
       true,
     ],
   ];
-  for (const [minK, durK, label, pct] of timedDebuffs) {
+  for (const [minK, durK, key, pct] of timedDebuffs) {
     if (minK in stats) {
       used.add(minK);
       const dur = stats[durK];
       if (durK in stats) used.add(durK);
-      const suffix = dur !== undefined ? forSecondsSuffix(dur) : "";
-      rows.push({ value: pct ? `${fmtNum(stats[minK]!)}%` : fmtNum(stats[minK]!), label: `${label}${suffix}` });
+      const label = dur !== undefined ? joinT(appT(key), forSecondsSuffix(dur)) : appT(key);
+      const v = stats[minK]!;
+      rows.push({ value: litT(pct ? `${fmtNum(v)}%` : fmtNum(v)), label });
     }
   }
 
@@ -550,37 +535,38 @@ export function formatPowerStats(stats: Record<string, number>): PowerRow[] {
     const max = take(`offensive${seg}Max`);
     const chance = take(`offensive${seg}Chance`);
     const seconds = max !== undefined && max !== min ? `${fmtNum(min)}-${fmtNum(max)}` : fmtNum(min);
-    const effect = translate(key);
     if (chance !== undefined)
-      rows.push({ value: `${fmtNum(chance)}%`, label: translate("stat.power.ccChanceDuration", { seconds, effect }) });
-    else rows.push({ value: seconds, label: translate("stat.power.ccDuration", { effect }) });
+      rows.push({
+        value: litT(`${fmtNum(chance)}%`),
+        label: appT("stat.power.ccChanceDuration", { seconds, effect: appT(key) }),
+      });
+    else rows.push({ value: litT(seconds), label: appT("stat.power.ccDuration", { effect: appT(key) }) });
   }
 
   // Anything else (instant damage ranges, leech, resist reductions): reuse the
-  // bonus formatter and drop the leading "+" an ability line does not show.
-  // Bridge: formatBonusRows now returns Text in stable input order (sorting moved to
-  // callers); formatPowerStats stays string-based and still sorts by label until Task 5.
+  // bonus formatter and drop the leading "+" an ability line does not show. These
+  // stay in stable input order here; adapters sort them by resolved label.
   const rest: Record<string, number> = {};
   for (const k of Object.keys(stats)) if (!used.has(k)) rest[k] = stats[k]!;
-  const restRows = formatBonusRows(rest)
-    .map((r) => ({ label: resolveTextGlobal(r.label), value: resolveTextGlobal(r.value) }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-  for (const r of restRows) {
-    rows.push({ label: r.label, value: r.value.replace(/^\+/, "") });
+  const fallthrough: StatRow[] = [];
+  for (const r of formatBonusRows(rest)) {
+    const v = r.value.k === "lit" ? litT(r.value.s.replace(/^\+/, "")) : r.value;
+    fallthrough.push({ label: r.label, value: v });
   }
-  return rows;
+  return { rows, fallthrough };
 }
 
 /**
  * A summon proc's pet: a "Summons N <Pet> for M Seconds" summary line plus the pet's
  * base attack rendered as ability stat rows (reusing the power-stat formatter).
  */
-export function formatPet(pet: PetInfo): { summon: string; attack: PowerRow[] } {
+export function formatPet(pet: PetInfo): { summon: Text; attack: PowerRows } {
   const plural = (pet.count ?? 1) > 1;
   const num = plural ? `${fmtNum(pet.count!)} ` : "";
-  const name = `${(pet.nameTag ? gameText(pet.nameTag) : null) ?? translate("stat.pet.minion")}${plural ? "s" : ""}`;
-  const dur = pet.duration ? forSecondsSuffix(pet.duration) : "";
-  return { summon: translate("stat.pet.summons", { num, name, dur }), attack: formatPowerStats(pet.attackStats) };
+  const nameBase: Text = pet.nameTag ? gameT(pet.nameTag) : appT("stat.pet.minion");
+  const name: Text = plural ? joinT(nameBase, "s") : nameBase;
+  const dur: Text = pet.duration ? forSecondsSuffix(pet.duration) : litT("");
+  return { summon: appT("stat.pet.summons", { num, name, dur }), attack: formatPowerStats(pet.attackStats) };
 }
 
 // --- Condensed view: one line per concept (subject), carrying its dimensions ---

@@ -3,6 +3,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { groupedBonusRows, formatPowerStats } from "../src/core/statFormat";
+import { resolveTextGlobal } from "../src/core/localization";
 import { installEnglish } from "./helpers/localizeEn";
 
 installEnglish();
@@ -72,7 +73,10 @@ test("no devotion stat renders via humanize() in any view", () => {
     if (forbidden.has(label)) leaks.push(label);
   };
   for (const map of starMaps) for (const g of groupedBonusRows(map)) for (const r of g.rows) scan(r.label);
-  for (const map of powerMaps) for (const r of formatPowerStats(map)) scan(r.label);
+  for (const map of powerMaps) {
+    const p = formatPowerStats(map);
+    for (const r of [...p.rows, ...p.fallthrough]) scan(resolveTextGlobal(r.label));
+  }
   // Deduplicate for a readable failure listing the raw labels that leaked.
   expect([...new Set(leaks)]).toEqual([]);
 });

@@ -7,9 +7,15 @@ import appZh from "../src/i18n/app.zh.json";
 import gameEn from "../../data/i18n/game.en.json";
 import gameZh from "../../data/i18n/game.zh.json";
 import { buildModel, type DevotionsDoc } from "../src/core/model";
-import { makeLocalization, setLocalization, resolveTextGlobal } from "../src/core/localization";
+import { makeLocalization, setLocalization, resolveTextGlobal, type Text } from "../src/core/localization";
 import type { Localization } from "../src/ports/Localization";
-import { formatBonusRowsWithIds, formatPowerStats, formatPet, condensedRows } from "../src/core/statFormat";
+import {
+  formatBonusRowsWithIds,
+  formatPowerStats,
+  formatPet,
+  condensedRows,
+  type PowerRows,
+} from "../src/core/statFormat";
 import { benefitRows } from "../src/core/benefitRows";
 import { commitButton } from "../src/core/commitAction";
 import { sumBonuses, sumPetBonuses, racialTargets } from "../src/core/aggregate";
@@ -44,6 +50,14 @@ function partialReach(completable: Set<string>) {
 // over descriptors), never WHAT it returns.
 function collectSurfaces(loc: Localization): unknown {
   setLocalization(loc);
+  // Power rows resolve in core's semantic order; the fallthrough segment is sorted
+  // by resolved label and appended, mirroring tooltipView's powerRowsHtml.
+  const resolveRow = (r: { label: Text; value: Text }) => ({
+    label: resolveTextGlobal(r.label),
+    value: resolveTextGlobal(r.value),
+  });
+  const resolvePower = (p: PowerRows) =>
+    p.rows.map(resolveRow).concat(p.fallthrough.map(resolveRow).sort((a, b) => a.label.localeCompare(b.label)));
   const racial = racialTargets(model, selection);
   const perStar: Record<string, unknown> = {};
   for (const sid of selection) {
@@ -54,8 +68,11 @@ function collectSurfaces(loc: Localization): unknown {
         .sort((a, b) => a.label.localeCompare(b.label)),
     };
     if (star.celestialPower) {
-      entry.power = formatPowerStats(star.celestialPower.stats);
-      if (star.celestialPower.pet) entry.pet = formatPet(star.celestialPower.pet);
+      entry.power = resolvePower(formatPowerStats(star.celestialPower.stats));
+      if (star.celestialPower.pet) {
+        const pet = formatPet(star.celestialPower.pet);
+        entry.pet = { summon: resolveTextGlobal(pet.summon), attack: resolvePower(pet.attack) };
+      }
     }
     perStar[sid] = entry;
   }

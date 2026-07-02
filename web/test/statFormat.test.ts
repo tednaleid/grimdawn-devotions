@@ -18,6 +18,11 @@ installEnglish();
 
 const res = (t: Text) => resolveText(enLoc, t);
 const resRow = (r: { label: Text; value: Text } | null) => (r ? { label: res(r.label), value: res(r.value) } : null);
+const resRows = (rows: { label: Text; value: Text }[]) =>
+  rows.map((r) => ({ value: res(r.value), label: res(r.label) }));
+// Mirrors the adapter render for the fallthrough segment: resolve, then sort by resolved label.
+const resSorted = (rows: { label: Text; value: Text }[]) =>
+  resRows(rows).sort((a, b) => a.label.localeCompare(b.label));
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
@@ -215,7 +220,7 @@ describe("formatBonusRows merges Min/Max damage into a range and skips weapon to
 describe("formatPowerStats renders celestial-power ability lines GD-style", () => {
   // The Scorpion Sting acceptance example: every line must reproduce exactly.
   test("Scorpion Sting reproduces the grimtools tooltip stat lines in order", () => {
-    const rows = formatPowerStats({
+    const r = formatPowerStats({
       skillCooldownTime: 1.5,
       projectileLaunchNumber: 6,
       projectilePiercingChance: 100,
@@ -226,7 +231,8 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
       offensiveSlowDefensiveAbilityMin: 150,
       offensiveSlowDefensiveAbilityDurationMin: 5,
     });
-    expect(rows).toEqual([
+    expect(r.fallthrough).toEqual([]);
+    expect(resRows(r.rows)).toEqual([
       { value: "1.5", label: "Second Skill Recharge" },
       { value: "6", label: "Projectile(s)" },
       { value: "100%", label: "Chance to pass through Enemies" },
@@ -243,8 +249,8 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
       skillActiveDuration: 8,
       skillTargetRadius: 15,
       damageAbsorption: 400,
-    });
-    expect(rows).toEqual([
+    }).rows;
+    expect(resRows(rows)).toEqual([
       { value: "12", label: "Second Skill Recharge" },
       { value: "8", label: "Second Duration" },
       { value: "15", label: "Meter Radius" },
@@ -253,33 +259,39 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
   });
 
   test("heal/restore powers render flat + percent health and percent energy (Dryad's Blessing, Inspiration)", () => {
-    expect(formatPowerStats({ skillCooldownTime: 2.7, skillLifeBonus: 848, skillLifePercent: 10 })).toEqual([
+    expect(
+      resRows(formatPowerStats({ skillCooldownTime: 2.7, skillLifeBonus: 848, skillLifePercent: 10 }).rows),
+    ).toEqual([
       { value: "2.7", label: "Second Skill Recharge" },
       { value: "848", label: "Health Restored" },
       { value: "10%", label: "Health Restored" },
     ]);
-    expect(formatPowerStats({ skillManaPercent: 25 })).toEqual([{ value: "25%", label: "Energy Restored" }]);
+    expect(resRows(formatPowerStats({ skillManaPercent: 25 }).rows)).toEqual([
+      { value: "25%", label: "Energy Restored" },
+    ]);
   });
 
   test("DoT pairs multiply per-second by duration and use the DoT display name", () => {
-    expect(formatPowerStats({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 })).toEqual([
+    expect(resRows(formatPowerStats({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 }).rows)).toEqual([
       { value: "300", label: "Burn Damage over 3 Seconds" },
     ]);
-    expect(formatPowerStats({ offensiveSlowPhysicalMin: 50, offensiveSlowPhysicalDurationMin: 4 })).toEqual([
-      { value: "200", label: "Internal Trauma Damage over 4 Seconds" },
-    ]);
+    expect(
+      resRows(formatPowerStats({ offensiveSlowPhysicalMin: 50, offensiveSlowPhysicalDurationMin: 4 }).rows),
+    ).toEqual([{ value: "200", label: "Internal Trauma Damage over 4 Seconds" }]);
   });
 
   test("target debuffs (movement slow, resistance/damage reduction) render as timed reductions", () => {
     expect(
-      formatPowerStats({
-        offensiveSlowRunSpeedMin: 45,
-        offensiveSlowRunSpeedDurationMin: 3,
-        offensiveTotalResistanceReductionAbsoluteMin: 24,
-        offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
-        offensiveTotalDamageReductionPercentMin: 15,
-        offensiveTotalDamageReductionPercentDurationMin: 2,
-      }),
+      resRows(
+        formatPowerStats({
+          offensiveSlowRunSpeedMin: 45,
+          offensiveSlowRunSpeedDurationMin: 3,
+          offensiveTotalResistanceReductionAbsoluteMin: 24,
+          offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
+          offensiveTotalDamageReductionPercentMin: 15,
+          offensiveTotalDamageReductionPercentDurationMin: 2,
+        }).rows,
+      ),
     ).toEqual([
       { value: "45%", label: "Slower target Movement for 3 Seconds" },
       { value: "24", label: "Reduced target's Resistances for 1 Seconds" },
@@ -289,67 +301,81 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
 
   test("crowd-control procs render as chance/duration, not raw offensive ids", () => {
     // Stun with a chance: "50% Chance of 1 Seconds of Stun".
-    expect(formatPowerStats({ offensiveStunChance: 50, offensiveStunMin: 1 })).toEqual([
+    expect(resRows(formatPowerStats({ offensiveStunChance: 50, offensiveStunMin: 1 }).rows)).toEqual([
       { value: "50%", label: "Chance of 1 Seconds of Stun" },
     ]);
     // Guaranteed (no chance facet): "1.8 Seconds of Confusion".
-    expect(formatPowerStats({ offensiveConfusionMin: 1.8 })).toEqual([{ value: "1.8", label: "Seconds of Confusion" }]);
+    expect(resRows(formatPowerStats({ offensiveConfusionMin: 1.8 }).rows)).toEqual([
+      { value: "1.8", label: "Seconds of Confusion" },
+    ]);
     // Knockdown carries a Min-Max duration range.
     expect(
-      formatPowerStats({ offensiveKnockdownChance: 100, offensiveKnockdownMin: 0.8, offensiveKnockdownMax: 1.5 }),
+      resRows(
+        formatPowerStats({ offensiveKnockdownChance: 100, offensiveKnockdownMin: 0.8, offensiveKnockdownMax: 1.5 })
+          .rows,
+      ),
     ).toEqual([{ value: "100%", label: "Chance of 0.8-1.5 Seconds of Knockdown" }]);
     // No raw humanized "Offensive ..." label survives.
     const petrify = formatPowerStats({ offensivePetrifyChance: 50, offensivePetrifyMin: 1.5 });
-    expect(petrify).toEqual([{ value: "50%", label: "Chance of 1.5 Seconds of Petrify" }]);
+    expect(resRows(petrify.rows)).toEqual([{ value: "50%", label: "Chance of 1.5 Seconds of Petrify" }]);
   });
 
   test("timed magnitude debuffs (fumble, slows, resist reductions) render as reused subject phrases", () => {
-    expect(formatPowerStats({ offensiveFumbleMin: 14, offensiveFumbleDurationMin: 2 })).toEqual([
+    expect(resRows(formatPowerStats({ offensiveFumbleMin: 14, offensiveFumbleDurationMin: 2 }).rows)).toEqual([
       { value: "14%", label: "Fumble for 2 Seconds" },
     ]);
-    expect(formatPowerStats({ offensiveProjectileFumbleMin: 25, offensiveProjectileFumbleDurationMin: 3 })).toEqual([
-      { value: "25%", label: "Impaired Aim for 3 Seconds" },
-    ]);
-    expect(formatPowerStats({ offensiveSlowAttackSpeedMin: 30, offensiveSlowAttackSpeedDurationMin: 5 })).toEqual([
-      { value: "30%", label: "Slow target's Attack Speed for 5 Seconds" },
-    ]);
-    expect(formatPowerStats({ offensiveSlowTotalSpeedMin: 50, offensiveSlowTotalSpeedDurationMin: 8 })).toEqual([
-      { value: "50%", label: "Slow target's Total Speed for 8 Seconds" },
-    ]);
     expect(
-      formatPowerStats({
-        offensiveElementalResistanceReductionAbsoluteMin: 32,
-        offensiveElementalResistanceReductionAbsoluteDurationMin: 2,
-      }),
+      resRows(formatPowerStats({ offensiveProjectileFumbleMin: 25, offensiveProjectileFumbleDurationMin: 3 }).rows),
+    ).toEqual([{ value: "25%", label: "Impaired Aim for 3 Seconds" }]);
+    expect(
+      resRows(formatPowerStats({ offensiveSlowAttackSpeedMin: 30, offensiveSlowAttackSpeedDurationMin: 5 }).rows),
+    ).toEqual([{ value: "30%", label: "Slow target's Attack Speed for 5 Seconds" }]);
+    expect(
+      resRows(formatPowerStats({ offensiveSlowTotalSpeedMin: 50, offensiveSlowTotalSpeedDurationMin: 8 }).rows),
+    ).toEqual([{ value: "50%", label: "Slow target's Total Speed for 8 Seconds" }]);
+    expect(
+      resRows(
+        formatPowerStats({
+          offensiveElementalResistanceReductionAbsoluteMin: 32,
+          offensiveElementalResistanceReductionAbsoluteDurationMin: 2,
+        }).rows,
+      ),
     ).toEqual([{ value: "32", label: "Reduced target's Elemental Resistances (flat) for 2 Seconds" }]);
     expect(
-      formatPowerStats({ offensivePhysicalReductionPercentMin: 20, offensivePhysicalReductionPercentDurationMin: 5 }),
+      resRows(
+        formatPowerStats({ offensivePhysicalReductionPercentMin: 20, offensivePhysicalReductionPercentDurationMin: 5 })
+          .rows,
+      ),
     ).toEqual([{ value: "20%", label: "Reduced target's Physical Resistance for 5 Seconds" }]);
   });
 
   test("radius falls back to skillTargetRadius when there is no projectile radius", () => {
-    expect(formatPowerStats({ skillTargetRadius: 3.5 })).toEqual([{ value: "3.5", label: "Meter Radius" }]);
+    expect(resRows(formatPowerStats({ skillTargetRadius: 3.5 }).rows)).toEqual([
+      { value: "3.5", label: "Meter Radius" },
+    ]);
   });
 
   test("unhandled stat ids fall through to bonus formatting without a leading +", () => {
     // Twin Fangs: flat Vitality range + a leech percent, shown as ability lines.
-    const rows = formatPowerStats({
+    const r = formatPowerStats({
       weaponDamagePct: 22,
       offensiveLifeMin: 128,
       offensiveLifeMax: 221,
       offensiveLifeLeechMin: 45,
     });
-    // Explicit meta lines come first; the rest reuse the bonus formatter (sorted
-    // by label, sign stripped).
-    expect(rows).toEqual([
-      { value: "22%", label: "Weapon Damage" },
+    // Explicit meta lines are the ordered rows; the rest reuse the bonus formatter
+    // (sign stripped) and land in fallthrough, which adapters sort by resolved label.
+    expect(resRows(r.rows)).toEqual([{ value: "22%", label: "Weapon Damage" }]);
+    expect(resSorted(r.fallthrough)).toEqual([
       { value: "45%", label: "of Attack Damage converted to Health" },
       { value: "128-221", label: "Vitality Damage" },
     ]);
   });
 
   test("empty stats yield no rows", () => {
-    expect(formatPowerStats({})).toEqual([]);
+    const r = formatPowerStats({});
+    expect(r.rows).toEqual([]);
+    expect(r.fallthrough).toEqual([]);
   });
 });
 
@@ -361,20 +387,21 @@ describe("formatPet renders a summon proc's summary + base attack", () => {
       duration: 20,
       attackStats: { offensiveAetherMin: 230, offensiveLifeMin: 230 },
     });
-    expect(r.summon).toBe("Summons 6 Skeletons for 20 Seconds");
-    expect(r.attack).toEqual([
+    expect(res(r.summon)).toBe("Summons 6 Skeletons for 20 Seconds");
+    expect(r.attack.rows).toEqual([]);
+    expect(resSorted(r.attack.fallthrough)).toEqual([
       { value: "230", label: "Aether Damage" },
       { value: "230", label: "Vitality Damage" },
     ]);
   });
   test("single pet shows no count or plural (Bysmiel's Command)", () => {
-    expect(formatPet({ nameTag: "tagDevotionPet_Hound", count: 1, duration: 20, attackStats: {} }).summon).toBe(
+    expect(res(formatPet({ nameTag: "tagDevotionPet_Hound", count: 1, duration: 20, attackStats: {} }).summon)).toBe(
       "Summons Eldritch Hound for 20 Seconds",
     );
   });
   test("missing count omits the number (Elemental Seeker)", () => {
     expect(
-      formatPet({ nameTag: "tagDevotionPet_ElementalSeeker", count: null, duration: 3, attackStats: {} }).summon,
+      res(formatPet({ nameTag: "tagDevotionPet_ElementalSeeker", count: null, duration: 3, attackStats: {} }).summon),
     ).toBe("Summons Elemental Seeker for 3 Seconds");
   });
 });
