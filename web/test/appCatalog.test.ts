@@ -43,6 +43,7 @@ function placeholders(value: string): Set<string> {
 
 const REQUIRED = [
   "ui.title",
+  "ui.lang.label",
   "ui.boot.failed",
   "ui.boot.reload",
   "ui.boot.loading",

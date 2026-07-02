@@ -1,9 +1,23 @@
 // ABOUTME: Tests the localization adapter: locale detection, catalog fetch, and degrade-on-failure.
 // ABOUTME: Injects a fake fetch and preferred list; never touches the network or the DOM.
 import { test, expect } from "bun:test";
-import { loadLocalization, SUPPORTED_LOCALES } from "../src/adapters/localizationAdapter";
+import { loadLocalization, SUPPORTED_LOCALES, storedLocale, storeLocale } from "../src/adapters/localizationAdapter";
 import { translate } from "../src/core/localization";
 import { pickLocale } from "../src/core/locale";
+
+function fakeStorage(init: Record<string, string> = {}): Storage {
+  const m = new Map(Object.entries(init));
+  return {
+    getItem: (k: string) => m.get(k) ?? null,
+    setItem: (k: string, v: string) => void m.set(k, v),
+    removeItem: (k: string) => void m.delete(k),
+    clear: () => m.clear(),
+    key: () => null,
+    get length() {
+      return m.size;
+    },
+  } as unknown as Storage;
+}
 
 function fakeFetch(map: Record<string, unknown>): typeof fetch {
   return (async (url: string) => {
@@ -55,4 +69,20 @@ test("detects a shipped non-English locale from the default supported set", asyn
 
 test("pickLocale resolves a shipped locale against the default supported set", () => {
   expect(pickLocale(["de-DE", "en"], SUPPORTED_LOCALES)).toBe("de");
+});
+
+test("storeLocale + storedLocale round-trips a supported override", () => {
+  const s = fakeStorage();
+  storeLocale("de", s);
+  expect(storedLocale(SUPPORTED_LOCALES, s)).toBe("de");
+});
+
+test("storedLocale ignores an unsupported or unset override", () => {
+  expect(storedLocale(SUPPORTED_LOCALES, fakeStorage({ locale: "xx" }))).toBeNull();
+  expect(storedLocale(SUPPORTED_LOCALES, fakeStorage())).toBeNull();
+});
+
+test("storage helpers no-op when storage is absent", () => {
+  expect(storedLocale(SUPPORTED_LOCALES, null)).toBeNull();
+  expect(() => storeLocale("de", null)).not.toThrow();
 });
