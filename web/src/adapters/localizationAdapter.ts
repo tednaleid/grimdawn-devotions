@@ -1,6 +1,6 @@
-// ABOUTME: Loads app.<locale>.json catalogs, detects the locale, and installs the resolver singleton.
+// ABOUTME: Loads app.<locale>.json catalogs, detects the locale, and builds the resolver instance.
 // ABOUTME: Degrades to English then raw keys if a catalog is missing; the UI never blocks on i18n.
-import { makeLocalization, setLocalization } from "../core/localization";
+import { makeLocalization } from "../core/localization";
 import { pickLocale } from "../core/locale";
 import type { Localization } from "../ports/Localization";
 
@@ -89,7 +89,5 @@ export async function loadLocalization(
   const active = locale === "en" ? fallback : await getJson(fetchImpl, `${base}/i18n/app.${locale}.json`);
   const gameFallback = await getJson(fetchImpl, `${base}/data/i18n/game.en.json`);
   const gameActive = locale === "en" ? gameFallback : await getJson(fetchImpl, `${base}/data/i18n/game.${locale}.json`);
-  const loc = makeLocalization(active, fallback, locale, gameActive, gameFallback);
-  setLocalization(loc);
-  return loc;
+  return makeLocalization(active, fallback, locale, gameActive, gameFallback);
 }

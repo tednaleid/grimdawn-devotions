@@ -10,11 +10,9 @@ import {
   formatPet,
   isFilterableStat,
 } from "../src/core/statFormat";
-import { installEnglish, enLoc } from "./helpers/localizeEn";
-import { makeLocalization, setLocalization, resolveText, type Text } from "../src/core/localization";
+import { enLoc } from "./helpers/localizeEn";
+import { makeLocalization, resolveText, type Text } from "../src/core/localization";
 import { STAT_TAGS } from "../src/core/statTags";
-
-installEnglish();
 
 const res = (t: Text) => resolveText(enLoc, t);
 const resRow = (r: { label: Text; value: Text } | null) => (r ? { label: res(r.label), value: res(r.value) } : null);
@@ -437,15 +435,10 @@ describe("mapped stat labels resolve via gameText, not translate", () => {
       { [fireTag]: "GAME_FIRE" },
       {},
     );
-    setLocalization(loc);
-    try {
-      const row = statRow("offensiveFireModifier", 10);
-      const label = row ? resolveText(loc, row.label) : undefined;
-      expect(label).toContain("GAME_FIRE");
-      expect(label).not.toContain("APP_FIRE");
-    } finally {
-      installEnglish();
-    }
+    const row = statRow("offensiveFireModifier", 10);
+    const label = row ? resolveText(loc, row.label) : undefined;
+    expect(label).toContain("GAME_FIRE");
+    expect(label).not.toContain("APP_FIRE");
   });
 });
 

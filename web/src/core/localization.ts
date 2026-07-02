@@ -1,5 +1,5 @@
 // ABOUTME: Pure localization resolver: active-locale -> English -> raw-key fallback, named interpolation.
-// ABOUTME: Also holds a module singleton so view modules can call translate() without threading a port.
+// ABOUTME: Every caller threads an explicit Localization port; there is no global resolver.
 import type { Localization } from "../ports/Localization";
 
 function interpolate(template: string, params?: Record<string, string | number>): string {
@@ -88,23 +88,4 @@ export function resolveText(loc: Localization, t: Text): string {
 /** Sort by resolved label in the locale's collation order (non-mutating). */
 export function sortByResolved<T>(loc: Localization, items: T[], labelOf: (x: T) => Text): T[] {
   return [...items].sort((a, b) => resolveText(loc, labelOf(a)).localeCompare(resolveText(loc, labelOf(b))));
-}
-
-// TEMPORARY migration shim: resolve via the module singleton so unconverted adapters keep
-// working while core converts underneath them. Deleted with the singleton (see the
-// i18n-hexagonal-boundary spec); nothing new may call this.
-const RAW_LOC: Localization = makeLocalization({}, {}, "en");
-export function resolveTextGlobal(t: Text): string {
-  return resolveText(current ?? RAW_LOC, t);
-}
-
-let current: Localization | null = null;
-export function setLocalization(loc: Localization): void {
-  current = loc;
-}
-export function translate(key: string, params?: Record<string, string | number>): string {
-  return current ? current.translate(key, params) : key;
-}
-export function gameText(tag: string): string {
-  return current ? current.gameText(tag) : tag;
 }

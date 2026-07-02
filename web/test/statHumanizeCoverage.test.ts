@@ -3,10 +3,8 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { groupedBonusRows, formatPowerStats } from "../src/core/statFormat";
-import { resolveTextGlobal } from "../src/core/localization";
-import { installEnglish } from "./helpers/localizeEn";
-
-installEnglish();
+import { resolveText } from "../src/core/localization";
+import { enLoc } from "./helpers/localizeEn";
 
 // Exact copy of statFormat.ts humanize(): the mechanical id->words fallback we never want a user to see.
 function humanize(id: string): string {
@@ -73,10 +71,10 @@ test("no devotion stat renders via humanize() in any view", () => {
     if (forbidden.has(label)) leaks.push(label);
   };
   for (const map of starMaps)
-    for (const g of groupedBonusRows(map)) for (const r of g.rows) scan(resolveTextGlobal(r.label));
+    for (const g of groupedBonusRows(map)) for (const r of g.rows) scan(resolveText(enLoc, r.label));
   for (const map of powerMaps) {
     const p = formatPowerStats(map);
-    for (const r of [...p.rows, ...p.fallthrough]) scan(resolveTextGlobal(r.label));
+    for (const r of [...p.rows, ...p.fallthrough]) scan(resolveText(enLoc, r.label));
   }
   // Deduplicate for a readable failure listing the raw labels that leaked.
   expect([...new Set(leaks)]).toEqual([]);

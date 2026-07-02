@@ -7,7 +7,7 @@ import appZh from "../src/i18n/app.zh.json";
 import gameEn from "../../data/i18n/game.en.json";
 import gameZh from "../../data/i18n/game.zh.json";
 import { buildModel, type DevotionsDoc } from "../src/core/model";
-import { makeLocalization, setLocalization, resolveTextGlobal, type Text } from "../src/core/localization";
+import { makeLocalization, resolveText, type Text } from "../src/core/localization";
 import type { Localization } from "../src/ports/Localization";
 import {
   formatBonusRowsWithIds,
@@ -46,16 +46,14 @@ function partialReach(completable: Set<string>) {
   } as import("../src/core/reachability").ReachView;
 }
 
-// Resolves every core text surface to plain strings. Stage 1: formatters read the
-// singleton, so install loc first. Later tasks change HOW this resolves (resolveText
-// over descriptors), never WHAT it returns.
+// Resolves every core text surface to plain strings via the explicit loc, so the snapshot
+// is a pure function of (model, selection, loc) and never depends on load order.
 function collectSurfaces(loc: Localization): unknown {
-  setLocalization(loc);
   // Power rows resolve in core's semantic order; the fallthrough segment is sorted
   // by resolved label and appended, mirroring tooltipView's powerRowsHtml.
   const resolveRow = (r: { label: Text; value: Text }) => ({
-    label: resolveTextGlobal(r.label),
-    value: resolveTextGlobal(r.value),
+    label: resolveText(loc, r.label),
+    value: resolveText(loc, r.value),
   });
   const resolvePower = (p: PowerRows) =>
     p.rows.map(resolveRow).concat(p.fallthrough.map(resolveRow).sort((a, b) => a.label.localeCompare(b.label)));
@@ -68,9 +66,9 @@ function collectSurfaces(loc: Localization): unknown {
       group: g.group,
       subjects: g.subjects
         .map((s) => ({
-          subject: resolveTextGlobal(s.subject),
-          key: `${g.group}:${resolveTextGlobal(s.subject)}`,
-          parts: s.parts.map((p) => ({ ...p, value: resolveTextGlobal(p.value) })),
+          subject: resolveText(loc, s.subject),
+          key: `${g.group}:${resolveText(loc, s.subject)}`,
+          parts: s.parts.map((p) => ({ ...p, value: resolveText(loc, p.value) })),
         }))
         .sort((a, b) => a.subject.localeCompare(b.subject)),
     }));
@@ -84,17 +82,17 @@ function collectSurfaces(loc: Localization): unknown {
       subjects: g.subjects
         .map((s) => ({
           ids: s.ids,
-          key: `${g.group}:${resolveTextGlobal(s.subject)}`,
+          key: `${g.group}:${resolveText(loc, s.subject)}`,
           rows: s.rows.map((r) => ({
             role: r.role,
-            subLabel: resolveTextGlobal(r.subLabel),
+            subLabel: resolveText(loc, r.subLabel),
             id: r.id,
-            base: resolveTextGlobal(r.base),
-            now: resolveTextGlobal(r.now),
-            delta: resolveTextGlobal(r.delta),
+            base: resolveText(loc, r.base),
+            now: resolveText(loc, r.now),
+            delta: resolveText(loc, r.delta),
             verdict: r.verdict,
           })),
-          subject: resolveTextGlobal(s.subject),
+          subject: resolveText(loc, s.subject),
           verdict: s.verdict,
         }))
         .sort((a, b) => a.subject.localeCompare(b.subject)),
@@ -105,14 +103,14 @@ function collectSurfaces(loc: Localization): unknown {
     const star = model.stars.get(sid)!;
     const entry: Record<string, unknown> = {
       bonuses: formatBonusRowsWithIds(star.bonuses, { racialTarget: star.racialTarget })
-        .map((r) => ({ id: r.id, label: resolveTextGlobal(r.label), value: resolveTextGlobal(r.value) }))
+        .map((r) => ({ id: r.id, label: resolveText(loc, r.label), value: resolveText(loc, r.value) }))
         .sort((a, b) => a.label.localeCompare(b.label)),
     };
     if (star.celestialPower) {
       entry.power = resolvePower(formatPowerStats(star.celestialPower.stats));
       if (star.celestialPower.pet) {
         const pet = formatPet(star.celestialPower.pet);
-        entry.pet = { summon: resolveTextGlobal(pet.summon), attack: resolvePower(pet.attack) };
+        entry.pet = { summon: resolveText(loc, pet.summon), attack: resolvePower(pet.attack) };
       }
     }
     perStar[sid] = entry;
@@ -132,7 +130,7 @@ function collectSurfaces(loc: Localization): unknown {
     commit: [
       commitButton(model, selection, partialReach(new Set(CONS)), { kind: "constellation", id: "crane" }),
       commitButton(model, new Set(), partialReach(new Set()), { kind: "constellation", id: "crane" }),
-    ].map((b) => ({ label: resolveTextGlobal(b.label), enabled: b.enabled })),
+    ].map((b) => ({ label: resolveText(loc, b.label), enabled: b.enabled })),
     buildOrder: buildOrderHtml(loc, model, null, [
       { kind: "scaffold-add", conId: "crossroads_order", points: 1, heldAfter: 1 },
       { kind: "complete", conId: "crane", points: 6, heldAfter: 7 },

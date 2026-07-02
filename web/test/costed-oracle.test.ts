@@ -6,16 +6,13 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { buildReachCons, buildCoverTable, INF, type ReachCon } from "../src/core/reachability";
 import { minPeakCost } from "./support/costed-oracle";
-import { gameText } from "../src/core/localization";
-import { installEnglish } from "./helpers/localizeEn";
-
-installEnglish();
+import { enLoc } from "./helpers/localizeEn";
 
 const model = buildModel(doc as any);
 const cons = buildReachCons(model);
 const table = buildCoverTable(cons);
 const byId = new Map(cons.map((c) => [c.id, c]));
-const nameToId = new Map([...model.constellations.values()].map((c) => [gameText(c.nameTag), c.id]));
+const nameToId = new Map([...model.constellations.values()].map((c) => [enLoc.gameText(c.nameTag), c.id]));
 const membersOf = (names: string[]): ReachCon[] => names.map((n) => byId.get(nameToId.get(n)!)!);
 
 // Fox + Scholar's Light + Oklaine's Lantern (12 stars, all eldritch): self-covering at the end, but Oklaine

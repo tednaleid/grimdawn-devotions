@@ -10,7 +10,7 @@ const doc = {
   constellations: [
     {
       id: "Lev",
-      name_tag: "tagDevotion_C12", // real Leviathan tag, so gameText resolves it to "Leviathan" under installEnglish()
+      name_tag: "tagDevotion_C12", // real Leviathan tag, so enLoc.gameText resolves it to "Leviathan"
       tier: null,
       affinityRequired: { eldritch: 13, ascendant: 13 },
       affinityBonus: {},

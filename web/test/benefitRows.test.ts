@@ -5,9 +5,7 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { benefitRows } from "../src/core/benefitRows";
 import { resolveText, type Text } from "../src/core/localization";
-import { installEnglish, enLoc } from "./helpers/localizeEn";
-
-installEnglish();
+import { enLoc } from "./helpers/localizeEn";
 
 const res = (t: Text) => resolveText(enLoc, t);
 
