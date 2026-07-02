@@ -4,14 +4,14 @@ import en from "../../src/i18n/app.en.json";
 import gameEn from "../../../data/i18n/game.en.json";
 import { makeLocalization, setLocalization } from "../../src/core/localization";
 
+export const enLoc = makeLocalization(
+  en as Record<string, string>,
+  en as Record<string, string>,
+  "en",
+  gameEn as Record<string, string>,
+  gameEn as Record<string, string>,
+);
+
 export function installEnglish(): void {
-  setLocalization(
-    makeLocalization(
-      en as Record<string, string>,
-      en as Record<string, string>,
-      "en",
-      gameEn as Record<string, string>,
-      gameEn as Record<string, string>,
-    ),
-  );
+  setLocalization(enLoc);
 }

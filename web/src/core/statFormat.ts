@@ -1,7 +1,7 @@
 // ABOUTME: Formats raw Grim Dawn devotion stat ids + values into player-facing rows.
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
-import { translate, gameText } from "./localization";
+import { translate, gameText, stripValueTokens } from "./localization";
 import { STAT_TAGS, STAT_FORMAT_TAGS } from "./statTags";
 
 export interface StatRow {
@@ -143,18 +143,6 @@ const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
   characterWeaponIntelligenceReqReduction: { percent: true, sign: -1 },
   characterJewelryIntelligenceReqReduction: { percent: true, sign: -1 },
 };
-
-// Strip Grim Dawn value placeholders ("{%.0f0}%", ranges "{%.0f0}-{%.0f1}%") and the leading/trailing
-// "%"/dash/space they leave behind, so a value-embedded stat format tag reduces to its bare noun. A
-// no-op on the plain-noun tags in STAT_TAGS. Used only for value-PREFIX stats (value leads the noun in
-// every language); value-suffix stats are app-authored instead.
-function stripValueTokens(s: string): string {
-  return s
-    .replace(/\{%[^}]*\}/g, "")
-    .replace(/^[\s%-]+|[\s%-]+$/g, "")
-    .replace(/\s{2,}/g, " ")
-    .trim();
-}
 
 function humanize(id: string): string {
   const s = id
