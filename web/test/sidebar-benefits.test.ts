@@ -6,10 +6,8 @@ import type { CondensedGroup } from "../src/core/statFormat";
 import type { DevotionModel } from "../src/core/types";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { installEnglish } from "./helpers/localizeEn";
+import { enLoc } from "./helpers/localizeEn";
 import { litT } from "../src/core/localization";
-
-installEnglish();
 
 const emptyModel = { stars: new Map(), constellations: new Map() } as unknown as DevotionModel;
 const catalog: CondensedGroup[] = [
@@ -32,7 +30,7 @@ const catalog: CondensedGroup[] = [
 
 function availOf(availableIds?: Set<string>): string {
   const el = { innerHTML: "" } as unknown as HTMLElement;
-  return renderBenefits(el, emptyModel, new Set(), undefined, new Set(), catalog, availableIds).availHtml;
+  return renderBenefits(enLoc, el, emptyModel, new Set(), undefined, new Set(), catalog, availableIds).availHtml;
 }
 
 test("'available to get' lists only subjects with an obtainable stat id", () => {
@@ -55,6 +53,7 @@ test("a tagged subject stays listed even when it is no longer obtainable (so it 
   const el = { innerHTML: "" } as unknown as HTMLElement;
   // Cold is absent from availableIds (unobtainable) but tagged; it must remain in the list.
   const html = renderBenefits(
+    enLoc,
     el,
     emptyModel,
     new Set(),
@@ -88,13 +87,25 @@ const petCat: CondensedGroup[] = [
 ];
 function petAvailOf(keys?: Set<string>, tags: Set<string> = new Set()): string {
   const el = { innerHTML: "" } as unknown as HTMLElement;
-  return renderBenefits(el, emptyModel, new Set(), undefined, tags, [], undefined, undefined, petCat, keys)
+  return renderBenefits(enLoc, el, emptyModel, new Set(), undefined, tags, [], undefined, undefined, petCat, keys)
     .petAvailHtml;
 }
 
 test("the active 'Bonus to All Pets' section is taggable with pet: scoped ids", () => {
   const el = { innerHTML: "" } as unknown as HTMLElement;
-  renderBenefits(el, realModel, new Set([petStar.id]), undefined, new Set(), [], undefined, undefined, [], undefined);
+  renderBenefits(
+    enLoc,
+    el,
+    realModel,
+    new Set([petStar.id]),
+    undefined,
+    new Set(),
+    [],
+    undefined,
+    undefined,
+    [],
+    undefined,
+  );
   const html = (el as unknown as { innerHTML: string }).innerHTML;
   expect(html).toContain("Bonus to All Pets");
   expect(html).toMatch(/data-vid="pet:/);
@@ -123,7 +134,7 @@ test("powersListHtml renders each power with its star-id hook and name", () => {
       power: { nameTag: "Twin Fangs", descriptionTag: "x", proc: null, level: 1, stats: {}, pet: null },
     },
   ];
-  const html = powersListHtml(powers as any);
+  const html = powersListHtml(enLoc, powers as any);
   expect(html).toContain('data-star-id="bat:4"');
   expect(html).toContain("Twin Fangs");
   expect(html).toContain('class="power"');
@@ -135,6 +146,6 @@ test("powersListHtml sorts rows by power name, not input/constellation order", (
     power: { nameTag: name, descriptionTag: null, proc: null, level: 1, stats: {}, pet: null },
   });
   // Input ordered by constellation/star id; output must read alphabetically by power name.
-  const html = powersListHtml([mk("aaa:1", "Wendigo's Mark"), mk("bbb:1", "Arcane Bomb")] as any);
+  const html = powersListHtml(enLoc, [mk("aaa:1", "Wendigo's Mark"), mk("bbb:1", "Arcane Bomb")] as any);
   expect(html.indexOf("Arcane Bomb")).toBeLessThan(html.indexOf("Wendigo's Mark"));
 });

@@ -5,7 +5,7 @@ import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { gameText } from "../src/core/localization";
 import { tooltipView } from "../src/adapters/tooltipView";
-import { installEnglish } from "./helpers/localizeEn";
+import { enLoc, installEnglish } from "./helpers/localizeEn";
 
 installEnglish();
 
@@ -28,7 +28,7 @@ test("proc trigger resolves through the view to its English display word", () =>
 
   const el = { style: {}, innerHTML: "", offsetWidth: 0, offsetHeight: 0 } as any as HTMLElement;
   const tip = tooltipView(el);
-  tip.show(model, scorpion.id, 0, 0);
+  tip.show(enLoc, model, scorpion.id, 0, 0);
 
   // Proves translate("trigger." + triggerKey) actually resolved and landed in the
   // "({chance}% Chance on {trigger})" qualifier, not just that the key exists somewhere.

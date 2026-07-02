@@ -4,6 +4,7 @@ import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { renderBenefits } from "../src/adapters/sidebarView";
+import { enLoc } from "./helpers/localizeEn";
 
 const model = buildModel(doc as any);
 function starGranting(stat: string): string {
@@ -12,7 +13,7 @@ function starGranting(stat: string): string {
 }
 function render(selected: Set<string>, baseline: Set<string> | null): string {
   const el = { innerHTML: "" } as any as HTMLElement;
-  renderBenefits(el, model, selected, undefined, new Set(), [], undefined, undefined, [], undefined, baseline);
+  renderBenefits(enLoc, el, model, selected, undefined, new Set(), [], undefined, undefined, [], undefined, baseline);
   return (el as any).innerHTML as string;
 }
 

@@ -9,7 +9,7 @@ import {
   storeLocale,
 } from "../adapters/localizationAdapter";
 import { mountLanguagePicker } from "../adapters/languagePicker";
-import { translate, resolveTextGlobal } from "../core/localization";
+import { translate } from "../core/localization";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
@@ -285,8 +285,19 @@ async function boot() {
         return;
       }
       const totals = affinityTotals(model, state.selected);
-      if (t.kind === "star") tip.show(model, t.id, x, y, totals, undefined, selectedBenefits);
-      else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id), undefined, selectedBenefits);
+      if (t.kind === "star") tip.show(localization, model, t.id, x, y, totals, undefined, selectedBenefits);
+      else
+        tip.showConstellation(
+          localization,
+          model,
+          t.id,
+          x,
+          y,
+          totals,
+          completionInfo(t.id),
+          undefined,
+          selectedBenefits,
+        );
     },
   });
 
@@ -298,6 +309,7 @@ async function boot() {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
     if (sid) {
       tip.show(
+        localization,
         model,
         sid,
         (e as MouseEvent).clientX,
@@ -475,7 +487,7 @@ async function boot() {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><div id="build-order-panel"></div>`);
       panel = document.getElementById("build-order-panel")!;
     }
-    panel.innerHTML = buildOrderHtml(model, data.manifest, steps, noOrder);
+    panel.innerHTML = buildOrderHtml(localization, model, data.manifest, steps, noOrder);
     // Hover-sync: build-order rows carry data-con-id; box that constellation on the map (drawn on top).
     panel.querySelectorAll<HTMLElement>(".bo-step[data-con-id]").forEach((row) => {
       const cid = row.dataset.conId;
@@ -491,6 +503,7 @@ async function boot() {
     const availableIds = availableBonusIds(model, state.selected, reach.completable);
     const availPetKeys = availablePetKeys(model, state.selected, reach.completable);
     const r = renderBenefits(
+      localization,
       benefitsEl,
       model,
       state.selected,
@@ -536,6 +549,7 @@ async function boot() {
     handle.update(state, taggedStars(), reach, diff, affinityFilterSets());
     renderBenefitsPanel();
     prevAffinity = renderAffinities(
+      localization,
       affinityEl,
       model,
       reach.have,
@@ -559,7 +573,7 @@ async function boot() {
     if (availPowers.length)
       affinityEl.insertAdjacentHTML(
         "beforeend",
-        `<hr class="panel-sep"/><h2>${translate("ui.panel.celestialPowers")}</h2>${powersListHtml(availPowers)}`,
+        `<hr class="panel-sep"/><h2>${translate("ui.panel.celestialPowers")}</h2>${powersListHtml(localization, availPowers)}`,
       );
     // Empty-state copy. The build order shows whenever the selection is self-covering: the cap is auto-raised
     // to the validity floor (above), so a self-covering selection that still has no order is genuinely
@@ -638,10 +652,20 @@ async function boot() {
     popoverTarget = target;
     popoverXY = { x, y };
     const totals = affinityTotals(model, state.selected);
-    const raw = commitButton(model, state.selected, reach, target);
-    const btn = { label: resolveTextGlobal(raw.label), enabled: raw.enabled };
-    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn, selectedBenefits);
-    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn, selectedBenefits);
+    const btn = commitButton(model, state.selected, reach, target);
+    if (target.kind === "star") tip.show(localization, model, target.id, x, y, totals, btn, selectedBenefits);
+    else
+      tip.showConstellation(
+        localization,
+        model,
+        target.id,
+        x,
+        y,
+        totals,
+        completionInfo(target.id),
+        btn,
+        selectedBenefits,
+      );
   }
   function commitPopover() {
     if (!popoverTarget) return;

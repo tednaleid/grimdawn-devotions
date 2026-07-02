@@ -133,12 +133,12 @@ function collectSurfaces(loc: Localization): unknown {
       commitButton(model, selection, partialReach(new Set(CONS)), { kind: "constellation", id: "crane" }),
       commitButton(model, new Set(), partialReach(new Set()), { kind: "constellation", id: "crane" }),
     ].map((b) => ({ label: resolveTextGlobal(b.label), enabled: b.enabled })),
-    buildOrder: buildOrderHtml(model, null, [
+    buildOrder: buildOrderHtml(loc, model, null, [
       { kind: "scaffold-add", conId: "crossroads_order", points: 1, heldAfter: 1 },
       { kind: "complete", conId: "crane", points: 6, heldAfter: 7 },
       { kind: "scaffold-refund", conId: "crossroads_order", points: -1, heldAfter: 6 },
     ]),
-    buildOrderEmpty: buildOrderHtml(model, null, null, { kind: "incomplete", deficit: [3, 0, 0, 1, 0] }),
+    buildOrderEmpty: buildOrderHtml(loc, model, null, null, { kind: "incomplete", deficit: [3, 0, 0, 1, 0] }),
   };
 }
 

@@ -5,7 +5,7 @@ import type { Affinity, DevotionModel } from "../core/types";
 import type { BuildStep, Vec } from "../core/reachability";
 import type { AssetManifest } from "../ports/DataSource";
 import { affinityOrb } from "./affinityColors";
-import { translate, gameText } from "../core/localization";
+import type { Localization } from "../ports/Localization";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -33,19 +33,23 @@ export type NoOrderInfo =
   | { kind: "searched"; minCap: number | null };
 
 // "20 more Ascendant and 7 more Order" from a deficit vector.
-function deficitPhrase(deficit: Vec): string {
+function deficitPhrase(loc: Localization, deficit: Vec): string {
   const parts = deficit
     .map((d, i) =>
       d > 0
-        ? translate("ui.buildOrder.deficitMore", { count: d, affinity: translate(`aff.${AFFINITY[i]!.toLowerCase()}`) })
+        ? loc.translate("ui.buildOrder.deficitMore", {
+            count: d,
+            affinity: loc.translate(`aff.${AFFINITY[i]!.toLowerCase()}`),
+          })
         : "",
     )
     .filter(Boolean);
   if (parts.length <= 1) return parts[0] ?? "";
-  return `${parts.slice(0, -1).join(", ")}${translate("ui.buildOrder.deficitJoin")}${parts[parts.length - 1]}`;
+  return `${parts.slice(0, -1).join(", ")}${loc.translate("ui.buildOrder.deficitJoin")}${parts[parts.length - 1]}`;
 }
 
 export function buildOrderHtml(
+  loc: Localization,
   model: DevotionModel,
   manifest: AssetManifest | null,
   steps: BuildStep[] | null,
@@ -55,21 +59,21 @@ export function buildOrderHtml(
     const info: NoOrderInfo = noOrder ?? { kind: "empty" };
     let body: string;
     if (info.kind === "incomplete") {
-      const deficit = esc(deficitPhrase(info.deficit));
+      const deficit = esc(deficitPhrase(loc, info.deficit));
       body =
-        `<div class="bo-empty-msg">${translate("ui.buildOrder.incompleteAffinity", { deficit })}</div>` +
-        `<div class="bo-empty-sub">${translate("ui.buildOrder.addSupporting")}</div>`;
+        `<div class="bo-empty-msg">${loc.translate("ui.buildOrder.incompleteAffinity", { deficit })}</div>` +
+        `<div class="bo-empty-sub">${loc.translate("ui.buildOrder.addSupporting")}</div>`;
     } else if (info.kind === "searched") {
       body =
         info.minCap != null
-          ? `<div class="bo-empty-msg">${translate("ui.buildOrder.noPathCap", { minCap: info.minCap })}</div>` +
-            `<div class="bo-empty-sub">${translate("ui.buildOrder.scaffoldingNote")}</div>`
-          : `<div class="bo-empty-msg">${translate("ui.buildOrder.noLegalPath")}</div>`;
+          ? `<div class="bo-empty-msg">${loc.translate("ui.buildOrder.noPathCap", { minCap: info.minCap })}</div>` +
+            `<div class="bo-empty-sub">${loc.translate("ui.buildOrder.scaffoldingNote")}</div>`
+          : `<div class="bo-empty-msg">${loc.translate("ui.buildOrder.noLegalPath")}</div>`;
     } else {
       // nothing to order yet: the order appears once the selection covers its own affinity.
-      body = `<div class="bo-empty-msg">${translate("ui.buildOrder.selectPrompt")}</div>`;
+      body = `<div class="bo-empty-msg">${loc.translate("ui.buildOrder.selectPrompt")}</div>`;
     }
-    return `<h2>${translate("ui.panel.buildOrder")}</h2><div class="bo-empty">${body}</div>`;
+    return `<h2>${loc.translate("ui.panel.buildOrder")}</h2><div class="bo-empty">${body}</div>`;
   }
   let n = 0;
   const rows = steps
@@ -77,9 +81,9 @@ export function buildOrderHtml(
       const c = model.constellations.get(s.conId);
       const cr = CROSSROADS[s.conId];
       const name = cr
-        ? `${c ? gameText(c.nameTag) : translate("ui.buildOrder.crossroads")} (${translate(`ui.buildOrder.dir.${cr.dirKey}`)})`
+        ? `${c ? loc.gameText(c.nameTag) : loc.translate("ui.buildOrder.crossroads")} (${loc.translate(`ui.buildOrder.dir.${cr.dirKey}`)})`
         : c
-          ? gameText(c.nameTag)
+          ? loc.gameText(c.nameTag)
           : s.conId;
       const artName = c?.background?.image?.split("/").pop() ?? "";
       const art = manifest?.images[artName];
@@ -92,12 +96,13 @@ export function buildOrderHtml(
         const artCell = img || dot;
         return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
       }
-      const label = s.kind === "scaffold-add" ? translate("ui.buildOrder.add") : translate("ui.buildOrder.refund");
+      const label =
+        s.kind === "scaffold-add" ? loc.translate("ui.buildOrder.add") : loc.translate("ui.buildOrder.refund");
       const cls = s.kind === "scaffold-add" ? "bo-add" : "bo-refund";
       // Empty art-column cell (or the crossroads dot) so the five grid columns line up with complete rows.
       const artCell = dot || `<span class="bo-art"></span>`;
       return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span>${artCell}<span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
     })
     .join("");
-  return `<h2>${translate("ui.panel.buildOrder")}</h2><div class="bo-list">${rows}</div>`;
+  return `<h2>${loc.translate("ui.panel.buildOrder")}</h2><div class="bo-list">${rows}</div>`;
 }
