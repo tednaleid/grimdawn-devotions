@@ -15,6 +15,7 @@ import {
   formatPet,
   condensedRows,
   type PowerRows,
+  type CondensedGroup,
 } from "../src/core/statFormat";
 import { benefitRows } from "../src/core/benefitRows";
 import { commitButton } from "../src/core/commitAction";
@@ -58,6 +59,21 @@ function collectSurfaces(loc: Localization): unknown {
   });
   const resolvePower = (p: PowerRows) =>
     p.rows.map(resolveRow).concat(p.fallthrough.map(resolveRow).sort((a, b) => a.label.localeCompare(b.label)));
+  // condensedRows now returns structural keys and insertion-order subjects (Task 6). The snapshot
+  // was frozen (Task 1) with the pre-refactor shape: subjects sorted by resolved label, keyed by
+  // `${group}:${resolved label}`. Reproduce that exact shape here so the snapshot stays identical;
+  // this is presentation the sidebarView adapter now does at HTML-assembly time (resolve + sort).
+  const resolveCondensed = (groups: CondensedGroup[]) =>
+    groups.map((g) => ({
+      group: g.group,
+      subjects: g.subjects
+        .map((s) => ({
+          subject: resolveTextGlobal(s.subject),
+          key: `${g.group}:${resolveTextGlobal(s.subject)}`,
+          parts: s.parts.map((p) => ({ ...p, value: resolveTextGlobal(p.value) })),
+        }))
+        .sort((a, b) => a.subject.localeCompare(b.subject)),
+    }));
   const racial = racialTargets(model, selection);
   const perStar: Record<string, unknown> = {};
   for (const sid of selection) {
@@ -77,8 +93,8 @@ function collectSurfaces(loc: Localization): unknown {
     perStar[sid] = entry;
   }
   return {
-    condensed: condensedRows(sumBonuses(model, selection), { racialTarget: racial }),
-    condensedPet: condensedRows(sumPetBonuses(model, selection)),
+    condensed: resolveCondensed(condensedRows(sumBonuses(model, selection), { racialTarget: racial })),
+    condensedPet: resolveCondensed(condensedRows(sumPetBonuses(model, selection))),
     benefitRowsRegular: benefitRows(model, selection, null),
     benefitRowsCompare: benefitRows(model, selection, baseline),
     perStar,

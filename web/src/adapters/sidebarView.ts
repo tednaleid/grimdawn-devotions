@@ -7,7 +7,7 @@ import { condensedRows, GROUP_KEY, type CondensedGroup, type CondensedSubject } 
 import { affinityOrb } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
-import { translate, gameText } from "../core/localization";
+import { translate, gameText, resolveTextGlobal } from "../core/localization";
 
 // One row per celestial power: the name plus a data-star-id hook so a hover shows the power's full
 // tooltip (proc, level, stats, requires/grants). Shared by the left "gained" list and the right
@@ -147,9 +147,10 @@ export function renderBenefits(
             const obtainable = availKeys === undefined || ks.some((k) => availKeys.has(k));
             return obtainable || ks.some((k) => selectedBenefits.has(k));
           })
+          .sort((a, b) => resolveTextGlobal(a.subject).localeCompare(resolveTextGlobal(b.subject)))
           .map(
             (s) =>
-              `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"><span class="bsubj" data-gtoggle>${s.subject}</span></div>`,
+              `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"><span class="bsubj" data-gtoggle>${resolveTextGlobal(s.subject)}</span></div>`,
           )
           .join("");
         return subs ? `<h3>${translate(GROUP_KEY[g.group])}</h3><div class="avail-list">${subs}</div>` : "";

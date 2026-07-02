@@ -7,6 +7,7 @@ import type { DevotionModel } from "../src/core/types";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { installEnglish } from "./helpers/localizeEn";
+import { litT } from "../src/core/localization";
 
 installEnglish();
 
@@ -16,14 +17,14 @@ const catalog: CondensedGroup[] = [
     group: "Offense",
     subjects: [
       {
-        subject: "Fire Damage",
+        subject: litT("Fire Damage"),
         key: "Offense:Fire Damage",
-        parts: [{ dim: "flat", value: "+10", id: "offensiveFireMin" }],
+        parts: [{ dim: "flat", value: litT("+10"), id: "offensiveFireMin" }],
       },
       {
-        subject: "Cold Damage",
+        subject: litT("Cold Damage"),
         key: "Offense:Cold Damage",
-        parts: [{ dim: "flat", value: "+10", id: "offensiveColdMin" }],
+        parts: [{ dim: "flat", value: litT("+10"), id: "offensiveColdMin" }],
       },
     ],
   },
@@ -73,14 +74,14 @@ const petCat: CondensedGroup[] = [
     group: "Resistances",
     subjects: [
       {
-        subject: "Fire Resistance",
+        subject: litT("Fire Resistance"),
         key: "Defense:Fire Resistance",
-        parts: [{ dim: "pct", value: "+10%", id: "defensiveFire" }],
+        parts: [{ dim: "pct", value: litT("+10%"), id: "defensiveFire" }],
       },
       {
-        subject: "Cold Resistance",
+        subject: litT("Cold Resistance"),
         key: "Defense:Cold Resistance",
-        parts: [{ dim: "pct", value: "+10%", id: "defensiveCold" }],
+        parts: [{ dim: "pct", value: litT("+10%"), id: "defensiveCold" }],
       },
     ],
   },

@@ -72,7 +72,8 @@ test("no devotion stat renders via humanize() in any view", () => {
   const scan = (label: string) => {
     if (forbidden.has(label)) leaks.push(label);
   };
-  for (const map of starMaps) for (const g of groupedBonusRows(map)) for (const r of g.rows) scan(r.label);
+  for (const map of starMaps)
+    for (const g of groupedBonusRows(map)) for (const r of g.rows) scan(resolveTextGlobal(r.label));
   for (const map of powerMaps) {
     const p = formatPowerStats(map);
     for (const r of [...p.rows, ...p.fallthrough]) scan(resolveTextGlobal(r.label));

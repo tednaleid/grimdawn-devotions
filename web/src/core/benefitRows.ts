@@ -3,7 +3,7 @@
 import type { DevotionModel, StarId } from "./types";
 import { sumBonuses, sumPetBonuses, racialTargets } from "./aggregate";
 import { condensedRows, classify, type CondensedPart, type StatGroup } from "./statFormat";
-import { translate } from "./localization";
+import { translate, resolveTextGlobal } from "./localization";
 
 export type Verdict = "up" | "down" | "same" | "mixed";
 export type RowRole = "subject" | "sub" | "cont";
@@ -49,6 +49,8 @@ function fmtDelta(n: number): string {
 // Row value text: keep the seconds suffix on a flat duration; everything else is the raw condensed
 // value. A max-resist is qualified at row-build time: by the "max" sub-label on a later row, or by a
 // "max " prefix when it is the subject's first/only row (see maxQualified in buildScope).
+// TODO(Task 7): condensedRows now returns Text; resolved here at the boundary until this module
+// converts its own public output (BenefitSubject/BenefitRow) to Text.
 function rowValue(dim: CondensedPart["dim"], value: string): string {
   return dim === "durFlat" ? translate("ui.benefit.seconds", { value }) : value;
 }
@@ -82,14 +84,20 @@ function skeleton(
       for (const s of g.subjects) {
         let sm = subjs.get(s.key);
         if (!sm) {
-          sm = { group: g.group, subject: s.subject, key: s.key, parts: [] };
+          // TODO(Task 7): condensedRows now returns a Text subject and a structural (locale
+          // independent) key. This module's public key is still label-based (`${group}:${label}`,
+          // consumed by sidebarView's tag/selection wiring keyed off it) - resolved here at the
+          // boundary until this module converts its own public output (BenefitSubject) to Text and
+          // switches consumers over to the structural key.
+          const subject = resolveTextGlobal(s.subject);
+          sm = { group: g.group, subject, key: `${g.group}:${subject}`, parts: [] };
           subjs.set(s.key, sm);
           order.push(s.key);
         }
         for (const p of s.parts) {
           if (!sm.parts.some((x) => x.id === p.id)) sm.parts.push({ id: p.id, dim: p.dim });
           const target = comparing && side === 0 ? baseVal : nowVal;
-          target.set(p.id, rowValue(p.dim, p.value));
+          target.set(p.id, rowValue(p.dim, resolveTextGlobal(p.value)));
         }
       }
     }

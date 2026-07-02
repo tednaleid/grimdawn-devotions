@@ -2,9 +2,12 @@
 // ABOUTME: Verifies subject grouping, dimension order (flat before percent), and per-part ids for selection.
 import { test, expect } from "bun:test";
 import { condensedRows } from "../src/core/statFormat";
-import { installEnglish } from "./helpers/localizeEn";
+import { installEnglish, enLoc } from "./helpers/localizeEn";
+import { resolveText, type Text } from "../src/core/localization";
 
 installEnglish();
+
+const res = (t: Text) => resolveText(enLoc, t);
 
 const bonuses = {
   // Frostburn (Cold DoT): flat dmg, % dmg, flat duration, % duration.
@@ -29,7 +32,7 @@ const bonuses = {
 
 const groups = condensedRows(bonuses);
 const subj = (group: string, subject: string) =>
-  groups.find((g) => g.group === group)?.subjects.find((s) => s.subject === subject);
+  groups.find((g) => g.group === group)?.subjects.find((s) => res(s.subject) === subject);
 
 test("groups are returned in GROUP_ORDER", () => {
   expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Resistances"]);
@@ -38,18 +41,18 @@ test("groups are returned in GROUP_ORDER", () => {
 test("a DoT damage type collapses to one subject with flat/pct/durFlat/durPct in order", () => {
   const s = subj("Offense", "Frostburn")!;
   expect(s.parts.map((p) => p.dim)).toEqual(["flat", "pct", "durFlat", "durPct"]);
-  expect(s.parts.map((p) => p.value)).toEqual(["+10-15", "+18%", "+0.5", "+20%"]);
+  expect(s.parts.map((p) => res(p.value))).toEqual(["+10-15", "+18%", "+0.5", "+20%"]);
 });
 
 test("flat comes before percent for instant damage and attributes", () => {
-  expect(subj("Offense", "Fire")!.parts.map((p) => p.value)).toEqual(["+5-8", "+13%"]);
-  expect(subj("Attributes", "Physique")!.parts.map((p) => p.value)).toEqual(["+32", "+3%"]);
+  expect(subj("Offense", "Fire")!.parts.map((p) => res(p.value))).toEqual(["+5-8", "+13%"]);
+  expect(subj("Attributes", "Physique")!.parts.map((p) => res(p.value))).toEqual(["+32", "+3%"]);
 });
 
 test("resistance collapses base + max onto one subject", () => {
   const s = subj("Resistances", "Fire Resistance")!;
   expect(s.parts.map((p) => p.dim)).toEqual(["pct", "max"]);
-  expect(s.parts.map((p) => p.value)).toEqual(["+13%", "+3%"]);
+  expect(s.parts.map((p) => res(p.value))).toEqual(["+13%", "+3%"]);
 });
 
 test("each part carries its representative raw id (flat uses the Min id)", () => {
@@ -61,7 +64,7 @@ test("each part carries its representative raw id (flat uses the Min id)", () =>
 test("a single-dimension stat is its own one-part subject", () => {
   const s = subj("Attributes", "Movement Speed")!;
   expect(s.parts.map((p) => p.dim)).toEqual(["pct"]);
-  expect(s.parts[0]!.value).toBe("+5%");
+  expect(res(s.parts[0]!.value)).toBe("+5%");
 });
 
 test("resistance reduction stats group under Resistance Reduction with distinct flat/percent subjects", () => {
@@ -74,7 +77,7 @@ test("resistance reduction stats group under Resistance Reduction with distinct 
   });
   const rr = g.find((x) => x.group === "Resistance Reduction");
   expect(rr).toBeTruthy();
-  const subjects = rr!.subjects.map((s) => s.subject).sort();
+  const subjects = rr!.subjects.map((s) => res(s.subject)).sort();
   expect(subjects).toEqual([
     "Reduced target's Elemental Resistances",
     "Reduced target's Elemental Resistances (flat)",
@@ -82,7 +85,7 @@ test("resistance reduction stats group under Resistance Reduction with distinct 
     "Reduced target's Resistances",
   ]);
   // The flat all-res subject carries its magnitude (flat) and a duration facet.
-  const all = rr!.subjects.find((s) => s.subject === "Reduced target's Resistances")!;
+  const all = rr!.subjects.find((s) => res(s.subject) === "Reduced target's Resistances")!;
   expect(all.parts.map((p) => p.dim).sort()).toEqual(["durFlat", "flat"]);
 });
 
@@ -96,14 +99,14 @@ test("retaliation stats group under Retaliation and collapse by concept", () => 
   });
   const ret = g.find((x) => x.group === "Retaliation");
   expect(ret).toBeTruthy();
-  const subjects = ret!.subjects.map((s) => s.subject).sort();
+  const subjects = ret!.subjects.map((s) => res(s.subject)).sort();
   expect(subjects).toContain("Fire Retaliation");
   expect(subjects).toContain("% Retaliation added to Attack");
   expect(subjects).toContain("Fear");
   // Fire flat + Fire % collapse onto one subject; Fear min + chance onto one.
-  const fire = ret!.subjects.find((s) => s.subject === "Fire Retaliation")!;
+  const fire = ret!.subjects.find((s) => res(s.subject) === "Fire Retaliation")!;
   expect(fire.parts.map((p) => p.dim).sort()).toEqual(["flat", "pct"]);
-  const fear = ret!.subjects.find((s) => s.subject === "Fear")!;
+  const fear = ret!.subjects.find((s) => res(s.subject) === "Fear")!;
   expect(fear.parts.length).toBe(2);
 });
 
@@ -122,7 +125,7 @@ test("crowd-control stats group under Crowd Control with one subject per effect"
   });
   const cc = g.find((x) => x.group === "Crowd Control");
   expect(cc).toBeTruthy();
-  const subjects = cc!.subjects.map((s) => s.subject).sort();
+  const subjects = cc!.subjects.map((s) => res(s.subject)).sort();
   expect(subjects).toEqual(
     [
       "Impaired Aim",
@@ -134,12 +137,27 @@ test("crowd-control stats group under Crowd Control with one subject per effect"
     ].sort(),
   );
   // Stun's magnitude (flat) and chance (pct) collapse onto one subject.
-  const stun = cc!.subjects.find((s) => s.subject === "Stun")!;
+  const stun = cc!.subjects.find((s) => res(s.subject) === "Stun")!;
   expect(stun.parts.map((p) => p.dim).sort()).toEqual(["flat", "pct"]);
 });
 
 test("DoT damage stays in Offense, not Crowd Control (offensiveSlowFire is Burn)", () => {
   const g = condensedRows({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 });
-  expect(g.find((x) => x.group === "Offense")?.subjects.map((s) => s.subject)).toContain("Burn");
+  expect(g.find((x) => x.group === "Offense")?.subjects.map((s) => res(s.subject))).toContain("Burn");
   expect(g.find((x) => x.group === "Crowd Control")).toBeUndefined();
+});
+
+test("subject keys are structural, not display text", () => {
+  const groups = condensedRows({ offensiveFireMin: 10, defensiveFire: 8, defensiveFireMaxResist: 3 });
+  const keys = groups.flatMap((g) => g.subjects.map((s) => s.key));
+  expect(keys).toContain("Offense:damage:Fire");
+  expect(keys).toContain("Resistances:resist:Fire");
+  // base resist and max resist merge into ONE subject (max is a dim of the resistance subject)
+  expect(keys.filter((k) => k === "Resistances:resist:Fire")).toHaveLength(1);
+});
+test("intentional merges hold under structural keys", () => {
+  const armor = condensedRows({ defensiveProtection: 100, defensiveProtectionModifier: 8 });
+  expect(armor.flatMap((g) => g.subjects).map((s) => s.key)).toEqual(["Armor & Mitigation:armor"]);
+  const fear = condensedRows({ retaliationFearMin: 1, retaliationFearChance: 20 });
+  expect(fear.flatMap((g) => g.subjects).map((s) => s.key)).toEqual(["Retaliation:retaliation-fear"]);
 });

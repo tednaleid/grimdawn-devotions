@@ -1,7 +1,7 @@
 // ABOUTME: Formats raw Grim Dawn devotion stat ids + values into player-facing rows.
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
-import { translate, appT, gameT, gameStrippedT, litT, joinT, resolveTextGlobal, type Text } from "./localization";
+import { appT, gameT, gameStrippedT, litT, joinT, type Text } from "./localization";
 import { STAT_TAGS, STAT_FORMAT_TAGS } from "./statTags";
 
 export interface StatRow {
@@ -355,11 +355,10 @@ export function formatBonusRowsWithIds(
 }
 
 // A grouped row keeps its representative stat id so callers can diff it (highlight changes).
-// TODO(Task 6): converts to Text like StatRow; still resolved strings for now.
 export interface GroupedRow {
   id: string;
-  label: string;
-  value: string;
+  label: Text;
+  value: Text;
 }
 
 // --- Celestial power ability stats ------------------------------------------
@@ -579,11 +578,11 @@ const DIM_ORDER: StatDim[] = ["flat", "pct", "max", "durFlat", "durPct"];
 
 export interface CondensedPart {
   dim: StatDim;
-  value: string;
+  value: Text;
   id: string;
 }
 export interface CondensedSubject {
-  subject: string;
+  subject: Text;
   key: string;
   parts: CondensedPart[];
 }
@@ -592,9 +591,10 @@ export interface CondensedGroup {
   subjects: CondensedSubject[];
 }
 
-// Map a raw stat id to its (group, subject, dimension), mirroring classify's families.
-// Bridge: the *Label helpers now return Text; decompose stays string-based until Task 6.
-function decompose(id: string): { group: StatGroup; subject: string; dim: StatDim } | null {
+// Map a raw stat id to its (group, subject, dimension), mirroring classify's families. subjectKey is
+// the locale-independent identity used to merge dimensions of the same concept onto one subject
+// (see CondensedSubject.key = `${group}:${subjectKey}`); subject is the Text label shown to the user.
+function decompose(id: string): { group: StatGroup; subjectKey: string; subject: Text; dim: StatDim } | null {
   const c = classify(id);
   if (!c) return null;
   const group = groupFor(id);
@@ -604,91 +604,160 @@ function decompose(id: string): { group: StatGroup; subject: string; dim: StatDi
     if (type) {
       const pct = m[3] === "Modifier";
       const dim: StatDim = m[2] ? (pct ? "durPct" : "durFlat") : pct ? "pct" : "flat";
-      return { group, subject: resolveTextGlobal(type), dim };
+      return { group, subjectKey: `dot:${m[1]!}`, subject: type, dim };
     }
   }
   if ((m = id.match(/^offensive([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
     const type = instantDamageLabel(m[1]!);
-    if (type) return { group, subject: resolveTextGlobal(type), dim: m[2] === "Modifier" ? "pct" : "flat" };
+    if (type) return { group, subjectKey: `damage:${m[1]!}`, subject: type, dim: m[2] === "Modifier" ? "pct" : "flat" };
+  }
+  // Retaliation damage: retaliation<Type>[Modifier|Min|Max], mirrors classify's family (see there).
+  if ((m = id.match(/^retaliation([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
+    const type = instantDamageLabel(m[1]!);
+    if (type)
+      return {
+        group,
+        subjectKey: `retaliation:${m[1]!}`,
+        subject: appT("stat.template.retaliation", { type }),
+        dim: m[2] === "Modifier" ? "pct" : "flat",
+      };
   }
   if ((m = id.match(/^defensive([A-Za-z]+?)MaxResist$/))) {
     const type = resistLabel(m[1]!);
     if (type)
-      return { group, subject: translate("stat.template.resistance", { type: resolveTextGlobal(type) }), dim: "max" };
+      return {
+        group,
+        subjectKey: `resist:${m[1]!}`,
+        subject: appT("stat.template.resistance", { type }),
+        dim: "max",
+      };
   }
   if ((m = id.match(/^defensive([A-Za-z]+?)$/))) {
     const type = resistLabel(m[1]!);
     if (type)
-      return { group, subject: translate("stat.template.resistance", { type: resolveTextGlobal(type) }), dim: "pct" };
+      return {
+        group,
+        subjectKey: `resist:${m[1]!}`,
+        subject: appT("stat.template.resistance", { type }),
+        dim: "pct",
+      };
   }
   if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/))) {
     const name = attrLabel(m[1]!);
-    if (name) return { group, subject: resolveTextGlobal(name), dim: m[2] ? "pct" : "flat" };
+    if (name) return { group, subjectKey: `attr:${m[1]!}`, subject: name, dim: m[2] ? "pct" : "flat" };
   }
-  if (id === "defensiveProtection")
-    return { group, subject: translate("stat.override.defensiveProtection"), dim: "flat" };
-  if (id === "defensiveProtectionModifier")
-    return { group, subject: translate("stat.override.defensiveProtectionModifier"), dim: "pct" };
+  // Intentional merges: these two id pairs share one subject even though they are not the same
+  // stat family (armor's flat/pct facets and the fear status effect's magnitude/chance facets).
+  if (id === "defensiveProtection" || id === "defensiveProtectionModifier")
+    return {
+      group,
+      subjectKey: "armor",
+      subject: appT("stat.override.defensiveProtection"),
+      dim: id.endsWith("Modifier") ? "pct" : "flat",
+    };
+  if (id === "retaliationFearMin" || id === "retaliationFearChance")
+    return {
+      group,
+      subjectKey: "retaliation-fear",
+      subject: appT("stat.override.retaliationFearMin"),
+      dim: id === "retaliationFearChance" ? "pct" : "flat",
+    };
   // Resistance reduction: flat and percent are distinct subjects (they stack differently in game).
   if (id.match(/^offensiveTotalResistanceReductionAbsolute(Duration)?Min$/))
     return {
       group,
-      subject: translate("stat.power.reducedTargetResistances"),
+      subjectKey: "stat.power.reducedTargetResistances",
+      subject: appT("stat.power.reducedTargetResistances"),
       dim: /Duration/.test(id) ? "durFlat" : "flat",
     };
   if (id.match(/^offensiveElementalResistanceReductionAbsolute(Duration)?Min$/))
     return {
       group,
-      subject: translate("stat.subject.reducedElementalResistancesFlat"),
+      subjectKey: "stat.subject.reducedElementalResistancesFlat",
+      subject: appT("stat.subject.reducedElementalResistancesFlat"),
       dim: /Duration/.test(id) ? "durFlat" : "flat",
     };
   if (id.match(/^offensiveElementalResistanceReductionPercent(Duration)?Min$/))
     return {
       group,
-      subject: translate("stat.override.offensiveElementalResistanceReductionPercentMin"),
+      subjectKey: "stat.override.offensiveElementalResistanceReductionPercentMin",
+      subject: appT("stat.override.offensiveElementalResistanceReductionPercentMin"),
       dim: /Duration/.test(id) ? "durFlat" : "pct",
     };
   if (id.match(/^offensivePhysicalReductionPercent(Duration)?Min$/))
     return {
       group,
-      subject: translate("stat.subject.reducedPhysicalResistance"),
+      subjectKey: "stat.subject.reducedPhysicalResistance",
+      subject: appT("stat.subject.reducedPhysicalResistance"),
       dim: /Duration/.test(id) ? "durFlat" : "pct",
     };
   // Crowd control: a status effect (magnitude Min + a Chance facet).
   let cc: RegExpMatchArray | null;
   if ((cc = id.match(/^offensive(Stun|Freeze|Petrify|Knockdown|Confusion)(Chance)?(Min|Max)?$/)))
-    return { group, subject: translate(`stat.subject.cc${cc[1]}`), dim: cc[2] ? "pct" : "flat" };
+    return {
+      group,
+      subjectKey: `stat.subject.cc${cc[1]}`,
+      subject: appT(`stat.subject.cc${cc[1]}`),
+      dim: cc[2] ? "pct" : "flat",
+    };
   if (id.match(/^offensiveFumble(Duration)?Min$/))
-    return { group, subject: translate("stat.subject.fumble"), dim: /Duration/.test(id) ? "durFlat" : "flat" };
+    return {
+      group,
+      subjectKey: "stat.subject.fumble",
+      subject: appT("stat.subject.fumble"),
+      dim: /Duration/.test(id) ? "durFlat" : "flat",
+    };
   if (id.match(/^offensiveProjectileFumble(Duration)?Min$/))
-    return { group, subject: translate("stat.subject.impairedAim"), dim: /Duration/.test(id) ? "durFlat" : "flat" };
+    return {
+      group,
+      subjectKey: "stat.subject.impairedAim",
+      subject: appT("stat.subject.impairedAim"),
+      dim: /Duration/.test(id) ? "durFlat" : "flat",
+    };
   if (id.match(/^offensiveSlowRunSpeed(Duration)?Min$/))
-    return { group, subject: translate("stat.subject.slowMovement"), dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return {
+      group,
+      subjectKey: "stat.subject.slowMovement",
+      subject: appT("stat.subject.slowMovement"),
+      dim: /Duration/.test(id) ? "durFlat" : "pct",
+    };
   if (id.match(/^offensiveSlowTotalSpeed(Duration)?Min$/))
-    return { group, subject: translate("stat.subject.slowTotalSpeed"), dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return {
+      group,
+      subjectKey: "stat.subject.slowTotalSpeed",
+      subject: appT("stat.subject.slowTotalSpeed"),
+      dim: /Duration/.test(id) ? "durFlat" : "pct",
+    };
   if (id.match(/^offensiveSlowAttackSpeed(Duration)?Min$/))
-    return { group, subject: translate("stat.subject.slowAttackSpeed"), dim: /Duration/.test(id) ? "durFlat" : "pct" };
+    return {
+      group,
+      subjectKey: "stat.subject.slowAttackSpeed",
+      subject: appT("stat.subject.slowAttackSpeed"),
+      dim: /Duration/.test(id) ? "durFlat" : "pct",
+    };
   if (id.match(/^offensiveSlowOffensiveAbility(Duration)?Min$/))
     return {
       group,
-      subject: translate("stat.power.reducedOffensiveAbility"),
+      subjectKey: "stat.power.reducedOffensiveAbility",
+      subject: appT("stat.power.reducedOffensiveAbility"),
       dim: /Duration/.test(id) ? "durFlat" : "flat",
     };
   if (id.match(/^offensiveSlowDefensiveAbility(Duration)?Min$/))
     return {
       group,
-      subject: translate("stat.power.reducedDefensiveAbility"),
+      subjectKey: "stat.power.reducedDefensiveAbility",
+      subject: appT("stat.power.reducedDefensiveAbility"),
       dim: /Duration/.test(id) ? "durFlat" : "flat",
     };
   if (id.match(/^offensiveTotalDamageReductionPercent(Duration)?Min$/))
     return {
       group,
-      subject: translate("stat.power.reducedTargetDamage"),
+      subjectKey: "stat.power.reducedTargetDamage",
+      subject: appT("stat.power.reducedTargetDamage"),
       dim: /Duration/.test(id) ? "durFlat" : "pct",
     };
-  // Standalone stat: its own one-line subject.
-  // Bridge: classify now returns a Text label; decompose stays string-based until Task 6.
-  return { group, subject: resolveTextGlobal(c.label), dim: c.percent ? "pct" : "flat" };
+  // Standalone stat: its own one-line subject, keyed by its raw stat id.
+  return { group, subjectKey: id, subject: c.label, dim: c.percent ? "pct" : "flat" };
 }
 
 /** Format a bonuses map into subjects grouped by category, each subject carrying its dimensions. */
@@ -705,19 +774,19 @@ export function condensedRows(
       subs = new Map();
       groups.set(d.group, subs);
     }
-    let cs = subs.get(d.subject);
+    let cs = subs.get(d.subjectKey);
     if (!cs) {
-      cs = { subject: d.subject, key: `${d.group}:${d.subject}`, parts: [] };
-      subs.set(d.subject, cs);
+      cs = { subject: d.subject, key: `${d.group}:${d.subjectKey}`, parts: [] };
+      subs.set(d.subjectKey, cs);
     }
-    // Bridge: bonusEntries now returns a Text value; condensedRows stays string-based until Task 6.
-    cs.parts.push({ dim: d.dim, value: resolveTextGlobal(row.value), id });
+    cs.parts.push({ dim: d.dim, value: row.value, id });
   }
   return GROUP_ORDER.filter((g) => groups.has(g)).map((g) => ({
     group: g,
-    subjects: [...groups.get(g)!.values()]
-      .map((cs) => ({ ...cs, parts: cs.parts.sort((a, b) => DIM_ORDER.indexOf(a.dim) - DIM_ORDER.indexOf(b.dim)) }))
-      .sort((a, b) => a.subject.localeCompare(b.subject)),
+    subjects: [...groups.get(g)!.values()].map((cs) => ({
+      ...cs,
+      parts: cs.parts.sort((a, b) => DIM_ORDER.indexOf(a.dim) - DIM_ORDER.indexOf(b.dim)),
+    })),
   }));
 }
 
@@ -726,16 +795,15 @@ export function groupedBonusRows(
   bonuses: Record<string, number>,
   opts: { racialTarget?: string[] } = {},
 ): { group: StatGroup; rows: GroupedRow[] }[] {
-  // Bridge: bonusEntries now returns Text rows; groupedBonusRows stays string-based until Task 6.
   const byGroup = new Map<StatGroup, GroupedRow[]>();
   for (const { id, row } of bonusEntries(bonuses, opts)) {
     const g = groupFor(id);
     const arr = byGroup.get(g) ?? [];
-    arr.push({ id, label: resolveTextGlobal(row.label), value: resolveTextGlobal(row.value) });
+    arr.push({ id, label: row.label, value: row.value });
     byGroup.set(g, arr);
   }
   return GROUP_ORDER.filter((g) => byGroup.has(g)).map((g) => ({
     group: g,
-    rows: byGroup.get(g)!.sort((a, b) => a.label.localeCompare(b.label)),
+    rows: byGroup.get(g)!,
   }));
 }
