@@ -17,7 +17,7 @@ import {
   type PowerRows,
   type CondensedGroup,
 } from "../src/core/statFormat";
-import { benefitRows } from "../src/core/benefitRows";
+import { benefitRows, type BenefitGroup } from "../src/core/benefitRows";
 import { commitButton } from "../src/core/commitAction";
 import { sumBonuses, sumPetBonuses, racialTargets } from "../src/core/aggregate";
 import { buildOrderHtml } from "../src/adapters/buildOrderView";
@@ -74,6 +74,31 @@ function collectSurfaces(loc: Localization): unknown {
         }))
         .sort((a, b) => a.subject.localeCompare(b.subject)),
     }));
+  // benefitRows now returns structural keys and insertion-order subjects (Task 7), same shape shift
+  // as condensedRows above. The snapshot was frozen with the pre-refactor shape: subjects sorted by
+  // resolved label, keyed by `${group}:${resolved label}`, every Text field resolved to a string.
+  // Reproduce that exact shape here (sidebarView now does this resolve+sort at HTML-assembly time).
+  const resolveBenefitRows = (groups: BenefitGroup[]) =>
+    groups.map((g) => ({
+      group: g.group,
+      subjects: g.subjects
+        .map((s) => ({
+          ids: s.ids,
+          key: `${g.group}:${resolveTextGlobal(s.subject)}`,
+          rows: s.rows.map((r) => ({
+            role: r.role,
+            subLabel: resolveTextGlobal(r.subLabel),
+            id: r.id,
+            base: resolveTextGlobal(r.base),
+            now: resolveTextGlobal(r.now),
+            delta: resolveTextGlobal(r.delta),
+            verdict: r.verdict,
+          })),
+          subject: resolveTextGlobal(s.subject),
+          verdict: s.verdict,
+        }))
+        .sort((a, b) => a.subject.localeCompare(b.subject)),
+    }));
   const racial = racialTargets(model, selection);
   const perStar: Record<string, unknown> = {};
   for (const sid of selection) {
@@ -95,8 +120,14 @@ function collectSurfaces(loc: Localization): unknown {
   return {
     condensed: resolveCondensed(condensedRows(sumBonuses(model, selection), { racialTarget: racial })),
     condensedPet: resolveCondensed(condensedRows(sumPetBonuses(model, selection))),
-    benefitRowsRegular: benefitRows(model, selection, null),
-    benefitRowsCompare: benefitRows(model, selection, baseline),
+    benefitRowsRegular: {
+      player: resolveBenefitRows(benefitRows(model, selection, null).player),
+      pet: resolveBenefitRows(benefitRows(model, selection, null).pet),
+    },
+    benefitRowsCompare: {
+      player: resolveBenefitRows(benefitRows(model, selection, baseline).player),
+      pet: resolveBenefitRows(benefitRows(model, selection, baseline).pet),
+    },
     perStar,
     commit: [
       commitButton(model, selection, partialReach(new Set(CONS)), { kind: "constellation", id: "crane" }),

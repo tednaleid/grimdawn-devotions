@@ -40,9 +40,9 @@ function benefitListHtml(
 ): string {
   const cells = (r: BenefitGroup["subjects"][number]["rows"][number]) =>
     comparing
-      ? `<span class="brow-v base">${r.base}</span><span class="brow-v ${r.verdict}">${r.now}</span><span class="brow-v ${r.verdict}">${r.delta}</span>`
-      : `<span class="brow-v${flash(r.id)}">${r.now}</span>`;
-  const rowHtml = (s: BenefitSubject, r: BenefitGroup["subjects"][number]["rows"][number]) => {
+      ? `<span class="brow-v base">${resolveTextGlobal(r.base)}</span><span class="brow-v ${r.verdict}">${resolveTextGlobal(r.now)}</span><span class="brow-v ${r.verdict}">${resolveTextGlobal(r.delta)}</span>`
+      : `<span class="brow-v${flash(r.id)}">${resolveTextGlobal(r.now)}</span>`;
+  const rowHtml = (s: BenefitSubject, subject: string, r: BenefitGroup["subjects"][number]["rows"][number]) => {
     const vid = keyOf(r.id);
     const sel = selectedBenefits.has(vid) ? " vsel" : "";
     if (r.role === "subject") {
@@ -50,19 +50,29 @@ function benefitListHtml(
       const vtint = comparing && s.verdict ? ` ${s.verdict}` : "";
       return (
         `<div class="brow${sel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}">` +
-        `<span class="brow-lbl subj${vtint}" data-gtoggle title="${s.subject}">${s.subject}</span>` +
+        `<span class="brow-lbl subj${vtint}" data-gtoggle title="${subject}">${subject}</span>` +
         `<span class="brow-vals" data-vid="${vid}">${cells(r)}</span></div>`
       );
     }
     const lbl =
-      r.role === "sub" ? `<span class="brow-lbl sub">${r.subLabel}</span>` : `<span class="brow-lbl cont"></span>`;
+      r.role === "sub"
+        ? `<span class="brow-lbl sub">${resolveTextGlobal(r.subLabel)}</span>`
+        : `<span class="brow-lbl cont"></span>`;
     return `<div class="brow${sel}" data-vid="${vid}">${lbl}<span class="brow-vals">${cells(r)}</span></div>`;
   };
   return groups
-    .map(
-      (g) =>
-        `<h3>${translate(GROUP_KEY[g.group])}</h3>${g.subjects.map((s) => s.rows.map((r) => rowHtml(s, r)).join("")).join("")}`,
-    )
+    .map((g) => {
+      const subjects = [...g.subjects].sort((a, b) =>
+        resolveTextGlobal(a.subject).localeCompare(resolveTextGlobal(b.subject)),
+      );
+      const rowsHtml = subjects
+        .map((s) => {
+          const subject = resolveTextGlobal(s.subject);
+          return s.rows.map((r) => rowHtml(s, subject, r)).join("");
+        })
+        .join("");
+      return `<h3>${translate(GROUP_KEY[g.group])}</h3>${rowsHtml}`;
+    })
     .join("");
 }
 
