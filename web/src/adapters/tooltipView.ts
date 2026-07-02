@@ -13,7 +13,7 @@ import { formatBonusRowsWithIds, formatPet, formatPowerStats } from "../core/sta
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 import { affinityTagId } from "../core/urlState";
-import { translate, gameText } from "../core/localization";
+import { translate, gameText, resolveTextGlobal } from "../core/localization";
 
 type AffinityTotals = Record<Affinity, number>;
 
@@ -49,6 +49,8 @@ function bonusRowsHtml(
   racialTarget?: string[],
 ): string {
   return formatBonusRowsWithIds(bonuses, { racialTarget })
+    .map((r) => ({ id: r.id, label: resolveTextGlobal(r.label), value: resolveTextGlobal(r.value) }))
+    .sort((a, b) => a.label.localeCompare(b.label))
     .map((r) => {
       const vid = `${scope}${r.id}`;
       const sel = selectedBenefits.has(vid) ? " vsel" : "";

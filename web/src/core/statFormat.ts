@@ -1,21 +1,19 @@
 // ABOUTME: Formats raw Grim Dawn devotion stat ids + values into player-facing rows.
 // ABOUTME: Encodes the percent/flat split and GD's internal->display quirks (Life=Vitality, Dexterity=Cunning, ...).
 import type { PetInfo } from "./types";
-import { translate, gameText, stripValueTokens } from "./localization";
+import { translate, gameText, appT, gameT, gameStrippedT, litT, resolveTextGlobal, type Text } from "./localization";
 import { STAT_TAGS, STAT_FORMAT_TAGS } from "./statTags";
 
 export interface StatRow {
-  label: string;
-  value: string;
+  label: Text;
+  value: Text;
 }
 
 // Resolve a stat catalog key to display text: mapped keys (data/stat-tags.json) go through the
-// authoritative game term (gameText); unmapped keys fall back to the app catalog (translate).
-// Resolved at call time, never at module load (the localization singleton installs after this
-// module evaluates).
-function statLabel(key: string): string {
+// authoritative game term (gameT); unmapped keys fall back to the app catalog (appT).
+function statLabel(key: string): Text {
   const tag = STAT_TAGS[key];
-  return tag ? gameText(tag) : translate(key);
+  return tag ? gameT(tag) : appT(key);
 }
 
 // Instant damage type segments recognized in ids. GD quirks: internal Life = Vitality, Poison = Acid.
@@ -33,12 +31,12 @@ const INSTANT_DAMAGE_SEGMENTS = new Set([
   "Poison",
   "Life",
 ]);
-function instantDamageLabel(segment: string): string | undefined {
+function instantDamageLabel(segment: string): Text | undefined {
   return INSTANT_DAMAGE_SEGMENTS.has(segment) ? statLabel(`stat.damage.${segment}`) : undefined;
 }
 // "Slow" (damage-over-time) type segments. Display names live under stat.dot.<Segment>.
 const DOT_DAMAGE_SEGMENTS = new Set(["Bleeding", "Physical", "Fire", "Cold", "Lightning", "Poison", "Life"]);
-function dotDamageLabel(segment: string): string | undefined {
+function dotDamageLabel(segment: string): Text | undefined {
   return DOT_DAMAGE_SEGMENTS.has(segment) ? statLabel(`stat.dot.${segment}`) : undefined;
 }
 // Resistance type segments. (Status effects like Stun/Freeze are NOT resistances in GD - they are
@@ -55,7 +53,7 @@ const RESIST_SEGMENTS = new Set([
   "Life",
   "Bleeding",
 ]);
-function resistLabel(segment: string): string | undefined {
+function resistLabel(segment: string): Text | undefined {
   return RESIST_SEGMENTS.has(segment) ? statLabel(`stat.resist.${segment}`) : undefined;
 }
 // Character attribute segments (GD renamed the classic attributes). Display names live under
@@ -71,12 +69,12 @@ const ATTR_SEGMENTS = new Set([
   "LifeRegen",
   "ManaRegen",
 ]);
-function attrLabel(segment: string): string | undefined {
+function attrLabel(segment: string): Text | undefined {
   return ATTR_SEGMENTS.has(segment) ? statLabel(`stat.attr.${segment}`) : undefined;
 }
 
 interface Classified {
-  label: string;
+  label: Text;
   percent: boolean;
   sign: number; // 1 normal, -1 for reductions shown as negative
 }
@@ -160,7 +158,7 @@ function humanize(id: string): string {
 export function classify(id: string): Classified | null {
   if (/^[A-Z]/.test(id)) return null; // weapon-class token (Spear2h, Dagger, ...) - shown via weapon requirement
   const o = OVERRIDES[id];
-  if (o) return { label: translate(`stat.override.${id}`), percent: o.percent, sign: o.sign };
+  if (o) return { label: appT(`stat.override.${id}`), percent: o.percent, sign: o.sign };
 
   let m: RegExpMatchArray | null;
 
@@ -169,35 +167,35 @@ export function classify(id: string): Classified | null {
     const type = dotDamageLabel(m[1]!);
     if (type) {
       const percent = m[3] === "Modifier";
-      const label = m[2] ? translate("stat.template.duration", { type }) : translate("stat.template.damage", { type });
+      const label = m[2] ? appT("stat.template.duration", { type }) : appT("stat.template.damage", { type });
       return { label, percent, sign: 1 };
     }
   }
   // Offensive instant damage: offensive<Type>[Modifier|Min|Max]
   if ((m = id.match(/^offensive([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
     const type = instantDamageLabel(m[1]!);
-    if (type) return { label: translate("stat.template.damage", { type }), percent: m[2] === "Modifier", sign: 1 };
+    if (type) return { label: appT("stat.template.damage", { type }), percent: m[2] === "Modifier", sign: 1 };
   }
   // Defensive maximum resistance: defensive<Type>MaxResist
   if ((m = id.match(/^defensive([A-Za-z]+?)MaxResist$/))) {
     const type = resistLabel(m[1]!);
-    if (type) return { label: translate("stat.template.maxResistance", { type }), percent: true, sign: 1 };
+    if (type) return { label: appT("stat.template.maxResistance", { type }), percent: true, sign: 1 };
   }
   // Defensive reduced damage-over-time duration: defensive<Type>Duration.
   // GD names these by the DoT (Internal Trauma/Burn/Frostburn/...) and shows them as a positive percent.
   if ((m = id.match(/^defensive([A-Za-z]+?)Duration$/))) {
     const type = dotDamageLabel(m[1]!);
-    if (type) return { label: translate("stat.template.reducedDuration", { type }), percent: true, sign: 1 };
+    if (type) return { label: appT("stat.template.reducedDuration", { type }), percent: true, sign: 1 };
   }
   // Defensive base resistance: defensive<Type>
   if ((m = id.match(/^defensive([A-Za-z]+?)$/))) {
     const type = resistLabel(m[1]!);
-    if (type) return { label: translate("stat.template.resistance", { type }), percent: true, sign: 1 };
+    if (type) return { label: appT("stat.template.resistance", { type }), percent: true, sign: 1 };
   }
   // Retaliation damage: retaliation<Type>[Modifier|Min|Max]. Modifier is the percent form.
   if ((m = id.match(/^retaliation([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
     const type = instantDamageLabel(m[1]!);
-    if (type) return { label: translate("stat.template.retaliation", { type }), percent: m[2] === "Modifier", sign: 1 };
+    if (type) return { label: appT("stat.template.retaliation", { type }), percent: m[2] === "Modifier", sign: 1 };
   }
   // Character attribute: character<Attr>[Modifier]
   if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/))) {
@@ -207,25 +205,30 @@ export function classify(id: string): Classified | null {
 
   // Value-embedded game format stats ("{v}% <noun>"): source the noun from the game tag, strip the value.
   const fmtTag = STAT_FORMAT_TAGS[id];
-  if (fmtTag) return { label: stripValueTokens(gameText(fmtTag)), percent: true, sign: 1 };
+  if (fmtTag) return { label: gameStrippedT(fmtTag), percent: true, sign: 1 };
 
   // Fallback: humanize, treating Modifier/Percent/Resistance/Chance as percent and Reduction as a negative percent.
   const percent = /Modifier$|Percent|Reduction$|Resistance$|Chance$/.test(id);
-  return { label: humanize(id), percent, sign: /Reduction$/.test(id) ? -1 : 1 };
+  return { label: litT(humanize(id)), percent, sign: /Reduction$/.test(id) ? -1 : 1 };
 }
 
-function fmtValue(value: number, percent: boolean, sign: number): string {
+function fmtValue(value: number, percent: boolean, sign: number): Text {
   const n = sign * value;
   const s = n >= 0 ? `+${n}` : `${n}`;
-  return percent ? `${s}%` : s;
+  return litT(percent ? `${s}%` : s);
 }
 
 // Internal race name -> player-facing (GD shows the plural, except Undead). Display names and the
 // multi-race join separator live in the catalog under stat.race.<Race> / stat.race.join.
 const RACE_SEGMENTS = new Set(["Beast", "Chthonic", "Human", "Undead"]);
-function raceLabel(targets?: string[]): string | null {
+function raceLabel(targets?: string[]): Text | null {
   if (!targets || targets.length === 0) return null;
-  return targets.map((t) => (RACE_SEGMENTS.has(t) ? translate(`stat.race.${t}`) : t)).join(translate("stat.race.join"));
+  const parts: Text[] = [];
+  targets.forEach((t, i) => {
+    if (i > 0) parts.push(appT("stat.race.join"));
+    parts.push(RACE_SEGMENTS.has(t) ? appT(`stat.race.${t}`) : litT(t));
+  });
+  return { k: "join", parts };
 }
 
 /** Format a single stat id + value into a display row, or null if it is not a stat (weapon token). */
@@ -235,8 +238,8 @@ export function statRow(id: string, value: number, racialTarget?: string[]): Sta
   let label = c.label;
   const race = raceLabel(racialTarget);
   if (race) {
-    if (id === "racialBonusPercentDamage") label = translate("stat.subject.damageToRace", { race });
-    else if (id === "racialBonusPercentDefense") label = translate("stat.subject.lessDamageFromRace", { race });
+    if (id === "racialBonusPercentDamage") label = appT("stat.subject.damageToRace", { race });
+    else if (id === "racialBonusPercentDefense") label = appT("stat.subject.lessDamageFromRace", { race });
   }
   return { label, value: fmtValue(value, c.percent, c.sign) };
 }
@@ -326,7 +329,7 @@ function bonusEntries(
         if (c && !c.percent) {
           used.add(minK);
           used.add(maxK);
-          out.push({ id: minK, row: { label: c.label, value: `+${bonuses[minK]}-${bonuses[maxK]}` } });
+          out.push({ id: minK, row: { label: c.label, value: litT(`+${bonuses[minK]}-${bonuses[maxK]}`) } });
           continue;
         }
       }
@@ -338,26 +341,25 @@ function bonusEntries(
   return out;
 }
 
-/** Format a bonuses map into a single list of display rows, sorted by label. */
+/** Format a bonuses map into a single list of display rows, in stable input order. */
 export function formatBonusRows(bonuses: Record<string, number>, opts: { racialTarget?: string[] } = {}): StatRow[] {
-  return bonusEntries(bonuses, opts)
-    .map((e) => e.row)
-    .sort((a, b) => a.label.localeCompare(b.label));
+  return bonusEntries(bonuses, opts).map((e) => e.row);
 }
 
 /** Like formatBonusRows, but each row keeps its representative stat id (for tagging tooltip rows). */
 export function formatBonusRowsWithIds(
   bonuses: Record<string, number>,
   opts: { racialTarget?: string[] } = {},
-): { id: string; label: string; value: string }[] {
-  return bonusEntries(bonuses, opts)
-    .map((e) => ({ id: e.id, label: e.row.label, value: e.row.value }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+): { id: string; label: Text; value: Text }[] {
+  return bonusEntries(bonuses, opts).map((e) => ({ id: e.id, label: e.row.label, value: e.row.value }));
 }
 
 // A grouped row keeps its representative stat id so callers can diff it (highlight changes).
-export interface GroupedRow extends StatRow {
+// TODO(Task 6): converts to Text like StatRow; still resolved strings for now.
+export interface GroupedRow {
   id: string;
+  label: string;
+  value: string;
 }
 
 // --- Celestial power ability stats ------------------------------------------
@@ -365,6 +367,11 @@ export interface GroupedRow extends StatRow {
 // own stat lines the way grimtools shows them ("1.5 Second Skill Recharge",
 // "1125 Poison Damage over 5 Seconds"). These render with the same value+label
 // shape as bonus rows, but the value carries the unit and no leading sign.
+// TODO(Task 5): converts to Text like StatRow; still resolved strings for now.
+interface PowerRow {
+  label: string;
+  value: string;
+}
 
 function fmtNum(n: number): string {
   return String(n);
@@ -382,8 +389,8 @@ function forSecondsSuffix(seconds: number): string {
  * grimtools' order; any remaining raw stat ids fall through to bonus formatting
  * (sign stripped, since an ability grants the value rather than a +/- modifier).
  */
-export function formatPowerStats(stats: Record<string, number>): StatRow[] {
-  const rows: StatRow[] = [];
+export function formatPowerStats(stats: Record<string, number>): PowerRow[] {
+  const rows: PowerRow[] = [];
   const used = new Set<string>();
   const take = (k: string): number | undefined => {
     if (k in stats) {
@@ -436,7 +443,8 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
       used.add(minK);
       used.add(durK);
       const total = Math.round(stats[minK]! * stats[durK]!);
-      const name = statLabel(`stat.dot.${seg}`);
+      // Bridge: statLabel now returns a Text; formatPowerStats stays string-based until Task 5.
+      const name = resolveTextGlobal(statLabel(`stat.dot.${seg}`));
       rows.push({
         value: fmtNum(total),
         label: translate("stat.power.dotDamageOverSeconds", { name, seconds: fmtNum(stats[durK]!) }),
@@ -550,9 +558,14 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
 
   // Anything else (instant damage ranges, leech, resist reductions): reuse the
   // bonus formatter and drop the leading "+" an ability line does not show.
+  // Bridge: formatBonusRows now returns Text in stable input order (sorting moved to
+  // callers); formatPowerStats stays string-based and still sorts by label until Task 5.
   const rest: Record<string, number> = {};
   for (const k of Object.keys(stats)) if (!used.has(k)) rest[k] = stats[k]!;
-  for (const r of formatBonusRows(rest)) {
+  const restRows = formatBonusRows(rest)
+    .map((r) => ({ label: resolveTextGlobal(r.label), value: resolveTextGlobal(r.value) }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+  for (const r of restRows) {
     rows.push({ label: r.label, value: r.value.replace(/^\+/, "") });
   }
   return rows;
@@ -562,7 +575,7 @@ export function formatPowerStats(stats: Record<string, number>): StatRow[] {
  * A summon proc's pet: a "Summons N <Pet> for M Seconds" summary line plus the pet's
  * base attack rendered as ability stat rows (reusing the power-stat formatter).
  */
-export function formatPet(pet: PetInfo): { summon: string; attack: StatRow[] } {
+export function formatPet(pet: PetInfo): { summon: string; attack: PowerRow[] } {
   const plural = (pet.count ?? 1) > 1;
   const num = plural ? `${fmtNum(pet.count!)} ` : "";
   const name = `${(pet.nameTag ? gameText(pet.nameTag) : null) ?? translate("stat.pet.minion")}${plural ? "s" : ""}`;
@@ -594,6 +607,7 @@ export interface CondensedGroup {
 }
 
 // Map a raw stat id to its (group, subject, dimension), mirroring classify's families.
+// Bridge: the *Label helpers now return Text; decompose stays string-based until Task 6.
 function decompose(id: string): { group: StatGroup; subject: string; dim: StatDim } | null {
   const c = classify(id);
   if (!c) return null;
@@ -604,24 +618,26 @@ function decompose(id: string): { group: StatGroup; subject: string; dim: StatDi
     if (type) {
       const pct = m[3] === "Modifier";
       const dim: StatDim = m[2] ? (pct ? "durPct" : "durFlat") : pct ? "pct" : "flat";
-      return { group, subject: type, dim };
+      return { group, subject: resolveTextGlobal(type), dim };
     }
   }
   if ((m = id.match(/^offensive([A-Za-z]+?)(Modifier|Min|Max)?$/))) {
     const type = instantDamageLabel(m[1]!);
-    if (type) return { group, subject: type, dim: m[2] === "Modifier" ? "pct" : "flat" };
+    if (type) return { group, subject: resolveTextGlobal(type), dim: m[2] === "Modifier" ? "pct" : "flat" };
   }
   if ((m = id.match(/^defensive([A-Za-z]+?)MaxResist$/))) {
     const type = resistLabel(m[1]!);
-    if (type) return { group, subject: translate("stat.template.resistance", { type }), dim: "max" };
+    if (type)
+      return { group, subject: translate("stat.template.resistance", { type: resolveTextGlobal(type) }), dim: "max" };
   }
   if ((m = id.match(/^defensive([A-Za-z]+?)$/))) {
     const type = resistLabel(m[1]!);
-    if (type) return { group, subject: translate("stat.template.resistance", { type }), dim: "pct" };
+    if (type)
+      return { group, subject: translate("stat.template.resistance", { type: resolveTextGlobal(type) }), dim: "pct" };
   }
   if ((m = id.match(/^character([A-Za-z]+?)(Modifier)?$/))) {
     const name = attrLabel(m[1]!);
-    if (name) return { group, subject: name, dim: m[2] ? "pct" : "flat" };
+    if (name) return { group, subject: resolveTextGlobal(name), dim: m[2] ? "pct" : "flat" };
   }
   if (id === "defensiveProtection")
     return { group, subject: translate("stat.override.defensiveProtection"), dim: "flat" };
@@ -685,7 +701,8 @@ function decompose(id: string): { group: StatGroup; subject: string; dim: StatDi
       dim: /Duration/.test(id) ? "durFlat" : "pct",
     };
   // Standalone stat: its own one-line subject.
-  return { group, subject: c.label, dim: c.percent ? "pct" : "flat" };
+  // Bridge: classify now returns a Text label; decompose stays string-based until Task 6.
+  return { group, subject: resolveTextGlobal(c.label), dim: c.percent ? "pct" : "flat" };
 }
 
 /** Format a bonuses map into subjects grouped by category, each subject carrying its dimensions. */
@@ -707,7 +724,8 @@ export function condensedRows(
       cs = { subject: d.subject, key: `${d.group}:${d.subject}`, parts: [] };
       subs.set(d.subject, cs);
     }
-    cs.parts.push({ dim: d.dim, value: row.value, id });
+    // Bridge: bonusEntries now returns a Text value; condensedRows stays string-based until Task 6.
+    cs.parts.push({ dim: d.dim, value: resolveTextGlobal(row.value), id });
   }
   return GROUP_ORDER.filter((g) => groups.has(g)).map((g) => ({
     group: g,
@@ -722,11 +740,12 @@ export function groupedBonusRows(
   bonuses: Record<string, number>,
   opts: { racialTarget?: string[] } = {},
 ): { group: StatGroup; rows: GroupedRow[] }[] {
+  // Bridge: bonusEntries now returns Text rows; groupedBonusRows stays string-based until Task 6.
   const byGroup = new Map<StatGroup, GroupedRow[]>();
   for (const { id, row } of bonusEntries(bonuses, opts)) {
     const g = groupFor(id);
     const arr = byGroup.get(g) ?? [];
-    arr.push({ id, ...row });
+    arr.push({ id, label: resolveTextGlobal(row.label), value: resolveTextGlobal(row.value) });
     byGroup.set(g, arr);
   }
   return GROUP_ORDER.filter((g) => byGroup.has(g)).map((g) => ({

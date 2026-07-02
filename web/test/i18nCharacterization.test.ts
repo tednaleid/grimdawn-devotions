@@ -49,7 +49,9 @@ function collectSurfaces(loc: Localization): unknown {
   for (const sid of selection) {
     const star = model.stars.get(sid)!;
     const entry: Record<string, unknown> = {
-      bonuses: formatBonusRowsWithIds(star.bonuses, { racialTarget: star.racialTarget }),
+      bonuses: formatBonusRowsWithIds(star.bonuses, { racialTarget: star.racialTarget })
+        .map((r) => ({ id: r.id, label: resolveTextGlobal(r.label), value: resolveTextGlobal(r.value) }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     };
     if (star.celestialPower) {
       entry.power = formatPowerStats(star.celestialPower.stats);
