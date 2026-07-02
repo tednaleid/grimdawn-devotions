@@ -245,16 +245,11 @@ Phases 1a, 1b, 2, and 3 are all done: the localization seam, app-owned
 chrome/statFormat strings, game-data tags resolved via `gameText`, the
 curated stat-tag mapping, and 13 shipped locales (`en de fr es ru zh pl it cs
 ja ko pt vi`, Spanish added in a follow-on once the `Text_ES.arc` extraction
-issue was resolved). See [docs/i18n.md](docs/i18n.md) and
-`docs/superpowers/specs/2026-06-30-i18n-localization-design.md` for the full
-design. Remaining work:
+issue was resolved). A further follow-on added a visible language picker
+(header globe button; see `docs/i18n.md`). See [docs/i18n.md](docs/i18n.md)
+and `docs/superpowers/specs/2026-06-30-i18n-localization-design.md` for the
+full design. Remaining work:
 
-- **Visible language picker.** The app auto-detects the locale from
-  `navigator.languages` with no in-app control to override it. Adding one is
-  optional and non-breaking because locale is a viewer preference, never in
-  the URL hash. Pointer: a new UI control that calls `loadLocalization` again
-  with a forced `preferred` locale and re-renders the current selection (all
-  real state is already in the hash and language independent).
 - **Community correction of authored translations.** The 12 non-English
   `app.<locale>.json` catalogs (`web/src/i18n/app.*.json`) are LLM-authored
   best-effort translations, not reviewed by native speakers. Corrections are
