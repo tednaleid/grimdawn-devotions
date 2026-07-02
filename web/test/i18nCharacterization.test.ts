@@ -7,7 +7,7 @@ import appZh from "../src/i18n/app.zh.json";
 import gameEn from "../../data/i18n/game.en.json";
 import gameZh from "../../data/i18n/game.zh.json";
 import { buildModel, type DevotionsDoc } from "../src/core/model";
-import { makeLocalization, setLocalization } from "../src/core/localization";
+import { makeLocalization, setLocalization, resolveTextGlobal } from "../src/core/localization";
 import type { Localization } from "../src/ports/Localization";
 import { formatBonusRowsWithIds, formatPowerStats, formatPet, condensedRows } from "../src/core/statFormat";
 import { benefitRows } from "../src/core/benefitRows";
@@ -66,7 +66,7 @@ function collectSurfaces(loc: Localization): unknown {
     commit: [
       commitButton(model, selection, partialReach(new Set(CONS)), { kind: "constellation", id: "crane" }),
       commitButton(model, new Set(), partialReach(new Set()), { kind: "constellation", id: "crane" }),
-    ],
+    ].map((b) => ({ label: resolveTextGlobal(b.label), enabled: b.enabled })),
     buildOrder: buildOrderHtml(model, null, [
       { kind: "scaffold-add", conId: "crossroads_order", points: 1, heldAfter: 1 },
       { kind: "complete", conId: "crane", points: 6, heldAfter: 7 },

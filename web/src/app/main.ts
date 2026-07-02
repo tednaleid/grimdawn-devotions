@@ -9,7 +9,7 @@ import {
   storeLocale,
 } from "../adapters/localizationAdapter";
 import { mountLanguagePicker } from "../adapters/languagePicker";
-import { translate } from "../core/localization";
+import { translate, resolveTextGlobal } from "../core/localization";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
@@ -638,7 +638,8 @@ async function boot() {
     popoverTarget = target;
     popoverXY = { x, y };
     const totals = affinityTotals(model, state.selected);
-    const btn = commitButton(model, state.selected, reach, target);
+    const raw = commitButton(model, state.selected, reach, target);
+    const btn = { label: resolveTextGlobal(raw.label), enabled: raw.enabled };
     if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn, selectedBenefits);
     else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn, selectedBenefits);
   }
