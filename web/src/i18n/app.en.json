@@ -1,5 +1,6 @@
 {
   "ui.title": "Grim Dawn Devotion Planner",
+  "ui.lang.label": "Change language",
   "ui.boot.failed": "Couldn't load the planner.",
   "ui.boot.reload": "Reload",
   "ui.boot.loading": "Loading the devotion map…",

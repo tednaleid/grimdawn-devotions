@@ -105,6 +105,67 @@ header button:active {
 #reset-points {
   margin-left: auto;
 }
+/* Language picker: a globe button at the header's right edge that opens a compact locale popover. */
+.lang-picker {
+  position: relative;
+  flex: none;
+}
+.lang-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.45rem; /* icon fits tighter than the text buttons */
+  line-height: 0;
+  color: #9aa4b2; /* subtle by default; brightens on hover */
+}
+.lang-btn:hover {
+  color: #e6edf3;
+}
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  margin: 0;
+  padding: 0.25rem;
+  list-style: none;
+  min-width: 9rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  background: #1b2129;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.lang-menu[hidden] {
+  display: none;
+}
+/* Menu items are plain rows, not the boxed header buttons they would otherwise inherit. */
+.lang-menu button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  color: #e6edf3;
+  font-size: 0.85rem;
+}
+.lang-menu button:hover {
+  background: #2d333b;
+  border-color: transparent;
+}
+.lang-menu button.current {
+  font-weight: 600;
+}
+.lang-menu button.current::after {
+  content: "✓";
+  float: right;
+  margin-left: 0.75rem;
+  color: #9aa4b2;
+}
 /* Points budget bar: used (spent) / min (validity floor) / headroom, with a grey cap grabber. */
 #point-bar {
   position: relative;

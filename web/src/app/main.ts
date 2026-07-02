@@ -1,7 +1,14 @@
 // ABOUTME: Application entry point for the Grim Dawn Devotion Planner.
 // ABOUTME: Owns SelectionState and wires every adapter (data, svg, nav, sidebars, tooltip) to the core.
 import { httpDataSource } from "../adapters/httpDataSource";
-import { loadLocalization, SUPPORTED_LOCALES } from "../adapters/localizationAdapter";
+import {
+  loadLocalization,
+  SUPPORTED_LOCALES,
+  LOCALE_NAMES,
+  storedLocale,
+  storeLocale,
+} from "../adapters/localizationAdapter";
+import { mountLanguagePicker } from "../adapters/languagePicker";
 import { translate } from "../core/localization";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
@@ -51,7 +58,14 @@ async function boot() {
     sessionStorage.removeItem("bootReloaded");
   } catch {}
   const data = await httpDataSource(".").load();
-  await loadLocalization({ base: ".", available: SUPPORTED_LOCALES });
+  // A stored override (from the language picker) wins over browser auto-detection; if none, pass
+  // undefined so loadLocalization falls back to navigator.languages as before.
+  const overrideLocale = storedLocale(SUPPORTED_LOCALES);
+  let localization = await loadLocalization({
+    base: ".",
+    available: SUPPORTED_LOCALES,
+    preferred: overrideLocale ? [overrideLocale] : undefined,
+  });
   const model = data.model;
   const cons: ReachCon[] = buildReachCons(model);
   const table = data.coverTable; // null -> dimming disabled (degraded)
@@ -90,17 +104,24 @@ async function boot() {
   // Benefit "tags": the raw stat ids selected in the Benefits panel; they highlight the
   // matching map nodes and are persisted in the URL so a shared link restores them.
   const selectedBenefits = new Set<string>(restored?.benefits ?? []);
-  // The full benefit catalog (every subject + its stat ids), so the panel can list
-  // benefits the current build does not grant yet. Static per model, computed once.
+  // The full benefit catalog (every subject + its stat ids), so the panel can list benefits the
+  // current build does not grant yet. The stat ids are static per model, but condensedRows resolves
+  // each subject's display label via translate/gameText at call time, so the catalog itself must be
+  // rebuilt after a language switch (see buildCatalogs, called at boot and from the language picker).
   const allBonuses: Record<string, number> = {};
   for (const id of statCanonical) allBonuses[id] = 1;
   for (const id of canonicalPowerStatIds(model)) allBonuses[id] = 1;
-  const benefitCatalog = condensedRows(allBonuses);
   // The pet benefit catalog (every pet subject + its stat ids), for the pet "Available to get" list.
-  // Static per model, computed once. Pet stat ids are raw here; the renderer scopes them.
+  // Pet stat ids are raw here (static per model); the renderer scopes them. Same rebuild-on-language-
+  // switch rule as benefitCatalog above.
   const allPetBonuses: Record<string, number> = {};
   for (const id of canonicalPetStatIds(model)) allPetBonuses[id] = 1;
-  const petCatalog = condensedRows(allPetBonuses);
+  let benefitCatalog = condensedRows(allBonuses);
+  let petCatalog = condensedRows(allPetBonuses);
+  function buildCatalogs() {
+    benefitCatalog = condensedRows(allBonuses);
+    petCatalog = condensedRows(allPetBonuses);
+  }
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -114,15 +135,35 @@ async function boot() {
   const leftBtn = document.getElementById("drawer-left-btn") as HTMLButtonElement;
   const rightBtn = document.getElementById("drawer-right-btn") as HTMLButtonElement;
   const scrim = document.getElementById("drawer-scrim") as HTMLElement;
-  document.title = translate("ui.title");
-  (document.querySelector(".plabel") as HTMLElement).textContent = translate("ui.points.label");
-  totalWord.textContent = ` ${translate("ui.points.total")}`;
-  resetPointsBtn.textContent = translate("ui.points.reset");
-  leftBtn.setAttribute("aria-label", translate("ui.drawer.benefitsAria"));
-  rightBtn.setAttribute("aria-label", translate("ui.drawer.affinityAria"));
-  leftBtn.textContent = translate("ui.drawer.benefits");
-  rightBtn.textContent = translate("ui.drawer.affinity");
-  barEl.setAttribute("aria-label", translate("ui.points.budgetAria"));
+  // Static chrome text, re-applied after a language switch (the views re-render via refresh()).
+  function applyChrome() {
+    document.title = translate("ui.title");
+    (document.querySelector(".plabel") as HTMLElement).textContent = translate("ui.points.label");
+    totalWord.textContent = ` ${translate("ui.points.total")}`;
+    resetPointsBtn.textContent = translate("ui.points.reset");
+    leftBtn.setAttribute("aria-label", translate("ui.drawer.benefitsAria"));
+    rightBtn.setAttribute("aria-label", translate("ui.drawer.affinityAria"));
+    leftBtn.textContent = translate("ui.drawer.benefits");
+    rightBtn.textContent = translate("ui.drawer.affinity");
+    barEl.setAttribute("aria-label", translate("ui.points.budgetAria"));
+  }
+  applyChrome();
+  // Language picker (globe button, right of the header). Switching swaps catalogs, re-applies chrome,
+  // and re-renders the views; locale is a viewer preference, never in the URL hash.
+  const picker = mountLanguagePicker(headerEl, {
+    current: localization.locale,
+    available: SUPPORTED_LOCALES,
+    names: LOCALE_NAMES,
+    label: translate("ui.lang.label"),
+    onSelect: async (locale) => {
+      storeLocale(locale);
+      localization = await loadLocalization({ base: ".", available: SUPPORTED_LOCALES, preferred: [locale] });
+      applyChrome();
+      buildCatalogs(); // benefit/pet catalog labels are baked in at build time; must be redone per locale
+      picker.setCurrent(localization.locale, translate("ui.lang.label"));
+      refresh();
+    },
+  });
   const tip = tooltipView(tooltipEl);
   const isTouch = () => matchMedia("(hover: none) and (pointer: coarse)").matches;
   let popoverTarget: CommitTarget | null = null; // the star/constellation the open popover commits
