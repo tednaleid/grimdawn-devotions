@@ -5,7 +5,7 @@ import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { condensedRows, GROUP_KEY, type CondensedGroup, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
-import { affinityTagId } from "../core/benefitTag";
+import { affinityTagId, petTagId } from "../core/benefitTag";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
 import { resolveText, sortByResolved, gameT } from "../core/localization";
 import type { Localization } from "../ports/Localization";
@@ -100,7 +100,7 @@ export function renderBenefits(
   const powers = powersGained(model, selected);
 
   // A render scope (player or pet) over one catalog. keyOf namespaces a raw stat id into its tag
-  // key (identity for player, "pet:"+id for pet). The scope closes over selectedBenefits for
+  // key (identity for player, petTagId for pet). The scope closes over selectedBenefits for
   // selection state.
   function makeScope(keyOf: (id: string) => string, scopeCatalog: CondensedGroup[]) {
     const catIds = new Map<string, string[]>();
@@ -122,7 +122,7 @@ export function renderBenefits(
 
   type Scope = ReturnType<typeof makeScope>;
   const player = makeScope((id) => id, catalog);
-  const pet = makeScope((id) => `pet:${id}`, petCatalog);
+  const pet = makeScope(petTagId, petCatalog);
 
   const activeKeysOf = (groups: CondensedGroup[]) => {
     const set = new Set<string>();
@@ -136,7 +136,7 @@ export function renderBenefits(
   const flashPet = (id: string) => changeClass(prevPet, id, petBonuses);
   const comparing = baselineSelected !== null;
   const activeHtml = benefitListHtml(loc, rows.player, comparing, selectedBenefits, (id) => id, flashPlayer);
-  const petActiveHtml = benefitListHtml(loc, rows.pet, comparing, selectedBenefits, (id) => `pet:${id}`, flashPet);
+  const petActiveHtml = benefitListHtml(loc, rows.pet, comparing, selectedBenefits, petTagId, flashPet);
   const activeKeys = activeKeysOf(condensedRows(bonuses, { racialTarget: racialTargets(model, selected) }));
   const petActiveKeys = activeKeysOf(condensedRows(petBonuses));
 
