@@ -1,6 +1,7 @@
 // ABOUTME: Aggregation functions over a set of selected star ids.
 // ABOUTME: Computes summed stat bonuses, celestial powers gained, and weapon requirements.
 import type { CelestialPower, DevotionModel, StarId } from "./types";
+import { petTagId } from "./benefitTag";
 import { isFilterableStat } from "./statFormat";
 
 export function sumBonuses(model: DevotionModel, selected: Set<StarId>): Record<string, number> {
@@ -129,7 +130,7 @@ export function availablePetKeys(model: DevotionModel, selected: Set<StarId>, co
       if (selected.has(sid)) continue;
       const pet = model.stars.get(sid)?.petBonuses;
       if (!pet) continue;
-      for (const k of Object.keys(pet)) out.add(`pet:${k}`);
+      for (const k of Object.keys(pet)) out.add(petTagId(k));
     }
   }
   return out;

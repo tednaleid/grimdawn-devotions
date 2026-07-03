@@ -12,7 +12,7 @@ import type {
 import { formatBonusRowsWithIds, formatPet, formatPowerStats, type PowerRows } from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
-import { affinityTagId } from "../core/urlState";
+import { affinityTagId, petTagId } from "../core/benefitTag";
 import { resolveText, sortByResolved, type Text } from "../core/localization";
 import type { Localization } from "../ports/Localization";
 
@@ -46,19 +46,20 @@ function requiresLine(
     .join(" ");
 }
 
-// Bonus rows tagged with their filter id (`scope` is "" for player bonuses, "pet:" for pet bonuses);
-// a row whose tag is in selectedBenefits is marked selected (vsel) so it reads like the sidebar.
+// Bonus rows tagged with their filter id (`keyOf` maps a raw stat id to its tag key: identity for
+// player rows, petTagId for pet rows); a row whose tag is in selectedBenefits is marked selected
+// (vsel) so it reads like the sidebar.
 function bonusRowsHtml(
   loc: Localization,
   bonuses: Record<string, number>,
   selectedBenefits: Set<string>,
-  scope: string,
+  keyOf: (id: string) => string,
   racialTarget?: string[],
 ): string {
   return sortByResolved(loc, formatBonusRowsWithIds(bonuses, { racialTarget }), (r) => r.label)
     .map((r) => ({ id: r.id, label: resolveText(loc, r.label), value: resolveText(loc, r.value) }))
     .map((r) => {
-      const vid = `${scope}${r.id}`;
+      const vid = keyOf(r.id);
       const sel = selectedBenefits.has(vid) ? " vsel" : "";
       return `<div class="tip-bonus${sel}" data-vid="${vid}"><span class="val">${r.value}</span> ${r.label}</div>`;
     })
@@ -78,7 +79,7 @@ function petBonusHtml(
   selectedBenefits: Set<string>,
 ): string {
   if (!petBonuses || Object.keys(petBonuses).length === 0) return "";
-  return `<div class="tip-pet-bonus-head">${loc.translate("ui.tooltip.petBonus")}</div>${bonusRowsHtml(loc, petBonuses, selectedBenefits, "pet:")}`;
+  return `<div class="tip-pet-bonus-head">${loc.translate("ui.tooltip.petBonus")}</div>${bonusRowsHtml(loc, petBonuses, selectedBenefits, petTagId)}`;
 }
 
 // Ability stat lines: the semantic rows render in core's order, untouched; the
@@ -173,7 +174,7 @@ export function tooltipView(el: HTMLElement) {
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? powerHtml(loc, star.celestialPower) : "";
       const weaponReqTag = star.weaponRequirement?.descriptionTag;
-      el.innerHTML = `<strong>${loc.gameText(con.nameTag)}</strong>${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, "", star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${commitHtml(loc, commit)}`;
+      el.innerHTML = `<strong>${loc.gameText(con.nameTag)}</strong>${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, (id) => id, star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${commitHtml(loc, commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
@@ -218,7 +219,7 @@ export function tooltipView(el: HTMLElement) {
               return `<div class="tip-weapon-req">${loc.translate("ui.tooltip.partialGate", { req })}</div>`;
             })
             .join("");
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(loc, sumBonuses(model, stars), selectedBenefits, "", racialTargets(model, stars))}${weaponReq}${petBonusHtml(loc, sumPetBonuses(model, stars), selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${dimLine}${commitHtml(loc, commit)}`;
+      el.innerHTML = `${head}${powers}${bonusRowsHtml(loc, sumBonuses(model, stars), selectedBenefits, (id) => id, racialTargets(model, stars))}${weaponReq}${petBonusHtml(loc, sumPetBonuses(model, stars), selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${dimLine}${commitHtml(loc, commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },

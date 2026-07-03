@@ -1,6 +1,7 @@
 // ABOUTME: Encodes/decodes planner state (point cap, selected stars, selected benefit tags) to a compact URL hash.
 // ABOUTME: Each selection is a trailing-trimmed bitset over a stable canonical id order, base64url-encoded.
-import { AFFINITIES, type Affinity, type DevotionModel, type StarId } from "./types";
+import { AFFINITIES, type DevotionModel, type StarId } from "./types";
+import { affinityTagId, petTagId } from "./benefitTag";
 import { isFilterableStat } from "./statFormat";
 
 const MIN_CAP = 1;
@@ -42,11 +43,6 @@ export function canonicalPowerStatIds(model: DevotionModel): string[] {
   return [...set].sort();
 }
 
-/** The affinity filter tag for a grant/require of one affinity, e.g. `aff:grant:eldritch`. */
-export function affinityTagId(kind: "grant" | "req", a: Affinity): string {
-  return `aff:${kind}:${a}`;
-}
-
 /** The 10 affinity filter tags (each affinity x grant/require), in a stable order. */
 function canonicalAffinityIds(): string[] {
   return AFFINITIES.flatMap((a) => [affinityTagId("grant", a), affinityTagId("req", a)]);
@@ -61,7 +57,7 @@ function canonicalAffinityIds(): string[] {
 export function canonicalBenefitIds(model: DevotionModel): string[] {
   return [
     ...canonicalStatIds(model),
-    ...canonicalPetStatIds(model).map((id) => `pet:${id}`),
+    ...canonicalPetStatIds(model).map(petTagId),
     ...canonicalAffinityIds(),
     ...canonicalPowerStatIds(model), // appended LAST so older player/pet/affinity payloads decode unchanged
   ];
