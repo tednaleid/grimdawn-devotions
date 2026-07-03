@@ -308,3 +308,36 @@ Pointers: the `load()` method in `web/src/adapters/httpDataSource.ts` chains
 needs the model). Re-verify the existing fallbacks after: a missing/mismatched
 cover blob must still disable dimming, and a missing `reach.wasm` must still fall
 back to the TS resolver.
+
+## Item-database follow-ups (downstream of the raw deposit)
+
+The raw deposit (`just deposit`, see `docs/deposit.md`) is phase 1 of the
+item-database initiative. The ranked ideation record at
+`docs/ideation/2026-07-03-item-data-extraction-ideation.html` holds the full
+analysis; these are the deferred directions, in rough order:
+
+- **Typed canonical schema: entities + long-form stats.** `items.parquet`
+  (dense low-cardinality columns: id, class, rarity, level, slot, template)
+  plus `stats.parquet` (item_id, stat_id, value_min, value_max) keeping raw
+  .dbr stat ids. Scope which categories are included using the census's
+  canonical-key coverage table (R7). All derivation is SQL over the deposit.
+- **Reference-closure edges table.** `edges(src_record, ref_key, dst_record)`
+  built from the same reference-following the census's dangling-ref
+  diagnostic does; enables "items whose granted skill deals chaos damage",
+  set membership, affix-pool queries. Pointer: `power_skill_chain` in
+  `scripts/parse_devotions.py` for the reference-hop precedent.
+- **Dataset-as-product releases.** Per-patch immutable releases tagged by
+  Steam buildid (already in deposit meta) with checksums and a
+  machine-generated balance diff vs the previous build; the diff doubles as a
+  pipeline drift smoke test.
+- **Engine bake-off: facet bitmaps vs DuckDB-WASM.** Decide the browser query
+  engine with measured deposit sizes, not assumptions. Precedent constraints:
+  the 2026-06-21 reachability spec's DuckDB rejection (its exception clause
+  arguably fits this case) and the 2026-06-28 first-load byte-budget work.
+- **Engine-independent query IR in the URL hash.** Compact filter IR (facet
+  terms, ranges, text, combinators) encoded with `urlState.ts` tolerance
+  discipline, so shared links never encode engine specifics. Must be settled
+  before the first shareable item-query link ships.
+- **Exception-only stat-label generator.** Decompose stat-id naming into
+  candidate game tags, verify against `Text_EN`, hand-curate only the misses;
+  scales item stat labels to 13 locales without hand-authoring 700+ ids.
