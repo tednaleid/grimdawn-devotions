@@ -39,6 +39,7 @@ import {
   decodeHash,
   encodeHash,
 } from "../core/urlState";
+import { parseTag } from "../core/benefitTag";
 import { affinityTotals } from "../core/affinity";
 import {
   starsGranting,
@@ -174,15 +175,15 @@ async function boot() {
     el.addEventListener("animationend", () => el.classList.remove("flash-blocked"), { once: true });
   }
 
-  // The map stars to emphasize for the current benefit tags: bare keys scan player bonuses,
-  // pet: keys scan pet bonuses; aff: keys are constellation-level (see affinityMatchCons) and skipped here.
+  // The map stars to emphasize for the current benefit tags: player tags scan player bonuses,
+  // pet tags scan pet bonuses; affinity tags are constellation-level (see affinityFilterSets).
   function taggedStars(): Set<StarId> {
     const playerTags = new Set<string>();
     const petTags = new Set<string>();
     for (const k of selectedBenefits) {
-      if (k.startsWith("aff:")) continue;
-      if (k.startsWith("pet:")) petTags.add(k.slice(4));
-      else playerTags.add(k);
+      const tag = parseTag(k);
+      if (tag?.kind === "player") playerTags.add(tag.statId);
+      else if (tag?.kind === "pet") petTags.add(tag.statId);
     }
     const out = starsGranting(model, playerTags);
     for (const id of starsGrantingPet(model, petTags)) out.add(id);
@@ -195,8 +196,9 @@ async function boot() {
     const grants = new Set<Affinity>();
     const requires = new Set<Affinity>();
     for (const k of selectedBenefits) {
-      if (k.startsWith("aff:grant:")) grants.add(k.slice("aff:grant:".length) as Affinity);
-      else if (k.startsWith("aff:req:")) requires.add(k.slice("aff:req:".length) as Affinity);
+      const tag = parseTag(k);
+      if (tag?.kind !== "affinity") continue;
+      (tag.dir === "grant" ? grants : requires).add(tag.affinity);
     }
     if (grants.size === 0 && requires.size === 0) return undefined;
     return { grants, requires };
