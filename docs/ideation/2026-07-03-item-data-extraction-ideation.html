@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ideation: Grim Dawn Item Data Extraction</title>
+<style>
+  :root {
+    --bg: #faf9f7;
+    --surface: #ffffff;
+    --ink: #24211c;
+    --muted: #6b6459;
+    --line: #e3ded6;
+    --accent: #8a4f24;
+    --accent-soft: #f6ece2;
+    --accent-text: #6e3d18;
+    --info-soft: #e9f0f2;
+    --info-text: #2e5a66;
+    --warn-soft: #f7f0dc;
+    --warn-text: #6f5a13;
+    --good-soft: #e9f1e6;
+    --good-text: #3d5f33;
+    --mono: ui-monospace, "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.6 Georgia, "Iowan Old Style", "Times New Roman", serif;
+  }
+  .page { max-width: 900px; margin-inline: auto; padding: 3rem 1.5rem 4rem; }
+  header.doc-head { border-bottom: 2px solid var(--ink); padding-bottom: 1.2rem; margin-bottom: 1.6rem; }
+  .eyebrow {
+    font-family: ui-sans-serif, system-ui, sans-serif;
+    font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent-text); font-weight: 700;
+  }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: .35rem 0 .8rem; }
+  h2 {
+    font-size: 1.25rem; margin: 2.6rem 0 .9rem;
+    padding-top: 1.2rem; border-top: 1px solid var(--line);
+  }
+  h3 { font-size: 1.05rem; margin: 1.4rem 0 .4rem; }
+  p, li { max-width: 72ch; }
+  code { font-family: var(--mono); font-size: .84em; background: #f0ede7; padding: .08em .3em; border-radius: 3px; }
+  a { color: var(--accent-text); }
+  .meta-strip {
+    display: flex; flex-wrap: wrap; gap: .4rem 1.6rem;
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .8rem; color: var(--muted);
+  }
+  .meta-strip b { color: var(--ink); font-weight: 600; }
+  .stats { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1.4rem 0 0; }
+  .stat {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+    padding: .5rem .9rem; font-family: ui-sans-serif, system-ui, sans-serif; font-size: .78rem; color: var(--muted);
+  }
+  .stat b { display: block; font-size: 1.15rem; color: var(--ink); font-weight: 700; }
+  ul.axes { padding-left: 1.2rem; }
+  ul.axes li { margin: .3rem 0; }
+  .axis-slug { font-family: var(--mono); font-size: .8rem; color: var(--accent-text); }
+  ul.jump {
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .85rem;
+    columns: 2; gap: 2rem; padding-left: 1.2rem; margin: 0 0 1.6rem;
+  }
+  ul.jump li { margin: .25rem 0; break-inside: avoid; }
+  article.idea {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 1.3rem 1.5rem 1.4rem; margin: 1.2rem 0;
+  }
+  article.idea h3 { margin: 0 0 .6rem; font-size: 1.12rem; }
+  .idea-num {
+    display: inline-block; font-family: ui-sans-serif, system-ui, sans-serif;
+    background: var(--accent-soft); color: var(--accent-text);
+    font-weight: 700; font-size: .8rem; border-radius: 999px;
+    padding: .12rem .6rem; margin-right: .45rem; vertical-align: 2px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: .4rem; margin: .1rem 0 .9rem; }
+  .chip {
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .72rem; font-weight: 600;
+    border-radius: 999px; padding: .18rem .65rem;
+  }
+  .chip.axis   { background: var(--info-soft); color: var(--info-text); }
+  .chip.conf   { background: var(--good-soft); color: var(--good-text); }
+  .chip.conf-m { background: var(--warn-soft); color: var(--warn-text); }
+  .chip.cx     { background: #eeebe5; color: #57503f; }
+  dl.fields { margin: .9rem 0 0; }
+  dl.fields dt {
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .7rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: .8rem;
+  }
+  dl.fields dd { margin: .15rem 0 0; max-width: 74ch; }
+  .basis-tag { font-family: var(--mono); font-size: .78rem; font-weight: 700; color: var(--accent-text); }
+  figure { margin: 1.2rem 0 .4rem; }
+  figure svg { max-width: 100%; height: auto; display: block; }
+  figcaption {
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .74rem; color: var(--muted); margin-top: .4rem;
+  }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: .9rem; margin: 1rem 0 .3rem; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } ul.jump { columns: 1; } }
+  .option-card { border-radius: 8px; padding: .9rem 1rem; font-size: .92rem; }
+  .option-card.a { background: var(--good-soft); }
+  .option-card.b { background: var(--info-soft); }
+  .option-card .opt-label {
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .7rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; display: block; margin-bottom: .35rem;
+  }
+  .option-card.a .opt-label { color: var(--good-text); }
+  .option-card.b .opt-label { color: var(--info-text); }
+  .option-card ul { margin: .3rem 0 0; padding-left: 1.1rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; margin: 1rem 0; }
+  th, td { text-align: left; padding: .45rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th {
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .72rem;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+  }
+  ul.refs { padding-left: 1.2rem; font-size: .9rem; }
+  ul.refs li { margin: .3rem 0; }
+  footer.composition-signal {
+    margin-top: 3.5rem; padding-top: 1rem; border-top: 1px solid var(--line);
+    font-family: ui-sans-serif, system-ui, sans-serif; font-size: .75rem; color: var(--muted);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="doc-head">
+  <span class="eyebrow">Ideation &middot; repo-grounded</span>
+  <h1>Grim Dawn Item Data Extraction: a Queryable Dataset as the Foundation</h1>
+  <div class="meta-strip">
+    <span><b>Date</b> <time datetime="2026-07-03">2026-07-03</time></span>
+    <span><b>Topic</b> item-data-extraction</span>
+    <span><b>Mode</b> repo-grounded</span>
+  </div>
+  <div class="meta-strip" style="margin-top:.5rem">
+    <span><b>Focus</b> Extract all Grim Dawn item data into a really good, well-known schema (parquet + DuckDB-in-browser as the leading candidate) so it is easily queried and becomes the basis for an item-database website with compound filtering better than grimtools.com/db &mdash; and for other future work. Data out first; consider alternatives to the leading candidate.</span>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>46</b> raw ideas</div>
+    <div class="stat"><b>6</b> ideation frames</div>
+    <div class="stat"><b>7</b> survivors</div>
+    <div class="stat"><b>5/5</b> axes covered</div>
+    <div class="stat"><b>15</b> cut or folded</div>
+  </div>
+</header>
+
+<section id="grounding-context">
+  <h2>Grounding Context</h2>
+  <p><strong>Codebase Context.</strong> The repo ships a static devotion-planner SPA (TypeScript/Bun, hexagonal core/ports/adapters, GitHub Pages, no backend, URL-hash state, 13-locale i18n through <code>Text</code> descriptors and a <code>Localization</code> port). A Windows-only pipeline (game <code>ArchiveTool.exe</code> on <code>.arz</code>/<code>.arc</code> archives &rarr; <code>.dbr</code> key-value files &rarr; stdlib-only <code>scripts/parse_devotions.py</code>) <em>already extracts 18,738 item DBR files</em> under <code>extracted/records/</code> across 26 categories &mdash; it just never parses them. The DBR parser discovers keys at runtime (patch-tolerant), expansions auto-discover via the <code>gdx*</code> convention, and <code>just parse</code> already stamps Steam build-id provenance. A shelved <code>--duckdb</code> flag already emits a long-format <code>(dbr, key, value)</code> CSV for devotions. Serving today: <code>devotions.json</code> (372&thinsp;KB), <code>cover-table.bin</code> (1.8&thinsp;MB precomputed binary index), per-language game-tag tables, an optional 64&thinsp;KB Rust WASM module with a TS fallback, and a tuned ~107&thinsp;KB first load. <code>BACKLOG.md</code> has zero item-database entries &mdash; this is greenfield. Item records are sparse and complex: 400+ mostly-zero stat keys per weapon file, min/max damage pairs, multi-boolean applicability flags, and cross-record references to sets, granted skills, and affix pools.</p>
+  <p><strong>External context</strong> (web research, value: high). grimtools.com/db is closed-source; no OSS schema-documented Grim Dawn item dataset exists &mdash; that is the open gap. Crate Entertainment ships an <em>official</em> Asset Manager extraction workflow (documented in the Grim Dawn Modding Guide), a friendlier legal posture than PoE/Last Epoch reverse engineering. Cautionary tale: PoE&rsquo;s RePoE/PyPoE extraction ecosystem forked and rotted for lack of a maintenance owner. Strongest UX analog: Scryfall&rsquo;s compound query DSL and versioned bulk exports. On engines: DuckDB-WASM + static parquet is a live 2025&ndash;26 pattern, but its bundle is heavy (~33&thinsp;MB eh build) vs sql.js at ~1.5&thinsp;MB; <code>sql.js-httpvfs</code> does range-request SQLite on GitHub Pages; client-side faceted-search libraries (ItemsJS, FlexSearch) are a legitimate no-engine fallback at tens-of-thousands-of-rows scale.</p>
+  <p><strong>Past learnings.</strong> No <code>docs/solutions/</code> knowledge base exists; the closest in-repo references are <code>docs/dbr-format.md</code>, <code>docs/assets-and-textures.md</code>, <code>docs/i18n.md</code>, and the dated specs under <code>docs/superpowers/specs/</code> &mdash; one of which explicitly rejected DuckDB/parquet for reachability with an exception clause that arguably describes this exact use case.</p>
+</section>
+
+<section id="topic-axes">
+  <h2>Topic Axes</h2>
+  <ul class="axes">
+    <li><span class="axis-slug">item-schema</span> &mdash; item record modeling: fields, affixes, stat ids, sparsity, cardinality</li>
+    <li><span class="axis-slug">pipeline</span> &mdash; extraction pipeline reuse and refresh: parser, ArchiveTool, Windows-only constraint, per-patch re-runs, provenance</li>
+    <li><span class="axis-slug">storage-query</span> &mdash; storage format and query engine: parquet/DuckDB-WASM vs alternatives, serving on GitHub Pages, size and cold-start</li>
+    <li><span class="axis-slug">i18n-tags</span> &mdash; localization and tag resolution for items across 13 locales</li>
+    <li><span class="axis-slug">filter-url</span> &mdash; filter/search surface and shareable URL state</li>
+  </ul>
+</section>
+
+<section id="ranked-ideas">
+  <h2>Ranked Ideas</h2>
+  <ul class="jump">
+    <li><a href="#idea-1">1. Raw deposit + schema census + query-first spine</a></li>
+    <li><a href="#idea-2">2. Canonical two-table schema: entities + long-form stats</a></li>
+    <li><a href="#idea-3">3. Reference-closure edges table</a></li>
+    <li><a href="#idea-4">4. Dataset-as-product: per-build releases with balance diffs</a></li>
+    <li><a href="#idea-5">5. Measure-first engine bake-off: bitmaps vs in-browser SQL</a></li>
+    <li><a href="#idea-6">6. Engine-independent query IR in the URL hash</a></li>
+    <li><a href="#idea-7">7. Exception-only stat-label generator for i18n</a></li>
+  </ul>
+
+  <article class="idea" id="idea-1">
+    <h3><span class="idea-num">1</span>Raw deposit + schema census + query-first spine</h3>
+    <div class="chips">
+      <span class="chip axis">axis: pipeline</span>
+      <span class="chip conf">Confidence 90%</span>
+      <span class="chip cx">Complexity Low</span>
+    </div>
+    <p><strong>Description.</strong> Get the data out before designing anything. Run the existing field-agnostic extractor over all 18,738 item DBRs once (the <code>read_dbr</code> reader plus the shelved <code>--duckdb</code> long-format path need only a root-directory change), emitting a lossless <code>(record, key, value)</code> parquet stamped with the Steam build id. That deposit is committed or released, so every schema experiment afterwards runs anywhere &mdash; no game install, no ArchiveTool, no &ldquo;close the game first.&rdquo; The first derived artifact is a <em>schema census</em>: every distinct key with its type shape, non-zero frequency, cardinality, and per-category coverage. Add <code>justfile</code> DuckDB CLI recipes so the dataset is mined conversationally from day one; the queries actually asked become the requirements log for the eventual filter UI. The census also settles the scope denominator &mdash; whether weakly-modeled categories (<code>enemygear/</code>, <code>questitems/</code>, <code>faction/</code>) are in or out &mdash; with data instead of debate. i18n ships with the deposit, not after it: because <code>.dbr</code> text fields store tags rather than display text, the facts table is language-free by construction, and a companion <code>labels.parquet</code> of <code>(locale, tag, text)</code> &mdash; the full per-locale tag tables for all 13 locales, unfiltered at this layer &mdash; makes localized querying a join and the English fallback a <code>COALESCE</code>.</p>
+    <figure>
+      <svg viewBox="0 0 760 150" role="img" aria-label="Flow: Windows extraction once per patch produces a raw deposit; census, ad-hoc queries, and schema iteration all run anywhere downstream">
+        <defs>
+          <marker id="arr1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b6459"/>
+          </marker>
+        </defs>
+        <rect x="10" y="45" width="170" height="60" rx="8" fill="#f7f0dc" stroke="#c9b98a"/>
+        <text x="95" y="70" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="13" font-weight="700" fill="#6f5a13">Windows box</text>
+        <text x="95" y="88" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#6f5a13">ArchiveTool &middot; once per patch</text>
+        <line x1="180" y1="75" x2="255" y2="75" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr1)"/>
+        <rect x="260" y="45" width="190" height="60" rx="8" fill="#f6ece2" stroke="#d3b193"/>
+        <text x="355" y="70" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="13" font-weight="700" fill="#6e3d18">raw deposit</text>
+        <text x="355" y="88" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11" fill="#6e3d18">(record, key, value) + buildId</text>
+        <line x1="450" y1="60" x2="530" y2="28" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr1)"/>
+        <line x1="450" y1="75" x2="530" y2="75" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr1)"/>
+        <line x1="450" y1="90" x2="530" y2="122" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr1)"/>
+        <rect x="535" y="8" width="210" height="38" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="640" y="32" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">schema census report</text>
+        <rect x="535" y="56" width="210" height="38" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="640" y="80" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">DuckDB CLI mining (query log)</text>
+        <rect x="535" y="104" width="210" height="38" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="640" y="128" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">schema iteration, any OS</text>
+      </svg>
+      <figcaption>The expensive, manual step runs once per patch; everything revisable happens downstream of the deposit.</figcaption>
+    </figure>
+    <dl class="fields">
+      <dt>Basis</dt>
+      <dd><span class="basis-tag">direct:</span> <code>scripts/parse_devotions.py:745-746</code> &mdash; <code>ap.add_argument("--duckdb", ..., help="Also emit devotion_records.csv (long format) for ad-hoc querying")</code>; <code>write_duckdb_csv</code> at <code>:699</code> (&ldquo;Emit a tidy long-format (dbr, key, value) table&rdquo;); <code>justfile:106-115</code> game-must-be-closed guard and <code>:151-162</code> Steam build-id capture; <code>docs/dbr-format.md</code> &ldquo;Union-wide sparse schema; don&rsquo;t assume a fixed key set.&rdquo; External echo: NCBI&rsquo;s raw-archive-first model in bioinformatics.</dd>
+      <dt>Rationale</dt>
+      <dd>Every other decision in this document gets cheaper and less speculative once the census exists &mdash; it converts &ldquo;sparse and complex schema&rdquo; from a fear into a table. The riskiest unknown is not rendering; it is whether the schema answers real compound questions. Mining via SQL before any UI exists discovers which filter capabilities matter at near-zero build cost, and the deposit decouples all of that iteration from the Windows-only bottleneck. This is the highest information-per-hour move available and directly delivers Ted&rsquo;s stated main goal in its first weekend.</dd>
+      <dt>Downsides</dt>
+      <dd>The raw long-format deposit for items will be substantially larger than devotions&rsquo; 32&thinsp;MB CSV; it may need release-asset hosting rather than a committed file. A lossless deposit defers, not avoids, the typed-schema work (idea 2).</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="idea-2">
+    <h3><span class="idea-num">2</span>Canonical two-table schema: entities + long-form stats, raw stat-id passthrough</h3>
+    <div class="chips">
+      <span class="chip axis">axis: item-schema</span>
+      <span class="chip conf">Confidence 80%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+    <p><strong>Description.</strong> The published, durable shape is a pair: <code>items.parquet</code> (one row per item: id, class, rarity, level, slot, template &mdash; the dense low-cardinality columns) and <code>stats.parquet</code> (<code>item_id, stat_id, value_min, value_max</code> &mdash; the long form for 400+ mostly-zero stat keys). Stat ids stay <em>raw</em> (<code>offensivePhysicalMin</code>, not an invented affix taxonomy), mirroring how devotion bonuses are already modeled, so labels resolve later through a mapping layer and the stored data never churns. The same fact-table shape can span every bonus-bearer &mdash; items, loot affixes, devotion stars, granted skills &mdash; making &ldquo;legendary daggers with attack speed&rdquo; and &ldquo;devotions with attack speed&rdquo; the same query. Website payloads are <em>derived extracts</em> of this canonical pair (the OSM planet-plus-extracts model), exactly as <code>devotions.json</code> (372&thinsp;KB) and <code>cover-table.bin</code> (1.8&thinsp;MB) are today derived from a 32&thinsp;MB raw dump. Named sub-decisions to settle here: min/max pairs as first-class columns, and normalizing sparse boolean flag families (enchant weapon-applicability: <code>axe,1 / dagger,1 / ...</code>) into join tables rather than 15 wide columns.</p>
+    <figure>
+      <svg viewBox="0 0 760 190" role="img" aria-label="Canonical items and stats tables in the middle; raw deposit feeds them; website extracts, analysts, and future tools consume them">
+        <defs>
+          <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b6459"/>
+          </marker>
+        </defs>
+        <rect x="10" y="65" width="150" height="60" rx="8" fill="#eeebe5" stroke="#c9c2b4"/>
+        <text x="85" y="90" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" font-weight="700" fill="#57503f">raw deposit</text>
+        <text x="85" y="107" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="11" fill="#57503f">(idea 1)</text>
+        <line x1="160" y1="95" x2="235" y2="95" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <rect x="240" y="20" width="240" height="150" rx="10" fill="#f6ece2" stroke="#d3b193"/>
+        <text x="360" y="42" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" font-weight="700" fill="#6e3d18">canonical dataset</text>
+        <rect x="258" y="54" width="204" height="42" rx="6" fill="#ffffff" stroke="#d3b193"/>
+        <text x="360" y="72" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11.5" fill="#24211c">items.parquet</text>
+        <text x="360" y="88" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="10.5" fill="#6b6459">dense: class, rarity, level, slot</text>
+        <rect x="258" y="106" width="204" height="42" rx="6" fill="#ffffff" stroke="#d3b193"/>
+        <text x="360" y="124" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11.5" fill="#24211c">stats.parquet</text>
+        <text x="360" y="140" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="10.5" fill="#6b6459">long: item_id, stat_id, min, max</text>
+        <line x1="480" y1="55" x2="555" y2="35" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="480" y1="95" x2="555" y2="95" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="480" y1="135" x2="555" y2="155" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <rect x="560" y="16" width="188" height="38" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="654" y="40" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">website extracts (small)</text>
+        <rect x="560" y="76" width="188" height="38" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="654" y="100" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">DuckDB / pandas / Polars</text>
+        <rect x="560" y="136" width="188" height="38" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="654" y="160" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">future tools &amp; community</text>
+      </svg>
+      <figcaption>One canonical pair; every consumer &mdash; including the future website &mdash; is a derivation, not the format driver.</figcaption>
+    </figure>
+    <dl class="fields">
+      <dt>Basis</dt>
+      <dd><span class="basis-tag">direct:</span> <code>docs/dbr-format.md:77-78</code> &mdash; &ldquo;Bonuses: every key with a non-zero, single-number value&hellip; Keep raw stat ids&rdquo;; <code>extract_bonuses</code> at <code>parse_devotions.py:186-196</code>; the existing 32&thinsp;MB&rarr;372&thinsp;KB&rarr;1.8&thinsp;MB derivation tiering; enchant flag rows quoted from <code>a01a_enchant.dbr</code>. <span class="basis-tag">external:</span> OSM planet-plus-extracts; Wikidata&rsquo;s entity/statement split.</dd>
+      <dt>Rationale</dt>
+      <dd>This is the &ldquo;really good, well-known schema&rdquo; deliverable itself. The entity+statement split answers the wide-vs-long question for a 400-plus-key sparse domain without a 400-column table, keeps every downstream consumer&rsquo;s label changes out of the stored data, and cleanly separates the durable interchange artifact (openable in any tool, forever) from whatever the browser ends up loading. Raw-id passthrough is the decision devotions already made and banked; forking a second stat vocabulary now would mean two id systems surviving every patch.</dd>
+      <dt>Downsides</dt>
+      <dd>Long-form stats make some simple reads (one item&rsquo;s full sheet) a pivot rather than a row read. The unified cross-entity fact table is a bigger commitment than items-only and could be deferred without losing the core shape.</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="idea-3">
+    <h3><span class="idea-num">3</span>Reference-closure edges table: items are a graph, not just rows</h3>
+    <div class="chips">
+      <span class="chip axis">axis: item-schema</span>
+      <span class="chip conf">Confidence 80%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+    <p><strong>Description.</strong> Item records point at other records: <code>itemSetName</code> (the set), <code>itemSkillName</code> (granted skill), <code>modifiedSkillName1..N</code> (skill modifiers), <code>petBonusName</code>, and the <code>loottables/</code> &rarr; <code>lootaffixes/</code> pools that decide what can roll on what. Ship an explicit <code>edges(src_record, ref_key, dst_record)</code> table alongside the canonical pair, built with the same reference-following logic <code>power_skill_chain</code> already uses for devotion celestial powers. Recursive or join queries then natively answer questions grimtools structurally cannot express as filters: &ldquo;items whose granted skill deals chaos damage,&rdquo; &ldquo;which affixes can roll on this base,&rdquo; &ldquo;all members of set Y and what completing it grants.&rdquo;</p>
+    <figure>
+      <svg viewBox="0 0 760 170" role="img" aria-label="An item node connecting to a set, a granted skill, a modified skill, and an affix pool via labeled edges">
+        <defs>
+          <marker id="arr3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b6459"/>
+          </marker>
+        </defs>
+        <rect x="40" y="62" width="150" height="46" rx="23" fill="#f6ece2" stroke="#d3b193"/>
+        <text x="115" y="90" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="13" font-weight="700" fill="#6e3d18">item record</text>
+        <line x1="190" y1="72" x2="330" y2="34" stroke="#6b6459" stroke-width="1.4" marker-end="url(#arr3)"/>
+        <text x="252" y="38" font-family="ui-monospace,monospace" font-size="10.5" fill="#57503f" style="paint-order: stroke fill" stroke="#faf9f7" stroke-width="3">itemSetName</text>
+        <line x1="190" y1="85" x2="330" y2="85" stroke="#6b6459" stroke-width="1.4" marker-end="url(#arr3)"/>
+        <text x="228" y="79" font-family="ui-monospace,monospace" font-size="10.5" fill="#57503f" style="paint-order: stroke fill" stroke="#faf9f7" stroke-width="3">itemSkillName</text>
+        <line x1="190" y1="98" x2="330" y2="136" stroke="#6b6459" stroke-width="1.4" marker-end="url(#arr3)"/>
+        <text x="215" y="129" font-family="ui-monospace,monospace" font-size="10.5" fill="#57503f" style="paint-order: stroke fill" stroke="#faf9f7" stroke-width="3">modifiedSkillName1</text>
+        <rect x="335" y="12" width="160" height="40" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="415" y="37" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">item set</text>
+        <rect x="335" y="65" width="160" height="40" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="415" y="90" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">granted skill</text>
+        <rect x="335" y="118" width="160" height="40" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="415" y="143" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">player skill modified</text>
+        <line x1="495" y1="85" x2="580" y2="85" stroke="#6b6459" stroke-width="1.4" marker-end="url(#arr3)"/>
+        <text x="512" y="79" font-family="ui-sans-serif,system-ui" font-size="10.5" fill="#57503f" style="paint-order: stroke fill" stroke="#faf9f7" stroke-width="3">one hop more</text>
+        <rect x="585" y="62" width="160" height="46" rx="8" fill="#e9f1e6" stroke="#a8c19c"/>
+        <text x="665" y="83" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" font-weight="700" fill="#3d5f33">damage type, pets,</text>
+        <text x="665" y="99" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" font-weight="700" fill="#3d5f33">buffs of that skill</text>
+      </svg>
+      <figcaption>Much of an item&rsquo;s power lives one or two hops away; an edges table makes those hops queryable.</figcaption>
+    </figure>
+    <dl class="fields">
+      <dt>Basis</dt>
+      <dd><span class="basis-tag">direct:</span> <code>extracted/records/records/items/gearweapons/swords1h/b001_sword.dbr:161</code> &mdash; <code>itemSkillName,records/skills/itemskills/granted/item_summonharbinger.dbr</code>; <code>itemSetName</code> in <code>d013_sword.dbr:169</code>; <code>power_skill_chain</code> reference-following at <code>parse_devotions.py:250-263</code> with cached lookups. <span class="basis-tag">external:</span> MusicBrainz&rsquo;s relationship (edge) model &mdash; the entity tables are boring; the edges are where the interesting queries live.</dd>
+      <dt>Rationale</dt>
+      <dd>A flat-record extract undersells this data: skill grants, set membership, and affix pools are the difference between a stat spreadsheet and a queryable game model. The emit cost is low (the reference resolver already exists and caches), and it is precisely the class of compound question &mdash; across record types &mdash; that motivated this whole project.</dd>
+      <dt>Downsides</dt>
+      <dd>Expands the extraction contract from &ldquo;the items directory&rdquo; to its transitive closure (skills, sets, pets), growing scope and the census surface. Recursive queries push toward SQL-capable consumers, which mildly couples to the engine decision (idea 5).</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="idea-4">
+    <h3><span class="idea-num">4</span>Dataset-as-product: immutable per-build releases with machine-generated balance diffs</h3>
+    <div class="chips">
+      <span class="chip axis">axis: pipeline</span>
+      <span class="chip conf">Confidence 75%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+    <p><strong>Description.</strong> Treat the dataset &mdash; not the website &mdash; as the product. Each patch refresh publishes a GitHub Release tagged by the Steam build id the pipeline already captures: parquet, gzipped JSONL, checksums, a schema document, and a machine-generated diff against the previous build (<code>ANTI JOIN</code> in DuckDB: items added, stats changed, values rebalanced). History is never overwritten &mdash; point-in-time discipline, because a build Steam no longer serves is unrecoverable if skipped. The diff doubles as data-driven patch notes (Grim Dawn&rsquo;s official notes are famously incomplete on item numbers &mdash; a community hook no other site offers) and as the pipeline&rsquo;s own drift smoke test: the repo has already shipped one quantified silent-drift bug (49 of 63 celestial powers inflated by a patched assumption), and items multiply that blast radius.</p>
+    <dl class="fields">
+      <dt>Basis</dt>
+      <dd><span class="basis-tag">direct:</span> <code>justfile:151-162</code> &mdash; <code>buildid=$(grep -oE '"buildid"...' "$manifest")</code> stamped for provenance; <code>parse_devotions.py:54-56</code> &mdash; the &ldquo;inflating ~49 of 63 powers&rdquo; incident comment. <span class="basis-tag">external:</span> Scryfall bulk data (versioned exports seeding an ecosystem of third-party sites &mdash; the closest analog to this exact play); point-in-time databases in finance; Ensembl&rsquo;s numbered releases; RePoE/PyPoE&rsquo;s rot as the cautionary tale for unowned pipelines.</dd>
+      <dt>Rationale</dt>
+      <dd>No public, versioned, schema-documented Grim Dawn item dataset exists (verifier note: an unverifiable-but-plausible gap claim from research). Publishing one is a durable contribution independent of any UI, it is the move that compounds hardest &mdash; every future tool builds on it instead of re-scraping &mdash; and the per-build partition column costs almost nothing now while being impossible to retrofit later.</dd>
+      <dt>Downsides</dt>
+      <dd>Public artifacts create an implicit maintenance expectation (the RePoE lesson cuts both ways) and a versioning contract third parties pin to. Redistribution of extracted game data is community-normalized and Crate-tolerated rather than explicitly licensed &mdash; worth a conscious check before publishing loudly.</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="idea-5">
+    <h3><span class="idea-num">5</span>Measure-first engine bake-off: facet bitmaps vs in-browser SQL</h3>
+    <div class="chips">
+      <span class="chip axis">axis: storage-query</span>
+      <span class="chip conf">Confidence 85%</span>
+      <span class="chip cx">Complexity Low</span>
+    </div>
+    <p><strong>Description.</strong> Two sound but mutually exclusive runtime architectures came out of ideation; do not pick between them by taste. After the census exists (idea 1), measure real row and byte counts &mdash; with non-lootable categories trimmed &mdash; and prototype both against the same ten &ldquo;grimtools can&rsquo;t do this&rdquo; queries. The repo has done exactly this before: pre-compressing <code>cover-table.bin</code> was &ldquo;considered and dropped&rdquo; when a live check showed the gain didn&rsquo;t justify the complexity. Notably, the same spec that rejected DuckDB for reachability wrote the exception clause that arguably describes this case: it would &ldquo;only earn its keep for large analytical queries over much more data.&rdquo; Whether ~19k items is &ldquo;much more data&rdquo; is a measurement, not an argument.</p>
+    <div class="two-col">
+      <div class="option-card a">
+        <span class="opt-label">Option A &middot; precomputed facet bitmaps</span>
+        <ul>
+          <li><code>cover-table.bin</code> pattern: canonical item order, one bitmap per facet value, magic header + buildId</li>
+          <li>Compound filters = bitwise AND/OR over Uint32Arrays; microseconds, ~2&ndash;3&thinsp;KB per facet</li>
+          <li>No engine in the critical path; DuckDB stays a build-time tool and power-user escape hatch</li>
+          <li>Cost: derived artifacts to rebuild per release; numeric ranges and free text need extra structures</li>
+        </ul>
+      </div>
+      <div class="option-card b">
+        <span class="opt-label">Option B &middot; DuckDB-WASM range-reads the parquet</span>
+        <ul>
+          <li>The canonical parquet is also the runtime file &mdash; zero derived artifacts, zero drift</li>
+          <li>Full SQL in the browser: ranges, joins (edges table), free text, arbitrary boolean logic</li>
+          <li>Live 2025&ndash;26 pattern (static parquet-over-HTTP with range requests)</li>
+          <li>Cost: ~33&thinsp;MB engine vs the app&rsquo;s tuned ~107&thinsp;KB first load; mobile cold-start</li>
+        </ul>
+      </div>
+    </div>
+    <dl class="fields">
+      <dt>Basis</dt>
+      <dd><span class="basis-tag">direct:</span> <code>docs/superpowers/specs/2026-06-21-path-predictor-reachability-design.md:277-281</code> &mdash; DuckDB/parquet &ldquo;explicitly rejected&hellip; would only earn their keep for large analytical queries over much more data&rdquo; (verified verbatim, including the exception clause); <code>2026-06-28</code> first-load spec&rsquo;s ~107&thinsp;KB budget and &ldquo;considered and dropped&rdquo; precedent; <code>reachWasm.ts</code> graceful WASM-fallback pattern. <span class="basis-tag">external:</span> DuckDB-WASM bundle weight vs sql.js (~1.5&thinsp;MB) and <code>sql.js-httpvfs</code> as the middle option.</dd>
+      <dt>Rationale</dt>
+      <dd>This is the load-bearing bet of the whole plan, and the two options optimize different goods (first-load discipline vs zero-drift full SQL). The repo&rsquo;s own precedents supply both the decision criteria and the resolution mechanism: measure, then commit. A hybrid (bitmaps by default, engine lazy-loaded on demand, mirroring <code>reach.wasm</code>&rsquo;s optional-binary pattern) remains a legitimate outcome of the bake-off.</dd>
+      <dt>Downsides</dt>
+      <dd>A bake-off costs a week that a gut call would not &mdash; but reversing a wrong engine bet after URLs and consumers exist costs far more (see idea 6 for the hedge).</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="idea-6">
+    <h3><span class="idea-num">6</span>Engine-independent query IR in the URL hash</h3>
+    <div class="chips">
+      <span class="chip axis">axis: filter-url</span>
+      <span class="chip conf-m chip conf-m" style="background:var(--warn-soft);color:var(--warn-text)">Confidence 65%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+    <p><strong>Description.</strong> Before the first shareable link ships, define a compact query intermediate representation &mdash; facet terms, numeric ranges, text terms, boolean combinators &mdash; encoded in the URL hash with the same stale-link tolerance discipline as <code>urlState.ts</code>. A Scryfall-style text DSL (<code>class:dagger rarity:legendary stat:attackSpeed&gt;10</code>) and clickable facet chips are then two front-ends compiling to the same IR, and the loaded engine &mdash; facet bitmaps, DuckDB-WASM, sql.js, or a plain JS predicate &mdash; is just a compile target. The hash also carries the dataset buildId so a stale link can say &ldquo;this search ran against build 19149150.&rdquo;</p>
+    <figure>
+      <svg viewBox="0 0 760 180" role="img" aria-label="Two front-ends, DSL text and facet chips, compile to one query IR in the URL; the IR compiles to any of three engines">
+        <defs>
+          <marker id="arr6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#6b6459"/>
+          </marker>
+        </defs>
+        <rect x="20" y="22" width="180" height="42" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="110" y="48" text-anchor="middle" font-family="ui-monospace,monospace" font-size="11.5" fill="#2e5a66">class:dagger stat:as&gt;10</text>
+        <rect x="20" y="112" width="180" height="42" rx="8" fill="#e9f0f2" stroke="#9fb9c0"/>
+        <text x="110" y="138" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#2e5a66">facet chips UI</text>
+        <line x1="200" y1="43" x2="290" y2="78" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr6)"/>
+        <line x1="200" y1="133" x2="290" y2="98" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr6)"/>
+        <rect x="295" y="62" width="180" height="52" rx="10" fill="#f6ece2" stroke="#d3b193"/>
+        <text x="385" y="84" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="13" font-weight="700" fill="#6e3d18">query IR</text>
+        <text x="385" y="102" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="10.5" fill="#6e3d18">in URL hash + buildId</text>
+        <line x1="475" y1="72" x2="565" y2="36" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr6)"/>
+        <line x1="475" y1="88" x2="565" y2="88" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr6)"/>
+        <line x1="475" y1="104" x2="565" y2="140" stroke="#6b6459" stroke-width="1.5" marker-end="url(#arr6)"/>
+        <rect x="570" y="16" width="170" height="40" rx="8" fill="#e9f1e6" stroke="#a8c19c"/>
+        <text x="655" y="41" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#3d5f33">bitmap index</text>
+        <rect x="570" y="68" width="170" height="40" rx="8" fill="#e9f1e6" stroke="#a8c19c"/>
+        <text x="655" y="93" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#3d5f33">DuckDB-WASM SQL</text>
+        <rect x="570" y="120" width="170" height="40" rx="8" fill="#e9f1e6" stroke="#a8c19c"/>
+        <text x="655" y="145" text-anchor="middle" font-family="ui-sans-serif,system-ui" font-size="12" fill="#3d5f33">JS predicate / sql.js</text>
+      </svg>
+      <figcaption>Links encode the question, never the engine &mdash; so idea 5&rsquo;s choice stays reversible after launch.</figcaption>
+    </figure>
+    <dl class="fields">
+      <dt>Basis</dt>
+      <dd><span class="basis-tag">direct:</span> <code>web/src/core/urlState.ts:111-118</code> &mdash; the canonical-order bitset scheme built for a small fixed id universe, which would reproduce grimtools&rsquo; expressiveness ceiling if reused as-is for items; CLAUDE.md&rsquo;s bookmarkable-URL invariant. <span class="basis-tag">external:</span> Scryfall&rsquo;s query DSL; IVOA ADQL (astronomy&rsquo;s portable-query standard) as the looser structural analog.</dd>
+      <dt>Rationale</dt>
+      <dd>Every shipped link is a compatibility contract. If URLs encode raw SQL or engine-shaped state, the storage bet silently freezes forever; if they encode an IR, engines can be swapped, benchmarked, and lazy-loaded behind stable links. This is also where Ted&rsquo;s core complaint gets solved structurally: compound, non-mutually-exclusive predicates are native to the IR rather than a UI matrix bolted on later.</dd>
+      <dt>Downsides</dt>
+      <dd>Designing an IR before the census and query log exist risks abstraction in the wrong places &mdash; sequence it after idea 1&rsquo;s mining phase. Medium confidence: the right IR scope (how much boolean power, whether free text is first-class) is genuinely open until real queries accumulate.</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="idea-7">
+    <h3><span class="idea-num">7</span>Exception-only stat-label generator for 13-locale i18n</h3>
+    <div class="chips">
+      <span class="chip axis">axis: i18n-tags</span>
+      <span class="chip conf-m" style="background:var(--warn-soft);color:var(--warn-text)">Confidence 65%</span>
+      <span class="chip cx">Complexity Medium</span>
+    </div>
+    <p><strong>Description.</strong> Items need display labels for 700+ raw stat ids across 13 locales; <code>data/stat-tags.json</code>&rsquo;s hand-curated 36 entries cannot scale linearly. But the stat-id naming convention is decomposable (<code>offensivePhysicalMin</code> = prefix + domain + modifier, the same families as the parser&rsquo;s <code>POWER_STAT_PREFIXES</code>), and the game&rsquo;s own text tables must contain a display string for every stat its tooltips render. Build a generator that proposes a candidate game tag per stat id via name transforms, verifies each resolves in <code>Text_EN</code>, auto-accepts verified hits, and emits only the misses for hand curation &mdash; inverting &ldquo;curate every key&rdquo; into &ldquo;curate the exceptions.&rdquo; Extend the existing <code>statHumanizeCoverage</code> guard-test pattern so unlabeled item stats fail CI instead of silently rendering raw ids to users.</p>
+    <dl class="fields">
+      <dt>Basis</dt>
+      <dd><span class="basis-tag">direct:</span> <code>data/stat-tags.json</code> (36 entries, verified) vs 400+ stat keys per weapon file; <code>POWER_STAT_PREFIXES</code> at <code>parse_devotions.py:71</code>; <code>data/stat-format-tags.json</code>&rsquo;s <code>"defensiveConvert": "DefenseConvert"</code> &mdash; an existing mechanical name transform; <code>statHumanizeCoverage.test.ts</code> as the proven coverage-guard mechanism (docs/i18n.md:287).</dd>
+      <dt>Rationale</dt>
+      <dd>Label coverage is the item database&rsquo;s largest grind and its biggest i18n risk &mdash; the difference between shipping 13 locales and shipping English with a backlog item. The repo&rsquo;s i18n invariant makes raw-id rendering a rule violation, so this work is mandatory; the only question is whether it is authorship or verification. The core dataset stays language-free (tags only) per the existing binding invariant; per-locale label tables ride the existing <code>build_game_tables.py</code> machinery scaled up.</dd>
+      <dt>Downsides</dt>
+      <dd>The transform heuristics are unproven until tried against the real tag tables &mdash; the auto-accept rate could be 90% or 40%, and the miss list at 40% is still a real curation project. Verification against <code>Text_EN</code> only proves a tag exists, not that it is the <em>right</em> label for that stat in tooltip context; spot-checking is still needed.</dd>
+    </dl>
+  </article>
+</section>
+
+<section id="rejection-summary">
+  <h2>Rejection Summary</h2>
+  <p>46 raw ideas merged to 24 candidates; a fresh-context verifier spot-checked every load-bearing citation against the repo (two citation errors found and corrected). Cuts and folds:</p>
+  <table>
+    <thead><tr><th>#</th><th>Idea</th><th>Reason rejected or folded</th></tr></thead>
+    <tbody>
+      <tr><td>3</td><td>Templates-as-schema (extract <code>.tpl</code> files as the schema authority)</td><td>Weak basis: <code>.tpl</code> files are absent from the extracted tree and may not ship in the runtime archives at all; the census (idea 1) yields equivalent schema info with zero feasibility risk. Worth a 30-minute probe inside idea 1, not a direction.</td></tr>
+      <tr><td>9</td><td>Query-first via DuckDB CLI/MCP before any UI</td><td>Sound practice but not a standalone direction; merged into idea 1 as its mining phase.</td></tr>
+      <tr><td>10/11</td><td>Facet bitmaps &middot; parquet range-read</td><td>Mutually exclusive runtime architectures (verifier-flagged contradiction); both preserved as the competing options inside idea 5 rather than asserted as answers.</td></tr>
+      <tr><td>14</td><td>Language-free core + per-locale label sidecars</td><td>Restates the repo&rsquo;s already-binding i18n invariant &mdash; policy, not a choice. Implementation detail folded into ideas 2 and 7.</td></tr>
+      <tr><td>16</td><td>URL result-signature + buildId telemetry links</td><td>Derivative refinement of ideas 4 and 6; cited the evidence dossier rather than a primary source.</td></tr>
+      <tr><td>17</td><td>Min/max ranges as first-class schema</td><td>Correct but a truism &mdash; below the discussion bar; folded into idea 2 as a named sub-decision.</td></tr>
+      <tr><td>18</td><td>Normalize boolean flag families into join tables</td><td>Sound; folded into idea 2 as a named sub-decision rather than a separate direction.</td></tr>
+      <tr><td>19</td><td>Scope out non-lootable categories early</td><td>Sound gating step, not a direction; folded into idea 1 (the census settles the denominator with data).</td></tr>
+      <tr><td>20</td><td>Pure-Python <code>.arz</code> reader (kill ArchiveTool)</td><td>Sound but high-effort; idea 1&rsquo;s raw deposit removes most of the same pain at near-zero cost. Revisit if refresh cadence or CI reproducibility becomes a real constraint.</td></tr>
+      <tr><td>21</td><td>Auto-generate facets/canonical arrays from the census</td><td>Basis refuted: cited BACKLOG.md:105, which is unrelated (the real note is at :56). Underlying idea premature until facets exist.</td></tr>
+      <tr><td>22</td><td>Ship inside the existing repo/CI</td><td>Table stakes &mdash; the obvious default with no alternative in tension.</td></tr>
+      <tr><td>23/24</td><td>DuckDB spec-precedent; extend <code>just</code> recipes to items</td><td>Folded pre-verification: the former is evidence inside idea 5, the latter is table stakes inside idea 1.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="sources-references">
+  <h2>Sources &amp; References</h2>
+  <ul class="refs">
+    <li><a href="https://github.com/tednaleid/grimdawn-devotions/blob/main/scripts/parse_devotions.py">scripts/parse_devotions.py</a> &mdash; field-agnostic DBR parser; <code>write_duckdb_csv</code> (:699), <code>--duckdb</code> (:745), <code>POWER_STAT_PREFIXES</code> (:71), drift incident (:54)</li>
+    <li><a href="https://github.com/tednaleid/grimdawn-devotions/blob/main/docs/dbr-format.md">docs/dbr-format.md</a> &mdash; DBR format rules, sparse-schema and raw-stat-id guidance</li>
+    <li><a href="https://github.com/tednaleid/grimdawn-devotions/blob/main/docs/i18n.md">docs/i18n.md</a> &mdash; tag tables, fallback chain, coverage guards</li>
+    <li><a href="https://github.com/tednaleid/grimdawn-devotions/blob/main/justfile">justfile</a> &mdash; extraction guard (:106), gdx auto-discovery (:118), buildid provenance (:151)</li>
+    <li><a href="https://github.com/tednaleid/grimdawn-devotions/blob/main/web/src/core/urlState.ts">web/src/core/urlState.ts</a> &mdash; encodeHash/decodeHash bitset scheme</li>
+    <li><a href="https://github.com/tednaleid/grimdawn-devotions/blob/main/docs/superpowers/specs/2026-06-21-path-predictor-reachability-design.md">docs/superpowers/specs/2026-06-21-path-predictor-reachability-design.md</a> &mdash; the DuckDB rejection and its exception clause</li>
+    <li><a href="https://scryfall.com/docs/syntax">Scryfall query syntax</a> and <a href="https://scryfall.com/docs/api/bulk-data">bulk data</a> &mdash; strongest UX and dataset-product analogs</li>
+    <li><a href="https://github.com/atom0s/grimarz">atom0s/grimarz</a> &mdash; canonical OSS .arz extractor (format tractability)</li>
+    <li><a href="https://github.com/brather1ng/RePoE">RePoE</a> / <a href="https://github.com/Project-Path-of-Exile-Wiki/PyPoE">PyPoE</a> &mdash; the maintenance-owner cautionary tale</li>
+    <li><a href="https://github.com/phiresky/sql.js-httpvfs">phiresky/sql.js-httpvfs</a> &mdash; range-request SQLite on static hosting (the middle engine option)</li>
+    <li><a href="https://www.grimtools.com/db/">grimtools.com/db</a> &mdash; the comprehensiveness benchmark and the filter-UX gap</li>
+  </ul>
+</section>
+
+<footer class="composition-signal">Composed 2026-07-03T19:43Z by ce-ideate from the session focus prompt (grimdawn-devotions repo; run 055a3102: 46 raw ideas, 5 ideation agents, 5 evidence dossiers, fresh-context basis verification).</footer>
+
+</div>
+</body>
+</html>
