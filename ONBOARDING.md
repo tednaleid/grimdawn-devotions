@@ -37,6 +37,8 @@ GitHub Pages; no backend, no accounts.
 - Headless browser smoke: `just e2e` (run `just install-e2e` once first)
 - Pre-commit hook (opt-in, runs `just check`): `just install-hooks`
 - Tool/data check: `just doctor`
+- Raw game-data deposit (full records tree + labels as parquet): `just deposit`, then
+  `just census` / `just q "SQL"` to mine it - see `docs/deposit.md`
 
 ## Architecture
 Each page is a parser-to-dataset half plus a browser-rendered half, sharing
@@ -86,6 +88,7 @@ Pages, auto-deployed from `main`).
 ## Dig deeper
 - `README.md` -- project overview, `devotions.json` schema, extraction steps
 - `docs/dbr-format.md` -- reverse-engineered game data model
+- `docs/deposit.md` -- raw game-data deposit: schema, recipes, refresh flow
 - `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings
 - `docs/reachability-engine.md` -- shipped vs costed engine comparison + the current-state decision

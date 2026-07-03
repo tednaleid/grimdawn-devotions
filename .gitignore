@@ -4,6 +4,10 @@
 # Optional long-format dump (~32 MB) - regenerate with `just parse --duckdb`
 /data/devotion_records.csv
 
+# Raw game-data deposit (parquet; regenerate with `just deposit` on Windows).
+# Gitignored pending the size-gate home decision - see docs/deposit.md.
+/data/deposit/
+
 # Python / uv
 __pycache__/
 *.pyc

@@ -13,6 +13,11 @@ out         := justfile_directory() / "data/devotions.json"
 out_rr      := justfile_directory() / "data/resistance-reduction.json"
 out_mon     := justfile_directory() / "data/monsters.json"
 
+# Raw game-data deposit home (gitignored pending the size gate; see docs/deposit.md).
+# Every deposit recipe resolves through this one variable so relocating the deposit
+# (including to a separate repo) is a one-line change.
+deposit_dir := justfile_directory() / "data/deposit"
+
 # Default: show available recipes
 default:
     @just --list
@@ -285,6 +290,53 @@ i18n-tables *LANGS:
     done
     echo "built:$built"
     [ -n "$skipped" ] && echo "skipped:$skipped" || true
+
+# --- Raw game-data deposit ----------------------------------------------------
+# Lossless long-format extraction of the FULL records/ tree plus per-locale label
+# tables, queryable anywhere via DuckDB (no game install needed after `deposit`).
+# Refresh flow after a game patch: `just extract`, then `just i18n-tables`, then
+# `just deposit`. See docs/deposit.md.
+
+# Build facts.parquet + labels.parquet + meta.parquet from the extracted tree
+deposit:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Best-effort: read the Steam build id from the app manifest for provenance.
+    manifest="{{gd_dir}}/../../appmanifest_219990.acf"
+    buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    uv run scripts/build_deposit.py build \
+        --records-dir "{{records_dir}}" --text-root "{{justfile_directory()}}/extracted" \
+        --out-dir "{{deposit_dir}}" --i18n-dir "{{justfile_directory()}}/data/i18n" \
+        --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"}
+
+# Schema census over the deposit: per-category key stats, template usage, diagnostics
+census:
+    uv run scripts/build_deposit.py census --deposit-dir "{{deposit_dir}}"
+
+# Ad-hoc SQL over the deposit (views: facts, labels, meta), e.g.
+#   just q "SELECT key, count(*) FROM facts GROUP BY key ORDER BY 2 DESC LIMIT 10"
+q SQL:
+    uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" --sql "{{SQL}}"
+
+# Acceptance query AE1: components matching "Cold" in name/description, level 20+ (fails on 0 rows)
+q-cold-components:
+    uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
+        --file scripts/deposit_queries/cold_components.sql --fail-on-empty
+
+# Acceptance query AE2: (sword1h OR dagger) AND (Epic OR Legendary) AND lightning damage (fails on 0 rows)
+q-compound-facets:
+    uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
+        --file scripts/deposit_queries/compound_facets.sql --fail-on-empty
+
+# Acceptance query AE3: German text search with per-tag English fallback (fails on 0 rows)
+q-search-de:
+    uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
+        --file scripts/deposit_queries/search_de.sql --fail-on-empty
+
+# Delete the deposit artifacts. Deliberately NOT part of `clean`: regenerating
+# them needs Windows + the game install, so `clean` must never touch them.
+clean-deposit:
+    rm -rf "{{deposit_dir}}"
 
 # Install web dependencies (bun)
 web-install:
