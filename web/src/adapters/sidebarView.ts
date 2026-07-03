@@ -5,7 +5,7 @@ import type { Vec } from "../core/reachability";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets } from "../core/aggregate";
 import { condensedRows, GROUP_KEY, type CondensedGroup, type CondensedSubject } from "../core/statFormat";
 import { affinityOrb } from "./affinityColors";
-import { affinityTagId } from "../core/urlState";
+import { affinityTagId } from "../core/benefitTag";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
 import { resolveText, sortByResolved, gameT } from "../core/localization";
 import type { Localization } from "../ports/Localization";

@@ -12,7 +12,7 @@ import type {
 import { formatBonusRowsWithIds, formatPet, formatPowerStats, type PowerRows } from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
-import { affinityTagId } from "../core/urlState";
+import { affinityTagId } from "../core/benefitTag";
 import { resolveText, sortByResolved, type Text } from "../core/localization";
 import type { Localization } from "../ports/Localization";
 
