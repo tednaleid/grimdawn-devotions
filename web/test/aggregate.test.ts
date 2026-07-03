@@ -15,14 +15,11 @@ import {
   availablePowers,
   weaponRequirements,
 } from "../src/core/aggregate";
-import { gameText } from "../src/core/localization";
-import { installEnglish } from "./helpers/localizeEn";
-
-installEnglish();
+import { enLoc } from "./helpers/localizeEn";
 
 const model = buildModel(doc as any);
 
-const conByName = (name: string) => [...model.constellations.values()].find((c) => gameText(c.nameTag) === name)!;
+const conByName = (name: string) => [...model.constellations.values()].find((c) => enLoc.gameText(c.nameTag) === name)!;
 const bonusIdsOf = (starIds: Iterable<string>, skip: Set<string> = new Set()): Set<string> => {
   const out = new Set<string>();
   for (const sid of starIds) if (!skip.has(sid)) for (const k of Object.keys(model.stars.get(sid)!.bonuses)) out.add(k);
@@ -77,7 +74,7 @@ test("availableBonusIds: empty when nothing is completable", () => {
 
 test("sumPetBonuses sums 'Bonus to All Pets' stats, separate from player bonuses", () => {
   // Shepherd's Crook's elemental-resistance star: 10% to the player, 15% to pets.
-  const con = [...model.constellations.values()].find((c) => gameText(c.nameTag) === "Shepherd's Crook")!;
+  const con = [...model.constellations.values()].find((c) => enLoc.gameText(c.nameTag) === "Shepherd's Crook")!;
   const star = con.starIds.map((id) => model.stars.get(id)!).find((s) => s.petBonuses?.defensiveElementalResistance)!;
   expect(star.bonuses.defensiveElementalResistance).toBe(10);
   expect(star.petBonuses!.defensiveElementalResistance).toBe(15);
@@ -149,9 +146,9 @@ test("sums like stat ids additively across stars", () => {
 
 test("collects celestial powers with their star ids", () => {
   const powers = powersGained(model, new Set(["bat:4"]));
-  expect(powers.map((p) => gameText(p.power.nameTag))).toContain("Twin Fangs");
+  expect(powers.map((p) => enLoc.gameText(p.power.nameTag))).toContain("Twin Fangs");
   expect(powers[0]!.power.descriptionTag).toBeTruthy();
-  expect(gameText(powers[0]!.power.descriptionTag!)).toBeTruthy();
+  expect(enLoc.gameText(powers[0]!.power.descriptionTag!)).toBeTruthy();
   expect(powers[0]!.starId).toBe("bat:4");
 });
 
@@ -222,8 +219,8 @@ test("availablePowers lists completable, not-yet-gained powers and excludes gain
   // Not selected -> listed.
   const avail = availablePowers(model, new Set(), new Set([bat.id]));
   expect(avail.map((p) => p.starId)).toContain(powerStar.id);
-  expect(gameText(avail.find((p) => p.starId === powerStar.id)!.power.nameTag)).toBe(
-    gameText(powerStar.celestialPower!.nameTag),
+  expect(enLoc.gameText(avail.find((p) => p.starId === powerStar.id)!.power.nameTag)).toBe(
+    enLoc.gameText(powerStar.celestialPower!.nameTag),
   );
   // Power star selected (gained) -> excluded.
   const gained = availablePowers(model, new Set([powerStar.id]), new Set([bat.id]));
@@ -235,5 +232,5 @@ test("availablePowers lists completable, not-yet-gained powers and excludes gain
 test("weaponRequirements carries each gated star's description", () => {
   const reqs = weaponRequirements(model, new Set(["kraken:0"]));
   expect(reqs).toHaveLength(1);
-  expect(gameText(reqs[0]!.descriptionTag!)).toBe("Requires a two-handed melee or two-handed ranged weapon.");
+  expect(enLoc.gameText(reqs[0]!.descriptionTag!)).toBe("Requires a two-handed melee or two-handed ranged weapon.");
 });

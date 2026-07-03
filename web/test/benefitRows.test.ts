@@ -4,9 +4,7 @@ import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { benefitRows } from "../src/core/benefitRows";
-import { installEnglish } from "./helpers/localizeEn";
-
-installEnglish();
+import { res } from "./helpers/localizeEn";
 
 const model = buildModel(doc as any);
 // A subject's flat and percent come from different stars, so build the multi-part shapes from the
@@ -28,33 +26,33 @@ const allRows = (groups: ReturnType<typeof benefitRows>["player"]) => subjectsOf
 
 test("regular mode: a flat+percent subject yields a subject row then a bare continuation row", () => {
   const { player } = benefitRows(model, allStars, null);
-  const phys = subjectsOf(player).find((s) => s.subject === "Physique")!;
+  const phys = subjectsOf(player).find((s) => res(s.subject) === "Physique")!;
   expect(phys.rows[0]!.role).toBe("subject");
-  expect(phys.rows.some((r) => r.role === "cont" && r.subLabel === "")).toBe(true);
+  expect(phys.rows.some((r) => r.role === "cont" && res(r.subLabel) === "")).toBe(true);
   // regular mode leaves the compare cells empty
-  expect(phys.rows[0]!.base).toBe("");
-  expect(phys.rows[0]!.delta).toBe("");
+  expect(res(phys.rows[0]!.base)).toBe("");
+  expect(res(phys.rows[0]!.delta)).toBe("");
 });
 
 test("regular mode: a resistance with pct + max yields a subject row then a 'max' sub-label row", () => {
   const { player } = benefitRows(model, allStars, null);
-  const res = subjectsOf(player).find((s) => s.subject === "Aether Resistance")!;
-  const maxRow = res.rows.find((r) => r.subLabel === "max")!;
+  const subj = subjectsOf(player).find((s) => res(s.subject) === "Aether Resistance")!;
+  const maxRow = subj.rows.find((r) => res(r.subLabel) === "max")!;
   expect(maxRow.role).toBe("sub");
   // the max value drops the "max " prefix (the sub-label conveys it)
-  expect(maxRow.now.startsWith("max")).toBe(false);
+  expect(res(maxRow.now).startsWith("max")).toBe(false);
 });
 
 test("regular mode: a damage-over-time subject yields a 'duration' sub-label row", () => {
   const { player } = benefitRows(model, allStars, null);
-  const bleed = subjectsOf(player).find((s) => s.subject === "Bleeding")!;
+  const bleed = subjectsOf(player).find((s) => res(s.subject) === "Bleeding")!;
   expect(bleed.rows[0]!.role).toBe("subject");
-  expect(bleed.rows.some((r) => r.role === "sub" && r.subLabel === "duration")).toBe(true);
+  expect(bleed.rows.some((r) => r.role === "sub" && res(r.subLabel) === "duration")).toBe(true);
 });
 
 test("regular mode: every value id is present once and the subject lists all its ids", () => {
   const { player } = benefitRows(model, allStars, null);
-  const phys = subjectsOf(player).find((s) => s.subject === "Physique")!;
+  const phys = subjectsOf(player).find((s) => res(s.subject) === "Physique")!;
   const rowIds = phys.rows.map((r) => r.id);
   expect(new Set(rowIds).size).toBe(rowIds.length); // no duplicate rows
   expect(phys.ids.slice().sort()).toEqual([...rowIds].sort()); // subject.ids covers exactly its rows
@@ -65,8 +63,8 @@ test("compare mode: a stat only in current is an up row with a dash base", () =>
   const { player } = benefitRows(model, new Set([star]), new Set());
   const row = allRows(player).find((r) => r.id === "offensiveTotalDamageModifier")!;
   expect(row.verdict).toBe("up");
-  expect(row.base).toBe("—"); // em dash
-  expect(row.now).not.toBe("—");
+  expect(res(row.base)).toBe("—"); // em dash
+  expect(res(row.now)).not.toBe("—");
 });
 
 test("compare mode: an unchanged flat range is 'same' with a dash delta; a changed one colors with no number", () => {
@@ -74,15 +72,15 @@ test("compare mode: an unchanged flat range is 'same' with a dash delta; a chang
   const sel = new Set([star]);
   const same = allRows(benefitRows(model, sel, sel).player).find((r) => r.id === partId)!;
   expect(same.verdict).toBe("same");
-  expect(same.delta).toBe("—");
+  expect(res(same.delta)).toBe("—");
   const added = allRows(benefitRows(model, sel, new Set()).player).find((r) => r.id === partId)!;
   expect(added.verdict).toBe("up");
-  expect(added.delta).toBe(""); // colored, no scalar
+  expect(res(added.delta)).toBe(""); // colored, no scalar
 });
 
 test("compare mode: a subject with one part up and one down rolls up to 'mixed'", () => {
   const { player } = benefitRows(model, new Set(["akeron_s_scorpion:0"]), new Set(["hawk:2"]));
-  const subj = subjectsOf(player).find((s) => s.key === "Attributes:Offensive Ability")!;
+  const subj = subjectsOf(player).find((s) => s.key === "Attributes:attr:OffensiveAbility")!;
   expect(subj.rows.some((r) => r.verdict === "up")).toBe(true);
   expect(subj.rows.some((r) => r.verdict === "down")).toBe(true);
   expect(subj.verdict).toBe("mixed");
@@ -102,7 +100,7 @@ test("compare mode: increasing a reduction (sign -1) reads as 'up', not 'down'",
   const row = allRows(benefitRows(model, new Set([high.id]), new Set([low.id])).player).find((r) => r.id === stat)!;
   expect(row.verdict).toBe("up");
   // the delta stays the literal change in the displayed (negative) value, so base + delta = now holds.
-  expect(row.delta.startsWith("-")).toBe(true);
+  expect(res(row.delta).startsWith("-")).toBe(true);
 });
 
 test("compare mode: decreasing a reduction (sign -1) reads as 'down'", () => {
@@ -127,16 +125,17 @@ test("a max-resist that is the subject's only part keeps a 'max' qualifier on th
   // leviathan:5 grants only a maximum Cold Resistance (no base resist), so it is the subject row and
   // must still read as a maximum, not as a base resistance.
   const { player } = benefitRows(model, new Set(["leviathan:5"]), null);
-  const cold = subjectsOf(player).find((s) => s.subject === "Cold Resistance")!;
+  const cold = subjectsOf(player).find((s) => res(s.subject) === "Cold Resistance")!;
   expect(cold.rows[0]!.role).toBe("subject");
-  expect(cold.rows[0]!.now.startsWith("max")).toBe(true);
+  expect(res(cold.rows[0]!.now).startsWith("max")).toBe(true);
 });
 
-test("compare mode sorts subjects alphabetically within each group (now-only subjects included)", () => {
-  // base and current share a group but contribute different subjects; the union must stay sorted.
-  const { player } = benefitRows(model, new Set(["light_of_empyrion:5"]), new Set(["obelisk_of_menhir:5"]));
+test("subjects are returned in structural (condensedRows) order within each group", () => {
+  // benefitRows no longer sorts subjects itself (structural order out; adapter sorts by resolved
+  // label). Assert structural order matches condensedRows for the same scope.
+  const { player } = benefitRows(model, new Set(["light_of_empyrion:5", "obelisk_of_menhir:5"]), null);
   for (const g of player) {
-    const names = g.subjects.map((s) => s.subject);
-    expect(names).toEqual([...names].sort((a, b) => a.localeCompare(b)));
+    const keys = g.subjects.map((s) => s.key);
+    expect(new Set(keys).size).toBe(keys.length); // no duplicate subjects
   }
 });

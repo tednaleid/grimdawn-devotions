@@ -529,8 +529,9 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Test: `web/test/statFormat.test.ts`, `web/test/i18nCharacterization.test.ts`
 
 **Interfaces:**
-- Produces: `formatPowerStats(stats): StatRow[]` and `formatPet(pet): { summon: Text; attack: StatRow[] }` returning `Text` rows in the existing (already stable, grimtools) order. Row order here is intentional, NOT alphabetical: adapters must not sort power rows.
-- Consumes: Task 2 constructors and Task 4's `StatRow`.
+- AMENDED during execution (decision by Ted, 2026-07-02): the original contract (`StatRow[]`, adapters never sort power rows) was contradictory — the characterization snapshot proves the fall-through rows (leftover stats formatted via formatBonusRows) sort alphabetically by resolved label PER LOCALE today, which no locale-independent core order reproduces.
+- Produces instead: `formatPowerStats(stats): { rows: StatRow[]; fallthrough: StatRow[] }` — `rows` in the fixed grimtools order (adapters render as-is, never sort), `fallthrough` unordered (adapters sort it by resolved label, e.g. `sortByResolved`, then append after `rows`). `formatPet(pet): { summon: Text; attack: { rows: StatRow[]; fallthrough: StatRow[] } }` follows the same shape. Core stays locale-independent AND the snapshot stays byte-identical.
+- Consumes: Task 2 constructors and Task 4's `StatRow`. Task 8's adapter conversion must preserve the render rule: rows as-is, then sorted fallthrough.
 
 - [ ] **Step 1: Update the power/pet test assertions with the Task 4 `res`/`resRow` helpers**
 

@@ -39,9 +39,11 @@ client state that only lives in memory or the DOM.
 ## Internationalization (invariant we maintain)
 
 This is a fully internationalized app. No user-facing string is hardcoded in app
-code: every app-authored string resolves through `translate(key, params?)` against
+code: core modules return `Text` descriptors and adapters resolve them through the
+`Localization` port (`loc.translate(key, params?)` / `resolveText`) against
 `web/src/i18n/app.<locale>.json`, with a per-key fallback of active locale, then
-English, then the raw key. Game-data text resolves from extracted per-language tag
+English, then the raw key. There is no global resolver; a guard test
+(`web/test/i18nBoundary.test.ts`) enforces this. Game-data text resolves from extracted per-language tag
 tables (authoritative, see docs/i18n.md). Locale is a viewer preference detected
 from the browser and is never in the URL hash; selection ids stay language
 independent. When you add a user-facing string, add a catalog key (never a literal)

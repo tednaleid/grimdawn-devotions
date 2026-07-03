@@ -3,16 +3,14 @@ import { test, expect } from "bun:test";
 import { buildModel } from "../src/core/model";
 import { renderAffinities } from "../src/adapters/sidebarView";
 import type { Vec } from "../src/core/reachability";
-import { installEnglish } from "./helpers/localizeEn";
-
-installEnglish();
+import { enLoc } from "./helpers/localizeEn";
 
 const doc = {
   meta: { affinities: ["ascendant", "chaos", "eldritch", "order", "primordial"] },
   constellations: [
     {
       id: "Lev",
-      name_tag: "tagDevotion_C12", // real Leviathan tag, so gameText resolves it to "Leviathan" under installEnglish()
+      name_tag: "tagDevotion_C12", // real Leviathan tag, so enLoc.gameText resolves it to "Leviathan"
       tier: null,
       affinityRequired: { eldritch: 13, ascendant: 13 },
       affinityBonus: {},
@@ -25,7 +23,7 @@ const model = buildModel(doc);
 
 function render(have: Vec, need: Vec, src: Map<number, string[]>, selectedBenefits: Set<string> = new Set()) {
   const el = { innerHTML: "" } as any as HTMLElement;
-  renderAffinities(el, model, have, need, src, undefined, selectedBenefits);
+  renderAffinities(enLoc, el, model, have, need, src, undefined, selectedBenefits);
   return (el as any).innerHTML as string;
 }
 

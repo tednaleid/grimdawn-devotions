@@ -4,10 +4,8 @@ import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { commitButton } from "../src/core/commitAction";
+import { appT } from "../src/core/localization";
 import type { ReachView } from "../src/core/reachability";
-import { installEnglish } from "./helpers/localizeEn";
-
-installEnglish();
 
 const model = buildModel(doc as any);
 const con = [...model.constellations.values()].find((c) => c.starIds.length >= 2)!;
@@ -28,26 +26,32 @@ function reachWith(clickable: string[], completable: string[]): ReachView {
 test("selected star -> Remove, enabled", () => {
   const r = reachWith([], []);
   expect(commitButton(model, new Set([starA]), r, { kind: "star", id: starA })).toEqual({
-    label: "Remove",
+    label: appT("ui.commit.remove"),
     enabled: true,
   });
 });
 
 test("unselected clickable star -> Add, enabled", () => {
   const r = reachWith([starA], []);
-  expect(commitButton(model, new Set(), r, { kind: "star", id: starA })).toEqual({ label: "Add", enabled: true });
+  expect(commitButton(model, new Set(), r, { kind: "star", id: starA })).toEqual({
+    label: appT("ui.commit.add"),
+    enabled: true,
+  });
 });
 
 test("unselected non-clickable star -> Add, disabled", () => {
   const r = reachWith([], []);
-  expect(commitButton(model, new Set(), r, { kind: "star", id: starA })).toEqual({ label: "Add", enabled: false });
+  expect(commitButton(model, new Set(), r, { kind: "star", id: starA })).toEqual({
+    label: appT("ui.commit.add"),
+    enabled: false,
+  });
 });
 
 test("fully selected constellation -> Remove, enabled", () => {
   const r = reachWith([], []);
   const sel = new Set(con.starIds);
   expect(commitButton(model, sel, r, { kind: "constellation", id: con.id })).toEqual({
-    label: "Remove",
+    label: appT("ui.commit.remove"),
     enabled: true,
   });
 });
@@ -55,7 +59,7 @@ test("fully selected constellation -> Remove, enabled", () => {
 test("partially selected, completable constellation -> Add, enabled", () => {
   const r = reachWith([], [con.id]);
   expect(commitButton(model, new Set([starA]), r, { kind: "constellation", id: con.id })).toEqual({
-    label: "Add",
+    label: appT("ui.commit.add"),
     enabled: true,
   });
 });
@@ -63,7 +67,7 @@ test("partially selected, completable constellation -> Add, enabled", () => {
 test("unselected, non-completable constellation -> Add, disabled", () => {
   const r = reachWith([], []);
   expect(commitButton(model, new Set(), r, { kind: "constellation", id: con.id })).toEqual({
-    label: "Add",
+    label: appT("ui.commit.add"),
     enabled: false,
   });
   void starB;

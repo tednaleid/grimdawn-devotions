@@ -1,0 +1,5013 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`characterization: en surfaces are stable 1`] = `
+{
+  "benefitRowsCompare": {
+    "pet": [
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePoison",
+            ],
+            "key": "Resistances:Poison & Acid Resistance",
+            "rows": [
+              {
+                "base": "+20%",
+                "delta": "—",
+                "id": "defensivePoison",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "Poison & Acid Resistance",
+            "verdict": "same",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:Vitality Resistance",
+            "rows": [
+              {
+                "base": "+20%",
+                "delta": "+20",
+                "id": "defensiveLife",
+                "now": "+40%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Vitality Resistance",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:Total Damage",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+130",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+130%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Total Damage",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:Reduced Entrapment Duration",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+20",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Reduced Entrapment Duration",
+            "verdict": "up",
+          },
+        ],
+      },
+    ],
+    "player": [
+      {
+        "group": "Attributes",
+        "subjects": [
+          {
+            "ids": [
+              "characterSpellCastSpeedModifier",
+            ],
+            "key": "Attributes:Casting Speed",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+5",
+                "id": "characterSpellCastSpeedModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Casting Speed",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterLife",
+              "characterLifeModifier",
+            ],
+            "key": "Attributes:Health",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+1100",
+                "id": "characterLife",
+                "now": "+1100",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+6",
+                "id": "characterLifeModifier",
+                "now": "+6%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Health",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterLifeRegen",
+            ],
+            "key": "Attributes:Health Regeneration",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+25",
+                "id": "characterLifeRegen",
+                "now": "+25",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Health Regeneration",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterHealIncreasePercent",
+            ],
+            "key": "Attributes:Increased Healing",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "characterHealIncreasePercent",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Increased Healing",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterOffensiveAbility",
+            ],
+            "key": "Attributes:Offensive Ability",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+245",
+                "id": "characterOffensiveAbility",
+                "now": "+245",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Offensive Ability",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterStrength",
+            ],
+            "key": "Attributes:Physique",
+            "rows": [
+              {
+                "base": "+15",
+                "delta": "+30",
+                "id": "characterStrength",
+                "now": "+45",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Physique",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterIntelligence",
+            ],
+            "key": "Attributes:Spirit",
+            "rows": [
+              {
+                "base": "+15",
+                "delta": "—",
+                "id": "characterIntelligence",
+                "now": "+15",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "Spirit",
+            "verdict": "same",
+          },
+          {
+            "ids": [
+              "characterWeaponIntelligenceReqReduction",
+            ],
+            "key": "Attributes:Spirit Requirement for all Weapons",
+            "rows": [
+              {
+                "base": "-10%",
+                "delta": "—",
+                "id": "characterWeaponIntelligenceReqReduction",
+                "now": "-10%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "Spirit Requirement for all Weapons",
+            "verdict": "same",
+          },
+        ],
+      },
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "offensivePoisonMin",
+              "offensivePoisonModifier",
+            ],
+            "key": "Offense:Acid",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+12",
+                "id": "offensivePoisonMin",
+                "now": "+12",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+219",
+                "id": "offensivePoisonModifier",
+                "now": "+219%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Acid",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveSlowBleedingMin",
+              "offensiveSlowBleedingModifier",
+              "offensiveSlowBleedingDurationMin",
+              "offensiveSlowBleedingDurationModifier",
+            ],
+            "key": "Offense:Bleeding",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+20",
+                "id": "offensiveSlowBleedingMin",
+                "now": "+20",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+150",
+                "id": "offensiveSlowBleedingModifier",
+                "now": "+150%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+3",
+                "id": "offensiveSlowBleedingDurationMin",
+                "now": "+3s",
+                "role": "sub",
+                "subLabel": "duration",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+50",
+                "id": "offensiveSlowBleedingDurationModifier",
+                "now": "+50%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Bleeding",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveChaosModifier",
+            ],
+            "key": "Offense:Chaos",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+199",
+                "id": "offensiveChaosModifier",
+                "now": "+199%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Chaos",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveCritDamageModifier",
+            ],
+            "key": "Offense:Crit Damage",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+5",
+                "id": "offensiveCritDamageModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Crit Damage",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "racialBonusPercentDamage",
+            ],
+            "key": "Offense:Damage to specific enemy types",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+6",
+                "id": "racialBonusPercentDamage",
+                "now": "+6%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Damage to specific enemy types",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensivePhysicalModifier",
+            ],
+            "key": "Offense:Physical",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+100",
+                "id": "offensivePhysicalModifier",
+                "now": "+100%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Physical",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveSlowPoisonModifier",
+              "offensiveSlowPoisonDurationModifier",
+            ],
+            "key": "Offense:Poison",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+340",
+                "id": "offensiveSlowPoisonModifier",
+                "now": "+340%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+30",
+                "id": "offensiveSlowPoisonDurationModifier",
+                "now": "+30%",
+                "role": "sub",
+                "subLabel": "duration",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Poison",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:Total Damage",
+            "rows": [
+              {
+                "base": "+15%",
+                "delta": "+30",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+45%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Total Damage",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveLifeMin",
+              "offensiveLifeModifier",
+            ],
+            "key": "Offense:Vitality",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+8",
+                "id": "offensiveLifeMin",
+                "now": "+8",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+199",
+                "id": "offensiveLifeModifier",
+                "now": "+199%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Vitality",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveSlowLifeModifier",
+            ],
+            "key": "Offense:Vitality Decay",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+160",
+                "id": "offensiveSlowLifeModifier",
+                "now": "+160%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Vitality Decay",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveBleeding",
+            ],
+            "key": "Resistances:Bleeding Resistance",
+            "rows": [
+              {
+                "base": "+16%",
+                "delta": "+10",
+                "id": "defensiveBleeding",
+                "now": "+26%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Bleeding Resistance",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveElementalResistance",
+            ],
+            "key": "Resistances:Elemental Resistance",
+            "rows": [
+              {
+                "base": "+16%",
+                "delta": "—",
+                "id": "defensiveElementalResistance",
+                "now": "+16%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "Elemental Resistance",
+            "verdict": "same",
+          },
+          {
+            "ids": [
+              "defensivePhysical",
+            ],
+            "key": "Resistances:Physical Resistance",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+4",
+                "id": "defensivePhysical",
+                "now": "+4%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Physical Resistance",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensivePierce",
+            ],
+            "key": "Resistances:Pierce Resistance",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "defensivePierce",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Pierce Resistance",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensivePoison",
+              "defensivePoisonMaxResist",
+            ],
+            "key": "Resistances:Poison & Acid Resistance",
+            "rows": [
+              {
+                "base": "+12%",
+                "delta": "+20",
+                "id": "defensivePoison",
+                "now": "+32%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+3",
+                "id": "defensivePoisonMaxResist",
+                "now": "+3%",
+                "role": "sub",
+                "subLabel": "max",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Poison & Acid Resistance",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:Vitality Resistance",
+            "rows": [
+              {
+                "base": "+12%",
+                "delta": "+25",
+                "id": "defensiveLife",
+                "now": "+37%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Vitality Resistance",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Armor & Mitigation",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePercentReflectionResistance",
+            ],
+            "key": "Armor & Mitigation:Reflected Damage Reduction",
+            "rows": [
+              {
+                "base": "+22%",
+                "delta": "—",
+                "id": "defensivePercentReflectionResistance",
+                "now": "+22%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "Reflected Damage Reduction",
+            "verdict": "same",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:Reduced Entrapment Duration",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+20",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Reduced Entrapment Duration",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveFreeze",
+            ],
+            "key": "Status Protection:Reduced Freeze Duration",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "defensiveFreeze",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Reduced Freeze Duration",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveStun",
+            ],
+            "key": "Status Protection:Reduced Stun Duration",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "defensiveStun",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Reduced Stun Duration",
+            "verdict": "up",
+          },
+        ],
+      },
+    ],
+  },
+  "benefitRowsRegular": {
+    "pet": [
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:Total Damage",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+130%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Total Damage",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePoison",
+            ],
+            "key": "Resistances:Poison & Acid Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePoison",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Poison & Acid Resistance",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:Vitality Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveLife",
+                "now": "+40%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Vitality Resistance",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:Reduced Entrapment Duration",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Reduced Entrapment Duration",
+            "verdict": "",
+          },
+        ],
+      },
+    ],
+    "player": [
+      {
+        "group": "Attributes",
+        "subjects": [
+          {
+            "ids": [
+              "characterSpellCastSpeedModifier",
+            ],
+            "key": "Attributes:Casting Speed",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterSpellCastSpeedModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Casting Speed",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterLife",
+              "characterLifeModifier",
+            ],
+            "key": "Attributes:Health",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterLife",
+                "now": "+1100",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterLifeModifier",
+                "now": "+6%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Health",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterLifeRegen",
+            ],
+            "key": "Attributes:Health Regeneration",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterLifeRegen",
+                "now": "+25",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Health Regeneration",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterHealIncreasePercent",
+            ],
+            "key": "Attributes:Increased Healing",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterHealIncreasePercent",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Increased Healing",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterOffensiveAbility",
+            ],
+            "key": "Attributes:Offensive Ability",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterOffensiveAbility",
+                "now": "+245",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Offensive Ability",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterStrength",
+            ],
+            "key": "Attributes:Physique",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterStrength",
+                "now": "+45",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Physique",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterIntelligence",
+            ],
+            "key": "Attributes:Spirit",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterIntelligence",
+                "now": "+15",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Spirit",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterWeaponIntelligenceReqReduction",
+            ],
+            "key": "Attributes:Spirit Requirement for all Weapons",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterWeaponIntelligenceReqReduction",
+                "now": "-10%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Spirit Requirement for all Weapons",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "offensivePoisonMin",
+              "offensivePoisonModifier",
+            ],
+            "key": "Offense:Acid",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensivePoisonMin",
+                "now": "+12",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensivePoisonModifier",
+                "now": "+219%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Acid",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveSlowBleedingMin",
+              "offensiveSlowBleedingModifier",
+              "offensiveSlowBleedingDurationMin",
+              "offensiveSlowBleedingDurationModifier",
+            ],
+            "key": "Offense:Bleeding",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingMin",
+                "now": "+20",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingModifier",
+                "now": "+150%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingDurationMin",
+                "now": "+3s",
+                "role": "sub",
+                "subLabel": "duration",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingDurationModifier",
+                "now": "+50%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Bleeding",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveChaosModifier",
+            ],
+            "key": "Offense:Chaos",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveChaosModifier",
+                "now": "+199%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Chaos",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveCritDamageModifier",
+            ],
+            "key": "Offense:Crit Damage",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveCritDamageModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Crit Damage",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "racialBonusPercentDamage",
+            ],
+            "key": "Offense:Damage to specific enemy types",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "racialBonusPercentDamage",
+                "now": "+6%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Damage to specific enemy types",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensivePhysicalModifier",
+            ],
+            "key": "Offense:Physical",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensivePhysicalModifier",
+                "now": "+100%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Physical",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveSlowPoisonModifier",
+              "offensiveSlowPoisonDurationModifier",
+            ],
+            "key": "Offense:Poison",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowPoisonModifier",
+                "now": "+340%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowPoisonDurationModifier",
+                "now": "+30%",
+                "role": "sub",
+                "subLabel": "duration",
+                "verdict": "",
+              },
+            ],
+            "subject": "Poison",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:Total Damage",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+45%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Total Damage",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveLifeMin",
+              "offensiveLifeModifier",
+            ],
+            "key": "Offense:Vitality",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveLifeMin",
+                "now": "+8",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveLifeModifier",
+                "now": "+199%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Vitality",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveSlowLifeModifier",
+            ],
+            "key": "Offense:Vitality Decay",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowLifeModifier",
+                "now": "+160%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Vitality Decay",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveBleeding",
+            ],
+            "key": "Resistances:Bleeding Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveBleeding",
+                "now": "+26%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Bleeding Resistance",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveElementalResistance",
+            ],
+            "key": "Resistances:Elemental Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveElementalResistance",
+                "now": "+16%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Elemental Resistance",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensivePhysical",
+            ],
+            "key": "Resistances:Physical Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePhysical",
+                "now": "+4%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Physical Resistance",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensivePierce",
+            ],
+            "key": "Resistances:Pierce Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePierce",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Pierce Resistance",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensivePoison",
+              "defensivePoisonMaxResist",
+            ],
+            "key": "Resistances:Poison & Acid Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePoison",
+                "now": "+32%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePoisonMaxResist",
+                "now": "+3%",
+                "role": "sub",
+                "subLabel": "max",
+                "verdict": "",
+              },
+            ],
+            "subject": "Poison & Acid Resistance",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:Vitality Resistance",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveLife",
+                "now": "+37%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Vitality Resistance",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:Reduced Entrapment Duration",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Reduced Entrapment Duration",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveFreeze",
+            ],
+            "key": "Status Protection:Reduced Freeze Duration",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveFreeze",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Reduced Freeze Duration",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveStun",
+            ],
+            "key": "Status Protection:Reduced Stun Duration",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveStun",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Reduced Stun Duration",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Armor & Mitigation",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePercentReflectionResistance",
+            ],
+            "key": "Armor & Mitigation:Reflected Damage Reduction",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePercentReflectionResistance",
+                "now": "+22%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Reflected Damage Reduction",
+            "verdict": "",
+          },
+        ],
+      },
+    ],
+  },
+  "buildOrder": "<h2>Build order</h2><div class="bo-list"><div class="bo-step bo-add" data-con-id="crossroads_order"><span class="bo-n"></span><span class="bo-art"><span class="orb" style="background:#e6c34d"></span></span><span class="bo-name">Add Crossroads (NE)</span><span class="bo-pts">+1</span><span class="bo-held">1</span></div><div class="bo-step bo-complete" data-con-id="crane"><span class="bo-n">1</span><span class="bo-name">Crane</span><span class="bo-pts">+6</span><span class="bo-held">7</span></div><div class="bo-step bo-refund" data-con-id="crossroads_order"><span class="bo-n"></span><span class="bo-art"><span class="orb" style="background:#e6c34d"></span></span><span class="bo-name">Refund Crossroads (NE)</span><span class="bo-pts">-1</span><span class="bo-held">6</span></div></div>",
+  "buildOrderEmpty": "<h2>Build order</h2><div class="bo-empty"><div class="bo-empty-msg">Incomplete build: needs 3 more Ascendant and 1 more Order affinity.</div><div class="bo-empty-sub">Add supporting constellations that grant it.</div></div>",
+  "commit": [
+    {
+      "enabled": true,
+      "label": "Remove",
+    },
+    {
+      "enabled": false,
+      "label": "Add",
+    },
+  ],
+  "condensed": [
+    {
+      "group": "Attributes",
+      "subjects": [
+        {
+          "key": "Attributes:Casting Speed",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "characterSpellCastSpeedModifier",
+              "value": "+5%",
+            },
+          ],
+          "subject": "Casting Speed",
+        },
+        {
+          "key": "Attributes:Health",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterLife",
+              "value": "+1100",
+            },
+            {
+              "dim": "pct",
+              "id": "characterLifeModifier",
+              "value": "+6%",
+            },
+          ],
+          "subject": "Health",
+        },
+        {
+          "key": "Attributes:Health Regeneration",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterLifeRegen",
+              "value": "+25",
+            },
+          ],
+          "subject": "Health Regeneration",
+        },
+        {
+          "key": "Attributes:Increased Healing",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "characterHealIncreasePercent",
+              "value": "+15%",
+            },
+          ],
+          "subject": "Increased Healing",
+        },
+        {
+          "key": "Attributes:Offensive Ability",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterOffensiveAbility",
+              "value": "+245",
+            },
+          ],
+          "subject": "Offensive Ability",
+        },
+        {
+          "key": "Attributes:Physique",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterStrength",
+              "value": "+45",
+            },
+          ],
+          "subject": "Physique",
+        },
+        {
+          "key": "Attributes:Spirit",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterIntelligence",
+              "value": "+15",
+            },
+          ],
+          "subject": "Spirit",
+        },
+        {
+          "key": "Attributes:Spirit Requirement for all Weapons",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "characterWeaponIntelligenceReqReduction",
+              "value": "-10%",
+            },
+          ],
+          "subject": "Spirit Requirement for all Weapons",
+        },
+      ],
+    },
+    {
+      "group": "Offense",
+      "subjects": [
+        {
+          "key": "Offense:Acid",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "offensivePoisonMin",
+              "value": "+12",
+            },
+            {
+              "dim": "pct",
+              "id": "offensivePoisonModifier",
+              "value": "+219%",
+            },
+          ],
+          "subject": "Acid",
+        },
+        {
+          "key": "Offense:Bleeding",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "offensiveSlowBleedingMin",
+              "value": "+20",
+            },
+            {
+              "dim": "pct",
+              "id": "offensiveSlowBleedingModifier",
+              "value": "+150%",
+            },
+            {
+              "dim": "durFlat",
+              "id": "offensiveSlowBleedingDurationMin",
+              "value": "+3",
+            },
+            {
+              "dim": "durPct",
+              "id": "offensiveSlowBleedingDurationModifier",
+              "value": "+50%",
+            },
+          ],
+          "subject": "Bleeding",
+        },
+        {
+          "key": "Offense:Chaos",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveChaosModifier",
+              "value": "+199%",
+            },
+          ],
+          "subject": "Chaos",
+        },
+        {
+          "key": "Offense:Crit Damage",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveCritDamageModifier",
+              "value": "+5%",
+            },
+          ],
+          "subject": "Crit Damage",
+        },
+        {
+          "key": "Offense:Damage to specific enemy types",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "racialBonusPercentDamage",
+              "value": "+6%",
+            },
+          ],
+          "subject": "Damage to specific enemy types",
+        },
+        {
+          "key": "Offense:Physical",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensivePhysicalModifier",
+              "value": "+100%",
+            },
+          ],
+          "subject": "Physical",
+        },
+        {
+          "key": "Offense:Poison",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveSlowPoisonModifier",
+              "value": "+340%",
+            },
+            {
+              "dim": "durPct",
+              "id": "offensiveSlowPoisonDurationModifier",
+              "value": "+30%",
+            },
+          ],
+          "subject": "Poison",
+        },
+        {
+          "key": "Offense:Total Damage",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveTotalDamageModifier",
+              "value": "+45%",
+            },
+          ],
+          "subject": "Total Damage",
+        },
+        {
+          "key": "Offense:Vitality",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "offensiveLifeMin",
+              "value": "+8",
+            },
+            {
+              "dim": "pct",
+              "id": "offensiveLifeModifier",
+              "value": "+199%",
+            },
+          ],
+          "subject": "Vitality",
+        },
+        {
+          "key": "Offense:Vitality Decay",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveSlowLifeModifier",
+              "value": "+160%",
+            },
+          ],
+          "subject": "Vitality Decay",
+        },
+      ],
+    },
+    {
+      "group": "Resistances",
+      "subjects": [
+        {
+          "key": "Resistances:Bleeding Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveBleeding",
+              "value": "+26%",
+            },
+          ],
+          "subject": "Bleeding Resistance",
+        },
+        {
+          "key": "Resistances:Elemental Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveElementalResistance",
+              "value": "+16%",
+            },
+          ],
+          "subject": "Elemental Resistance",
+        },
+        {
+          "key": "Resistances:Physical Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePhysical",
+              "value": "+4%",
+            },
+          ],
+          "subject": "Physical Resistance",
+        },
+        {
+          "key": "Resistances:Pierce Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePierce",
+              "value": "+15%",
+            },
+          ],
+          "subject": "Pierce Resistance",
+        },
+        {
+          "key": "Resistances:Poison & Acid Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePoison",
+              "value": "+32%",
+            },
+            {
+              "dim": "max",
+              "id": "defensivePoisonMaxResist",
+              "value": "+3%",
+            },
+          ],
+          "subject": "Poison & Acid Resistance",
+        },
+        {
+          "key": "Resistances:Vitality Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveLife",
+              "value": "+37%",
+            },
+          ],
+          "subject": "Vitality Resistance",
+        },
+      ],
+    },
+    {
+      "group": "Status Protection",
+      "subjects": [
+        {
+          "key": "Status Protection:Reduced Entrapment Duration",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveTrap",
+              "value": "+20%",
+            },
+          ],
+          "subject": "Reduced Entrapment Duration",
+        },
+        {
+          "key": "Status Protection:Reduced Freeze Duration",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveFreeze",
+              "value": "+15%",
+            },
+          ],
+          "subject": "Reduced Freeze Duration",
+        },
+        {
+          "key": "Status Protection:Reduced Stun Duration",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveStun",
+              "value": "+15%",
+            },
+          ],
+          "subject": "Reduced Stun Duration",
+        },
+      ],
+    },
+    {
+      "group": "Armor & Mitigation",
+      "subjects": [
+        {
+          "key": "Armor & Mitigation:Reflected Damage Reduction",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePercentReflectionResistance",
+              "value": "+22%",
+            },
+          ],
+          "subject": "Reflected Damage Reduction",
+        },
+      ],
+    },
+  ],
+  "condensedPet": [
+    {
+      "group": "Offense",
+      "subjects": [
+        {
+          "key": "Offense:Total Damage",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveTotalDamageModifier",
+              "value": "+130%",
+            },
+          ],
+          "subject": "Total Damage",
+        },
+      ],
+    },
+    {
+      "group": "Resistances",
+      "subjects": [
+        {
+          "key": "Resistances:Poison & Acid Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePoison",
+              "value": "+20%",
+            },
+          ],
+          "subject": "Poison & Acid Resistance",
+        },
+        {
+          "key": "Resistances:Vitality Resistance",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveLife",
+              "value": "+40%",
+            },
+          ],
+          "subject": "Vitality Resistance",
+        },
+      ],
+    },
+    {
+      "group": "Status Protection",
+      "subjects": [
+        {
+          "key": "Status Protection:Reduced Entrapment Duration",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveTrap",
+              "value": "+20%",
+            },
+          ],
+          "subject": "Reduced Entrapment Duration",
+        },
+      ],
+    },
+  ],
+  "perStar": {
+    "abomination:0": {
+      "bonuses": [
+        {
+          "id": "offensiveChaosModifier",
+          "label": "Chaos Damage",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "Poison Damage",
+          "value": "+80%",
+        },
+      ],
+    },
+    "abomination:1": {
+      "bonuses": [
+        {
+          "id": "offensivePoisonModifier",
+          "label": "Acid Damage",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveLifeModifier",
+          "label": "Vitality Damage",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveSlowLifeModifier",
+          "label": "Vitality Decay Damage",
+          "value": "+80%",
+        },
+      ],
+    },
+    "abomination:2": {
+      "bonuses": [
+        {
+          "id": "defensivePoisonMaxResist",
+          "label": "Maximum Poison & Acid Resistance",
+          "value": "+3%",
+        },
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+40",
+        },
+        {
+          "id": "defensivePoison",
+          "label": "Poison & Acid Resistance",
+          "value": "+20%",
+        },
+      ],
+    },
+    "abomination:3": {
+      "bonuses": [
+        {
+          "id": "offensiveChaosModifier",
+          "label": "Chaos Damage",
+          "value": "+80%",
+        },
+        {
+          "id": "characterLife",
+          "label": "Health",
+          "value": "+400",
+        },
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+40",
+        },
+        {
+          "id": "offensiveLifeModifier",
+          "label": "Vitality Damage",
+          "value": "+80%",
+        },
+      ],
+    },
+    "abomination:4": {
+      "bonuses": [],
+      "power": [
+        {
+          "label": "Second Skill Recharge",
+          "value": "18",
+        },
+        {
+          "label": "Second Duration",
+          "value": "12",
+        },
+        {
+          "label": "Chaos Damage",
+          "value": "54-135",
+        },
+        {
+          "label": "Chaos Damage",
+          "value": "260%",
+        },
+        {
+          "label": "Health Regeneration",
+          "value": "100%",
+        },
+        {
+          "label": "Vitality Damage",
+          "value": "310%",
+        },
+        {
+          "label": "Vitality Decay Damage",
+          "value": "310%",
+        },
+      ],
+    },
+    "abomination:5": {
+      "bonuses": [
+        {
+          "id": "characterLife",
+          "label": "Health",
+          "value": "+400",
+        },
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+40",
+        },
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "Poison Damage",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveSlowLifeModifier",
+          "label": "Vitality Decay Damage",
+          "value": "+80%",
+        },
+      ],
+    },
+    "abomination:6": {
+      "bonuses": [
+        {
+          "id": "offensivePoisonMin",
+          "label": "Acid Damage",
+          "value": "+12",
+        },
+        {
+          "id": "offensivePoisonModifier",
+          "label": "Acid Damage",
+          "value": "+100%",
+        },
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "Poison Damage",
+          "value": "+100%",
+        },
+      ],
+    },
+    "abomination:7": {
+      "bonuses": [],
+      "power": [
+        {
+          "label": "Second Skill Recharge",
+          "value": "3",
+        },
+        {
+          "label": "Meter Radius",
+          "value": "10",
+        },
+        {
+          "label": "Poison Damage over 5 Seconds",
+          "value": "1560",
+        },
+        {
+          "label": "Seconds of Confusion",
+          "value": "1.8",
+        },
+      ],
+    },
+    "akeron_s_scorpion:0": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+12",
+        },
+      ],
+    },
+    "akeron_s_scorpion:1": {
+      "bonuses": [
+        {
+          "id": "offensivePoisonModifier",
+          "label": "Acid Damage",
+          "value": "+15%",
+        },
+        {
+          "id": "characterStrength",
+          "label": "Physique",
+          "value": "+15",
+        },
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "Poison Damage",
+          "value": "+30%",
+        },
+      ],
+    },
+    "akeron_s_scorpion:2": {
+      "bonuses": [
+        {
+          "id": "offensivePoisonModifier",
+          "label": "Acid Damage",
+          "value": "+24%",
+        },
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+18",
+        },
+      ],
+    },
+    "akeron_s_scorpion:3": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "Poison Damage",
+          "value": "+50%",
+        },
+        {
+          "id": "offensiveSlowPoisonDurationModifier",
+          "label": "Poison Duration",
+          "value": "+30%",
+        },
+      ],
+    },
+    "akeron_s_scorpion:4": {
+      "bonuses": [],
+      "power": [
+        {
+          "label": "Second Skill Recharge",
+          "value": "1.5",
+        },
+        {
+          "label": "Projectile(s)",
+          "value": "6",
+        },
+        {
+          "label": "Chance to pass through Enemies",
+          "value": "100%",
+        },
+        {
+          "label": "Meter Radius",
+          "value": "0.1",
+        },
+        {
+          "label": "Weapon Damage",
+          "value": "40%",
+        },
+        {
+          "label": "Poison Damage over 5 Seconds",
+          "value": "1125",
+        },
+        {
+          "label": "Reduced target's Defensive Ability for 5 Seconds",
+          "value": "150",
+        },
+      ],
+    },
+    "berserker:0": {
+      "bonuses": [
+        {
+          "id": "characterLife",
+          "label": "Health",
+          "value": "+300",
+        },
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+20",
+        },
+      ],
+    },
+    "berserker:1": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowBleedingModifier",
+          "label": "Bleeding Damage",
+          "value": "+50%",
+        },
+        {
+          "id": "offensivePhysicalModifier",
+          "label": "Physical Damage",
+          "value": "+50%",
+        },
+        {
+          "id": "defensiveFreeze",
+          "label": "Reduced Freeze Duration",
+          "value": "+15%",
+        },
+      ],
+    },
+    "berserker:2": {
+      "bonuses": [
+        {
+          "id": "offensiveCritDamageModifier",
+          "label": "Crit Damage",
+          "value": "+5%",
+        },
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+60",
+        },
+      ],
+    },
+    "berserker:3": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowBleedingModifier",
+          "label": "Bleeding Damage",
+          "value": "+50%",
+        },
+        {
+          "id": "offensivePhysicalModifier",
+          "label": "Physical Damage",
+          "value": "+50%",
+        },
+        {
+          "id": "defensiveStun",
+          "label": "Reduced Stun Duration",
+          "value": "+15%",
+        },
+      ],
+    },
+    "berserker:4": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowBleedingMin",
+          "label": "Bleeding Damage",
+          "value": "+20",
+        },
+        {
+          "id": "offensiveSlowBleedingModifier",
+          "label": "Bleeding Damage",
+          "value": "+50%",
+        },
+        {
+          "id": "offensiveSlowBleedingDurationMin",
+          "label": "Bleeding Duration",
+          "value": "+3",
+        },
+        {
+          "id": "offensiveSlowBleedingDurationModifier",
+          "label": "Bleeding Duration",
+          "value": "+50%",
+        },
+      ],
+    },
+    "berserker:5": {
+      "bonuses": [
+        {
+          "id": "characterLifeRegen",
+          "label": "Health Regeneration",
+          "value": "+25",
+        },
+        {
+          "id": "characterHealIncreasePercent",
+          "label": "Increased Healing",
+          "value": "+15%",
+        },
+        {
+          "id": "defensivePhysical",
+          "label": "Physical Resistance",
+          "value": "+4%",
+        },
+        {
+          "id": "defensivePierce",
+          "label": "Pierce Resistance",
+          "value": "+15%",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:0": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "Offensive Ability",
+          "value": "+15",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:1": {
+      "bonuses": [
+        {
+          "id": "characterSpellCastSpeedModifier",
+          "label": "Casting Speed",
+          "value": "+5%",
+        },
+        {
+          "id": "characterStrength",
+          "label": "Physique",
+          "value": "+15",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:2": {
+      "bonuses": [
+        {
+          "id": "defensiveLife",
+          "label": "Vitality Resistance",
+          "value": "+15%",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:3": {
+      "bonuses": [
+        {
+          "id": "defensiveTrap",
+          "label": "Reduced Entrapment Duration",
+          "value": "+20%",
+        },
+        {
+          "id": "offensiveTotalDamageModifier",
+          "label": "Total Damage",
+          "value": "+30%",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:4": {
+      "bonuses": [],
+      "pet": {
+        "attack": [
+          {
+            "label": "Poison Damage over 2 Seconds",
+            "value": "476",
+          },
+          {
+            "label": "Reduced target's Offensive Ability for 6 Seconds",
+            "value": "180",
+          },
+          {
+            "label": "Reduced target's Resistances for 6 Seconds",
+            "value": "25",
+          },
+          {
+            "label": "Acid Damage",
+            "value": "286-335",
+          },
+        ],
+        "summon": "Summons Eldritch Hound for 20 Seconds",
+      },
+      "power": [
+        {
+          "label": "Second Skill Recharge",
+          "value": "30",
+        },
+      ],
+    },
+    "crane:0": {
+      "bonuses": [
+        {
+          "id": "characterStrength",
+          "label": "Physique",
+          "value": "+15",
+        },
+        {
+          "id": "characterIntelligence",
+          "label": "Spirit",
+          "value": "+15",
+        },
+      ],
+    },
+    "crane:1": {
+      "bonuses": [
+        {
+          "id": "defensivePoison",
+          "label": "Poison & Acid Resistance",
+          "value": "+12%",
+        },
+      ],
+    },
+    "crane:2": {
+      "bonuses": [
+        {
+          "id": "characterWeaponIntelligenceReqReduction",
+          "label": "Spirit Requirement for all Weapons",
+          "value": "-10%",
+        },
+        {
+          "id": "offensiveTotalDamageModifier",
+          "label": "Total Damage",
+          "value": "+15%",
+        },
+      ],
+    },
+    "crane:3": {
+      "bonuses": [
+        {
+          "id": "defensiveLife",
+          "label": "Vitality Resistance",
+          "value": "+12%",
+        },
+      ],
+    },
+    "crane:4": {
+      "bonuses": [
+        {
+          "id": "defensiveBleeding",
+          "label": "Bleeding Resistance",
+          "value": "+16%",
+        },
+        {
+          "id": "defensiveElementalResistance",
+          "label": "Elemental Resistance",
+          "value": "+16%",
+        },
+        {
+          "id": "defensivePercentReflectionResistance",
+          "label": "Reflected Damage Reduction",
+          "value": "+22%",
+        },
+      ],
+    },
+    "gallows:0": {
+      "bonuses": [
+        {
+          "id": "offensiveChaosModifier",
+          "label": "Chaos Damage",
+          "value": "+15%",
+        },
+        {
+          "id": "offensiveLifeModifier",
+          "label": "Vitality Damage",
+          "value": "+15%",
+        },
+      ],
+    },
+    "gallows:1": {
+      "bonuses": [
+        {
+          "id": "defensiveBleeding",
+          "label": "Bleeding Resistance",
+          "value": "+10%",
+        },
+        {
+          "id": "characterLifeModifier",
+          "label": "Health",
+          "value": "+3%",
+        },
+      ],
+    },
+    "gallows:2": {
+      "bonuses": [
+        {
+          "id": "characterLifeModifier",
+          "label": "Health",
+          "value": "+3%",
+        },
+        {
+          "id": "defensiveLife",
+          "label": "Vitality Resistance",
+          "value": "+10%",
+        },
+      ],
+    },
+    "gallows:3": {
+      "bonuses": [
+        {
+          "id": "offensiveChaosModifier",
+          "label": "Chaos Damage",
+          "value": "+24%",
+        },
+        {
+          "id": "racialBonusPercentDamage",
+          "label": "Damage to Undead & Humans",
+          "value": "+6%",
+        },
+        {
+          "id": "offensiveLifeMin",
+          "label": "Vitality Damage",
+          "value": "+8",
+        },
+        {
+          "id": "offensiveLifeModifier",
+          "label": "Vitality Damage",
+          "value": "+24%",
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`characterization: zh surfaces are stable 1`] = `
+{
+  "benefitRowsCompare": {
+    "pet": [
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePoison",
+            ],
+            "key": "Resistances:毒素&酸性抗性",
+            "rows": [
+              {
+                "base": "+20%",
+                "delta": "—",
+                "id": "defensivePoison",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "毒素&酸性抗性",
+            "verdict": "same",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:活力抗性",
+            "rows": [
+              {
+                "base": "+20%",
+                "delta": "+20",
+                "id": "defensiveLife",
+                "now": "+40%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "活力抗性",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:总伤害",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+130",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+130%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "总伤害",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:束缚持续时间减少",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+20",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "束缚持续时间减少",
+            "verdict": "up",
+          },
+        ],
+      },
+    ],
+    "player": [
+      {
+        "group": "Attributes",
+        "subjects": [
+          {
+            "ids": [
+              "characterHealIncreasePercent",
+            ],
+            "key": "Attributes:Increased Healing",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "characterHealIncreasePercent",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "Increased Healing",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterStrength",
+            ],
+            "key": "Attributes:体格",
+            "rows": [
+              {
+                "base": "+15",
+                "delta": "+30",
+                "id": "characterStrength",
+                "now": "+45",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "体格",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterWeaponIntelligenceReqReduction",
+            ],
+            "key": "Attributes:所有武器的智力需求",
+            "rows": [
+              {
+                "base": "-10%",
+                "delta": "—",
+                "id": "characterWeaponIntelligenceReqReduction",
+                "now": "-10%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "所有武器的智力需求",
+            "verdict": "same",
+          },
+          {
+            "ids": [
+              "characterOffensiveAbility",
+            ],
+            "key": "Attributes:攻击能力",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+245",
+                "id": "characterOffensiveAbility",
+                "now": "+245",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "攻击能力",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterSpellCastSpeedModifier",
+            ],
+            "key": "Attributes:施法速度",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+5",
+                "id": "characterSpellCastSpeedModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "施法速度",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterLife",
+              "characterLifeModifier",
+            ],
+            "key": "Attributes:生命",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+1100",
+                "id": "characterLife",
+                "now": "+1100",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+6",
+                "id": "characterLifeModifier",
+                "now": "+6%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "生命",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterLifeRegen",
+            ],
+            "key": "Attributes:生命回复",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+25",
+                "id": "characterLifeRegen",
+                "now": "+25",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "生命回复",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "characterIntelligence",
+            ],
+            "key": "Attributes:精神",
+            "rows": [
+              {
+                "base": "+15",
+                "delta": "—",
+                "id": "characterIntelligence",
+                "now": "+15",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "精神",
+            "verdict": "same",
+          },
+        ],
+      },
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "racialBonusPercentDamage",
+            ],
+            "key": "Offense:对特定种族的伤害",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+6",
+                "id": "racialBonusPercentDamage",
+                "now": "+6%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "对特定种族的伤害",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:总伤害",
+            "rows": [
+              {
+                "base": "+15%",
+                "delta": "+30",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+45%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "总伤害",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveCritDamageModifier",
+            ],
+            "key": "Offense:暴击伤害",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+5",
+                "id": "offensiveCritDamageModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "暴击伤害",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveSlowPoisonModifier",
+              "offensiveSlowPoisonDurationModifier",
+            ],
+            "key": "Offense:毒素",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+340",
+                "id": "offensiveSlowPoisonModifier",
+                "now": "+340%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+30",
+                "id": "offensiveSlowPoisonDurationModifier",
+                "now": "+30%",
+                "role": "sub",
+                "subLabel": "持续时间",
+                "verdict": "up",
+              },
+            ],
+            "subject": "毒素",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveLifeMin",
+              "offensiveLifeModifier",
+            ],
+            "key": "Offense:活力",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+8",
+                "id": "offensiveLifeMin",
+                "now": "+8",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+199",
+                "id": "offensiveLifeModifier",
+                "now": "+199%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "活力",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveSlowLifeModifier",
+            ],
+            "key": "Offense:活力衰减",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+160",
+                "id": "offensiveSlowLifeModifier",
+                "now": "+160%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "活力衰减",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveSlowBleedingMin",
+              "offensiveSlowBleedingModifier",
+              "offensiveSlowBleedingDurationMin",
+              "offensiveSlowBleedingDurationModifier",
+            ],
+            "key": "Offense:流血",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+20",
+                "id": "offensiveSlowBleedingMin",
+                "now": "+20",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+150",
+                "id": "offensiveSlowBleedingModifier",
+                "now": "+150%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+3",
+                "id": "offensiveSlowBleedingDurationMin",
+                "now": "+3秒",
+                "role": "sub",
+                "subLabel": "持续时间",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+50",
+                "id": "offensiveSlowBleedingDurationModifier",
+                "now": "+50%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "流血",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensiveChaosModifier",
+            ],
+            "key": "Offense:混乱",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+199",
+                "id": "offensiveChaosModifier",
+                "now": "+199%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "混乱",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensivePhysicalModifier",
+            ],
+            "key": "Offense:物理",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+100",
+                "id": "offensivePhysicalModifier",
+                "now": "+100%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "物理",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "offensivePoisonMin",
+              "offensivePoisonModifier",
+            ],
+            "key": "Offense:酸性",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+12",
+                "id": "offensivePoisonMin",
+                "now": "+12",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+219",
+                "id": "offensivePoisonModifier",
+                "now": "+219%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "酸性",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveElementalResistance",
+            ],
+            "key": "Resistances:元素抗性",
+            "rows": [
+              {
+                "base": "+16%",
+                "delta": "—",
+                "id": "defensiveElementalResistance",
+                "now": "+16%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "元素抗性",
+            "verdict": "same",
+          },
+          {
+            "ids": [
+              "defensivePoison",
+              "defensivePoisonMaxResist",
+            ],
+            "key": "Resistances:毒素&酸性抗性",
+            "rows": [
+              {
+                "base": "+12%",
+                "delta": "+20",
+                "id": "defensivePoison",
+                "now": "+32%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+              {
+                "base": "—",
+                "delta": "+3",
+                "id": "defensivePoisonMaxResist",
+                "now": "+3%",
+                "role": "sub",
+                "subLabel": "最大值",
+                "verdict": "up",
+              },
+            ],
+            "subject": "毒素&酸性抗性",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:活力抗性",
+            "rows": [
+              {
+                "base": "+12%",
+                "delta": "+25",
+                "id": "defensiveLife",
+                "now": "+37%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "活力抗性",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveBleeding",
+            ],
+            "key": "Resistances:流血抗性",
+            "rows": [
+              {
+                "base": "+16%",
+                "delta": "+10",
+                "id": "defensiveBleeding",
+                "now": "+26%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "流血抗性",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensivePhysical",
+            ],
+            "key": "Resistances:物理伤抗性",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+4",
+                "id": "defensivePhysical",
+                "now": "+4%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "物理伤抗性",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensivePierce",
+            ],
+            "key": "Resistances:穿刺抗性",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "defensivePierce",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "穿刺抗性",
+            "verdict": "up",
+          },
+        ],
+      },
+      {
+        "group": "Armor & Mitigation",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePercentReflectionResistance",
+            ],
+            "key": "Armor & Mitigation:反伤减免",
+            "rows": [
+              {
+                "base": "+22%",
+                "delta": "—",
+                "id": "defensivePercentReflectionResistance",
+                "now": "+22%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "same",
+              },
+            ],
+            "subject": "反伤减免",
+            "verdict": "same",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveFreeze",
+            ],
+            "key": "Status Protection:冰冻持续时间减少",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "defensiveFreeze",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "冰冻持续时间减少",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveStun",
+            ],
+            "key": "Status Protection:昏迷持续时间减少",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+15",
+                "id": "defensiveStun",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "昏迷持续时间减少",
+            "verdict": "up",
+          },
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:束缚持续时间减少",
+            "rows": [
+              {
+                "base": "—",
+                "delta": "+20",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "束缚持续时间减少",
+            "verdict": "up",
+          },
+        ],
+      },
+    ],
+  },
+  "benefitRowsRegular": {
+    "pet": [
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:总伤害",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+130%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "总伤害",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePoison",
+            ],
+            "key": "Resistances:毒素&酸性抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePoison",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "毒素&酸性抗性",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:活力抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveLife",
+                "now": "+40%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "活力抗性",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:束缚持续时间减少",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "束缚持续时间减少",
+            "verdict": "",
+          },
+        ],
+      },
+    ],
+    "player": [
+      {
+        "group": "Attributes",
+        "subjects": [
+          {
+            "ids": [
+              "characterHealIncreasePercent",
+            ],
+            "key": "Attributes:Increased Healing",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterHealIncreasePercent",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "Increased Healing",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterStrength",
+            ],
+            "key": "Attributes:体格",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterStrength",
+                "now": "+45",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "体格",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterWeaponIntelligenceReqReduction",
+            ],
+            "key": "Attributes:所有武器的智力需求",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterWeaponIntelligenceReqReduction",
+                "now": "-10%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "所有武器的智力需求",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterOffensiveAbility",
+            ],
+            "key": "Attributes:攻击能力",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterOffensiveAbility",
+                "now": "+245",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "攻击能力",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterSpellCastSpeedModifier",
+            ],
+            "key": "Attributes:施法速度",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterSpellCastSpeedModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "施法速度",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterLife",
+              "characterLifeModifier",
+            ],
+            "key": "Attributes:生命",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterLife",
+                "now": "+1100",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterLifeModifier",
+                "now": "+6%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "生命",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterLifeRegen",
+            ],
+            "key": "Attributes:生命回复",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterLifeRegen",
+                "now": "+25",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "生命回复",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "characterIntelligence",
+            ],
+            "key": "Attributes:精神",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "characterIntelligence",
+                "now": "+15",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "精神",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Offense",
+        "subjects": [
+          {
+            "ids": [
+              "racialBonusPercentDamage",
+            ],
+            "key": "Offense:对特定种族的伤害",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "racialBonusPercentDamage",
+                "now": "+6%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "对特定种族的伤害",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:总伤害",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+45%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "总伤害",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveCritDamageModifier",
+            ],
+            "key": "Offense:暴击伤害",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveCritDamageModifier",
+                "now": "+5%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "暴击伤害",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveSlowPoisonModifier",
+              "offensiveSlowPoisonDurationModifier",
+            ],
+            "key": "Offense:毒素",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowPoisonModifier",
+                "now": "+340%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowPoisonDurationModifier",
+                "now": "+30%",
+                "role": "sub",
+                "subLabel": "持续时间",
+                "verdict": "",
+              },
+            ],
+            "subject": "毒素",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveLifeMin",
+              "offensiveLifeModifier",
+            ],
+            "key": "Offense:活力",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveLifeMin",
+                "now": "+8",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveLifeModifier",
+                "now": "+199%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "活力",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveSlowLifeModifier",
+            ],
+            "key": "Offense:活力衰减",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowLifeModifier",
+                "now": "+160%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "活力衰减",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveSlowBleedingMin",
+              "offensiveSlowBleedingModifier",
+              "offensiveSlowBleedingDurationMin",
+              "offensiveSlowBleedingDurationModifier",
+            ],
+            "key": "Offense:流血",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingMin",
+                "now": "+20",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingModifier",
+                "now": "+150%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingDurationMin",
+                "now": "+3秒",
+                "role": "sub",
+                "subLabel": "持续时间",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveSlowBleedingDurationModifier",
+                "now": "+50%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "流血",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensiveChaosModifier",
+            ],
+            "key": "Offense:混乱",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveChaosModifier",
+                "now": "+199%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "混乱",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensivePhysicalModifier",
+            ],
+            "key": "Offense:物理",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensivePhysicalModifier",
+                "now": "+100%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "物理",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "offensivePoisonMin",
+              "offensivePoisonModifier",
+            ],
+            "key": "Offense:酸性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensivePoisonMin",
+                "now": "+12",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensivePoisonModifier",
+                "now": "+219%",
+                "role": "cont",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "酸性",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Resistances",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveElementalResistance",
+            ],
+            "key": "Resistances:元素抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveElementalResistance",
+                "now": "+16%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "元素抗性",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensivePoison",
+              "defensivePoisonMaxResist",
+            ],
+            "key": "Resistances:毒素&酸性抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePoison",
+                "now": "+32%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePoisonMaxResist",
+                "now": "+3%",
+                "role": "sub",
+                "subLabel": "最大值",
+                "verdict": "",
+              },
+            ],
+            "subject": "毒素&酸性抗性",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveLife",
+            ],
+            "key": "Resistances:活力抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveLife",
+                "now": "+37%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "活力抗性",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveBleeding",
+            ],
+            "key": "Resistances:流血抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveBleeding",
+                "now": "+26%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "流血抗性",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensivePhysical",
+            ],
+            "key": "Resistances:物理伤抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePhysical",
+                "now": "+4%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "物理伤抗性",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensivePierce",
+            ],
+            "key": "Resistances:穿刺抗性",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePierce",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "穿刺抗性",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Status Protection",
+        "subjects": [
+          {
+            "ids": [
+              "defensiveFreeze",
+            ],
+            "key": "Status Protection:冰冻持续时间减少",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveFreeze",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "冰冻持续时间减少",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveStun",
+            ],
+            "key": "Status Protection:昏迷持续时间减少",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveStun",
+                "now": "+15%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "昏迷持续时间减少",
+            "verdict": "",
+          },
+          {
+            "ids": [
+              "defensiveTrap",
+            ],
+            "key": "Status Protection:束缚持续时间减少",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensiveTrap",
+                "now": "+20%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "束缚持续时间减少",
+            "verdict": "",
+          },
+        ],
+      },
+      {
+        "group": "Armor & Mitigation",
+        "subjects": [
+          {
+            "ids": [
+              "defensivePercentReflectionResistance",
+            ],
+            "key": "Armor & Mitigation:反伤减免",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "defensivePercentReflectionResistance",
+                "now": "+22%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "反伤减免",
+            "verdict": "",
+          },
+        ],
+      },
+    ],
+  },
+  "buildOrder": "<h2>构建顺序</h2><div class="bo-list"><div class="bo-step bo-add" data-con-id="crossroads_order"><span class="bo-n"></span><span class="bo-art"><span class="orb" style="background:#e6c34d"></span></span><span class="bo-name">添加 抉择之地 (NE)</span><span class="bo-pts">+1</span><span class="bo-held">1</span></div><div class="bo-step bo-complete" data-con-id="crane"><span class="bo-n">1</span><span class="bo-name">仙鹤</span><span class="bo-pts">+6</span><span class="bo-held">7</span></div><div class="bo-step bo-refund" data-con-id="crossroads_order"><span class="bo-n"></span><span class="bo-art"><span class="orb" style="background:#e6c34d"></span></span><span class="bo-name">返还 抉择之地 (NE)</span><span class="bo-pts">-1</span><span class="bo-held">6</span></div></div>",
+  "buildOrderEmpty": "<h2>构建顺序</h2><div class="bo-empty"><div class="bo-empty-msg">构建未完成: 还需要还需3点天界、还需1点秩序点亲和。</div><div class="bo-empty-sub">添加能提供该亲和的辅助星座。</div></div>",
+  "commit": [
+    {
+      "enabled": true,
+      "label": "移除",
+    },
+    {
+      "enabled": false,
+      "label": "添加",
+    },
+  ],
+  "condensed": [
+    {
+      "group": "Attributes",
+      "subjects": [
+        {
+          "key": "Attributes:Increased Healing",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "characterHealIncreasePercent",
+              "value": "+15%",
+            },
+          ],
+          "subject": "Increased Healing",
+        },
+        {
+          "key": "Attributes:体格",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterStrength",
+              "value": "+45",
+            },
+          ],
+          "subject": "体格",
+        },
+        {
+          "key": "Attributes:所有武器的智力需求",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "characterWeaponIntelligenceReqReduction",
+              "value": "-10%",
+            },
+          ],
+          "subject": "所有武器的智力需求",
+        },
+        {
+          "key": "Attributes:攻击能力",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterOffensiveAbility",
+              "value": "+245",
+            },
+          ],
+          "subject": "攻击能力",
+        },
+        {
+          "key": "Attributes:施法速度",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "characterSpellCastSpeedModifier",
+              "value": "+5%",
+            },
+          ],
+          "subject": "施法速度",
+        },
+        {
+          "key": "Attributes:生命",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterLife",
+              "value": "+1100",
+            },
+            {
+              "dim": "pct",
+              "id": "characterLifeModifier",
+              "value": "+6%",
+            },
+          ],
+          "subject": "生命",
+        },
+        {
+          "key": "Attributes:生命回复",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterLifeRegen",
+              "value": "+25",
+            },
+          ],
+          "subject": "生命回复",
+        },
+        {
+          "key": "Attributes:精神",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "characterIntelligence",
+              "value": "+15",
+            },
+          ],
+          "subject": "精神",
+        },
+      ],
+    },
+    {
+      "group": "Offense",
+      "subjects": [
+        {
+          "key": "Offense:对特定种族的伤害",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "racialBonusPercentDamage",
+              "value": "+6%",
+            },
+          ],
+          "subject": "对特定种族的伤害",
+        },
+        {
+          "key": "Offense:总伤害",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveTotalDamageModifier",
+              "value": "+45%",
+            },
+          ],
+          "subject": "总伤害",
+        },
+        {
+          "key": "Offense:暴击伤害",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveCritDamageModifier",
+              "value": "+5%",
+            },
+          ],
+          "subject": "暴击伤害",
+        },
+        {
+          "key": "Offense:毒素",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveSlowPoisonModifier",
+              "value": "+340%",
+            },
+            {
+              "dim": "durPct",
+              "id": "offensiveSlowPoisonDurationModifier",
+              "value": "+30%",
+            },
+          ],
+          "subject": "毒素",
+        },
+        {
+          "key": "Offense:活力",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "offensiveLifeMin",
+              "value": "+8",
+            },
+            {
+              "dim": "pct",
+              "id": "offensiveLifeModifier",
+              "value": "+199%",
+            },
+          ],
+          "subject": "活力",
+        },
+        {
+          "key": "Offense:活力衰减",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveSlowLifeModifier",
+              "value": "+160%",
+            },
+          ],
+          "subject": "活力衰减",
+        },
+        {
+          "key": "Offense:流血",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "offensiveSlowBleedingMin",
+              "value": "+20",
+            },
+            {
+              "dim": "pct",
+              "id": "offensiveSlowBleedingModifier",
+              "value": "+150%",
+            },
+            {
+              "dim": "durFlat",
+              "id": "offensiveSlowBleedingDurationMin",
+              "value": "+3",
+            },
+            {
+              "dim": "durPct",
+              "id": "offensiveSlowBleedingDurationModifier",
+              "value": "+50%",
+            },
+          ],
+          "subject": "流血",
+        },
+        {
+          "key": "Offense:混乱",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveChaosModifier",
+              "value": "+199%",
+            },
+          ],
+          "subject": "混乱",
+        },
+        {
+          "key": "Offense:物理",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensivePhysicalModifier",
+              "value": "+100%",
+            },
+          ],
+          "subject": "物理",
+        },
+        {
+          "key": "Offense:酸性",
+          "parts": [
+            {
+              "dim": "flat",
+              "id": "offensivePoisonMin",
+              "value": "+12",
+            },
+            {
+              "dim": "pct",
+              "id": "offensivePoisonModifier",
+              "value": "+219%",
+            },
+          ],
+          "subject": "酸性",
+        },
+      ],
+    },
+    {
+      "group": "Resistances",
+      "subjects": [
+        {
+          "key": "Resistances:元素抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveElementalResistance",
+              "value": "+16%",
+            },
+          ],
+          "subject": "元素抗性",
+        },
+        {
+          "key": "Resistances:毒素&酸性抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePoison",
+              "value": "+32%",
+            },
+            {
+              "dim": "max",
+              "id": "defensivePoisonMaxResist",
+              "value": "+3%",
+            },
+          ],
+          "subject": "毒素&酸性抗性",
+        },
+        {
+          "key": "Resistances:活力抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveLife",
+              "value": "+37%",
+            },
+          ],
+          "subject": "活力抗性",
+        },
+        {
+          "key": "Resistances:流血抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveBleeding",
+              "value": "+26%",
+            },
+          ],
+          "subject": "流血抗性",
+        },
+        {
+          "key": "Resistances:物理伤抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePhysical",
+              "value": "+4%",
+            },
+          ],
+          "subject": "物理伤抗性",
+        },
+        {
+          "key": "Resistances:穿刺抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePierce",
+              "value": "+15%",
+            },
+          ],
+          "subject": "穿刺抗性",
+        },
+      ],
+    },
+    {
+      "group": "Status Protection",
+      "subjects": [
+        {
+          "key": "Status Protection:冰冻持续时间减少",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveFreeze",
+              "value": "+15%",
+            },
+          ],
+          "subject": "冰冻持续时间减少",
+        },
+        {
+          "key": "Status Protection:昏迷持续时间减少",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveStun",
+              "value": "+15%",
+            },
+          ],
+          "subject": "昏迷持续时间减少",
+        },
+        {
+          "key": "Status Protection:束缚持续时间减少",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveTrap",
+              "value": "+20%",
+            },
+          ],
+          "subject": "束缚持续时间减少",
+        },
+      ],
+    },
+    {
+      "group": "Armor & Mitigation",
+      "subjects": [
+        {
+          "key": "Armor & Mitigation:反伤减免",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePercentReflectionResistance",
+              "value": "+22%",
+            },
+          ],
+          "subject": "反伤减免",
+        },
+      ],
+    },
+  ],
+  "condensedPet": [
+    {
+      "group": "Offense",
+      "subjects": [
+        {
+          "key": "Offense:总伤害",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveTotalDamageModifier",
+              "value": "+130%",
+            },
+          ],
+          "subject": "总伤害",
+        },
+      ],
+    },
+    {
+      "group": "Resistances",
+      "subjects": [
+        {
+          "key": "Resistances:毒素&酸性抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensivePoison",
+              "value": "+20%",
+            },
+          ],
+          "subject": "毒素&酸性抗性",
+        },
+        {
+          "key": "Resistances:活力抗性",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveLife",
+              "value": "+40%",
+            },
+          ],
+          "subject": "活力抗性",
+        },
+      ],
+    },
+    {
+      "group": "Status Protection",
+      "subjects": [
+        {
+          "key": "Status Protection:束缚持续时间减少",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "defensiveTrap",
+              "value": "+20%",
+            },
+          ],
+          "subject": "束缚持续时间减少",
+        },
+      ],
+    },
+  ],
+  "perStar": {
+    "abomination:0": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "毒素伤害",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveChaosModifier",
+          "label": "混乱伤害",
+          "value": "+80%",
+        },
+      ],
+    },
+    "abomination:1": {
+      "bonuses": [
+        {
+          "id": "offensiveLifeModifier",
+          "label": "活力伤害",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveSlowLifeModifier",
+          "label": "活力衰减伤害",
+          "value": "+80%",
+        },
+        {
+          "id": "offensivePoisonModifier",
+          "label": "酸性伤害",
+          "value": "+80%",
+        },
+      ],
+    },
+    "abomination:2": {
+      "bonuses": [
+        {
+          "id": "defensivePoisonMaxResist",
+          "label": "最大毒素&酸性抗性",
+          "value": "+3%",
+        },
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+40",
+        },
+        {
+          "id": "defensivePoison",
+          "label": "毒素&酸性抗性",
+          "value": "+20%",
+        },
+      ],
+    },
+    "abomination:3": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+40",
+        },
+        {
+          "id": "offensiveLifeModifier",
+          "label": "活力伤害",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveChaosModifier",
+          "label": "混乱伤害",
+          "value": "+80%",
+        },
+        {
+          "id": "characterLife",
+          "label": "生命",
+          "value": "+400",
+        },
+      ],
+    },
+    "abomination:4": {
+      "bonuses": [],
+      "power": [
+        {
+          "label": "第二技能充能时间",
+          "value": "18",
+        },
+        {
+          "label": "第二段持续时间",
+          "value": "12",
+        },
+        {
+          "label": "活力伤害",
+          "value": "310%",
+        },
+        {
+          "label": "活力衰减伤害",
+          "value": "310%",
+        },
+        {
+          "label": "混乱伤害",
+          "value": "54-135",
+        },
+        {
+          "label": "混乱伤害",
+          "value": "260%",
+        },
+        {
+          "label": "生命回复",
+          "value": "100%",
+        },
+      ],
+    },
+    "abomination:5": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+40",
+        },
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "毒素伤害",
+          "value": "+80%",
+        },
+        {
+          "id": "offensiveSlowLifeModifier",
+          "label": "活力衰减伤害",
+          "value": "+80%",
+        },
+        {
+          "id": "characterLife",
+          "label": "生命",
+          "value": "+400",
+        },
+      ],
+    },
+    "abomination:6": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "毒素伤害",
+          "value": "+100%",
+        },
+        {
+          "id": "offensivePoisonMin",
+          "label": "酸性伤害",
+          "value": "+12",
+        },
+        {
+          "id": "offensivePoisonModifier",
+          "label": "酸性伤害",
+          "value": "+100%",
+        },
+      ],
+    },
+    "abomination:7": {
+      "bonuses": [],
+      "power": [
+        {
+          "label": "第二技能充能时间",
+          "value": "3",
+        },
+        {
+          "label": "米半径",
+          "value": "10",
+        },
+        {
+          "label": "5秒内的毒素伤害",
+          "value": "1560",
+        },
+        {
+          "label": "Seconds of 混乱",
+          "value": "1.8",
+        },
+      ],
+    },
+    "akeron_s_scorpion:0": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+12",
+        },
+      ],
+    },
+    "akeron_s_scorpion:1": {
+      "bonuses": [
+        {
+          "id": "characterStrength",
+          "label": "体格",
+          "value": "+15",
+        },
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "毒素伤害",
+          "value": "+30%",
+        },
+        {
+          "id": "offensivePoisonModifier",
+          "label": "酸性伤害",
+          "value": "+15%",
+        },
+      ],
+    },
+    "akeron_s_scorpion:2": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+18",
+        },
+        {
+          "id": "offensivePoisonModifier",
+          "label": "酸性伤害",
+          "value": "+24%",
+        },
+      ],
+    },
+    "akeron_s_scorpion:3": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowPoisonModifier",
+          "label": "毒素伤害",
+          "value": "+50%",
+        },
+        {
+          "id": "offensiveSlowPoisonDurationModifier",
+          "label": "毒素持续时间",
+          "value": "+30%",
+        },
+      ],
+    },
+    "akeron_s_scorpion:4": {
+      "bonuses": [],
+      "power": [
+        {
+          "label": "第二技能充能时间",
+          "value": "1.5",
+        },
+        {
+          "label": "发射物",
+          "value": "6",
+        },
+        {
+          "label": "穿透敌人的几率",
+          "value": "100%",
+        },
+        {
+          "label": "米半径",
+          "value": "0.1",
+        },
+        {
+          "label": "武器伤害",
+          "value": "40%",
+        },
+        {
+          "label": "5秒内的毒素伤害",
+          "value": "1125",
+        },
+        {
+          "label": "降低目标的防御力（持续5秒）",
+          "value": "150",
+        },
+      ],
+    },
+    "berserker:0": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+20",
+        },
+        {
+          "id": "characterLife",
+          "label": "生命",
+          "value": "+300",
+        },
+      ],
+    },
+    "berserker:1": {
+      "bonuses": [
+        {
+          "id": "defensiveFreeze",
+          "label": "冰冻持续时间减少",
+          "value": "+15%",
+        },
+        {
+          "id": "offensiveSlowBleedingModifier",
+          "label": "流血伤害",
+          "value": "+50%",
+        },
+        {
+          "id": "offensivePhysicalModifier",
+          "label": "物理伤害",
+          "value": "+50%",
+        },
+      ],
+    },
+    "berserker:2": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+60",
+        },
+        {
+          "id": "offensiveCritDamageModifier",
+          "label": "暴击伤害",
+          "value": "+5%",
+        },
+      ],
+    },
+    "berserker:3": {
+      "bonuses": [
+        {
+          "id": "defensiveStun",
+          "label": "昏迷持续时间减少",
+          "value": "+15%",
+        },
+        {
+          "id": "offensiveSlowBleedingModifier",
+          "label": "流血伤害",
+          "value": "+50%",
+        },
+        {
+          "id": "offensivePhysicalModifier",
+          "label": "物理伤害",
+          "value": "+50%",
+        },
+      ],
+    },
+    "berserker:4": {
+      "bonuses": [
+        {
+          "id": "offensiveSlowBleedingMin",
+          "label": "流血伤害",
+          "value": "+20",
+        },
+        {
+          "id": "offensiveSlowBleedingModifier",
+          "label": "流血伤害",
+          "value": "+50%",
+        },
+        {
+          "id": "offensiveSlowBleedingDurationMin",
+          "label": "流血持续时间",
+          "value": "+3",
+        },
+        {
+          "id": "offensiveSlowBleedingDurationModifier",
+          "label": "流血持续时间",
+          "value": "+50%",
+        },
+      ],
+    },
+    "berserker:5": {
+      "bonuses": [
+        {
+          "id": "characterHealIncreasePercent",
+          "label": "Increased Healing",
+          "value": "+15%",
+        },
+        {
+          "id": "defensivePhysical",
+          "label": "物理伤抗性",
+          "value": "+4%",
+        },
+        {
+          "id": "characterLifeRegen",
+          "label": "生命回复",
+          "value": "+25",
+        },
+        {
+          "id": "defensivePierce",
+          "label": "穿刺抗性",
+          "value": "+15%",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:0": {
+      "bonuses": [
+        {
+          "id": "characterOffensiveAbility",
+          "label": "攻击能力",
+          "value": "+15",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:1": {
+      "bonuses": [
+        {
+          "id": "characterStrength",
+          "label": "体格",
+          "value": "+15",
+        },
+        {
+          "id": "characterSpellCastSpeedModifier",
+          "label": "施法速度",
+          "value": "+5%",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:2": {
+      "bonuses": [
+        {
+          "id": "defensiveLife",
+          "label": "活力抗性",
+          "value": "+15%",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:3": {
+      "bonuses": [
+        {
+          "id": "offensiveTotalDamageModifier",
+          "label": "总伤害",
+          "value": "+30%",
+        },
+        {
+          "id": "defensiveTrap",
+          "label": "束缚持续时间减少",
+          "value": "+20%",
+        },
+      ],
+    },
+    "bysmiel_s_bonds:4": {
+      "bonuses": [],
+      "pet": {
+        "attack": [
+          {
+            "label": "2秒内的毒素伤害",
+            "value": "476",
+          },
+          {
+            "label": "降低目标的攻击力（持续6秒）",
+            "value": "180",
+          },
+          {
+            "label": "降低目标的抗性（持续6秒）",
+            "value": "25",
+          },
+          {
+            "label": "酸性伤害",
+            "value": "286-335",
+          },
+        ],
+        "summon": "召唤拜斯迈的猎犬（持续20秒）",
+      },
+      "power": [
+        {
+          "label": "第二技能充能时间",
+          "value": "30",
+        },
+      ],
+    },
+    "crane:0": {
+      "bonuses": [
+        {
+          "id": "characterStrength",
+          "label": "体格",
+          "value": "+15",
+        },
+        {
+          "id": "characterIntelligence",
+          "label": "精神",
+          "value": "+15",
+        },
+      ],
+    },
+    "crane:1": {
+      "bonuses": [
+        {
+          "id": "defensivePoison",
+          "label": "毒素&酸性抗性",
+          "value": "+12%",
+        },
+      ],
+    },
+    "crane:2": {
+      "bonuses": [
+        {
+          "id": "offensiveTotalDamageModifier",
+          "label": "总伤害",
+          "value": "+15%",
+        },
+        {
+          "id": "characterWeaponIntelligenceReqReduction",
+          "label": "所有武器的智力需求",
+          "value": "-10%",
+        },
+      ],
+    },
+    "crane:3": {
+      "bonuses": [
+        {
+          "id": "defensiveLife",
+          "label": "活力抗性",
+          "value": "+12%",
+        },
+      ],
+    },
+    "crane:4": {
+      "bonuses": [
+        {
+          "id": "defensiveElementalResistance",
+          "label": "元素抗性",
+          "value": "+16%",
+        },
+        {
+          "id": "defensivePercentReflectionResistance",
+          "label": "反伤减免",
+          "value": "+22%",
+        },
+        {
+          "id": "defensiveBleeding",
+          "label": "流血抗性",
+          "value": "+16%",
+        },
+      ],
+    },
+    "gallows:0": {
+      "bonuses": [
+        {
+          "id": "offensiveLifeModifier",
+          "label": "活力伤害",
+          "value": "+15%",
+        },
+        {
+          "id": "offensiveChaosModifier",
+          "label": "混乱伤害",
+          "value": "+15%",
+        },
+      ],
+    },
+    "gallows:1": {
+      "bonuses": [
+        {
+          "id": "defensiveBleeding",
+          "label": "流血抗性",
+          "value": "+10%",
+        },
+        {
+          "id": "characterLifeModifier",
+          "label": "生命",
+          "value": "+3%",
+        },
+      ],
+    },
+    "gallows:2": {
+      "bonuses": [
+        {
+          "id": "defensiveLife",
+          "label": "活力抗性",
+          "value": "+10%",
+        },
+        {
+          "id": "characterLifeModifier",
+          "label": "生命",
+          "value": "+3%",
+        },
+      ],
+    },
+    "gallows:3": {
+      "bonuses": [
+        {
+          "id": "racialBonusPercentDamage",
+          "label": "对亡灵、人类的伤害",
+          "value": "+6%",
+        },
+        {
+          "id": "offensiveLifeMin",
+          "label": "活力伤害",
+          "value": "+8",
+        },
+        {
+          "id": "offensiveLifeModifier",
+          "label": "活力伤害",
+          "value": "+24%",
+        },
+        {
+          "id": "offensiveChaosModifier",
+          "label": "混乱伤害",
+          "value": "+24%",
+        },
+      ],
+    },
+  },
+}
+`;

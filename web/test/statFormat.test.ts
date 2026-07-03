@@ -10,30 +10,28 @@ import {
   formatPet,
   isFilterableStat,
 } from "../src/core/statFormat";
-import { installEnglish } from "./helpers/localizeEn";
-import { makeLocalization, setLocalization } from "../src/core/localization";
+import { res, resRow, resRows, resSorted } from "./helpers/localizeEn";
+import { makeLocalization, resolveText } from "../src/core/localization";
 import { STAT_TAGS } from "../src/core/statTags";
-
-installEnglish();
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {
-    expect(statRow("characterDexterity", 20)).toEqual({ label: "Cunning", value: "+20" });
+    expect(resRow(statRow("characterDexterity", 20))).toEqual({ label: "Cunning", value: "+20" });
   });
   test("strength is Physique, flat", () => {
-    expect(statRow("characterStrength", 10)).toEqual({ label: "Physique", value: "+10" });
+    expect(resRow(statRow("characterStrength", 10))).toEqual({ label: "Physique", value: "+10" });
   });
   test("intelligence is Spirit, flat", () => {
-    expect(statRow("characterIntelligence", 8)).toEqual({ label: "Spirit", value: "+8" });
+    expect(resRow(statRow("characterIntelligence", 8))).toEqual({ label: "Spirit", value: "+8" });
   });
   test("life is Health, flat", () => {
-    expect(statRow("characterLife", 40)).toEqual({ label: "Health", value: "+40" });
+    expect(resRow(statRow("characterLife", 40))).toEqual({ label: "Health", value: "+40" });
   });
   test("life modifier is Health, percent", () => {
-    expect(statRow("characterLifeModifier", 3)).toEqual({ label: "Health", value: "+3%" });
+    expect(resRow(statRow("characterLifeModifier", 3))).toEqual({ label: "Health", value: "+3%" });
   });
   test("offensive ability is flat, no Character prefix", () => {
-    expect(statRow("characterOffensiveAbility", 15)).toEqual({ label: "Offensive Ability", value: "+15" });
+    expect(resRow(statRow("characterOffensiveAbility", 15))).toEqual({ label: "Offensive Ability", value: "+15" });
   });
 });
 
@@ -41,19 +39,19 @@ describe("statRow format-string stats (game-sourced term, value stripped)", () =
   // These GD stats store their display as a value-embedded format string ("{v}% <noun>").
   // We source the noun from the game tag and strip the value token; the value renders separately.
   test("defensivePercentCurrentLife is Resistance to Life Reduction, percent", () => {
-    expect(statRow("defensivePercentCurrentLife", 20)).toEqual({
+    expect(resRow(statRow("defensivePercentCurrentLife", 20))).toEqual({
       label: "Resistance to Life Reduction",
       value: "+20%",
     });
   });
   test("defensiveConvert is Reduced Mind Control Duration, percent (not stun, not flat +50)", () => {
-    expect(statRow("defensiveConvert", 50)).toEqual({
+    expect(resRow(statRow("defensiveConvert", 50))).toEqual({
       label: "Reduced Mind Control Duration",
       value: "+50%",
     });
   });
   test("characterHealIncreasePercent is an authored percent label (value-suffix game format)", () => {
-    expect(statRow("characterHealIncreasePercent", 20)).toEqual({
+    expect(resRow(statRow("characterHealIncreasePercent", 20))).toEqual({
       label: "Increased Healing",
       value: "+20%",
     });
@@ -62,67 +60,82 @@ describe("statRow format-string stats (game-sourced term, value stripped)", () =
 
 describe("statRow offensive damage (percent vs flat)", () => {
   test("physical modifier is percent damage", () => {
-    expect(statRow("offensivePhysicalModifier", 15)).toEqual({ label: "Physical Damage", value: "+15%" });
+    expect(resRow(statRow("offensivePhysicalModifier", 15))).toEqual({ label: "Physical Damage", value: "+15%" });
   });
   test("bleeding (Slow) modifier is percent Bleeding damage", () => {
-    expect(statRow("offensiveSlowBleedingModifier", 15)).toEqual({ label: "Bleeding Damage", value: "+15%" });
+    expect(resRow(statRow("offensiveSlowBleedingModifier", 15))).toEqual({
+      label: "Bleeding Damage",
+      value: "+15%",
+    });
   });
   test("Slow physical is Internal Trauma", () => {
-    expect(statRow("offensiveSlowPhysicalModifier", 10)).toEqual({ label: "Internal Trauma Damage", value: "+10%" });
+    expect(resRow(statRow("offensiveSlowPhysicalModifier", 10))).toEqual({
+      label: "Internal Trauma Damage",
+      value: "+10%",
+    });
   });
   test("offensive Life is Vitality (GD quirk)", () => {
-    expect(statRow("offensiveLifeModifier", 11)).toEqual({ label: "Vitality Damage", value: "+11%" });
+    expect(resRow(statRow("offensiveLifeModifier", 11))).toEqual({ label: "Vitality Damage", value: "+11%" });
   });
 });
 
 describe("statRow defensive (resistances are percent; armor is flat)", () => {
   test("physical resistance is percent", () => {
-    expect(statRow("defensivePhysical", 12)).toEqual({ label: "Physical Resistance", value: "+12%" });
+    expect(resRow(statRow("defensivePhysical", 12))).toEqual({ label: "Physical Resistance", value: "+12%" });
   });
   test("protection is Armor, flat", () => {
-    expect(statRow("defensiveProtection", 24)).toEqual({ label: "Armor", value: "+24" });
+    expect(resRow(statRow("defensiveProtection", 24))).toEqual({ label: "Armor", value: "+24" });
   });
 });
 
 describe("statRow speeds and weapon tokens", () => {
   test("run speed is Movement Speed, percent", () => {
-    expect(statRow("characterRunSpeedModifier", 5)).toEqual({ label: "Movement Speed", value: "+5%" });
+    expect(resRow(statRow("characterRunSpeedModifier", 5))).toEqual({ label: "Movement Speed", value: "+5%" });
   });
   test("weapon-class tokens (capitalized) are skipped", () => {
     expect(statRow("Spear2h", 1)).toBeNull();
     expect(statRow("Dagger", 1)).toBeNull();
   });
   test("strips the redundant Character prefix in the humanize fallback", () => {
-    expect(statRow("characterFooBar", 5)).toEqual({ label: "Foo Bar", value: "+5" });
+    expect(resRow(statRow("characterFooBar", 5))).toEqual({ label: "Foo Bar", value: "+5" });
   });
 });
 
 describe("statRow grimtools-verified corrections", () => {
   test("status effects are reduced-duration / protection, not resistances", () => {
-    expect(statRow("defensiveStun", 25)).toEqual({ label: "Reduced Stun Duration", value: "+25%" });
-    expect(statRow("defensiveTrap", 30)).toEqual({ label: "Reduced Entrapment Duration", value: "+30%" });
-    expect(statRow("defensiveDisruption", 30)).toEqual({ label: "Skill Disruption Protection", value: "+30%" });
+    expect(resRow(statRow("defensiveStun", 25))).toEqual({ label: "Reduced Stun Duration", value: "+25%" });
+    expect(resRow(statRow("defensiveTrap", 30))).toEqual({ label: "Reduced Entrapment Duration", value: "+30%" });
+    expect(resRow(statRow("defensiveDisruption", 30))).toEqual({
+      label: "Skill Disruption Protection",
+      value: "+30%",
+    });
   });
   test("defensive DoT duration uses DoT names and a positive percent", () => {
-    expect(statRow("defensiveFireDuration", 25)).toEqual({ label: "Reduced Burn Duration", value: "+25%" });
-    expect(statRow("defensivePhysicalDuration", 25)).toEqual({
+    expect(resRow(statRow("defensiveFireDuration", 25))).toEqual({ label: "Reduced Burn Duration", value: "+25%" });
+    expect(resRow(statRow("defensivePhysicalDuration", 25))).toEqual({
       label: "Reduced Internal Trauma Duration",
       value: "+25%",
     });
-    expect(statRow("defensiveColdDuration", 20)).toEqual({ label: "Reduced Frostburn Duration", value: "+20%" });
+    expect(resRow(statRow("defensiveColdDuration", 20))).toEqual({
+      label: "Reduced Frostburn Duration",
+      value: "+20%",
+    });
   });
   test("poison resistance is Poison & Acid", () => {
-    expect(statRow("defensivePoison", 15)).toEqual({ label: "Poison & Acid Resistance", value: "+15%" });
-    expect(statRow("defensivePoisonMaxResist", 3)).toEqual({ label: "Maximum Poison & Acid Resistance", value: "+3%" });
+    expect(resRow(statRow("defensivePoison", 15))).toEqual({ label: "Poison & Acid Resistance", value: "+15%" });
+    expect(resRow(statRow("defensivePoisonMaxResist", 3))).toEqual({
+      label: "Maximum Poison & Acid Resistance",
+      value: "+3%",
+    });
   });
   test("requirement reductions use official labels and a negative percent", () => {
-    expect(statRow("characterMeleeStrengthReqReduction", 10)).toEqual({
+    expect(resRow(statRow("characterMeleeStrengthReqReduction", 10))).toEqual({
       label: "Physique Requirement for Melee Weapons",
       value: "-10%",
     });
   });
   test("reduced-target resistance debuff is shown positive", () => {
-    expect(statRow("offensiveElementalResistanceReductionPercentMin", 20)).toEqual({
+    expect(resRow(statRow("offensiveElementalResistanceReductionPercentMin", 20))).toEqual({
       label: "Reduced target's Elemental Resistances",
       value: "+20%",
     });
@@ -131,23 +144,29 @@ describe("statRow grimtools-verified corrections", () => {
 
 describe("statRow racial damage/defense names the concrete race", () => {
   test("single race is pluralized", () => {
-    expect(statRow("racialBonusPercentDamage", 8, ["Human"])).toEqual({ label: "Damage to Humans", value: "+8%" });
-    expect(statRow("racialBonusPercentDefense", 10, ["Beast"])).toEqual({
+    expect(resRow(statRow("racialBonusPercentDamage", 8, ["Human"]))).toEqual({
+      label: "Damage to Humans",
+      value: "+8%",
+    });
+    expect(resRow(statRow("racialBonusPercentDefense", 10, ["Beast"]))).toEqual({
       label: "Less Damage from Beasts",
       value: "+10%",
     });
   });
   test("Undead stays Undead; multiple races join with &", () => {
-    expect(statRow("racialBonusPercentDamage", 6, ["Undead", "Human"])).toEqual({
+    expect(resRow(statRow("racialBonusPercentDamage", 6, ["Undead", "Human"]))).toEqual({
       label: "Damage to Undead & Humans",
       value: "+6%",
     });
   });
   test("falls back to the generic label when no target is given", () => {
-    expect(statRow("racialBonusPercentDamage", 8)).toEqual({ label: "Damage to specific enemy types", value: "+8%" });
+    expect(resRow(statRow("racialBonusPercentDamage", 8))).toEqual({
+      label: "Damage to specific enemy types",
+      value: "+8%",
+    });
   });
   test("formatBonusRows threads the racial target through", () => {
-    expect(formatBonusRows({ racialBonusPercentDamage: 8 }, { racialTarget: ["Chthonic"] })).toEqual([
+    expect(formatBonusRows({ racialBonusPercentDamage: 8 }, { racialTarget: ["Chthonic"] }).map(resRow)).toEqual([
       { label: "Damage to Chthonics", value: "+8%" },
     ]);
   });
@@ -162,8 +181,12 @@ describe("groupedBonusRows groups by category in render order", () => {
       skillManaCostReduction: 5,
     });
     expect(groups.map((g) => g.group)).toEqual(["Attributes", "Offense", "Resistances", "Other"]);
-    expect(groups[0]!.rows).toEqual([{ id: "characterStrength", label: "Physique", value: "+10" }]);
-    expect(groups[1]!.rows).toEqual([{ id: "offensivePhysicalModifier", label: "Physical Damage", value: "+15%" }]);
+    expect(groups[0]!.rows.map((r) => ({ id: r.id, label: res(r.label), value: res(r.value) }))).toEqual([
+      { id: "characterStrength", label: "Physique", value: "+10" },
+    ]);
+    expect(groups[1]!.rows.map((r) => ({ id: r.id, label: res(r.label), value: res(r.value) }))).toEqual([
+      { id: "offensivePhysicalModifier", label: "Physical Damage", value: "+15%" },
+    ]);
   });
   test("omits groups with no rows", () => {
     const groups = groupedBonusRows({ characterDexterity: 5 });
@@ -173,12 +196,14 @@ describe("groupedBonusRows groups by category in render order", () => {
 
 describe("formatBonusRows merges Min/Max damage into a range and skips weapon tokens", () => {
   test("merges a flat damage Min/Max pair", () => {
-    expect(formatBonusRows({ offensiveFireMin: 3, offensiveFireMax: 5 })).toEqual([
+    expect(formatBonusRows({ offensiveFireMin: 3, offensiveFireMax: 5 }).map(resRow)).toEqual([
       { label: "Fire Damage", value: "+3-5" },
     ]);
   });
   test("drops capitalized weapon tokens from rows", () => {
-    const rows = formatBonusRows({ Spear2h: 1, characterLife: 60, characterOffensiveAbility: 15 });
+    const rows = formatBonusRows({ Spear2h: 1, characterLife: 60, characterOffensiveAbility: 15 })
+      .map(resRow)
+      .sort((a, b) => a!.label.localeCompare(b!.label));
     expect(rows).toEqual([
       { label: "Health", value: "+60" },
       { label: "Offensive Ability", value: "+15" },
@@ -189,7 +214,7 @@ describe("formatBonusRows merges Min/Max damage into a range and skips weapon to
 describe("formatPowerStats renders celestial-power ability lines GD-style", () => {
   // The Scorpion Sting acceptance example: every line must reproduce exactly.
   test("Scorpion Sting reproduces the grimtools tooltip stat lines in order", () => {
-    const rows = formatPowerStats({
+    const r = formatPowerStats({
       skillCooldownTime: 1.5,
       projectileLaunchNumber: 6,
       projectilePiercingChance: 100,
@@ -200,7 +225,8 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
       offensiveSlowDefensiveAbilityMin: 150,
       offensiveSlowDefensiveAbilityDurationMin: 5,
     });
-    expect(rows).toEqual([
+    expect(r.fallthrough).toEqual([]);
+    expect(resRows(r.rows)).toEqual([
       { value: "1.5", label: "Second Skill Recharge" },
       { value: "6", label: "Projectile(s)" },
       { value: "100%", label: "Chance to pass through Enemies" },
@@ -217,8 +243,8 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
       skillActiveDuration: 8,
       skillTargetRadius: 15,
       damageAbsorption: 400,
-    });
-    expect(rows).toEqual([
+    }).rows;
+    expect(resRows(rows)).toEqual([
       { value: "12", label: "Second Skill Recharge" },
       { value: "8", label: "Second Duration" },
       { value: "15", label: "Meter Radius" },
@@ -227,33 +253,39 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
   });
 
   test("heal/restore powers render flat + percent health and percent energy (Dryad's Blessing, Inspiration)", () => {
-    expect(formatPowerStats({ skillCooldownTime: 2.7, skillLifeBonus: 848, skillLifePercent: 10 })).toEqual([
+    expect(
+      resRows(formatPowerStats({ skillCooldownTime: 2.7, skillLifeBonus: 848, skillLifePercent: 10 }).rows),
+    ).toEqual([
       { value: "2.7", label: "Second Skill Recharge" },
       { value: "848", label: "Health Restored" },
       { value: "10%", label: "Health Restored" },
     ]);
-    expect(formatPowerStats({ skillManaPercent: 25 })).toEqual([{ value: "25%", label: "Energy Restored" }]);
+    expect(resRows(formatPowerStats({ skillManaPercent: 25 }).rows)).toEqual([
+      { value: "25%", label: "Energy Restored" },
+    ]);
   });
 
   test("DoT pairs multiply per-second by duration and use the DoT display name", () => {
-    expect(formatPowerStats({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 })).toEqual([
+    expect(resRows(formatPowerStats({ offensiveSlowFireMin: 100, offensiveSlowFireDurationMin: 3 }).rows)).toEqual([
       { value: "300", label: "Burn Damage over 3 Seconds" },
     ]);
-    expect(formatPowerStats({ offensiveSlowPhysicalMin: 50, offensiveSlowPhysicalDurationMin: 4 })).toEqual([
-      { value: "200", label: "Internal Trauma Damage over 4 Seconds" },
-    ]);
+    expect(
+      resRows(formatPowerStats({ offensiveSlowPhysicalMin: 50, offensiveSlowPhysicalDurationMin: 4 }).rows),
+    ).toEqual([{ value: "200", label: "Internal Trauma Damage over 4 Seconds" }]);
   });
 
   test("target debuffs (movement slow, resistance/damage reduction) render as timed reductions", () => {
     expect(
-      formatPowerStats({
-        offensiveSlowRunSpeedMin: 45,
-        offensiveSlowRunSpeedDurationMin: 3,
-        offensiveTotalResistanceReductionAbsoluteMin: 24,
-        offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
-        offensiveTotalDamageReductionPercentMin: 15,
-        offensiveTotalDamageReductionPercentDurationMin: 2,
-      }),
+      resRows(
+        formatPowerStats({
+          offensiveSlowRunSpeedMin: 45,
+          offensiveSlowRunSpeedDurationMin: 3,
+          offensiveTotalResistanceReductionAbsoluteMin: 24,
+          offensiveTotalResistanceReductionAbsoluteDurationMin: 1,
+          offensiveTotalDamageReductionPercentMin: 15,
+          offensiveTotalDamageReductionPercentDurationMin: 2,
+        }).rows,
+      ),
     ).toEqual([
       { value: "45%", label: "Slower target Movement for 3 Seconds" },
       { value: "24", label: "Reduced target's Resistances for 1 Seconds" },
@@ -263,67 +295,81 @@ describe("formatPowerStats renders celestial-power ability lines GD-style", () =
 
   test("crowd-control procs render as chance/duration, not raw offensive ids", () => {
     // Stun with a chance: "50% Chance of 1 Seconds of Stun".
-    expect(formatPowerStats({ offensiveStunChance: 50, offensiveStunMin: 1 })).toEqual([
+    expect(resRows(formatPowerStats({ offensiveStunChance: 50, offensiveStunMin: 1 }).rows)).toEqual([
       { value: "50%", label: "Chance of 1 Seconds of Stun" },
     ]);
     // Guaranteed (no chance facet): "1.8 Seconds of Confusion".
-    expect(formatPowerStats({ offensiveConfusionMin: 1.8 })).toEqual([{ value: "1.8", label: "Seconds of Confusion" }]);
+    expect(resRows(formatPowerStats({ offensiveConfusionMin: 1.8 }).rows)).toEqual([
+      { value: "1.8", label: "Seconds of Confusion" },
+    ]);
     // Knockdown carries a Min-Max duration range.
     expect(
-      formatPowerStats({ offensiveKnockdownChance: 100, offensiveKnockdownMin: 0.8, offensiveKnockdownMax: 1.5 }),
+      resRows(
+        formatPowerStats({ offensiveKnockdownChance: 100, offensiveKnockdownMin: 0.8, offensiveKnockdownMax: 1.5 })
+          .rows,
+      ),
     ).toEqual([{ value: "100%", label: "Chance of 0.8-1.5 Seconds of Knockdown" }]);
     // No raw humanized "Offensive ..." label survives.
     const petrify = formatPowerStats({ offensivePetrifyChance: 50, offensivePetrifyMin: 1.5 });
-    expect(petrify).toEqual([{ value: "50%", label: "Chance of 1.5 Seconds of Petrify" }]);
+    expect(resRows(petrify.rows)).toEqual([{ value: "50%", label: "Chance of 1.5 Seconds of Petrify" }]);
   });
 
   test("timed magnitude debuffs (fumble, slows, resist reductions) render as reused subject phrases", () => {
-    expect(formatPowerStats({ offensiveFumbleMin: 14, offensiveFumbleDurationMin: 2 })).toEqual([
+    expect(resRows(formatPowerStats({ offensiveFumbleMin: 14, offensiveFumbleDurationMin: 2 }).rows)).toEqual([
       { value: "14%", label: "Fumble for 2 Seconds" },
     ]);
-    expect(formatPowerStats({ offensiveProjectileFumbleMin: 25, offensiveProjectileFumbleDurationMin: 3 })).toEqual([
-      { value: "25%", label: "Impaired Aim for 3 Seconds" },
-    ]);
-    expect(formatPowerStats({ offensiveSlowAttackSpeedMin: 30, offensiveSlowAttackSpeedDurationMin: 5 })).toEqual([
-      { value: "30%", label: "Slow target's Attack Speed for 5 Seconds" },
-    ]);
-    expect(formatPowerStats({ offensiveSlowTotalSpeedMin: 50, offensiveSlowTotalSpeedDurationMin: 8 })).toEqual([
-      { value: "50%", label: "Slow target's Total Speed for 8 Seconds" },
-    ]);
     expect(
-      formatPowerStats({
-        offensiveElementalResistanceReductionAbsoluteMin: 32,
-        offensiveElementalResistanceReductionAbsoluteDurationMin: 2,
-      }),
+      resRows(formatPowerStats({ offensiveProjectileFumbleMin: 25, offensiveProjectileFumbleDurationMin: 3 }).rows),
+    ).toEqual([{ value: "25%", label: "Impaired Aim for 3 Seconds" }]);
+    expect(
+      resRows(formatPowerStats({ offensiveSlowAttackSpeedMin: 30, offensiveSlowAttackSpeedDurationMin: 5 }).rows),
+    ).toEqual([{ value: "30%", label: "Slow target's Attack Speed for 5 Seconds" }]);
+    expect(
+      resRows(formatPowerStats({ offensiveSlowTotalSpeedMin: 50, offensiveSlowTotalSpeedDurationMin: 8 }).rows),
+    ).toEqual([{ value: "50%", label: "Slow target's Total Speed for 8 Seconds" }]);
+    expect(
+      resRows(
+        formatPowerStats({
+          offensiveElementalResistanceReductionAbsoluteMin: 32,
+          offensiveElementalResistanceReductionAbsoluteDurationMin: 2,
+        }).rows,
+      ),
     ).toEqual([{ value: "32", label: "Reduced target's Elemental Resistances (flat) for 2 Seconds" }]);
     expect(
-      formatPowerStats({ offensivePhysicalReductionPercentMin: 20, offensivePhysicalReductionPercentDurationMin: 5 }),
+      resRows(
+        formatPowerStats({ offensivePhysicalReductionPercentMin: 20, offensivePhysicalReductionPercentDurationMin: 5 })
+          .rows,
+      ),
     ).toEqual([{ value: "20%", label: "Reduced target's Physical Resistance for 5 Seconds" }]);
   });
 
   test("radius falls back to skillTargetRadius when there is no projectile radius", () => {
-    expect(formatPowerStats({ skillTargetRadius: 3.5 })).toEqual([{ value: "3.5", label: "Meter Radius" }]);
+    expect(resRows(formatPowerStats({ skillTargetRadius: 3.5 }).rows)).toEqual([
+      { value: "3.5", label: "Meter Radius" },
+    ]);
   });
 
   test("unhandled stat ids fall through to bonus formatting without a leading +", () => {
     // Twin Fangs: flat Vitality range + a leech percent, shown as ability lines.
-    const rows = formatPowerStats({
+    const r = formatPowerStats({
       weaponDamagePct: 22,
       offensiveLifeMin: 128,
       offensiveLifeMax: 221,
       offensiveLifeLeechMin: 45,
     });
-    // Explicit meta lines come first; the rest reuse the bonus formatter (sorted
-    // by label, sign stripped).
-    expect(rows).toEqual([
-      { value: "22%", label: "Weapon Damage" },
+    // Explicit meta lines are the ordered rows; the rest reuse the bonus formatter
+    // (sign stripped) and land in fallthrough, which adapters sort by resolved label.
+    expect(resRows(r.rows)).toEqual([{ value: "22%", label: "Weapon Damage" }]);
+    expect(resSorted(r.fallthrough)).toEqual([
       { value: "45%", label: "of Attack Damage converted to Health" },
       { value: "128-221", label: "Vitality Damage" },
     ]);
   });
 
   test("empty stats yield no rows", () => {
-    expect(formatPowerStats({})).toEqual([]);
+    const r = formatPowerStats({});
+    expect(r.rows).toEqual([]);
+    expect(r.fallthrough).toEqual([]);
   });
 });
 
@@ -335,20 +381,21 @@ describe("formatPet renders a summon proc's summary + base attack", () => {
       duration: 20,
       attackStats: { offensiveAetherMin: 230, offensiveLifeMin: 230 },
     });
-    expect(r.summon).toBe("Summons 6 Skeletons for 20 Seconds");
-    expect(r.attack).toEqual([
+    expect(res(r.summon)).toBe("Summons 6 Skeletons for 20 Seconds");
+    expect(r.attack.rows).toEqual([]);
+    expect(resSorted(r.attack.fallthrough)).toEqual([
       { value: "230", label: "Aether Damage" },
       { value: "230", label: "Vitality Damage" },
     ]);
   });
   test("single pet shows no count or plural (Bysmiel's Command)", () => {
-    expect(formatPet({ nameTag: "tagDevotionPet_Hound", count: 1, duration: 20, attackStats: {} }).summon).toBe(
+    expect(res(formatPet({ nameTag: "tagDevotionPet_Hound", count: 1, duration: 20, attackStats: {} }).summon)).toBe(
       "Summons Eldritch Hound for 20 Seconds",
     );
   });
   test("missing count omits the number (Elemental Seeker)", () => {
     expect(
-      formatPet({ nameTag: "tagDevotionPet_ElementalSeeker", count: null, duration: 3, attackStats: {} }).summon,
+      res(formatPet({ nameTag: "tagDevotionPet_ElementalSeeker", count: null, duration: 3, attackStats: {} }).summon),
     ).toBe("Summons Elemental Seeker for 3 Seconds");
   });
 });
@@ -364,8 +411,8 @@ test("formatBonusRowsWithIds keeps each row's stat id, merging a flat damage ran
 test("formatBonusRowsWithIds rows carry the correct label and value", () => {
   const bonuses = { characterStrength: 5, offensiveFireModifier: 12 };
   const withIds = formatBonusRowsWithIds(bonuses);
-  expect(withIds.find((r) => r.id === "characterStrength")!.label).toBe("Physique");
-  expect(withIds.find((r) => r.id === "offensiveFireModifier")!.value).toBe("+12%");
+  expect(res(withIds.find((r) => r.id === "characterStrength")!.label)).toBe("Physique");
+  expect(res(withIds.find((r) => r.id === "offensiveFireModifier")!.value)).toBe("+12%");
 });
 
 describe("mapped stat labels resolve via gameText, not translate", () => {
@@ -373,22 +420,17 @@ describe("mapped stat labels resolve via gameText, not translate", () => {
     // Deliberately divergent catalogs: if statLabel ever regressed to translate(key) for a
     // mapped key, the rendered label would contain "APP_FIRE" instead of "GAME_FIRE".
     const fireTag = STAT_TAGS["stat.damage.Fire"]!;
-    setLocalization(
-      makeLocalization(
-        { "stat.damage.Fire": "APP_FIRE", "stat.template.damage": "{type} Damage" },
-        {},
-        "en",
-        { [fireTag]: "GAME_FIRE" },
-        {},
-      ),
+    const loc = makeLocalization(
+      { "stat.damage.Fire": "APP_FIRE", "stat.template.damage": "{type} Damage" },
+      {},
+      "en",
+      { [fireTag]: "GAME_FIRE" },
+      {},
     );
-    try {
-      const row = statRow("offensiveFireModifier", 10);
-      expect(row?.label).toContain("GAME_FIRE");
-      expect(row?.label).not.toContain("APP_FIRE");
-    } finally {
-      installEnglish();
-    }
+    const row = statRow("offensiveFireModifier", 10);
+    const label = row ? resolveText(loc, row.label) : undefined;
+    expect(label).toContain("GAME_FIRE");
+    expect(label).not.toContain("APP_FIRE");
   });
 });
 

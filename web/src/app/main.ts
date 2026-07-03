@@ -9,7 +9,6 @@ import {
   storeLocale,
 } from "../adapters/localizationAdapter";
 import { mountLanguagePicker } from "../adapters/languagePicker";
-import { translate } from "../core/localization";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
@@ -105,23 +104,17 @@ async function boot() {
   // matching map nodes and are persisted in the URL so a shared link restores them.
   const selectedBenefits = new Set<string>(restored?.benefits ?? []);
   // The full benefit catalog (every subject + its stat ids), so the panel can list benefits the
-  // current build does not grant yet. The stat ids are static per model, but condensedRows resolves
-  // each subject's display label via translate/gameText at call time, so the catalog itself must be
-  // rebuilt after a language switch (see buildCatalogs, called at boot and from the language picker).
+  // current build does not grant yet. condensedRows now returns ids/keys/Text descriptors (no
+  // resolved strings), so the catalog is locale-independent and built once at boot.
   const allBonuses: Record<string, number> = {};
   for (const id of statCanonical) allBonuses[id] = 1;
   for (const id of canonicalPowerStatIds(model)) allBonuses[id] = 1;
   // The pet benefit catalog (every pet subject + its stat ids), for the pet "Available to get" list.
-  // Pet stat ids are raw here (static per model); the renderer scopes them. Same rebuild-on-language-
-  // switch rule as benefitCatalog above.
+  // Pet stat ids are raw here (static per model); the renderer scopes them.
   const allPetBonuses: Record<string, number> = {};
   for (const id of canonicalPetStatIds(model)) allPetBonuses[id] = 1;
-  let benefitCatalog = condensedRows(allBonuses);
-  let petCatalog = condensedRows(allPetBonuses);
-  function buildCatalogs() {
-    benefitCatalog = condensedRows(allBonuses);
-    petCatalog = condensedRows(allPetBonuses);
-  }
+  const benefitCatalog = condensedRows(allBonuses);
+  const petCatalog = condensedRows(allPetBonuses);
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
@@ -137,15 +130,15 @@ async function boot() {
   const scrim = document.getElementById("drawer-scrim") as HTMLElement;
   // Static chrome text, re-applied after a language switch (the views re-render via refresh()).
   function applyChrome() {
-    document.title = translate("ui.title");
-    (document.querySelector(".plabel") as HTMLElement).textContent = translate("ui.points.label");
-    totalWord.textContent = ` ${translate("ui.points.total")}`;
-    resetPointsBtn.textContent = translate("ui.points.reset");
-    leftBtn.setAttribute("aria-label", translate("ui.drawer.benefitsAria"));
-    rightBtn.setAttribute("aria-label", translate("ui.drawer.affinityAria"));
-    leftBtn.textContent = translate("ui.drawer.benefits");
-    rightBtn.textContent = translate("ui.drawer.affinity");
-    barEl.setAttribute("aria-label", translate("ui.points.budgetAria"));
+    document.title = localization.translate("ui.title");
+    (document.querySelector(".plabel") as HTMLElement).textContent = localization.translate("ui.points.label");
+    totalWord.textContent = ` ${localization.translate("ui.points.total")}`;
+    resetPointsBtn.textContent = localization.translate("ui.points.reset");
+    leftBtn.setAttribute("aria-label", localization.translate("ui.drawer.benefitsAria"));
+    rightBtn.setAttribute("aria-label", localization.translate("ui.drawer.affinityAria"));
+    leftBtn.textContent = localization.translate("ui.drawer.benefits");
+    rightBtn.textContent = localization.translate("ui.drawer.affinity");
+    barEl.setAttribute("aria-label", localization.translate("ui.points.budgetAria"));
   }
   applyChrome();
   // Language picker (globe button, right of the header). Switching swaps catalogs, re-applies chrome,
@@ -154,13 +147,12 @@ async function boot() {
     current: localization.locale,
     available: SUPPORTED_LOCALES,
     names: LOCALE_NAMES,
-    label: translate("ui.lang.label"),
+    label: localization.translate("ui.lang.label"),
     onSelect: async (locale) => {
       storeLocale(locale);
       localization = await loadLocalization({ base: ".", available: SUPPORTED_LOCALES, preferred: [locale] });
       applyChrome();
-      buildCatalogs(); // benefit/pet catalog labels are baked in at build time; must be redone per locale
-      picker.setCurrent(localization.locale, translate("ui.lang.label"));
+      picker.setCurrent(localization.locale, localization.translate("ui.lang.label"));
       refresh();
     },
   });
@@ -285,8 +277,19 @@ async function boot() {
         return;
       }
       const totals = affinityTotals(model, state.selected);
-      if (t.kind === "star") tip.show(model, t.id, x, y, totals, undefined, selectedBenefits);
-      else tip.showConstellation(model, t.id, x, y, totals, completionInfo(t.id), undefined, selectedBenefits);
+      if (t.kind === "star") tip.show(localization, model, t.id, x, y, totals, undefined, selectedBenefits);
+      else
+        tip.showConstellation(
+          localization,
+          model,
+          t.id,
+          x,
+          y,
+          totals,
+          completionInfo(t.id),
+          undefined,
+          selectedBenefits,
+        );
     },
   });
 
@@ -298,6 +301,7 @@ async function boot() {
     const sid = (e.target as Element)?.closest?.(".power[data-star-id]")?.getAttribute("data-star-id");
     if (sid) {
       tip.show(
+        localization,
         model,
         sid,
         (e as MouseEvent).clientX,
@@ -400,9 +404,9 @@ async function boot() {
     if (showMin)
       html += `<div class="pb-seg pb-min" style="left:${pct(used)}%;width:${pct(curMin) - pct(used)}%"></div>`;
     html += `<div class="pb-seg pb-head" style="left:${pct(headStart)}%;width:${pct(cap) - pct(headStart)}%"></div>`;
-    html += `<span class="pb-lab" style="left:0">${translate("ui.points.used", { count: used })}</span>`;
+    html += `<span class="pb-lab" style="left:0">${localization.translate("ui.points.used", { count: used })}</span>`;
     if (showMin && !hideMinLabel)
-      html += `<span class="pb-lab" style="left:${pct(used)}%">${translate("ui.points.min", { count: curMin })}</span>`;
+      html += `<span class="pb-lab" style="left:${pct(used)}%">${localization.translate("ui.points.min", { count: curMin })}</span>`;
     if (!uncapped) html += `<div class="pb-grab" style="left:${pct(cap)}%"></div>`;
     barEl.innerHTML = html;
     barEl.classList.toggle("uncapped", uncapped);
@@ -475,7 +479,7 @@ async function boot() {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><div id="build-order-panel"></div>`);
       panel = document.getElementById("build-order-panel")!;
     }
-    panel.innerHTML = buildOrderHtml(model, data.manifest, steps, noOrder);
+    panel.innerHTML = buildOrderHtml(localization, model, data.manifest, steps, noOrder);
     // Hover-sync: build-order rows carry data-con-id; box that constellation on the map (drawn on top).
     panel.querySelectorAll<HTMLElement>(".bo-step[data-con-id]").forEach((row) => {
       const cid = row.dataset.conId;
@@ -491,6 +495,7 @@ async function boot() {
     const availableIds = availableBonusIds(model, state.selected, reach.completable);
     const availPetKeys = availablePetKeys(model, state.selected, reach.completable);
     const r = renderBenefits(
+      localization,
       benefitsEl,
       model,
       state.selected,
@@ -536,6 +541,7 @@ async function boot() {
     handle.update(state, taggedStars(), reach, diff, affinityFilterSets());
     renderBenefitsPanel();
     prevAffinity = renderAffinities(
+      localization,
       affinityEl,
       model,
       reach.have,
@@ -548,18 +554,18 @@ async function boot() {
     if (availHtml)
       affinityEl.insertAdjacentHTML(
         "beforeend",
-        `<hr class="panel-sep"/><h2>${translate("ui.panel.availableToGet")}</h2>${availHtml}`,
+        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.availableToGet")}</h2>${availHtml}`,
       );
     if (petAvailHtml)
       affinityEl.insertAdjacentHTML(
         "beforeend",
-        `<hr class="panel-sep"/><h2>${translate("ui.panel.petBonus")}</h2>${petAvailHtml}`,
+        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.petBonus")}</h2>${petAvailHtml}`,
       );
     const availPowers = availablePowers(model, state.selected, reach.completable);
     if (availPowers.length)
       affinityEl.insertAdjacentHTML(
         "beforeend",
-        `<hr class="panel-sep"/><h2>${translate("ui.panel.celestialPowers")}</h2>${powersListHtml(availPowers)}`,
+        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.celestialPowers")}</h2>${powersListHtml(localization, availPowers)}`,
       );
     // Empty-state copy. The build order shows whenever the selection is self-covering: the cap is auto-raised
     // to the validity floor (above), so a self-covering selection that still has no order is genuinely
@@ -578,7 +584,9 @@ async function boot() {
     paintBuildOrder(curBuildOrder, boInfo);
     const uncapped = !Number.isFinite(state.pointCap);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
-    capToggle.title = uncapped ? translate("ui.points.capRestoreTitle") : translate("ui.points.capRemoveTitle");
+    capToggle.title = uncapped
+      ? localization.translate("ui.points.capRestoreTitle")
+      : localization.translate("ui.points.capRemoveTitle");
     totalWord.style.display = uncapped ? "none" : "";
     renderPointBar();
     history.replaceState(
@@ -639,8 +647,19 @@ async function boot() {
     popoverXY = { x, y };
     const totals = affinityTotals(model, state.selected);
     const btn = commitButton(model, state.selected, reach, target);
-    if (target.kind === "star") tip.show(model, target.id, x, y, totals, btn, selectedBenefits);
-    else tip.showConstellation(model, target.id, x, y, totals, completionInfo(target.id), btn, selectedBenefits);
+    if (target.kind === "star") tip.show(localization, model, target.id, x, y, totals, btn, selectedBenefits);
+    else
+      tip.showConstellation(
+        localization,
+        model,
+        target.id,
+        x,
+        y,
+        totals,
+        completionInfo(target.id),
+        btn,
+        selectedBenefits,
+      );
   }
   function commitPopover() {
     if (!popoverTarget) return;

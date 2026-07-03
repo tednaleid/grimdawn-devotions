@@ -3,12 +3,7 @@ import { test, expect, beforeEach } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { tooltipView } from "../src/adapters/tooltipView";
-import { installEnglish } from "./helpers/localizeEn";
-
-// This tooltip renders localized text; install the English catalog so it does not
-// depend on another test file having installed the localization singleton first
-// (test-file order differs across platforms).
-installEnglish();
+import { enLoc } from "./helpers/localizeEn";
 
 const model = buildModel(doc as any);
 
@@ -22,7 +17,7 @@ beforeEach(() => {
 test("shows the completion minimum when dim info is supplied", () => {
   const el = { style: {}, innerHTML: "", offsetWidth: 0, offsetHeight: 0 } as any as HTMLElement;
   const tip = tooltipView(el);
-  tip.showConstellation(model, "bat", 0, 0, undefined, { needs: 26, cap: 55 });
+  tip.showConstellation(enLoc, model, "bat", 0, 0, undefined, { needs: 26, cap: 55 });
   expect((el as any).innerHTML).toContain("Needs 26 of your 55");
 });
 
@@ -31,7 +26,7 @@ test("shows 'cannot be completed' (not a sentinel number) when there is no reach
   const tip = tooltipView(el);
   // No `needs` -> the engine found no completion within the cap; the tooltip must say so plainly
   // rather than leaking the INF sentinel as "Needs 1000000000 of your 55 points".
-  tip.showConstellation(model, "bat", 0, 0, undefined, { cap: 55 });
+  tip.showConstellation(enLoc, model, "bat", 0, 0, undefined, { cap: 55 });
   expect((el as any).innerHTML).toContain("Cannot be completed within 55 points");
   expect((el as any).innerHTML).not.toContain("Needs");
   expect((el as any).innerHTML).not.toContain("1000000000");

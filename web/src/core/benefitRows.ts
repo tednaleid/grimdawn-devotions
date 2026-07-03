@@ -3,21 +3,21 @@
 import type { DevotionModel, StarId } from "./types";
 import { sumBonuses, sumPetBonuses, racialTargets } from "./aggregate";
 import { condensedRows, classify, type CondensedPart, type StatGroup } from "./statFormat";
-import { translate } from "./localization";
+import { appT, litT, type Text } from "./localization";
 
 export type Verdict = "up" | "down" | "same" | "mixed";
 export type RowRole = "subject" | "sub" | "cont";
 export interface BenefitRow {
   role: RowRole;
-  subLabel: string; // "duration" | "max" when role === "sub", else ""
+  subLabel: Text; // "duration" | "max" when role === "sub", else EMPTY
   id: string;
-  base: string; // "" in regular mode
-  now: string; // displayed value (regular: the build's value; compare: current)
-  delta: string; // "" in regular mode
+  base: Text; // EMPTY in regular mode
+  now: Text; // displayed value (regular: the build's value; compare: current)
+  delta: Text; // EMPTY in regular mode
   verdict: Verdict | ""; // "" in regular mode
 }
 export interface BenefitSubject {
-  subject: string;
+  subject: Text;
   key: string;
   ids: string[];
   verdict: Verdict | ""; // subject roll-up (compare only)
@@ -28,7 +28,8 @@ export interface BenefitGroup {
   subjects: BenefitSubject[];
 }
 
-const DASH = "—";
+const DASH = litT("—");
+const EMPTY = litT("");
 const DIM_INDEX: Record<CondensedPart["dim"], number> = { flat: 0, pct: 1, max: 2, durFlat: 3, durPct: 4 };
 
 // The displayed (sign-applied) scalar for a stat id, or undefined when absent.
@@ -41,16 +42,16 @@ function displayed(map: Record<string, number>, id: string): number | undefined 
 function rangeMaxId(id: string): string | null {
   return id.endsWith("Min") ? `${id.slice(0, -3)}Max` : null;
 }
-function fmtDelta(n: number): string {
+function fmtDelta(n: number): Text {
   if (n === 0) return DASH;
   const r = Math.round(n * 100) / 100;
-  return r > 0 ? `+${r}` : `${r}`;
+  return litT(r > 0 ? `+${r}` : `${r}`);
 }
 // Row value text: keep the seconds suffix on a flat duration; everything else is the raw condensed
 // value. A max-resist is qualified at row-build time: by the "max" sub-label on a later row, or by a
 // "max " prefix when it is the subject's first/only row (see maxQualified in buildScope).
-function rowValue(dim: CondensedPart["dim"], value: string): string {
-  return dim === "durFlat" ? translate("ui.benefit.seconds", { value }) : value;
+function rowValue(dim: CondensedPart["dim"], value: Text): Text {
+  return dim === "durFlat" ? appT("ui.benefit.seconds", { value }) : value;
 }
 
 interface PartMeta {
@@ -59,7 +60,7 @@ interface PartMeta {
 }
 interface SubjMeta {
   group: StatGroup;
-  subject: string;
+  subject: Text;
   key: string;
   parts: PartMeta[];
 }
@@ -71,10 +72,10 @@ function skeleton(
   nowMap: Record<string, number>,
   racial: string[],
   comparing: boolean,
-): { subjects: SubjMeta[]; baseVal: Map<string, string>; nowVal: Map<string, string> } {
+): { subjects: SubjMeta[]; baseVal: Map<string, Text>; nowVal: Map<string, Text> } {
   const maps = comparing ? [baseMap, nowMap] : [nowMap];
-  const baseVal = new Map<string, string>();
-  const nowVal = new Map<string, string>();
+  const baseVal = new Map<string, Text>();
+  const nowVal = new Map<string, Text>();
   const subjs = new Map<string, SubjMeta>();
   const order: string[] = [];
   for (let side = 0; side < maps.length; side++) {
@@ -112,44 +113,44 @@ function buildScope(
     const rows: BenefitRow[] = sm.parts.map((part) => {
       const isDur = part.dim === "durFlat" || part.dim === "durPct";
       let role: RowRole;
-      let subLabel = "";
+      let subLabel: Text = EMPTY;
       if (!firstDone) role = "subject";
       else if (part.dim === "max") {
         role = "sub";
-        subLabel = translate("ui.benefit.max");
+        subLabel = appT("ui.benefit.max");
       } else if (isDur && !durLabeled) {
         role = "sub";
-        subLabel = translate("ui.benefit.duration");
+        subLabel = appT("ui.benefit.duration");
       } else role = "cont";
       if (isDur) durLabeled = true;
       firstDone = true;
 
       // A max-resist on the subject row has no "max" sub-label to qualify it, so prefix the value.
       const maxFirst = role === "subject" && part.dim === "max";
-      const maxQualified = (s: string) =>
-        maxFirst && s !== DASH ? translate("ui.benefit.maxPrefix", { subject: s }) : s;
+      const maxQualified = (s: Text): Text =>
+        maxFirst && !(s.k === "lit" && s.s === "—") ? appT("ui.benefit.maxPrefix", { subject: s }) : s;
 
       if (!comparing) {
         return {
           role,
           subLabel,
           id: part.id,
-          base: "",
+          base: EMPTY,
           now: maxQualified(nowVal.get(part.id) ?? DASH),
-          delta: "",
+          delta: EMPTY,
           verdict: "",
         };
       }
       const base = maxQualified(baseVal.get(part.id) ?? DASH);
       const now = maxQualified(nowVal.get(part.id) ?? DASH);
       const maxId = rangeMaxId(part.id);
-      let delta: string;
+      let delta: Text;
       let verdict: Verdict;
       if (maxId && (baseMap[maxId] !== undefined || nowMap[maxId] !== undefined)) {
         const b = (baseMap[part.id] ?? 0) + (baseMap[maxId] ?? 0);
         const n = (nowMap[part.id] ?? 0) + (nowMap[maxId] ?? 0);
         verdict = n > b ? "up" : n < b ? "down" : "same";
-        delta = verdict === "same" ? DASH : "";
+        delta = verdict === "same" ? DASH : EMPTY;
       } else {
         const b = displayed(baseMap, part.id) ?? 0;
         const n = displayed(nowMap, part.id) ?? 0;
@@ -179,12 +180,8 @@ function buildScope(
     if (!byGroup.has(sm.group)) byGroup.set(sm.group, []);
     byGroup.get(sm.group)!.push(subj);
   }
-  // Sort subjects alphabetically within each group so both modes match. condensedRows already sorts,
-  // so this is a no-op in regular mode; in compare mode it reorders the base/now union into one order.
-  return [...byGroup].map(([group, subjects]) => ({
-    group,
-    subjects: subjects.sort((a, b) => a.subject.localeCompare(b.subject)),
-  }));
+  // Subjects stay in structural (insertion) order; the adapter sorts by resolved label at render time.
+  return [...byGroup].map(([group, subjects]) => ({ group, subjects }));
 }
 
 export function benefitRows(
