@@ -10,17 +10,9 @@ import {
   formatPet,
   isFilterableStat,
 } from "../src/core/statFormat";
-import { enLoc } from "./helpers/localizeEn";
-import { makeLocalization, resolveText, type Text } from "../src/core/localization";
+import { res, resRow, resRows, resSorted } from "./helpers/localizeEn";
+import { makeLocalization, resolveText } from "../src/core/localization";
 import { STAT_TAGS } from "../src/core/statTags";
-
-const res = (t: Text) => resolveText(enLoc, t);
-const resRow = (r: { label: Text; value: Text } | null) => (r ? { label: res(r.label), value: res(r.value) } : null);
-const resRows = (rows: { label: Text; value: Text }[]) =>
-  rows.map((r) => ({ value: res(r.value), label: res(r.label) }));
-// Mirrors the adapter render for the fallthrough segment: resolve, then sort by resolved label.
-const resSorted = (rows: { label: Text; value: Text }[]) =>
-  resRows(rows).sort((a, b) => a.label.localeCompare(b.label));
 
 describe("statRow attributes (GD internal -> display names)", () => {
   test("dexterity is Cunning, flat", () => {

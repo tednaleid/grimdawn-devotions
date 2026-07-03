@@ -4,10 +4,7 @@ import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
 import { benefitRows } from "../src/core/benefitRows";
-import { resolveText, type Text } from "../src/core/localization";
-import { enLoc } from "./helpers/localizeEn";
-
-const res = (t: Text) => resolveText(enLoc, t);
+import { res } from "./helpers/localizeEn";
 
 const model = buildModel(doc as any);
 // A subject's flat and percent come from different stars, so build the multi-part shapes from the
