@@ -340,23 +340,31 @@ engine fix.
 Pointers: `web/scripts/reachability-fuzz.ts`; `docs/reachability-engine.md`
 "Known limits".
 
-## Item-database follow-ups (downstream of the raw deposit)
+## Item-database follow-ups (downstream of the derived schema)
 
-The raw deposit (`just deposit`, see `docs/deposit.md`) is phase 1 of the
-item-database initiative. The ranked ideation record at
+The raw deposit (`just deposit`, `docs/deposit.md`) is phase 1 and the derived
+typed schema (`just derive`, `docs/item-schema.md`) is phase 2 of the
+item-database initiative; the ranked ideation record at
 `docs/ideation/2026-07-03-item-data-extraction-ideation.html` holds the full
-analysis; these are the deferred directions, in rough order:
+analysis. Deferred directions, in rough order:
 
-- **Typed canonical schema: entities + long-form stats.** `items.parquet`
-  (dense low-cardinality columns: id, class, rarity, level, slot, template)
-  plus `stats.parquet` (item_id, stat_id, value_min, value_max) keeping raw
-  .dbr stat ids. Scope which categories are included using the census's
-  canonical-key coverage table (R7). All derivation is SQL over the deposit.
-- **Reference-closure edges table.** `edges(src_record, ref_key, dst_record)`
-  built from the same reference-following the census's dangling-ref
-  diagnostic does; enables "items whose granted skill deals chaos damage",
-  set membership, affix-pool queries. Pointer: `power_skill_chain` in
-  `scripts/parse_devotions.py` for the reference-hop precedent.
+- **Affix-to-gear applicability through the weighted loot-table graph.** The
+  named fast-follow that activates the affix domain's gear-type buttons:
+  resolve which prefixes/suffixes can roll on which gear types by walking
+  `LootRandomizerTable` weights from the gear loot tables. Also resolves the
+  `blueprints_without_crafts` diagnostic (random-gear blueprints whose
+  `artifactName` is a dynamic loot table - 58 at build 19149150).
+- **Roll-range gap: scaled offensive bonus lines.** Offensive damage-bonus
+  stats on items carrying `attributeScalePercent` show a level-linked upscale
+  on grimtools that plain jitter does not reproduce; datapoints recorded in
+  `data/item-curation/variance.json` under `calibration.known_gap`.
+- **Attack-speed tier pinning.** Fast/Average/Moderate/Slow APS bases in
+  `data/item-curation/attack-speed.json` are interpolated; one grimtools card
+  per tier (a Fast 1h axe, a scepter, a Slow 2h mace) pins them.
+- **AND toggle within stat families.** OR is the only launch semantics
+  (R16); the stats table already supports AND via `GROUP BY/HAVING`.
+- **Pet-skill stat rollup.** Pet chains are relations only (`spawns_pet`);
+  rolling pet-skill stats into the filterable stats table is deferred.
 - **Dataset-as-product releases.** Per-patch immutable releases tagged by
   Steam buildid (already in deposit meta) with checksums and a
   machine-generated balance diff vs the previous build; the diff doubles as a
