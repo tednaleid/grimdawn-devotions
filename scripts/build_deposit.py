@@ -478,6 +478,25 @@ def print_table(cols: list[str], rows: list[tuple], max_rows: int) -> None:
         print(f"... ({len(rows) - max_rows} more rows not shown)")
 
 
+def register_derived(con: duckdb.DuckDBPyConnection, derived_dir: Path,
+                     required: bool) -> bool:
+    """Views every parquet under the derived dir (entities, stats, relations, ...).
+
+    Missing dir is fatal only for recipes that need the derived schema
+    (--require-derived); plain deposit queries keep working without it.
+    """
+    if not derived_dir.is_dir() or not any(derived_dir.glob("*.parquet")):
+        if required:
+            print(f"ERROR: no derived schema at {derived_dir}.", file=sys.stderr)
+            print("Run `just derive` first (needs the deposit from `just deposit`).",
+                  file=sys.stderr)
+            return False
+        return True
+    for p in sorted(derived_dir.glob("*.parquet")):
+        con.execute(f"CREATE VIEW {p.stem} AS SELECT * FROM read_parquet({sql_str(p.as_posix())})")
+    return True
+
+
 def cmd_query(args) -> int:
     if not args.sql and not args.file:
         print("ERROR: pass --sql or --file.", file=sys.stderr)
@@ -485,6 +504,9 @@ def cmd_query(args) -> int:
     sql = args.sql or Path(args.file).read_text(encoding="utf-8")
     con = open_deposit(args.deposit_dir.resolve())
     warn_buildid_mismatch(read_meta(con))
+    if args.derived_dir and not register_derived(con, args.derived_dir.resolve(),
+                                                 args.require_derived):
+        return 2
     try:
         res = con.execute(sql)
         cols = [d[0] for d in res.description] if res.description else []
@@ -533,6 +555,10 @@ def main(argv=None) -> int:
     q.add_argument("--max-rows", type=int, default=100, help="Rows to display (count is always full)")
     q.add_argument("--fail-on-empty", action="store_true",
                    help="Exit non-zero when the query returns 0 rows (acceptance recipes)")
+    q.add_argument("--derived-dir", type=Path, default=None,
+                   help="Also view data/derived/*.parquet (entities, stats, relations, ...)")
+    q.add_argument("--require-derived", action="store_true",
+                   help="Fail (pointing at `just derive`) when the derived schema is missing")
     q.set_defaults(fn=cmd_query)
 
     args = ap.parse_args(argv)

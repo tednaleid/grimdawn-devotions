@@ -702,6 +702,20 @@ def cmd_build(args) -> int:
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
                 f"TO {sql_str(rel_out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
 
+    # The filter taxonomy rides along as a table so acceptance SQL and the SPA
+    # join it instead of parsing JSON. Ids are unified to the stats table's
+    # vocabulary (Min/Max suffixes stripped); the JSON keeps raw ids so the drift
+    # guard can check them against the deposit's key census. Id-less families
+    # like `pet` are source-predicates documented in docs/item-schema.md.
+    fam_rows = sorted({(fam, re.sub(r"(Min|Max)$", "", sid))
+                       for fam, spec in cur["stat-families"]["families"].items()
+                       for sid in spec.get("ids", [])})
+    con.execute("CREATE TEMP TABLE families (family VARCHAR, stat_id VARCHAR)")
+    con.executemany("INSERT INTO families VALUES (?, ?)", fam_rows)
+    fam_out = out_dir / "families.parquet"
+    con.execute(f"COPY (SELECT * FROM families ORDER BY family, stat_id) "
+                f"TO {sql_str(fam_out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+
     counts = con.execute(
         "SELECT domain, count(*) FROM entities GROUP BY 1 ORDER BY 1").fetchall()
     src_counts = con.execute(
@@ -721,7 +735,7 @@ def cmd_build(args) -> int:
                                          if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities", "stats", "relations"):
+    for name in ("entities", "stats", "relations", "families"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
