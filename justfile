@@ -259,10 +259,12 @@ deposit:
 census:
     uv run scripts/build_deposit.py census --deposit-dir "{{deposit_dir}}"
 
-# Ad-hoc SQL over the deposit (views: facts, labels, meta), e.g.
+# Ad-hoc SQL over the deposit (views: facts, labels, meta) plus, when built, the
+# derived schema (entities, stats, relations, families), e.g.
 #   just q "SELECT key, count(*) FROM facts GROUP BY key ORDER BY 2 DESC LIMIT 10"
 q SQL:
-    uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" --sql "{{SQL}}"
+    uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
+        --derived-dir "{{derived_dir}}" --sql "{{SQL}}"
 
 # Acceptance query AE1: components matching "Cold" in name/description, level 20+ (fails on 0 rows)
 q-cold-components:
@@ -284,6 +286,37 @@ q-search-de:
 derive:
     uv run scripts/build_derived.py build --deposit-dir "{{deposit_dir}}" \
         --curation-dir "{{justfile_directory()}}/data/item-curation" --out-dir "{{derived_dir}}"
+
+# One derived acceptance query (all seven below fail on zero rows AND on oracle mismatch,
+# since each SQL gates its output on its pinned checks - see scripts/derived_queries/)
+_q-derived FILE:
+    uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
+        --derived-dir "{{derived_dir}}" --require-derived \
+        --file "scripts/derived_queries/{{FILE}}" --fail-on-empty
+
+# AE1: dagger + Cold family + level range; innate and granted-skill cold; per-variant range
+q-ae1-cold-daggers: (_q-derived "ae1_cold_daggers.sql")
+
+# AE2: augments applicable to rings or amulets (pinned: 97 at build 19149150)
+q-ae2-augments-ring-amulet: (_q-derived "ae2_augments_ring_amulet.sql")
+
+# AE3: blueprint crafts + reagent edges, and reverse lookup from Searing Ember
+q-ae3-blueprint-links: (_q-derived "ae3_blueprint_links.sql")
+
+# AE4: computed requirements match the grimtools card oracles exactly (74/93, 426, ...)
+q-ae4-requirement-oracles: (_q-derived "ae4_requirement_oracles.sql")
+
+# AE5: legendary two-handed axes reconcile with grimtools' 14; The Guillotine card fields
+q-ae5-legendary-2h-axes: (_q-derived "ae5_legendary_2h_axes.sql")
+
+# AE6: expansion badges match the screenshot oracles (base / aom / fg)
+q-ae6-expansion-badges: (_q-derived "ae6_expansion_badges.sql")
+
+# AE7: German text search with English fallback, including granted-skill descriptions
+q-ae7-search-de: (_q-derived "ae7_search_de.sql")
+
+# All seven derived acceptance queries (the AE gate from docs/item-schema.md)
+q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de
 
 # Delete the deposit artifacts. Deliberately NOT part of `clean`: regenerating
 # them needs Windows + the game install, so `clean` must never touch them.
