@@ -14,7 +14,7 @@ Steam build id from the same run:
 | file | shape | contents |
 |---|---|---|
 | `facts.parquet` | `(record, idx, key, value, value_num)` | one row per `key,value` line of every `.dbr` file, in file order. `record` is the forward-slash path relative to the extracted root (`records/...`), matching the form `.dbr` reference values use. Duplicate keys within a record are preserved as separate rows; `idx` orders them. `value` is the raw text; `value_num` is a best-effort DOUBLE (NULL when non-numeric) so range queries work without a typing pass. Multi-value cells stay `;`-packed in `value`; exploding them is downstream SQL. |
-| `labels.parquet` | `(locale, tag, text)` | the full tag table of every extracted language (13 currently), unfiltered, with Grim Dawn formatting codes stripped. Localized display is a join; active-locale-then-English fallback is `COALESCE(loc.text, en.text)`. |
+| `labels.parquet` | `(locale, tag, text, source)` | the full tag table of every extracted language (13 currently), unfiltered, with Grim Dawn formatting codes stripped. Localized display is a join; active-locale-then-English fallback is `COALESCE(loc.text, en.text)`. `source` is the stem of the earliest tag file defining the tag (schema v2): `tags_items` = base game, `tagsgdx1_items` = Ashes of Malmouth, `tagsgdx2_items` = Forgotten Gods - the expansion-attribution signal for the derived item schema. Text keeps last-wins semantics across files (expansion text overrides base). |
 | `meta.parquet` | `(key, value)` | provenance: steam build id, game version, generation timestamp, file/row counts, locale coverage (built / missing / stale / skipped). |
 
 Not represented: `.tpl` template inheritance. The deposit carries raw `.dbr`

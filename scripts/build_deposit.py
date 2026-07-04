@@ -11,9 +11,12 @@ Three parquet artifacts (see docs/deposit.md):
   facts.parquet   one row per key,value line of every .dbr, in file order:
                   (record, idx, key, value, value_num). Duplicate keys within a
                   record are preserved as separate rows (idx orders them).
-  labels.parquet  (locale, tag, text) - the FULL tag table of every extracted
-                  language (unfiltered; filtering to referenced tags is a
-                  web-payload concern, not an analyst one).
+  labels.parquet  (locale, tag, text, source) - the FULL tag table of every
+                  extracted language (unfiltered; filtering to referenced tags
+                  is a web-payload concern, not an analyst one). `source` is
+                  the stem of the earliest tag file defining the tag - the
+                  expansion-attribution signal (tags_items = base game,
+                  tagsgdx1_items = AoM, tagsgdx2_items = FG).
   meta.parquet    key/value provenance: steam build id, counts, locale coverage.
 
 Subcommands:
@@ -37,13 +40,13 @@ from pathlib import Path
 import duckdb
 
 sys.path.insert(0, str(Path(__file__).parent))
-from parse_devotions import clean_text, load_translations  # shared trivial helpers
+from parse_devotions import clean_text  # shared trivial helper
 
 # Label text spans 13 locales; a cp1252 Windows console must not crash the printer.
 for _stream in (sys.stdout, sys.stderr):
     _stream.reconfigure(encoding="utf-8", errors="replace")
 
-SCHEMA_VERSION = "1"
+SCHEMA_VERSION = "2"
 # Sentinel so DuckDB's read_csv never turns an empty .dbr value into NULL (losslessness).
 NULLSTR = "\\N{deposit-null}"
 
@@ -82,6 +85,33 @@ def iter_dbr_lines(path: Path):
             value = value[:-1]
         yield idx, key, value
         idx += 1
+
+
+def load_tag_table(text_dir: Path) -> dict[str, tuple[str, str]]:
+    """tag -> (text, source) over every *.txt under text_dir, in sorted file order.
+
+    Later files win on text (tags_items < tagsgdx1_items < tagsgdx2_items sorts
+    base before the expansions, so expansion text overrides base - the game's
+    own layering). `source` keeps the stem of the EARLIEST file defining the
+    tag, the expansion-attribution signal (labels schema v2).
+    """
+    tags: dict[str, tuple[str, str]] = {}
+    for fp in sorted(text_dir.rglob("*.txt"), key=lambda p: p.relative_to(text_dir).as_posix()):
+        try:
+            text = fp.read_text(encoding="utf-8-sig", errors="replace")
+        except OSError:
+            continue
+        source = fp.stem
+        for line in text.splitlines():
+            tag, sep, val = line.partition("=")
+            if not sep:
+                continue
+            tag = tag.strip()
+            if not tag:
+                continue
+            prev = tags.get(tag)
+            tags[tag] = (val.strip(), prev[1] if prev else source)
+    return tags
 
 
 def file_size_str(p: Path) -> str:
@@ -154,20 +184,24 @@ def cmd_build(args) -> int:
     locales_skipped: list[str] = []
     locales_stale: list[str] = []
     labels_rows = 0
+    en_item_source_counts: dict[str, int] = {}
     with labels_csv.open("w", newline="", encoding="utf-8") as fh:
         w = csv.writer(fh, lineterminator="\n")
-        w.writerow(["locale", "tag", "text"])
+        w.writerow(["locale", "tag", "text", "source"])
         for tdir in text_dirs:
             locale = tdir.name[len("text_"):]
             if tdir.stat().st_mtime < records_mtime:
                 locales_stale.append(locale)
-            tags = load_translations(tdir)
+            tags = load_tag_table(tdir)
             if not tags:
                 print(f"WARNING: locale '{locale}' has no readable tags under {tdir}; skipped.")
                 locales_skipped.append(locale)
                 continue
             for tag in sorted(tags):
-                w.writerow([locale, tag, clean_text(tags[tag])])
+                text, source = tags[tag]
+                w.writerow([locale, tag, clean_text(text), source])
+                if locale == "en" and source.endswith("_items"):
+                    en_item_source_counts[source] = en_item_source_counts.get(source, 0) + 1
             locale_counts[locale] = len(tags)
             labels_rows += len(tags)
     if locales_stale:
@@ -189,9 +223,9 @@ def cmd_build(args) -> int:
         f"ORDER BY record, idx) "
         f"TO {sql_str(facts_pq.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
     con.execute(
-        f"COPY (SELECT locale, tag, text "
+        f"COPY (SELECT locale, tag, text, source "
         f"FROM read_csv({sql_str(labels_csv.as_posix())}, {csv_opts}, "
-        f"columns={{'locale':'VARCHAR','tag':'VARCHAR','text':'VARCHAR'}}) "
+        f"columns={{'locale':'VARCHAR','tag':'VARCHAR','text':'VARCHAR','source':'VARCHAR'}}) "
         f"ORDER BY locale, tag) "
         f"TO {sql_str(labels_pq.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
 
@@ -225,6 +259,9 @@ def cmd_build(args) -> int:
     print(f"  facts rows: {facts_rows}")
     locs = "  ".join(f"{k}({v})" for k, v in sorted(locale_counts.items()))
     print(f"  labels rows: {labels_rows}  locales: {locs or '(none)'}")
+    if en_item_source_counts:
+        srcs = "  ".join(f"{s}({n})" for s, n in sorted(en_item_source_counts.items()))
+        print(f"  en item-tag sources: {srcs}")
     if locales_missing:
         print(f"  locales MISSING (not extracted): {' '.join(locales_missing)}")
     if locales_skipped:
