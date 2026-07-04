@@ -403,18 +403,95 @@ def build_entities(con: duckdb.DuckDBPyConnection, cur: dict, out_dir: Path,
     con.executemany(
         "INSERT INTO entities VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", inserts)
 
-    # has_blueprint: some blueprint's crafts target is this record (KTD8 keys).
+    # has_blueprint: some blueprint's crafts edge targets this record (KTD8).
     con.execute("""
         UPDATE entities SET has_blueprint = TRUE
-        WHERE lower(record) IN (
-          SELECT lower(trim(value)) FROM facts
-          WHERE key IN ('forcedRandomArtifactName', 'artifactName')
-            AND record LIKE 'records/items/crafting/%')""")
+        WHERE record IN (SELECT dst FROM relations WHERE kind = 'crafts')""")
 
     out = out_dir / "entities.parquet"
     con.execute(f"COPY (SELECT * FROM entities ORDER BY record) TO {sql_str(out.as_posix())} "
                 f"(FORMAT parquet, COMPRESSION zstd)")
     return len(inserts)
+
+
+# ---------------------------------------------------------------------------
+# relations
+# ---------------------------------------------------------------------------
+
+# Applies-to slot flags on augment/component records -> the gear-type vocabulary
+# of gear-types.json (1h melee flags lack the "1h" suffix; everything else matches).
+FLAG_TYPE = {
+    "sword": "sword1h", "axe": "axe1h", "mace": "mace1h",
+    "dagger": "dagger", "scepter": "scepter", "sword2h": "sword2h", "axe2h": "axe2h",
+    "mace2h": "mace2h", "spear2h": "spear2h", "ranged1h": "ranged1h", "ranged2h": "ranged2h",
+    "shield": "shield", "offhand": "offhand", "head": "head", "chest": "chest",
+    "shoulders": "shoulders", "hands": "hands", "legs": "legs", "feet": "feet",
+    "waist": "waist", "amulet": "amulet", "ring": "ring", "medal": "medal",
+}
+
+
+def build_relations(con: duckdb.DuckDBPyConnection, diag: dict) -> int:
+    con.execute("CREATE TEMP TABLE flag_map (flag VARCHAR, gear_type VARCHAR)")
+    con.executemany("INSERT INTO flag_map VALUES (?, ?)", list(FLAG_TYPE.items()))
+
+    con.execute("""
+        CREATE TEMP TABLE relations (src VARCHAR, kind VARCHAR, dst VARCHAR)""")
+    # applies_to: slot flags with value 1 on augments/components (R12).
+    con.execute("""
+        INSERT INTO relations
+        SELECT s.record, 'applies_to', m.gear_type
+        FROM scoped s
+        JOIN facts f USING (record)
+        JOIN flag_map m ON m.flag = f.key
+        WHERE s.domain IN ('augment', 'component') AND f.value_num = 1""")
+    # crafts: forcedRandomArtifactName always; else artifactName when it resolves
+    # to an in-scope entity record (KTD8). dst is the entity's canonical path.
+    con.execute("""
+        INSERT INTO relations
+        SELECT s.record, 'crafts', COALESCE(e.record, lower(trim(f.value)))
+        FROM scoped s
+        JOIN facts f USING (record)
+        LEFT JOIN scoped e ON lower(e.record) = lower(trim(f.value))
+        WHERE s.domain = 'blueprint' AND f.key = 'forcedRandomArtifactName' AND f.value != ''""")
+    con.execute("""
+        INSERT INTO relations
+        SELECT s.record, 'crafts', e.record
+        FROM scoped s
+        JOIN facts f USING (record)
+        JOIN scoped e ON lower(e.record) = lower(trim(f.value))
+        WHERE s.domain = 'blueprint' AND f.key = 'artifactName' AND f.value != ''
+          AND NOT EXISTS (SELECT 1 FROM relations r WHERE r.src = s.record AND r.kind = 'crafts')""")
+    # reagent edges always resolve where possible but are kept even when dangling.
+    con.execute("""
+        INSERT INTO relations
+        SELECT s.record, 'reagent', COALESCE(e.record, lower(trim(f.value)))
+        FROM scoped s
+        JOIN facts f USING (record)
+        LEFT JOIN scoped e ON lower(e.record) = lower(trim(f.value))
+        WHERE s.domain = 'blueprint' AND f.value != ''
+          AND f.key IN ('reagent1BaseName', 'reagent2BaseName', 'reagent3BaseName')""")
+    con.execute("""
+        INSERT INTO relations
+        SELECT record, 'set_member', trim("itemSetName") FROM scoped
+        WHERE COALESCE("itemSetName", '') != ''""")
+    con.execute("""
+        INSERT INTO relations
+        SELECT record, 'grants_skill', trim("itemSkillName") FROM scoped
+        WHERE COALESCE("itemSkillName", '') != ''""")
+    # Pet chains ride as relations only in this phase (KTD5): a granted summon
+    # skill's spawnObjects (;-packed) names the pet creature record(s).
+    con.execute("""
+        INSERT INTO relations
+        SELECT DISTINCT s.record, 'spawns_pet', trim(pet)
+        FROM scoped s
+        JOIN facts f ON f.record = s."itemSkillName" AND f.key = 'spawnObjects'
+        CROSS JOIN unnest(string_split(f.value, ';')) AS t(pet)
+        WHERE trim(pet) != ''""")
+
+    diag["blueprints_without_crafts"] = con.execute("""
+        SELECT count(*) FROM scoped s WHERE s.domain = 'blueprint'
+          AND NOT EXISTS (SELECT 1 FROM relations r WHERE r.src = s.record AND r.kind = 'crafts')""").fetchone()[0]
+    return con.execute("SELECT count(*) FROM relations").fetchone()[0]
 
 
 # ---------------------------------------------------------------------------
@@ -617,25 +694,34 @@ def cmd_build(args) -> int:
             "cost_default_used": 0, "cost_record_missing": 0, "equation_errors": 0,
             "skill_ref_missing": 0}
     build_wide(con, cur)
+    n_relations = build_relations(con, diag)
     n_entities = build_entities(con, cur, out_dir, diag)
     n_stats = build_stats(con, cur, out_dir, diag)
+
+    rel_out = out_dir / "relations.parquet"
+    con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
+                f"TO {sql_str(rel_out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
 
     counts = con.execute(
         "SELECT domain, count(*) FROM entities GROUP BY 1 ORDER BY 1").fetchall()
     src_counts = con.execute(
         "SELECT source, count(*) FROM (SELECT * FROM self_stats UNION ALL "
         "SELECT * FROM skill_stats) GROUP BY 1 ORDER BY 1").fetchall()
+    kind_counts = con.execute(
+        "SELECT kind, count(*) FROM relations GROUP BY 1 ORDER BY 1").fetchall()
 
     print("\n=== DERIVED SUMMARY ===")
     print(f"  entities: {n_entities}   " +
           "  ".join(f"{d}({n})" for d, n in counts))
     print(f"  stats rows: {n_stats}   " +
           "  ".join(f"{s}({n})" for s, n in src_counts))
+    print(f"  relations: {n_relations}   " +
+          "  ".join(f"{k}({n})" for k, n in kind_counts))
     print(f"  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                          if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities", "stats"):
+    for name in ("entities", "stats", "relations"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
