@@ -8,6 +8,10 @@
 # Gitignored pending the size-gate home decision - see docs/deposit.md.
 /data/deposit/
 
+# Derived typed item schema (parquet; regenerate anywhere with `just derive`).
+# Same size-gate discipline as the deposit - see docs/item-schema.md.
+/data/derived/
+
 # Python / uv
 __pycache__/
 *.pyc

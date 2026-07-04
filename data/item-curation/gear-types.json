@@ -5,7 +5,10 @@
     "Drift guard (scripts/build_derived.py): a record in a scoped category whose Class is absent",
     "from `classes` fails the build loudly; `domain: null` entries are deliberate exclusions and",
     "are only counted. `categories` lists every records/items/* prefix with the domains allowed",
-    "there ([] = structural, out of scope); an unknown category prefix also fails the build.",
+    "there ([] = structural, out of scope); an unknown records/items/* prefix also fails the",
+    "build. Categories outside records/items/ are opt-in only: the four listed carry the",
+    "grimtools-visible quest-reward wearables (e.g. Wilhelm's Wondrous Wargem); dev sandbox,",
+    "fx, and NPC cosmetic armor stay out by omission.",
     "Slots are multi-valued (R15): one-handed and two-handed weapons occupy main and off hand,",
     "shields and caster off-hands the off hand only."
   ],
@@ -27,6 +30,9 @@
     "records/items/crafting": ["blueprint"],
     "records/items/questitems": ["quest"],
     "records/items/lootaffixes": ["affix"],
+    "records/storyelements/rewards": ["gear"],
+    "records/storyelements/questassets": ["gear"],
+    "records/storyelementsgdx2/questassets": ["gear"],
     "records/items/bonusitems": [],
     "records/items/lootchests": [],
     "records/items/lootsets": [],
@@ -72,6 +78,11 @@
     "ItemFactionBooster": { "domain": null, "note": "consumable reputation item" },
     "ItemFactionWarrant": { "domain": null, "note": "consumable reputation item" },
     "ItemUsableSkill": { "domain": null, "note": "consumable skill scroll" },
-    "OneShot_Scroll": { "domain": null, "note": "consumable scroll" }
+    "OneShot_Scroll": { "domain": null, "note": "consumable scroll" },
+    "Decoration": { "domain": null, "note": "structural (storyelements scenery)" },
+    "WeatherDecoration": { "domain": null, "note": "structural (storyelements scenery)" },
+    "Destructible": { "domain": null, "note": "structural (storyelements scenery)" },
+    "FixedItemDoor": { "domain": null, "note": "structural (storyelements door)" },
+    "FixedLever": { "domain": null, "note": "structural (storyelements lever)" }
   }
 }

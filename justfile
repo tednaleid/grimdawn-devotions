@@ -15,6 +15,8 @@ out         := justfile_directory() / "data/devotions.json"
 # Every deposit recipe resolves through this one variable so relocating the deposit
 # (including to a separate repo) is a one-line change.
 deposit_dir := justfile_directory() / "data/deposit"
+# Derived typed item schema (gitignored, same size-gate discipline; see docs/item-schema.md).
+derived_dir := justfile_directory() / "data/derived"
 
 # Default: show available recipes
 default:
@@ -277,10 +279,20 @@ q-search-de:
     uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
         --file scripts/deposit_queries/search_de.sql --fail-on-empty
 
+# Build the derived typed item schema (entities/stats/relations parquet) from the
+# deposit + data/item-curation/. Runs the curation drift guards first (fails loudly).
+derive:
+    uv run scripts/build_derived.py build --deposit-dir "{{deposit_dir}}" \
+        --curation-dir "{{justfile_directory()}}/data/item-curation" --out-dir "{{derived_dir}}"
+
 # Delete the deposit artifacts. Deliberately NOT part of `clean`: regenerating
 # them needs Windows + the game install, so `clean` must never touch them.
 clean-deposit:
     rm -rf "{{deposit_dir}}"
+
+# Delete the derived item-schema artifacts (regenerate anywhere with `just derive`)
+clean-derived:
+    rm -rf "{{derived_dir}}"
 
 # Install web dependencies (bun)
 web-install:
