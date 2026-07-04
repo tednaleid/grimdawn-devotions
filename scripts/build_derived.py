@@ -35,6 +35,7 @@ import ast
 import json
 import math
 import operator
+import re
 import sys
 from pathlib import Path
 
@@ -182,9 +183,21 @@ WIDE_KEYS = [
     "Class", "itemNameTag", "description", "itemText", "itemClassification",
     "itemLevel", "levelRequirement", "strengthRequirement", "dexterityRequirement",
     "intelligenceRequirement", "itemCostName", "characterBaseAttackSpeedTag",
-    "characterBaseAttackSpeed", "itemSkillName", "itemSetName", "attributeScalePercent",
+    "characterBaseAttackSpeed", "itemSkillName", "itemSkillLevelEq", "itemSkillLevel",
+    "itemSkillAutoController", "petBonusName", "itemSetName", "attributeScalePercent",
     "lootRandomizerName", "lootRandomizerJitter", "lootRandomizerCost",
 ]
+
+# Value-bearing stat vocabulary shared by the self-stat and skill-rollup stages;
+# structural plumbing keys never become stats rows.
+STAT_KEY_RE = "^(offensive|retaliation|defensive|character)"
+STAT_STRUCTURAL_RE = "(XOR|Global|Jitter|Equation|Tag$)"
+STAT_EXTRA_IDS = ("augmentSkillLevel1", "augmentSkillLevel2", "augmentMasteryLevel1",
+                  "augmentMasteryLevel2", "augmentAllLevel")
+SKILL_CARD_IDS = ("skillManaCost", "skillCooldownTime", "skillActiveDuration",
+                  "skillTargetRadius", "skillTargetNumber")
+# APS plumbing (see attack-speed.json), not a display stat.
+STAT_ID_BLOCKLIST = {"characterBaseAttackSpeed"}
 
 
 def build_wide(con: duckdb.DuckDBPyConnection, cur: dict) -> None:
@@ -405,6 +418,185 @@ def build_entities(con: duckdb.DuckDBPyConnection, cur: dict, out_dir: Path,
 
 
 # ---------------------------------------------------------------------------
+# stats
+# ---------------------------------------------------------------------------
+
+def parse_leveled(value: str, level: int) -> float | None:
+    """A skill stat at the granted level: ;-packed arrays index at level-1, clamped."""
+    parts = value.split(";") if value else []
+    if not parts:
+        return None
+    idx = min(max(level, 1) - 1, len(parts) - 1)
+    try:
+        return float(parts[idx])
+    except ValueError:
+        return None
+
+
+def unify_pairs(kv: dict[str, float]) -> dict[str, tuple[float, float]]:
+    """Collapse <id>Min/<id>Max sibling keys into one (value_min, value_max) entry."""
+    out: dict[str, tuple[float, float]] = {}
+    for key, v in kv.items():
+        if key.endswith("Min") or key.endswith("Max"):
+            base = key[:-3]
+            lo, hi = out.get(base, (0.0, 0.0))
+            if key.endswith("Min"):
+                lo = v
+            else:
+                hi = v
+            out[base] = (lo, hi)
+        else:
+            out[key] = (v, v)
+    return {k: (lo if lo else hi, max(lo, hi)) for k, (lo, hi) in out.items()
+            if lo or hi}
+
+
+def build_stats(con: duckdb.DuckDBPyConnection, cur: dict, out_dir: Path,
+                diag: dict) -> int:
+    var = cur["variance"]
+    jitter = float(var["jitter_percent"])
+    exempt_ids = set(var["exempt_ids"]) | set(STAT_EXTRA_IDS) - {""}
+    exempt_pat = "|".join(f"({p})" for p in var["exempt_id_patterns"])
+    weapon_dmg = set(var["weapon_damage_ids"])
+
+    # --- self stats: SQL over the scoped entities ---------------------------
+    exempt_ids_sql = ", ".join(sql_str(i) for i in sorted(exempt_ids))
+    weapon_dmg_sql = ", ".join(sql_str(i) for i in sorted(weapon_dmg))
+    aps_types_sql = ", ".join(sql_str(t) for t in sorted(APS_TYPES | {"shield", "offhand"}))
+    exempt_domains_sql = ", ".join(sql_str(d) for d in var["exempt_domains"])
+    con.execute(f"""
+        CREATE TEMP TABLE self_stats AS
+        WITH raw AS (
+          SELECT s.record, s.domain, s.gear_type,
+                 TRY_CAST(s."lootRandomizerJitter" AS DOUBLE) AS affix_jitter,
+                 f.key, f.value_num
+          FROM scoped s JOIN facts f USING (record)
+          WHERE f.value_num IS NOT NULL AND f.value_num != 0
+            AND ((regexp_matches(f.key, '{STAT_KEY_RE}')
+                  AND NOT regexp_matches(f.key, '{STAT_STRUCTURAL_RE}'))
+                 OR f.key IN ({", ".join(sql_str(i) for i in STAT_EXTRA_IDS)}))
+            AND f.key NOT IN ({", ".join(sql_str(i) for i in sorted(STAT_ID_BLOCKLIST))})
+        ),
+        unified AS (
+          SELECT record, domain, gear_type, affix_jitter,
+                 regexp_replace(key, '(Min|Max)$', '') AS stat_id,
+                 max(CASE WHEN key LIKE '%Min' THEN value_num END) AS minv,
+                 max(CASE WHEN key LIKE '%Max' THEN value_num END) AS maxv,
+                 max(CASE WHEN key NOT LIKE '%Min' AND key NOT LIKE '%Max'
+                          THEN value_num END) AS plainv
+          FROM raw GROUP BY 1, 2, 3, 4, 5
+        ),
+        valued AS (
+          SELECT record, domain, gear_type, affix_jitter, stat_id,
+                 COALESCE(minv, plainv, maxv) AS value_min,
+                 GREATEST(COALESCE(minv, plainv, maxv), COALESCE(maxv, 0)) AS value_max,
+                 (minv IS NOT NULL AND maxv IS NOT NULL AND maxv != minv) AS is_pair,
+                 CASE WHEN domain = 'affix' THEN COALESCE(affix_jitter, 0) ELSE {jitter} END AS jit
+          FROM unified
+        )
+        SELECT record, 'self' AS source, stat_id, value_min, value_max,
+               CASE WHEN is_pair OR jit = 0
+                         OR domain IN ({exempt_domains_sql})
+                         OR stat_id IN ({exempt_ids_sql})
+                         OR regexp_matches(stat_id, {sql_str(exempt_pat)})
+                         OR (stat_id IN ({weapon_dmg_sql})
+                             AND gear_type IN ({aps_types_sql}))
+                    THEN NULL
+                    ELSE ceil(value_min * (1 - jit / 100)) END AS display_low,
+               CASE WHEN is_pair OR jit = 0
+                         OR domain IN ({exempt_domains_sql})
+                         OR stat_id IN ({exempt_ids_sql})
+                         OR regexp_matches(stat_id, {sql_str(exempt_pat)})
+                         OR (stat_id IN ({weapon_dmg_sql})
+                             AND gear_type IN ({aps_types_sql}))
+                    THEN NULL
+                    ELSE floor(value_max * (1 + jit / 100)) END AS display_high
+        FROM valued""")
+
+    # --- granted-skill rollup: python over the skill closure (KTD5) ---------
+    stat_re = re.compile(STAT_KEY_RE)
+    structural_re = re.compile(STAT_STRUCTURAL_RE)
+
+    items = [dict(zip(("record", "skill", "eq", "lvl_lit", "item_level", "controller", "pet"), r))
+             for r in con.execute("""
+        SELECT record, "itemSkillName", "itemSkillLevelEq", "itemSkillLevel",
+               TRY_CAST("itemLevel" AS DOUBLE), "itemSkillAutoController", "petBonusName"
+        FROM scoped
+        WHERE COALESCE("itemSkillName", '') != '' OR COALESCE("petBonusName", '') != ''""").fetchall()]
+
+    # One fetch for every referenced skill/buff/controller/pet-bonus record.
+    refs = {v for it in items for v in (it["skill"], it["controller"], it["pet"]) if v}
+    con.execute("CREATE TEMP TABLE ref_list (record VARCHAR)")
+    con.executemany("INSERT INTO ref_list VALUES (?)", [(r,) for r in sorted(refs)])
+    ref_facts: dict[str, dict[str, str]] = {}
+    for rec, key, value in con.execute(
+            "SELECT f.record, f.key, f.value FROM facts f JOIN ref_list r USING (record)").fetchall():
+        ref_facts.setdefault(rec, {})[key] = value
+    # buffSkillName is a second hop discovered from the first fetch.
+    buffs = {kv["buffSkillName"] for kv in ref_facts.values()
+             if kv.get("buffSkillName")} - set(ref_facts)
+    if buffs:
+        con.execute("DELETE FROM ref_list")
+        con.executemany("INSERT INTO ref_list VALUES (?)", [(r,) for r in sorted(buffs)])
+        for rec, key, value in con.execute(
+                "SELECT f.record, f.key, f.value FROM facts f JOIN ref_list r USING (record)").fetchall():
+            ref_facts.setdefault(rec, {})[key] = value
+
+    skill_rows: list[tuple] = []
+
+    def emit_skill_stats(item: str, rec: str, source: str, level: int) -> None:
+        kv = ref_facts.get(rec)
+        if kv is None:
+            diag["skill_ref_missing"] += 1
+            return
+        leveled: dict[str, float] = {}
+        for key, value in kv.items():
+            ok = (stat_re.match(key) and not structural_re.search(key)) or key in SKILL_CARD_IDS
+            if not ok or key in STAT_ID_BLOCKLIST:
+                continue
+            v = parse_leveled(value, level)
+            if v:
+                leveled[key] = v
+        for stat_id, (lo, hi) in unify_pairs(leveled).items():
+            skill_rows.append((item, source, stat_id, lo, hi, None, None))
+
+    for it in items:
+        if it["skill"]:
+            level = 1
+            if it["eq"]:
+                try:
+                    level = max(1, math.floor(eval_equation(
+                        it["eq"], {"itemlevel": it["item_level"] or 0.0})))
+                except ValueError:
+                    diag["equation_errors"] += 1
+            elif it["lvl_lit"]:
+                level = max(1, int(fnum(it["lvl_lit"]) or 1))
+            emit_skill_stats(it["record"], it["skill"], "skill", level)
+            buff = ref_facts.get(it["skill"], {}).get("buffSkillName")
+            if buff:
+                emit_skill_stats(it["record"], buff, "skill_buff", level)
+            chance = fnum(ref_facts.get(it["controller"] or "", {}).get("chanceToRun"))
+            if chance:
+                skill_rows.append((it["record"], "skill", "skillProcChance",
+                                   chance, chance, None, None))
+        if it["pet"]:
+            emit_skill_stats(it["record"], it["pet"], "pet_bonus", 1)
+
+    con.execute("""
+        CREATE TEMP TABLE skill_stats (
+          record VARCHAR, source VARCHAR, stat_id VARCHAR, value_min DOUBLE,
+          value_max DOUBLE, display_low DOUBLE, display_high DOUBLE)""")
+    con.executemany("INSERT INTO skill_stats VALUES (?,?,?,?,?,?,?)", skill_rows)
+
+    out = out_dir / "stats.parquet"
+    con.execute(f"""
+        COPY (SELECT * FROM self_stats UNION ALL SELECT * FROM skill_stats
+              ORDER BY record, source, stat_id)
+        TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)""")
+    return con.execute("SELECT count(*) FROM (SELECT * FROM self_stats UNION ALL SELECT * FROM skill_stats)").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 
 def cmd_build(args) -> int:
     deposit_dir = args.deposit_dir.resolve()
@@ -422,21 +614,28 @@ def cmd_build(args) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     diag = {"unnamed": 0, "expansion_defaulted": 0, "aps_missing_tier": 0,
-            "cost_default_used": 0, "cost_record_missing": 0, "equation_errors": 0}
+            "cost_default_used": 0, "cost_record_missing": 0, "equation_errors": 0,
+            "skill_ref_missing": 0}
     build_wide(con, cur)
     n_entities = build_entities(con, cur, out_dir, diag)
+    n_stats = build_stats(con, cur, out_dir, diag)
 
     counts = con.execute(
         "SELECT domain, count(*) FROM entities GROUP BY 1 ORDER BY 1").fetchall()
+    src_counts = con.execute(
+        "SELECT source, count(*) FROM (SELECT * FROM self_stats UNION ALL "
+        "SELECT * FROM skill_stats) GROUP BY 1 ORDER BY 1").fetchall()
 
     print("\n=== DERIVED SUMMARY ===")
     print(f"  entities: {n_entities}   " +
           "  ".join(f"{d}({n})" for d, n in counts))
+    print(f"  stats rows: {n_stats}   " +
+          "  ".join(f"{s}({n})" for s, n in src_counts))
     print(f"  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                          if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities",):
+    for name in ("entities", "stats"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
