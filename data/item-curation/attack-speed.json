@@ -1,0 +1,31 @@
+{
+  "_aboutme": [
+    "ABOUTME: Curated base attacks-per-second by weapon speed tier (no .tpl templates exist in",
+    "ABOUTME: the extract, so the engine's per-tier animation base is reproduced here).",
+    "Model: displayed APS = tier_base[characterBaseAttackSpeedTag] + characterBaseAttackSpeed",
+    "(the record's own signed offset). characterAttackSpeedModifier is NOT folded in - it is the",
+    "item's separate '+N% Attack Speed' stat. Evidence: the per-record offsets band by tier",
+    "across all weapon classes (VeryFast -0.06..0.01 ... VerySlow -0.24..-0.14), so the base is",
+    "per tier, not per class - matching the community's per-category-base description.",
+    "APS is displayed for weapon classes only; shields and caster off-hands (tier tag",
+    "CharacterAttackSpeedAverage) show no APS on cards and are excluded."
+  ],
+  "tier_base": {
+    "tagAttackSpeedVeryFast": 1.95,
+    "tagAttackSpeedFast": 1.875,
+    "tagAttackSpeedAverage": 1.8,
+    "tagAttackSpeedModerate": 1.8,
+    "tagAttackSpeedSlow": 1.725,
+    "tagAttackSpeedVerySlow": 1.65
+  },
+  "pinned": {
+    "tagAttackSpeedVeryFast": "Sacrificial Knife card: 1.93 = 1.95 + (-0.02)",
+    "tagAttackSpeedVerySlow": "The Guillotine and Death's Reach cards: 1.48 = 1.65 + (-0.17)"
+  },
+  "provisional": {
+    "tagAttackSpeedFast": "interpolated; needs one grimtools card oracle (e.g. a Fast 1h axe)",
+    "tagAttackSpeedAverage": "interpolated; needs one grimtools card oracle (e.g. a scepter)",
+    "tagAttackSpeedModerate": "single enemygear staff uses it; mapped to Average pending an oracle",
+    "tagAttackSpeedSlow": "interpolated; needs one grimtools card oracle (e.g. a Slow 2h mace)"
+  }
+}

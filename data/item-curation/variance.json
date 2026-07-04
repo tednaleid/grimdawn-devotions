@@ -1,0 +1,28 @@
+{
+  "_aboutme": [
+    "ABOUTME: Curated stat-roll variance rule (no variance keys exist in items or records/game/,",
+    "ABOUTME: so the engine's jitter is reproduced here; see docs/item-schema.md).",
+    "Rule: display range = base * (1 - jitter/100) .. base * (1 + jitter/100), each end then",
+    "scaled by (1 + attributeScalePercent/100) where the record carries that key. Affix stats",
+    "read jitter from their own record's lootRandomizerJitter; item self-stats use the curated",
+    "item_attribute_jitter_percent below. Integer stats round outward (floor low, ceil high)",
+    "so the printed range always contains the base roll.",
+    "Exemptions never roll: the ids listed, plus every stat on augment and component records."
+  ],
+  "item_attribute_jitter_percent": 12.5,
+  "calibration": "pending U4: candidates 12.5 (Sacrificial Knife card implies +7/+9% around base 8) vs 20 (community documentation); U4 locks the value that reproduces the screenshot corpus and records the evidence here",
+  "scale_key": "attributeScalePercent",
+  "affix_jitter_key": "lootRandomizerJitter",
+  "exempt_ids": [
+    "augmentSkillLevel1",
+    "augmentSkillLevel2",
+    "augmentMasteryLevel1",
+    "augmentMasteryLevel2",
+    "augmentAllLevel",
+    "characterLightRadius",
+    "characterIncreasedExperience",
+    "characterManaRegen",
+    "characterManaRegenModifier"
+  ],
+  "exempt_domains": ["augment", "component"]
+}
