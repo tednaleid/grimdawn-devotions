@@ -34,6 +34,8 @@ backend, no accounts.
 - Tool/data check: `just doctor`
 - Raw game-data deposit (full records tree + labels as parquet): `just deposit`, then
   `just census` / `just q "SQL"` to mine it - see `docs/deposit.md`
+- Derived typed item schema (entities/stats/relations parquet): `just derive`, then
+  `just q-ae-all` for the acceptance queries - see `docs/item-schema.md`
 
 ## Architecture
 Two halves. (1) The parser (`scripts/parse_devotions.py`) reads extracted game
@@ -67,6 +69,7 @@ https://tednaleid.github.io/grimdawn-devotions/ (GitHub Pages, auto-deployed fro
 - `README.md` -- project overview, `devotions.json` schema, extraction steps
 - `docs/dbr-format.md` -- reverse-engineered game data model
 - `docs/deposit.md` -- raw game-data deposit: schema, recipes, refresh flow
+- `docs/item-schema.md` -- derived typed item schema: tables, curated inputs, known gaps
 - `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings
 - `docs/reachability-engine.md` -- shipped vs costed engine comparison + the current-state decision
