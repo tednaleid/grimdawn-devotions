@@ -2,15 +2,23 @@
   "_aboutme": [
     "ABOUTME: Curated stat-roll variance rule (no variance keys exist in items or records/game/,",
     "ABOUTME: so the engine's jitter is reproduced here; see docs/item-schema.md).",
-    "Rule: display range = base * (1 - jitter/100) .. base * (1 + jitter/100), each end then",
-    "scaled by (1 + attributeScalePercent/100) where the record carries that key. Affix stats",
-    "read jitter from their own record's lootRandomizerJitter; item self-stats use the curated",
-    "item_attribute_jitter_percent below. Integer stats round outward (floor low, ceil high)",
-    "so the printed range always contains the base roll.",
-    "Exemptions never roll: the ids listed, plus every stat on augment and component records."
+    "Rule: display_low = ceil(base * (1 - jitter/100)), display_high = floor(base * (1 + jitter/100))",
+    "- inward rounding, so the printed range is what the game can actually roll. Item stats use",
+    "jitter_percent below; affix stats use their own record's lootRandomizerJitter (0 = fixed).",
+    "True Min/Max damage pairs, weapon damage lines, and the exemptions below never roll."
   ],
-  "item_attribute_jitter_percent": 12.5,
-  "calibration": "pending U4: candidates 12.5 (Sacrificial Knife card implies +7/+9% around base 8) vs 20 (community documentation); U4 locks the value that reproduces the screenshot corpus and records the evidence here",
+  "jitter_percent": 20,
+  "calibration": {
+    "value": "20 with inward rounding, locked 2026-07-04 against the screenshot corpus",
+    "evidence": [
+      "Sacrificial Knife +8% cold modifier -> 7/9 (8*0.8=6.4 ceil 7; 8*1.2=9.6 floor 9). This resolves the 12.5-vs-20 question in favor of the community's 20: 12.5 only looked right under exact-bound rounding.",
+      "Meat Shield: physique 46 -> 37/55; +% health 21 -> 17/25; health regen 40 -> 32/48; constitution 50 -> 40/60; vitality res 35 -> 28/42 (all exact)",
+      "The Final Stop: health 360 -> 288/432; stun res 30 -> 24/36 (exact)",
+      "Bramblevine: acid retaliation 688 -> 551/825; physical res 12 -> 10/14; elemental res 35 -> 28/42; +% all retaliation 40 -> 32/48 (exact)",
+      "Avatar of Order: fire retaliation 260 -> 208/312 (exact)"
+    ],
+    "known_gap": "Offensive damage-bonus lines on items carrying attributeScalePercent show an extra level-linked upscale on grimtools that plain jitter does not reproduce: Meat Shield offensiveLife 22 -> card 23/33 (implies ~x1.27 at level 50); Bramblevine offensive modifiers 60 -> card 62/93 (implies ~x1.2917 at level 58). v1 ships plain jitter ranges for these lines; the scaling mechanism is a BACKLOG follow-up."
+  },
   "scale_key": "attributeScalePercent",
   "affix_jitter_key": "lootRandomizerJitter",
   "exempt_ids": [
@@ -22,7 +30,14 @@
     "characterLightRadius",
     "characterIncreasedExperience",
     "characterManaRegen",
-    "characterManaRegenModifier"
+    "characterManaRegenModifier",
+    "defensiveBlock",
+    "defensiveBlockChance",
+    "defensiveBlockModifier",
+    "defensiveBlockAmountModifier",
+    "defensiveBlockRecoveryTime"
   ],
-  "exempt_domains": ["augment", "component"]
+  "exempt_id_patterns": ["^offensiveBase", "Chance$", "Duration(Modifier)?$"],
+  "weapon_damage_ids": ["offensivePhysical"],
+  "exempt_domains": ["augment", "component", "relic", "quest", "blueprint"]
 }
