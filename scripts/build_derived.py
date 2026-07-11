@@ -8,8 +8,8 @@
 """Derived item schema: typed tables for the item-database SPA, built by SQL alone.
 
 Inputs: the deposit parquet (facts/labels/meta, labels schema v2 with tag sources)
-and data/item-curation/*.json. Outputs under data/derived/ (gitignored, same
-size-gate discipline as the deposit):
+and data/item-curation/*.json. Outputs under data/derived/ (never committed;
+released alongside the deposit - see docs/deposit.md):
 
   entities.parquet   one row per in-scope game record: identity, domain/type/slots
                      taxonomy, variant group key, rarity, computed requirements,
