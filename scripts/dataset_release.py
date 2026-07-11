@@ -228,6 +228,80 @@ def cmd_publish(args) -> int:
     return 0
 
 
+# ---------------------------------------------------------------------------
+# fetch
+# ---------------------------------------------------------------------------
+
+def load_lock(path: Path) -> dict:
+    if not path.is_file():
+        err(f"no lockfile at {path} - nothing to fetch.")
+        print("Publish from the Windows box first (`just publish-deposit`).", file=sys.stderr)
+        raise SystemExit(2)
+    try:
+        lock = json.loads(path.read_text(encoding="utf-8"))
+        if not lock["download_base"] or not lock["assets"]:
+            raise KeyError("empty download_base or assets")
+        for e in lock["assets"]:
+            if e["dir"] not in ("deposit", "derived") or not e["name"] or not e["sha256"]:
+                raise KeyError(f"bad asset entry {e}")
+    except (json.JSONDecodeError, KeyError, TypeError) as ex:
+        err(f"malformed lockfile {path}: {ex}")
+        raise SystemExit(2)
+    return lock
+
+
+def cmd_fetch(args) -> int:
+    lock = load_lock(args.lock)
+
+    def local_path(e: dict) -> Path:
+        return asset_dir(e["dir"], args.deposit_dir, args.derived_dir) / e["name"]
+
+    # Idempotence: only assets whose local copy is absent or hash-mismatched are fetched.
+    needs = [e for e in lock["assets"]
+             if not (local_path(e).is_file() and sha256_file(local_path(e)) == e["sha256"])]
+    if not needs:
+        print(f"up to date: all {len(lock['assets'])} artifacts match deposit.lock ({lock['tag']})")
+        return 0
+
+    # Download everything to a temp dir on the same volume, verify every hash,
+    # and only then move into place - a bad download never replaces current data.
+    data_root = args.deposit_dir.parent
+    data_root.mkdir(parents=True, exist_ok=True)
+    tmp = Path(tempfile.mkdtemp(prefix=".fetch-", dir=data_root))
+    try:
+        for e in needs:
+            url = f"{lock['download_base']}/{e['name']}"
+            print(f"downloading {e['name']} ({e['bytes']:,} bytes) ...")
+            try:
+                with urllib.request.urlopen(url) as r, (tmp / e["name"]).open("wb") as f:
+                    shutil.copyfileobj(r, f)
+            except (urllib.error.URLError, OSError) as ex:
+                err(f"download of {e['name']} failed: {ex}")
+                print(f"URL: {url}\nLocal data is untouched.", file=sys.stderr)
+                raise SystemExit(2)
+        bad = [e["name"] for e in needs if sha256_file(tmp / e["name"]) != e["sha256"]]
+        if bad:
+            err("checksum mismatch for: " + ", ".join(bad))
+            print("Local data is untouched. deposit.lock and the downloaded assets disagree -\n"
+                  "check that the lockfile matches the release it points at.", file=sys.stderr)
+            raise SystemExit(2)
+        for e in needs:
+            target = local_path(e)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                os.replace(tmp / e["name"], target)
+            except OSError as ex:
+                err(f"could not move {e['name']} into place: {ex}")
+                print("Close whatever holds the file open (a server or query), then re-run\n"
+                      "`just fetch-deposit` - it resumes with whatever is still missing.",
+                      file=sys.stderr)
+                raise SystemExit(2)
+        print(f"fetched {len(needs)} artifact(s) ({lock['tag']})")
+        return 0
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -254,6 +328,10 @@ def main() -> int:
     p_pub.add_argument("--assume-existing-tags", metavar="TAGS",
                        help="comma-separated tag list standing in for `gh release list` (testing)")
     p_pub.set_defaults(fn=cmd_publish)
+
+    p_fetch = sub.add_parser("fetch", help="download + verify the assets pinned by deposit.lock")
+    common(p_fetch)
+    p_fetch.set_defaults(fn=cmd_fetch)
 
     args = ap.parse_args()
     return args.fn(args)
