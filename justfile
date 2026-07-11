@@ -339,6 +339,12 @@ publish-deposit *ARGS: derive q-ae-all
     uv run scripts/dataset_release.py publish --deposit-dir "{{deposit_dir}}" \
         --derived-dir "{{derived_dir}}" --lock "{{justfile_directory()}}/deposit.lock" {{ARGS}}
 
+# Download the parquet artifacts pinned by deposit.lock (any machine; needs no gh,
+# no auth, no game install). Idempotent: does nothing when local files already match.
+fetch-deposit:
+    uv run scripts/dataset_release.py fetch --deposit-dir "{{deposit_dir}}" \
+        --derived-dir "{{derived_dir}}" --lock "{{justfile_directory()}}/deposit.lock"
+
 # Throwaway item-DB browser prototype: itemdb.html over the derived parquet.
 # Serves the REPO ROOT (so the page can fetch data/derived + data/deposit).
 item-browser:
