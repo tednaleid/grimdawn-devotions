@@ -327,6 +327,12 @@ clean-deposit:
 clean-derived:
     rm -rf "{{derived_dir}}"
 
+# Throwaway item-DB browser prototype: itemdb.html over the derived parquet.
+# Serves the REPO ROOT (so the page can fetch data/derived + data/deposit).
+item-browser:
+    @echo "open http://localhost:5174/itemdb.html"
+    bunx serve "{{justfile_directory()}}" -l 5174
+
 # Install web dependencies (bun)
 web-install:
     cd "{{justfile_directory()}}/web" && bun install
