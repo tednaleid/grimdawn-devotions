@@ -25,6 +25,7 @@ default:
 # --- Prerequisite checks ----------------------------------------------------
 
 # Check tools + committed data needed to build/serve (extraction prereqs optional, Windows-only)
+[group("setup")]
 doctor:
     #!/usr/bin/env bash
     set -uo pipefail
@@ -74,17 +75,22 @@ _install-tool tool brew_formula winget_id:
     fi
 
 # Install uv (Python manager) if missing
+[group("setup")]
 install-uv: (_install-tool "uv" "uv" "astral-sh.uv")
 
 # Install bun (web toolchain) if missing
+[group("setup")]
 install-bun: (_install-tool "bun" "bun" "Oven-sh.Bun")
 
 # Install jq (JSON CLI) if missing
+[group("setup")]
 install-jq: (_install-tool "jq" "jq" "jqlang.jq")
 
 # Install the Rust toolchain + wasm32 target (only needed to rebuild the reachability WASM core).
 # The site builds and runs without it: the engine falls back to the (slower) TS resolver when
 # data/reach.wasm is absent. cargo lands in ~/.cargo/bin; open a new shell for it on PATH.
+[group("setup")]
+[doc("Install the Rust toolchain + wasm32 target (only needed to rebuild the reachability WASM core)")]
 install-rust:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -104,6 +110,7 @@ install-rust:
     echo "Rust + wasm32 target ready. If 'cargo' is not on PATH yet, open a new shell."
 
 # Install everything needed to run the parser + web build (uv + bun + jq + a managed Python)
+[group("setup")]
 install: install-uv install-bun install-jq
     @command -v uv >/dev/null 2>&1 && uv python install || echo "Re-run 'just install' once 'uv' is on PATH."
 
@@ -121,6 +128,7 @@ _require-game-closed:
     fi
 
 # Extract records + English text from the base game and expansions (Windows-only: runs the game's ArchiveTool.exe; needs ~5 GB free)
+[group("devotions")]
 extract: _require-game-closed
     #!/usr/bin/env bash
     set -euo pipefail
@@ -156,6 +164,8 @@ extract: _require-game-closed
 
 # Parse extracted records into devotions.json (passes version + steam build id). Game text tables
 # (including English) are built separately by `just i18n-tables`, the single generic builder.
+[group("devotions")]
+[doc("Parse extracted records into devotions.json (game version + steam build id stamped)")]
 parse *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -168,11 +178,13 @@ parse *ARGS:
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
 
 # Full pipeline: extract then parse
+[group("devotions")]
 all: extract parse i18n-tables
 
 # KEEPS the committed dataset (data/devotions.json, data/stat_labels.json) — those only
 # regenerate via `just parse` on Windows, so clean must never delete them.
 # Remove build artifacts: web/dist, data/cover-table.bin, data/reach.wasm, web/wasm/target, csv dump.
+[group("devotions")]
 clean:
     rm -rf "{{justfile_directory()}}/web/dist" \
            "{{justfile_directory()}}/web/wasm/target" \
@@ -181,6 +193,7 @@ clean:
            "{{justfile_directory()}}/data/devotion_records.csv"
 
 # Extract + optimize devotion artwork from the base + expansion UI.arc archives into assets/ (WebP + manifest)
+[group("devotions")]
 assets *ARGS: _require-game-closed
     uv run scripts/build_assets.py --gd-dir "{{gd_dir}}" \
         --out-dir "{{justfile_directory()}}/assets/devotions" {{ARGS}}
@@ -195,6 +208,8 @@ assets *ARGS: _require-game-closed
 # ArchiveTool needs an ABSOLUTE -extract path (a relative one fails to open the output file: it prints
 # progress and exits 0 but writes zero files, and pops an archivewriter.cpp assert on debug builds) and
 # stdin redirected (`< /dev/null`, else it blocks). Both are handled below.
+[group("devotions")]
+[doc("Build data/i18n/game.<lang>.json for every installed language, or just the ones you name")]
 i18n-tables *LANGS:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -244,6 +259,7 @@ i18n-tables *LANGS:
 # `just deposit`, then `just publish-deposit`. See docs/deposit.md.
 
 # Build facts.parquet + labels.parquet + meta.parquet from the extracted tree
+[group("deposit")]
 deposit:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -256,33 +272,41 @@ deposit:
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"}
 
 # Schema census over the deposit: per-category key stats, template usage, diagnostics
+[group("deposit")]
 census:
     uv run scripts/build_deposit.py census --deposit-dir "{{deposit_dir}}"
 
 # Ad-hoc SQL over the deposit (views: facts, labels, meta) plus, when built, the
 # derived schema (entities, stats, relations, families), e.g.
 #   just q "SELECT key, count(*) FROM facts GROUP BY key ORDER BY 2 DESC LIMIT 10"
+[group("deposit")]
+[doc("Ad-hoc SQL over the deposit + derived views (facts, labels, meta, entities, stats, relations, families)")]
 q SQL:
     uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
         --derived-dir "{{derived_dir}}" --sql "{{SQL}}"
 
 # Acceptance query AE1: components matching "Cold" in name/description, level 20+ (fails on 0 rows)
+[group("deposit")]
 q-cold-components:
     uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
         --file scripts/deposit_queries/cold_components.sql --fail-on-empty
 
 # Acceptance query AE2: (sword1h OR dagger) AND (Epic OR Legendary) AND lightning damage (fails on 0 rows)
+[group("deposit")]
 q-compound-facets:
     uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
         --file scripts/deposit_queries/compound_facets.sql --fail-on-empty
 
 # Acceptance query AE3: German text search with per-tag English fallback (fails on 0 rows)
+[group("deposit")]
 q-search-de:
     uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
         --file scripts/deposit_queries/search_de.sql --fail-on-empty
 
 # Build the derived typed item schema (entities/stats/relations parquet) from the
 # deposit + data/item-curation/. Runs the curation drift guards first (fails loudly).
+[group("deposit")]
+[doc("Build the derived typed item schema (entities/stats/relations parquet) from the deposit + curation")]
 derive:
     uv run scripts/build_derived.py build --deposit-dir "{{deposit_dir}}" \
         --curation-dir "{{justfile_directory()}}/data/item-curation" --out-dir "{{derived_dir}}"
@@ -295,35 +319,46 @@ _q-derived FILE:
         --file "scripts/derived_queries/{{FILE}}" --fail-on-empty
 
 # AE1: dagger + Cold family + level range; innate and granted-skill cold; per-variant range
+[group("deposit")]
 q-ae1-cold-daggers: (_q-derived "ae1_cold_daggers.sql")
 
 # AE2: augments applicable to rings or amulets (pinned: 97 at build 19149150)
+[group("deposit")]
 q-ae2-augments-ring-amulet: (_q-derived "ae2_augments_ring_amulet.sql")
 
 # AE3: blueprint crafts + reagent edges, and reverse lookup from Searing Ember
+[group("deposit")]
 q-ae3-blueprint-links: (_q-derived "ae3_blueprint_links.sql")
 
 # AE4: computed requirements match the grimtools card oracles exactly (74/93, 426, ...)
+[group("deposit")]
 q-ae4-requirement-oracles: (_q-derived "ae4_requirement_oracles.sql")
 
 # AE5: legendary two-handed axes reconcile with grimtools' 14; The Guillotine card fields
+[group("deposit")]
 q-ae5-legendary-2h-axes: (_q-derived "ae5_legendary_2h_axes.sql")
 
 # AE6: expansion badges match the screenshot oracles (base / aom / fg)
+[group("deposit")]
 q-ae6-expansion-badges: (_q-derived "ae6_expansion_badges.sql")
 
 # AE7: German text search with English fallback, including granted-skill descriptions
+[group("deposit")]
 q-ae7-search-de: (_q-derived "ae7_search_de.sql")
 
 # All seven derived acceptance queries (the AE gate from docs/item-schema.md)
+[group("deposit")]
 q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de
 
 # Delete the deposit artifacts. Deliberately NOT part of `clean`: regenerating
 # them needs Windows + the game install, so `clean` must never touch them.
+[group("deposit")]
+[doc("Delete the deposit artifacts (deliberately separate from clean: regeneration needs Windows + the game)")]
 clean-deposit:
     rm -rf "{{deposit_dir}}"
 
 # Delete the derived item-schema artifacts (regenerate anywhere with `just derive`)
+[group("deposit")]
 clean-derived:
     rm -rf "{{derived_dir}}"
 
@@ -334,26 +369,32 @@ clean-derived:
 
 # Extra args pass through to the script, e.g. `just publish-deposit --dry-run`.
 # Publish deposit + derived parquet as a GitHub Release + write deposit.lock (Windows; gated on derive + q-ae-all)
+[group("release")]
 publish-deposit *ARGS: derive q-ae-all
     uv run scripts/dataset_release.py publish --deposit-dir "{{deposit_dir}}" \
         --derived-dir "{{derived_dir}}" --lock "{{justfile_directory()}}/deposit.lock" {{ARGS}}
 
 # Download + verify the parquet pinned by deposit.lock (any machine; no gh/auth/game install; idempotent)
+[group("release")]
 fetch-deposit:
     uv run scripts/dataset_release.py fetch --deposit-dir "{{deposit_dir}}" \
         --derived-dir "{{derived_dir}}" --lock "{{justfile_directory()}}/deposit.lock"
 
 # Throwaway item-DB browser prototype: itemdb.html over the derived parquet.
 # Serves the REPO ROOT (so the page can fetch data/derived + data/deposit).
+[group("deposit")]
+[doc("Throwaway item-DB browser prototype: serves the repo root on :5174 for itemdb.html")]
 item-browser:
     @echo "open http://localhost:5174/itemdb.html"
     bunx serve "{{justfile_directory()}}" -l 5174
 
 # Install web dependencies (bun)
+[group("web")]
 web-install:
     cd "{{justfile_directory()}}/web" && bun install
 
 # Generate the precomputed cover table from data/devotions.json (only if stale)
+[group("web")]
 cover-table:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -380,6 +421,7 @@ _ensure-wasm-target:
 # `just install-rust` first if you have no rust toolchain at all). The engine loads this for the
 # fast resolver; absent, it falls back to the TS resolver, so this is optional for a working build.
 # Build the reachability core to WebAssembly (raw wasm32, no wasm-bindgen) into data/reach.wasm.
+[group("web")]
 wasm: _ensure-wasm-target
     #!/usr/bin/env bash
     set -euo pipefail
@@ -393,11 +435,15 @@ wasm: _ensure-wasm-target
 # Run the core test suite. Pass args to target a file or filter, e.g.
 #   just test test/reachability.test.ts   (one file)   |   just test -t Oklaine   (by name)
 # The heavy downward-closure walk is gated out of this run; see `just test-slow`.
+[group("check")]
+[doc("Run the core test suite; pass args to target a file or filter (heavy walk gated to test-slow)")]
 test *ARGS:
     cd "{{justfile_directory()}}/web" && bun test {{ARGS}}
 
 # Slow reachability property tier: the heavy metamorphic downward-closure walk, gated behind REACH_SLOW
 # so the default suite (and the pre-commit hook) stay fast. Run before big engine changes.
+[group("check")]
+[doc("Slow reachability property tier: the heavy metamorphic downward-closure walk (REACH_SLOW)")]
 test-slow:
     cd "{{justfile_directory()}}/web" && REACH_SLOW=1 bun test test/reachability-monotonicity.test.ts
 
@@ -406,17 +452,23 @@ test-slow:
 # passes: demanding singletons (each non-self-covering constellation whole from empty - the freeze cases)
 # and seeded random play. `just perf` uses the deployed WASM path; `just perf --ts` measures the pure TS
 # core algorithm you iterate on. Flags: --seeds N --start S --cap C --max-ms M --replay <seed> --ts.
+[group("reachability")]
+[doc("Per-click engine perf harness: times selectionView, the exact work one UI click costs")]
 perf *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/perf-reachability.ts {{ARGS}}
 
 # Seeded reachability correctness fuzzer: build known-valid builds forward (ground-truth rule), replay
 # them claim-anywhere, assert the engine never dims a valid-build member. Flags: --seeds N --start S
 # --ts.  e.g. just fuzz --seeds 200.  Uses the WASM resolver if built (just wasm).
+[group("reachability")]
+[doc("Seeded reachability correctness fuzzer: forward ground-truth builds, replayed claim-anywhere")]
 fuzz *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/reachability-fuzz.ts {{ARGS}}
 
 # Regenerate the reachable-builds fixture (web/test/fixtures/reachable-builds.json): ground-truth-reachable
 # builds the engine wrongly dims (confirmed by the constructor) plus guards. Run after a data change.
+[group("reachability")]
+[doc("Regenerate the reachable-builds fixture (run after a data change)")]
 gen-reach-fixtures:
     cd "{{justfile_directory()}}/web" && bun scripts/gen-reach-fixtures.ts
 
@@ -424,22 +476,29 @@ gen-reach-fixtures:
 # constellation that becomes viable after an additive pick was a false-dim before (oracle-free, real model).
 # Reports the rate and dumps cases to web/test/fixtures/false-dims.json. Flags: --seeds N --start S
 # --max-pts P --cap C --ts --no-dump.  e.g. just harvest-false-dims --seeds 30.  Re-run after a data change.
+[group("reachability")]
+[doc("Metamorphic false-dim harvester: seeded additive star walks (oracle-free, real model)")]
 harvest-false-dims *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/harvest-false-dims.ts {{ARGS}}
 
 # Heavy reachability validation for big algorithm changes (minutes): cross-checks the engine against the
 # BFS oracle at scale (both directions) and harvests ground-truth real-model false-dims. Exits non-zero
 # on any disagreement. Flags: --a-seeds N (small-model oracle) --b-seeds N (real-model harvest).
+[group("reachability")]
+[doc("Heavy reachability validation vs the BFS oracle (minutes; before big engine changes)")]
 validate-reach *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/validate-reach.ts {{ARGS}}
 
 # Verify the Rust/WASM resolver is verdict-equivalent to the TS resolver (run after `just wasm`).
+[group("reachability")]
 validate-wasm:
     cd "{{justfile_directory()}}/web" && bun scripts/validate-wasm.ts
 
 # Audit the engine's false-reach (soundness) gap vs the BFS oracle: which classify path emits it, whether
 # the rate shrinks with budget, and a real-model upper bound via the sound peak witness. See
 # docs/reachability-engine.md "Update 2026-06-25: false-reach audit".
+[group("reachability")]
+[doc("Audit the engine false-reach (soundness) gap vs the BFS oracle")]
 audit-false-reach:
     cd "{{justfile_directory()}}/web" && bun scripts/audit-false-reach.ts
 
@@ -447,6 +506,8 @@ audit-false-reach:
 # requirement, partial self-payback) at real-map-like abundance, against the BFS oracle in both directions.
 # Surfaces the construction-PEAK false-reach when two such constellations are stacked in a tight budget.
 # Flags: --seeds N --start S --dump K.  See docs/reachability-engine.md "shape-biased fuzz".
+[group("reachability")]
+[doc("Shape-biased reachability fuzz: multi-color requirement + partial self-payback at real abundance")]
 shape-fuzz *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/reachability-shape-fuzz.ts {{ARGS}}
 
@@ -454,40 +515,51 @@ shape-fuzz *ARGS:
 # Affliction-like shape, ask the SHIPPED engine if it lights them, and PROVE which are unconstructible
 # within 55 via the costed branch's exactMinPeak (vendored as a 3-way oracle). A build the engine lights
 # that the oracle proves unreachable is a confirmed real-map false-reach. Flags: --seeds N --start S --dump K.
+[group("reachability")]
+[doc("Real-map false-reach hunt: tight near-budget real builds vs the exactMinPeak oracle")]
 realmap-hunt *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/reachability-realmap-hunt.ts {{ARGS}}
 
 # Validate the guided-build-order engine: measure buildOrderPath's false-negative rate (misses an order the
 # exact minPeakCost oracle proves exists) and false-positive rate (shows an illegal path) across typical
 # self-covering builds, single-constellation partials, and random subsets. Flags: --seeds N --subsets M.
+[group("reachability")]
+[doc("Validate the guided-build-order engine: false-negative and false-positive rates")]
 build-order-validate *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/build-order-validate.ts {{ARGS}}
 
 # Type-check the web sources (no emit)
+[group("check")]
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
 
 # Lint the web sources with Biome (warnings fail too, so check/CI catch them)
+[group("check")]
 lint:
     cd "{{justfile_directory()}}/web" && bunx biome lint --error-on-warnings
 
 # Auto-fix the safe lint findings Biome can resolve on its own
+[group("check")]
 lint-fix:
     cd "{{justfile_directory()}}/web" && bunx biome lint --write
 
 # Format the web sources with Biome (writes changes in place)
+[group("check")]
 fmt:
     cd "{{justfile_directory()}}/web" && bunx biome format --write
 
 # Verify formatting without writing (fails if anything is unformatted); used by check + CI
+[group("check")]
 fmt-check:
     cd "{{justfile_directory()}}/web" && bunx biome format
 
 # Full verification gate: formatting, tests, lint, and type-check
+[group("check")]
 check: fmt-check test lint typecheck
 
 # Opt-in (hooks are not tracked): run this once after cloning.
 # Install a git pre-commit hook that runs `just check` before each commit.
+[group("setup")]
 install-hooks:
     #!/usr/bin/env bash
     set -euo pipefail
@@ -497,6 +569,7 @@ install-hooks:
     echo "Installed pre-commit hook: $hook"
 
 # Build the static site into web/dist (bundles JS, copies html/css/data/assets)
+[group("web")]
 build: cover-table
     #!/usr/bin/env bash
     set -euo pipefail
@@ -531,31 +604,37 @@ build: cover-table
     echo "Built web/dist"
 
 # Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)
+[group("web")]
 serve: build
     bunx serve "{{justfile_directory()}}/web/dist" -l 5173
 
-# Stop a running dev server (frees port 5173). Safe to run when nothing is listening.
+# Stop running dev servers (frees ports 5173 planner + 5174 item browser). Safe when nothing is listening.
+[group("web")]
 stop:
     #!/usr/bin/env bash
     set -uo pipefail
-    port=5173
-    case "$(uname -s)" in
-      MINGW*|MSYS*|CYGWIN*)
-        pid=$(netstat -ano 2>/dev/null | grep -E ":$port[[:space:]].*LISTENING" | awk '{print $NF}' | sort -u | head -1)
-        if [ -n "${pid:-}" ]; then taskkill //F //T //PID "$pid" >/dev/null 2>&1 && echo "stopped server on :$port (pid $pid)"; else echo "no server on :$port"; fi
-        ;;
-      *)
-        pids=$(lsof -ti "tcp:$port" 2>/dev/null || true)
-        if [ -n "${pids:-}" ]; then kill $pids 2>/dev/null && echo "stopped server on :$port (pids $pids)"; else echo "no server on :$port"; fi
-        ;;
-    esac
+    for port in 5173 5174; do
+      case "$(uname -s)" in
+        MINGW*|MSYS*|CYGWIN*)
+          pid=$(netstat -ano 2>/dev/null | grep -E ":$port[[:space:]].*LISTENING" | awk '{print $NF}' | sort -u | head -1)
+          if [ -n "${pid:-}" ]; then taskkill //F //T //PID "$pid" >/dev/null 2>&1 && echo "stopped server on :$port (pid $pid)"; else echo "no server on :$port"; fi
+          ;;
+        *)
+          pids=$(lsof -ti "tcp:$port" 2>/dev/null || true)
+          if [ -n "${pids:-}" ]; then kill $pids 2>/dev/null && echo "stopped server on :$port (pids $pids)"; else echo "no server on :$port"; fi
+          ;;
+      esac
+    done
 
 # Install the headless Chromium the e2e check drives (run once)
+[group("setup")]
 install-e2e:
     cd "{{justfile_directory()}}/web" && bunx playwright@1.61.0 install chromium
 
 # Build, then verify the page works in a real headless browser.
 # Drives Chromium with a raw CDP client over bun's native WebSocket; playwright's
 # own pipe and ws transports do not connect under bun on Windows. Run install-e2e once first.
+[group("web")]
+[doc("Build, then verify the page works in a real headless browser (run install-e2e once first)")]
 e2e: build
     cd "{{justfile_directory()}}/web" && bun e2e/smoke.ts
