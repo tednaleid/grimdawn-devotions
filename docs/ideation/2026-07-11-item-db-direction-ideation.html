@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ideation: Item-DB Direction — Repo, Data, Source, Boundary</title>
+<style>
+  :root {
+    --bg: #faf9f7; --text: #23211c; --muted: #6b6557; --border: #ddd8cc;
+    --card: #ffffff; --accent: #2d6a4f; --accent-soft: #e7f2ec; --accent-text: #1f4d39;
+    --warn-soft: #fdf1e2; --warn-text: #8a5416; --info-soft: #e8eef7; --info-text: #2c4a75;
+    --chip: #efece4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17150f; --text: #ddd8ca; --muted: #99927f; --border: #3a352a;
+      --card: #201d15; --accent: #67b48d; --accent-soft: #21312a; --accent-text: #8fd0ad;
+      --warn-soft: #33270f; --warn-text: #e0aa5e; --info-soft: #1d2735; --info-text: #8fb0e0;
+      --chip: #2b2820;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 Georgia, 'Times New Roman', serif; }
+  main { max-width: 900px; margin-inline: auto; padding: 32px 20px 60px; }
+  p, li, dd { max-width: 70ch; }
+  h1 { font-size: 1.7em; line-height: 1.25; margin: 0.2em 0 0.3em; }
+  h2 { font-size: 1.25em; margin-top: 2em; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  h3 { font-size: 1.05em; margin: 0; }
+  .eyebrow { font-family: system-ui, sans-serif; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  .meta { font-family: system-ui, sans-serif; font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 8px; }
+  .meta b { color: var(--text); font-weight: 600; }
+  article.idea { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 22px; margin: 18px 0; }
+  .idea-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .idchip { font-family: ui-monospace, monospace; font-size: 12px; background: var(--accent-soft); color: var(--accent-text); border-radius: 5px; padding: 2px 8px; font-weight: 700; }
+  .chips { margin-left: auto; display: flex; gap: 6px; }
+  .chip { font-family: system-ui, sans-serif; font-size: 11.5px; background: var(--chip); color: var(--muted); border-radius: 5px; padding: 2px 8px; white-space: nowrap; }
+  dl.fields { margin: 12px 0 0; }
+  dl.fields dt { font-family: system-ui, sans-serif; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 10px; }
+  dl.fields dd { margin: 2px 0 0; }
+  .basis { background: var(--info-soft); border-radius: 7px; padding: 8px 12px; }
+  .basis, .basis * { color: var(--info-text); }
+  .downside { background: var(--warn-soft); border-radius: 7px; padding: 8px 12px; }
+  .downside, .downside * { color: var(--warn-text); }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: 0.87em; background: var(--chip); padding: 1px 5px; border-radius: 4px; }
+  .basis code, .downside code { background: transparent; padding: 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { font-family: system-ui, sans-serif; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--card); }
+  ul.jump { font-family: system-ui, sans-serif; font-size: 14px; columns: 2; margin: 10px 0 0; padding-left: 20px; }
+  ul.jump li { margin: 3px 0; }
+  a { color: var(--accent); }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 14px 0; }
+  .fact { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-family: system-ui, sans-serif; font-size: 13.5px; }
+  .fact b { display: block; font-size: 17px; }
+  figure { margin: 14px 0 4px; }
+  figcaption { font-family: system-ui, sans-serif; font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+  svg text { font-family: system-ui, sans-serif; }
+  footer.composition-signal { margin-top: 48px; border-top: 1px solid var(--border); padding-top: 10px; font-family: system-ui, sans-serif; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Ideation</div>
+  <h1>Item-DB Direction: Repo Topology, Data Artifacts, Item Source, grimtools Boundary</h1>
+  <div class="meta">
+    <span><b>date</b> 2026-07-11</span>
+    <span><b>topic</b> item-db-direction</span>
+    <span><b>mode</b> repo-grounded</span>
+  </div>
+  <p class="meta" style="display:block"><b>focus</b> Should the item-database initiative stay in the grimdawn-devotions repo or move to its own? Inputs: size/finality of the gitignored artifacts, whether item "source" (where to get it) is derivable from our data, and the viability of linking out to grimtools for maps/quests.</p>
+
+  <h2 id="grounding-context">Grounding Context</h2>
+  <p><strong>Codebase context.</strong> One repo currently holds the devotions planner (deployed to GitHub Pages from <code>web/dist</code> only) and the item-data initiative (branch <code>item-data-raw-deposit</code>): the raw deposit, the derived typed schema, committed curation JSON, and a throwaway DuckDB-WASM prototype. The split was pre-engineered to be cheap: <code>deposit_dir</code> is a single justfile variable ("relocating the deposit (including to a separate repo) is a one-line change"), <code>build_deposit.py</code> and <code>build_derived.py</code> share no imports beyond trivial helpers, and CI/deploy never touch item data. The real coupling is upstream: both domains share the Windows-only extraction (<code>just extract</code>, ~5&nbsp;GB) and the <code>i18n-tables</code> recipe ("the single, generic builder of ALL game text tables").</p>
+  <div class="facts">
+    <div class="fact"><b>343 KiB</b> git pack size today (repo is tiny)</div>
+    <div class="fact"><b>20.5 MB</b> data/deposit (gitignored): facts 12.1 + labels 5.7 + meta</div>
+    <div class="fact"><b>~600 KB</b> data/derived (gitignored), 14,130 entities</div>
+    <div class="fact"><b>372 KB</b> devotions.json — the committed-data precedent</div>
+  </div>
+  <p><strong>Distance to "final" for the derived schema</strong> (the honest answer to "how close are we"): four attack-speed tiers marked <code>interpolated; needs one grimtools card oracle</code>, one variance <code>known_gap</code> (scaled offensive lines), and six named Known Gaps in <code>docs/item-schema.md</code> (affix applicability, pet-skill rollup, proc trigger text, unnamed records, plus the two above). Most of the calibration distance closes in one screenshot-harvest evening; the structural gaps ride on the loot-graph work below. <code>meta.parquet</code> already carries <code>game_version</code>, <code>steam_buildid</code>, and row counts — release-tagging provenance exists today.</p>
+  <p><strong>Acquisition data is already in the deposit</strong> (verified by live queries this session): 1,965 loot-table records with <code>lootNameN</code>/<code>lootWeightN</code> edges to items; 4,149 creature records with <code>chanceToEquip*</code> slots (chain verified end-to-end: <code>manticore_h06</code> → <code>chanceToEquipMisc3=100</code> → <code>mt_comp_rare_a01</code>); 45 merchant NPC records; 292 <code>factionSource</code> + 128 <code>factionRequired</code> facts; 1,333 container/chest records. One early claim did <em>not</em> survive verification — see the Rejection Summary.</p>
+  <p><strong>External research</strong> (moderate value): grimtools shows "dropped from" only for named-monster sources; vendor, faction, quest, and chest sources are not modeled there, and its item→monster cross-links have documented drift. grimtools item URLs are internal sequential ids — an external site cannot compute item deep links; only name-based search links and <code>/map/areas/&lt;id&gt;</code> are constructible, and grimtools runs per-patch snapshot sites, so even those aren't guaranteed stable. Prior art: GDLoot derives loot tables from lootmastertables + monster equipment (excludes chests); IAGD/GDStash parse <code>database.arz</code> without modeling acquisition. No <code>docs/solutions/</code> learnings exist; web research was fresh this run.</p>
+
+  <h2 id="topic-axes">Topic Axes</h2>
+  <ul>
+    <li><strong>repo-topology</strong> — where the item work lives; what a split costs and buys</li>
+    <li><strong>data-artifacts</strong> — commit policy, sizes, format finality, releases/versioning</li>
+    <li><strong>item-source</strong> — deriving "where do I get this item" from the loot/vendor/faction/quest graph</li>
+    <li><strong>scope-boundary</strong> — what the app owns vs links out; external-link mechanics</li>
+  </ul>
+
+  <h2 id="ranked-ideas">Ranked Ideas</h2>
+  <ul class="jump">
+    <li><a href="#i1">1. Contracts before topology</a></li>
+    <li><a href="#i2">2. Data platform in place</a></li>
+    <li><a href="#i3">3. Acquisition edges v1</a></li>
+    <li><a href="#i4">4. Tiered source coverage</a></li>
+    <li><a href="#i5">5. Own what a query answers</a></li>
+    <li><a href="#i6">6. Deploy the evidence</a></li>
+  </ul>
+
+  <article class="idea" id="i1">
+    <div class="idea-head"><span class="idchip">1</span><h3>Contracts before topology: stay one repo, write the split tripwires, settle the query IR</h3>
+      <span class="chips"><span class="chip">repo-topology</span><span class="chip">Conf 85%</span><span class="chip">Cx Medium</span></span></div>
+    <dl class="fields">
+      <dt>Description</dt><dd>Don't decide "one repo or two" now — the codebase already made deferral free. Instead: (a) write down the tripwires that would force a split (first external consumer of the parquet, first independently-deployed item app, item work breaking devotions CI) and stay single-repo until one fires; (b) settle the one genuinely irreversible contract first — the engine-independent, host-independent query IR in the URL hash, because published links are the only artifact you can't migrate; (c) treat the released deposit as the interchange boundary if a split ever happens (it carries all 13 locales' raw text — though display formatting like <code>statFormat.ts</code> conventions stays code, not data).</dd>
+      <dt>Basis</dt><dd class="basis"><code>direct:</code> justfile:14–16 — "Every deposit recipe resolves through this one variable so relocating the deposit (including to a separate repo) is a one-line change"; docs/deposit.md — "The emitter is self-contained, so moving the deposit to a dedicated item-database repo later stays a cheap option"; BACKLOG query-IR item — "Must be settled before the first shareable item-query link ships." <code>external:</code> data-engineering polyrepo norm: split on divergent consumers/teams, not on domains.</dd>
+      <dt>Rationale</dt><dd>Every hard fact found points the same way: deploy ships only <code>web/dist</code>, the builders share no imports, and the only expensive coupling (Windows extraction + i18n-tables) is exactly what a split would duplicate. Meanwhile the long-game feature — a combined gear+devotion character planner, which is grimtools' actual product — is the strongest single argument for one repo: items and devotions share extraction, 13-locale labels, and stat-line formatting.</dd>
+      <dt>Downsides</dt><dd class="downside">The item work keeps living on a branch of a repo named "devotions", which reads oddly to outsiders; a rename or umbrella framing may eventually be wanted. Tripwires only work if actually written down (BACKLOG) rather than remembered.</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="i2">
+    <div class="idea-head"><span class="idchip">2</span><h3>Data platform in place: lockfile + balance diff in git, parquet in per-buildid GitHub Releases</h3>
+      <span class="chips"><span class="chip">data-artifacts</span><span class="chip">Conf 80%</span><span class="chip">Cx Medium</span></span></div>
+    <dl class="fields">
+      <dt>Description</dt><dd>Never commit the parquet — at any stability. Git permanently holds what git is good at: curation JSON, a ~1&nbsp;KB <code>deposit.lock</code> manifest (buildid, game version, row counts, sha256 — note: checksum emission is <em>new</em> plumbing; meta.parquet doesn't carry one today), and a machine-generated per-patch <strong>balance diff</strong> ("Meat Shield offensiveLife 22→24") that is small, delta-diffable, doubles as a pipeline drift smoke test, and is community-valuable content nobody else publishes. The parquet artifacts ship as immutable GitHub Releases tagged by Steam buildid. Locally, <code>just derive</code> writes buildid-namespaced snapshots so a game patch can't clobber the only pre-patch copy.</dd>
+      <dt>Basis</dt><dd class="basis"><code>direct:</code> docs/deposit.md — "parquet does not delta-diff, so iterating on the deposit's shape while committed would write a full ~18 MB blob into history per format change"; BACKLOG — "Per-patch immutable releases tagged by Steam buildid (already in deposit meta) with checksums and a machine-generated balance diff vs the previous build." <code>external:</code> DVC pointer files, Nix <code>flake.lock</code>, Hugging Face moving datasets off git blobs for the same non-delta reason; OSM publishes the planet file out-of-band while diffs are first-class.</dd>
+      <dt>Rationale</dt><dd>This dissolves Ted's "how close to final?" question rather than answering it: finality stops gating anything because releases are versioned and immutable — a schema change is just a new release, and the 343&nbsp;KiB pack stays tiny forever. It also removes the strongest pro-split argument (keeping blobs out of history) and gives CI and any future second repo a fetchable deposit (idea 1's interchange).</dd>
+      <dt>Downsides</dt><dd class="downside">Releases are GitHub-specific (portable in principle, but the fetch path hardcodes a host); a <code>fetch-if-missing</code> path in the justfile is new work; the balance-diff generator is a real small project, not a flag flip.</dd>
+    </dl>
+    <figure>
+      <svg viewBox="0 0 720 240" role="img" aria-label="Two artifact lanes: git holds small text files; GitHub Releases hold parquet per buildid">
+        <rect x="10" y="30" width="330" height="180" rx="10" fill="var(--accent-soft)" stroke="var(--border)"/>
+        <text x="30" y="56" font-size="13" font-weight="700" fill="var(--accent-text)">git (pack stays ~343 KiB)</text>
+        <rect x="30" y="72" width="290" height="30" rx="6" fill="var(--card)" stroke="var(--border)"/>
+        <text x="42" y="92" font-size="12.5" fill="var(--text)">data/item-curation/*.json (hand-authored)</text>
+        <rect x="30" y="110" width="290" height="30" rx="6" fill="var(--card)" stroke="var(--border)"/>
+        <text x="42" y="130" font-size="12.5" fill="var(--text)">deposit.lock — buildid + sha256 (~1 KB)</text>
+        <rect x="30" y="148" width="290" height="30" rx="6" fill="var(--card)" stroke="var(--border)"/>
+        <text x="42" y="168" font-size="12.5" fill="var(--text)">balance-diff vs prior build (small text)</text>
+        <rect x="380" y="30" width="330" height="180" rx="10" fill="var(--info-soft)" stroke="var(--border)"/>
+        <text x="400" y="56" font-size="13" font-weight="700" fill="var(--info-text)">GitHub Release, tag = steam buildid</text>
+        <rect x="400" y="72" width="290" height="30" rx="6" fill="var(--card)" stroke="var(--border)"/>
+        <text x="412" y="92" font-size="12.5" fill="var(--text)">facts / labels / meta parquet (20.5 MB)</text>
+        <rect x="400" y="110" width="290" height="30" rx="6" fill="var(--card)" stroke="var(--border)"/>
+        <text x="412" y="130" font-size="12.5" fill="var(--text)">entities / stats / relations / families (600 KB)</text>
+        <rect x="400" y="148" width="290" height="30" rx="6" fill="var(--card)" stroke="var(--border)"/>
+        <text x="412" y="168" font-size="12.5" fill="var(--text)">checksums + immutable per patch</text>
+        <line x1="320" y1="125" x2="400" y2="125" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="360" y="115" font-size="11" fill="var(--muted)" text-anchor="middle" paint-order="stroke fill" stroke="var(--bg)" stroke-width="3">points at</text>
+        <defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted)"/></marker></defs>
+      </svg>
+      <figcaption>Illustrative: each artifact class goes where its format behaves — small diffable text in git, immutable binary in releases.</figcaption>
+    </figure>
+  </article>
+
+  <article class="idea" id="i3">
+    <div class="idea-head"><span class="idchip">3</span><h3>Acquisition edges v1: one loot-graph walker, three products, provenance-tagged from day one</h3>
+      <span class="chips"><span class="chip">item-source</span><span class="chip">Conf 75%</span><span class="chip">Cx High</span></span></div>
+    <dl class="fields">
+      <dt>Description</dt><dd>Build one transposed (reverse-reachability) walk over the weighted loot graph — creature <code>chanceToEquip*</code> → loot table <code>lootNameN/lootWeightN</code> → item, plus merchant, faction, and quest entry points — emitting rows shaped <code>(item_record, source_record, path_kind, effective_weight)</code>. That single artifact answers Ted's "where do I get this item" (<code>drops_from</code> / <code>sold_by</code> / <code>quest_reward</code> edge kinds), delivers the BACKLOG's top deferred item (affix-to-gear applicability), and resolves the 58 <code>blueprints_without_crafts</code> diagnostic. Every emitted edge carries a provenance qualifier — <code>flat-fact</code> | <code>loot-walk</code> | <code>curated-oracle</code> | <code>interpolated</code> — a schema-shape decision that is cheap only if made before the first edge ships.</dd>
+      <dt>Basis</dt><dd class="basis"><code>direct:</code> BACKLOG — "resolve which prefixes/suffixes can roll on which gear types by walking LootRandomizerTable weights from the gear loot tables. Also resolves the blueprints_without_crafts diagnostic"; verified chain <code>manticore_h06</code> → <code>chanceToEquipMisc3=100</code> → <code>mt_comp_rare_a01</code> (reproduced independently by the verifier). <code>external:</code> search-engine transposed link graphs answer both directions from one index; Wikidata's claim/reference/rank model for the qualifiers; grimtools' documented cross-link drift is the failure the qualifiers prevent.</dd>
+      <dt>Rationale</dt><dd>"Source" stops being a new initiative and becomes the already-planned graph work with a second output — one walker amortized across the two most-wanted features plus a known diagnostic. Programmatic derivation with provenance also positions the data to be <em>more</em> correct than grimtools' semi-manual mapping, which demonstrably drifts.</dd>
+      <dt>Downsides</dt><dd class="downside">The weighted graph has real depth (nested master tables, level-scaled weights, dynamic difficulty tiers) — this is the largest single work item on the list, and effective-weight semantics need care to avoid publishing misleading drop percentages.</dd>
+    </dl>
+    <figure>
+      <svg viewBox="0 0 720 250" role="img" aria-label="One walker over the loot graph emits three outputs">
+        <rect x="10" y="18" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--border)"/>
+        <text x="22" y="36" font-size="12.5" font-weight="600" fill="var(--text)">4,149 creatures</text>
+        <text x="22" y="52" font-size="11.5" fill="var(--muted)">chanceToEquip*</text>
+        <rect x="10" y="74" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--border)"/>
+        <text x="22" y="92" font-size="12.5" font-weight="600" fill="var(--text)">45 merchants · 292 faction facts</text>
+        <text x="22" y="108" font-size="11.5" fill="var(--muted)">flat facts (no walk needed)</text>
+        <rect x="10" y="130" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--border)"/>
+        <text x="22" y="148" font-size="12.5" font-weight="600" fill="var(--text)">1,965 loot tables</text>
+        <text x="22" y="164" font-size="11.5" fill="var(--muted)">lootNameN / lootWeightN</text>
+        <rect x="10" y="186" width="200" height="44" rx="8" fill="var(--card)" stroke="var(--border)"/>
+        <text x="22" y="204" font-size="12.5" font-weight="600" fill="var(--text)">1,333 chests · quest records</text>
+        <text x="22" y="220" font-size="11.5" fill="var(--muted)">quest tier: needs fresh research</text>
+        <rect x="280" y="95" width="170" height="60" rx="8" fill="var(--accent-soft)" stroke="var(--border)"/>
+        <text x="365" y="120" font-size="13" font-weight="700" fill="var(--accent-text)" text-anchor="middle">one transposed</text>
+        <text x="365" y="138" font-size="13" font-weight="700" fill="var(--accent-text)" text-anchor="middle">graph walker</text>
+        <line x1="210" y1="40" x2="278" y2="108" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="210" y1="96" x2="278" y2="118" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="210" y1="152" x2="278" y2="132" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="210" y1="208" x2="278" y2="142" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <rect x="520" y="40" width="190" height="40" rx="8" fill="var(--card)" stroke="var(--border)"/>
+        <text x="532" y="64" font-size="12.5" fill="var(--text)">drops_from / sold_by edges</text>
+        <rect x="520" y="105" width="190" height="40" rx="8" fill="var(--card)" stroke="var(--border)"/>
+        <text x="532" y="129" font-size="12.5" fill="var(--text)">affix_applies_to (BACKLOG #1)</text>
+        <rect x="520" y="170" width="190" height="40" rx="8" fill="var(--card)" stroke="var(--border)"/>
+        <text x="532" y="194" font-size="12.5" fill="var(--text)">58 blueprints_without_crafts</text>
+        <line x1="450" y1="112" x2="518" y2="62" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="450" y1="125" x2="518" y2="125" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <line x1="450" y1="138" x2="518" y2="188" stroke="var(--muted)" stroke-width="1.5" marker-end="url(#arr2)"/>
+        <defs><marker id="arr2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--muted)"/></marker></defs>
+      </svg>
+      <figcaption>Illustrative: the sources on the left are all in the deposit today; one walk emits all three outputs on the right.</figcaption>
+    </figure>
+  </article>
+
+  <article class="idea" id="i4">
+    <div class="idea-head"><span class="idchip">4</span><h3>Tiered source coverage, cheapest tiers first — and it beats grimtools where grimtools is blind</h3>
+      <span class="chips"><span class="chip">item-source</span><span class="chip">Conf 65%</span><span class="chip">Cx Medium</span></span></div>
+    <dl class="fields">
+      <dt>Description</dt><dd>Ship source data in tiers ordered by cost, with an explicit "world drop" fallback (the community's own granularity norm): tier 1 = faction/vendor gating (<code>factionSource</code>/<code>factionRequired</code> + 45 merchant inventories) — flat-fact joins, no graph walk; tier 2 = named-monster drops and MIs via the walker (idea 3); tier 3 = chests; tier 4 = quest rewards. Hand-curate domains under ~50 rows (merchants, faction display names, quest wearables) with drift guards instead of building plumbing for them. Tier 1 alone already exceeds grimtools, which models none of vendor/faction/quest/chest acquisition. <strong>Caveat from verification:</strong> the quest tier's shape is genuinely unknown — the earlier "quest records carry only XP rewards" evidence was refuted (bad SQL; the keys belonged to devotion shrines), and a real <code>perPartyMemberDropItemName</code> item reference was found under <code>storyelements/questitems/</code> — so tier 4 needs one fresh research pass before it's scoped.</dd>
+      <dt>Basis</dt><dd class="basis"><code>direct:</code> verified counts — 292 <code>factionSource</code> + 128 <code>factionRequired</code> facts, 45 <code>merchantType</code> records, e.g. merchant <code>FileDescription: "Luther Graves - Merchant Rescue"</code>. <code>external:</code> grimtools models "dropped from" only for named-monster sources (background research); GDLoot's deliberate chest exclusion as precedent for tiering; Diablo-community wikis' extract-then-confirm hybrid.</dd>
+      <dt>Rationale</dt><dd>It converts "is source a lot of work?" into a cost map: two tiers are cheap, one is the walker, one is a bounded research-then-curate job. And it reframes the feature from catch-up to differentiator — "Sold by Luther Graves (Devil's Crossing), Honored" is an answer grimtools cannot give.</dd>
+      <dt>Downsides</dt><dd class="downside">Tiered shipping means a period where some items say "world drop" that actually have specific sources — needs honest UI labeling ("source unknown/unresolved") to avoid grimtools-style wrong-link erosion of trust. Quest tier scope is unquantified until the redo pass.</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="i5">
+    <div class="idea-head"><span class="idchip">5</span><h3>Link-out policy: own everything a query can answer; name-search links only, never ids</h3>
+      <span class="chips"><span class="chip">scope-boundary</span><span class="chip">Conf 85%</span><span class="chip">Cx Low</span></span></div>
+    <dl class="fields">
+      <dt>Description</dt><dd>Adopt one rule for Ted's "link out for maps/quests?" question: anything answerable by a DuckDB query over the deposit (stats, requirements, sources, crafts, factions) is owned natively; only world geometry and lore walkthroughs link out. Mechanically, outbound links must be <em>name-intent</em> links — grimtools name-search URLs or <code>/map/areas/&lt;id&gt;</code>, or wiki name-slug URLs computable from our labels — never grimtools item ids, which are internal sequential values no external site can compute, served from per-patch snapshot hosts. And never link out for item source: once ideas 3–4 land, our source data is strictly better than the incumbent's.</dd>
+      <dt>Basis</dt><dd class="basis"><code>external:</code> grimtools URL research — item ids not computable externally, per-patch snapshot sites, documented broken cross-links. <code>direct:</code> census — level art (6,826 records), triggervolumes, scriptentities deliberately unmodeled; no outbound links exist anywhere in <code>web/src</code> today (verified: grimtools appears only in design-reference comments).</dd>
+      <dt>Rationale</dt><dd>One testable rule settles every future "model X or link out?" debate, including several already implicit in the census. It also forecloses a plausible-sounding plan (deep-link every item card) that would have hit an infeasibility wall mid-implementation.</dd>
+      <dt>Downsides</dt><dd class="downside">Name-search links inherit a normalization burden (our label text vs grimtools' display strings) and degrade to "search results" rather than landing on the exact page; per-patch snapshot hosts mean even good links rot on grimtools' schedule, not ours.</dd>
+    </dl>
+  </article>
+
+  <article class="idea" id="i6">
+    <div class="idea-head"><span class="idchip">6</span><h3>Deploy the evidence: ship /items/ on the existing Pages site with a source-facet spike</h3>
+      <span class="chips"><span class="chip">repo-topology</span><span class="chip">Conf 60%</span><span class="chip">Cx Medium</span></span></div>
+    <dl class="fields">
+      <dt>Description</dt><dd>Graduate the throwaway browser one notch: publish it at <code>/items/</code> on the existing GitHub Pages deploy, with the ~600&nbsp;KB derived parquet, and add a quick source facet (tier-1 flat facts only) to test the feature against real usage. <strong>Cost correction from verification:</strong> this is <em>not</em> "one workflow edit" — CI runs on <code>ubuntu-latest</code> and cannot regenerate the parquet (extraction is Windows-only), so the derived artifacts must first exist as committed or released files (idea 2 provides exactly that). Also resolve the prototype's CDN-loaded DuckDB against the site's self-contained ethos before shipping.</dd>
+      <dt>Basis</dt><dd class="basis"><code>direct:</code> deploy.yml uploads only <code>web/dist</code>; itemdb.html ABOUTME — "Throwaway prototype…"; derived output ~600&nbsp;KB vs the already-shipped 372&nbsp;KB devotions.json. <code>reasoned:</code> the engine bake-off, the query-IR design, and the topology question all improve with a deployed artifact generating real data instead of speculation.</dd>
+      <dt>Rationale</dt><dd>Three open decisions (engine, IR, topology) are currently argued from intuition; a live page converts them to measured questions for one afternoon of work once idea 2's artifact hosting exists. Sequencing note: if facet bitmaps win the bake-off, the derived parquet may remain a build intermediate forever — another reason it never needs a git home.</dd>
+      <dt>Downsides</dt><dd class="downside">Shipping a rough page under the polished planner's domain has reputational cost (label it beta); depends on idea 2 (artifact fetchable in CI); CDN dependency conflicts with the repo's self-contained deploy habits and needs vendoring or acceptance.</dd>
+    </dl>
+  </article>
+
+  <h2 id="rejection-summary">Rejection Summary</h2>
+  <p>47 raw ideas from five frames merged into 15 clusters + 4 syntheses; 6 survived verification and arbitration. Beyond straight duplicates:</p>
+  <table>
+    <tr><th>Idea</th><th>Reason rejected / disposition</th></tr>
+    <tr><td>"Quest records carry only XP-reward keys" (evidence for the quest source tier)</td><td>Refuted by verification: the documented query returns 0 rows (SQL precedence bug); the XP keys belong to devotion shrines. A <code>perPartyMemberDropItemName</code> counter-example exists. Quest tier re-scoped as "needs fresh research" in idea 4.</td></tr>
+    <tr><td>Lockfile fields "read from meta.parquet"</td><td>Corrected: meta.parquet has no checksum field; sha256 emission is new (small) plumbing. Absorbed into idea 2.</td></tr>
+    <tr><td>"/items/ is one workflow edit"</td><td>Cost understated — CI cannot regenerate parquet (Windows-only extraction). Corrected into idea 6.</td></tr>
+    <tr><td>Engine bake-off must precede commit policy (standalone)</td><td>Sound but folded into ideas 2 and 6 as sequencing notes — duplicates stronger composites.</td></tr>
+    <tr><td>Git subtree / reversible-split mechanics; merge-case argument; i18n seam-cutting (standalones)</td><td>Folded into idea 1 — same decision, one card.</td></tr>
+    <tr><td>Schema-version quiescence gate; known-gaps checklist; buildid snapshots; balance diff (standalones)</td><td>Folded into idea 2 — one artifact policy, one card.</td></tr>
+    <tr><td>Wikidata provenance qualifiers (standalone)</td><td>Folded into idea 3 as the edge-qualifier requirement.</td></tr>
+    <tr><td>Hand-curate sub-50-row domains; "own phrases, not places" boundary (standalones)</td><td>Folded into ideas 4 and 5 respectively.</td></tr>
+    <tr><td>Zero-Windows / never-patches / grimtools-vanishes constraint flips</td><td>Generative scaffolding — their surviving conclusions (CI drift gate, oracle harvest, diff-as-product) live inside ideas 1, 2, and 4; the flips themselves are not standalone actions.</td></tr>
+  </table>
+  <p>Axis coverage: all four axes carry survivors (repo-topology ×2, data-artifacts ×1, item-source ×2, scope-boundary ×1).</p>
+
+  <footer class="composition-signal">Composed 2026-07-11 by ce-ideate (repo-grounded; 5 ideation frames + fresh-context verifier) from the session focus: item-DB repo topology, artifact finality, item source, grimtools boundary.</footer>
+</main>
+</body>
+</html>

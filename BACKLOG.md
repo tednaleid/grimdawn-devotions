@@ -344,16 +344,78 @@ Pointers: `web/scripts/reachability-fuzz.ts`; `docs/reachability-engine.md`
 
 The raw deposit (`just deposit`, `docs/deposit.md`) is phase 1 and the derived
 typed schema (`just derive`, `docs/item-schema.md`) is phase 2 of the
-item-database initiative; the ranked ideation record at
-`docs/ideation/2026-07-03-item-data-extraction-ideation.html` holds the full
-analysis. Deferred directions, in rough order:
+item-database initiative. Ideation records:
+`docs/ideation/2026-07-03-item-data-extraction-ideation.html` (extraction) and
+`docs/ideation/2026-07-11-item-db-direction-ideation.html` (repo topology,
+artifact policy, item source, grimtools boundary).
 
-- **Affix-to-gear applicability through the weighted loot-table graph.** The
-  named fast-follow that activates the affix domain's gear-type buttons:
-  resolve which prefixes/suffixes can roll on which gear types by walking
-  `LootRandomizerTable` weights from the gear loot tables. Also resolves the
-  `blueprints_without_crafts` diagnostic (random-gear blueprints whose
-  `artifactName` is a dynamic loot table - 58 at build 19149150).
+### Direction decisions (ratified 2026-07-11)
+
+- **Single repo, split on tripwires.** The item work stays in this repo until
+  a tripwire fires: first external consumer of the parquet, first
+  independently-deployed item app, or item work breaking devotions CI. The
+  split stays cheap by design (`deposit_dir` one-line relocation, no
+  cross-imports, deploy ships only `web/dist`); the future combined
+  gear+devotion planner weights staying. The released deposit is the
+  interchange boundary if a split ever happens (raw text for 13 locales is in
+  `labels.parquet`; display formatting stays code).
+- **Link-out rule: own everything a query can answer.** Anything answerable
+  by DuckDB over the deposit (stats, requirements, sources, crafts, factions)
+  is modeled natively; only world geometry and lore link out. Outbound links
+  are name-intent links (grimtools name-search URLs, `/map/areas/<id>`, wiki
+  name slugs) - never grimtools item ids, which are internal sequential
+  values on per-patch snapshot hosts. Never link out for item source.
+
+### Sequenced roadmap
+
+1. **Dataset releases + lockfile + balance diff** (next milestone). Parquet
+   is never committed at any stability: per-patch immutable GitHub Releases
+   tagged by Steam buildid (in deposit meta), uploaded from the Windows box
+   via a `just publish-deposit` recipe (`gh release create`). Git commits a
+   ~1 KB `deposit.lock` (buildid, row counts, sha256 - checksum emission is
+   new plumbing) plus a machine-generated balance diff vs the previous build
+   (small text, delta-diffable, doubles as a pipeline drift smoke test).
+   Justfile gains fetch-if-missing so derive and the AE gates run anywhere,
+   including CI. Local `just derive` writes buildid-namespaced snapshots so a
+   patch cannot clobber the pre-patch copy.
+2. **Item source tier 1: faction and vendor edges** (first new feature).
+   Flat-fact joins, no graph walk: 292 `factionSource` + 128
+   `factionRequired` facts and 45 merchant records ("Sold by Luther Graves
+   (Devil's Crossing), Honored"). Beats grimtools, which models no
+   vendor/faction/quest/chest sources. Hand-curate sub-50-row domains
+   (faction display names, merchants) with drift guards. Unresolved items
+   fall back to "world drop" per the community norm.
+3. **Acquisition edges via one transposed loot-graph walker** (big rock;
+   supersedes the old affix-applicability item). One reverse-reachability
+   walk over creature `chanceToEquip*` -> `LootRandomizerTable` weights ->
+   items emits `(item, source, path_kind, effective_weight)` and delivers
+   three products at once: `drops_from`/monster-MI source edges, affix-to-gear
+   applicability (activates the affix domain's gear-type buttons), and
+   resolution of the `blueprints_without_crafts` diagnostic (58 at build
+   19149150). Every edge carries a provenance qualifier (flat-fact |
+   loot-walk | curated-oracle | interpolated) - decide the qualifier
+   vocabulary before the first edge ships. Quest-reward tier needs a fresh
+   research pass first: the "XP-only" evidence was refuted (keys belonged to
+   devotion shrines), and `perPartyMemberDropItemName` under
+   `storyelements/questitems/` shows item rewards exist in the records tree.
+4. **Ship `/items/` on the existing Pages deploy** (after 1). Publish the
+   prototype plus derived parquet at a subpath, with the tier-1 source facet.
+   Not "one workflow edit": CI cannot regenerate parquet (Windows-only
+   extraction), so it depends on step 1's fetchable release; also resolve the
+   prototype's CDN-loaded DuckDB against the self-contained deploy ethos.
+
+### Unsequenced follow-ups
+
+- **Engine bake-off: facet bitmaps vs DuckDB-WASM.** Decide the browser query
+  engine with measured sizes, not assumptions. Precedent constraints: the
+  2026-06-21 reachability spec's DuckDB rejection (its exception clause
+  arguably fits this case) and the 2026-06-28 first-load byte-budget work.
+  If bitmaps win, derived parquet stays a build intermediate forever.
+- **Engine-independent query IR in the URL hash.** Compact filter IR (facet
+  terms, ranges, text, combinators) encoded with `urlState.ts` tolerance
+  discipline, host-independent, so shared links never encode engine or origin
+  specifics. Published URLs are the initiative's only irreversible artifact;
+  must be settled before the first shareable item-query link ships.
 - **Roll-range gap: scaled offensive bonus lines.** Offensive damage-bonus
   stats on items carrying `attributeScalePercent` show a level-linked upscale
   on grimtools that plain jitter does not reproduce; datapoints recorded in
@@ -365,18 +427,6 @@ analysis. Deferred directions, in rough order:
   (R16); the stats table already supports AND via `GROUP BY/HAVING`.
 - **Pet-skill stat rollup.** Pet chains are relations only (`spawns_pet`);
   rolling pet-skill stats into the filterable stats table is deferred.
-- **Dataset-as-product releases.** Per-patch immutable releases tagged by
-  Steam buildid (already in deposit meta) with checksums and a
-  machine-generated balance diff vs the previous build; the diff doubles as a
-  pipeline drift smoke test.
-- **Engine bake-off: facet bitmaps vs DuckDB-WASM.** Decide the browser query
-  engine with measured deposit sizes, not assumptions. Precedent constraints:
-  the 2026-06-21 reachability spec's DuckDB rejection (its exception clause
-  arguably fits this case) and the 2026-06-28 first-load byte-budget work.
-- **Engine-independent query IR in the URL hash.** Compact filter IR (facet
-  terms, ranges, text, combinators) encoded with `urlState.ts` tolerance
-  discipline, so shared links never encode engine specifics. Must be settled
-  before the first shareable item-query link ships.
 - **Exception-only stat-label generator.** Decompose stat-id naming into
   candidate game tags, verify against `Text_EN`, hand-curate only the misses;
   scales item stat labels to 13 locales without hand-authoring 700+ ids.
