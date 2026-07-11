@@ -65,6 +65,12 @@ game content. If anyone at Crate would prefer something here be changed or
 removed, please reach out and we'll comply. Made with respect and
 gratitude for the game and a mod-friendly studio.
 
+This repo's GitHub Releases (`deposit-*` tags) carry parquet snapshots of
+extracted game facts used by our own tooling. They are internal build
+artifacts, not a published dataset: no stability promise, and they may be
+reshaped or re-published at any time (see
+[docs/deposit.md](docs/deposit.md)).
+
 ## Quick start
 
 Prereqs are managed for you via [`just`](https://github.com/casey/just),

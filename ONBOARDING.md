@@ -36,6 +36,9 @@ backend, no accounts.
   `just census` / `just q "SQL"` to mine it - see `docs/deposit.md`
 - Derived typed item schema (entities/stats/relations parquet): `just derive`, then
   `just q-ae-all` for the acceptance queries - see `docs/item-schema.md`
+- Dataset releases (parquet lives in GitHub Releases, pinned by `deposit.lock`):
+  `just fetch-deposit` pulls it on any machine; `just publish-deposit` (Windows)
+  releases a new build - see `docs/deposit.md`
 
 ## Architecture
 Two halves. (1) The parser (`scripts/parse_devotions.py`) reads extracted game

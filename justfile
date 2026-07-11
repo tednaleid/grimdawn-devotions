@@ -11,11 +11,11 @@ gd_version  := env_var_or_default("GD_VERSION", "1.2.1.x")
 records_dir := justfile_directory() / "extracted/records"
 text_dir    := justfile_directory() / "extracted/text_en"
 out         := justfile_directory() / "data/devotions.json"
-# Raw game-data deposit home (gitignored pending the size gate; see docs/deposit.md).
-# Every deposit recipe resolves through this one variable so relocating the deposit
-# (including to a separate repo) is a one-line change.
+# Raw game-data deposit home (never committed; published to GitHub Releases and
+# pinned by deposit.lock - see docs/deposit.md). Every deposit recipe resolves
+# through this one variable so relocating the deposit is a one-line change.
 deposit_dir := justfile_directory() / "data/deposit"
-# Derived typed item schema (gitignored, same size-gate discipline; see docs/item-schema.md).
+# Derived typed item schema (same home: GitHub Releases, never git; see docs/item-schema.md).
 derived_dir := justfile_directory() / "data/derived"
 
 # Default: show available recipes
@@ -241,7 +241,7 @@ i18n-tables *LANGS:
 # Lossless long-format extraction of the FULL records/ tree plus per-locale label
 # tables, queryable anywhere via DuckDB (no game install needed after `deposit`).
 # Refresh flow after a game patch: `just extract`, then `just i18n-tables`, then
-# `just deposit`. See docs/deposit.md.
+# `just deposit`, then `just publish-deposit`. See docs/deposit.md.
 
 # Build facts.parquet + labels.parquet + meta.parquet from the extracted tree
 deposit:
@@ -332,15 +332,13 @@ clean-derived:
 # immutable GitHub Release (deposit-<buildid>.<rev>) and writes deposit.lock;
 # fetch pulls exactly what the lockfile pins on any machine. See docs/deposit.md.
 
-# Publish the deposit + derived parquet as a GitHub Release (Windows box; gated on
-# derive + all seven acceptance queries). Extras pass through, e.g.
-#   just publish-deposit --dry-run
+# Extra args pass through to the script, e.g. `just publish-deposit --dry-run`.
+# Publish deposit + derived parquet as a GitHub Release + write deposit.lock (Windows; gated on derive + q-ae-all)
 publish-deposit *ARGS: derive q-ae-all
     uv run scripts/dataset_release.py publish --deposit-dir "{{deposit_dir}}" \
         --derived-dir "{{derived_dir}}" --lock "{{justfile_directory()}}/deposit.lock" {{ARGS}}
 
-# Download the parquet artifacts pinned by deposit.lock (any machine; needs no gh,
-# no auth, no game install). Idempotent: does nothing when local files already match.
+# Download + verify the parquet pinned by deposit.lock (any machine; no gh/auth/game install; idempotent)
 fetch-deposit:
     uv run scripts/dataset_release.py fetch --deposit-dir "{{deposit_dir}}" \
         --derived-dir "{{derived_dir}}" --lock "{{justfile_directory()}}/deposit.lock"

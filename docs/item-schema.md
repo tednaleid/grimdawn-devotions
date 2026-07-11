@@ -4,9 +4,10 @@ The typed, current-build-only parquet contract for the item database: entity,
 stat, and relationship tables derived from the raw deposit
 ([docs/deposit.md](deposit.md)) by SQL plus a whitelisted equation evaluator,
 sized for client-side DuckDB-WASM querying in a backend-less SPA. Built by
-`just derive` into `data/derived/` (gitignored, same size-gate discipline as
-the deposit); regenerates anywhere from the deposit and the committed curation
-files alone - no game install needed.
+`just derive` into `data/derived/` (never committed - released alongside the
+deposit and fetched via `just fetch-deposit`; see docs/deposit.md); regenerates
+anywhere from the deposit and the committed curation files alone - no game
+install needed.
 
 ## Tables
 

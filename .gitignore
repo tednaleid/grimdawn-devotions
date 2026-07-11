@@ -4,12 +4,13 @@
 # Optional long-format dump (~32 MB) - regenerate with `just parse --duckdb`
 /data/devotion_records.csv
 
-# Raw game-data deposit (parquet; regenerate with `just deposit` on Windows).
-# Gitignored pending the size-gate home decision - see docs/deposit.md.
+# Raw game-data deposit (parquet). Never committed: lives in GitHub Releases
+# pinned by deposit.lock - `just fetch-deposit` anywhere, or regenerate with
+# `just deposit` on Windows. See docs/deposit.md.
 /data/deposit/
 
-# Derived typed item schema (parquet; regenerate anywhere with `just derive`).
-# Same size-gate discipline as the deposit - see docs/item-schema.md.
+# Derived typed item schema (parquet). Same home: GitHub Releases, never git -
+# `just fetch-deposit`, or regenerate anywhere with `just derive`.
 /data/derived/
 
 # Python / uv

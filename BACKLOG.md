@@ -337,16 +337,13 @@ artifact policy, item source, grimtools boundary).
 
 ### Sequenced roadmap
 
-1. **Dataset releases + lockfile + balance diff** (next milestone). Parquet
-   is never committed at any stability: per-patch immutable GitHub Releases
-   tagged by Steam buildid (in deposit meta), uploaded from the Windows box
-   via a `just publish-deposit` recipe (`gh release create`). Git commits a
-   ~1 KB `deposit.lock` (buildid, row counts, sha256 - checksum emission is
-   new plumbing) plus a machine-generated balance diff vs the previous build
-   (small text, delta-diffable, doubles as a pipeline drift smoke test).
-   Justfile gains fetch-if-missing so derive and the AE gates run anywhere,
-   including CI. Local `just derive` writes buildid-namespaced snapshots so a
-   patch cannot clobber the pre-patch copy.
+1. **Dataset releases + lockfile** (shipped 2026-07-11; see
+   `docs/plans/2026-07-11-001-feat-dataset-releases-plan.md` and
+   `docs/deposit.md`). `just publish-deposit` / `just fetch-deposit` with a
+   committed `deposit.lock`. Still open as a follow-on: the machine-generated
+   balance diff vs the previous build (small text, delta-diffable, doubles as
+   a pipeline drift smoke test, community-valuable) - the release archive
+   this shipped is its input.
 2. **Item source tier 1: faction and vendor edges** (first new feature).
    Flat-fact joins, no graph walk: 292 `factionSource` + 128
    `factionRequired` facts and 45 merchant records ("Sold by Luther Graves
