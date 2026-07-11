@@ -116,7 +116,8 @@ def build_lock(meta: dict[str, str], tag: str, download_base: str, entries: list
 
 
 def write_lock(lock: dict, path: Path) -> None:
-    path.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8")
+    # newline pinned so a Windows publish does not write a CRLF lockfile into git
+    path.write_text(json.dumps(lock, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"wrote {path} ({lock['tag']}, {len(lock['assets'])} assets)")
 
 
