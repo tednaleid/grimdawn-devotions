@@ -127,6 +127,107 @@ def cmd_lock(args) -> int:
     return 0
 
 
+# ---------------------------------------------------------------------------
+# publish
+# ---------------------------------------------------------------------------
+
+def run_gh(gh_args: list[str], what: str) -> str:
+    try:
+        res = subprocess.run(["gh", *gh_args], capture_output=True, text=True)
+    except FileNotFoundError:
+        err("`gh` CLI not found - publish needs it (fetch does not). https://cli.github.com")
+        raise SystemExit(2)
+    if res.returncode != 0:
+        err(f"{what} failed (gh {' '.join(gh_args[:2])} ...):\n{res.stderr.strip()}")
+        raise SystemExit(2)
+    return res.stdout.strip()
+
+
+def next_revision(buildid: str, existing_tags: list[str]) -> int:
+    """Next free rev for deposit-<buildid>.<rev>; existing releases are never touched."""
+    prefix = f"deposit-{buildid}."
+    revs = []
+    for tag in existing_tags:
+        if tag.startswith(prefix) and tag[len(prefix):].isdigit():
+            revs.append(int(tag[len(prefix):]))
+    return max(revs) + 1 if revs else 1
+
+
+def git_head_sha() -> str:
+    res = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True)
+    if res.returncode != 0:
+        err(f"git rev-parse HEAD failed:\n{res.stderr.strip()}")
+        raise SystemExit(2)
+    return res.stdout.strip()
+
+
+def head_on_remote(nwo: str, sha: str) -> bool:
+    res = subprocess.run(["gh", "api", f"repos/{nwo}/commits/{sha}", "--silent"],
+                         capture_output=True, text=True)
+    return res.returncode == 0
+
+
+def cmd_publish(args) -> int:
+    entries = build_asset_entries(args.deposit_dir, args.derived_dir)
+    meta = read_deposit_meta(args.deposit_dir)
+    buildid = require_buildid(meta)
+
+    if args.assume_existing_tags is not None:  # dev/test hook for revision discovery
+        existing = [t for t in args.assume_existing_tags.split(",") if t]
+    else:
+        out = run_gh(["release", "list", "--limit", "1000", "--json", "tagName",
+                      "--jq", ".[].tagName"], "release listing")
+        existing = out.splitlines()
+    tag = f"deposit-{buildid}.{next_revision(buildid, existing)}"
+
+    nwo = run_gh(["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"],
+                 "repo lookup")
+    download_base = f"https://github.com/{nwo}/releases/download/{tag}"
+    lock = build_lock(meta, tag, download_base, entries)
+    sha = git_head_sha()
+
+    if args.dry_run:
+        print(f"DRY RUN: would create release {tag} on {nwo} (target {sha[:12]}) "
+              f"with {len(entries)} assets, then write {args.lock}", file=sys.stderr)
+        if not head_on_remote(nwo, sha):
+            print(f"WARNING: commit {sha[:12]} is not on the remote; a real publish will "
+                  "refuse until the branch is pushed.", file=sys.stderr)
+        print(json.dumps(lock, indent=2))
+        return 0
+
+    # The tag must point at a commit the remote has, or gh creates it against the
+    # default branch head - a permanently wrong target once releases are immutable.
+    if not head_on_remote(nwo, sha):
+        err(f"commit {sha[:12]} is not on the remote, so the release tag cannot point at it.")
+        print("Push the current branch first (`git push`), then re-run.", file=sys.stderr)
+        raise SystemExit(2)
+
+    title = f"deposit {buildid}.{tag.rsplit('.', 1)[1]} (game {meta.get('game_version', '?')})"
+    notes = (f"Internal data artifact for this repo's tooling (see docs/deposit.md): "
+             f"build {buildid}, {meta.get('facts_rows', '?')} fact rows, "
+             f"{meta.get('labels_rows', '?')} label rows.")
+    paths = [str(asset_dir(d, args.deposit_dir, args.derived_dir) / name) for name, d in ASSETS]
+    create = ["release", "create", tag, *paths, "--title", title, "--notes", notes,
+              "--target", sha]
+    if args.draft:
+        create.append("--draft")
+    run_gh(create, f"release creation ({tag})")
+    print(f"created release {tag} with {len(paths)} assets")
+
+    if args.draft:
+        print("draft release: deposit.lock NOT written (delete the draft manually when done)")
+        return 0
+    try:
+        write_lock(lock, args.lock)
+    except OSError as e:
+        # The release exists and is immutable; say plainly what is left to do.
+        err(f"release {tag} was created, but writing {args.lock} failed: {e}")
+        print(f"Re-run: scripts/dataset_release.py lock --tag {tag} "
+              f"--download-base {download_base} ...", file=sys.stderr)
+        raise SystemExit(2)
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -143,6 +244,16 @@ def main() -> int:
     p_lock.add_argument("--download-base", required=True,
                         help="release download URL prefix the lockfile records")
     p_lock.set_defaults(fn=cmd_lock)
+
+    p_pub = sub.add_parser("publish", help="create the next deposit-<buildid>.<rev> release")
+    common(p_pub)
+    p_pub.add_argument("--dry-run", action="store_true",
+                       help="hash + discover the tag and print the would-be lockfile; no side effects")
+    p_pub.add_argument("--draft", action="store_true",
+                       help="create a draft release for scratch testing; skips the lockfile")
+    p_pub.add_argument("--assume-existing-tags", metavar="TAGS",
+                       help="comma-separated tag list standing in for `gh release list` (testing)")
+    p_pub.set_defaults(fn=cmd_publish)
 
     args = ap.parse_args()
     return args.fn(args)
