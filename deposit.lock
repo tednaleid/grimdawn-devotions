@@ -1,0 +1,52 @@
+{
+  "tag": "deposit-19149150.1",
+  "steam_buildid": "19149150",
+  "game_version": "1.2.1.x",
+  "schema_version": "2",
+  "published_utc": "2026-07-11T22:54:47Z",
+  "download_base": "https://github.com/tednaleid/grimdawn-devotions/releases/download/deposit-19149150.1",
+  "assets": [
+    {
+      "name": "facts.parquet",
+      "dir": "deposit",
+      "sha256": "9ca3b6bef0b581eba322774becd935f35946c52a17b713e4247818f8010d2102",
+      "bytes": 12726111
+    },
+    {
+      "name": "labels.parquet",
+      "dir": "deposit",
+      "sha256": "f533659b8740e431c1bb07969e5172572241b174426655692acdfcdc45fa6787",
+      "bytes": 5965288
+    },
+    {
+      "name": "meta.parquet",
+      "dir": "deposit",
+      "sha256": "0563902befa53550aaccbe3f930bea95e220cbfcfab70f025e21496ab3a773dc",
+      "bytes": 1043
+    },
+    {
+      "name": "entities.parquet",
+      "dir": "derived",
+      "sha256": "9bb893b0a2df297235f0b75e124da889df57d518b367358e0667cb69e2cefaab",
+      "bytes": 124811
+    },
+    {
+      "name": "stats.parquet",
+      "dir": "derived",
+      "sha256": "711f05a77bc7e6c6b7bfe2afdcccb185797abbf103fac2c5c083645af9e36839",
+      "bytes": 423001
+    },
+    {
+      "name": "relations.parquet",
+      "dir": "derived",
+      "sha256": "7382ec8d95efeb222dc30ac31ea27e7c1e9a02dcbb46ea43f59c74081c5b473a",
+      "bytes": 46974
+    },
+    {
+      "name": "families.parquet",
+      "dir": "derived",
+      "sha256": "9c6ba0b61d441cbbc6c1678b27e1bb427a1ce50555ffc5bebbc0f4926ab1cd6a",
+      "bytes": 2621
+    }
+  ]
+}
