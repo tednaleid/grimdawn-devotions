@@ -207,16 +207,26 @@ def cmd_publish(args) -> int:
              f"build {buildid}, {meta.get('facts_rows', '?')} fact rows, "
              f"{meta.get('labels_rows', '?')} label rows.")
     paths = [str(asset_dir(d, args.deposit_dir, args.derived_dir) / name) for name, d in ASSETS]
-    create = ["release", "create", tag, *paths, "--title", title, "--notes", notes,
-              "--target", sha]
-    if args.draft:
-        create.append("--draft")
-    run_gh(create, f"release creation ({tag})")
-    print(f"created release {tag} with {len(paths)} assets")
+    # Draft first, publish after all assets are attached: the repo has immutable
+    # releases enabled, and a release locks (assets and tag) the moment it is
+    # published - an upload failure after publishing would strand an incomplete,
+    # unfixable release. Drafts stay editable and deletable.
+    run_gh(["release", "create", tag, *paths, "--title", title, "--notes", notes,
+            "--target", sha, "--draft"], f"draft release creation ({tag})")
+    print(f"created draft release {tag} with {len(paths)} assets")
 
     if args.draft:
-        print("draft release: deposit.lock NOT written (delete the draft manually when done)")
+        print("draft kept as requested: deposit.lock NOT written "
+              "(publish or delete the draft manually)")
         return 0
+    try:
+        run_gh(["release", "edit", tag, "--draft=false"], f"release publish ({tag})")
+    except SystemExit:
+        err(f"the draft {tag} exists with its assets but was NOT published.")
+        print(f"Finish manually: gh release edit {tag} --draft=false  "
+              "(or delete the draft and re-run)", file=sys.stderr)
+        raise
+    print(f"published release {tag}")
     try:
         write_lock(lock, args.lock)
     except OSError as e:
