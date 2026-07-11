@@ -327,6 +327,18 @@ clean-deposit:
 clean-derived:
     rm -rf "{{derived_dir}}"
 
+# --- Dataset releases ---------------------------------------------------------
+# Generated parquet never enters git: publish uploads deposit + derived as an
+# immutable GitHub Release (deposit-<buildid>.<rev>) and writes deposit.lock;
+# fetch pulls exactly what the lockfile pins on any machine. See docs/deposit.md.
+
+# Publish the deposit + derived parquet as a GitHub Release (Windows box; gated on
+# derive + all seven acceptance queries). Extras pass through, e.g.
+#   just publish-deposit --dry-run
+publish-deposit *ARGS: derive q-ae-all
+    uv run scripts/dataset_release.py publish --deposit-dir "{{deposit_dir}}" \
+        --derived-dir "{{derived_dir}}" --lock "{{justfile_directory()}}/deposit.lock" {{ARGS}}
+
 # Throwaway item-DB browser prototype: itemdb.html over the derived parquet.
 # Serves the REPO ROOT (so the page can fetch data/derived + data/deposit).
 item-browser:
