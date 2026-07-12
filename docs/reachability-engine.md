@@ -48,6 +48,21 @@ gap exactly. In order:
 
 The cheap bracket decides almost every candidate; only the gap reaches the resolver.
 
+## The per-selection sweep
+
+`reachabilityForSelection` emits the per-element signals one UI refresh needs:
+
+- `completable` (per constellation): classify "selection + the whole constellation".
+- `reachableStars` (per star): every unselected star whose path (the star plus its unselected
+  predecessors) keeps the selection reachable. For a completable constellation that is all its
+  unselected stars. For one that is enterable but not completable, the engine finds `maxK`, the
+  largest per-constellation star count that still classifies reachable, by binary search over the
+  count (at most 3 classify calls for an 8-star constellation): the verdict depends only on the
+  count (selectionSummary reduces selections to counts) and is monotone in it (a bigger proper
+  prefix costs more and grants nothing until complete). A star is reachable iff its path keeps the
+  count at or under `maxK`. This is what lights a 4-point path to a celestial power inside a
+  constellation too expensive to finish.
+
 ## Soundness
 
 These one-sided facts are exact, and the engine never contradicts them:

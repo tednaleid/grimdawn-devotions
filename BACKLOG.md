@@ -308,3 +308,31 @@ Pointers: the `load()` method in `web/src/adapters/httpDataSource.ts` chains
 needs the model). Re-verify the existing fallbacks after: a missing/mismatched
 cover blob must still disable dimming, and a missing `reach.wasm` must still fall
 back to the TS resolver.
+
+## Reachability sweep: TS-fallback perf for the reachableStars maxK search
+
+The `reachableStars` maxK sweep (added for partial-constellation reachability)
+slowed some whole-constellation-from-empty clicks on the pure-TS resolver
+fallback path: tree_of_life went from 14ms to roughly 582ms. The deployed WASM
+path is unaffected (worst singleton 34ms, 0 clicks over 400ms), so this only
+matters for users without the WASM resolver loaded. The documented lever is
+the budget-shift dedup: for a non-completable constellation, "selection + k
+stars at budget B" decides like "selection + 1 star at budget B-(k-1)" (a
+witness that finishes the constellation would make it completable, a
+contradiction), cutting the maxK search to about one classify call.
+
+Pointers: `reachabilityForSelection`'s maxK search in
+`web/src/core/reachability.ts`; the fallback is described in
+`docs/superpowers/specs/2026-07-12-partial-constellation-reachability-design.md`.
+
+## Reachability fuzz: pre-existing conservative false-dims on seeds 97 and 113
+
+`just fuzz` seeds 97 and 113 (outside the CI fuzz range of seeds 1-20, or 1-4
+without WASM) produce 10 pre-existing conservative false-dims: the engine dims
+selections that are members of a valid build. Verified identical on
+pre-feature main, so this is not a regression from partial-constellation
+reachability. Candidates: add to the known-gaps documentation, or a deeper
+engine fix.
+
+Pointers: `web/scripts/reachability-fuzz.ts`; `docs/reachability-engine.md`
+"Known limits".

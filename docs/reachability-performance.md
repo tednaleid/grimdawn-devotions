@@ -46,9 +46,10 @@ and three things keep it bounded:
    every covering node (uncapped) is now affordable and makes the verdict
    order-independent, so the TS and WASM resolvers stay verdict-equivalent.
 
-A second sound, free speedup: a frontier star of a completable constellation is
-always clickable (any prefix of a reachable completion is reachable), so the
-clickable half of the sweep skips the resolver for it.
+A second sound, free speedup: every unselected star of a completable constellation is
+reachable (any prefix of a reachable completion is reachable), so the reachableStars
+half of the sweep pays no resolver call for completable constellations; only
+partially enterable ones run the maxK binary search.
 
 Toolchain: `just install-rust` (rustup + wasm32 target), `just wasm` (builds
 `data/reach.wasm`), `just build` copies it into `dist`. None are required to run the

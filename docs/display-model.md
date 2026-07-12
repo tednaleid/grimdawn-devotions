@@ -26,7 +26,7 @@ Because brightness, color, and emphasis own different channels, they combine fre
 
 ## Brightness: Attainability
 
-Sourced from the existing `ReachView` (`clickable` and `completable` per-element flags) with no changes to the reachability engine.
+Sourced from the ReachView (completable per constellation, reachableStars per star) with no changes to the resolver beneath the reachability engine.
 
 ### Constellations
 
@@ -37,16 +37,19 @@ Sourced from the existing `ReachView` (`clickable` and `completable` per-element
 ### Stars
 
 - **Active**: selected.
-- **Attainable**: clickable (next on a reachability path), OR its constellation is completable. This is a practical approximation: a constellation you can fully finish lights all its stars as attainable, so the lead and next star brighten as you pick. A constellation you cannot complete falls back to the frontier only.
+- **Attainable**: in `reachableStars` - the star plus its unselected predecessors fits the remaining
+  budget. This covers every unselected star of a completable constellation and the in-reach stars of
+  a partially enterable one (a constellation too expensive to finish can still light the stars whose
+  path fits, computed exactly by the engine's per-constellation maxK search).
 - **Unattainable**: otherwise.
-
-This approximation deliberately avoids computing true deep-star attainability, which would require a per-star resolver run.
 
 ### Edges
 
 - **Active**: both endpoints selected (taken).
-- **Attainable**: in an attainable or completable constellation.
-- **Unattainable**: in an unattainable constellation.
+- **Attainable**: the deeper endpoint is selected or in `reachableStars` (its path contains the
+  shallower endpoint, so the whole edge sits on a reachable path).
+- **Unattainable**: otherwise. Edge brightness is endpoint-level, so the lit path through a dimmed
+  constellation reads star-to-star while the constellation art stays dim.
 
 ## Color: Affinity Filter
 
@@ -97,7 +100,7 @@ The split ensures the map's *logic* (brightness only from attainability, affinit
 ## What Did Not Change
 
 - The reachability engine and its performance path.
-- The `ReachView` shape or the `clickable` and `completable` signals.
+- The reachability resolver and its performance path. The ReachView gained reachableStars (per-star attainability) and dropped the frontier-only clickable signal.
 - The URL hash format or the `b=` selection encoding.
 - The ports boundary or how the core exports data.
 - Tooltips, the sidebar, or any UI outside the map rendering.

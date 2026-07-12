@@ -1025,7 +1025,7 @@ export interface ReachView {
   needSource: Map<number, string[]>;
 }
 
-/** One full sweep for a selection: what can be completed, what stars can be clicked, and the panel vectors. */
+/** One full sweep for a selection: what can be completed, what stars are reachable, and the panel vectors. */
 export function reachabilityForSelection(
   model: DevotionModel,
   cons: ReachCon[],
