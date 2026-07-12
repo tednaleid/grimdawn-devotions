@@ -191,6 +191,22 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
   return { own, supply, target, startedIds, partialFinish, built };
 }
 
+/** The unselected path to a star: the star plus every unselected transitive predecessor. Predecessors
+ *  never cross constellations, so the path stays within the star's own constellation. This is the set
+ *  a click on the star must add, and its size is the star's point cost from the current selection. */
+export function pathToStar(model: DevotionModel, selected: Set<StarId>, starId: StarId): Set<StarId> {
+  const path = new Set<StarId>();
+  const stack: StarId[] = [starId];
+  while (stack.length) {
+    const id = stack.pop()!;
+    if (path.has(id) || selected.has(id)) continue;
+    path.add(id);
+    const star = model.stars.get(id);
+    if (star) for (const p of star.predecessors) stack.push(p);
+  }
+  return path;
+}
+
 /** Treat a fully-claimed set as a selection state: every claim is a completed member. */
 export function stateFromClaimed(claimed: ReachCon[]): ReachState {
   const { req, grant, own } = claimSummary(claimed);
