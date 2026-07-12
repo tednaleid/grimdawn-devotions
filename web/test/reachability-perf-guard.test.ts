@@ -36,6 +36,10 @@ const TED_STATES = [
   // which on these unreachable builds runs all 16 passes (no early exit) - the worst build-order cost.
   "#p=55&s=HwAAAAAAAD4AAAAABzwAAAAAAAAAAACABwDAHwAAAAAA4AcAAAAAAACA_wMA8AEAAAAf",
   "#p=55&s=AADwAQCADwAAAAAfAAAAAAAAAAAAAD4AAAAAAPADAAAA4AcAAAAAPwCA_wMAAMAP",
+  // Partial-constellation reachability states: 4 spare points with Korvaak and Tortoise enterable but
+  // not completable - the maxK binary searches run on exactly these near-budget sweeps.
+  "#p=55&s=AAAAAAEHAAAAOAAAOAA8PAA8APgHAAB4AHwAAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAAAAAAAAAAAAADAHw",
+  "#p=55&s=AAAAAAEHAAAAOAAAOAA8PAA8APgHAAB4AHwAAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAAAAAAAAOACAADAHw",
 ];
 
 // Generous: the witness states run ~85ms and the resolver tail ~300ms here; the pre-fix regression was
