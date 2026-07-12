@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "恩恵",
   "ui.drawer.benefitsAria": "恩恵を表示",
   "ui.info.aria": "このプランナーについて",
+  "ui.info.build": "ビルド {buildid}",
   "ui.info.description": "Grim Dawnの星座（devotion）システムのファンメイド・ビルドプランナー。",
   "ui.info.gameData": "ゲームデータ: v{version}（{date}抽出）",
   "ui.info.gameDataNoDate": "ゲームデータ: v{version}",

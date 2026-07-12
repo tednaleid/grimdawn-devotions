@@ -20,7 +20,11 @@ async function getJson<T>(url: string): Promise<T | null> {
 
 /** The dataset provenance for the info popover; missing fields become empty strings (degrade, never throw). */
 export function metaFromDoc(doc: DevotionsDoc): DataMeta {
-  return { gameVersion: doc.meta?.game_version ?? "", generatedUtc: doc.meta?.generated_utc ?? "" };
+  return {
+    gameVersion: doc.meta?.game_version ?? "",
+    generatedUtc: doc.meta?.generated_utc ?? "",
+    steamBuildid: doc.meta?.steam_buildid ?? "",
+  };
 }
 
 /** Decode blob bytes into a CoverTable, or null on any malformed/mismatched input (degrade to no dimming). */

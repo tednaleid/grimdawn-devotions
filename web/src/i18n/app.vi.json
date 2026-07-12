@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "Lợi Ích",
   "ui.drawer.benefitsAria": "Hiện lợi ích",
   "ui.info.aria": "Về công cụ này",
+  "ui.info.build": "bản dựng {buildid}",
   "ui.info.description": "Công cụ lập kế hoạch build do người hâm mộ tạo cho hệ thống devotion của Grim Dawn.",
   "ui.info.gameData": "Dữ liệu game: v{version} (trích xuất {date})",
   "ui.info.gameDataNoDate": "Dữ liệu game: v{version}",

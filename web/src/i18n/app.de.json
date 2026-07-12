@@ -160,6 +160,7 @@
   "ui.drawer.benefits": "Vorteile",
   "ui.drawer.benefitsAria": "Vorteile anzeigen",
   "ui.info.aria": "Über diesen Planer",
+  "ui.info.build": "Build {buildid}",
   "ui.info.description": "Ein von Fans erstellter Build-Planer für das Devotion-System von Grim Dawn.",
   "ui.info.gameData": "Spieldaten: v{version} (extrahiert {date})",
   "ui.info.gameDataNoDate": "Spieldaten: v{version}",

@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "Bonusy",
   "ui.drawer.benefitsAria": "Zobrazit bonusy",
   "ui.info.aria": "O tomto plánovači",
+  "ui.info.build": "sestavení {buildid}",
   "ui.info.description": "Fanouškovský plánovač buildů pro systém devotion ve hře Grim Dawn.",
   "ui.info.gameData": "Herní data: v{version} (extrahováno {date})",
   "ui.info.gameDataNoDate": "Herní data: v{version}",

@@ -2,6 +2,7 @@
   "ui.title": "Grim Dawn Devotion Planner",
   "ui.lang.label": "Change language",
   "ui.info.aria": "About this planner",
+  "ui.info.build": "build {buildid}",
   "ui.info.description": "A fan-made build planner for Grim Dawn's devotion system.",
   "ui.info.gameData": "Game data: v{version} (extracted {date})",
   "ui.info.gameDataNoDate": "Game data: v{version}",

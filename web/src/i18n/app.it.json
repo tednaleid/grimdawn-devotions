@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "Bonus",
   "ui.drawer.benefitsAria": "Mostra bonus",
   "ui.info.aria": "Informazioni su questo pianificatore",
+  "ui.info.build": "build {buildid}",
   "ui.info.description": "Un pianificatore di build creato dai fan per il sistema di devozione di Grim Dawn.",
   "ui.info.gameData": "Dati di gioco: v{version} (estratti {date})",
   "ui.info.gameDataNoDate": "Dati di gioco: v{version}",

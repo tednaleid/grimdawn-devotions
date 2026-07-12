@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "Бонусы",
   "ui.drawer.benefitsAria": "Показать бонусы",
   "ui.info.aria": "Об этом планировщике",
+  "ui.info.build": "сборка {buildid}",
   "ui.info.description": "Фанатский планировщик билдов для системы созвездий Grim Dawn.",
   "ui.info.gameData": "Данные игры: v{version} (извлечены {date})",
   "ui.info.gameDataNoDate": "Данные игры: v{version}",

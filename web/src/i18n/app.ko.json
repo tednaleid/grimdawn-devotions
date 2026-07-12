@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "효과",
   "ui.drawer.benefitsAria": "효과 보기",
   "ui.info.aria": "이 플래너 정보",
+  "ui.info.build": "빌드 {buildid}",
   "ui.info.description": "Grim Dawn의 성좌(devotion) 시스템을 위한 팬 제작 빌드 플래너입니다.",
   "ui.info.gameData": "게임 데이터: v{version} ({date} 추출)",
   "ui.info.gameDataNoDate": "게임 데이터: v{version}",

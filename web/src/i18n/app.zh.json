@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "效果",
   "ui.drawer.benefitsAria": "显示效果",
   "ui.info.aria": "关于此规划器",
+  "ui.info.build": "构建 {buildid}",
   "ui.info.description": "由粉丝制作的《恐怖黎明》星座系统配装规划器。",
   "ui.info.gameData": "游戏数据：v{version}（提取于 {date}）",
   "ui.info.gameDataNoDate": "游戏数据：v{version}",

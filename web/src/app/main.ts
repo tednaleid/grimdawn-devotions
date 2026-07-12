@@ -54,6 +54,7 @@ import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState, StarId } from "../core/types";
 
 const GITHUB_URL = "https://github.com/tednaleid/grimdawn-devotions";
+const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/"; // per-build page: <base><buildid>/
 
 async function boot() {
   // A prior failed load may have set this guard (see bootFailed() in index.html). The module has now
@@ -155,10 +156,17 @@ async function boot() {
         ? localization.translate("ui.info.gameData", { version: data.meta.gameVersion, date })
         : localization.translate("ui.info.gameDataNoDate", { version: data.meta.gameVersion })
       : null;
+    const build = data.meta.steamBuildid
+      ? {
+          label: localization.translate("ui.info.build", { buildid: data.meta.steamBuildid }),
+          url: `${STEAMDB_PATCHNOTES_URL}${data.meta.steamBuildid}/`,
+        }
+      : null;
     return {
       label: localization.translate("ui.info.aria"),
       description: localization.translate("ui.info.description"),
       gameData,
+      build,
       github: localization.translate("ui.info.github"),
     };
   }

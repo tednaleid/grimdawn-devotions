@@ -159,6 +159,7 @@
   "ui.drawer.benefits": "Bonusy",
   "ui.drawer.benefitsAria": "Pokaż bonusy",
   "ui.info.aria": "O tym planerze",
+  "ui.info.build": "kompilacja {buildid}",
   "ui.info.description": "Fanowski planer buildów dla systemu dewocji w Grim Dawn.",
   "ui.info.gameData": "Dane gry: v{version} (wyodrębniono {date})",
   "ui.info.gameDataNoDate": "Dane gry: v{version}",

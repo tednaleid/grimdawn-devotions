@@ -45,6 +45,7 @@ const REQUIRED = [
   "ui.title",
   "ui.lang.label",
   "ui.info.aria",
+  "ui.info.build",
   "ui.info.description",
   "ui.info.gameData",
   "ui.info.gameDataNoDate",

@@ -20,6 +20,7 @@ export interface AssetManifest {
 export interface DataMeta {
   gameVersion: string; // e.g. "1.2.1.x"
   generatedUtc: string; // ISO extraction timestamp, e.g. "2026-07-01T05:46:25Z"
+  steamBuildid: string; // Steam build id captured from the app manifest at parse time; empty when absent
 }
 
 export interface LoadedData {
