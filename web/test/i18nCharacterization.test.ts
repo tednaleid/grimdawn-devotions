@@ -40,6 +40,7 @@ function partialReach(completable: Set<string>) {
   return {
     completable,
     clickable: new Set<string>(),
+    reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
     needSource: new Map(),

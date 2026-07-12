@@ -87,6 +87,7 @@ test("immediacy state: a clickable star is selectable, an unreachable one is loc
   const reach: ReachView = {
     completable: new Set([ids[0]!]),
     clickable: new Set(),
+    reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
     needSource: new Map(),
@@ -124,6 +125,7 @@ test("brightness as opacity on art: a completable constellation is at the attain
   const reach: ReachView = {
     completable: new Set([withArtId]),
     clickable: new Set(),
+    reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
     needSource: new Map(),
@@ -158,6 +160,7 @@ test("stars and links in an unattainable constellation carry the unattainable op
   const reach: ReachView = {
     completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
     clickable: new Set(),
+    reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
     needSource: new Map(),
@@ -231,6 +234,7 @@ test("an unattainable, non-matching constellation carries both mute class and un
   const reach: ReachView = {
     completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
     clickable: new Set(),
+    reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
     needSource: new Map(),

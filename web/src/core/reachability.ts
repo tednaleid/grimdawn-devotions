@@ -1017,6 +1017,10 @@ export function selectionMinCost(
 export interface ReachView {
   completable: Set<string>;
   clickable: Set<StarId>;
+  // Every unselected star whose path (the star plus its unselected predecessors) keeps the selection
+  // reachable at the sweep budget: all unselected stars of a completable constellation, plus the stars
+  // within reach of a partially enterable one (path cost <= maxK - see reachabilityForSelection).
+  reachableStars: Set<StarId>;
   have: Vec;
   need: Vec;
   needSource: Map<number, string[]>;
@@ -1032,37 +1036,65 @@ export function reachabilityForSelection(
 ): ReachView {
   const st = selectionSummary(model, selected);
   const completable = new Set<string>();
-  const clickable = new Set<StarId>();
-  // completable: completing the whole constellation stays within budget. A constellation already fully
-  // selected "completes" to the current selection unchanged, so its verdict is the current selection's -
-  // classify that once and reuse it instead of re-running the (sometimes costly) resolver per complete
-  // constellation. This collapses the redundant late-game sweep where most constellations are complete.
+  const reachableStars = new Set<StarId>();
+  // A constellation already fully selected "completes" to the current selection unchanged, so its
+  // verdict is the current selection's - classify that once and reuse it instead of re-running the
+  // (sometimes costly) resolver per complete constellation.
   const selfReachable = classifyForSelection(cons, table, st, budget) === "reachable";
   for (const c of model.constellations.values()) {
-    if (c.starIds.every((sid) => selected.has(sid))) {
+    const size = c.starIds.length;
+    let selCount = 0;
+    for (const sid of c.starIds) if (selected.has(sid)) selCount++;
+    if (selCount === size) {
       if (selfReachable) completable.add(c.id);
       continue;
     }
-    const withCon = new Set(selected);
-    for (const sid of c.starIds) withCon.add(sid);
-    if (classifyForSelection(cons, table, selectionSummary(model, withCon), budget) === "reachable")
+    // The verdict for "selection + k stars of c" depends only on the count k (selectionSummary reduces
+    // a selection to per-constellation counts), so the probe set is the selection plus unselected stars
+    // of c in index order until the count reaches k - WHICH stars is immaterial to the verdict.
+    const reachableAt = (k: number): boolean => {
+      const withK = new Set(selected);
+      let count = selCount;
+      for (const sid of c.starIds) {
+        if (count >= k) break;
+        if (!withK.has(sid)) {
+          withK.add(sid);
+          count++;
+        }
+      }
+      return classifyForSelection(cons, table, selectionSummary(model, withK), budget) === "reachable";
+    };
+    if (reachableAt(size)) {
       completable.add(c.id);
+      for (const sid of c.starIds) if (!selected.has(sid)) reachableStars.add(sid);
+      continue;
+    }
+    // Not completable: find maxK, the largest star count that stays reachable. Probe the cheapest
+    // entry (selCount+1) first - most non-completable constellations admit nothing, and that probe is
+    // the same dim proof the old per-frontier-star pass paid - then binary search the rest (the
+    // verdict is monotone in k: a bigger proper prefix costs more and grants nothing until complete).
+    let lo = selCount + 1;
+    const last = size - 1; // k = size is the completable question, already answered above
+    if (lo > last || !reachableAt(lo)) continue;
+    let hi = last;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (reachableAt(mid)) lo = mid;
+      else hi = mid - 1;
+    }
+    const maxK = lo;
+    for (const sid of c.starIds) {
+      if (selected.has(sid)) continue;
+      if (selCount + pathToStar(model, selected, sid).size <= maxK) reachableStars.add(sid);
+    }
   }
-  // clickable: each not-selected star whose predecessors are all selected, if placing it keeps the selection reachable.
+  // clickable is now a pure projection: a frontier star's verdict IS the count selCount+1 verdict,
+  // which reachableStars already encodes. (Removed entirely once all consumers migrate.)
+  const clickable = new Set<StarId>();
   for (const star of model.stars.values()) {
     if (selected.has(star.id)) continue;
     if (!star.predecessors.every((p) => selected.has(p))) continue;
-    // A frontier star of a completable constellation is always clickable: the witness build that
-    // completes that constellation also contains this star, so any prefix of it stays reachable.
-    // This skips the resolver for most of the clickable pass (the dominant early-game cost).
-    if (completable.has(star.constellationId)) {
-      clickable.add(star.id);
-      continue;
-    }
-    const withStar = new Set(selected);
-    withStar.add(star.id);
-    if (classifyForSelection(cons, table, selectionSummary(model, withStar), budget) === "reachable")
-      clickable.add(star.id);
+    if (reachableStars.has(star.id)) clickable.add(star.id);
   }
   // panel: have = supply, need = target, needSource = started cons defining each color's max.
   const needSource = new Map<number, string[]>();
@@ -1075,7 +1107,7 @@ export function reachabilityForSelection(
     }
     needSource.set(i, src);
   }
-  return { completable, clickable, have: st.supply, need: st.target, needSource };
+  return { completable, clickable, reachableStars, have: st.supply, need: st.target, needSource };
 }
 
 /** The full engine result one UI refresh needs for a selection: the validity floor and the sweep. */

@@ -19,6 +19,7 @@ function reach(over: Partial<ReachView> = {}): ReachView {
   return {
     completable: new Set(),
     clickable: new Set(),
+    reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
     needSource: new Map(),

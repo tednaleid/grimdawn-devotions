@@ -17,6 +17,7 @@ function reachWith(clickable: string[], completable: string[]): ReachView {
   return {
     completable: new Set(completable),
     clickable: new Set(clickable),
+    reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
     needSource: new Map(),

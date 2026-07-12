@@ -111,6 +111,7 @@ test("selectionView bundles the validity floor and the floor-raised sweep (the p
   const direct = reachabilityForSelection(m, c, t, sel, Math.max(cap, min));
   expect([...view.reach.completable].sort()).toEqual([...direct.completable].sort());
   expect([...view.reach.clickable].sort()).toEqual([...direct.clickable].sort());
+  expect([...view.reach.reachableStars].sort()).toEqual([...direct.reachableStars].sort());
   expect(view.reach.have).toEqual(direct.have);
   expect(view.reach.need).toEqual(direct.need);
 });

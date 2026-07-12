@@ -231,7 +231,9 @@ async function boot() {
     const clickable = new Set<string>();
     for (const st of model.stars.values())
       if (!state.selected.has(st.id) && st.predecessors.every((p) => state.selected.has(p))) clickable.add(st.id);
-    return { completable, clickable, have: s.supply, need: s.target, needSource };
+    const reachableStars = new Set<string>();
+    for (const st of model.stars.values()) if (!state.selected.has(st.id)) reachableStars.add(st.id);
+    return { completable, clickable, reachableStars, have: s.supply, need: s.target, needSource };
   }
 
   // The minimum points to complete a faded constellation, cached per refresh. Returns
