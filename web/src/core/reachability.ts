@@ -1016,7 +1016,6 @@ export function selectionMinCost(
 
 export interface ReachView {
   completable: Set<string>;
-  clickable: Set<StarId>;
   // Every unselected star whose path (the star plus its unselected predecessors) keeps the selection
   // reachable at the sweep budget: all unselected stars of a completable constellation, plus the stars
   // within reach of a partially enterable one (path cost <= maxK - see reachabilityForSelection).
@@ -1088,14 +1087,6 @@ export function reachabilityForSelection(
       if (selCount + pathToStar(model, selected, sid).size <= maxK) reachableStars.add(sid);
     }
   }
-  // clickable is now a pure projection: a frontier star's verdict IS the count selCount+1 verdict,
-  // which reachableStars already encodes. (Removed entirely once all consumers migrate.)
-  const clickable = new Set<StarId>();
-  for (const star of model.stars.values()) {
-    if (selected.has(star.id)) continue;
-    if (!star.predecessors.every((p) => selected.has(p))) continue;
-    if (reachableStars.has(star.id)) clickable.add(star.id);
-  }
   // panel: have = supply, need = target, needSource = started cons defining each color's max.
   const needSource = new Map<number, string[]>();
   for (let i = 0; i < 5; i++) {
@@ -1107,13 +1098,13 @@ export function reachabilityForSelection(
     }
     needSource.set(i, src);
   }
-  return { completable, clickable, reachableStars, have: st.supply, need: st.target, needSource };
+  return { completable, reachableStars, have: st.supply, need: st.target, needSource };
 }
 
 /** The full engine result one UI refresh needs for a selection: the validity floor and the sweep. */
 export interface SelectionView {
   minCost: number; // selectionMinCost: fewest points that keep this selection a legal build (the slider floor)
-  reach: ReachView; // reachabilityForSelection: dimming, clickable stars, and the affinity panel vectors
+  reach: ReachView; // reachabilityForSelection: dimming, reachable stars, and the affinity panel vectors
   buildOrder: BuildStep[] | null; // live (tries=16) constellation-level order to assemble the selection, or null
 }
 

@@ -35,11 +35,10 @@ const baseline = new Set<StarId>(model.constellations.get("crane")!.starIds);
 const enLoc = makeLocalization(appEn, appEn, "en", gameEn, gameEn);
 const zhLoc = makeLocalization(appZh as Record<string, string>, appEn, "zh", gameZh as Record<string, string>, gameEn);
 
-// commitButton only reads clickable/completable from ReachView; a minimal stand-in avoids the engine.
+// commitButton only reads reachableStars/completable from ReachView; a minimal stand-in avoids the engine.
 function partialReach(completable: Set<string>) {
   return {
     completable,
-    clickable: new Set<string>(),
     reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],

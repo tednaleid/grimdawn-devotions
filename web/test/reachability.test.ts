@@ -110,7 +110,6 @@ test("selectionView bundles the validity floor and the floor-raised sweep (the p
   // reach must be the sweep at the floor-raised budget (max(cap, floor)), identical to calling it directly
   const direct = reachabilityForSelection(m, c, t, sel, Math.max(cap, min));
   expect([...view.reach.completable].sort()).toEqual([...direct.completable].sort());
-  expect([...view.reach.clickable].sort()).toEqual([...direct.clickable].sort());
   expect([...view.reach.reachableStars].sort()).toEqual([...direct.reachableStars].sort());
   expect(view.reach.have).toEqual(direct.have);
   expect(view.reach.need).toEqual(direct.need);
@@ -256,7 +255,7 @@ test("selectionSummary splits started vs completed and tracks partial finishes",
   expect(s.partialFinish.length).toBe(0);
 });
 
-test("reachabilityForSelection: a startable-but-not-completable constellation keeps a clickable first star", () => {
+test("reachabilityForSelection: a startable-but-not-completable constellation keeps a reachable first star", () => {
   // Synthetic Crook/Anvil at budget 6: Crook (5 stars, grants ascendant 5) is complete; Anvil (4 stars, needs ascendant 1).
   const model: any = modelFromCons([
     { id: "x0", size: 1, req: [0, 0, 0, 0, 0], grant: [1, 0, 0, 0, 0] },
@@ -268,8 +267,8 @@ test("reachabilityForSelection: a startable-but-not-completable constellation ke
   const selected = new Set<string>(["Crook:0", "Crook:1", "Crook:2", "Crook:3", "Crook:4"]);
   const view = reachabilityForSelection(model, mc, table, selected, 6);
   expect(view.completable.has("Anvil")).toBe(false); // 5 + 4 = 9 > 6
-  expect(view.clickable.has("Anvil:0")).toBe(true); // first star fits (cost 6, deficit 0)
-  expect(view.clickable.has("Anvil:1")).toBe(false); // predecessor (Anvil:0) not yet selected
+  expect(view.reachableStars.has("Anvil:0")).toBe(true); // first star fits (cost 6, deficit 0)
+  expect(view.reachableStars.has("Anvil:1")).toBe(false); // 5 + 2 = 7 > 6, over budget
   expect(view.have[0]).toBe(5); // ascendant supply from completed Crook
 });
 
@@ -341,5 +340,5 @@ test.skip("reachabilityForSelection stays fast at a deep multi-capstone state", 
   const view = reachabilityForSelection(realModel, cons, cover, sel, 55);
   expect(performance.now() - t).toBeLessThan(3000);
   expect(view.completable.size).toBeGreaterThan(0);
-  expect(view.clickable.size).toBeGreaterThan(0);
+  expect(view.reachableStars.size).toBeGreaterThan(0);
 });

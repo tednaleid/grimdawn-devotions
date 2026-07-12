@@ -86,7 +86,6 @@ test("immediacy state: a clickable star is selectable, an unreachable one is loc
   // ids[0]=akeron_s_scorpion, ids[1]=anvil, ids[2]=assassin_s_blade
   const reach: ReachView = {
     completable: new Set([ids[0]!]),
-    clickable: new Set(),
     reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
@@ -101,9 +100,9 @@ test("immediacy state: a clickable star is selectable, an unreachable one is loc
   // The clickable star renders with class "selectable"
   expect(svg).toMatch(/class="(star|hit) [^"]*selectable/);
 
-  // ids[2] is not completable and has no clickable stars -> its data-con-id should appear (it is rendered),
+  // ids[2] is not completable and has no reachable stars -> its data-con-id should appear (it is rendered),
   // and when a manifest is present its art gets "unreachable". Without a manifest we verify the star
-  // is "locked" (not selectable) since no star of ids[2] is in reach.clickable.
+  // is "locked" (not selectable) since no star of ids[2] is in reach.reachableStars.
   expect(svg).toContain(`data-star-id="${ids[2]!}:0" class="hit locked"`);
 
   // ids[0] is completable -> its first star is also locked (no predecessors met), but the
@@ -124,7 +123,6 @@ test("brightness as opacity on art: a completable constellation is at the attain
 
   const reach: ReachView = {
     completable: new Set([withArtId]),
-    clickable: new Set(),
     reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
@@ -159,7 +157,6 @@ test("stars and links in an unattainable constellation carry the unattainable op
   )!;
   const reach: ReachView = {
     completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
-    clickable: new Set(),
     reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],
@@ -233,7 +230,6 @@ test("an unattainable, non-matching constellation carries both mute class and un
   const notGranted = AFFINITIES.find((a) => (dimCon.affinityBonus[a] ?? 0) === 0)!;
   const reach: ReachView = {
     completable: new Set([...model.constellations.keys()].filter((id) => id !== dimCon.id)),
-    clickable: new Set(),
     reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],

@@ -1,4 +1,4 @@
-// ABOUTME: Reachability-driven star toggles: add only what the ReachView marks clickable,
+// ABOUTME: Reachability-driven star toggles: add only what the ReachView marks reachable,
 // ABOUTME: remove freely (cascading to dependents), never block a removal.
 import { test, expect } from "bun:test";
 import { buildModel } from "../src/core/model";
@@ -36,7 +36,6 @@ const doc = {
 const model = buildModel(doc);
 const view = (reachable: string[], completable: string[] = []): ReachView => ({
   completable: new Set(completable),
-  clickable: new Set(),
   reachableStars: new Set(reachable),
   have: [0, 0, 0, 0, 0],
   need: [0, 0, 0, 0, 0],

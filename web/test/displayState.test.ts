@@ -18,7 +18,6 @@ function con(id: string, starIds: string[], bonus: Partial<Record<Affinity, numb
 function reach(over: Partial<ReachView> = {}): ReachView {
   return {
     completable: new Set(),
-    clickable: new Set(),
     reachableStars: new Set<string>(),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],

@@ -55,7 +55,7 @@ function mulberry32(a: number) {
 }
 const pick = <T>(rng: () => number, arr: T[]): T => arr[Math.floor(rng() * arr.length)]!;
 
-export interface Step { seed: number; idx: number; own: number; ms: number; completable: number; clickable: number; partials: number; clicked: string }
+export interface Step { seed: number; idx: number; own: number; ms: number; completable: number; reachable: number; partials: number; clicked: string }
 const allSteps: Step[] = [];
 
 /** Play one seeded game; record a timed sweep after every star click.
@@ -74,10 +74,10 @@ export function playGame(seed: number, verbose = false, onStep?: (selected: Set<
     const ms = performance.now() - t;
     lastView = view.reach;
     const st = selectionSummary(model, selected);
-    const step: Step = { seed, idx: idx++, own: selected.size, ms, completable: lastView.completable.size, clickable: lastView.clickable.size, partials: st.partialFinish.length, clicked };
+    const step: Step = { seed, idx: idx++, own: selected.size, ms, completable: lastView.completable.size, reachable: lastView.reachableStars.size, partials: st.partialFinish.length, clicked };
     steps.push(step);
     onStep?.(new Set(selected), step);
-    if (verbose) console.log(`  step ${String(step.idx).padStart(3)}  own ${String(step.own).padStart(2)}  ${ms.toFixed(1).padStart(7)} ms  completable ${String(step.completable).padStart(2)}  clickable ${String(step.clickable).padStart(2)}  partials ${step.partials}  +${clicked}`);
+    if (verbose) console.log(`  step ${String(step.idx).padStart(3)}  own ${String(step.own).padStart(2)}  ${ms.toFixed(1).padStart(7)} ms  completable ${String(step.completable).padStart(2)}  reachable ${String(step.reachable).padStart(2)}  partials ${step.partials}  +${clicked}`);
   };
 
   // Click every star of a constellation in predecessor order, measuring after each new star.
@@ -150,7 +150,7 @@ function runReplay(seed: number): void {
   const steps = playGame(seed, true);
   const slow = [...steps].sort((a, b) => b.ms - a.ms).slice(0, 5);
   console.log(`\n  ${steps.length} steps, final own ${steps.at(-1)?.own ?? 0}. Slowest:`);
-  for (const s of slow) console.log(`    step ${s.idx}  own ${s.own}  ${s.ms.toFixed(1)} ms  (completable ${s.completable}, clickable ${s.clickable}, partials ${s.partials}, +${s.clicked})`);
+  for (const s of slow) console.log(`    step ${s.idx}  own ${s.own}  ${s.ms.toFixed(1)} ms  (completable ${s.completable}, reachable ${s.reachable}, partials ${s.partials}, +${s.clicked})`);
 }
 
 function runSweep(): void {
@@ -172,7 +172,7 @@ function runSweep(): void {
 
   const worst = [...allSteps].sort((a, b) => b.ms - a.ms).slice(0, 15);
   console.log(`\nslowest 15 clicks (replay a seed with --replay <seed>):`);
-  for (const w of worst) console.log(`  seed ${String(w.seed).padStart(4)}  step ${String(w.idx).padStart(3)}  own ${String(w.own).padStart(2)}  ${w.ms.toFixed(1).padStart(7)} ms  completable ${String(w.completable).padStart(2)}  clickable ${String(w.clickable).padStart(2)}  partials ${w.partials}  +${w.clicked}`);
+  for (const w of worst) console.log(`  seed ${String(w.seed).padStart(4)}  step ${String(w.idx).padStart(3)}  own ${String(w.own).padStart(2)}  ${w.ms.toFixed(1).padStart(7)} ms  completable ${String(w.completable).padStart(2)}  reachable ${String(w.reachable).padStart(2)}  partials ${w.partials}  +${w.clicked}`);
 
   const over = allSteps.filter((x) => x.ms > MAX_MS);
   console.log(`\n${over.length} click(s) over ${MAX_MS} ms.`);

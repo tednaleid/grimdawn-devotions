@@ -16,7 +16,6 @@ const starB = con.starIds[1]!;
 function reachWith(reachable: string[], completable: string[]): ReachView {
   return {
     completable: new Set(completable),
-    clickable: new Set(),
     reachableStars: new Set(reachable),
     have: [0, 0, 0, 0, 0],
     need: [0, 0, 0, 0, 0],

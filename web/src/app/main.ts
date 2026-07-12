@@ -206,7 +206,7 @@ async function boot() {
   }
 
   // The permissive ReachView for the degraded path (uncapped, or no cover table): nothing dims, every
-  // constellation is completable and every frontier star clickable, while have/need still come from the
+  // constellation is completable and every unselected star reachable, while have/need still come from the
   // selection summary. The dimming-on path goes through the core selectionView port (see refresh).
   let reach: ReachView;
   function permissiveReach(): ReachView {
@@ -229,12 +229,9 @@ async function boot() {
       needSource.set(i, src);
     }
     const completable = new Set<string>([...model.constellations.keys()]);
-    const clickable = new Set<string>();
-    for (const st of model.stars.values())
-      if (!state.selected.has(st.id) && st.predecessors.every((p) => state.selected.has(p))) clickable.add(st.id);
     const reachableStars = new Set<string>();
     for (const st of model.stars.values()) if (!state.selected.has(st.id)) reachableStars.add(st.id);
-    return { completable, clickable, reachableStars, have: s.supply, need: s.target, needSource };
+    return { completable, reachableStars, have: s.supply, need: s.target, needSource };
   }
 
   // The minimum points to complete a faded constellation, cached per refresh. Returns

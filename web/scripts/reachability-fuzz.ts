@@ -55,10 +55,10 @@ export function generateValidBuild(rng: () => number): ReachCon[] {
   return B;
 }
 
-export interface Violation { seed: number; order: string; claimed: string[]; dimmed: string; kind: "completable" | "clickable" }
+export interface Violation { seed: number; order: string; claimed: string[]; dimmed: string; kind: "completable" | "first-star" }
 
 /** Claim B's members in `order` (one sweep per claim). After each claim, every unclaimed member must
- *  stay completable, and its first star must be clickable (you must still be able to start it). Either
+ *  stay completable, and its first star must be reachable (you must still be able to start it). Either
  *  failure is the engine dimming something genuinely on a valid path - a false dim, i.e. an engine bug. */
 export function backwardCheck(seed: number, orderName: string, B: ReachCon[], order: ReachCon[]): Violation[] {
   const v: Violation[] = [];
@@ -71,7 +71,7 @@ export function backwardCheck(seed: number, orderName: string, B: ReachCon[], or
       if (claimed.has(u.id)) continue;
       if (!view.completable.has(u.id)) v.push({ seed, order: orderName, claimed: [...claimed], dimmed: u.id, kind: "completable" });
       const first = model.constellations.get(u.id)!.starIds[0]!; // an unclaimed member's first star is a frontier star
-      if (!selected.has(first) && !view.clickable.has(first)) v.push({ seed, order: orderName, claimed: [...claimed], dimmed: first, kind: "clickable" });
+      if (!selected.has(first) && !view.reachableStars.has(first)) v.push({ seed, order: orderName, claimed: [...claimed], dimmed: first, kind: "first-star" });
     }
   }
   return v;
