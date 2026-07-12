@@ -32,6 +32,7 @@
   .card .name { font-weight: 600; }
   .card .meta { color: var(--dim); font-size: 12px; margin: 2px 0 6px; }
   .card .req { color: var(--dim); font-size: 12px; margin-bottom: 6px; }
+  .card .srcline { color: #8fb98f; font-size: 12px; margin-bottom: 2px; }
   .card ul { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12px; color: #b7e0a0; }
   .card ul li.src { color: var(--dim); margin-top: 5px; font-style: italic; }
   .badge { font-size: 10px; border-radius: 3px; padding: 1px 5px; margin-left: 6px; vertical-align: 1px; }
@@ -79,6 +80,7 @@ async function reg(name, url) {
 await Promise.all([
   reg("entities.parquet", "data/derived/entities.parquet"),
   reg("stats.parquet", "data/derived/stats.parquet"),
+  reg("sources.parquet", "data/derived/sources.parquet"),
   reg("labels.parquet", "data/deposit/labels.parquet"),
 ]);
 const tFetch = performance.now();
@@ -103,20 +105,44 @@ for (const s of rows(await conn.query(`
   if (!list) statsByRecord.set(s.record, (list = []));
   list.push(s);
 }
+
+// Acquisition sources: vendor rows carry vendor+faction+tier; crafted rows carry the
+// blueprint's name in vendor_name (faction/tier null). Items without rows are unsourced.
+const sourcesByRecord = new Map();
+for (const s of rows(await conn.query(`
+    SELECT s.item, s.kind, s.tier, lv.text AS vendor_name, lf.text AS faction_name
+    FROM 'sources.parquet' s
+    LEFT JOIN (SELECT tag, text FROM 'labels.parquet' WHERE locale = 'en') lv ON lv.tag = s.vendor_tag
+    LEFT JOIN (SELECT tag, text FROM 'labels.parquet' WHERE locale = 'en') lf ON lf.tag = s.faction_tag
+    ORDER BY s.item, s.kind, s.tier, vendor_name`))) {
+  let list = sourcesByRecord.get(s.item);
+  if (!list) sourcesByRecord.set(s.item, (list = []));
+  list.push(s);
+}
+for (const it of items) {
+  const src = sourcesByRecord.get(it.record) ?? [];
+  it.source = [...new Set(src.map((s) => (s.kind === "crafted" ? "crafted" : "faction vendor")))];
+  if (!it.source.length) it.source = ["unsourced"];
+}
 const tQuery = performance.now();
 $("timing").textContent =
   `${items.length} items · wasm ${Math.round(tInit - t0)}ms · fetch ${Math.round(tFetch - tInit)}ms · query ${Math.round(tQuery - tFetch)}ms`;
 
 // --- filter state: OR within a group, AND across groups -----------------------
-const FIELDS = ["domain", "gear_type", "rarity", "expansion"];
-const active = { domain: new Set(), gear_type: new Set(), rarity: new Set(), expansion: new Set() };
+// `source` is set-valued (an item can be both vendor-sold and crafted); the other
+// fields are scalars. A set-valued field matches when ANY of its values is selected,
+// and counts count items (once per value they hold), not source rows.
+const FIELDS = ["domain", "gear_type", "rarity", "expansion", "source"];
+const active = { domain: new Set(), gear_type: new Set(), rarity: new Set(), expansion: new Set(), source: new Set() };
 const buttons = [];
+
+const values = (it, field) => (Array.isArray(it[field]) ? it[field] : [it[field]]);
 
 // Faceted-count rule: a button's count honors every OTHER group's filters (and the
 // search text) but ignores its own group, since picking a sibling would OR-expand.
 function matchesExcept(it, except, q) {
   for (const f of FIELDS) {
-    if (f !== except && active[f].size && !active[f].has(it[f])) return false;
+    if (f !== except && active[f].size && !values(it, f).some((v) => active[f].has(v))) return false;
   }
   return !q || it.name.toLowerCase().includes(q);
 }
@@ -124,8 +150,9 @@ function matchesExcept(it, except, q) {
 function vocab(field, order) {
   const counts = new Map();
   for (const it of items) {
-    const v = it[field];
-    if (v) counts.set(v, (counts.get(v) ?? 0) + 1);
+    for (const v of values(it, field)) {
+      if (v) counts.set(v, (counts.get(v) ?? 0) + 1);
+    }
   }
   const keys = [...counts.keys()];
   keys.sort(order ? (a, b) => order.indexOf(a) - order.indexOf(b) : (a, b) => counts.get(b) - counts.get(a));
@@ -137,6 +164,7 @@ const GROUPS = [
   ["gear_type", "gear type", null],
   ["rarity", "rarity", RARITY_ORDER],
   ["expansion", "expansion", ["base", "aom", "fg"]],
+  ["source", "source", ["faction vendor", "crafted", "unsourced"]],
 ];
 for (const [field, label, order] of GROUPS) {
   const div = document.createElement("div");
@@ -167,10 +195,18 @@ function statLine(s) {
 }
 function fmtNum(v) { return Number.isInteger(v) ? v : Math.round(v * 100) / 100; }
 
+const TIER_LABEL = { friendly: "Friendly", respected: "Respected", honored: "Honored", revered: "Revered" };
+function sourceLine(s) {
+  return s.kind === "crafted"
+    ? `Crafted via ${s.vendor_name ?? "blueprint (unnamed)"}`
+    : `Sold by ${s.vendor_name ?? "?"} (${s.faction_name ?? "?"}), ${TIER_LABEL[s.tier] ?? s.tier}`;
+}
+
 function card(it) {
   const stats = statsByRecord.get(it.record) ?? [];
   const self = stats.filter((s) => s.source === "self");
   const granted = stats.filter((s) => s.source !== "self");
+  const srcLines = (sourcesByRecord.get(it.record) ?? []).map(sourceLine);
   const reqs = [];
   if (it.req_level) reqs.push(`level ${it.req_level}`);
   if (it.req_physique) reqs.push(`${it.req_physique} physique`);
@@ -183,6 +219,7 @@ function card(it) {
     <div class="name" style="color: var(--${(it.rarity || "common").toLowerCase()})">${esc(it.name)}${badges}</div>
     <div class="meta">${esc(it.gear_type || it.domain)} · ilvl ${it.item_level ?? "?"}${it.attacks_per_sec ? ` · ${it.attacks_per_sec.toFixed(2)}/s` : ""}</div>
     ${reqs.length ? `<div class="req">requires ${reqs.join(", ")}</div>` : ""}
+    ${srcLines.map((t) => `<div class="srcline">${esc(t)}</div>`).join("")}
     <ul>${self.map((s) => `<li>${esc(statLine(s))}</li>`).join("")}
     ${granted.length ? `<li class="src">granted skill</li>` + granted.map((s) => `<li>${esc(statLine(s))}</li>`).join("") : ""}</ul>
   </div>`;
@@ -192,10 +229,12 @@ function render() {
   const q = $("search").value.trim().toLowerCase();
   const match = items.filter((it) => matchesExcept(it, null, q));
 
-  const counts = { domain: new Map(), gear_type: new Map(), rarity: new Map(), expansion: new Map() };
+  const counts = { domain: new Map(), gear_type: new Map(), rarity: new Map(), expansion: new Map(), source: new Map() };
   for (const it of items) {
     for (const field of FIELDS) {
-      if (matchesExcept(it, field, q)) counts[field].set(it[field], (counts[field].get(it[field]) ?? 0) + 1);
+      if (matchesExcept(it, field, q)) {
+        for (const v of values(it, field)) counts[field].set(v, (counts[field].get(v) ?? 0) + 1);
+      }
     }
   }
   for (const { field, value, btn, span } of buttons) {
