@@ -493,11 +493,11 @@ async function boot() {
     });
   }
   function renderBenefitsPanel() {
-    // "Available to get" lists only benefits still reachable from here: bonuses on unselected stars
-    // in constellations that remain completable. In the permissive path completable is every
-    // constellation, so this lists everything not yet held (the prior behavior).
-    const availableIds = availableBonusIds(model, state.selected, reach.completable);
-    const availPetKeys = availablePetKeys(model, state.selected, reach.completable);
+    // "Available to get" lists only benefits still reachable from here: bonuses carried by
+    // reach.reachableStars. In the permissive path reachableStars is every unselected star, so this
+    // lists everything not yet held (the prior behavior).
+    const availableIds = availableBonusIds(model, reach.reachableStars);
+    const availPetKeys = availablePetKeys(model, reach.reachableStars);
     const r = renderBenefits(
       localization,
       benefitsEl,
@@ -565,7 +565,7 @@ async function boot() {
         "beforeend",
         `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.petBonus")}</h2>${petAvailHtml}`,
       );
-    const availPowers = availablePowers(model, state.selected, reach.completable);
+    const availPowers = availablePowers(model, reach.reachableStars);
     if (availPowers.length)
       affinityEl.insertAdjacentHTML(
         "beforeend",

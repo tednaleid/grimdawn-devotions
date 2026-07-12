@@ -96,62 +96,43 @@ export function starsGrantingPet(model: DevotionModel, ids: Set<string>): Set<St
   return out;
 }
 
-// The stat ids still obtainable from the current selection: every bonus carried by a
-// not-yet-selected star inside a constellation that remains completable. Drives the
-// "Available to get" panel so it lists only benefits the build can still fold in, and
-// empties once the points are spent and nothing stays completable. `completable` comes
-// from reachabilityForSelection; this stays a pure projection over the model.
-export function availableBonusIds(model: DevotionModel, selected: Set<StarId>, completable: Set<string>): Set<string> {
+// The stat ids still obtainable from the current selection: every bonus carried by a reachable star
+// (reachableStars: unselected stars whose path fits the budget - all stars of completable
+// constellations plus the in-reach stars of partially enterable ones). Drives "Available to get".
+export function availableBonusIds(model: DevotionModel, reachableStars: Set<StarId>): Set<string> {
   const out = new Set<string>();
-  for (const conId of completable) {
-    const con = model.constellations.get(conId);
-    if (!con) continue;
-    for (const sid of con.starIds) {
-      if (selected.has(sid)) continue;
-      const star = model.stars.get(sid);
-      if (!star) continue;
-      for (const k of Object.keys(star.bonuses)) out.add(k);
-      const power = star.celestialPower;
-      if (power) for (const k of Object.keys(power.stats)) if (isFilterableStat(k)) out.add(k);
-    }
+  for (const sid of reachableStars) {
+    const star = model.stars.get(sid);
+    if (!star) continue;
+    for (const k of Object.keys(star.bonuses)) out.add(k);
+    const power = star.celestialPower;
+    if (power) for (const k of Object.keys(power.stats)) if (isFilterableStat(k)) out.add(k);
   }
   return out;
 }
 
-// The pet bonuses still obtainable from the current selection, as pet:-scoped tag keys: every
-// petBonus carried by a not-yet-selected star inside a constellation that remains completable.
-// Drives the pet "Available to get" list. `completable` comes from reachabilityForSelection.
-export function availablePetKeys(model: DevotionModel, selected: Set<StarId>, completable: Set<string>): Set<string> {
+// The pet bonuses still obtainable, as pet:-scoped tag keys (see availableBonusIds for the
+// reachableStars contract). Drives the pet "Available to get" list.
+export function availablePetKeys(model: DevotionModel, reachableStars: Set<StarId>): Set<string> {
   const out = new Set<string>();
-  for (const conId of completable) {
-    const con = model.constellations.get(conId);
-    if (!con) continue;
-    for (const sid of con.starIds) {
-      if (selected.has(sid)) continue;
-      const pet = model.stars.get(sid)?.petBonuses;
-      if (!pet) continue;
-      for (const k of Object.keys(pet)) out.add(petTagId(k));
-    }
+  for (const sid of reachableStars) {
+    const pet = model.stars.get(sid)?.petBonuses;
+    if (!pet) continue;
+    for (const k of Object.keys(pet)) out.add(petTagId(k));
   }
   return out;
 }
 
-// The celestial powers still validly pickable from the current selection: the power star of every
-// completable constellation whose power is not already gained (its power star not yet selected).
-// Drives the right-side "Celestial Powers" list. `completable` comes from reachabilityForSelection.
+// The celestial powers still validly pickable: the power star of any reachable star set (a gained
+// power's star is selected, so it is never in reachableStars). Drives the "Celestial Powers" list.
 export function availablePowers(
   model: DevotionModel,
-  selected: Set<StarId>,
-  completable: Set<string>,
+  reachableStars: Set<StarId>,
 ): { starId: StarId; power: CelestialPower }[] {
   const out: { starId: StarId; power: CelestialPower }[] = [];
-  for (const conId of completable) {
-    const con = model.constellations.get(conId);
-    if (!con) continue;
-    for (const sid of con.starIds) {
-      const star = model.stars.get(sid);
-      if (star?.celestialPower && !selected.has(sid)) out.push({ starId: sid, power: star.celestialPower });
-    }
+  for (const sid of reachableStars) {
+    const star = model.stars.get(sid);
+    if (star?.celestialPower) out.push({ starId: sid, power: star.celestialPower });
   }
   return out;
 }

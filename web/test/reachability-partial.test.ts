@@ -14,6 +14,7 @@ import {
 } from "../src/core/reachability";
 import type { DevotionModel } from "../src/core/types";
 import { decodeHash, canonicalStarIds } from "../src/core/urlState";
+import { availablePowers } from "../src/core/aggregate";
 
 const realModel = buildModel(doc as any);
 
@@ -195,3 +196,11 @@ test("reachableStars membership agrees with classifyForSelection on random small
     }
   }
 });
+
+test("real map: Eye of Korvaak and Turtle Shell are available to get at the 51-point state", () => {
+  const sel = decodeHash(HASH_51, starCanon)!.selected;
+  const v = reachabilityForSelection(realModel, realCons, realTable, sel, 55);
+  const powerStars = availablePowers(realModel, v.reachableStars).map((p) => p.starId);
+  expect(powerStars).toContain("korvaak_the_eldritch_sun:4");
+  expect(powerStars).toContain("tortoise:4");
+}, 60_000);
