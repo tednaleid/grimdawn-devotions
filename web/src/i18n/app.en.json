@@ -1,6 +1,11 @@
 {
   "ui.title": "Grim Dawn Devotion Planner",
   "ui.lang.label": "Change language",
+  "ui.info.aria": "About this planner",
+  "ui.info.description": "A fan-made build planner for Grim Dawn's devotion system.",
+  "ui.info.gameData": "Game data: v{version} (extracted {date})",
+  "ui.info.gameDataNoDate": "Game data: v{version}",
+  "ui.info.github": "View on GitHub",
   "ui.boot.failed": "Couldn't load the planner.",
   "ui.boot.reload": "Reload",
   "ui.boot.loading": "Loading the devotion map…",
