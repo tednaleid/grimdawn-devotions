@@ -3,7 +3,7 @@
 import { buildModel, type DevotionsDoc } from "../core/model";
 import { buildReachCons, type CoverTable, type ReachCon } from "../core/reachability";
 import { decodeCoverBlob } from "./coverTableBlob";
-import type { AssetManifest, DataSource, LoadedData } from "../ports/DataSource";
+import type { AssetManifest, DataMeta, DataSource, LoadedData } from "../ports/DataSource";
 
 declare const __BUILD_ID__: string;
 const buildId = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
@@ -16,6 +16,11 @@ async function getJson<T>(url: string): Promise<T | null> {
   } catch {
     return null;
   }
+}
+
+/** The dataset provenance for the info popover; missing fields become empty strings (degrade, never throw). */
+export function metaFromDoc(doc: DevotionsDoc): DataMeta {
+  return { gameVersion: doc.meta?.game_version ?? "", generatedUtc: doc.meta?.generated_utc ?? "" };
 }
 
 /** Decode blob bytes into a CoverTable, or null on any malformed/mismatched input (degrade to no dimming). */
@@ -57,7 +62,7 @@ export function httpDataSource(base = "."): DataSource {
       } catch (e) {
         console.warn("reach.wasm fetch failed; using the TS resolver", e);
       }
-      return { model, manifest, coverTable, reachWasm };
+      return { model, manifest, coverTable, reachWasm, meta: metaFromDoc(doc) };
     },
   };
 }

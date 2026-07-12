@@ -34,6 +34,7 @@ interface RawConstellation {
   stars: RawStar[];
 }
 export interface DevotionsDoc {
+  meta?: { game_version?: string; generated_utc?: string };
   constellations: RawConstellation[];
 }
 

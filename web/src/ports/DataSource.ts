@@ -16,11 +16,18 @@ export interface AssetManifest {
   images: Record<string, AssetImage>;
 }
 
+/** Dataset provenance stamped by the parser; empty strings when the dataset carries no meta. */
+export interface DataMeta {
+  gameVersion: string; // e.g. "1.2.1.x"
+  generatedUtc: string; // ISO extraction timestamp, e.g. "2026-07-01T05:46:25Z"
+}
+
 export interface LoadedData {
   model: DevotionModel;
   manifest: AssetManifest | null;
   coverTable: CoverTable | null;
   reachWasm: Uint8Array | null; // raw reach.wasm bytes, or null (engine falls back to the TS resolver)
+  meta: DataMeta;
 }
 
 export interface DataSource {
