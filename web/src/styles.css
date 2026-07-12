@@ -166,6 +166,51 @@ header button:active {
   margin-left: 0.75rem;
   color: #9aa4b2;
 }
+/* Info popover: an (i) button left of the language globe with the planner's provenance. */
+.info-popover {
+  position: relative;
+  flex: none;
+}
+.info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.45rem;
+  line-height: 0;
+  color: #9aa4b2;
+}
+.info-btn:hover {
+  color: #e6edf3;
+}
+.info-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 30;
+  padding: 0.6rem 0.75rem;
+  width: 16rem;
+  background: #1b2129;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  font-size: 0.85rem;
+  color: #e6edf3;
+}
+.info-panel[hidden] {
+  display: none;
+}
+.info-panel p {
+  margin: 0 0 0.4rem;
+}
+.info-panel p:last-child {
+  margin-bottom: 0;
+}
+.info-panel a {
+  color: #6cb6ff;
+}
+.info-version {
+  color: #9aa4b2;
+}
 /* Points budget bar: used (spent) / min (validity floor) / headroom, with a grey cap grabber. */
 #point-bar {
   position: relative;
