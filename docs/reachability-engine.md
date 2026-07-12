@@ -56,12 +56,13 @@ The cheap bracket decides almost every candidate; only the gap reaches the resol
 - `reachableStars` (per star): every unselected star whose path (the star plus its unselected
   predecessors) keeps the selection reachable. For a completable constellation that is all its
   unselected stars. For one that is enterable but not completable, the engine finds `maxK`, the
-  largest per-constellation star count that still classifies reachable, by binary search over the
-  count (at most 3 classify calls for an 8-star constellation): the verdict depends only on the
-  count (selectionSummary reduces selections to counts) and is monotone in it (a bigger proper
-  prefix costs more and grants nothing until complete). A star is reachable iff its path keeps the
-  count at or under `maxK`. This is what lights a 4-point path to a celestial power inside a
-  constellation too expensive to finish.
+  largest per-constellation star count that still classifies reachable: one probe at the cheapest
+  entry (selCount + 1), then a bisection of at most 3 further classify calls for an 8-star
+  constellation, on top of the whole-constellation check the sweep already pays for every
+  constellation. The verdict depends only on the count (selectionSummary reduces selections to
+  counts) and is monotone in it (a bigger proper prefix costs more and grants nothing until
+  complete). A star is reachable iff its path keeps the count at or under `maxK`. This is what
+  lights a 4-point path to a celestial power inside a constellation too expensive to finish.
 
 ## Soundness
 

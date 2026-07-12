@@ -99,8 +99,7 @@ The split ensures the map's *logic* (brightness only from attainability, affinit
 
 ## What Did Not Change
 
-- The reachability engine and its performance path.
-- The reachability resolver and its performance path. The ReachView gained reachableStars (per-star attainability) and dropped the frontier-only clickable signal.
+- The reachability resolver and its performance path. The sweep's ReachView gained reachableStars (per-star attainability) and dropped the frontier-only clickable signal.
 - The URL hash format or the `b=` selection encoding.
 - The ports boundary or how the core exports data.
 - Tooltips, the sidebar, or any UI outside the map rendering.
