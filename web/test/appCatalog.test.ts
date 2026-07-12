@@ -84,6 +84,7 @@ const REQUIRED = [
   "ui.tooltip.needsPoints",
   "ui.tooltip.cannotComplete",
   "ui.tooltip.partialGate",
+  "ui.tooltip.pointsToReach",
   "ui.panel.buildOrder",
   "ui.buildOrder.crossroads",
   "ui.buildOrder.dir.n",

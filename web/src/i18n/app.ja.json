@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "付与: ",
   "ui.tooltip.needsPoints": "{cap}ポイント中{needs}が必要",
   "ui.tooltip.partialGate": "一部のボーナスには{req}が必要です",
+  "ui.tooltip.pointsToReach": "到達には{count}ポイント",
   "ui.tooltip.petBonus": "全ペットへのボーナス",
   "ui.tooltip.procQualifier": "（{trigger}時に{chance}%の確率）",
   "ui.tooltip.pts": "{count}pt",

@@ -572,6 +572,11 @@ main {
   color: #e0a96a;
   font-size: 0.9em;
 }
+.tip-path-cost {
+  margin-top: 0.15rem;
+  color: #9aa4b2;
+  font-size: 0.9em;
+}
 #map-container {
   position: relative;
   overflow: hidden;

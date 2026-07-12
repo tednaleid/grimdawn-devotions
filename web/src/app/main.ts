@@ -23,6 +23,7 @@ import {
   completionMinCost,
   selectionSummary,
   setExactResolver,
+  pathToStar,
   INF,
   type ReachView,
   type ReachCon,
@@ -251,6 +252,14 @@ async function boot() {
     return needs < INF ? { needs, cap: state.pointCap } : { cap: state.pointCap };
   }
 
+  // The path cost to show in a star tooltip: the star's unselected predecessor path size, only for
+  // an unselected reachable star whose path is 2+ (frontier stars keep the plain tooltip).
+  function starPathCost(starId: StarId): number | undefined {
+    if (state.selected.has(starId) || !reach.reachableStars.has(starId)) return undefined;
+    const cost = pathToStar(model, state.selected, starId).size;
+    return cost >= 2 ? cost : undefined;
+  }
+
   const handle = mountSvg(mapContainer, model, {
     manifest: data.manifest,
     onStarClick: (id, x, y) => {
@@ -281,7 +290,8 @@ async function boot() {
         return;
       }
       const totals = affinityTotals(model, state.selected);
-      if (t.kind === "star") tip.show(localization, model, t.id, x, y, totals, undefined, selectedBenefits);
+      if (t.kind === "star")
+        tip.show(localization, model, t.id, x, y, totals, undefined, selectedBenefits, starPathCost(t.id));
       else
         tip.showConstellation(
           localization,
@@ -651,7 +661,8 @@ async function boot() {
     popoverXY = { x, y };
     const totals = affinityTotals(model, state.selected);
     const btn = commitButton(model, state.selected, reach, target);
-    if (target.kind === "star") tip.show(localization, model, target.id, x, y, totals, btn, selectedBenefits);
+    if (target.kind === "star")
+      tip.show(localization, model, target.id, x, y, totals, btn, selectedBenefits, starPathCost(target.id));
     else
       tip.showConstellation(
         localization,

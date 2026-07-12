@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Даёт: ",
   "ui.tooltip.needsPoints": "Требует {needs} из ваших {cap} очков",
   "ui.tooltip.partialGate": "Некоторые бонусы требуют {req}",
+  "ui.tooltip.pointsToReach": "Достижимо за {count} очков",
   "ui.tooltip.petBonus": "Бонус для всех питомцев",
   "ui.tooltip.procQualifier": "({chance}% шанс при {trigger})",
   "ui.tooltip.pts": "{count} оч.",

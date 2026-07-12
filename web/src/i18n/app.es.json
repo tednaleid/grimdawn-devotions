@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Otorga: ",
   "ui.tooltip.needsPoints": "Necesita {needs} de tus {cap} puntos",
   "ui.tooltip.partialGate": "Algunas bonificaciones requieren {req}",
+  "ui.tooltip.pointsToReach": "Se alcanza con {count} puntos",
   "ui.tooltip.petBonus": "Bonificación para Todas las Mascotas",
   "ui.tooltip.procQualifier": "({chance}% de Probabilidad con {trigger})",
   "ui.tooltip.pts": "{count} pts",

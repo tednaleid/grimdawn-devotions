@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Cấp: ",
   "ui.tooltip.needsPoints": "Cần {needs} trong tổng số {cap} điểm của bạn",
   "ui.tooltip.partialGate": "Một số lợi ích yêu cầu {req}",
+  "ui.tooltip.pointsToReach": "Cần {count} điểm để đạt tới",
   "ui.tooltip.petBonus": "Thưởng Cho Tất Cả Thú Cưng",
   "ui.tooltip.procQualifier": "({chance}% Cơ Hội khi {trigger})",
   "ui.tooltip.pts": "{count} điểm",

@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "제공: ",
   "ui.tooltip.needsPoints": "포인트 {cap}개 중 {needs}개 필요",
   "ui.tooltip.partialGate": "일부 보너스에 필요: {req}",
+  "ui.tooltip.pointsToReach": "도달하려면 {count} 포인트 필요",
   "ui.tooltip.petBonus": "모든 펫 보너스",
   "ui.tooltip.procQualifier": "({trigger} 시 {chance}% 확률)",
   "ui.tooltip.pts": "{count}P",

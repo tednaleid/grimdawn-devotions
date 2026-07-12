@@ -168,13 +168,20 @@ export function tooltipView(el: HTMLElement) {
       totals?: AffinityTotals,
       commit?: { label: Text; enabled: boolean },
       selectedBenefits: Set<string> = new Set(),
+      pathCost?: number,
     ) {
       const star = model.stars.get(starId);
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
       const power = star.celestialPower ? powerHtml(loc, star.celestialPower) : "";
       const weaponReqTag = star.weaponRequirement?.descriptionTag;
-      el.innerHTML = `<strong>${loc.gameText(con.nameTag)}</strong>${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, (id) => id, star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${commitHtml(loc, commit)}`;
+      // The cost of claiming this star from here (its unselected predecessor path). The controller
+      // passes it only for deep reachable stars (cost >= 2); frontier stars keep the plain tooltip.
+      const costLine =
+        pathCost !== undefined
+          ? `<div class="tip-path-cost">${loc.translate("ui.tooltip.pointsToReach", { count: pathCost })}</div>`
+          : "";
+      el.innerHTML = `<strong>${loc.gameText(con.nameTag)}</strong>${costLine}${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, (id) => id, star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${commitHtml(loc, commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },

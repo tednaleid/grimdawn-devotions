@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Uděluje: ",
   "ui.tooltip.needsPoints": "Potřebuje {needs} z vašich {cap} bodů",
   "ui.tooltip.partialGate": "Některé bonusy vyžadují {req}",
+  "ui.tooltip.pointsToReach": "Dosažitelné za {count} bodů",
   "ui.tooltip.petBonus": "Bonus pro všechny mazlíčky",
   "ui.tooltip.procQualifier": "({chance} % šance na {trigger})",
   "ui.tooltip.pts": "{count} b.",

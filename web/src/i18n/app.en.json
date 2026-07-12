@@ -41,6 +41,7 @@
   "ui.tooltip.needsPoints": "Needs {needs} of your {cap} points",
   "ui.tooltip.cannotComplete": "Cannot be completed within {cap} points",
   "ui.tooltip.partialGate": "Some bonuses require {req}",
+  "ui.tooltip.pointsToReach": "{count} points to reach",
   "ui.panel.buildOrder": "Build order",
   "ui.buildOrder.crossroads": "Crossroads",
   "ui.buildOrder.dir.n": "N",

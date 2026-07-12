@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "赋予: ",
   "ui.tooltip.needsPoints": "需要你{cap}点中的{needs}点",
   "ui.tooltip.partialGate": "部分加成需要{req}",
+  "ui.tooltip.pointsToReach": "需要{count}点才能到达",
   "ui.tooltip.petBonus": "对所有宠物的加成",
   "ui.tooltip.procQualifier": "（{trigger}时有{chance}%几率）",
   "ui.tooltip.pts": "{count}点",

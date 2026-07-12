@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Concede: ",
   "ui.tooltip.needsPoints": "Precisa de {needs} dos seus {cap} pontos",
   "ui.tooltip.partialGate": "Alguns bônus exigem {req}",
+  "ui.tooltip.pointsToReach": "Alcançável com {count} pontos",
   "ui.tooltip.petBonus": "Bônus para Todos os Companheiros",
   "ui.tooltip.procQualifier": "({chance}% de chance: {trigger})",
   "ui.tooltip.pts": "{count} pts",

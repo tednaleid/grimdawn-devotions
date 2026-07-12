@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Accorde : ",
   "ui.tooltip.needsPoints": "Nécessite {needs} de vos {cap} points",
   "ui.tooltip.partialGate": "Certains bonus nécessitent {req}",
+  "ui.tooltip.pointsToReach": "Atteignable en {count} points",
   "ui.tooltip.petBonus": "Bonus à tous les familiers",
   "ui.tooltip.procQualifier": "({chance} % de chance : {trigger})",
   "ui.tooltip.pts": "{count} pts",

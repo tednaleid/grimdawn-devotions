@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Garantisce: ",
   "ui.tooltip.needsPoints": "Richiede {needs} dei tuoi {cap} punti",
   "ui.tooltip.partialGate": "Alcuni bonus richiedono {req}",
+  "ui.tooltip.pointsToReach": "Raggiungibile con {count} punti",
   "ui.tooltip.petBonus": "Bonus a tutti i Famigli",
   "ui.tooltip.procQualifier": "({chance}% di probabilità su {trigger})",
   "ui.tooltip.pts": "{count} pt",

@@ -178,6 +178,7 @@
   "ui.tooltip.grants": "Gewährt: ",
   "ui.tooltip.needsPoints": "Benötigt {needs} deiner {cap} Punkte",
   "ui.tooltip.partialGate": "Einige Boni erfordern {req}",
+  "ui.tooltip.pointsToReach": "Mit {count} Punkten erreichbar",
   "ui.tooltip.petBonus": "Bonus auf alle Kreaturen",
   "ui.tooltip.procQualifier": "({chance}% Chance bei {trigger})",
   "ui.tooltip.pts": "{count} Pkt.",

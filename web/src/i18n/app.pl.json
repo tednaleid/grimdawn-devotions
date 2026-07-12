@@ -177,6 +177,7 @@
   "ui.tooltip.grants": "Daje: ",
   "ui.tooltip.needsPoints": "Wymaga {needs} z {cap} punktów",
   "ui.tooltip.partialGate": "Niektóre bonusy wymagają: {req}",
+  "ui.tooltip.pointsToReach": "Osiągalne za {count} punktów",
   "ui.tooltip.petBonus": "Bonus dla wszystkich pupili",
   "ui.tooltip.procQualifier": "({chance}% szansy: {trigger})",
   "ui.tooltip.pts": "{count} pkt",
