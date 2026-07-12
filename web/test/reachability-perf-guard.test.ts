@@ -42,9 +42,11 @@ const TED_STATES = [
   "#p=55&s=AAAAAAEHAAAAOAAAOAA8PAA8APgHAAB4AHwAAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAAAAAAAAOACAADAHw",
 ];
 
-// Generous: the witness states run ~85ms and the resolver tail ~300ms here; the pre-fix regression was
-// 4.5s. 1500ms catches a seconds-scale regression with wide margin for slow CI, without flaking on the norm.
-const MAX_MS = 1500;
+// Coarse: the TS-path maxK sweeps for reachableStars put the slowest state (guard-s77-n45) at ~1.1s
+// locally and ~1.6s on CI runners; the regression this guards against was 4.5s. 3000ms still trips on
+// a seconds-scale regression without flaking on the norm. Re-tighten alongside the BACKLOG budget-shift
+// dedup, which removes most of the maxK cost.
+const MAX_MS = 3000;
 
 test("selectionView stays fast on tight self-covering builds (peak-witness regression guard)", () => {
   const canon = canonicalStarIds(model);

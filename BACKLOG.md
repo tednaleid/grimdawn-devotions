@@ -324,6 +324,9 @@ contradiction), cutting the maxK search to about one classify call.
 Pointers: `reachabilityForSelection`'s maxK search in
 `web/src/core/reachability.ts`; the fallback is described in
 `docs/superpowers/specs/2026-07-12-partial-constellation-reachability-design.md`.
+The coarse CI guard (`web/test/reachability-perf-guard.test.ts`) runs this TS
+path and had its MAX_MS raised to 3000ms to absorb the slowdown on CI runners
+(slowest state ~1.6s there); re-tighten it when the dedup lands.
 
 ## Reachability fuzz: pre-existing conservative false-dims on seeds 97 and 113
 
