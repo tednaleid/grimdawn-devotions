@@ -48,7 +48,7 @@ regenerate, and no inspection requires leaving the terminal.
   "broken join", so it is treated as failure.
 - `just publish-deposit` - upload the deposit + derived parquet as an
   immutable GitHub Release and write `deposit.lock` (Windows box; gated on
-  `just derive` and all seven acceptance queries passing fresh; add
+  `just derive` and all eight acceptance queries passing fresh; add
   `--dry-run` to print the would-be lockfile with no side effects)
 - `just fetch-deposit` - download exactly what `deposit.lock` pins into
   `data/deposit/` + `data/derived/`, verifying every checksum (any machine;
@@ -89,7 +89,7 @@ encoding thrives on DBR key/value repetition.
 Generated parquet never enters git at any stability level: parquet does not
 delta-diff, so every format iteration would bake a full ~18 MB blob into
 history. Instead, `just publish-deposit` uploads the three deposit files plus
-the four derived files (`docs/item-schema.md`) as assets of an immutable
+the five derived files (`docs/item-schema.md`) as assets of an immutable
 GitHub Release tagged `deposit-<steam buildid>.<rev>` - a format change
 between game patches re-publishes the same buildid under the next `<rev>`,
 and existing releases are never modified or deleted. Git commits only
