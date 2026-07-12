@@ -23,7 +23,7 @@ test("renders the description, game-data line, and GitHub link with safe attribu
   expect(html).toContain("build 19149150");
 });
 
-test("omits the game-data line entirely when it is null", () => {
+test("omits the provenance line entirely when gameData and build are both null", () => {
   const html = infoPanelHtml({ ...text, gameData: null, build: null }, URL);
   expect(html).not.toContain("info-version");
   expect(html).toContain("View on GitHub"); // the other lines still render
