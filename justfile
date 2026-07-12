@@ -346,9 +346,13 @@ q-ae6-expansion-badges: (_q-derived "ae6_expansion_badges.sql")
 [group("deposit")]
 q-ae7-search-de: (_q-derived "ae7_search_de.sql")
 
-# All seven derived acceptance queries (the AE gate from docs/item-schema.md)
+# AE8: faction vendor sources match the pinned coverage (284/292) + transcribed card oracles
 [group("deposit")]
-q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de
+q-ae8-faction-sources: (_q-derived "ae8_faction_sources.sql")
+
+# All eight derived acceptance queries (the AE gate from docs/item-schema.md)
+[group("deposit")]
+q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de q-ae8-faction-sources
 
 # Delete the deposit artifacts. Deliberately NOT part of `clean`: regenerating
 # them needs Windows + the game install, so `clean` must never touch them.
