@@ -34,12 +34,16 @@ const view = (completable: string[]): ReachView => ({
 });
 const st = (ids: string[]): SelectionState => ({ selected: new Set(ids), pointCap: 55 });
 
-test("claims all stars when completable", () => {
+test("claims all stars when none are selected and the constellation is completable", () => {
   const next = toggleConstellation(model, st([]), view(["A"]), "A");
   expect([...next.selected].sort()).toEqual(["A:0", "A:1"]);
 });
-test("rejects a claim when not completable", () => {
+test("rejects a claim when not completable (no deterministic partial path to pick)", () => {
   expect(toggleConstellation(model, st([]), view([]), "A")).toEqual(st([]));
+});
+test("clears a PARTIALLY selected constellation instead of completing it (all-in / all-out)", () => {
+  const next = toggleConstellation(model, st(["A:0"]), view(["A"]), "A");
+  expect(next.selected.size).toBe(0); // even though completable, any-selected means clear
 });
 test("removes the whole constellation freely when fully selected", () => {
   const next = toggleConstellation(model, st(["A:0", "A:1"]), view([]), "A");

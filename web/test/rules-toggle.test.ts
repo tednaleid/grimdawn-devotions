@@ -34,20 +34,29 @@ const doc = {
   ],
 } as any;
 const model = buildModel(doc);
-const view = (clickable: string[], completable: string[] = []): ReachView => ({
+const view = (reachable: string[], completable: string[] = []): ReachView => ({
   completable: new Set(completable),
-  clickable: new Set(clickable),
-  reachableStars: new Set<string>(),
+  clickable: new Set(),
+  reachableStars: new Set(reachable),
   have: [0, 0, 0, 0, 0],
   need: [0, 0, 0, 0, 0],
   needSource: new Map(),
 });
 const st = (ids: string[]): SelectionState => ({ selected: new Set(ids), pointCap: 55 });
 
-test("adds a clickable star; rejects a non-clickable one", () => {
+test("adds a reachable star; rejects one not in reachableStars", () => {
   const reach = view(["A:0"]);
   expect(toggleStar(model, st([]), reach, "A:0").selected.has("A:0")).toBe(true);
-  expect(toggleStar(model, st([]), reach, "A:1")).toEqual(st([])); // not clickable -> unchanged
+  expect(toggleStar(model, st([]), reach, "A:1")).toEqual(st([])); // not reachable -> unchanged
+});
+
+test("clicking a deep reachable star adds its whole unselected path", () => {
+  const reach = view(["A:1"]); // the deep star is reachable; a click claims A:0 too
+  const next = toggleStar(model, st([]), reach, "A:1");
+  expect([...next.selected].sort()).toEqual(["A:0", "A:1"]);
+  // With the predecessor already selected, only the star itself is added.
+  const next2 = toggleStar(model, st(["A:0"]), reach, "A:1");
+  expect([...next2.selected].sort()).toEqual(["A:0", "A:1"]);
 });
 
 test("removing a star cascades to its dependents and is never blocked", () => {

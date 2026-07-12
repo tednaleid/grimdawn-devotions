@@ -1,7 +1,14 @@
 // ABOUTME: Reachability-driven selection rules: add only ReachView-approved targets, remove freely.
 // ABOUTME: No engine calls here; the controller passes a precomputed ReachView. recapValue is unchanged.
 import type { DevotionModel, SelectionState, StarId } from "./types";
-import { classifyForSelection, selectionSummary, type CoverTable, type ReachCon, type ReachView } from "./reachability";
+import {
+  classifyForSelection,
+  pathToStar,
+  selectionSummary,
+  type CoverTable,
+  type ReachCon,
+  type ReachView,
+} from "./reachability";
 
 // The finite cap to restore when leaving uncapped mode, or null when re-capping
 // is not allowed yet. A cap can never sit below the points already spent, and the
@@ -33,9 +40,11 @@ export function toggleStar(
 ): SelectionState {
   if (state.selected.has(starId))
     return { selected: removeWithDependents(model, state.selected, starId), pointCap: state.pointCap };
-  if (!reach.clickable.has(starId)) return state; // not a valid target right now
+  if (!reach.reachableStars.has(starId)) return state; // not a valid target right now
+  // Claim the star plus its unselected predecessors: one click takes the whole path. For a frontier
+  // star the path is just the star itself, so the old single-add behavior is preserved exactly.
   const next = new Set(state.selected);
-  next.add(starId);
+  for (const id of pathToStar(model, state.selected, starId)) next.add(id);
   return { selected: next, pointCap: state.pointCap };
 }
 
@@ -47,8 +56,9 @@ export function toggleConstellation(
 ): SelectionState {
   const con = model.constellations.get(conId);
   if (!con || con.starIds.length === 0) return state;
-  if (con.starIds.every((id) => state.selected.has(id))) {
-    // fully selected -> remove all (free)
+  if (con.starIds.some((id) => state.selected.has(id))) {
+    // Any selected -> clear the constellation (all-in / all-out). Completing a started constellation
+    // is done by clicking its remaining star(s); a partial claim has no deterministic star choice.
     const next = new Set(state.selected);
     for (const id of con.starIds) next.delete(id);
     return { selected: next, pointCap: state.pointCap };
