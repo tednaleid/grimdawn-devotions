@@ -123,7 +123,7 @@ def eval_equation(expr: str, variables: dict[str, float]) -> float:
 
 def load_curation(curation_dir: Path) -> dict:
     cur = {}
-    for name in ("gear-types", "stat-families", "attack-speed", "variance"):
+    for name in ("gear-types", "stat-families", "attack-speed", "variance", "factions"):
         p = curation_dir / f"{name}.json"
         if not p.is_file():
             print(f"ERROR: missing curation file {p}", file=sys.stderr)
@@ -166,6 +166,12 @@ def run_guards(con: duckdb.DuckDBPyConnection, cur: dict) -> None:
         f"AND c.value NOT LIKE 'WeaponArmor%' AND ({gear_pred})").fetchall()}
     if unknown_tiers := sorted(seen_tiers - tiers):
         failures.append(f"attack-speed tiers missing from attack-speed.json: {' '.join(unknown_tiers)}")
+
+    fac_map = set(cur["factions"]["faction_tags"])
+    seen_fac = {r[0] for r in con.execute(
+        "SELECT DISTINCT value FROM facts WHERE key='factionSource'").fetchall()}
+    if unmapped := sorted(seen_fac - fac_map):
+        failures.append(f"factionSource values missing from factions.json: {' '.join(unmapped)}")
 
     if failures:
         for f in failures:
@@ -495,6 +501,72 @@ def build_relations(con: duckdb.DuckDBPyConnection, diag: dict) -> int:
 
 
 # ---------------------------------------------------------------------------
+# sources
+# ---------------------------------------------------------------------------
+
+def build_sources(con: duckdb.DuckDBPyConnection, cur: dict, out_dir: Path) -> int:
+    """Item acquisition sources (tier 1): faction vendor rows from the merchant
+    chain plus crafted rows materialized from the crafts edges (plan KTD1/KTD2/KTD4).
+    Crafted rows reuse the vendor columns for the blueprint and leave faction/tier empty."""
+    con.execute("CREATE TEMP TABLE faction_map (fac VARCHAR, faction_tag VARCHAR)")
+    con.executemany("INSERT INTO faction_map VALUES (?, ?)",
+                    list(cur["factions"]["faction_tags"].items()))
+
+    # The merchant chain is followed from every marketFileName in the deposit
+    # (not path-scoped): today only faction vendors reference tier tables whose
+    # marketStaticItems carry faction-sourced items, and the acceptance pins
+    # (284 at build 19149150) make any future widening a loud, reviewed event.
+    con.execute("""
+        CREATE TEMP TABLE sources (
+          item VARCHAR, kind VARCHAR, vendor_record VARCHAR, vendor_tag VARCHAR,
+          faction_tag VARCHAR, tier VARCHAR, provenance VARCHAR)""")
+    con.execute("""
+        INSERT INTO sources
+        SELECT DISTINCT fs.record, 'faction_vendor', m.record, trim(d.value),
+               fm.faction_tag, replace(t.key, 'NormalTable', ''), 'flat-fact'
+        FROM facts m
+        JOIN facts t ON t.record = lower(trim(m.value))
+                    AND t.key IN ('friendlyNormalTable', 'respectedNormalTable',
+                                  'honoredNormalTable', 'reveredNormalTable')
+        JOIN facts si ON si.record = lower(trim(t.value)) AND si.key = 'marketStaticItems'
+        CROSS JOIN unnest(string_split(si.value, ';')) AS u(item)
+        JOIN facts fs ON fs.record = lower(trim(u.item)) AND fs.key = 'factionSource'
+        JOIN faction_map fm ON fm.fac = fs.value
+        LEFT JOIN facts d ON d.record = m.record AND d.key = 'description'
+        WHERE m.key = 'marketFileName'""")
+
+    # Guard 2 (factions.json): augments with no vendor row must be exactly the
+    # pinned unsold_augments list - dev template blanks, sold by no vendor.
+    expected = set(cur["factions"]["unsold_augments"])
+    actual = {r[0] for r in con.execute("""
+        SELECT DISTINCT record FROM facts f WHERE f.key = 'factionSource'
+          AND NOT EXISTS (SELECT 1 FROM sources s
+                          WHERE s.item = f.record AND s.kind = 'faction_vendor')""").fetchall()}
+    if actual != expected:
+        for r in sorted(actual - expected):
+            print(f"CURATION DRIFT: faction augment with no vendor row, not in "
+                  f"factions.json unsold_augments: {r}", file=sys.stderr)
+        for r in sorted(expected - actual):
+            print(f"CURATION DRIFT: factions.json unsold_augments entry now HAS a "
+                  f"vendor row (or left the deposit): {r}", file=sys.stderr)
+        print("Update data/item-curation/factions.json (deliberately) and re-run "
+              "`just derive`.", file=sys.stderr)
+        raise SystemExit(1)
+
+    con.execute("""
+        INSERT INTO sources
+        SELECT DISTINCT r.dst, 'crafted', r.src, e.name_tag, NULL, NULL, 'flat-fact'
+        FROM relations r
+        LEFT JOIN entities e ON e.record = r.src
+        WHERE r.kind = 'crafts'""")
+
+    out = out_dir / "sources.parquet"
+    con.execute(f"COPY (SELECT * FROM sources ORDER BY item, kind, vendor_record) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM sources").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 # stats
 # ---------------------------------------------------------------------------
 
@@ -697,6 +769,7 @@ def cmd_build(args) -> int:
     n_relations = build_relations(con, diag)
     n_entities = build_entities(con, cur, out_dir, diag)
     n_stats = build_stats(con, cur, out_dir, diag)
+    n_sources = build_sources(con, cur, out_dir)
 
     rel_out = out_dir / "relations.parquet"
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
@@ -731,11 +804,15 @@ def cmd_build(args) -> int:
           "  ".join(f"{s}({n})" for s, n in src_counts))
     print(f"  relations: {n_relations}   " +
           "  ".join(f"{k}({n})" for k, n in kind_counts))
+    src_kind_counts = con.execute(
+        "SELECT kind, count(*) FROM sources GROUP BY 1 ORDER BY 1").fetchall()
+    print(f"  sources: {n_sources}   " +
+          "  ".join(f"{k}({n})" for k, n in src_kind_counts))
     print(f"  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                          if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities", "stats", "relations", "families"):
+    for name in ("entities", "stats", "relations", "families", "sources"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
