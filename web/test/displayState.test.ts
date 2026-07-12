@@ -87,22 +87,26 @@ test("constellation: active and off-filter is active AND muted (no exemption)", 
   expect(d.color).toEqual({ kind: "mute" });
 });
 
-test("star brightness: active selected; attainable when clickable OR constellation completable; else unattainable", () => {
+test("star brightness: active selected; attainable iff in reachableStars; else unattainable", () => {
   const c = con("c", ["c:0", "c:1"]);
   const s0 = star("c:0", "c");
   expect(starDisplay(s0, c, settings({ selected: new Set(["c:0"]), reach: reach() })).brightness).toBe("active");
-  expect(starDisplay(s0, c, settings({ reach: reach({ clickable: new Set(["c:0"]) }) })).brightness).toBe("attainable");
-  expect(starDisplay(star("c:1", "c"), c, settings({ reach: reach({ completable: new Set(["c"]) }) })).brightness).toBe(
+  expect(starDisplay(s0, c, settings({ reach: reach({ reachableStars: new Set(["c:0"]) }) })).brightness).toBe(
     "attainable",
   );
+  // A deep star of a non-completable constellation lights when its path fits (it is in reachableStars).
+  expect(
+    starDisplay(star("c:1", "c"), c, settings({ reach: reach({ reachableStars: new Set(["c:0", "c:1"]) }) }))
+      .brightness,
+  ).toBe("attainable");
   expect(starDisplay(s0, c, settings({ reach: reach() })).brightness).toBe("unattainable");
 });
 
-test("star immediacy: clickable true only when clickable (or no reach)", () => {
+test("star immediacy: clickable true iff in reachableStars (or no reach)", () => {
   const c = con("c", ["c:0"]);
-  expect(starDisplay(star("c:0", "c"), c, settings({ reach: reach({ clickable: new Set(["c:0"]) }) })).clickable).toBe(
-    true,
-  );
+  expect(
+    starDisplay(star("c:0", "c"), c, settings({ reach: reach({ reachableStars: new Set(["c:0"]) }) })).clickable,
+  ).toBe(true);
   expect(starDisplay(star("c:0", "c"), c, settings({ reach: reach() })).clickable).toBe(false);
   expect(starDisplay(star("c:0", "c"), c, settings()).clickable).toBe(true);
 });
@@ -135,16 +139,18 @@ test("star diff add/remove flows through", () => {
   expect(d.diff).toBe("add");
 });
 
-test("edge brightness: active when taken; else follows the constellation", () => {
+test("edge brightness: active when taken; attainable iff the deeper endpoint is on a reachable path", () => {
   const c = con("c", ["c:0", "c:1"]);
-  expect(edgeDisplay(c, "c:0", "c:1", settings({ selected: new Set(["c:0", "c:1"]), reach: reach() })).taken).toBe(
-    true,
-  );
-  expect(edgeDisplay(c, "c:0", "c:1", settings({ selected: new Set(["c:0", "c:1"]), reach: reach() })).brightness).toBe(
-    "active",
-  );
-  expect(edgeDisplay(c, "c:0", "c:1", settings({ reach: reach({ completable: new Set(["c"]) }) })).brightness).toBe(
-    "attainable",
+  const both = settings({ selected: new Set(["c:0", "c:1"]), reach: reach() });
+  expect(edgeDisplay(c, "c:0", "c:1", both).taken).toBe(true);
+  expect(edgeDisplay(c, "c:0", "c:1", both).brightness).toBe("active");
+  // The deeper endpoint is reachable: the edge lights even though the constellation is not completable.
+  expect(
+    edgeDisplay(c, "c:0", "c:1", settings({ reach: reach({ reachableStars: new Set(["c:0", "c:1"]) }) })).brightness,
+  ).toBe("attainable");
+  // From a selected star toward an unreachable sibling: the edge goes dark (the sibling branch dims).
+  expect(edgeDisplay(c, "c:0", "c:1", settings({ selected: new Set(["c:0"]), reach: reach() })).brightness).toBe(
+    "unattainable",
   );
   expect(edgeDisplay(c, "c:0", "c:1", settings({ reach: reach() })).brightness).toBe("unattainable");
 });

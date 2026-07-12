@@ -55,10 +55,12 @@ export interface StarDisplay {
 
 export function starDisplay(star: Star, con: Constellation, s: DisplaySettings): StarDisplay {
   const selected = s.selected.has(star.id);
-  const clickable = !s.reach || s.reach.clickable.has(star.id);
+  // reachableStars holds every unselected star whose path fits the budget (deep stars of partially
+  // enterable constellations included), so it is both the brightness and the click affordance.
+  const clickable = !s.reach || s.reach.reachableStars.has(star.id);
   let brightness: Brightness;
   if (selected) brightness = "active";
-  else if (!s.reach || clickable || s.reach.completable.has(con.id)) brightness = "attainable";
+  else if (clickable) brightness = "attainable";
   else brightness = "unattainable";
   // Stars carry no affinity halo; the affinity axis only mutes them (when their constellation
   // provides none of the filtered colors) or leaves them at identity.
@@ -76,8 +78,10 @@ export interface EdgeDisplay {
 
 export function edgeDisplay(con: Constellation, fromId: StarId, toId: StarId, s: DisplaySettings): EdgeDisplay {
   const taken = s.selected.has(fromId) && s.selected.has(toId);
-  const conBright = constellationBrightness(con, s);
-  const brightness: Brightness = taken ? "active" : conBright === "unattainable" ? "unattainable" : "attainable";
+  // The deeper endpoint's path contains the shallower one, so the edge sits on a reachable path iff
+  // `to` is selected or reachable. Brightness is endpoint-level; the constellation art stays dim.
+  const toOnPath = !s.reach || s.selected.has(toId) || s.reach.reachableStars.has(toId);
+  const brightness: Brightness = taken ? "active" : toOnPath ? "attainable" : "unattainable";
   const conColor = constellationColor(con, s);
   const color: EdgeDisplay["color"] = conColor.kind === "mute" ? { kind: "mute" } : { kind: "identity" };
   return { brightness, color, taken };

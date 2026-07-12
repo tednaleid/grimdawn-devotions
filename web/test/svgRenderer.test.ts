@@ -94,7 +94,7 @@ test("immediacy state: a clickable star is selectable, an unreachable one is loc
   };
   // Make the first star of ids[1] clickable so it is "startable but not completable"
   const firstStar = model.constellations.get(ids[1]!)!.starIds[0]!;
-  reach.clickable.add(firstStar);
+  reach.reachableStars.add(firstStar);
 
   const svg = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null, reach });
 
