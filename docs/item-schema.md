@@ -17,13 +17,14 @@ install needed.
 | `stats.parquet` | `(record, source, stat_id, value_min, value_max, display_low, display_high)` | complete raw stats in long form. `source`: `self`, `skill` (granted skill at its granted level), `skill_buff` (one buff hop), `pet_bonus`. `Min`/`Max` sibling keys unify into one row; singles mirror into both value columns. `display_low/high` carry the variance-applied roll range, NULL when the stat never rolls |
 | `relations.parquet` | `(src, kind, dst)` | `applies_to` (augment/component -> gear-type token), `crafts` and `reagent` (blueprint edges), `set_member` (item -> set record), `grants_skill` (item -> skill record), `spawns_pet` (item -> pet creature via the granted summon skill) |
 | `families.parquet` | `(family, stat_id)` | the filter taxonomy from `stat-families.json`, ids unified to the stats vocabulary - "Cold" as one joinable family instead of 15 raw keys |
+| `sources.parquet` | `(item, kind, vendor_record, vendor_tag, faction_tag, tier, provenance)` | item acquisition sources, tier 1. `kind` = `faction_vendor` (derived from the merchant chain: merchant `marketFileName` -> merchant-table tier keys -> tier table `marketStaticItems`; `tier` is friendly/respected/honored/revered from the referencing key, `vendor_tag` the merchant's `description` name tag, `faction_tag` the curated `tagFaction*` tag) or `crafted` (materialized from the `crafts` edges; the blueprint's record and name tag ride in the vendor columns, `faction_tag` and `tier` are NULL). `provenance` = `flat-fact` for derived rows, `curated-oracle` reserved for hand-fixed ones. Items with no rows are unsourced (displayed silently; "world drop" waits for the loot walk). Localized reputation-tier display names exist as `tagFactionState*` label tags when a consumer needs them |
 
 The filter contract maps onto these directly: facet groups are predicates on
 `entities` columns (domain, type, slot, rarity, level range, expansion),
 semi-joins on `stats`+`families` (stat families, OR within a family) and
 `relations` (applies-to, crafts, sets), and text search joins `labels` (active
 locale with per-tag English fallback) over `name_tag`, `text_tag`, and the
-granted skill's name/description tags. `scripts/derived_queries/` holds seven
+granted skill's name/description tags. `scripts/derived_queries/` holds eight
 acceptance queries proving the whole contract; filters evaluate per entity row
 (variant), and a card UI collapses rows by `group_key`.
 
@@ -47,12 +48,19 @@ acceptance queries proving the whole contract; filters evaluate per entity row
   (weapon damage lines, block, chances, durations, skill/mastery bonuses,
   light radius, experience, energy regen, and all augment/component/relic
   stats). Calibration evidence and the one known gap live in the file itself.
+- `factions.json` - the `factionSource`-value-to-`tagFaction*` tag map (13
+  rows at build 19149150, following the game's own `tagFaction<value>` tag
+  convention, kept explicit so new factions are reviewed) plus
+  `unsold_augments`, the pinned list of faction-sourced augments no vendor
+  sells (8 dev template blanks).
 
 Drift guards run at the top of `just derive` and fail the build loudly:
 unknown `records/items/*` category, unknown `Class` in a scoped category,
-stat-family id absent from the deposit, unknown attack-speed tier. A game
-patch that grows the vocabulary breaks the build by design; update the
-curation file deliberately and re-run.
+stat-family id absent from the deposit, unknown attack-speed tier, unmapped
+`factionSource` value, and any drift between `unsold_augments` and the
+augments the vendor chain actually leaves uncovered. A game patch that grows
+the vocabulary breaks the build by design; update the curation file
+deliberately and re-run.
 
 ## Computed requirements
 
@@ -91,11 +99,12 @@ counted in the `expansion_defaulted` diagnostic.
 - `just derive` - rebuild `data/derived/` from the deposit + curation (runs
   the drift guards, prints per-domain counts, diagnostics, artifact sizes)
 - `just q "SQL"` - ad-hoc SQL; the derived views (`entities`, `stats`,
-  `relations`, `families`) register alongside `facts`/`labels`/`meta`
-- `just q-ae-all` - the seven acceptance recipes (AE1-AE7). Each gates its
+  `relations`, `families`, `sources`) register alongside `facts`/`labels`/`meta`
+- `just q-ae-all` - the eight acceptance recipes (AE1-AE8). Each gates its
   output on pinned oracle checks, so zero rows AND oracle drift both fail;
   after a game patch, expect count pins (97 ring/amulet augments, 14 legendary
-  2h axes) to fail until re-checked against grimtools and re-pinned.
+  2h axes, 284 vendor-sourced augments) to fail until re-checked against
+  grimtools and re-pinned.
 - `just clean-derived` - delete the artifacts
 
 After a patch: `just extract` -> `just i18n-tables` -> `just deposit` ->

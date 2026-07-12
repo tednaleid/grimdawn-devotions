@@ -311,7 +311,7 @@ derive:
     uv run scripts/build_derived.py build --deposit-dir "{{deposit_dir}}" \
         --curation-dir "{{justfile_directory()}}/data/item-curation" --out-dir "{{derived_dir}}"
 
-# One derived acceptance query (all seven below fail on zero rows AND on oracle mismatch,
+# One derived acceptance query (all eight below fail on zero rows AND on oracle mismatch,
 # since each SQL gates its output on its pinned checks - see scripts/derived_queries/)
 _q-derived FILE:
     uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \

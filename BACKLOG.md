@@ -375,13 +375,15 @@ artifact policy, item source, grimtools boundary).
    balance diff vs the previous build (small text, delta-diffable, doubles as
    a pipeline drift smoke test, community-valuable) - the release archive
    this shipped is its input.
-2. **Item source tier 1: faction and vendor edges** (first new feature).
-   Flat-fact joins, no graph walk: 292 `factionSource` + 128
-   `factionRequired` facts and 45 merchant records ("Sold by Luther Graves
-   (Devil's Crossing), Honored"). Beats grimtools, which models no
-   vendor/faction/quest/chest sources. Hand-curate sub-50-row domains
-   (faction display names, merchants) with drift guards. Unresolved items
-   fall back to "world drop" per the community norm.
+2. **Item source tier 1: faction vendor and crafted sources** (shipped
+   2026-07-11; see `docs/plans/2026-07-11-002-feat-item-source-tier1-plan.md`
+   and `docs/item-schema.md`). `sources.parquet` derives full vendor lines
+   ("Sold by Falonestra (Coven of Ugdenbog), Revered") from the merchant
+   chain, materializes crafted rows, and feeds the prototype's source facet;
+   `q-ae8-faction-sources` pins 284/292 coverage. Unsourced items stay silent
+   (revised from the earlier "world drop" fallback: that label waits for
+   step 3, which can actually distinguish it). Follow-up: whether the 8
+   template-blank augments should leave the entities table entirely.
 3. **Acquisition edges via one transposed loot-graph walker** (big rock;
    supersedes the old affix-applicability item). One reverse-reachability
    walk over creature `chanceToEquip*` -> `LootRandomizerTable` weights ->
