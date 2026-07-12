@@ -58,19 +58,21 @@ export function mountInfoPopover(header: HTMLElement, githubUrl: string): InfoPo
   const setText = (text: InfoPopoverText) => {
     btn.setAttribute("aria-label", text.label);
     btn.title = text.label;
+    panel.setAttribute("aria-label", text.label);
     panel.innerHTML = infoPanelHtml(text, githubUrl);
   };
 
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
+  btn.addEventListener("click", () => {
     setOpen(panel.hidden);
   });
   panel.addEventListener("click", (e) => {
-    e.stopPropagation(); // clicks inside (selecting text) must not reach the document dismisser
     if ((e.target as HTMLElement).closest("a")) setOpen(false); // following the link closes it
   });
-  // Dismiss on outside click or Escape (same contract as the language picker).
-  document.addEventListener("click", () => setOpen(false));
+  // Dismiss on outside click (containment check, so clicks inside this popover never close it -
+  // that also lets the OTHER header popover's button click close this one) or Escape.
+  document.addEventListener("click", (e) => {
+    if (!wrap.contains(e.target as Node)) setOpen(false);
+  });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setOpen(false);
   });

@@ -77,8 +77,7 @@ export function mountLanguagePicker(header: HTMLElement, opts: LanguagePickerOpt
     menu.innerHTML = languageMenuHtml(languageOptions(current, opts.available, opts.names));
   };
 
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();
+  btn.addEventListener("click", () => {
     setOpen(menu.hidden);
   });
   menu.addEventListener("click", (e) => {
@@ -87,8 +86,11 @@ export function mountLanguagePicker(header: HTMLElement, opts: LanguagePickerOpt
     setOpen(false);
     opts.onSelect(target.dataset.locale as string);
   });
-  // Dismiss on outside click or Escape.
-  document.addEventListener("click", () => setOpen(false));
+  // Dismiss on outside click (containment check, so clicks inside this popover never close it -
+  // that also lets the OTHER header popover's button click close this one) or Escape.
+  document.addEventListener("click", (e) => {
+    if (!wrap.contains(e.target as Node)) setOpen(false);
+  });
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") setOpen(false);
   });
