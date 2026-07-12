@@ -28,7 +28,10 @@ partially entered:
 2. Count bonuses and celestial powers on those stars as "available to get."
 3. Let a click on any reachable star claim it plus its unselected predecessors
    in one action.
-4. Do not meaningfully slow the per-click sweep; extend the perf harness and
+4. Represent a deliberate partial constellation honestly in the guided build
+   order: as the partial pick it is (with a star-count marker), placed at the
+   end of the order, never as the full constellation.
+5. Do not meaningfully slow the per-click sweep; extend the perf harness and
    guards to cover the new work.
 
 ## Why the engine is already close
@@ -159,6 +162,22 @@ completable constellations remains, plus bonuses and powers on deep reachable
 stars. At the 51-point reference state, Eye of Korvaak and Turtle Shell appear
 under Celestial Powers.
 
+## Build order
+
+The build-order engine needs no change: `selectionSummary` commits a partial
+constellation as a zero-grant member sized at its selected star count, so
+`buildOrderPath` already places it in the schedule's tail (zero-grant members go
+last, after every granting member and scaffold refund) with the partial point
+count on its step. The panel shows an order whenever the selection is
+self-covering (have at least need), which is exactly when a deliberate partial
+is a valid final state.
+
+The display must represent that step as the partial pick it is, not as the full
+constellation: a "complete" step whose points are less than its constellation's
+star count renders a partial-count marker, "(4/6)", from a new catalog key
+(`web/src/adapters/buildOrderView.ts` compares step points to the model's star
+count; the `BuildStep` type is untouched).
+
 ## What does not change
 
 - `classifyForSelection` and everything beneath it: the cover-table lower
@@ -212,7 +231,9 @@ automatically).
   and the small random models).
 - **Rules**: path-add closure, the background-click truth table including the
   no-op case. **Display**: star and edge brightness from `reachableStars`.
-  **Commit button**: the new Remove-when-partial mapping.
+  **Commit button**: the new Remove-when-partial mapping. **Build order**: a
+  complete step smaller than its constellation renders the partial marker; a
+  partial member's step lands in the order's tail with its partial point count.
 - **i18n**: the new tooltip key in the `appCatalog` guard.
 - **Regression gates**: `just test`, `just test-slow`, `just fuzz`,
   `just validate-wasm` (no WASM change, but the sweep's callers changed),
