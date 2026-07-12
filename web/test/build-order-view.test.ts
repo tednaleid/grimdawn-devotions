@@ -65,3 +65,16 @@ test("buildOrderHtml labels a crossroads with its cardinal direction and an affi
   expect(html).toContain(`background:${affinityColor("chaos")}`); // colored dot in the art column
   expect(html).toContain(`background:${affinityColor("eldritch")}`);
 });
+
+test("buildOrderHtml marks a complete step smaller than its constellation as a partial pick", () => {
+  const con = [...model.constellations.values()].find((c) => c.starIds.length >= 3)!;
+  const size = con.starIds.length;
+  const partial = buildOrderHtml(enLoc, model, null, [
+    { kind: "complete", conId: con.id, points: size - 1, heldAfter: size - 1 },
+  ]);
+  expect(partial).toContain(`(${size - 1}/${size})`);
+  expect(partial).toContain("bo-partial");
+  // A full-size step carries no partial marker.
+  const full = buildOrderHtml(enLoc, model, null, [{ kind: "complete", conId: con.id, points: size, heldAfter: size }]);
+  expect(full).not.toContain("bo-partial");
+});

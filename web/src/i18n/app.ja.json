@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "未完成のビルド: {deficit}の属性が必要です。",
   "ui.buildOrder.noLegalPath": "このビルドへの正当な経路は存在しません。",
   "ui.buildOrder.noPathCap": "{minCap}ポイント未満でこのビルドに到達する経路はありません。",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "返還",
   "ui.buildOrder.scaffoldingNote": "組み立てには一時的な足場が必要で、その間は合計が上限を超えます。",
   "ui.buildOrder.selectPrompt": "自己完結したビルドを選択すると順序が表示されます。",

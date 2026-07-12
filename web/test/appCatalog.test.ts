@@ -102,6 +102,7 @@ const REQUIRED = [
   "ui.buildOrder.scaffoldingNote",
   "ui.buildOrder.noLegalPath",
   "ui.buildOrder.selectPrompt",
+  "ui.buildOrder.partial",
   "aff.ascendant",
   "aff.chaos",
   "aff.eldritch",

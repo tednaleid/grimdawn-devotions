@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "Niekompletna budowa: wymaga powinowactwa {deficit}.",
   "ui.buildOrder.noLegalPath": "Nie istnieje legalna ścieżka do tej budowy.",
   "ui.buildOrder.noPathCap": "Nie ma ścieżki do tej budowy w mniej niż {minCap} punktów.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Zwrot",
   "ui.buildOrder.scaffoldingNote": "Złożenie tego wymaga tymczasowych rusztowań, które chwilowo przekraczają twój limit punktów.",
   "ui.buildOrder.selectPrompt": "Wybierz samowystarczalną budowę, aby zobaczyć jej kolejność.",

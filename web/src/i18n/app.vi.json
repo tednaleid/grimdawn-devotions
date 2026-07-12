@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "Bản dựng chưa hoàn chỉnh: cần thêm {deficit} ái lực.",
   "ui.buildOrder.noLegalPath": "Không tồn tại cách hợp lệ nào để đạt bản dựng này.",
   "ui.buildOrder.noPathCap": "Không có cách nào để đạt bản dựng này trong ít hơn {minCap} điểm.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Hoàn Trả",
   "ui.buildOrder.scaffoldingNote": "Việc lắp ráp cần giàn giáo tạm thời khiến tổng điểm vượt quá giới hạn của bạn.",
   "ui.buildOrder.selectPrompt": "Chọn một bản dựng tự cung cấp ái lực để xem thứ tự của nó.",

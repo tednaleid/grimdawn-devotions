@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "Neúplné sestavení: chybí {deficit} afinity.",
   "ui.buildOrder.noLegalPath": "K tomuto sestavení neexistuje platná cesta.",
   "ui.buildOrder.noPathCap": "Neexistuje cesta k tomuto sestavení v méně než {minCap} bodech.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Vrátit",
   "ui.buildOrder.scaffoldingNote": "Jeho sestavení vyžaduje dočasnou podporu, která posune průběžný součet nad váš limit.",
   "ui.buildOrder.selectPrompt": "Vyberte samostatně pokryté sestavení a zobrazte jeho pořadí.",

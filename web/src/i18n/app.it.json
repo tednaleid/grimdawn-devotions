@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "Build incompleta: richiede {deficit} di affinità.",
   "ui.buildOrder.noLegalPath": "Non esiste un percorso valido per questa build.",
   "ui.buildOrder.noPathCap": "Nessun percorso per questa build in meno di {minCap} punti.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Rimborso",
   "ui.buildOrder.scaffoldingNote": "Assemblarla richiede un'impalcatura temporanea che porta il totale oltre il tuo limite.",
   "ui.buildOrder.selectPrompt": "Seleziona una build autosufficiente per vederne l'ordine.",

@@ -142,6 +142,7 @@
   "ui.buildOrder.incompleteAffinity": "Unvollständiger Aufbau: benötigt {deficit} Affinität.",
   "ui.buildOrder.noLegalPath": "Es gibt keinen gültigen Weg zu diesem Aufbau.",
   "ui.buildOrder.noPathCap": "Kein Weg zu diesem Aufbau mit weniger als {minCap} Punkten.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Erstatten",
   "ui.buildOrder.scaffoldingNote": "Der Aufbau erfordert vorübergehende Zwischenschritte, die die laufende Summe über dein Limit hinaus erhöhen.",
   "ui.buildOrder.selectPrompt": "Wähle einen in sich geschlossenen Aufbau, um seine Reihenfolge zu sehen.",

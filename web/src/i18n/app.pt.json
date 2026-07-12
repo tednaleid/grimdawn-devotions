@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "Build incompleta: precisa de {deficit} de afinidade.",
   "ui.buildOrder.noLegalPath": "Não existe um caminho válido para esta build.",
   "ui.buildOrder.noPathCap": "Não há caminho para esta build em menos de {minCap} pontos.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Reembolsar",
   "ui.buildOrder.scaffoldingNote": "Montá-la exige uma estrutura temporária que faz o total ultrapassar seu limite durante o processo.",
   "ui.buildOrder.selectPrompt": "Selecione uma build autossuficiente para ver sua ordem.",

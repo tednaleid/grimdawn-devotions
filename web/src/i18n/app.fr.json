@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "Build incomplet : nécessite {deficit} d'affinité.",
   "ui.buildOrder.noLegalPath": "Aucun chemin valide vers ce build n'existe.",
   "ui.buildOrder.noPathCap": "Aucun chemin vers ce build en moins de {minCap} points.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Rembourser",
   "ui.buildOrder.scaffoldingNote": "Son assemblage nécessite un échafaudage temporaire qui dépasse votre limite de points.",
   "ui.buildOrder.selectPrompt": "Sélectionnez un build autosuffisant pour voir son ordre.",

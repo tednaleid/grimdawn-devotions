@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "构建未完成: 还需要{deficit}点亲和。",
   "ui.buildOrder.noLegalPath": "不存在通往此构建的合法路径。",
   "ui.buildOrder.noPathCap": "无法在少于{minCap}点的情况下达成此构建。",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "返还",
   "ui.buildOrder.scaffoldingNote": "组装它需要临时的过渡星座，其间总点数会超过你的上限。",
   "ui.buildOrder.selectPrompt": "选择一个自洽的构建以查看其点亮顺序。",

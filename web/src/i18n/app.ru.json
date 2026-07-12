@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "Незавершённая сборка: не хватает сродства {deficit}.",
   "ui.buildOrder.noLegalPath": "Легального пути к этой сборке не существует.",
   "ui.buildOrder.noPathCap": "Нет пути к этой сборке менее чем за {minCap} очков.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "Возврат",
   "ui.buildOrder.scaffoldingNote": "Для сборки требуются временные промежуточные звёзды, которые превышают ваш лимит очков.",
   "ui.buildOrder.selectPrompt": "Выберите самодостаточную сборку, чтобы увидеть её порядок.",

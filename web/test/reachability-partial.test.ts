@@ -10,6 +10,8 @@ import {
   selectionSummary,
   reachabilityForSelection,
   pathToStar,
+  buildOrderPath,
+  selectionView,
   type Vec,
 } from "../src/core/reachability";
 import type { DevotionModel } from "../src/core/types";
@@ -203,4 +205,28 @@ test("real map: Eye of Korvaak and Turtle Shell are available to get at the 51-p
   const powerStars = availablePowers(realModel, v.reachableStars).map((p) => p.starId);
   expect(powerStars).toContain("korvaak_the_eldritch_sun:4");
   expect(powerStars).toContain("tortoise:4");
+}, 60_000);
+
+test("build order: a deliberate partial is scheduled last with its partial point count", () => {
+  // branchy(): G (1 star, grants eldritch 3) covers X's requirement (eldritch 1), so {X:0, X:1} + G
+  // is a valid, self-covering selection with X held partial forever.
+  const m = branchy();
+  const c = buildReachCons(m);
+  const t = buildCoverTable(c);
+  const members = selectionSummary(m, new Set(["X:0", "X:1", "G:0"])).built;
+  const steps = buildOrderPath(c, t, members, 55)!;
+  expect(steps).not.toBeNull();
+  const last = steps[steps.length - 1]!;
+  expect(last).toEqual({ kind: "complete", conId: "X", points: 2, heldAfter: 3 });
+});
+
+test("real map: the Eye of Korvaak build's order carries Korvaak as a 4-point tail step", () => {
+  const sel = decodeHash(HASH_55, starCanon)!.selected;
+  const view = selectionView(realModel, realCons, realTable, sel, 55);
+  expect(view.buildOrder).not.toBeNull();
+  const korvaak = view.buildOrder!.findIndex((s) => s.conId === "korvaak_the_eldritch_sun" && s.kind === "complete");
+  expect(korvaak).toBeGreaterThanOrEqual(0);
+  expect(view.buildOrder![korvaak]!.points).toBe(4); // the partial count, not Korvaak's 6 stars
+  // Zero-grant members form the order's tail: everything after the partial is also a complete step.
+  for (const s of view.buildOrder!.slice(korvaak)) expect(s.kind).toBe("complete");
 }, 60_000);

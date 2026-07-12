@@ -59,6 +59,7 @@
   "ui.buildOrder.scaffoldingNote": "Assembling it needs transient scaffolding that pushes the running total past your cap.",
   "ui.buildOrder.noLegalPath": "No legal path to this build exists.",
   "ui.buildOrder.selectPrompt": "Select a self-covering build to see its order.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "aff.ascendant": "Ascendant",
   "aff.chaos": "Chaos",
   "aff.eldritch": "Eldritch",

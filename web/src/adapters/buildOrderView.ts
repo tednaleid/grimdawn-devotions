@@ -94,7 +94,13 @@ export function buildOrderHtml(
       if (s.kind === "complete") {
         n++;
         const artCell = img || dot;
-        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
+        // A step smaller than its constellation is a deliberate partial pick (e.g. 4 of 6 stars to
+        // reach a celestial power): annotate it so the row does not read as the full constellation.
+        const partial =
+          c && s.points < c.starIds.length
+            ? ` <span class="bo-partial">${loc.translate("ui.buildOrder.partial", { taken: s.points, total: c.starIds.length })}</span>`
+            : "";
+        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}${partial}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
       }
       const label =
         s.kind === "scaffold-add" ? loc.translate("ui.buildOrder.add") : loc.translate("ui.buildOrder.refund");

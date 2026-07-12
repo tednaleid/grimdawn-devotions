@@ -141,6 +141,7 @@
   "ui.buildOrder.incompleteAffinity": "미완성 빌드: {deficit}가 필요합니다.",
   "ui.buildOrder.noLegalPath": "이 빌드로 가는 유효한 경로가 존재하지 않습니다.",
   "ui.buildOrder.noPathCap": "{minCap} 포인트 미만으로는 이 빌드에 도달할 경로가 없습니다.",
+  "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.refund": "환불",
   "ui.buildOrder.scaffoldingNote": "조립에는 일시적인 발판이 필요하며, 그동안 누적 포인트가 한도를 초과합니다.",
   "ui.buildOrder.selectPrompt": "자체 완결된 빌드를 선택하면 순서가 표시됩니다.",

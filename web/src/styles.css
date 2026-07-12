@@ -577,6 +577,10 @@ main {
   color: #9aa4b2;
   font-size: 0.9em;
 }
+.bo-partial {
+  color: #9aa4b2;
+  font-size: 0.85em;
+}
 #map-container {
   position: relative;
   overflow: hidden;
