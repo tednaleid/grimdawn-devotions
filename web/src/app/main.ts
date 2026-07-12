@@ -9,6 +9,7 @@ import {
   storeLocale,
 } from "../adapters/localizationAdapter";
 import { mountLanguagePicker } from "../adapters/languagePicker";
+import { mountInfoPopover, type InfoPopoverText } from "../adapters/infoPopover";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
@@ -51,6 +52,8 @@ import {
 } from "../core/aggregate";
 import { condensedRows } from "../core/statFormat";
 import type { Affinity, SelectionState, StarId } from "../core/types";
+
+const GITHUB_URL = "https://github.com/tednaleid/grimdawn-devotions";
 
 async function boot() {
   // A prior failed load may have set this guard (see bootFailed() in index.html). The module has now
@@ -143,6 +146,24 @@ async function boot() {
     barEl.setAttribute("aria-label", localization.translate("ui.points.budgetAria"));
   }
   applyChrome();
+  // Header info popover: the planner's provenance (description, game-data version, repo link).
+  // Mounted before the language picker so the (i) sits immediately left of the globe.
+  function infoText(): InfoPopoverText {
+    const date = data.meta.generatedUtc.slice(0, 10); // date portion of the ISO stamp, timezone-free
+    const gameData = data.meta.gameVersion
+      ? date
+        ? localization.translate("ui.info.gameData", { version: data.meta.gameVersion, date })
+        : localization.translate("ui.info.gameDataNoDate", { version: data.meta.gameVersion })
+      : null;
+    return {
+      label: localization.translate("ui.info.aria"),
+      description: localization.translate("ui.info.description"),
+      gameData,
+      github: localization.translate("ui.info.github"),
+    };
+  }
+  const info = mountInfoPopover(headerEl, GITHUB_URL);
+  info.setText(infoText());
   // Language picker (globe button, right of the header). Switching swaps catalogs, re-applies chrome,
   // and re-renders the views; locale is a viewer preference, never in the URL hash.
   const picker = mountLanguagePicker(headerEl, {
@@ -154,6 +175,7 @@ async function boot() {
       storeLocale(locale);
       localization = await loadLocalization({ base: ".", available: SUPPORTED_LOCALES, preferred: [locale] });
       applyChrome();
+      info.setText(infoText());
       picker.setCurrent(localization.locale, localization.translate("ui.lang.label"));
       refresh();
     },
