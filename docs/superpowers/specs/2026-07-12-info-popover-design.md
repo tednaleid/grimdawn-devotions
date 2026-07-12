@@ -61,12 +61,15 @@ text), and re-applies the localized strings on language switch alongside
 
 ## Internationalization
 
-Four new catalog keys in `web/src/i18n/app.en.json` and all 12 other locale
+Five new catalog keys in `web/src/i18n/app.en.json` and all 12 other locale
 files, plus entries in the `REQUIRED` list of `web/test/appCatalog.test.ts`:
 
 - `ui.info.aria` - the button's accessible label ("About this planner").
 - `ui.info.description` - the one-line description.
 - `ui.info.gameData` - "Game data: v{version} (extracted {date})".
+- `ui.info.gameDataNoDate` - "Game data: v{version}", used when the dataset
+  carries no extraction timestamp, so the no-date fallback never needs string
+  surgery on a translated value.
 - `ui.info.github` - "View on GitHub".
 
 The version and date are parameters, never baked into the strings. The glyph on
@@ -75,13 +78,17 @@ the button is a symbol, not text, following the cap-toggle precedent.
 ## Testing
 
 - Adapter unit test (new `web/test/infoPopover.test.ts`, following the
-  languagePicker test pattern): mounts with sample meta, asserts the three
-  lines render with resolved catalog text and the correct href, asserts
-  toggle/Escape/outside-click behavior and `aria-expanded` state, and asserts
-  the empty-meta fallback (no date parenthetical when `generatedUtc` is empty).
-- `appCatalog` guard covers the four keys and their placeholder sets across
+  languagePicker test pattern): the pure content helper renders the three
+  lines with the given text, the correct href with `target`/`rel`, omits the
+  game-data line when null, and escapes text. The DOM mount is thin glue
+  verified in the browser, the same convention the language picker test
+  documents (the test suite has no DOM harness).
+- Data test: the meta mapping falls back to empty strings on absent or
+  partial `meta`, and reads the real dataset's values.
+- `appCatalog` guard covers the five keys and their placeholder sets across
   locales.
-- Manual browser check via `just serve`.
+- Browser check via `just serve`: toggle, Escape and outside-click dismiss,
+  link href, and re-rendered text after a language switch.
 
 ## Non-goals
 
