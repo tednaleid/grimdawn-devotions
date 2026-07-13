@@ -33,6 +33,7 @@
   .card .meta { color: var(--dim); font-size: 12px; margin: 2px 0 6px; }
   .card .req { color: var(--dim); font-size: 12px; margin-bottom: 6px; }
   .card .srcline { color: #8fb98f; font-size: 12px; margin-bottom: 2px; }
+  .card .apline { color: #8fa8c8; font-size: 12px; margin: -4px 0 6px; }
   .card ul { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12px; color: #b7e0a0; }
   .card ul li.src { color: var(--dim); margin-top: 5px; font-style: italic; }
   .badge { font-size: 10px; border-radius: 3px; padding: 1px 5px; margin-left: 6px; vertical-align: 1px; }
@@ -221,6 +222,29 @@ function sourceLine(s) {
     : `Sold by ${s.vendor_name ?? "?"} (${s.faction_name ?? "?"}), ${TIER_LABEL[s.tier] ?? s.tier}`;
 }
 
+// Applies-to display: collapse exact slot groups to an in-game style phrase, largest
+// group first; leftovers list raw (the same tokens as the facet buttons).
+const APPLY_GROUPS = [
+  ["all weapons", ["axe1h", "axe2h", "dagger", "mace1h", "mace2h", "ranged1h", "ranged2h", "scepter", "spear2h", "sword1h", "sword2h"]],
+  ["all armor", ["chest", "feet", "hands", "head", "legs", "shoulders", "waist"]],
+  ["1h melee", ["axe1h", "dagger", "mace1h", "scepter", "sword1h"]],
+  ["2h weapons", ["axe2h", "mace2h", "ranged2h", "spear2h", "sword2h"]],
+  ["all jewelry", ["amulet", "medal", "ring"]],
+];
+function appliesLine(slots) {
+  if (!slots || !slots.length) return null;
+  const rest = new Set(slots);
+  const parts = [];
+  for (const [phrase, members] of APPLY_GROUPS) {
+    if (members.every((m) => rest.has(m))) {
+      parts.push(phrase);
+      for (const m of members) rest.delete(m);
+    }
+  }
+  parts.push(...[...rest].sort());
+  return `Applies to ${parts.join(", ")}`;
+}
+
 function card(it) {
   const stats = statsByRecord.get(it.record) ?? [];
   const self = stats.filter((s) => s.source === "self");
@@ -234,9 +258,11 @@ function card(it) {
   const badges =
     (it.expansion !== "base" ? `<span class="badge ${it.expansion}">${it.expansion}</span>` : "") +
     (it.is_empowered ? `<span class="badge emp">empowered</span>` : "");
+  const apline = appliesLine(it.applies_to);
   return `<div class="card">
     <div class="name" style="color: var(--${(it.rarity || "common").toLowerCase()})">${esc(it.name)}${badges}</div>
     <div class="meta">${esc(Array.isArray(it.gear_type) ? it.domain : (it.gear_type || it.domain))} · ilvl ${it.item_level ?? "?"}${it.attacks_per_sec ? ` · ${it.attacks_per_sec.toFixed(2)}/s` : ""}</div>
+    ${apline ? `<div class="apline">${esc(apline)}</div>` : ""}
     ${reqs.length ? `<div class="req">requires ${reqs.join(", ")}</div>` : ""}
     ${srcLines.map((t) => `<div class="srcline">${esc(t)}</div>`).join("")}
     <ul>${self.map((s) => `<li>${esc(statLine(s))}</li>`).join("")}
