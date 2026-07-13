@@ -24,7 +24,7 @@ The filter contract maps onto these directly: facet groups are predicates on
 semi-joins on `stats`+`families` (stat families, OR within a family) and
 `relations` (applies-to, crafts, sets), and text search joins `labels` (active
 locale with per-tag English fallback) over `name_tag`, `text_tag`, and the
-granted skill's name/description tags. `scripts/derived_queries/` holds eight
+granted skill's name/description tags. `scripts/derived_queries/` holds nine
 acceptance queries proving the whole contract; filters evaluate per entity row
 (variant), and a card UI collapses rows by `group_key`.
 
@@ -100,7 +100,7 @@ counted in the `expansion_defaulted` diagnostic.
   the drift guards, prints per-domain counts, diagnostics, artifact sizes)
 - `just q "SQL"` - ad-hoc SQL; the derived views (`entities`, `stats`,
   `relations`, `families`, `sources`) register alongside `facts`/`labels`/`meta`
-- `just q-ae-all` - the eight acceptance recipes (AE1-AE8). Each gates its
+- `just q-ae-all` - the nine acceptance recipes (AE1-AE9). Each gates its
   output on pinned oracle checks, so zero rows AND oracle drift both fail;
   after a game patch, expect count pins (97 ring/amulet augments, 14 legendary
   2h axes, 284 vendor-sourced augments) to fail until re-checked against
