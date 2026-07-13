@@ -81,6 +81,7 @@ await Promise.all([
   reg("entities.parquet", "data/derived/entities.parquet"),
   reg("stats.parquet", "data/derived/stats.parquet"),
   reg("sources.parquet", "data/derived/sources.parquet"),
+  reg("relations.parquet", "data/derived/relations.parquet"),
   reg("labels.parquet", "data/deposit/labels.parquet"),
 ]);
 const tFetch = performance.now();
@@ -124,13 +125,31 @@ for (const it of items) {
   it.source = [...new Set(src.map((s) => (s.kind === "crafted" ? "crafted" : "faction vendor")))];
   if (!it.source.length) it.source = ["unsourced"];
 }
+
+// Applies-to: augments/components go ON other gear; their gear_type facet value set
+// becomes those target types (same vocabulary as gear's own gear_type), so clicking
+// "legs" matches legs armor AND everything applicable to legs.
+const appliesByRecord = new Map();
+for (const r of rows(await conn.query(`
+    SELECT src, dst FROM 'relations.parquet' WHERE kind = 'applies_to' ORDER BY src, dst`))) {
+  let list = appliesByRecord.get(r.src);
+  if (!list) appliesByRecord.set(r.src, (list = []));
+  list.push(r.dst);
+}
+for (const it of items) {
+  if (it.domain === "augment" || it.domain === "component") {
+    it.applies_to = appliesByRecord.get(it.record) ?? [];
+    it.gear_type = it.applies_to;
+  }
+}
 const tQuery = performance.now();
 $("timing").textContent =
   `${items.length} items · wasm ${Math.round(tInit - t0)}ms · fetch ${Math.round(tFetch - tInit)}ms · query ${Math.round(tQuery - tFetch)}ms`;
 
 // --- filter state: OR within a group, AND across groups -----------------------
-// `source` is set-valued (an item can be both vendor-sold and crafted); the other
-// fields are scalars. A set-valued field matches when ANY of its values is selected,
+// `source` and `gear_type` are set-valued (an item can be both vendor-sold and crafted;
+// an augment/component's gear types are the slots it applies to). Scalar fields wrap
+// into one-element sets. A set-valued field matches when ANY of its values is selected,
 // and counts count items (once per value they hold), not source rows.
 const FIELDS = ["domain", "gear_type", "rarity", "expansion", "source"];
 const active = { domain: new Set(), gear_type: new Set(), rarity: new Set(), expansion: new Set(), source: new Set() };
@@ -217,7 +236,7 @@ function card(it) {
     (it.is_empowered ? `<span class="badge emp">empowered</span>` : "");
   return `<div class="card">
     <div class="name" style="color: var(--${(it.rarity || "common").toLowerCase()})">${esc(it.name)}${badges}</div>
-    <div class="meta">${esc(it.gear_type || it.domain)} · ilvl ${it.item_level ?? "?"}${it.attacks_per_sec ? ` · ${it.attacks_per_sec.toFixed(2)}/s` : ""}</div>
+    <div class="meta">${esc(Array.isArray(it.gear_type) ? it.domain : (it.gear_type || it.domain))} · ilvl ${it.item_level ?? "?"}${it.attacks_per_sec ? ` · ${it.attacks_per_sec.toFixed(2)}/s` : ""}</div>
     ${reqs.length ? `<div class="req">requires ${reqs.join(", ")}</div>` : ""}
     ${srcLines.map((t) => `<div class="srcline">${esc(t)}</div>`).join("")}
     <ul>${self.map((s) => `<li>${esc(statLine(s))}</li>`).join("")}
