@@ -48,7 +48,7 @@ regenerate, and no inspection requires leaving the terminal.
   "broken join", so it is treated as failure.
 - `just publish-deposit` - upload the deposit + derived parquet as an
   immutable GitHub Release and write `deposit.lock` (Windows box; gated on
-  `just derive` and all eight acceptance queries passing fresh; add
+  `just derive` and all nine acceptance queries passing fresh; add
   `--dry-run` to print the would-be lockfile with no side effects)
 - `just fetch-deposit` - download exactly what `deposit.lock` pins into
   `data/deposit/` + `data/derived/`, verifying every checksum (any machine;

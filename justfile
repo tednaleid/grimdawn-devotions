@@ -311,7 +311,7 @@ derive:
     uv run scripts/build_derived.py build --deposit-dir "{{deposit_dir}}" \
         --curation-dir "{{justfile_directory()}}/data/item-curation" --out-dir "{{derived_dir}}"
 
-# One derived acceptance query (all eight below fail on zero rows AND on oracle mismatch,
+# One derived acceptance query (all nine below fail on zero rows AND on oracle mismatch,
 # since each SQL gates its output on its pinned checks - see scripts/derived_queries/)
 _q-derived FILE:
     uv run scripts/build_deposit.py query --deposit-dir "{{deposit_dir}}" \
@@ -350,9 +350,13 @@ q-ae7-search-de: (_q-derived "ae7_search_de.sql")
 [group("deposit")]
 q-ae8-faction-sources: (_q-derived "ae8_faction_sources.sql")
 
-# All eight derived acceptance queries (the AE gate from docs/item-schema.md)
+# AE9: applies-to edges cover all augments/components (446/447, blank pinned) + three card oracles
 [group("deposit")]
-q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de q-ae8-faction-sources
+q-ae9-applies-to: (_q-derived "ae9_applies_to.sql")
+
+# All nine derived acceptance queries (the AE gate from docs/item-schema.md)
+[group("deposit")]
+q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de q-ae8-faction-sources q-ae9-applies-to
 
 # Delete the deposit artifacts. Deliberately NOT part of `clean`: regenerating
 # them needs Windows + the game install, so `clean` must never touch them.
