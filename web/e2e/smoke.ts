@@ -440,6 +440,57 @@ try {
     "history: assigning a bookmarked hash applies it to the open app",
   );
 
+  // A pointer drag on the point bar is ONE history entry: pointerdown pushes, moves replace.
+  // One Back therefore restores the pre-drag cap; landing mid-drag would mean the moves pushed.
+  const capBeforeDrag = await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent");
+  await cdp.evaluate(`(() => {
+    const b = document.getElementById('point-bar');
+    const r = b.getBoundingClientRect();
+    const y = r.top + r.height / 2;
+    const x = (f) => r.left + r.width * f;
+    b.dispatchEvent(new PointerEvent('pointerdown', { clientX: x(0.6), clientY: y, bubbles: true }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: x(0.7), clientY: y, bubbles: true }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: x(0.8), clientY: y, bubbles: true }));
+    window.dispatchEvent(new PointerEvent('pointerup', { clientX: x(0.8), clientY: y, bubbles: true }));
+  })()`);
+  await Bun.sleep(150);
+  const capAfterDrag = await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent");
+  check(
+    capAfterDrag !== capBeforeDrag,
+    `history: dragging the point bar moves the cap (${capBeforeDrag} -> ${capAfterDrag})`,
+  );
+  await cdp.evaluate("history.back()");
+  await Bun.sleep(300);
+  check(
+    (await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent")) === capBeforeDrag,
+    "history: one Back undoes the whole drag gesture (moves replaced, not pushed)",
+  );
+  check(
+    await cdp.evaluate<boolean>(
+      `!!document.querySelector('circle[data-star-id="${histStar}"]')?.classList.contains('selected')`,
+    ),
+    "history: Back after the drag does not overshoot into earlier states",
+  );
+  // A rapid arrow-key burst coalesces into one entry: the first press pushes, the rest replace.
+  const capBeforeKeys = await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent");
+  await cdp.evaluate(`(() => {
+    const b = document.getElementById('point-bar');
+    b.focus();
+    for (let i = 0; i < 3; i++) b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+  })()`);
+  await Bun.sleep(150);
+  check(
+    (await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent")) ===
+      String(Number(capBeforeKeys) - 3),
+    "history: three quick ArrowLefts lower the cap by 3",
+  );
+  await cdp.evaluate("history.back()");
+  await Bun.sleep(300);
+  check(
+    (await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent")) === capBeforeKeys,
+    "history: one Back undoes the whole key burst (presses coalesced)",
+  );
+
   // --- Narrow viewport + touch emulation (responsive drawers, gestures, popover) ---
   await cdp.send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });

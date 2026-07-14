@@ -437,9 +437,9 @@ async function boot() {
     const v = Math.round(((clientX - r.left) / r.width) * MAX_POINTS);
     return Math.max(curMin, Math.min(MAX_POINTS, v));
   }
-  function setCap(cap: number): void {
+  function setCap(cap: number, urlMode: "push" | "replace" = "push"): void {
     state = { selected: state.selected, pointCap: cap };
-    refresh();
+    refresh(urlMode);
   }
   function renderPointBar(): void {
     const used = state.selected.size;
@@ -467,7 +467,8 @@ async function boot() {
   }
   let dragging = false;
   const onBarMove = (e: PointerEvent) => {
-    if (dragging) setCap(capFromClientX(e.clientX));
+    // Mid-drag caps replace: the pointerdown already pushed this gesture's single entry.
+    if (dragging) setCap(capFromClientX(e.clientX), "replace");
   };
   const onBarUp = () => {
     dragging = false;
@@ -483,6 +484,9 @@ async function boot() {
     window.addEventListener("pointerup", onBarUp);
     window.addEventListener("pointercancel", onBarUp);
   });
+  // Coalesce key bursts into one history entry: the first press pushes, presses within
+  // 500 ms of the previous one replace that entry, so a held arrow key is one Back step.
+  let lastCapKeyAt = 0;
   barEl.addEventListener("keydown", (e) => {
     if (!Number.isFinite(state.pointCap)) return;
     let c = state.pointCap as number;
@@ -492,7 +496,9 @@ async function boot() {
     else if (e.key === "End") c = MAX_POINTS;
     else return;
     e.preventDefault();
-    setCap(Math.max(curMin, Math.min(MAX_POINTS, c)));
+    const mode = e.timeStamp - lastCapKeyAt < 500 ? "replace" : "push";
+    lastCapKeyAt = e.timeStamp;
+    setCap(Math.max(curMin, Math.min(MAX_POINTS, c)), mode);
   });
 
   // The cap button toggles between the finite limit and uncapped (Infinity).
