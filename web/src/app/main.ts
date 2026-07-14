@@ -92,23 +92,33 @@ async function boot() {
   const canonical = canonicalStarIds(model);
   const statCanonical = canonicalStatIds(model);
   const benefitCanonical = canonicalBenefitIds(model);
-  const restored = decodeHash(location.hash, canonical, benefitCanonical);
-  let state: SelectionState = restored
-    ? {
-        selected: repairSelection(model, cons, table, restored.selected, restored.pointCap),
-        pointCap: restored.pointCap,
-      }
-    : { selected: new Set(), pointCap: 55 };
-  // The cap can never be below the points actually allocated; raise it if a restored
-  // link is over budget (the slider also enforces this floor below).
-  state = { selected: state.selected, pointCap: Math.max(state.pointCap, state.selected.size) };
+  let state: SelectionState = { selected: new Set(), pointCap: 55 };
   // Baseline for the comparison mode: null when not comparing.
-  let baseline: SelectionState | null = restored?.baseline ?? null;
+  let baseline: SelectionState | null = null;
   // The finite cap to fall back to when the user re-imposes the limit after going uncapped.
-  let lastFiniteCap = Number.isFinite(state.pointCap) ? state.pointCap : 55;
+  let lastFiniteCap = 55;
   // Benefit "tags": the raw stat ids selected in the Benefits panel; they highlight the
   // matching map nodes and are persisted in the URL so a shared link restores them.
-  const selectedBenefits = new Set<string>(restored?.benefits ?? []);
+  const selectedBenefits = new Set<string>();
+  // Decode and repair a hash into planner state. Runs at boot and on every hashchange
+  // (Back/Forward, bookmark clicks, hand-edited URLs); an undecodable hash is the empty build.
+  function applyHash(hash: string): void {
+    const restored = decodeHash(hash, canonical, benefitCanonical);
+    state = restored
+      ? {
+          selected: repairSelection(model, cons, table, restored.selected, restored.pointCap),
+          pointCap: restored.pointCap,
+        }
+      : { selected: new Set(), pointCap: 55 };
+    // The cap can never be below the points actually allocated; raise it if a restored
+    // link is over budget (the slider also enforces this floor below).
+    state = { selected: state.selected, pointCap: Math.max(state.pointCap, state.selected.size) };
+    baseline = restored?.baseline ?? null;
+    if (Number.isFinite(state.pointCap)) lastFiniteCap = state.pointCap;
+    selectedBenefits.clear();
+    for (const b of restored?.benefits ?? []) selectedBenefits.add(b);
+  }
+  applyHash(location.hash);
   // The full benefit catalog (every subject + its stat ids), so the panel can list benefits the
   // current build does not grant yet. condensedRows now returns ids/keys/Text descriptors (no
   // resolved strings), so the catalog is locale-independent and built once at boot.
@@ -554,7 +564,7 @@ async function boot() {
     availHtml = r.availHtml;
     petAvailHtml = r.petAvailHtml;
   }
-  function refresh() {
+  function refresh(urlMode: "push" | "replace" = "push") {
     completionCache.clear();
     // The full per-click engine cost (validity floor + dimming sweep) is the core selectionView port;
     // this controller is a thin caller, so optimize selectionView, not refresh. The degraded path
@@ -630,11 +640,13 @@ async function boot() {
       : localization.translate("ui.points.capRemoveTitle");
     totalWord.style.display = uncapped ? "none" : "";
     renderPointBar();
-    history.replaceState(
-      null,
-      "",
-      `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline)}`,
-    );
+    const next = `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline)}`;
+    // Only touch history when the hash actually changed: no-op refreshes (language switch,
+    // popover re-renders) must create no entry and leave the current one alone.
+    if (next !== location.hash) {
+      if (urlMode === "push") history.pushState(null, "", next);
+      else history.replaceState(null, "", next);
+    }
   }
 
   // Expose the header height to CSS so the corner toggles sit just below the top bar.
@@ -754,7 +766,15 @@ async function boot() {
     true,
   );
 
-  refresh();
+  // Back/Forward, bookmark clicks, and hand-edited URLs land here; our own pushState/replaceState
+  // calls never fire hashchange, so there is no feedback loop. After applying, canonicalize in
+  // place: a repaired or non-canonical incoming hash must not mint an extra entry.
+  window.addEventListener("hashchange", () => {
+    applyHash(location.hash);
+    refresh("replace");
+  });
+
+  refresh("replace"); // boot render; canonicalize the URL without creating a history entry
 }
 
 boot().catch((e) => {

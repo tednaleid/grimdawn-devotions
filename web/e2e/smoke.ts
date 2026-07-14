@@ -390,6 +390,56 @@ try {
     "Update Baseline exits compare mode and drops cs= from the URL",
   );
 
+  // --- History-aware URL state (docs/superpowers/specs/2026-07-14-url-history-design.md) ---
+  // Restore budget first: the earlier "empties" check parked the cap at the validity floor,
+  // so nothing is selectable until End lifts it back to 55.
+  await cdp.evaluate(
+    `(() => { const b = document.getElementById('point-bar'); b.focus(); b.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true })); })()`,
+  );
+  await Bun.sleep(150);
+  const hashBeforeClick = await cdp.evaluate<string>("location.hash");
+  const histStar = await cdp.evaluate<string>(
+    "document.querySelector('circle.hit.selectable:not(.selected)')?.getAttribute('data-star-id') || ''",
+  );
+  check(histStar.length > 0, "history: found a selectable star to click");
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="${histStar}"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
+  await Bun.sleep(150);
+  check((await cdp.evaluate<string>("location.hash")) !== hashBeforeClick, "history: clicking a star changes the hash");
+  await cdp.evaluate("history.back()");
+  await Bun.sleep(300);
+  check(
+    (await cdp.evaluate<string>("location.hash")) === hashBeforeClick,
+    "history: Back reverts the hash to the pre-click state",
+  );
+  check(
+    await cdp.evaluate<boolean>(
+      `(() => { const c = document.querySelector('circle[data-star-id="${histStar}"]'); return !!c && !c.classList.contains('selected'); })()`,
+    ),
+    "history: Back deselects the star (the app applied the old hash)",
+  );
+  await cdp.evaluate("history.forward()");
+  await Bun.sleep(300);
+  check(
+    await cdp.evaluate<boolean>(
+      `!!document.querySelector('circle[data-star-id="${histStar}"]')?.classList.contains('selected')`,
+    ),
+    "history: Forward reselects the star",
+  );
+  // A live "bookmark click": assigning a bookmarked hash applies it to the open app.
+  const hashSelected = await cdp.evaluate<string>("location.hash");
+  await cdp.evaluate("history.back()");
+  await Bun.sleep(300);
+  await cdp.evaluate(`location.hash = "${hashSelected.slice(1)}"`);
+  await Bun.sleep(300);
+  check(
+    await cdp.evaluate<boolean>(
+      `!!document.querySelector('circle[data-star-id="${histStar}"]')?.classList.contains('selected')`,
+    ),
+    "history: assigning a bookmarked hash applies it to the open app",
+  );
+
   // --- Narrow viewport + touch emulation (responsive drawers, gestures, popover) ---
   await cdp.send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
