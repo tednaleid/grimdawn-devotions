@@ -466,9 +466,19 @@ async function boot() {
     barEl.setAttribute("aria-valuenow", String(cap));
   }
   let dragging = false;
+  // The pointerdown commit can land exactly on the current cap (grabbing the grabber itself),
+  // which no-ops through refresh()'s dedupe guard and pushes nothing. dragPushed tracks whether
+  // this gesture has actually pushed yet, so the first commit that really changes the hash is the
+  // one that pushes and every commit after that replaces it. Without this, a mid-drag pointermove
+  // would blindly replace whatever entry was current before the gesture started, clobbering it.
+  let dragPushed = false;
+  function commitDragCap(cap: number): void {
+    const before = location.hash;
+    setCap(cap, dragPushed ? "replace" : "push");
+    if (location.hash !== before) dragPushed = true;
+  }
   const onBarMove = (e: PointerEvent) => {
-    // Mid-drag caps replace: the pointerdown already pushed this gesture's single entry.
-    if (dragging) setCap(capFromClientX(e.clientX), "replace");
+    if (dragging) commitDragCap(capFromClientX(e.clientX));
   };
   const onBarUp = () => {
     dragging = false;
@@ -479,7 +489,8 @@ async function boot() {
   barEl.addEventListener("pointerdown", (e) => {
     if (!Number.isFinite(state.pointCap)) return; // uncapped: the bar is read-only
     dragging = true;
-    setCap(capFromClientX(e.clientX));
+    dragPushed = false;
+    commitDragCap(capFromClientX(e.clientX));
     window.addEventListener("pointermove", onBarMove);
     window.addEventListener("pointerup", onBarUp);
     window.addEventListener("pointercancel", onBarUp);
@@ -496,9 +507,14 @@ async function boot() {
     else if (e.key === "End") c = MAX_POINTS;
     else return;
     e.preventDefault();
+    const target = Math.max(curMin, Math.min(MAX_POINTS, c));
+    // A clamped press that lands back on the current cap (e.g. ArrowRight at the max) must not
+    // refresh or arm the coalescing window - otherwise a later effective press within 500ms would
+    // replace, clobbering the entry from before this burst started.
+    if (target === state.pointCap) return;
     const mode = e.timeStamp - lastCapKeyAt < 500 ? "replace" : "push";
     lastCapKeyAt = e.timeStamp;
-    setCap(Math.max(curMin, Math.min(MAX_POINTS, c)), mode);
+    setCap(target, mode);
   });
 
   // The cap button toggles between the finite limit and uncapped (Infinity).
@@ -776,6 +792,12 @@ async function boot() {
   // calls never fire hashchange, so there is no feedback loop. After applying, canonicalize in
   // place: a repaired or non-canonical incoming hash must not mint an extra entry.
   window.addEventListener("hashchange", () => {
+    // Dismiss any open touch popover before re-rendering: Back/Forward can change the selection
+    // out from under it, and a stale popover would keep showing the pre-navigation content.
+    if (popoverTarget) {
+      popoverTarget = null;
+      tip.hide();
+    }
     applyHash(location.hash);
     refresh("replace");
   });

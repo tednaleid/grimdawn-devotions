@@ -491,6 +491,68 @@ try {
     "history: one Back undoes the whole key burst (presses coalesced)",
   );
 
+  // Grabber-start drag: pointerdown lands exactly on the current cap (a no-op through the dedupe
+  // guard), so only per-gesture push tracking makes the first pointermove push instead of replacing
+  // the pre-drag entry in place. histStar is the discriminator: without the fix, Back lands on an
+  // earlier entry where the cap is coincidentally unchanged but histStar is unselected.
+  const capBeforeGrabberDrag = await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent");
+  const grabberStartFrac = Number(capBeforeGrabberDrag) / 55;
+  await cdp.evaluate(`(() => {
+    const b = document.getElementById('point-bar');
+    const r = b.getBoundingClientRect();
+    const y = r.top + r.height / 2;
+    const x = (f) => r.left + r.width * f;
+    b.dispatchEvent(new PointerEvent('pointerdown', { clientX: x(${grabberStartFrac}), clientY: y, bubbles: true }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: x(0.5), clientY: y, bubbles: true }));
+    window.dispatchEvent(new PointerEvent('pointermove', { clientX: x(0.4), clientY: y, bubbles: true }));
+    window.dispatchEvent(new PointerEvent('pointerup', { clientX: x(0.4), clientY: y, bubbles: true }));
+  })()`);
+  await Bun.sleep(150);
+  check(
+    (await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent")) !== capBeforeGrabberDrag,
+    "history: dragging from the grabber's own position still moves the cap",
+  );
+  await cdp.evaluate("history.back()");
+  await Bun.sleep(300);
+  check(
+    (await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent")) === capBeforeGrabberDrag,
+    "history: one Back after a grabber-start drag returns to the pre-drag cap",
+  );
+  check(
+    await cdp.evaluate<boolean>(
+      `!!document.querySelector('circle[data-star-id="${histStar}"]')?.classList.contains('selected')`,
+    ),
+    "history: Back after a grabber-start drag does not overshoot past the pre-drag selection",
+  );
+
+  // A clamped no-op key press (End already at the max) must not arm the 500 ms coalescing window;
+  // only an effective press may. histStar is again the discriminator against a clobbered entry.
+  const capBeforeNoOpKey = await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent");
+  await cdp.evaluate(`(() => {
+    const b = document.getElementById('point-bar');
+    b.focus();
+    b.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true }));
+    b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+  })()`);
+  await Bun.sleep(150);
+  check(
+    (await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent")) ===
+      String(Number(capBeforeNoOpKey) - 1),
+    "history: a clamped no-op End then an ArrowLeft still lowers the cap by 1",
+  );
+  await cdp.evaluate("history.back()");
+  await Bun.sleep(300);
+  check(
+    (await cdp.evaluate<string>("document.getElementById('cap-toggle').textContent")) === capBeforeNoOpKey,
+    "history: one Back after a no-op-then-effective key press returns to the pre-burst cap",
+  );
+  check(
+    await cdp.evaluate<boolean>(
+      `!!document.querySelector('circle[data-star-id="${histStar}"]')?.classList.contains('selected')`,
+    ),
+    "history: Back after the no-op key press does not overshoot past the pre-burst selection",
+  );
+
   // --- Narrow viewport + touch emulation (responsive drawers, gestures, popover) ---
   await cdp.send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
   await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });
