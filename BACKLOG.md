@@ -60,6 +60,23 @@ grants/requires the tagged affinity). The Requires/Grants rendering lives in
 ids + selected class there and the click-toggle in `main.ts`. Builds on the
 tooltip-filter work above.
 
+## URL history: follow-up e2e coverage
+
+Shipped: Back/Forward traverse planner states, live hash edits apply, and
+points-bar gestures coalesce to one history entry (see
+`docs/superpowers/specs/2026-07-14-url-history-design.md`). The final review
+recommended two additional e2e checks that are not yet written:
+
+- Back across a compare-mode enter: after Set baseline pushes an entry with
+  `cs=`, one `history.back()` should drop `cs=` from the hash and clear
+  `body.comparing`.
+- Undecodable-hash reset: assigning a garbage hash mid-session should reset to
+  the empty build and canonicalize the URL in place (replace, no extra entry).
+
+Pointers: extend the history block in `web/e2e/smoke.ts` (between the
+compare-mode checks and the narrow-viewport section); the behaviors under test
+live in `main.ts`'s `applyHash()` / `hashchange` listener.
+
 ## Celestial powers in filters: deferred follow-ups
 
 Shipped: celestial-power stats participate in benefit filters (match the power's
