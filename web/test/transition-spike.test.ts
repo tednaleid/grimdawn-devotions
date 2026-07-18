@@ -105,9 +105,10 @@ test("mutatePair is deterministic per seed", () => {
   expect(JSON.stringify(a)).toBe(JSON.stringify(b));
 });
 
-test("every produced transition on 30 small-delta pairs is oracle-clean", () => {
+test("every produced transition on 30 small-delta pairs is oracle-clean; the majority resolve incrementally", () => {
   const rng = mulberry32(1234);
   let produced = 0;
+  let incremental = 0;
   for (let i = 0; i < 60 && produced < 30; i++) {
     const pair = mutatePair(rng);
     if (!pair) continue;
@@ -115,8 +116,13 @@ test("every produced transition on 30 small-delta pairs is oracle-clean", () => 
     if (!res) continue;
     produced++;
     expect(verifyTransition(pair.base, pair.cur, res.steps, 55)).toBeNull();
+    if (res.rung === "incremental") incremental++;
   }
   expect(produced).toBeGreaterThan(20); // the ladder should resolve the large majority
+  // Guards the spike's central claim, not just legality: a regression that silently pushed every pair
+  // to full-respec would still be oracle-clean and pass the assertion above. Conservative >50% bar so
+  // it is not seed-brittle while still catching that regression shape.
+  expect(incremental).toBeGreaterThan(produced / 2);
 });
 
 test("teardownRebuild is oracle-clean whenever it exists", () => {

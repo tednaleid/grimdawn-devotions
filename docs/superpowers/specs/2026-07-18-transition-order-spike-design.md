@@ -145,3 +145,186 @@ nothing in this spike commits to UI decisions. The spike script stays in
   constellation-level; the feature would be too).
 - No decision on compare-mode UI copy or layout; that belongs to the
   follow-up feature spec if the spike says go.
+
+## Findings (2026-07-18)
+
+Commands run, in order:
+
+```
+just spike-transition --pairs 20 --seed 1     # smoke run
+just spike-transition --pairs 500 --seed 1    # full run, seed 1
+just spike-transition --pairs 500 --seed 2    # full run, seed 2 (stability check)
+```
+
+Each full run generates 875 pairs total (500 small-delta, 125 random, 125
+near-cap, 125 tight-cap) and completed in about 5 seconds wall-clock (not
+minutes). Combined across both seeds: 1750 pairs, **zero oracle failures**.
+
+### Per-corpus results, seed 1
+
+| corpus | pairs | incremental | teardown-1 | full-respec | none | beats teardown+rebuild | moved/theoreticalMin (median, p95) | churn readd (pairs, events) | churn uncovered-add (pairs, events) | runtime transition p50/p95 | runtime from-scratch p50/p95 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| small-delta | 500 | 480 (96.0%) | 0 | 16 (3.2%) | 4 (0.8%) | 96.8% (480/496) | 1.00x, 1.10x | 16 (3.2%), 221 | 19 (3.8%), 30 | 0.044ms / 0.178ms | 0.075ms / 0.279ms |
+| random | 125 | 117 (93.6%) | 0 | 7 (5.6%) | 1 (0.8%) | 92.7% (115/124) | 1.02x, 1.25x | 7 (5.6%), 36 | 63 (50.4%), 98 | 0.115ms / 9.167ms | 0.081ms / 0.302ms |
+| near-cap | 125 | 122 (97.6%) | 0 | 2 (1.6%) | 1 (0.8%) | 98.4% (122/124) | 1.00x, 1.07x | 2 (1.6%), 28 | 3 (2.4%), 4 | 0.034ms / 0.087ms | 0.069ms / 0.205ms |
+| tight-cap | 125 | 118 (94.4%) | 0 | 4 (3.2%) | 3 (2.4%) | 96.7% (116/120) | 1.00x, 1.11x | 4 (3.2%), 55 | 5 (4.0%), 6 | 0.033ms / 4.334ms | 0.069ms / 0.154ms |
+
+### Per-corpus results, seed 2
+
+| corpus | pairs | incremental | teardown-1 | full-respec | none | beats teardown+rebuild | moved/theoreticalMin (median, p95) | churn readd (pairs, events) | churn uncovered-add (pairs, events) | runtime transition p50/p95 | runtime from-scratch p50/p95 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| small-delta | 500 | 484 (96.8%) | 0 | 15 (3.0%) | 1 (0.2%) | 97.0% (484/499) | 1.00x, 1.08x | 15 (3.0%), 211 | 15 (3.0%), 28 | 0.043ms / 0.150ms | 0.068ms / 0.282ms |
+| random | 125 | 112 (89.6%) | 0 | 13 (10.4%) | 0 | 88.8% (111/125) | 1.02x, 1.31x | 13 (10.4%), 66 | 64 (51.2%), 107 | 0.113ms / 14.799ms | 0.071ms / 0.190ms |
+| near-cap | 125 | 120 (96.0%) | 0 | 3 (2.4%) | 2 (1.6%) | 97.6% (120/123) | 1.00x, 1.07x | 3 (2.4%), 39 | 2 (1.6%), 2 | 0.036ms / 0.078ms | 0.066ms / 0.150ms |
+| tight-cap | 125 | 116 (92.8%) | 0 | 7 (5.6%) | 2 (1.6%) | 94.1% (112/119) | 1.00x, 3.63x | 7 (5.6%), 99 | 7 (5.6%), 8 | 0.034ms / 3.843ms | 0.079ms / 0.858ms |
+
+"beats teardown+rebuild" is counted over pairs that produced an order (rung
+!= none) and for which `teardownRebuild` also succeeded; "churn" percentages
+are of all pairs in the corpus. A cross-tab of rung against "beats
+teardown+rebuild" (small-delta, both seeds) shows the split is exact: every
+incremental resolution beats teardown+rebuild (480/480 seed 1, 484/484 seed
+2), and no full-respec resolution does (0/16 seed 1, 0/15 seed 2) — full
+respec costs about the same as the teardown+rebuild fallback, as expected
+since both tear the whole thing down.
+
+### teardown-1 essentially never wins
+
+Across both official runs (1750 pairs, all four corpora) the **teardown-1**
+rung produced zero winning orders. A broader diagnostic sweep (not part of
+the official corpus: 15 seeds x 300 mutated pairs + 15 seeds x 60 random
+pairs = 5400 pairs) found exactly one: rate ~0.02%. The escalation ladder's
+middle rung is real and oracle-clean when it fires, but on this corpus the
+search essentially always resolves at the two ends — either the pure
+incremental replay finds an order, or none of the up-to-8 singleton
+teardown candidates unstick it and the search falls through to full respec.
+
+### Sample orders (verbatim)
+
+**Incremental** (seed 1, small-delta pair, moved=14, theoreticalMin=14):
+
+```
+1. -7 tempest (held 48)
+2. +1 crossroads_chaos (held 49)
+3. +1 crossroads_order (held 50)
+4. +1 crossroads_primordial (held 51)
+5. +4 gallows (held 55)
+```
+
+**teardown-1** (from the diagnostic sweep above, mulberry32 seed 3,
+mutatePair small-delta pair; oracle-clean, moved=36 vs theoreticalMin=26 —
+`base` = tortoise, falcon, spider, quill, fox, magi, ghoul,
+crossroads_primordial, rhowan_s_crown, gallows, stag, messenger_of_war;
+`cur` = tortoise, falcon, spider, magi, ghoul, crossroads_primordial,
+gallows, stag, messenger_of_war, wretch, sailor_s_guide, tsunami — falcon is
+the shared member torn down and re-added):
+
+```
+1. -4 fox (held 51)
+2. -5 rhowan_s_crown (held 46)
+3. -5 falcon (held 41)
+4. +4 wretch (held 45)
+5. +4 sailor_s_guide (held 49)
+6. +5 falcon (held 54)
+7. -4 quill (held 50)
+8. +5 tsunami (held 55)
+```
+
+**full-respec** (seed 1, small-delta pair, moved=120, theoreticalMin=16 —
+the widest quality gap between rungs, as expected: a full teardown+rebuild
+of an unrelated build moves far more than the pure delta):
+
+```
+1. -6 hyrian_guardian_of_the_celestial_gates (held 49)
+2. -6 widow (held 43)
+3. -3 hawk (held 40)
+4. -5 shepherd_s_crook (held 35)
+5. -5 akeron_s_scorpion (held 30)
+6. -5 imp (held 25)
+7. -5 spider (held 20)
+8. -4 fox (held 16)
+9. +1 crossroads_chaos (held 17)
+10. -4 wretch (held 13)
+11. -1 crossroads_chaos (held 12)
+12. -4 sailor_s_guide (held 8)
+13. +1 crossroads_primordial (held 9)
+14. -4 gallows (held 5)
+15. -1 crossroads_primordial (held 4)
+16. +1 crossroads_eldritch (held 5)
+17. -3 scholar_s_light (held 2)
+18. -1 crossroads_eldritch (held 1)
+19. -1 crossroads_ascendant (held 0)
+20. +1 crossroads_ascendant (held 1)
+21. +1 crossroads_order (held 2)
+22. +1 crossroads_eldritch (held 3)
+23. +3 scholar_s_light (held 6)
+24. -1 crossroads_eldritch (held 5)
+25. +1 crossroads_primordial (held 6)
+26. +3 hound (held 9)
+27. -1 crossroads_primordial (held 8)
+28. +4 fox (held 12)
+29. +4 gallows (held 16)
+30. +4 harpy (held 20)
+31. +5 spider (held 25)
+32. +5 imp (held 30)
+33. +5 akeron_s_scorpion (held 35)
+34. +5 shepherd_s_crook (held 40)
+35. +3 hawk (held 43)
+36. +6 widow (held 49)
+37. +6 hyrian_guardian_of_the_celestial_gates (held 55)
+```
+
+### Runtime vs the live from-scratch cost
+
+On small-delta pairs (the realistic compare case, the only corpus the
+runtime bar is meaningfully load-bearing for) the transition order is
+consistently at or below the live `buildOrderPath` cost on the same input:
+p95 0.178ms vs 0.279ms (seed 1, 0.64x) and 0.150ms vs 0.282ms (seed 2,
+0.53x). near-cap is similar (0.42x-0.52x). random and tight-cap both show
+p95 tail outliers well past 2x from-scratch cost (random: 30.4x seed 1,
+77.9x seed 2; tight-cap: 28.1x seed 1, 4.5x seed 2) — a small number of
+pairs where the ladder burns through the full singleton-teardown search
+(up to 8 candidates x up to 16 seeded orders each) before landing on
+full-respec. random is the spec's declared stress corpus ("reported for
+information, not gated"); tight-cap is not declared non-gated and its p95
+outlier is a real go/no-go-relevant number, not just informational.
+
+### Go/no-go bar, verdict
+
+- **Hard invariant — zero oracle failures on emitted orders**: PASS. 0
+  failures across 1750 pairs (both seeds, all four corpora) plus 0 across
+  the 35-pair smoke run (`--pairs 20`, all four corpora) and a 5400-pair
+  diagnostic sweep run to hunt for a teardown-1 sample (below) — 7185 pairs
+  checked, 0 failures.
+- **Quality gate — at least 90% of small-delta pairs produce an incremental
+  order that strictly beats teardown+rebuild on moved points**: PASS. Seed
+  1: 480/500 = 96.0%. Seed 2: 484/500 = 96.8%. (Every incremental resolution
+  beats teardown+rebuild; no full-respec resolution does, per the cross-tab
+  above.)
+- **Quality gate — same-constellation refund-then-readd churn under 5% of
+  produced small-delta orders**: PASS. Seed 1: 16/496 = 3.2%. Seed 2:
+  15/499 = 3.0%.
+- **Runtime — p95 within roughly 2x the live from-scratch cost**: PASS on
+  small-delta (0.53x-0.64x) and near-cap (0.42x-0.52x). FAILS on random
+  (30.4x-77.9x) and tight-cap (4.5x-28.1x) — see the runtime section above
+  for the numbers and cause.
+
+### Recommendation
+
+The hard invariant and both small-delta quality-gate numbers clear their
+bars with margin on both seeds, and the escalation ladder's shape holds up
+at scale: incremental resolves 89.6%-97.6% of pairs across every corpus and
+seed (small-delta, near-cap, and tight-cap all stay at 92.8%+; random's
+89.6% is the one outlier, and random is the spec's declared stress corpus),
+the rare non-incremental cases are legal and no worse than the existing
+teardown+rebuild fallback, and moved points track the theoretical minimum
+closely (median 1.00x-1.02x, p95 1.07x-1.31x) everywhere except tight-cap's
+seed-2 p95 (3.63x). The open question is the runtime bar: small-delta and
+near-cap are comfortably inside 2x, but random and tight-cap post p95
+outliers of 4.5x to 78x on a per-click-path budget. Whether that disqualifies
+a go decision depends on whether the real feature needs to handle
+baseline-over-cap tight-cap transitions (a real production scenario, unlike
+the random stress corpus) on the interactive path, or whether those cases
+can fall back to a cheaper rung (e.g. skip straight to teardown+rebuild
+past a search-time budget) without losing the quality-gate numbers above.
+That trade-off is a call for Ted, not a number this spike can resolve on
+its own.

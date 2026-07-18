@@ -297,6 +297,11 @@ perf *ARGS:
 fuzz *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/reachability-fuzz.ts {{ARGS}}
 
+# Transition-order spike: prototype baseline-to-current build orders over generated pairs and report
+# go/no-go numbers (spec: docs/superpowers/specs/2026-07-18-transition-order-spike-design.md).
+spike-transition *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/transition-spike.ts {{ARGS}}
+
 # Regenerate the reachable-builds fixture (web/test/fixtures/reachable-builds.json): ground-truth-reachable
 # builds the engine wrongly dims (confirmed by the constructor) plus guards. Run after a data change.
 gen-reach-fixtures:
