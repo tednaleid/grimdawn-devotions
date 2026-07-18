@@ -1,8 +1,8 @@
 // ABOUTME: CI guard for the transition-order spike's pure pieces: the legality oracle first
 // ABOUTME: (ground truth for every emitted order), later the corpus generator and prototype.
 import { test, expect } from "bun:test";
-import { cons, generateValidBuild, mulberry32 } from "../scripts/reachability-fuzz";
-import { verifyTransition, type TransStep } from "../scripts/transition-spike";
+import { cons, generateValidBuild, mulberry32, isValidBuild } from "../scripts/reachability-fuzz";
+import { verifyTransition, type TransStep, mutatePair } from "../scripts/transition-spike";
 import type { ReachCon } from "../src/core/reachability";
 // Later tasks EXTEND these two import lines (model, isValidBuild, mutatePair, ...) rather than adding
 // duplicate import statements for the same modules.
@@ -72,4 +72,28 @@ test("exceeding the cap is a violation", () => {
 
 test("an order that does not end at the current build is a violation", () => {
   expect(verifyTransition([], [xrP], [], 55)).toContain("end state");
+});
+
+test("mutatePair produces two distinct valid builds sharing most members", () => {
+  const rng = mulberry32(42);
+  let found = 0;
+  for (let i = 0; i < 20 && found < 5; i++) {
+    const pair = mutatePair(rng);
+    if (!pair) continue;
+    found++;
+    expect(isValidBuild(pair.base)).toBeTrue();
+    expect(isValidBuild(pair.cur)).toBeTrue();
+    const baseIds = new Set(pair.base.map((c) => c.id));
+    const curIds = new Set(pair.cur.map((c) => c.id));
+    expect([...baseIds].some((id) => !curIds.has(id)) || [...curIds].some((id) => !baseIds.has(id))).toBeTrue();
+    const shared = [...baseIds].filter((id) => curIds.has(id)).length;
+    expect(shared).toBeGreaterThan(0); // small delta, not a full respec
+  }
+  expect(found).toBeGreaterThan(0);
+});
+
+test("mutatePair is deterministic per seed", () => {
+  const a = mutatePair(mulberry32(7));
+  const b = mutatePair(mulberry32(7));
+  expect(JSON.stringify(a)).toBe(JSON.stringify(b));
 });

@@ -85,3 +85,55 @@ export function verifyTransition(base: ReachCon[], cur: ReachCon[], steps: Trans
   for (const [id, n] of want) if (counts.get(id) !== n) return `end state mismatch at ${id}`;
   return null;
 }
+
+const BUDGET = 55;
+const SEED_AFF: Vec = [1, 1, 1, 1, 1]; // the refundable crossroads seed, as in the fuzzer
+
+/** Grow `B` with legal picks (the fuzzer's forward rule) until no candidate fits `budget`. */
+function grow(B: ReachCon[], rng: () => number, budget: number): ReachCon[] {
+  const inB = new Set(B.map((c) => c.id));
+  let grants = zero();
+  let stars = 0;
+  for (const c of B) {
+    grants = add(grants, c.grant);
+    stars += c.size;
+  }
+  for (let guard = 0; guard < 300; guard++) {
+    const reach = add(SEED_AFF, grants);
+    const cand = cons.filter(
+      (c) => !inB.has(c.id) && stars + c.size <= budget && covers(reach, c.req) && covers(add(grants, c.grant), c.req),
+    );
+    if (!cand.length) break;
+    const c = cand[Math.floor(rng() * cand.length)]!;
+    B = [...B, c];
+    inB.add(c.id);
+    grants = add(grants, c.grant);
+    stars += c.size;
+  }
+  return B;
+}
+
+/**
+ * A small-delta pair: a generated valid build, and a copy with 1-3 members removed and different
+ * members grown in their place, both valid. Null when no valid mutation lands in bounded retries.
+ */
+export function mutatePair(rng: () => number, budget = BUDGET): { base: ReachCon[]; cur: ReachCon[] } | null {
+  const base = generateValidBuild(rng);
+  if (base.length < 4 || !isValidBuild(base)) return null;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const k = 1 + Math.floor(rng() * 3);
+    const keep = [...base];
+    for (let i = 0; i < k && keep.length > 2; i++) keep.splice(Math.floor(rng() * keep.length), 1);
+    if (!isValidBuild(keep)) continue; // removing these strands a dependent; try another removal
+    const cur = grow(keep, rng, budget);
+    const baseIds = new Set(base.map((c) => c.id));
+    const changed = cur.length !== base.length || cur.some((c) => !baseIds.has(c.id));
+    if (changed && isValidBuild(cur)) return { base, cur };
+  }
+  return null;
+}
+
+/** Two independently generated valid builds (the stress corpus). */
+export function randomPair(rng: () => number): { base: ReachCon[]; cur: ReachCon[] } {
+  return { base: generateValidBuild(rng), cur: generateValidBuild(rng) };
+}
