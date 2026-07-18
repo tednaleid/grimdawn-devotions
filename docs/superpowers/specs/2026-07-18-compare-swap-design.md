@@ -8,11 +8,12 @@ and the live build in place, keeping the comparison active.
 
 ## Goal
 
-A third button in the compare controls row, after Revert and Update Baseline:
+A third button in the compare controls row, at the left end before Revert and
+Update Baseline:
 
     Comparing to baseline
 
-            [Revert] [Update Baseline] [Swap]
+    [Swap]          [Revert] [Update Baseline]
 
                         Base    Now     delta
 
@@ -46,8 +47,10 @@ applies; no special casing in the handler.
 ## UI and internationalization
 
 The button renders in the compare branch of `renderBenefits` in
-`web/src/adapters/sidebarView.ts`, id `cmp-swap`, in the `cmp-controls` row
-after the Update Baseline slot.
+`web/src/adapters/sidebarView.ts`, id `cmp-swap`, in a slot at the left end of
+the `cmp-controls` row, before the flex spacer. The existing fixed-width slots
+that align Revert over the Base column and Update Baseline over Now plus delta
+stay untouched; the swap slot occupies free space over the label column.
 
 One new catalog key, `ui.compare.swap` = "Swap", added to
 `web/src/i18n/app.en.json` and the 12 other locale catalogs, plus the
