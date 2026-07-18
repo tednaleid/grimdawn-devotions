@@ -153,6 +153,7 @@
   "ui.compare.now": "現在",
   "ui.compare.revert": "元に戻す",
   "ui.compare.setBaseline": "基準を設定",
+  "ui.compare.swap": "入れ替え",
   "ui.compare.updateBaseline": "基準を更新",
   "ui.drawer.affinity": "属性",
   "ui.drawer.affinityAria": "属性を表示",

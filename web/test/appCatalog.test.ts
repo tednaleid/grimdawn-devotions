@@ -74,6 +74,7 @@ const REQUIRED = [
   "ui.compare.revert",
   "ui.compare.updateBaseline",
   "ui.compare.setBaseline",
+  "ui.compare.swap",
   "ui.compare.base",
   "ui.compare.now",
   "ui.compare.delta",
