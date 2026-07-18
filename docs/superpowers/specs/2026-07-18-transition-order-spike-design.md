@@ -69,10 +69,27 @@ few one-line vector helpers it needs (`zero`, `covers`, `addCap`, `maxV`) are
 re-declared locally in the script. Three parts:
 
 1. **Prototype**: `transitionOrderPath(cons, table, baseline, current, cap,
-   tries)` implementing the seeded sampler and replay described above, with a
-   prefer-held bias in scaffold selection (held baseline constellations sort
-   ahead of fresh scaffolds of equal usefulness) since churn is treated
-   strictly.
+   tries)` implementing the seeded sampler and replay described above, with
+   three refinements:
+   - **Prefer-held bias**: held baseline constellations sort ahead of fresh
+     scaffolds of equal usefulness in scaffold selection.
+   - **Two-pass refund scheduling**: a forward pass computes each step's need
+     set, then a backward pass schedules each held constellation's refund
+     after its last use (immediately, if it is never needed). Refunds happen
+     when the points are wanted, not eagerly, which structurally eliminates
+     refund-then-readd churn rather than merely biasing against it. A
+     never-needed baseline-only constellation (supply comfortably above the
+     standing need) refunds at step zero and its points return up front.
+   - **Escalation ladder over shared teardowns**: the search chooses a subset
+     S of shared constellations to temporarily tear down, seeds the replay
+     with (shared minus S), and moves S into the add order (refund emitted
+     early, re-add sequenced by the sampler). S empty is the pure incremental
+     path, tried first. If it yields nothing, singleton S candidates are
+     tried in order of how much they relax the binding deficit (highest
+     dominating requirement, then most budget freed). S equal to all shared
+     members IS teardown+rebuild, so the fallback is the ladder's last rung
+     rather than a special case, and quality degrades gracefully from
+     surgical to full respec.
 2. **Oracle**: an independent legality checker that replays an emitted order
    step by step, recomputing from scratch at each step that every standing
    constellation's requirement is covered by standing grants (the engine's
@@ -90,12 +107,13 @@ re-declared locally in the script. Three parts:
    - Near-cap cases: deliberate 55-of-55 to 55-of-55 pairs, plus some pairs
      under tighter caps and pairs where the baseline exceeds the live cap.
 
-   Report, per corpus: hit rate (non-null and oracle-clean), percentage of
-   pairs where the incremental order strictly beats teardown+rebuild on moved
-   points, moved points relative to the theoretical minimum, churn frequency
-   by both forms, runtime percentiles alongside the live `buildOrderPath`
-   cost on the same inputs, and ten sample orders printed human-readably for
-   eyeballing.
+   Report, per corpus: ladder-rung distribution (pure incremental, singleton
+   teardown, full respec — every pair resolves to some rung, so the question
+   is how often the surgical rungs win), percentage of pairs where the
+   produced order strictly beats teardown+rebuild on moved points, moved
+   points relative to the theoretical minimum, churn frequency by both forms,
+   runtime percentiles alongside the live `buildOrderPath` cost on the same
+   inputs, and ten sample orders printed human-readably for eyeballing.
 
 ## Go/no-go bar
 
