@@ -178,7 +178,8 @@ export function renderBenefits(
   if (comparing) {
     const bar = `<div class="cmp-bar">${loc.translate("ui.compare.banner")}</div>`;
     const controls =
-      `<div class="cmp-controls"><span class="cmp-spacer"></span>` +
+      `<div class="cmp-controls"><span class="cmp-swap-slot"><button id="cmp-swap" type="button">${loc.translate("ui.compare.swap")}</button></span>` +
+      `<span class="cmp-spacer"></span>` +
       `<span class="cmp-revert-slot"><button id="cmp-revert" type="button">${loc.translate("ui.compare.revert")}</button></span>` +
       `<span class="cmp-upd-slot"><button id="cmp-update" type="button">${loc.translate("ui.compare.updateBaseline")}</button></span></div>`;
     const head = `<div class="cmp-head"><span class="brow-lbl"></span><span class="brow-v">${loc.translate("ui.compare.base")}</span><span class="brow-v">${loc.translate("ui.compare.now")}</span><span class="brow-v">${loc.translate("ui.compare.delta")}</span></div>`;

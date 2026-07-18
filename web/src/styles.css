@@ -430,7 +430,7 @@ main {
 .brow-v.same {
   color: #566175;
 }
-/* compare control row: Keep over Base, Update Baseline over Now+Delta */
+/* compare control row: Swap at the left, Revert over Base, Update Baseline over Now+Delta */
 .cmp-controls {
   display: flex;
   align-items: center;
@@ -438,6 +438,10 @@ main {
 }
 .cmp-controls .cmp-spacer {
   flex: 1;
+}
+.cmp-controls .cmp-swap-slot {
+  width: 64px;
+  text-align: center;
 }
 .cmp-controls .cmp-revert-slot {
   width: 64px;
@@ -462,6 +466,10 @@ main {
 #cmp-update {
   width: 124px;
   color: #83c995;
+}
+#cmp-swap {
+  width: 60px;
+  color: #6cb6ff;
 }
 .cmp-head {
   display: flex;

@@ -1,5 +1,5 @@
 // ABOUTME: renderBenefits emits one row per value in both modes; compare adds Base/Now/Delta and the
-// ABOUTME: Keep / Update Baseline controls. Tag attributes stay on the subject name and value cells.
+// ABOUTME: Swap / Revert / Update Baseline controls. Tag attributes stay on the subject name and value cells.
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
@@ -21,15 +21,17 @@ test("off mode renders the Set baseline button and value rows, no compare contro
   const html = render(new Set([starGranting("offensiveTotalDamageModifier")]), null);
   expect(html).toContain('id="set-baseline"');
   expect(html).not.toContain("cmp-bar");
+  expect(html).not.toContain('id="cmp-swap"');
   expect(html).toContain("brow"); // a benefit row
   expect(html).toContain('data-vid="offensiveTotalDamageModifier"');
 });
 
-test("compare mode renders the bar, Revert / Update Baseline controls, and Base/Now/Delta cells", () => {
+test("compare mode renders the bar, Swap / Revert / Update Baseline controls, and Base/Now/Delta cells", () => {
   const html = render(new Set([starGranting("offensiveTotalDamageModifier")]), new Set());
   expect(html).toContain("cmp-bar");
   expect(html).toContain('id="cmp-revert"');
   expect(html).toContain('id="cmp-update"');
+  expect(html).toContain('id="cmp-swap"');
   expect(html).not.toContain('id="cmp-clear"');
   expect(html).toContain("brow-v base"); // the Base cell
 });
