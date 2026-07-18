@@ -1,9 +1,16 @@
 // ABOUTME: CI guard for the transition-order spike's pure pieces: the legality oracle first
 // ABOUTME: (ground truth for every emitted order), later the corpus generator and prototype.
 import { test, expect } from "bun:test";
-import { cons, generateValidBuild, mulberry32, isValidBuild } from "../scripts/reachability-fuzz";
-import { verifyTransition, type TransStep, mutatePair } from "../scripts/transition-spike";
-import type { ReachCon } from "../src/core/reachability";
+import { cons, generateValidBuild, mulberry32, isValidBuild, model } from "../scripts/reachability-fuzz";
+import {
+  verifyTransition,
+  type TransStep,
+  mutatePair,
+  transitionOrderPath,
+  teardownRebuild,
+} from "../scripts/transition-spike";
+import { selectionSummary, type ReachCon } from "../src/core/reachability";
+import { canonicalStarIds, decodeHash } from "../src/core/urlState";
 // Later tasks EXTEND these two import lines (model, isValidBuild, mutatePair, ...) rather than adding
 // duplicate import statements for the same modules.
 
@@ -96,4 +103,60 @@ test("mutatePair is deterministic per seed", () => {
   const a = mutatePair(mulberry32(7));
   const b = mutatePair(mulberry32(7));
   expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+});
+
+test("every produced transition on 30 small-delta pairs is oracle-clean", () => {
+  const rng = mulberry32(1234);
+  let produced = 0;
+  for (let i = 0; i < 60 && produced < 30; i++) {
+    const pair = mutatePair(rng);
+    if (!pair) continue;
+    const res = transitionOrderPath(pair.base, pair.cur, 55);
+    if (!res) continue;
+    produced++;
+    expect(verifyTransition(pair.base, pair.cur, res.steps, 55)).toBeNull();
+  }
+  expect(produced).toBeGreaterThan(20); // the ladder should resolve the large majority
+});
+
+test("teardownRebuild is oracle-clean whenever it exists", () => {
+  const rng = mulberry32(99);
+  const pair = mutatePair(rng);
+  if (!pair) return; // corpus miss at this seed is not this test's subject
+  const steps = teardownRebuild(pair.base, pair.cur, 55);
+  if (steps) expect(verifyTransition(pair.base, pair.cur, steps, 55)).toBeNull();
+});
+
+test("identical builds transition in zero steps", () => {
+  const rng = mulberry32(5);
+  const b = generateValidBuild(rng);
+  const res = transitionOrderPath(b, b, 55);
+  expect(res).not.toBeNull();
+  expect(res!.steps.length).toBe(0);
+});
+
+test("the Eel pair: a real compare-URL transition is oracle-clean; a never-needed baseline-only member refunds up front", () => {
+  const canonical = canonicalStarIds(model);
+  const CUR = "p=55&s=AAAAgAAHAAAAAAAAAAAAPADAwQf44AEAAIA_AAD8AAAAAAAAAAAAAPAD4AMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfg";
+  const BASE = "p=55&s=AAAAAAAAAADABgAAAAAAPADAwQcA4AEAAIA_AAD8AAAAAAAAAPABAPAD4AMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfg";
+  const cur = selectionSummary(model, decodeHash(CUR, canonical)!.selected).built;
+  const base = selectionSummary(model, decodeHash(BASE, canonical)!.selected).built;
+  const res = transitionOrderPath(base, cur, 55);
+  expect(res).not.toBeNull();
+  expect(verifyTransition(base, cur, res!.steps, 55)).toBeNull();
+  // Assertion adjusted per the brief's step-zero note, verified by decoding both URLs. In THIS pair's
+  // direction (base -> cur) Eel is CURRENT-only: base holds no Eel, and cur ADDS Eel (3 stars, grants
+  // +5 primordial) as a primordial source. So Eel is added, not a baseline-only free refund - the
+  // step-zero refund of Eel does not apply here (Eel is "needed mid-transition", the case the note
+  // anticipated). The free refund the panel should still surface up front is a never-needed baseline-only
+  // member: Ghoul appears only in base as a 4/5 partial that grants no affinity, so it can never be
+  // load-bearing and must refund before any add.
+  const eelId = [...model.constellations.keys()].find((id) => id.includes("eel"))!;
+  const eelAdd = res!.steps.findIndex((s) => s.conId === eelId && s.kind === "add");
+  expect(eelAdd).toBeGreaterThanOrEqual(0);
+  const ghoulId = [...model.constellations.keys()].find((id) => id.includes("ghoul"))!;
+  const ghoulRefund = res!.steps.findIndex((s) => s.conId === ghoulId && s.kind === "refund");
+  const firstAdd = res!.steps.findIndex((s) => s.kind === "add");
+  expect(ghoulRefund).toBeGreaterThanOrEqual(0);
+  if (firstAdd >= 0) expect(ghoulRefund).toBeLessThan(firstAdd); // never-needed baseline member refunds up front
 });
