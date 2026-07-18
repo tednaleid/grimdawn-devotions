@@ -356,3 +356,28 @@ engine fix.
 
 Pointers: `web/scripts/reachability-fuzz.ts`; `docs/reachability-engine.md`
 "Known limits".
+
+## Compare mode: repair the decoded baseline in applyHash
+
+`applyHash` runs `repairSelection` on the live state only; `decodeHash` returns
+the `cs=` baseline raw. A hand-crafted or stale `cs=` promoted into the live
+build (via Swap or the pre-existing Revert path) renders unpruned on screen
+until the next reload re-decodes and repairs it, a narrow screen-vs-URL
+divergence. Repairing the baseline in `applyHash` hardens Swap and Revert
+alike. Related corner: an empty baseline is unrepresentable (`encodeHash`
+emits an empty `cs=` and the `baseSel.size > 0` decode gate drops the
+comparison on reload/Back), reachable via set-baseline on an empty build or
+Reset-while-comparing then Swap.
+
+Pointers: `applyHash` and the `cmp-swap`/`cmp-revert` branches in
+`web/src/app/main.ts`; `decodeHash` baseline gate in `web/src/core/urlState.ts`.
+
+## i18n guard: assert REQUIRED key presence per locale
+
+`web/test/appCatalog.test.ts` asserts the `REQUIRED` keys exist only in
+`app.en.json`; the per-locale tests catch stray keys and placeholder
+mismatches but never a missing key, so a forgotten translation silently
+falls back to English. Extend the guard to iterate all 13 catalogs.
+
+Pointers: the `REQUIRED` loop at `web/test/appCatalog.test.ts:150-153` and the
+per-locale test block below it.
