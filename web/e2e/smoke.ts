@@ -390,6 +390,53 @@ try {
     "Update Baseline exits compare mode and drops cs= from the URL",
   );
 
+  // Swap: exchanges the live build and the baseline in place; the comparison stays active
+  // (docs/superpowers/specs/2026-07-18-compare-swap-design.md). Restore the budget first:
+  // the cap is still parked at the validity floor from the "empties" check above.
+  await cdp.evaluate(
+    `(() => { const b = document.getElementById('point-bar'); b.focus(); b.dispatchEvent(new KeyboardEvent('keydown', { key: 'End', bubbles: true })); })()`,
+  );
+  await Bun.sleep(150);
+  await cdp.evaluate(`document.getElementById('set-baseline').click()`);
+  for (let i = 0; i < 20; i++) {
+    await Bun.sleep(100);
+    if (await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') !== null")) break;
+  }
+  // Diverge the live build from the baseline in both dimensions: add a star, drop the cap by one.
+  const swapStar = await cdp.evaluate<string>(
+    "document.querySelector('circle.hit.selectable:not(.selected)')?.getAttribute('data-star-id') || ''",
+  );
+  check(swapStar.length > 0, "swap: found a selectable star to diverge the live build");
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="${swapStar}"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
+  await Bun.sleep(150);
+  await cdp.evaluate(
+    `(() => { const b = document.getElementById('point-bar'); b.focus(); b.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true })); })()`,
+  );
+  await Bun.sleep(150);
+  const readParam = (k: string) =>
+    cdp.evaluate<string>(`new URLSearchParams(location.hash.slice(1)).get('${k}') || ''`);
+  const sPre = await readParam("s");
+  const csPre = await readParam("cs");
+  const pPre = await readParam("p");
+  const cpPre = await readParam("cp");
+  check(sPre !== csPre && pPre !== cpPre, "swap: live build and baseline differ before the swap");
+  await cdp.evaluate(`document.getElementById('cmp-swap').click()`);
+  await Bun.sleep(150);
+  check((await readParam("s")) === csPre && (await readParam("cs")) === sPre, "Swap exchanges s= and cs= in the URL");
+  check((await readParam("p")) === cpPre && (await readParam("cp")) === pPre, "Swap exchanges p= and cp= in the URL");
+  check(await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') !== null"), "Swap keeps the comparison active");
+  await cdp.evaluate(`document.getElementById('cmp-swap').click()`);
+  await Bun.sleep(150);
+  check(
+    (await readParam("s")) === sPre && (await readParam("cs")) === csPre,
+    "Swap again restores the original orientation",
+  );
+  // Exit compare and restore the pre-swap build so the sections below start from the same state.
+  await cdp.evaluate(`document.getElementById('cmp-revert').click()`);
+  await Bun.sleep(150);
+
   // --- History-aware URL state (docs/superpowers/specs/2026-07-14-url-history-design.md) ---
   // Restore budget first: the earlier "empties" check parked the cap at the validity floor,
   // so nothing is selectable until End lifts it back to 55.

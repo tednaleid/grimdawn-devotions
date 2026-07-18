@@ -399,6 +399,15 @@ async function boot() {
       refresh();
       return;
     }
+    if (t.id === "cmp-swap" && baseline) {
+      // Swap: the baseline becomes the live build and vice versa; the comparison stays active.
+      // refresh() pushes one history entry, or none when the two builds are identical (hash unchanged).
+      const live = state;
+      state = { selected: new Set(baseline.selected), pointCap: baseline.pointCap };
+      baseline = { selected: new Set(live.selected), pointCap: live.pointCap };
+      refresh();
+      return;
+    }
     const valEl = (e.target as Element)?.closest?.("[data-vid]");
     if (valEl) {
       const id = valEl.getAttribute("data-vid")!;
