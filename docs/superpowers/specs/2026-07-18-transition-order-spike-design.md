@@ -165,7 +165,7 @@ minutes). Combined across both seeds: 1750 pairs, **zero oracle failures**.
 | corpus | pairs | incremental | teardown-1 | full-respec | none | beats teardown+rebuild | moved/theoreticalMin (median, p95) | churn readd (pairs, events) | churn uncovered-add (pairs, events) | runtime transition p50/p95 | runtime from-scratch p50/p95 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | small-delta | 500 | 480 (96.0%) | 0 | 16 (3.2%) | 4 (0.8%) | 96.8% (480/496) | 1.00x, 1.10x | 16 (3.2%), 221 | 19 (3.8%), 30 | 0.044ms / 0.178ms | 0.075ms / 0.279ms |
-| random | 125 | 117 (93.6%) | 0 | 7 (5.6%) | 1 (0.8%) | 92.7% (115/124) | 1.02x, 1.25x | 7 (5.6%), 36 | 63 (50.4%), 98 | 0.115ms / 9.167ms | 0.081ms / 0.302ms |
+| random | 125 | 117 (93.6%) | 0 | 7 (5.6%) | 1 (0.8%) | 92.7% (115/124) | 1.05x, 1.25x | 7 (5.6%), 36 | 63 (50.4%), 98 | 0.115ms / 9.167ms | 0.081ms / 0.302ms |
 | near-cap | 125 | 122 (97.6%) | 0 | 2 (1.6%) | 1 (0.8%) | 98.4% (122/124) | 1.00x, 1.07x | 2 (1.6%), 28 | 3 (2.4%), 4 | 0.034ms / 0.087ms | 0.069ms / 0.205ms |
 | tight-cap | 125 | 118 (94.4%) | 0 | 4 (3.2%) | 3 (2.4%) | 96.7% (116/120) | 1.00x, 1.11x | 4 (3.2%), 55 | 5 (4.0%), 6 | 0.033ms / 4.334ms | 0.069ms / 0.154ms |
 
@@ -317,7 +317,7 @@ seed (small-delta, near-cap, and tight-cap all stay at 92.8%+; random's
 89.6% is the one outlier, and random is the spec's declared stress corpus),
 the rare non-incremental cases are legal and no worse than the existing
 teardown+rebuild fallback, and moved points track the theoretical minimum
-closely (median 1.00x-1.02x, p95 1.07x-1.31x) everywhere except tight-cap's
+closely (median 1.00x-1.05x, p95 1.07x-1.31x) everywhere except tight-cap's
 seed-2 p95 (3.63x). The open question is the runtime bar: small-delta and
 near-cap are comfortably inside 2x, but random and tight-cap post p95
 outliers of 4.5x to 78x on a per-click-path budget. Whether that disqualifies
