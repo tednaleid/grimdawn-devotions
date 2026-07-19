@@ -2,6 +2,7 @@
 // ABOUTME: empty board and enforces the in-game rules at every step (the verified-or-absent gate).
 import type { BuildStep, ReachCon, Vec } from "./reachability";
 
+// Deliberately duplicated from reachability.ts (its private CAP_MAX): the oracle must not import engine code. Keep in sync.
 const CAP_MAX: Vec = [20, 8, 20, 10, 20];
 const zero = (): Vec => [0, 0, 0, 0, 0];
 const addCap = (g: Vec, x: Vec): Vec => g.map((n, i) => Math.min(n + x[i]!, CAP_MAX[i]!)) as Vec;

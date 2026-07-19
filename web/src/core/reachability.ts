@@ -767,6 +767,7 @@ export function buildOrderPath(
       if (!heldIds.has(s.id)) {
         held.push(s);
         running += s.size;
+        if (running > budget) return null; // an over-cap add is illegal: honest null, never an illegal step
         steps.push({ kind: "scaffold-add", conId: s.id, points: s.size, heldAfter: running });
       }
     drainRefunds(needIds); // retry refunds the new scaffolds' grants may have made safe
