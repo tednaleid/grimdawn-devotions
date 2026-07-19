@@ -137,8 +137,9 @@ export function buildStepPopupHtml(loc: Localization, model: DevotionModel, step
     const n = state.need[i]!;
     const g = state.conGrant[i]!;
     const r = state.conReq[i]!;
-    const haveDelta = g > 0 ? ` <span class="bo-pop-delta">(${sign}${g})</span>` : "";
-    const needNote = r > 0 ? ` <span class="bo-pop-delta">(${r})</span>` : "";
+    // Parentheticals sit BEFORE the value so the post-step numbers stay column-aligned.
+    const haveDelta = g > 0 ? `<span class="bo-pop-delta">(${sign}${g})</span> ` : "";
+    const needNote = r > 0 ? `<span class="bo-pop-delta">(${r})</span> ` : "";
     let needCell: string;
     if (n > 0) {
       const met = state.have[i]! >= n;
@@ -148,11 +149,11 @@ export function buildStepPopupHtml(loc: Localization, model: DevotionModel, step
           return tag ? loc.gameText(tag) : cid;
         })
         .join(", ");
-      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${esc(names ? loc.translate("ui.affinity.neededBy", { names }) : "")}">${n}${needNote}</span>`;
+      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${esc(names ? loc.translate("ui.affinity.neededBy", { names }) : "")}">${needNote}${n}</span>`;
     } else {
-      needCell = `<span class="aff-need none">0${needNote}</span>`;
+      needCell = `<span class="aff-need none">${needNote}0</span>`;
     }
-    return `<div class="affinity affinity-${a}"><span>${affinityOrb(a)}${loc.translate(`aff.${a}`)}</span><span class="aff-have">${state.have[i]}${haveDelta}</span>${needCell}</div>`;
+    return `<div class="affinity affinity-${a}"><span>${affinityOrb(a)}${loc.translate(`aff.${a}`)}</span><span class="aff-have">${haveDelta}${state.have[i]}</span>${needCell}</div>`;
   }).join("");
   return (
     `<div class="bo-pop-name">${name}</div>` +

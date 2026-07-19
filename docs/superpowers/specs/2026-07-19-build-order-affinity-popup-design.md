@@ -87,8 +87,9 @@ same as today - the popup data is free.
 - The step's own effect folds INTO the table (a display iteration decided
   with the owner after first use; earlier separate Requires/Grants lines
   were dropped): its grant appears in the have column as a dimmed signed
-  parenthetical (`11 (+4)`, or `(-5)` on a refund), its requirement in the
-  need column as `5 (1)`. The heading above the table is the step's
+  parenthetical placed before the value so the post-step numbers stay
+  column-aligned (`(+4) 11`, or `(-5)` on a refund), its requirement in the
+  need column as `(1) 5`. The heading above the table is the step's
   localized name (game text; crossroads via the existing
   `ui.buildOrder.crossroads` and direction keys). Parentheses and signs are
   punctuation, not translatable copy, so no catalog keys are involved.
