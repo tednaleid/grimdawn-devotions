@@ -574,7 +574,8 @@ async function boot() {
   }
   function showBoPop(row: HTMLElement) {
     const i = Number(row.dataset.stepI ?? -1);
-    if (!curBuildOrder || !curBuildOrderStates || i < 0 || i >= curBuildOrderStates.length) return;
+    if (!curBuildOrder || !curBuildOrderStates || !Number.isInteger(i) || i < 0 || i >= curBuildOrderStates.length)
+      return;
     const el = boPopEl();
     el.innerHTML = buildStepPopupHtml(localization, model, curBuildOrder[i]!, curBuildOrderStates[i]!);
     el.style.display = "block";

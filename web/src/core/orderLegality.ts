@@ -82,6 +82,7 @@ export function replayBuildOrder(
     const s = steps[i]!;
     const c = conOf.get(s.conId);
     if (!c) return fail(`step ${i}: unknown constellation ${s.conId}`);
+    let st: { have: Vec; need: Vec; needSource: Map<number, string[]> };
     if (s.kind === "scaffold-refund") {
       if (!standing.has(s.conId)) return fail(`step ${i} (${s.conId}): refund of a constellation not standing`);
       if (s.points !== -c.size) return fail(`step ${i} (${s.conId}): refund points ${s.points}, expected ${-c.size}`);
@@ -89,9 +90,8 @@ export function replayBuildOrder(
       if (mid) return fail(mid);
       standing.delete(s.conId);
       running -= c.size;
-      const st = standingState();
+      st = standingState();
       if (!covers(st.have, st.need)) return fail(`step ${i} (${s.conId}) post-refund: requirement uncovered`);
-      states.push({ ...st, conReq: c.req, conGrant: c.grant });
     } else {
       if (standing.has(s.conId)) return fail(`step ${i} (${s.conId}): added while already standing`);
       if (s.points !== c.size) return fail(`step ${i} (${s.conId}): add points ${s.points}, expected ${c.size}`);
@@ -100,12 +100,13 @@ export function replayBuildOrder(
       standing.add(s.conId);
       running += c.size;
       if (running > cap) return fail(`step ${i} (${s.conId}): cap exceeded (${running} > ${cap})`);
-      const st = standingState();
+      st = standingState();
       if (!covers(st.have, st.need)) return fail(`step ${i} (${s.conId}) post-add: requirement uncovered`);
-      states.push({ ...st, conReq: c.req, conGrant: c.grant });
     }
     if (s.heldAfter !== running)
       return fail(`step ${i} (${s.conId}): heldAfter=${s.heldAfter}, running total is ${running}`);
+    // Push only after every check: a state exists exactly for each step that completed its checks.
+    states.push({ ...st, conReq: c.req, conGrant: c.grant });
   }
   const want = new Set(target.map((c) => c.id));
   if (want.size !== standing.size) return fail(`end state: ${standing.size} standing, ${want.size} wanted`);

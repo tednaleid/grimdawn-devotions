@@ -127,6 +127,9 @@ Its contract:
   re-derives validity at each step with no shared engine code. `selectionView`
   renders only orders the oracle proves legal; anything else is withheld and the
   panel shows its honest empty state. No order is better than an illegal order.
+  The verifying replay's per-step states ride along (`replayBuildOrder`, one
+  walk, two outputs) to feed the panel's step popup, so the have/need numbers a
+  user hovers are exactly the numbers the judge saw.
 
 The regression net: oracle unit tests (web/test/order-legality.test.ts), the
 real-build fixture replay and determinism pins (web/test/build-order-path.test.ts),

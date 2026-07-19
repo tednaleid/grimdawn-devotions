@@ -23,6 +23,7 @@ test("popup renders five affinity rows with have values and no filter-toggle att
   expect(html).toContain('class="aff-have"');
   expect(html).not.toContain("data-gtoggle");
   expect(html).not.toContain("data-gkey");
+  expect(html).not.toContain("data-ids");
 });
 
 test("a verified order's popup never shows a missing need cell", () => {

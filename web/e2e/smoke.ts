@@ -816,6 +816,10 @@ try {
     );
   }
   await cdp.send("Emulation.setEmulatedMedia", { features: [] });
+  check(
+    cdp.consoleErrors.length === 0,
+    `no console errors after the build-order popup checks (got ${cdp.consoleErrors.length})`,
+  );
 
   failed = results.some((r) => !r.ok);
 } catch (err) {

@@ -153,6 +153,22 @@ algorithm can be swapped without touching the tests. Add a step-count and
 scaffold-churn metric to `just build-order-validate` to prove the improvement
 quantitatively. Needs its own brainstorm/spec.
 
+## Build-order popup: touch e2e via Playwright
+
+The step popup's touch path (tap shows, re-tap and tap-away dismiss) is wired
+per the map tooltip's popover pattern but is not automation-verified: raw CDP
+`Emulation.setEmulatedMedia` cannot flip the `(hover: none) and (pointer:
+coarse)` media query in the headless Chrome the e2e harness drives (probed in
+isolation during implementation), so `web/e2e/smoke.ts` records a named
+SKIPPED check for the tap branch. Playwright's touch emulation handles what
+raw CDP could not; a small Playwright-driven check (or a hasTouch context in
+the existing harness if it grows one) would close the skip permanently.
+
+Pointers: the touch block at the end of `web/e2e/smoke.ts` (the
+`touchEmulated` probe and SKIPPED branch); the wiring under test is
+`showBoPop`/`hideBoPop` and the row `pointerup` toggle in
+`web/src/app/main.ts`.
+
 ## Guided build order: remaining follow-ups
 
 - Supporting-set suggester (the principled Oleron fix): for a not-self-covering
