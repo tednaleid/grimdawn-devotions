@@ -48,6 +48,20 @@ zero grant. For each step index it returns the post-step state:
 Deterministic, allocation-light, computed once per panel render (roughly 35
 steps by 5 colors).
 
+Relationship to the legality oracle: the progression is the DISPLAY twin of
+`verifyBuildOrder` (web/src/core/orderLegality.ts), not a third judge. The
+oracle asserts legality at every step including the conservative mid-step
+points (a refund loses its grant at the first refunded star while its own
+requirement stands until zero - the rule that makes tearing down a
+net-positive constellation illegal once its bootstrap is gone), and nothing
+reaches the panel without passing it. The progression shows the resulting
+POST-step states and does not re-judge mid-steps. The two are tied by a
+triangulation property: on any oracle-verified order, `have` covers `need`
+in every color after every step, so the popup of a rendered order never
+shows a missing cell - all green at every step is the visible form of the
+oracle's proof. A disagreement means one replayer is wrong, and the test
+suite asserts it cannot happen.
+
 **2. Popup content renderer.** A pure content helper in
 `web/src/adapters/buildOrderView.ts` that renders one step's popup HTML from
 the progression entry via the `Localization` port:
@@ -97,6 +111,12 @@ are unchanged.
   end and asserts the final step's have/need equals the live selection's
   Affinity-panel values (`selectionSummary` supply/target) - the popup and
   the panel must agree where they meet.
+- Triangulation with the oracle: a test walks the seeded corpus (the same
+  pinned seeds as web/test/build-order-oracle.test.ts), and for every
+  schedule `verifyBuildOrder` passes, asserts the progression reports
+  `have >= need` elementwise after every step. The popup of a verified
+  order can never show a missing cell; a violation means the progression
+  and the oracle disagree about standing state, failing loudly.
 - Adapter: content-helper tests asserting the rendered table (five rows,
   met/missing classes, neededBy titles) and the Requires/Grants section,
   through the test localization.
