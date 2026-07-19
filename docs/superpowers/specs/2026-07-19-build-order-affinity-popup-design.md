@@ -1,13 +1,13 @@
 # Build-order affinity popup: the have/need progression at every step
 
-Point-in-time design record. The build-order panel now renders only
-oracle-verified orders (see
-2026-07-18-build-order-validity-design.md), but following one manually is
-hard: to check a step you must replay the affinity math in your head. This
-feature makes each step self-explaining. Hovering a build-order step (or
-tapping it on touch) shows a popup with the affinity state as it would be
-with that step applied, in the same visual language as the Affinity panel in
-the upper right, plus what the step's own constellation requires and grants.
+Point-in-time design record. The build-order panel renders only
+oracle-verified orders (see 2026-07-18-build-order-validity-design.md), but
+following one manually is hard: to check a step you must replay the affinity
+math in your head. This feature makes each step self-explaining. Hovering a
+build-order step (or tapping it on touch) shows a popup with the affinity
+state as it would be with that step applied, in the same visual language as
+the Affinity panel in the upper right, plus what the step's own
+constellation requires and grants.
 
 Decided during design:
 
@@ -20,56 +20,65 @@ Decided during design:
 - "Need" means what it means in the Affinity panel, applied to the mid-build
   state: the elementwise max requirement over the constellations standing at
   that point, with met/missing coloring and "needed by" attribution.
+- No separate progression module. The oracle's replay already computes the
+  per-step standing state on every gated render and discarded it; the
+  redundancy was raised during design review and the design changed to a
+  single replay with two outputs. The popup's numbers are the numbers the
+  judge saw when it admitted the order - they cannot drift from the
+  verdict, by construction.
 
-## Architecture (approach A: pure progression, adapter render, thin wiring)
+## Architecture: one replay, two outputs
 
-Three units, one per layer, engine and oracle untouched:
+Three units, engine untouched, no new replayer:
 
-**1. Core progression helper.** A new pure module
-`web/src/core/buildOrderProgression.ts` exporting
-`buildOrderProgression(cons, members, steps)`. It replays the `BuildStep[]`
-once over a standing set: an add or complete puts the constellation in the
-set, a scaffold-refund removes it. Constellation lookup prefers the build's
-`members` over the global `cons` list (the same override the oracle uses),
-so the panel's synthetic partial members keep their selected-star size and
-zero grant. For each step index it returns the post-step state:
+**1. Rich replay in the oracle module.** `web/src/core/orderLegality.ts`
+gains a pure function
 
-- `have: Vec` - the capped sum (per-color affinity caps) of grants of
-  standing COMPLETE constellations;
-- `need: Vec` - the elementwise max requirement over standing
-  constellations;
+    replayBuildOrder(allCons, target, steps, cap):
+      { error: string | null, states: StepState[] }
+
+It is the existing verification walk, now also building one fresh
+`StepState` per step (pure: new vectors and maps per entry, no caller-owned
+structures mutated, no out-parameters):
+
+- `have: Vec` - capped sum of grants of standing COMPLETE constellations
+  after the step;
+- `need: Vec` - elementwise max requirement over standing constellations
+  after the step;
 - `needSource: Map<number, string[]>` - per color index, the ids of the
-  standing constellations demanding it (feeds the "needed by" title, exactly
+  standing constellations demanding it (feeds the "needed by" title exactly
   like the Affinity panel);
-- `conReq: Vec` and `conGrant: Vec` - the hovered step's own constellation
-  requirement and grant (for a partial member the grant is zero, matching
-  what it contributes).
+- `conReq: Vec`, `conGrant: Vec` - the step's own constellation requirement
+  and grant, from the same target-override lookup the verdict uses (a
+  synthetic partial member keeps its selected-star size and zero grant).
 
-Deterministic, allocation-light, computed once per panel render (roughly 35
-steps by 5 colors).
+`verifyBuildOrder` becomes a thin wrapper returning `.error`, so its
+existing callers and tests (the corpus nets, replayLegal, the validate
+harness) are untouched; the gate is the one caller that changes, moving to
+the rich function (unit 2), and its unit tests update with its new return
+shape. On an illegal schedule, `states` covers the
+steps up to and including the failing one; callers that only want the
+verdict never see it. The oracle module still imports only types from
+reachability - the independence invariant is about code, not outputs - and
+state collection is write-only bookkeeping with no effect on the verdict
+path. The existing oracle unit tests extend to assert the collected states
+on the same hand-built schedules, making the oracle's internal state
+observable rather than trusted.
 
-Relationship to the legality oracle: the progression is the DISPLAY twin of
-`verifyBuildOrder` (web/src/core/orderLegality.ts), not a third judge. The
-oracle asserts legality at every step including the conservative mid-step
-points (a refund loses its grant at the first refunded star while its own
-requirement stands until zero - the rule that makes tearing down a
-net-positive constellation illegal once its bootstrap is gone), and nothing
-reaches the panel without passing it. The progression shows the resulting
-POST-step states and does not re-judge mid-steps. The two are tied by a
-triangulation property: on any oracle-verified order, `have` covers `need`
-in every color after every step, so the popup of a rendered order never
-shows a missing cell - all green at every step is the visible form of the
-oracle's proof. A disagreement means one replayer is wrong, and the test
-suite asserts it cannot happen.
+**2. Gate returns the states with the order.** `gateBuildOrder` calls
+`replayBuildOrder` once and returns the order together with its states when
+legal (null otherwise); `selectionView` exposes both on the `SelectionView`
+port (states are present exactly when `buildOrder` is). One walk per click,
+same as today - the popup data is free.
 
-**2. Popup content renderer.** A pure content helper in
-`web/src/adapters/buildOrderView.ts` that renders one step's popup HTML from
-the progression entry via the `Localization` port:
+**3. Popup content renderer and wiring.** A pure content helper in
+`web/src/adapters/buildOrderView.ts` renders one step's popup HTML from its
+`StepState` via the `Localization` port:
 
 - A five-row have/need table mirroring `renderAffinities`
   (web/src/adapters/sidebarView.ts): affinity orb, localized name
-  (`aff.<affinity>`), have value, need cell with `met`/`missing` classes and
-  the `ui.affinity.neededBy` title, plus the `ui.affinity.have` /
+  (`aff.<affinity>`), have value, need cell with `met`/`missing` classes
+  and the `ui.affinity.neededBy` title, plus the `ui.affinity.have` /
   `ui.affinity.need` column heads.
 - A constellation section: the step's localized name (game text; crossroads
   via the existing `ui.buildOrder.crossroads` and direction keys), then
@@ -81,42 +90,48 @@ If any new key proves necessary during implementation it is added to all 13
 catalogs and the `web/test/appCatalog.test.ts` REQUIRED guard; the current
 design needs none.
 
-**3. Wiring in main.ts.** The build-order panel already renders `.bo-step`
-rows carrying `data-con-id`; rows gain `data-step-i` (their index into the
-progression array). Desktop: delegated `pointerenter`/`pointerleave` on the
+`main.ts` wiring: `.bo-step` rows gain `data-step-i` (their index into the
+states array). Desktop: delegated `pointerenter`/`pointerleave` on the
 panel shows/hides the popup for the hovered row. Touch (the existing
 `isTouch()` media query): tap toggles the popup for that row; a tap
 elsewhere or on the same row dismisses it, following the map tooltip's
 pointerup popover pattern. The popup is one absolutely positioned element
-beside the hovered row, clamped to the viewport, re-rendered per row from
-the precomputed progression. It is view chrome: no URL state, dismissed on
-selection change or panel re-render.
+beside the hovered row, clamped to the viewport. It is view chrome: no URL
+state, dismissed on selection change or panel re-render.
+
+Mid-step boundary, stated so it is not an accidental omission: legality at
+the conservative mid-step points (a refund loses its grant at the first
+refunded star while its own requirement stands until zero - the rule that
+makes tearing down a net-positive constellation illegal once its bootstrap
+is gone) is judged by the same replay that produces the states, and nothing
+reaches the panel without passing it. The popup displays POST-step states;
+because only verified orders render, `have` covers `need` after every
+rendered step and the popup never shows a missing cell - all green at every
+step is the visible form of the verdict.
 
 ## Error handling
 
-The popup derives only from data already rendered (the verified order and
-the model). If a step's constellation id is somehow unknown to both lookups
-the popup is skipped for that row (no throw, no partial popup). A null
-build order renders no rows, so there is nothing to hover; the empty states
-are unchanged.
+The popup derives only from data already rendered. If a step's
+constellation id is unknown to both lookups the replay reports it as a
+verdict error (existing behavior) and the gate withholds the order - there
+is no popup-specific failure path. A null build order renders no rows, so
+there is nothing to hover; the empty states are unchanged.
 
 ## Testing
 
-- Core: `web/test/build-order-progression.test.ts` replays hand-built
-  schedules (add, scaffold-add, refund, partial member) and asserts
-  have/need/needSource after each step, including that a refund drops
-  exactly the refunded grant and its needSource entries. A fixture test
-  replays the validity work's reproduction URL
-  (`#p=55&s=_38AQAIAAAAAAOAfAAAAAADAAYAHAMAHAAAAAPADPwAAAAAAPw`) end to
-  end and asserts the final step's have/need equals the live selection's
-  Affinity-panel values (`selectionSummary` supply/target) - the popup and
-  the panel must agree where they meet.
-- Triangulation with the oracle: a test walks the seeded corpus (the same
-  pinned seeds as web/test/build-order-oracle.test.ts), and for every
-  schedule `verifyBuildOrder` passes, asserts the progression reports
-  `have >= need` elementwise after every step. The popup of a verified
-  order can never show a missing cell; a violation means the progression
-  and the oracle disagree about standing state, failing loudly.
+- Oracle module: the existing hand-built schedules in
+  `web/test/order-legality.test.ts` extend to assert `replayBuildOrder`'s
+  per-step states (have/need/needSource/conReq/conGrant), including that a
+  refund drops exactly the refunded grant and its needSource entries, and
+  that `verifyBuildOrder` still returns the identical verdicts (wrapper
+  equivalence).
+- Panel agreement: a fixture test replays the validity work's reproduction
+  URL (`#p=55&s=_38AQAIAAAAAAOAfAAAAAADAAYAHAMAHAAAAAPADPwAAAAAAPw`) and
+  asserts the final step's have/need equals the live selection's
+  Affinity-panel values (`selectionSummary` supply/target) - the replay and
+  the panel are independent computations and must agree where they meet.
+- Port: `selectionView` returns states exactly when it returns an order,
+  and the states array length equals the step count.
 - Adapter: content-helper tests asserting the rendered table (five rows,
   met/missing classes, neededBy titles) and the Requires/Grants section,
   through the test localization.
@@ -127,8 +142,9 @@ are unchanged.
 
 ## Non-goals
 
-- No engine or oracle changes; `buildOrderPath`, `orderLegality`, and their
-  nets are untouched.
+- No engine changes; `buildOrderPath` and its nets are untouched. The
+  oracle module changes only by exposing what its walk already computed;
+  its verdict semantics are frozen by the existing corpus tests.
 - No URL state; hover is ephemeral view chrome.
 - No change to step ordering or step content beyond the added hover data
   attributes.
@@ -139,9 +155,8 @@ are unchanged.
 
 - Hovering any step of the reproduction URL's order shows the post-step
   have/need state and the step constellation's requires/grants; the final
-  step's popup matches the Affinity panel.
+  step's popup matches the Affinity panel; no step shows a missing cell.
 - Touch: tap shows, re-tap and tap-away dismiss.
 - `just check` green (including the appCatalog and i18n boundary guards);
   `just e2e` green with the new checks; no perf regression (`just perf`
-  unchanged - the progression computes once per render, off the hover
-  path).
+  unchanged - one replay per click, same as before this feature).
