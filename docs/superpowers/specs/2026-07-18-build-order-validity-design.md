@@ -81,6 +81,14 @@ and it caught this bug.
 - **Determinism pinning**: same build set in shuffled member orders produces
   byte-identical orders (locks the canonicalization); repeated runs are
   byte-identical (locks against accidental entropy).
+- **Tight-cap adversarial corpus**: the seeded generator yields organically
+  valid builds (mostly 51 to 55 stars) and the fixture file adds real ones,
+  but neither deliberately stresses zero-slack shapes - builds at or within
+  a point or two of the 55 cap whose construction needs heavy scaffolding,
+  where refund batches are largest and the drain logic works hardest. Sweep
+  seeds for the orders with the most refund steps and the least cap slack,
+  pin the worst offenders as named fixtures, and run them through the
+  oracle alongside the rest.
 - **Escalated-path coverage**: `minBuildableCap` and any other
   `buildOrderPath` callers inherit the canonicalized, legal behavior; a
   test covers at least one such caller.
