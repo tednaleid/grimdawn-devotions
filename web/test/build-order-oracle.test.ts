@@ -1,7 +1,7 @@
 // ABOUTME: The build-order regression net: every order the panel-path search emits for seeded valid
 // ABOUTME: builds (and the live-site reproduction URL) must pass the independent legality oracle.
 import { test, expect } from "bun:test";
-import { buildOrderPath, selectionSummary, BUDGET } from "../src/core/reachability";
+import { buildOrderPath, selectionSummary, selectionView, BUDGET } from "../src/core/reachability";
 import { verifyBuildOrder } from "../src/core/orderLegality";
 import { model, cons, table, generateValidBuild, mulberry32 } from "../scripts/reachability-fuzz";
 import { canonicalStarIds, decodeHash } from "../src/core/urlState";
@@ -38,4 +38,12 @@ test("the reproduction URL gets a legal order end to end", () => {
   const err = verifyBuildOrder(cons, members, steps!, 55);
   if (err) console.error(err);
   expect(err).toBeNull();
+});
+
+test("selectionView's rendered order is gated: verified or absent", () => {
+  const decoded = decodeHash(REPRO_HASH, canonicalStarIds(model));
+  const view = selectionView(model, cons, table, decoded!.selected, 55);
+  expect(view.buildOrder).not.toBeNull();
+  const members = selectionSummary(model, decoded!.selected).built;
+  expect(verifyBuildOrder(cons, members, view.buildOrder!, 55)).toBeNull();
 });

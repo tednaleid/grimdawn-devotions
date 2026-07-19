@@ -4,6 +4,7 @@
 // ABOUTME: its requirement met). minCost is bracketed by a fast cover-table lower bound (sound for
 // ABOUTME: "dim") and a constructibility-aware greedy upper bound (sound for "reachable").
 import { AFFINITIES, type DevotionModel, type StarId } from "./types";
+import { gateBuildOrder } from "./orderLegality";
 
 export type Vec = [number, number, number, number, number]; // order = AFFINITIES
 // Hard per-color cap: the max requirement that gates anything; affinity beyond this is worthless.
@@ -1135,7 +1136,7 @@ export function reachabilityForSelection(
 export interface SelectionView {
   minCost: number; // selectionMinCost: fewest points that keep this selection a legal build (the slider floor)
   reach: ReachView; // reachabilityForSelection: dimming, reachable stars, and the affinity panel vectors
-  buildOrder: BuildStep[] | null; // live (tries=16) constellation-level order to assemble the selection, or null
+  buildOrder: BuildStep[] | null; // live (tries=16) oracle-verified order to assemble the selection, or null (verified or absent)
 }
 
 /**
@@ -1156,6 +1157,9 @@ export function selectionView(
   const minCost = selectionMinCost(model, cons, table, selected);
   const reach = reachabilityForSelection(model, cons, table, selected, Math.max(cap, minCost));
   const members = selectionSummary(model, selected).built;
-  const buildOrder = members.length ? buildOrderPath(cons, table, members, cap, 16) : null;
+  const raw = members.length ? buildOrderPath(cons, table, members, cap, 16) : null;
+  // Verified or absent: render only orders the independent oracle proves legal at every step;
+  // anything else is withheld and the panel shows its honest empty state instead.
+  const buildOrder = gateBuildOrder(cons, members, raw, cap);
   return { minCost, reach, buildOrder };
 }
