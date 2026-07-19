@@ -157,6 +157,6 @@ export function buildStepPopupHtml(loc: Localization, model: DevotionModel, step
   }).join("");
   return (
     `<div class="bo-pop-name">${name}</div>` +
-    `<div class="affinity-head"><span></span><span class="aff-have">${loc.translate("ui.affinity.have")}</span><span class="aff-need-h">${loc.translate("ui.affinity.need")}</span></div>${rows}`
+    `<div class="bo-pop-table"><div class="affinity-head"><span></span><span class="aff-have">${loc.translate("ui.affinity.have")}</span><span class="aff-need-h">${loc.translate("ui.affinity.need")}</span></div>${rows}</div>`
   );
 }

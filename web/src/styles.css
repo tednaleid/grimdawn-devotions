@@ -912,14 +912,19 @@ body.comparing main {
   font-weight: 600;
   margin-bottom: 4px;
 }
-/* Header and rows share one grid template, so the have/need heads sit exactly over their
-   numbers in every locale (the sidebar's flex layout drifts at this narrow width). */
-#bo-pop .affinity,
-#bo-pop .affinity-head {
+/* One shared grid for the whole table (rows join it via display: contents), so every cell in a
+   column shares one width: heads sit exactly over their numbers in every locale, and rows with
+   parenthetical deltas cannot widen their own columns out of line with plain rows. */
+#bo-pop .bo-pop-table {
   display: grid;
   grid-template-columns: 1fr auto auto;
   column-gap: 10px;
+  row-gap: 2px;
   align-items: baseline;
+}
+#bo-pop .affinity,
+#bo-pop .affinity-head {
+  display: contents;
 }
 #bo-pop .aff-have,
 #bo-pop .aff-need,
