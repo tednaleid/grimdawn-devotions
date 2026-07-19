@@ -165,7 +165,7 @@ minutes). Combined across both seeds: 1750 pairs, **zero oracle failures**.
 | corpus | pairs | incremental | teardown-1 | full-respec | none | beats teardown+rebuild | moved/theoreticalMin (median, p95) | churn readd (pairs, events) | churn uncovered-add (pairs, events) | runtime transition p50/p95 | runtime from-scratch p50/p95 |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | small-delta | 500 | 480 (96.0%) | 0 | 16 (3.2%) | 4 (0.8%) | 96.8% (480/496) | 1.00x, 1.10x | 16 (3.2%), 221 | 19 (3.8%), 30 | 0.044ms / 0.178ms | 0.075ms / 0.279ms |
-| random | 125 | 117 (93.6%) | 0 | 7 (5.6%) | 1 (0.8%) | 92.7% (115/124) | 1.05x, 1.25x | 7 (5.6%), 36 | 63 (50.4%), 98 | 0.115ms / 9.167ms | 0.081ms / 0.302ms |
+| random | 125 | 117 (93.6%) | 0 | 7 (5.6%) | 1 (0.8%) | 92.7% (115/124) | 1.02x, 1.25x | 7 (5.6%), 36 | 63 (50.4%), 98 | 0.115ms / 9.167ms | 0.081ms / 0.302ms |
 | near-cap | 125 | 122 (97.6%) | 0 | 2 (1.6%) | 1 (0.8%) | 98.4% (122/124) | 1.00x, 1.07x | 2 (1.6%), 28 | 3 (2.4%), 4 | 0.034ms / 0.087ms | 0.069ms / 0.205ms |
 | tight-cap | 125 | 118 (94.4%) | 0 | 4 (3.2%) | 3 (2.4%) | 96.7% (116/120) | 1.00x, 1.11x | 4 (3.2%), 55 | 5 (4.0%), 6 | 0.033ms / 4.334ms | 0.069ms / 0.154ms |
 
@@ -281,12 +281,58 @@ consistently at or below the live `buildOrderPath` cost on the same input:
 p95 0.178ms vs 0.279ms (seed 1, 0.64x) and 0.150ms vs 0.282ms (seed 2,
 0.53x). near-cap is similar (0.42x-0.52x). random and tight-cap both show
 p95 tail outliers well past 2x from-scratch cost (random: 30.4x seed 1,
-77.9x seed 2; tight-cap: 28.1x seed 1, 4.5x seed 2) — a small number of
-pairs where the ladder burns through the full singleton-teardown search
-(up to 8 candidates x up to 16 seeded orders each) before landing on
-full-respec. random is the spec's declared stress corpus ("reported for
-information, not gated"); tight-cap is not declared non-gated and its p95
-outlier is a real go/no-go-relevant number, not just informational.
+77.9x seed 2; tight-cap: 28.1x seed 1, 4.5x seed 2). For tight-cap
+specifically, re-running the seed-1 corpus with per-pair instrumentation
+shows the tail traces to ZERO-SLACK pairs (both builds' size equals the
+cap — a common mid-leveling compare scenario, not the deliberate
+baseline-over-cap case the corpus was built to exercise): the corpus's 2
+baseline-over-cap pairs both resolved incremental in roughly 0.1ms, while
+every pair past a few milliseconds is zero-slack and burns the teardown-1
+candidate search (8 candidates x 17 sampled orders each) before falling
+through to full-respec or none. Removing or time-boxing teardown-1 is
+therefore expected to cure the runtime tail. random is the spec's declared
+stress corpus ("reported for information, not gated"); tight-cap is not
+declared non-gated and its p95 outlier is a real go/no-go-relevant number,
+not just informational.
+
+### The teardown+rebuild fallback's oracle rejections trace to a live-engine ordering bug
+
+The spike's most consequential discovery is not about the prototype at all: it is that the LIVE
+engine's own from-scratch order generator, `buildOrderPath` in `web/src/core/reachability.ts`, can
+itself emit an illegal refund sequence. At each construction step it diffs the previous scaffold
+set against the new one and pushes a refund for every scaffold dropped from `held`, in the
+iteration order of the `held` array — not in dependency order. When two scaffolds are refunded in
+the same batch and the second one's own requirement was covered by the first one's grant, the
+first refund strands the second mid-batch (observed pattern: refund `crossroads_chaos` then
+`viper`, where viper's own requirement needs the chaos affinity crossroads_chaos was supplying).
+
+Replaying 999 live from-scratch orders (one generated build per seed 1-999, `buildOrderPath` at
+its default tries=16) through the spike's independent oracle (`verifyTransition`, from an empty
+build to the generated selection): 43 (4.3%) fail, all at a refund step's conservative mid-point,
+none at an add step. This is a real product-facing bug candidate in the shipped guided-build-order
+panel, not a spike-only artifact — `buildOrderPath` is the same function the compare-mode panel
+calls today for the current build's from-scratch order.
+
+Two readings are currently unresolved, and only checking against the game can settle which: (a)
+the game genuinely forbids refunding a constellation whose own requirement was met by something
+also being refunded in the same pass, in which case today's build-order panel is printing
+unexecutable refund sequences for roughly 4% of builds — a real product bug the spike found as a
+side effect; or (b) the game exempts the constellation being refunded from needing its own
+requirement covered while it is itself being removed, in which case the spike's oracle is
+over-strict on this point and the spike's `none`/`full-respec` counts are conservative (some of
+those pairs may have a legal order the oracle wrongly rejected). Either reading is fixed the same
+way: dependency-order the refund batch so a scaffold refunds only after nothing still-standing
+needs it — exactly the pattern `seededReplay`'s backward-pass `drain()` already implements in this
+file.
+
+This also explains a result that otherwise looks surprising against this spec's own Definitions
+claim that teardown+rebuild is "constructively available whenever both endpoints have from-scratch
+orders": in the seed-1 small-delta corpus, all 4 `none` pairs had both `buildOrderPath(base)` and
+`buildOrderPath(cur)` succeed (checked directly, tries=64 matching `teardownRebuild`'s own call),
+yet `transitionOrderPath` still returned null. The ladder fell through because `teardownRebuild`'s
+REVERSED baseline order hit this exact refund-ordering hazard and the oracle correctly rejected
+it. The fallback is not unconditionally available the way the Definitions section describes; this
+note supersedes that claim.
 
 ### Go/no-go bar, verdict
 
@@ -308,6 +354,28 @@ outlier is a real go/no-go-relevant number, not just informational.
   (30.4x-77.9x) and tight-cap (4.5x-28.1x) — see the runtime section above
   for the numbers and cause.
 
+### What "zero oracle failures" does and doesn't mean
+
+Two disclosures on reading the numbers above. First, the headline "zero oracle failures across
+1750+ pairs" is true BY CONSTRUCTION, not by luck: every rung the escalation ladder tries is
+filtered through `clean()` (the same `verifyTransition` oracle) before `transitionOrderPath`
+returns it, and a rejected rung is silently retried at the next rung down rather than surfaced. An
+emitted order can never fail the oracle; the informative signals are instead the rung distribution
+(how often the surgical rungs win vs. falling to full-respec) and the rejection-driven demotions
+(how often a rung was tried and rejected before the next one succeeded, or before falling to
+`none`) — and the harness does not currently count the latter. The teardown+rebuild rejections
+found in the previous section are exactly this uncounted signal; they surfaced only through extra
+instrumentation, not from anything the shipped report prints.
+
+Second, corpus scope: every pair in all four corpora is built from WHOLE constellations only (the
+fuzzer's forward-generation rule adds a constellation at its full size or not at all). No corpus
+exercises a partial-constellation resize except the Eel fixture pair (a single hand-picked real
+compare-URL), and that pair resolves via the full-respec rung, not incrementally. The mutation
+step (`mutatePair`) also filters candidate removals through `isValidBuild`, which biases away from
+load-bearing swaps (a removal that strands a dependent is discarded and retried rather than kept
+as a harder case). So the synthetic 96% incremental-resolution number may overstate quality on
+real inputs, where partial-constellation resizes and load-bearing swaps are common.
+
 ### Recommendation
 
 The hard invariant and both small-delta quality-gate numbers clear their
@@ -317,14 +385,20 @@ seed (small-delta, near-cap, and tight-cap all stay at 92.8%+; random's
 89.6% is the one outlier, and random is the spec's declared stress corpus),
 the rare non-incremental cases are legal and no worse than the existing
 teardown+rebuild fallback, and moved points track the theoretical minimum
-closely (median 1.00x-1.05x, p95 1.07x-1.31x) everywhere except tight-cap's
+closely (median 1.00x-1.02x, p95 1.07x-1.31x) everywhere except tight-cap's
 seed-2 p95 (3.63x). The open question is the runtime bar: small-delta and
 near-cap are comfortably inside 2x, but random and tight-cap post p95
-outliers of 4.5x to 78x on a per-click-path budget. Whether that disqualifies
-a go decision depends on whether the real feature needs to handle
-baseline-over-cap tight-cap transitions (a real production scenario, unlike
-the random stress corpus) on the interactive path, or whether those cases
-can fall back to a cheaper rung (e.g. skip straight to teardown+rebuild
-past a search-time budget) without losing the quality-gate numbers above.
-That trade-off is a call for Ted, not a number this spike can resolve on
-its own.
+outliers of 4.5x to 78x on a per-click-path budget. The tight-cap tail
+traces specifically to zero-slack pairs (build size at the cap) burning the
+teardown-1 candidate search before falling through, not to the
+baseline-over-cap scenario the corpus was built to exercise (those pairs
+resolve incrementally in roughly 0.1ms) — so removing or time-boxing
+teardown-1 is the expected fix, not a scope question about which
+transitions the interactive path must handle. Separately, the
+teardown+rebuild fallback itself has an unresolved legality question (the
+refund-ordering bug described above), so the `none`/`full-respec` counts
+and the "beats teardown+rebuild" comparisons above should be read with that
+caveat rather than as fully settled numbers. Whether the runtime tail is
+fully cured by bounding teardown-1, or whether some cases should still fall
+back to a cheaper rung past a search-time budget, is a call for Ted, not a
+number this spike can resolve on its own.

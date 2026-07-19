@@ -150,13 +150,21 @@ test("the Eel pair: a real compare-URL transition is oracle-clean; a never-neede
   const res = transitionOrderPath(base, cur, 55);
   expect(res).not.toBeNull();
   expect(verifyTransition(base, cur, res!.steps, 55)).toBeNull();
+  // This pair resolves at full-respec (teardownRebuild), not the incremental/teardown-1 rungs' two-pass
+  // scheduler - a future replay improvement that makes this pair resolve incrementally should consciously
+  // revisit the assertions below rather than let them silently drift.
+  expect(res!.rung).toBe("full-respec");
   // Assertion adjusted per the brief's step-zero note, verified by decoding both URLs. In THIS pair's
   // direction (base -> cur) Eel is CURRENT-only: base holds no Eel, and cur ADDS Eel (3 stars, grants
   // +5 primordial) as a primordial source. So Eel is added, not a baseline-only free refund - the
   // step-zero refund of Eel does not apply here (Eel is "needed mid-transition", the case the note
-  // anticipated). The free refund the panel should still surface up front is a never-needed baseline-only
+  // anticipated). The free refund the panel still surfaces up front is a never-needed baseline-only
   // member: Ghoul appears only in base as a 4/5 partial that grants no affinity, so it can never be
-  // load-bearing and must refund before any add.
+  // load-bearing and must refund before any add. At full-respec, this up-front Ghoul refund comes from
+  // teardownRebuild's reversal of the baseline's own from-scratch order (Ghoul, a zero-grant member, is
+  // placed in the construction tail - last in the forward order, so first when reversed for teardown) -
+  // not from the two-pass scheduler's never-needed-scaffold logic, which only runs on the
+  // incremental/teardown-1 rungs.
   const eelId = [...model.constellations.keys()].find((id) => id.includes("eel"))!;
   const eelAdd = res!.steps.findIndex((s) => s.conId === eelId && s.kind === "add");
   expect(eelAdd).toBeGreaterThanOrEqual(0);

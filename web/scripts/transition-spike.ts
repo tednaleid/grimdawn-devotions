@@ -12,7 +12,7 @@ import {
   type Vec,
   type BuildStep,
 } from "../src/core/reachability";
-import { model, cons, table, generateValidBuild, isValidBuild, mulberry32 } from "./reachability-fuzz";
+import { cons, table, generateValidBuild, isValidBuild, mulberry32 } from "./reachability-fuzz";
 
 const zero = (): Vec => [0, 0, 0, 0, 0];
 const covers = (g: Vec, d: Vec): boolean =>
