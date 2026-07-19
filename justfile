@@ -345,6 +345,11 @@ realmap-hunt *ARGS:
 build-order-validate *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/build-order-validate.ts {{ARGS}}
 
+# Harvest the tight-cap adversarial build-order corpus (near-cap, refund-heavy orders) into
+# web/test/fixtures/tight-cap-builds.json.  e.g. just hunt-tight-cap --seeds 5000 --keep 12
+hunt-tight-cap *ARGS:
+    cd "{{justfile_directory()}}/web" && bun scripts/hunt-tight-cap.ts {{ARGS}}
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit

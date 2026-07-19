@@ -1,0 +1,222 @@
+{
+  "cases": [
+    {
+      "label": "tight-cap-s1134-peak55-r12",
+      "sel": {
+        "tsunami": 5,
+        "akeron_s_scorpion": 5,
+        "hawk": 3,
+        "vulture": 5,
+        "wolverine": 5,
+        "amatok_the_spirit_of_winter": 7,
+        "lion": 3,
+        "wendigo": 6,
+        "fox": 4,
+        "rhowan_s_scepter": 6,
+        "rat": 4,
+        "crossroads_ascendant": 1,
+        "crossroads_eldritch": 1
+      }
+    },
+    {
+      "label": "tight-cap-s86-peak55-r11",
+      "sel": {
+        "anvil": 5,
+        "wolverine": 5,
+        "scholar_s_light": 3,
+        "toad": 4,
+        "hound": 3,
+        "assassin_s_blade": 5,
+        "imp": 5,
+        "berserker": 6,
+        "bard_s_harp": 6,
+        "hydra": 6,
+        "akeron_s_scorpion": 5,
+        "crossroads_primordial": 1,
+        "crossroads_eldritch": 1
+      }
+    },
+    {
+      "label": "tight-cap-s845-peak55-r11",
+      "sel": {
+        "empty_throne": 4,
+        "crossroads_order": 1,
+        "eel": 3,
+        "falcon": 5,
+        "ghoul": 5,
+        "stag": 4,
+        "behemoth": 6,
+        "manticore": 6,
+        "wolverine": 5,
+        "harpy": 4,
+        "assassin_s_blade": 5,
+        "jackal": 3,
+        "crossroads_eldritch": 1,
+        "crossroads_ascendant": 1,
+        "crossroads_primordial": 1,
+        "crossroads_chaos": 1
+      }
+    },
+    {
+      "label": "tight-cap-s943-peak55-r11",
+      "sel": {
+        "scholar_s_light": 3,
+        "hawk": 3,
+        "dryad": 5,
+        "crossroads_ascendant": 1,
+        "toad": 4,
+        "empty_throne": 4,
+        "fiend": 5,
+        "jackal": 3,
+        "hound": 3,
+        "viper": 4,
+        "targo_the_builder": 7,
+        "kraken": 5,
+        "crossroads_eldritch": 1,
+        "wendigo": 6,
+        "crossroads_chaos": 1
+      }
+    },
+    {
+      "label": "tight-cap-s1005-peak55-r11",
+      "sel": {
+        "hammer": 3,
+        "rat": 4,
+        "lizard": 3,
+        "mantis": 4,
+        "shepherd_s_crook": 5,
+        "fiend": 5,
+        "eye_of_the_guardian": 5,
+        "crossroads_chaos": 1,
+        "oklaine_s_lantern": 5,
+        "ghoul": 5,
+        "kraken": 5,
+        "crossroads_ascendant": 1,
+        "typhos_the_jailor_of_souls": 6,
+        "eel": 3
+      }
+    },
+    {
+      "label": "tight-cap-s1847-peak55-r11",
+      "sel": {
+        "imp": 5,
+        "ghoul": 5,
+        "scholar_s_light": 3,
+        "anvil": 5,
+        "toad": 4,
+        "hyrian_guardian_of_the_celestial_gates": 6,
+        "crane": 5,
+        "amatok_the_spirit_of_winter": 7,
+        "quill": 4,
+        "rat": 4,
+        "huntress": 7
+      }
+    },
+    {
+      "label": "tight-cap-s388-peak55-r10",
+      "sel": {
+        "eel": 3,
+        "rat": 4,
+        "amatok_the_spirit_of_winter": 7,
+        "mantis": 4,
+        "panther": 4,
+        "hawk": 3,
+        "affliction": 7,
+        "ghoul": 5,
+        "anvil": 5,
+        "bard_s_harp": 6,
+        "rhowan_s_crown": 5,
+        "crossroads_eldritch": 1,
+        "crossroads_chaos": 1
+      }
+    },
+    {
+      "label": "tight-cap-s667-peak55-r10",
+      "sel": {
+        "fiend": 5,
+        "crossroads_primordial": 1,
+        "falcon": 5,
+        "bull": 5,
+        "scholar_s_light": 3,
+        "sailor_s_guide": 4,
+        "crane": 5,
+        "amatok_the_spirit_of_winter": 7,
+        "harvestman_s_scythe": 6,
+        "magi": 7,
+        "berserker": 6,
+        "crossroads_ascendant": 1
+      }
+    },
+    {
+      "label": "tight-cap-s869-peak55-r10",
+      "sel": {
+        "wretch": 4,
+        "bat": 5,
+        "falcon": 5,
+        "hydra": 6,
+        "solael_s_witchblade": 5,
+        "gallows": 4,
+        "stag": 4,
+        "widow": 6,
+        "sailor_s_guide": 4,
+        "eel": 3,
+        "revenant": 6,
+        "lion": 3
+      }
+    },
+    {
+      "label": "tight-cap-s880-peak55-r10",
+      "sel": {
+        "harpy": 4,
+        "wretch": 4,
+        "shepherd_s_crook": 5,
+        "assassin_s_blade": 5,
+        "stag": 4,
+        "hawk": 3,
+        "targo_the_builder": 7,
+        "dire_bear": 6,
+        "eye_of_the_guardian": 5,
+        "shieldmaiden": 6,
+        "murmur_mistress_of_rumors": 6
+      }
+    },
+    {
+      "label": "tight-cap-s949-peak55-r10",
+      "sel": {
+        "bull": 5,
+        "wretch": 4,
+        "akeron_s_scorpion": 5,
+        "crossroads_primordial": 1,
+        "eye_of_the_guardian": 5,
+        "crane": 5,
+        "eel": 3,
+        "ulo_the_keeper_of_the_waters": 5,
+        "rhowan_s_crown": 5,
+        "jackal": 3,
+        "lion": 3,
+        "crossroads_order": 1,
+        "magi": 7,
+        "hawk": 3
+      }
+    },
+    {
+      "label": "tight-cap-s1574-peak55-r10",
+      "sel": {
+        "scarab": 4,
+        "crossroads_eldritch": 1,
+        "toad": 4,
+        "crossroads_order": 1,
+        "fiend": 5,
+        "rhowan_s_crown": 5,
+        "hound": 3,
+        "fox": 4,
+        "dryad": 5,
+        "bull": 5,
+        "hydra": 6,
+        "dire_bear": 6,
+        "anvil": 5,
+        "crossroads_primordial": 1
+      }
+    }
+  ]
+}
