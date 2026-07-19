@@ -695,7 +695,9 @@ export type BuildStep =
  * dependent"): a scaffold is refunded only when everything still standing keeps its requirement covered
  * without it; refunds not yet safe stay held and are retried after later adds. Returns null when no
  * sampled order fits the budget, or when a held scaffold can never be legally refunded - the honest
- * "not validly buildable" signal. No order is better than an illegal order.
+ * "not validly buildable" signal. No order is better than an illegal order. Input is canonicalized
+ * (sorted by constellation id), so the output is a pure function of the build set - every caller
+ * (panel, test, script) gets the identical order.
  */
 export function buildOrderPath(
   cons: ReachCon[],
@@ -705,6 +707,7 @@ export function buildOrderPath(
   tries = 16,
   peakNodeCap = 3000,
 ): BuildStep[] | null {
+  B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: the order is a function of the build SET
   const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
   if (sc.peak > budget) return null;
   const parts = buildParts(cons, B);

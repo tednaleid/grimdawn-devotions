@@ -17,6 +17,7 @@ import fixtureJson from "./fixtures/reachable-builds.json";
 import { buildModel } from "../src/core/model";
 import { enLoc } from "./helpers/localizeEn";
 import { verifyBuildOrder } from "../src/core/orderLegality";
+import { mulberry32 } from "./support/reach-oracle";
 
 const fixture = fixtureJson as unknown as { cases: { label: string; sel: Record<string, number> }[] };
 const model = buildModel(doc as any);
@@ -149,3 +150,30 @@ test("buildOrderPath: the confirmed false-reach build has no order within 55", (
   // buildOrderEscalated runs a heavy tries=4096 search (~5-7s on CI runners); raise the per-test
   // timeout above bun's 5s default, matching the other heavy reachability tests.
 }, 30_000);
+
+test("buildOrderPath is canonical: any member-array order yields byte-identical steps", () => {
+  const rng = mulberry32(0xc0ffee);
+  let checked = 0;
+  for (const c of fixture.cases.slice(0, 20)) {
+    const members = membersOf(c.sel);
+    if (members.length < 2) continue;
+    const base = JSON.stringify(buildOrderPath(realCons, realTable, members, 55, 16));
+    for (let k = 0; k < 3; k++) {
+      const shuffled = [...members];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j]!, shuffled[i]!];
+      }
+      expect(JSON.stringify(buildOrderPath(realCons, realTable, shuffled, 55, 16))).toBe(base);
+    }
+    checked++;
+  }
+  expect(checked).toBeGreaterThan(0);
+});
+
+test("buildOrderPath is byte-identical across repeated calls", () => {
+  const members = membersOf(fixture.cases[0]!.sel);
+  const a = JSON.stringify(buildOrderPath(realCons, realTable, members, 55, 16));
+  const b = JSON.stringify(buildOrderPath(realCons, realTable, members, 55, 16));
+  expect(a).toBe(b);
+});
