@@ -48,3 +48,13 @@ tables (authoritative, see docs/i18n.md). Locale is a viewer preference detected
 from the browser and is never in the URL hash; selection ids stay language
 independent. When you add a user-facing string, add a catalog key (never a literal)
 and add it to the `web/test/appCatalog.test.ts` guard.
+
+## Build order is verified (invariant we maintain)
+
+The build-order panel renders only schedules proven legal at every step (adds
+and refunds, per the in-game rules in docs/devotion-system.md) by the
+independent oracle in `web/src/core/orderLegality.ts`. `selectionView` withholds
+anything the oracle rejects and the panel shows its honest empty state instead:
+no order is better than an illegal order. Keep `buildOrderPath` a pure function
+of the build set (canonicalized input), and keep the oracle free of engine
+helpers so it stays an independent check.

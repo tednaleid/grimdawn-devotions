@@ -105,6 +105,37 @@ truth in the costed-oracle tests. The shipped engine returns only a verdict; the
 guided build order builds its construction schedule from the same sampled witness
 (`buildOrderPath`), not from this DP.
 
+## The guided build order: legal at every step, verified or absent
+
+`buildOrderPath` (web/src/core/reachability.ts) turns a self-covering selection
+into a step-by-step construction schedule: complete the members in a sampled
+peak-minimizing order, adding transient scaffold constellations before the steps
+that need them and refunding scaffolds once the build's own grants cover them.
+Its contract:
+
+- **Canonical input.** The member array is sorted by constellation id at entry,
+  so the output is a pure function of the build set. Panel, tests, and scripts
+  get the identical order for the identical selection.
+- **Legal at every step.** Every emitted step obeys the in-game rules, refunds
+  included: a scaffold is refunded only when everything still standing keeps its
+  requirement covered without it (docs/devotion-system.md, "Removal cannot
+  strand a dependent"). Refunds not yet safe stay held and are retried after
+  later adds; a schedule whose scaffolds can never be legally refunded returns
+  null instead of emitting an illegal step.
+- **Verified or absent.** An independent oracle (`verifyBuildOrder` in
+  web/src/core/orderLegality.ts) replays every schedule from an empty board and
+  re-derives validity at each step with no shared engine code. `selectionView`
+  renders only orders the oracle proves legal; anything else is withheld and the
+  panel shows its honest empty state. No order is better than an illegal order.
+
+The regression net: oracle unit tests (web/test/order-legality.test.ts), the
+real-build fixture replay and determinism pins (web/test/build-order-path.test.ts),
+a seeded 150-build panel-path sweep plus the live-site reproduction URL
+(web/test/build-order-oracle.test.ts), the tight-cap adversarial corpus
+(web/test/build-order-tightcap.test.ts, harvested by `just hunt-tight-cap`), and
+the offline harness `just build-order-validate`, whose illegal-path count must
+stay zero.
+
 ## Verifying after a resolver change
 
 Re-run all of these; they are the regression gates:

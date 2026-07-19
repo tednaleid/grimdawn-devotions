@@ -91,7 +91,10 @@ behavior below:
    of the constellation, not of individual stars.)
 5. **Removal cannot strand a dependent.** You may remove (refund) any star, but not
    if doing so would drop a still-selected constellation below its affinity
-   requirement. The game keeps every selected constellation valid at all times.
+   requirement. The rule is strict (confirmed in-game): it protects every
+   constellation with at least one selected star, including the one being refunded
+   mid-teardown, and the game blocks the refund rather than allowing a temporarily
+   invalid state. The game keeps every selected constellation valid at all times.
 
 A selection is **valid** when every constellation with at least one selected star
 has its requirement met by the affinity of the currently completed constellations.
