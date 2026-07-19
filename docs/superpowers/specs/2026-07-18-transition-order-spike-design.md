@@ -306,8 +306,7 @@ the same batch and the second one's own requirement was covered by the first one
 first refund strands the second mid-batch (observed pattern: refund `crossroads_chaos` then
 `viper`, where viper's own requirement needs the chaos affinity crossroads_chaos was supplying).
 
-Replaying 999 live from-scratch orders (one generated build per seed 1-999, `buildOrderPath` at
-its default tries=16) through the spike's independent oracle (`verifyTransition`, from an empty
+Replaying 999 live from-scratch orders (the base and cur builds of the seed-1 small-delta corpus - 500 `mutatePair(mulberry32(1))` pairs, 1000 builds, 999 of which produced an order at tries=16; note these are base/cur siblings with heavy overlap, not 999 independent builds) through the spike's independent oracle (`verifyTransition`, from an empty
 build to the generated selection): 43 (4.3%) fail, all at a refund step's conservative mid-point,
 none at an add step. This is a real product-facing bug candidate in the shipped guided-build-order
 panel, not a spike-only artifact — `buildOrderPath` is the same function the compare-mode panel
