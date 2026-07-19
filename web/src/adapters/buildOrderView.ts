@@ -1,7 +1,9 @@
-// ABOUTME: Renders the guided build-order panel for the right sidebar: a numbered step list with
-// ABOUTME: constellation art on complete rows, distinct scaffold add/refund rows, and a running held
-// ABOUTME: total. Pure string output; the null state offers an on-demand "Find valid order" button.
+// ABOUTME: Renders the guided build-order panel: a numbered step list with constellation art, scaffold
+// ABOUTME: add/refund rows, a running held total, honest empty states, and the per-step affinity popup
+// ABOUTME: (post-step have/need in the Affinity panel's visual language). Pure string output.
 import type { Affinity, DevotionModel } from "../core/types";
+import { AFFINITIES } from "../core/types";
+import type { StepState } from "../core/orderLegality";
 import type { BuildStep, Vec } from "../core/reachability";
 import type { AssetManifest } from "../ports/DataSource";
 import { affinityOrb } from "./affinityColors";
@@ -20,6 +22,17 @@ const CROSSROADS: Record<string, { dirKey: string; affinity: Affinity }> = {
   crossroads_eldritch: { dirKey: "sw", affinity: "eldritch" },
   crossroads_ascendant: { dirKey: "se", affinity: "ascendant" },
 };
+
+// The step name shared by rows and the popup: crossroads get a direction label, others their game name.
+function stepConName(loc: Localization, model: DevotionModel, conId: string): string {
+  const c = model.constellations.get(conId);
+  const cr = CROSSROADS[conId];
+  return cr
+    ? `${c ? loc.gameText(c.nameTag) : loc.translate("ui.buildOrder.crossroads")} (${loc.translate(`ui.buildOrder.dir.${cr.dirKey}`)})`
+    : c
+      ? loc.gameText(c.nameTag)
+      : conId;
+}
 
 // Why no order is shown, for the empty-state copy:
 // - empty: nothing meaningful to order yet (no selection, or no point cap to assemble within).
@@ -77,14 +90,10 @@ export function buildOrderHtml(
   }
   let n = 0;
   const rows = steps
-    .map((s) => {
+    .map((s, si) => {
       const c = model.constellations.get(s.conId);
       const cr = CROSSROADS[s.conId];
-      const name = cr
-        ? `${c ? loc.gameText(c.nameTag) : loc.translate("ui.buildOrder.crossroads")} (${loc.translate(`ui.buildOrder.dir.${cr.dirKey}`)})`
-        : c
-          ? loc.gameText(c.nameTag)
-          : s.conId;
+      const name = stepConName(loc, model, s.conId);
       const artName = c?.background?.image?.split("/").pop() ?? "";
       const art = manifest?.images[artName];
       // Crossroads have no art; their art-column cell holds a dot in the granted affinity's color.
@@ -100,15 +109,62 @@ export function buildOrderHtml(
           c && s.points < c.starIds.length
             ? ` <span class="bo-partial">${loc.translate("ui.buildOrder.partial", { taken: s.points, total: c.starIds.length })}</span>`
             : "";
-        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}${partial}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
+        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}" data-step-i="${si}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}${partial}</span><span class="bo-pts">+${s.points}</span>${held}</div>`;
       }
       const label =
         s.kind === "scaffold-add" ? loc.translate("ui.buildOrder.add") : loc.translate("ui.buildOrder.refund");
       const cls = s.kind === "scaffold-add" ? "bo-add" : "bo-refund";
       // Empty art-column cell (or the crossroads dot) so the five grid columns line up with complete rows.
       const artCell = dot || `<span class="bo-art"></span>`;
-      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}"><span class="bo-n"></span>${artCell}<span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
+      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}" data-step-i="${si}"><span class="bo-n"></span>${artCell}<span class="bo-name">${label} ${esc(name)}</span><span class="bo-pts">${s.points > 0 ? "+" : ""}${s.points}</span>${held}</div>`;
     })
     .join("");
   return `<h2>${loc.translate("ui.panel.buildOrder")}</h2><div class="bo-list">${rows}</div>`;
+}
+
+// One "Requires: "/"Grants: " line with orb+number pairs for the nonzero colors, or "" when all zero.
+function popAffinityLine(loc: Localization, labelKey: string, vec: Vec): string {
+  const parts = AFFINITIES.map((a, i) =>
+    vec[i]! > 0 ? `<span class="bo-pop-aff">${affinityOrb(a)}${vec[i]}</span>` : "",
+  ).filter(Boolean);
+  if (!parts.length) return "";
+  return `<div class="bo-pop-line">${loc.translate(labelKey)}${parts.join(" ")}</div>`;
+}
+
+/**
+ * The hover/tap popup for one build-order step: the post-step have/need table in the Affinity
+ * panel's visual language (same classes, no filter-toggle attributes - the popup is display-only),
+ * plus what the step's own constellation requires and grants. `state` comes from the verifying
+ * replay via SelectionView.buildOrderStates, so the numbers are the ones the legality judge saw.
+ */
+export function buildStepPopupHtml(
+  loc: Localization,
+  model: DevotionModel,
+  step: BuildStep,
+  state: StepState,
+): string {
+  const name = esc(stepConName(loc, model, step.conId));
+  const rows = AFFINITIES.map((a, i) => {
+    const n = state.need[i]!;
+    let needCell: string;
+    if (n > 0) {
+      const met = state.have[i]! >= n;
+      const names = (state.needSource.get(i) ?? [])
+        .map((cid) => {
+          const tag = model.constellations.get(cid)?.nameTag;
+          return tag ? loc.gameText(tag) : cid;
+        })
+        .join(", ");
+      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${esc(names ? loc.translate("ui.affinity.neededBy", { names }) : "")}">${n}</span>`;
+    } else {
+      needCell = `<span class="aff-need none">0</span>`;
+    }
+    return `<div class="affinity affinity-${a}"><span>${affinityOrb(a)}${loc.translate(`aff.${a}`)}</span><span class="aff-have">${state.have[i]}</span>${needCell}</div>`;
+  }).join("");
+  return (
+    `<div class="bo-pop-name">${name}</div>` +
+    popAffinityLine(loc, "ui.tooltip.requires", state.conReq) +
+    popAffinityLine(loc, "ui.tooltip.grants", state.conGrant) +
+    `<div class="affinity-head"><span></span><span class="aff-have">${loc.translate("ui.affinity.have")}</span><span class="aff-need-h">${loc.translate("ui.affinity.need")}</span></div>${rows}`
+  );
 }
