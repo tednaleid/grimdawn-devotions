@@ -747,6 +747,76 @@ try {
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
   if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log(`    console: ${e}`);
 
+  // --- Build-order step popup: hover shows the post-step have/need state ---
+  // The narrow/touch block above never reset its device+touch emulation, so without undoing it here
+  // this hover check would inherit pointer:coarse and never show a hover-only popup.
+  await cdp.send("Emulation.clearDeviceMetricsOverride", {});
+  await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: false });
+  await cdp.evaluate(`location.hash = "#p=55&s=_38AQAIAAAAAAOAfAAAAAADAAYAHAMAHAAAAAPADPwAAAAAAPw"`);
+  for (let i = 0; i < 50; i++) {
+    if ((await cdp.evaluate<number>("document.querySelectorAll('.bo-step').length")) > 0) break;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.bo-step').length")) > 0,
+    "repro URL renders build-order steps",
+  );
+  await cdp.evaluate(`document.querySelector('.bo-step').dispatchEvent(new MouseEvent('mouseenter',{bubbles:false}))`);
+  check(
+    (await cdp.evaluate<string>("getComputedStyle(document.getElementById('bo-pop')).display")) === "block",
+    "hovering a build-order step shows the popup",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('#bo-pop .affinity').length")) === 5,
+    "popup shows five affinity rows",
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('#bo-pop .aff-need.missing').length")) === 0,
+    "popup of a verified order shows no missing need",
+  );
+  await cdp.evaluate(`document.querySelector('.bo-step').dispatchEvent(new MouseEvent('mouseleave',{bubbles:false}))`);
+  check(
+    (await cdp.evaluate<string>("getComputedStyle(document.getElementById('bo-pop')).display")) === "none",
+    "leaving the step hides the popup",
+  );
+
+  // --- Build-order step popup: touch tap-toggle (emulated coarse pointer) ---
+  await cdp.send("Emulation.setEmulatedMedia", {
+    features: [
+      { name: "hover", value: "none" },
+      { name: "pointer", value: "coarse" },
+    ],
+  });
+  const touchEmulated = await cdp.evaluate<boolean>(`matchMedia("(hover: none) and (pointer: coarse)").matches`);
+  if (touchEmulated) {
+    // Re-render so the rows re-bind under touch semantics, then tap.
+    await cdp.evaluate(`location.hash = "#p=55"`);
+    await new Promise((r) => setTimeout(r, 300));
+    await cdp.evaluate(`location.hash = "#p=55&s=_38AQAIAAAAAAOAfAAAAAADAAYAHAMAHAAAAAPADPwAAAAAAPw"`);
+    for (let i = 0; i < 50; i++) {
+      if ((await cdp.evaluate<number>("document.querySelectorAll('.bo-step').length")) > 0) break;
+      await new Promise((r) => setTimeout(r, 100));
+    }
+    await cdp.evaluate(
+      `document.querySelector('.bo-step').dispatchEvent(new PointerEvent('pointerup',{bubbles:true}))`,
+    );
+    check(
+      (await cdp.evaluate<string>("getComputedStyle(document.getElementById('bo-pop')).display")) === "block",
+      "tapping a step (touch) shows the popup",
+    );
+    await cdp.evaluate(`document.body.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true}))`);
+    check(
+      (await cdp.evaluate<string>("getComputedStyle(document.getElementById('bo-pop')).display")) === "none",
+      "tap-away dismisses the popup",
+    );
+  } else {
+    check(
+      true,
+      "SKIPPED: hover/pointer media emulation unsupported in this Chrome; tap path shares showBoPop/hideBoPop with the verified hover path",
+    );
+  }
+  await cdp.send("Emulation.setEmulatedMedia", { features: [] });
+
   failed = results.some((r) => !r.ok);
 } catch (err) {
   console.error(`\nE2E ERROR: ${(err as Error).message}`);

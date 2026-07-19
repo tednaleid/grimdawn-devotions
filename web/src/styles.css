@@ -892,6 +892,31 @@ body.comparing main {
   opacity: 0.6;
   font-size: 0.85em;
 }
+#bo-pop {
+  position: fixed;
+  display: none;
+  pointer-events: none;
+  background: #1c2330;
+  border: 1px solid #30363d;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  width: 220px;
+  /* Same layer as the map tooltip: above corner toggles, scrim, and drawers. */
+  z-index: 40;
+}
+#bo-pop .bo-pop-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+#bo-pop .bo-pop-line {
+  margin: 2px 0;
+  opacity: 0.9;
+}
+#bo-pop .bo-pop-aff {
+  margin-right: 6px;
+  white-space: nowrap;
+}
 .con-highlight {
   fill: none;
   stroke: #ffd479;

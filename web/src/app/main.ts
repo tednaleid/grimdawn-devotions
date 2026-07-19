@@ -13,7 +13,8 @@ import { mountInfoPopover, type InfoPopoverText } from "../adapters/infoPopover"
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
-import { buildOrderHtml, type NoOrderInfo } from "../adapters/buildOrderView";
+import { buildOrderHtml, buildStepPopupHtml, type NoOrderInfo } from "../adapters/buildOrderView";
+import type { StepState } from "../core/orderLegality";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleDrawer, type DrawerState } from "../core/drawerState";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
@@ -553,9 +554,40 @@ async function boot() {
   let availHtml = ""; // "available to get" catalog HTML; rendered under the Affinity panel on the right
   let petAvailHtml = ""; // pet "available to get" catalog HTML; rendered below the player one on the right
   let curBuildOrder: BuildStep[] | null = null; // live build order from selectionView; null in degraded path
+  let curBuildOrderStates: StepState[] | null = null; // the verifying replay's per-step states; parallel to curBuildOrder
+  let boPopRow: HTMLElement | null = null; // the build-order row whose popup is showing (touch toggle + dismiss)
+  // The step popup: a fixed singleton beside the hovered build-order row, showing the post-step
+  // have/need state from the verifying replay. Display-only (pointer-events none), so taps pass
+  // through and the document-level dismiss handles touch.
+  function boPopEl(): HTMLElement {
+    let el = document.getElementById("bo-pop");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "bo-pop";
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+  function hideBoPop() {
+    boPopRow = null;
+    boPopEl().style.display = "none";
+  }
+  function showBoPop(row: HTMLElement) {
+    const i = Number(row.dataset.stepI ?? -1);
+    if (!curBuildOrder || !curBuildOrderStates || i < 0 || i >= curBuildOrderStates.length) return;
+    const el = boPopEl();
+    el.innerHTML = buildStepPopupHtml(localization, model, curBuildOrder[i]!, curBuildOrderStates[i]!);
+    el.style.display = "block";
+    // Beside the row, to its left (the panel hugs the right edge), clamped to the viewport.
+    const r = row.getBoundingClientRect();
+    el.style.left = `${Math.max(4, r.left - el.offsetWidth - 8)}px`;
+    el.style.top = `${Math.min(Math.max(4, r.top - 4), window.innerHeight - el.offsetHeight - 4)}px`;
+    boPopRow = row;
+  }
   // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
   // change the star selection so nothing flashes).
   function paintBuildOrder(steps: BuildStep[] | null, noOrder?: NoOrderInfo | null) {
+    hideBoPop();
     let panel = document.getElementById("build-order-panel");
     if (!panel) {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><div id="build-order-panel"></div>`);
@@ -566,8 +598,20 @@ async function boot() {
     panel.querySelectorAll<HTMLElement>(".bo-step[data-con-id]").forEach((row) => {
       const cid = row.dataset.conId;
       if (!cid) return;
-      row.addEventListener("mouseenter", () => handle.highlightCon(cid));
-      row.addEventListener("mouseleave", () => handle.highlightCon(null));
+      row.addEventListener("mouseenter", () => {
+        handle.highlightCon(cid);
+        if (!isTouch()) showBoPop(row);
+      });
+      row.addEventListener("mouseleave", () => {
+        handle.highlightCon(null);
+        if (!isTouch()) hideBoPop();
+      });
+      // Touch: tap toggles this row's popup (the map tooltip's popover pattern).
+      row.addEventListener("pointerup", () => {
+        if (!isTouch()) return;
+        if (boPopRow === row) hideBoPop();
+        else showBoPop(row);
+      });
     });
   }
   function renderBenefitsPanel() {
@@ -607,10 +651,12 @@ async function boot() {
       if (state.pointCap < curMin) state = { selected: state.selected, pointCap: curMin };
       reach = view.reach;
       curBuildOrder = view.buildOrder;
+      curBuildOrderStates = view.buildOrderStates;
     } else {
       curMin = state.selected.size;
       reach = permissiveReach();
       curBuildOrder = null;
+      curBuildOrderStates = null;
     }
     document.body.classList.toggle("comparing", baseline !== null);
     updateNarrow();
@@ -783,6 +829,11 @@ async function boot() {
       tip.hide();
       dismissedPopoverTap = true; // swallow this tap's click so it does not open a new popover
     }
+  });
+  // Tap-away dismiss for the build-order step popup (it is pointer-events none, so any tap lands
+  // outside it; tapping the same row is handled by the row's own toggle).
+  document.addEventListener("pointerdown", (e) => {
+    if (boPopRow && !boPopRow.contains(e.target as Node)) hideBoPop();
   });
   // On mobile it is hard to find empty space, so a dismissing tap often lands on a constellation. Stop
   // that tap's click from reaching the map (capture phase runs before the map's bubble click handler).

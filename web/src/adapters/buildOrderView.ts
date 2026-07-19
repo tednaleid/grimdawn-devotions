@@ -137,12 +137,7 @@ function popAffinityLine(loc: Localization, labelKey: string, vec: Vec): string 
  * plus what the step's own constellation requires and grants. `state` comes from the verifying
  * replay via SelectionView.buildOrderStates, so the numbers are the ones the legality judge saw.
  */
-export function buildStepPopupHtml(
-  loc: Localization,
-  model: DevotionModel,
-  step: BuildStep,
-  state: StepState,
-): string {
+export function buildStepPopupHtml(loc: Localization, model: DevotionModel, step: BuildStep, state: StepState): string {
   const name = esc(stepConName(loc, model, step.conId));
   const rows = AFFINITIES.map((a, i) => {
     const n = state.need[i]!;
