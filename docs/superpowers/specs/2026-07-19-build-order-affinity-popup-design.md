@@ -56,9 +56,10 @@ structures mutated, no out-parameters):
 existing callers and tests (the corpus nets, replayLegal, the validate
 harness) are untouched; the gate is the one caller that changes, moving to
 the rich function (unit 2), and its unit tests update with its new return
-shape. On an illegal schedule, `states` covers the
-steps up to and including the failing one; callers that only want the
-verdict never see it. The oracle module still imports only types from
+shape. On an illegal schedule, `states` holds one
+entry per step that completed its checks (a step failing pre-add or
+mid-refund contributes no state); callers that only want the verdict never
+see it. The oracle module still imports only types from
 reachability - the independence invariant is about code, not outputs - and
 state collection is write-only bookkeeping with no effect on the verdict
 path. The existing oracle unit tests extend to assert the collected states

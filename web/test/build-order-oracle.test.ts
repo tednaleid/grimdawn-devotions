@@ -47,3 +47,20 @@ test("selectionView's rendered order is gated: verified or absent", () => {
   const members = selectionSummary(model, decoded!.selected).built;
   expect(verifyBuildOrder(cons, members, view.buildOrder!, 55)).toBeNull();
 });
+
+test("selectionView returns states exactly when it returns an order", () => {
+  const decoded = decodeHash(REPRO_HASH, canonicalStarIds(model));
+  const view = selectionView(model, cons, table, decoded!.selected, 55);
+  expect(view.buildOrder).not.toBeNull();
+  expect(view.buildOrderStates).not.toBeNull();
+  expect(view.buildOrderStates!.length).toBe(view.buildOrder!.length);
+});
+
+test("the final step's state agrees with the Affinity panel (supply/target)", () => {
+  const decoded = decodeHash(REPRO_HASH, canonicalStarIds(model));
+  const view = selectionView(model, cons, table, decoded!.selected, 55);
+  const last = view.buildOrderStates![view.buildOrderStates!.length - 1]!;
+  const summary = selectionSummary(model, decoded!.selected);
+  expect(last.have).toEqual(summary.supply);
+  expect(last.need).toEqual(summary.target);
+});
