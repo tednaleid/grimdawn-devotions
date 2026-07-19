@@ -1,7 +1,7 @@
 // ABOUTME: Build-order validation harness. Measures whether buildOrderPath (the shipped guided-build-order
 // ABOUTME: engine) gives correct answers across many builds, judged against the exact minPeakCost oracle. For
-// ABOUTME: each sampled selection it runs the live (tries=16) and escalated (tries=4096) search, replays any
-// ABOUTME: order for legality, and on a no-witness result consults the oracle: an order the oracle proves
+// ABOUTME: each sampled selection it runs the live (tries=16) and escalated (tries=4096) search, checks any
+// ABOUTME: order with the strict legality oracle (core/orderLegality); on no witness the cost oracle decides: an order it proves
 // ABOUTME: exists but the search missed is a FALSE-NEGATIVE (the viability number); an order that replays
 // ABOUTME: illegally is a FALSE-POSITIVE (must be zero). Run `just build-order-validate [--seeds N]`.
 import doc from "../../data/devotions.json";
@@ -12,11 +12,11 @@ import {
   buildOrderPath,
   type ReachCon,
   type Vec,
-  type BuildStep,
 } from "../src/core/reachability";
 import { mulberry32 } from "../test/support/reach-oracle";
 import { genSelfCovering } from "../test/support/walk-fuzzer";
 import { minPeakCost } from "../test/support/costed-oracle";
+import { verifyBuildOrder } from "../src/core/orderLegality";
 
 const argNum = (flag: string, def: number): number => {
   const i = process.argv.indexOf(flag);
@@ -47,33 +47,6 @@ function selfCovers(B: ReachCon[]): boolean {
     r = maxV(r, m.req);
   }
   return covers(g, r);
-}
-
-// Replay a schedule and return whether it is a LEGAL construction: every member's requirement is covered by
-// the affinity supplied before it is completed, and held points never exceed the cap. Non-throwing twin of
-// the replayLegal in build-order-path.test.ts.
-function replayLegal(steps: BuildStep[], cap: number): boolean {
-  const cById = new Map(cons.map((c) => [c.id, c]));
-  let held = 0;
-  let supply: Vec = [0, 0, 0, 0, 0];
-  const present = new Set<string>();
-  for (const s of steps) {
-    const c = cById.get(s.conId);
-    if (!c) return false;
-    if (s.kind === "scaffold-refund") {
-      held -= c.size;
-      present.delete(s.conId);
-      supply = [0, 0, 0, 0, 0];
-      for (const id of present) supply = addCap(supply, cById.get(id)!.grant);
-    } else {
-      if (!covers(supply, c.req)) return false;
-      held += c.size;
-      present.add(s.conId);
-      supply = addCap(supply, c.grant);
-    }
-    if (held > cap || held < 0) return false;
-  }
-  return true;
 }
 
 type Cat = "live-found" | "recoverable" | "false-negative" | "no-order-partial" | "no-order-peak" | "bail";
@@ -110,7 +83,7 @@ function classify(B: ReachCon[], t: Tally): Cat {
   if (sc) t.selfCov++;
 
   const live = buildOrderPath(cons, table, B, BUDGET, LIVE_TRIES);
-  if (live && !replayLegal(live, BUDGET)) {
+  if (live && verifyBuildOrder(cons, B, live, BUDGET) !== null) {
     t.illegal++;
     if (t.examples.fn.length < 8) t.examples.fn.push("ILLEGAL@live: " + fmt(B));
   } else if (live) {
@@ -119,7 +92,7 @@ function classify(B: ReachCon[], t: Tally): Cat {
   }
   // live missed (or was illegal): try the escalated search
   const esc = buildOrderPath(cons, table, B, BUDGET, ESC_TRIES);
-  if (esc && !replayLegal(esc, BUDGET)) {
+  if (esc && verifyBuildOrder(cons, B, esc, BUDGET) !== null) {
     t.illegal++;
     if (t.examples.fn.length < 8) t.examples.fn.push("ILLEGAL@esc: " + fmt(B));
   } else if (esc) {

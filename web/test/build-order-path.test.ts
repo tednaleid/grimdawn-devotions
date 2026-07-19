@@ -16,6 +16,7 @@ import doc from "../../data/devotions.json";
 import fixtureJson from "./fixtures/reachable-builds.json";
 import { buildModel } from "../src/core/model";
 import { enLoc } from "./helpers/localizeEn";
+import { verifyBuildOrder } from "../src/core/orderLegality";
 
 const fixture = fixtureJson as unknown as { cases: { label: string; sel: Record<string, number> }[] };
 const model = buildModel(doc as any);
@@ -27,40 +28,18 @@ const membersOf = (sel: Record<string, number>): ReachCon[] =>
     .map((id) => byId.get(id))
     .filter((c): c is ReachCon => !!c);
 
-// Replay a schedule and assert it is a LEGAL construction: at each step held points <= cap, a member's
-// requirement is covered by the affinity already supplied when it is completed, and the final completed
-// set (completes minus refunds) equals B with the build self-covering. Returns the end-state member ids.
+// Replay a schedule through the independent legality oracle (core/orderLegality): every step must be
+// legal in-game, refunds included. Target = the schedule's own net end state; callers assert that set
+// equals the intended build. Returns the end-state member ids.
 function replayLegal(steps: BuildStep[], allCons: ReachCon[], cap: number): Set<string> {
   const cById = new Map(allCons.map((c) => [c.id, c]));
-  let held = 0;
-  let supply: Vec = z();
   const present = new Set<string>();
-  const addCapV = (a: Vec, b: Vec): Vec => [
-    Math.min(a[0] + b[0], 20),
-    Math.min(a[1] + b[1], 8),
-    Math.min(a[2] + b[2], 20),
-    Math.min(a[3] + b[3], 10),
-    Math.min(a[4] + b[4], 20),
-  ];
-  const coversV = (g: Vec, d: Vec) => g.every((x, i) => x >= d[i]!);
   for (const s of steps) {
-    const c = cById.get(s.conId)!;
-    if (s.kind === "scaffold-refund") {
-      held -= c.size;
-      present.delete(s.conId);
-      // recompute supply from present completed members
-      supply = z();
-      for (const id of present) supply = addCapV(supply, cById.get(id)!.grant);
-    } else {
-      // both complete and scaffold-add must have their requirement met by current supply
-      expect(coversV(supply, c.req)).toBe(true);
-      held += c.size;
-      present.add(s.conId);
-      supply = addCapV(supply, c.grant);
-    }
-    expect(held).toBeLessThanOrEqual(cap);
-    expect(s.heldAfter).toBe(held);
+    if (s.kind === "scaffold-refund") present.delete(s.conId);
+    else present.add(s.conId);
   }
+  const target = [...present].map((id) => cById.get(id)!);
+  expect(verifyBuildOrder(allCons, target, steps, cap)).toBeNull();
   return present;
 }
 

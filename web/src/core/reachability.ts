@@ -691,8 +691,11 @@ export type BuildStep =
  * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
  * grants cover it. Replays the sampled construction order (sampledConstruction) and, at each step, asks
  * peakToReach for the actual scaffold SET to hold (crossroads-biased), diffing consecutive sets into
- * add/refund events. Returns null when no sampled order fits the budget (B not self-covering, or the
- * construction peak exceeds budget at the given `tries` - the honest "not validly buildable" signal).
+ * add/refund events. Refunds obey the in-game rule (docs/devotion-system.md, "removal cannot strand a
+ * dependent"): a scaffold is refunded only when everything still standing keeps its requirement covered
+ * without it; refunds not yet safe stay held and are retried after later adds. Returns null when no
+ * sampled order fits the budget, or when a held scaffold can never be legally refunded - the honest
+ * "not validly buildable" signal. No order is better than an illegal order.
  */
 export function buildOrderPath(
   cons: ReachCon[],
@@ -710,9 +713,37 @@ export function buildOrderPath(
   const REPLAY_CAP = 300_000; // cold path: find the exact min subset, immune to the sampling node cap
   const steps: BuildStep[] = [];
   let grant: Vec = zero();
-  let mreq: Vec = zero();
+  let mreq: Vec = zero(); // max requirement incl. the member being placed (drives the scaffold need-set)
+  let creq: Vec = zero(); // max requirement over COMPLETED members only (drives refund legality)
   let held: ReachCon[] = [];
   let running = 0;
+  // In-game refund rule: a scaffold may be refunded only if everything still standing (completed
+  // members plus the other held scaffolds) keeps its requirement covered without the scaffold's grant.
+  const canRefund = (s: ReachCon, keep: ReachCon[]): boolean => {
+    let g = grant;
+    let r = maxV(creq, s.req);
+    for (const k of keep) {
+      g = addCap(g, k.grant);
+      r = maxV(r, k.req);
+    }
+    return covers(g, r);
+  };
+  // Refund every held scaffold outside `needIds` that is safe to drop; unsafe ones stay held and are
+  // retried after later adds supply replacement grants. Fixed point: one refund can unlock another.
+  const drainRefunds = (needIds: Set<string>): void => {
+    for (let progress = true; progress; ) {
+      progress = false;
+      for (const s of [...held]) {
+        if (needIds.has(s.id)) continue;
+        const keep = held.filter((k) => k.id !== s.id);
+        if (!canRefund(s, keep)) continue;
+        held = keep;
+        running -= s.size;
+        steps.push({ kind: "scaffold-refund", conId: s.id, points: -s.size, heldAfter: running });
+        progress = true;
+      }
+    }
+  };
   for (const m of sc.order) {
     mreq = maxV(mreq, m.req);
     const def: Vec = [
@@ -726,28 +757,24 @@ export function buildOrderPath(
     const sz = peakToReach(pool, table, def, grant, REPLAY_CAP, { collect: need, preferSmall: true });
     if (sz >= INF) return null;
     const needIds = new Set(need.map((s) => s.id));
-    for (const s of held)
-      if (!needIds.has(s.id)) {
-        running -= s.size;
-        steps.push({ kind: "scaffold-refund", conId: s.id, points: -s.size, heldAfter: running });
-      }
+    drainRefunds(needIds);
     const heldIds = new Set(held.map((s) => s.id));
     for (const s of need)
       if (!heldIds.has(s.id)) {
+        held.push(s);
         running += s.size;
         steps.push({ kind: "scaffold-add", conId: s.id, points: s.size, heldAfter: running });
       }
-    held = need;
+    drainRefunds(needIds); // retry refunds the new scaffolds' grants may have made safe
     if (running > budget) return null; // soundness guard
     running += m.size;
     steps.push({ kind: "complete", conId: m.id, points: m.size, heldAfter: running });
     if (running > budget) return null;
     grant = addCap(grant, m.grant);
+    creq = maxV(creq, m.req);
   }
-  for (const s of held) {
-    running -= s.size;
-    steps.push({ kind: "scaffold-refund", conId: s.id, points: -s.size, heldAfter: running });
-  }
+  drainRefunds(new Set());
+  if (held.length) return null; // a scaffold no drain can legally refund: honest null, never an illegal step
   for (const t of sc.tail) {
     running += t.size;
     steps.push({ kind: "complete", conId: t.id, points: t.size, heldAfter: running });
