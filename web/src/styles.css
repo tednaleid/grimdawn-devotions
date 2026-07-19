@@ -901,7 +901,10 @@ body.comparing main {
   padding: 0.5rem 0.6rem;
   border-radius: 6px;
   font-size: 0.8rem;
-  width: 220px;
+  /* Size to content so long localized column heads (e.g. German) get real columns. */
+  width: max-content;
+  min-width: 200px;
+  max-width: 300px;
   /* Same layer as the map tooltip: above corner toggles, scrim, and drawers. */
   z-index: 40;
 }
@@ -909,13 +912,23 @@ body.comparing main {
   font-weight: 600;
   margin-bottom: 4px;
 }
-#bo-pop .bo-pop-line {
-  margin: 2px 0;
-  opacity: 0.9;
+/* Header and rows share one grid template, so the have/need heads sit exactly over their
+   numbers in every locale (the sidebar's flex layout drifts at this narrow width). */
+#bo-pop .affinity,
+#bo-pop .affinity-head {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  column-gap: 10px;
+  align-items: baseline;
 }
-#bo-pop .bo-pop-aff {
-  margin-right: 6px;
-  white-space: nowrap;
+#bo-pop .aff-have,
+#bo-pop .aff-need,
+#bo-pop .aff-need-h {
+  text-align: right;
+}
+#bo-pop .bo-pop-delta {
+  opacity: 0.65;
+  font-size: 0.9em;
 }
 .con-highlight {
   fill: none;

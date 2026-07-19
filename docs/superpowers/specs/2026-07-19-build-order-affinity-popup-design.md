@@ -80,11 +80,18 @@ same as today - the popup data is free.
   (web/src/adapters/sidebarView.ts): affinity orb, localized name
   (`aff.<affinity>`), have value, need cell with `met`/`missing` classes
   and the `ui.affinity.neededBy` title, plus the `ui.affinity.have` /
-  `ui.affinity.need` column heads.
-- A constellation section: the step's localized name (game text; crossroads
-  via the existing `ui.buildOrder.crossroads` and direction keys), then
-  Requires and Grants lines reusing the `ui.tooltip.requires` /
-  `ui.tooltip.grants` keys with orb-and-number affinity rendering.
+  `ui.affinity.need` column heads. Header and rows share one CSS grid
+  template scoped under the popup, so the column heads sit exactly over
+  their numbers in every locale (long heads like German widen their column
+  rather than drifting; the popup sizes to content).
+- The step's own effect folds INTO the table (a display iteration decided
+  with the owner after first use; earlier separate Requires/Grants lines
+  were dropped): its grant appears in the have column as a dimmed signed
+  parenthetical (`11 (+4)`, or `(-5)` on a refund), its requirement in the
+  need column as `5 (1)`. The heading above the table is the step's
+  localized name (game text; crossroads via the existing
+  `ui.buildOrder.crossroads` and direction keys). Parentheses and signs are
+  punctuation, not translatable copy, so no catalog keys are involved.
 
 No hardcoded strings: every label resolves through existing catalog keys.
 If any new key proves necessary during implementation it is added to all 13

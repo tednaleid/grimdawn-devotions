@@ -122,25 +122,23 @@ export function buildOrderHtml(
   return `<h2>${loc.translate("ui.panel.buildOrder")}</h2><div class="bo-list">${rows}</div>`;
 }
 
-// One "Requires: "/"Grants: " line with orb+number pairs for the nonzero colors, or "" when all zero.
-function popAffinityLine(loc: Localization, labelKey: string, vec: Vec): string {
-  const parts = AFFINITIES.map((a, i) =>
-    vec[i]! > 0 ? `<span class="bo-pop-aff">${affinityOrb(a)}${vec[i]}</span>` : "",
-  ).filter(Boolean);
-  if (!parts.length) return "";
-  return `<div class="bo-pop-line">${loc.translate(labelKey)}${parts.join(" ")}</div>`;
-}
-
 /**
  * The hover/tap popup for one build-order step: the post-step have/need table in the Affinity
- * panel's visual language (same classes, no filter-toggle attributes - the popup is display-only),
- * plus what the step's own constellation requires and grants. `state` comes from the verifying
- * replay via SelectionView.buildOrderStates, so the numbers are the ones the legality judge saw.
+ * panel's visual language (same classes, no filter-toggle attributes - the popup is display-only).
+ * The step's own effect folds into the table as dimmed parentheticals: its grant appears in the
+ * have column as a signed delta (+N, or -N on a refund), its requirement in the need column as
+ * (N). `state` comes from the verifying replay via SelectionView.buildOrderStates, so the numbers
+ * are the ones the legality judge saw.
  */
 export function buildStepPopupHtml(loc: Localization, model: DevotionModel, step: BuildStep, state: StepState): string {
   const name = esc(stepConName(loc, model, step.conId));
+  const sign = step.kind === "scaffold-refund" ? "-" : "+";
   const rows = AFFINITIES.map((a, i) => {
     const n = state.need[i]!;
+    const g = state.conGrant[i]!;
+    const r = state.conReq[i]!;
+    const haveDelta = g > 0 ? ` <span class="bo-pop-delta">(${sign}${g})</span>` : "";
+    const needNote = r > 0 ? ` <span class="bo-pop-delta">(${r})</span>` : "";
     let needCell: string;
     if (n > 0) {
       const met = state.have[i]! >= n;
@@ -150,16 +148,14 @@ export function buildStepPopupHtml(loc: Localization, model: DevotionModel, step
           return tag ? loc.gameText(tag) : cid;
         })
         .join(", ");
-      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${esc(names ? loc.translate("ui.affinity.neededBy", { names }) : "")}">${n}</span>`;
+      needCell = `<span class="aff-need ${met ? "met" : "missing"}" title="${esc(names ? loc.translate("ui.affinity.neededBy", { names }) : "")}">${n}${needNote}</span>`;
     } else {
-      needCell = `<span class="aff-need none">0</span>`;
+      needCell = `<span class="aff-need none">0${needNote}</span>`;
     }
-    return `<div class="affinity affinity-${a}"><span>${affinityOrb(a)}${loc.translate(`aff.${a}`)}</span><span class="aff-have">${state.have[i]}</span>${needCell}</div>`;
+    return `<div class="affinity affinity-${a}"><span>${affinityOrb(a)}${loc.translate(`aff.${a}`)}</span><span class="aff-have">${state.have[i]}${haveDelta}</span>${needCell}</div>`;
   }).join("");
   return (
     `<div class="bo-pop-name">${name}</div>` +
-    popAffinityLine(loc, "ui.tooltip.requires", state.conReq) +
-    popAffinityLine(loc, "ui.tooltip.grants", state.conGrant) +
     `<div class="affinity-head"><span></span><span class="aff-have">${loc.translate("ui.affinity.have")}</span><span class="aff-need-h">${loc.translate("ui.affinity.need")}</span></div>${rows}`
   );
 }

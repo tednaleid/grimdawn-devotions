@@ -1,5 +1,5 @@
 // ABOUTME: Tests the build-order step popup: post-step have/need table in the Affinity panel's visual
-// ABOUTME: language plus the step constellation's Requires/Grants lines, rendered from replay states.
+// ABOUTME: language, with the step's own grant/requirement folded in as parenthetical deltas.
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
@@ -32,13 +32,28 @@ test("a verified order's popup never shows a missing need cell", () => {
   }
 });
 
-test("popup shows Grants for a granting step and Requires for a requiring one", () => {
+test("the step's grant and requirement fold into the table as parentheticals", () => {
   const gi = states.findIndex((st) => st.conGrant.some((n) => n > 0));
   const ri = states.findIndex((st) => st.conReq.some((n) => n > 0));
   expect(gi).toBeGreaterThanOrEqual(0);
   expect(ri).toBeGreaterThanOrEqual(0);
-  expect(buildStepPopupHtml(enLoc, model, steps[gi]!, states[gi]!)).toContain("Grants:");
-  expect(buildStepPopupHtml(enLoc, model, steps[ri]!, states[ri]!)).toContain("Requires:");
+  const gGrant = states[gi]!.conGrant.find((n) => n > 0)!;
+  expect(buildStepPopupHtml(enLoc, model, steps[gi]!, states[gi]!)).toContain(
+    `<span class="bo-pop-delta">(+${gGrant})</span>`,
+  );
+  const rReq = states[ri]!.conReq.find((n) => n > 0)!;
+  expect(buildStepPopupHtml(enLoc, model, steps[ri]!, states[ri]!)).toContain(
+    `<span class="bo-pop-delta">(${rReq})</span>`,
+  );
+});
+
+test("a refund step's grant delta is negative", () => {
+  const fi = steps.findIndex((s, i) => s.kind === "scaffold-refund" && states[i]!.conGrant.some((n) => n > 0));
+  expect(fi).toBeGreaterThanOrEqual(0);
+  const g = states[fi]!.conGrant.find((n) => n > 0)!;
+  expect(buildStepPopupHtml(enLoc, model, steps[fi]!, states[fi]!)).toContain(
+    `<span class="bo-pop-delta">(-${g})</span>`,
+  );
 });
 
 test("a met need renders with the met class and the neededBy title", () => {
