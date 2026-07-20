@@ -112,47 +112,6 @@ the construction PEAK, not the post-refund cost (see
 branch `reachability-costed-scaffolding`, vendored in
 `web/test/support/costed-oracle.ts`.
 
-## Guided build order: churn-minimizing, need-driven ordering
-
-Today's orders are legal-at-best but often wasteful: the sampler
-(`sampledConstruction` in `web/src/core/reachability.ts`) optimizes the
-construction PEAK (cap fit) and nothing else. On a full 55-point build it takes
-the first seeded shuffle whose peak fits, so the member order is effectively
-arbitrary, and the per-step scaffold sets (`peakToReach` over the whole pool)
-freely buy and refund off-build constellations the build's own members could
-have supplied. Concrete case: the validity-fix reproduction build
-(`#p=55&s=_38AQAIAAAAAAOAfAAAAAADAAYAHAMAHAAAAAPADPwAAAAAAPw`) gets a 35-step
-order with Falcon/Quill scaffolding, while a hand-built path does it in about
-19 steps using only crossroads as transient scaffolds.
-
-Ted's algorithm sketch (worked through by hand on that build and legal under
-the strict refund rule at every step):
-
-1. Rank the build's remaining members by unsatisfied need: requirement above
-   the current standing supply (so a member whose colors are already covered
-   ranks low, whatever its printed requirement).
-2. Build legally toward the biggest-need member using IN-BUILD granters first.
-   Among activatable candidates, prefer the one with the best ratio of
-   points-toward-the-outstanding-need per star spent (Scholar's Light 4 green
-   for 3 stars beats Akeron's Scorpion 5 for 5).
-3. Scaffold only when stuck: if no in-build member is activatable, take a
-   crossroads, then the cheapest off-build path toward the current need
-   (exactly what `peakToReach` already computes). Refund scaffolds after last
-   use (the two-pass scheduling proven in the transition spike on branch
-   `compare-transition`).
-4. Cap fallback: a need-driven greedy can exceed the 55-point held cap on
-   tight builds where the min-peak sampler still finds a fitting order. Try
-   the greedy first; fall back to the current peak-minimizing search when the
-   greedy busts the cap or cannot finish.
-
-Why this is safe to do later: the build-order validity net (the legality
-oracle in `web/src/core/orderLegality.ts`, the seeded panel-path sweep, the
-tight-cap corpus, the verified-or-absent gate in `selectionView`) judges
-legality and set-determinism, not specific step sequences, so the ordering
-algorithm can be swapped without touching the tests. Add a step-count and
-scaffold-churn metric to `just build-order-validate` to prove the improvement
-quantitatively. Needs its own brainstorm/spec.
-
 ## Build-order popup: touch e2e via Playwright
 
 The step popup's touch path (tap shows, re-tap and tap-away dismiss) is wired

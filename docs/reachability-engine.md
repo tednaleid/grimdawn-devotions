@@ -108,10 +108,18 @@ guided build order builds its construction schedule from the same sampled witnes
 ## The guided build order: legal at every step, verified or absent
 
 `buildOrderPath` (web/src/core/reachability.ts) turns a self-covering selection
-into a step-by-step construction schedule: complete the members in a sampled
-peak-minimizing order, adding transient scaffold constellations before the steps
-that need them and refunding scaffolds once the build's own grants cover them.
-Its contract:
+into a step-by-step construction schedule. Two candidate member orders are
+emitted and the better schedule wins by the ordering objective (fewer scaffold
+churn points, then fewer steps): the need-driven greedy order
+(`needDrivenOrder`, each member activated by what the build has already placed
+plus at most a refundable crossroads, so the build builds itself), and the
+sampled peak-minimizing order (`sampledConstruction`), which also remains the
+engine's untouched reachability witness (`minPeakSampled`). Neither generator
+dominates - the greedy wins cap-tight builds the sampler scaffolds heavily,
+the sampler's bootstrap heuristic wins typical builds - so the per-build best
+of both is never worse than either alone. Both orders feed the same emission
+loop, which adds transient scaffold constellations before the steps that need
+them and refunds each the moment the in-game rules allow. Its contract:
 
 - **Canonical input.** The member array is sorted by constellation id at entry,
   so the output is a pure function of the build set. Panel, tests, and scripts
@@ -135,9 +143,11 @@ The regression net: oracle unit tests (web/test/order-legality.test.ts), the
 real-build fixture replay and determinism pins (web/test/build-order-path.test.ts),
 a seeded 150-build panel-path sweep plus the live-site reproduction URL
 (web/test/build-order-oracle.test.ts), the tight-cap adversarial corpus
-(web/test/build-order-tightcap.test.ts, harvested by `just hunt-tight-cap`), and
-the offline harness `just build-order-validate`, whose illegal-path count must
-stay zero.
+(web/test/build-order-tightcap.test.ts, harvested by `just hunt-tight-cap`),
+the aggregate churn/step quality pins in web/test/build-order-oracle.test.ts
+(a silent ordering regression fails CI; `just order-quality` is the
+per-build measurement tool), and the offline harness `just build-order-validate`,
+whose illegal-path count must stay zero.
 
 ## Verifying after a resolver change
 
