@@ -895,8 +895,8 @@ test("the reproduction URL's order meets its quality pins", () => {
   const members = selectionSummary(model, decoded!.selected).built;
   const steps = buildOrderPath(cons, table, members, 55, 16);
   expect(steps).not.toBeNull();
-  expect(churnPoints(steps!)).toBeLessThanOrEqual(<Cr>); // measured: crossroads-only means 0
-  expect(steps!.length).toBeLessThanOrEqual(<Sr>); // measured: low twenties, down from 35
+  expect(churnPoints(steps!)).toBeLessThanOrEqual(<Cr>); // measured exact at Task 4b (down from 26)
+  expect(steps!.length).toBeLessThanOrEqual(<Sr>); // measured exact at Task 4b (down from 35)
 });
 ```
 
@@ -922,16 +922,18 @@ In the section "The guided build order: legal at every step, verified or absent"
 
 ```markdown
 `buildOrderPath` (web/src/core/reachability.ts) turns a self-covering selection
-into a step-by-step construction schedule. It orders the granting members
-need-driven first (`needDrivenOrder`): each member is activated by what the
-build has already placed plus at most a refundable crossroads, so the build
-builds itself and non-crossroads scaffolding is bought only when genuinely
-stuck. When that order cannot be emitted within the point cap it falls back to
-the sampled peak-minimizing order (`sampledConstruction`), which also remains
-the engine's untouched reachability witness (`minPeakSampled`). Either order
-feeds the same emission loop, which adds transient scaffold constellations
-before the steps that need them and refunds each the moment the in-game rules
-allow. Its contract:
+into a step-by-step construction schedule. Two candidate member orders are
+emitted and the better schedule wins by the ordering objective (fewer scaffold
+churn points, then fewer steps): the need-driven greedy order
+(`needDrivenOrder`, each member activated by what the build has already placed
+plus at most a refundable crossroads, so the build builds itself), and the
+sampled peak-minimizing order (`sampledConstruction`), which also remains the
+engine's untouched reachability witness (`minPeakSampled`). Neither generator
+dominates - the greedy wins cap-tight builds the sampler scaffolds heavily,
+the sampler's bootstrap heuristic wins typical builds - so the per-build best
+of both is never worse than either alone. Both orders feed the same emission
+loop, which adds transient scaffold constellations before the steps that need
+them and refunds each the moment the in-game rules allow. Its contract:
 ```
 
 In the closing regression-net paragraph of the same section, extend the sentence listing the nets so it also names the quality net, e.g. after the tight-cap corpus clause add:
@@ -967,7 +969,7 @@ Write into the task report a table with one row per criterion, each marked PASS 
 2. Aggregate steps no higher (S <= S0)
 3. Zero orders lost (`lost=0` in Task 4's distribution line)
 4. Worsened tail: report `worsened=` count; if > 0, attach the per-build list from Task 4 Step 5
-5. Repro URL: churn 0 (crossroads-only) and steps in the low twenties
+5. Repro URL: churn and steps at or below the Task 4b measurement (churn 4, steps 23; baseline 26/35). Ted accepted these exact numbers when approving the best-of-both revision.
 6. Validity: FALSE-POSITIVE 0 in every harness group; full suite, fuzz, e2e green
 7. Perf: no regression
 
