@@ -13,7 +13,7 @@ import { mountInfoPopover, type InfoPopoverText } from "../adapters/infoPopover"
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
-import { buildOrderHtml, buildStepPopupHtml, type NoOrderInfo } from "../adapters/buildOrderView";
+import { buildOrderHtml, transitionHtml, buildStepPopupHtml, type NoOrderInfo } from "../adapters/buildOrderView";
 import type { StepState } from "../core/orderLegality";
 import { tooltipView } from "../adapters/tooltipView";
 import { toggleDrawer, type DrawerState } from "../core/drawerState";
@@ -30,6 +30,7 @@ import {
   type ReachView,
   type ReachCon,
   type BuildStep,
+  type SelectionView,
   type Vec,
 } from "../core/reachability";
 import { loadWasmResolver } from "../adapters/reachWasm";
@@ -555,6 +556,7 @@ async function boot() {
   let petAvailHtml = ""; // pet "available to get" catalog HTML; rendered below the player one on the right
   let curBuildOrder: BuildStep[] | null = null; // live build order from selectionView; null in degraded path
   let curBuildOrderStates: StepState[] | null = null; // the verifying replay's per-step states; parallel to curBuildOrder
+  let curTransition: SelectionView["transition"] = null; // compare-mode baseline-to-current transition; null when not comparing
   let boPopRow: HTMLElement | null = null; // the build-order row whose popup is showing (touch toggle + dismiss)
   // The step popup: a fixed singleton beside the hovered build-order row, showing the post-step
   // have/need state from the verifying replay. Display-only (pointer-events none), so taps pass
@@ -574,10 +576,13 @@ async function boot() {
   }
   function showBoPop(row: HTMLElement) {
     const i = Number(row.dataset.stepI ?? -1);
-    if (!curBuildOrder || !curBuildOrderStates || !Number.isInteger(i) || i < 0 || i >= curBuildOrderStates.length)
-      return;
+    // The popup's data source is whichever panel is showing: the transition pair when comparing,
+    // else the from-scratch build order.
+    const steps = curTransition ? curTransition.steps : curBuildOrder;
+    const states = curTransition ? curTransition.states : curBuildOrderStates;
+    if (!steps || !states || !Number.isInteger(i) || i < 0 || i >= states.length) return;
     const el = boPopEl();
-    el.innerHTML = buildStepPopupHtml(localization, model, curBuildOrder[i]!, curBuildOrderStates[i]!);
+    el.innerHTML = buildStepPopupHtml(localization, model, steps[i]!, states[i]!);
     el.style.display = "block";
     // Beside the row, to its left (the panel hugs the right edge), clamped to the viewport.
     const r = row.getBoundingClientRect();
@@ -585,17 +590,19 @@ async function boot() {
     el.style.top = `${Math.min(Math.max(4, r.top - 4), window.innerHeight - el.offsetHeight - 4)}px`;
     boPopRow = row;
   }
-  // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
-  // change the star selection so nothing flashes).
-  function paintBuildOrder(steps: BuildStep[] | null, noOrder?: NoOrderInfo | null) {
-    hideBoPop();
+  // The build-order panel element, created on first use (lazy: it does not exist until there is
+  // something to show).
+  function boPanel(): HTMLElement {
     let panel = document.getElementById("build-order-panel");
     if (!panel) {
       affinityEl.insertAdjacentHTML("beforeend", `<hr class="panel-sep"/><div id="build-order-panel"></div>`);
       panel = document.getElementById("build-order-panel")!;
     }
-    panel.innerHTML = buildOrderHtml(localization, model, data.manifest, steps, noOrder);
-    // Hover-sync: build-order rows carry data-con-id; box that constellation on the map (drawn on top).
+    return panel;
+  }
+  // Hover-sync: build-order rows carry data-con-id; box that constellation on the map (drawn on
+  // top), and show/hide the step popup. Shared by both the from-scratch and transition panels.
+  function wireBoRows(panel: HTMLElement) {
     panel.querySelectorAll<HTMLElement>(".bo-step[data-con-id]").forEach((row) => {
       const cid = row.dataset.conId;
       if (!cid) return;
@@ -614,6 +621,26 @@ async function boot() {
         else showBoPop(row);
       });
     });
+  }
+  // Re-render only the Benefits panel (used by benefit-tag clicks, which do not
+  // change the star selection so nothing flashes).
+  function paintBuildOrder(steps: BuildStep[] | null, noOrder?: NoOrderInfo | null) {
+    hideBoPop();
+    const panel = boPanel();
+    // Comparing but no verified transition order (the none pair): the from-scratch panel still
+    // renders, with a leading notice that it is showing the current build rather than a transition.
+    const note =
+      baseline !== null
+        ? `<div class="bo-note">${localization.translate("ui.buildOrder.transitionUnavailable")}</div>`
+        : "";
+    panel.innerHTML = note + buildOrderHtml(localization, model, data.manifest, steps, noOrder);
+    wireBoRows(panel);
+  }
+  function paintTransition(t: NonNullable<SelectionView["transition"]>) {
+    hideBoPop();
+    const panel = boPanel();
+    panel.innerHTML = transitionHtml(localization, model, data.manifest, t.steps, t.rung);
+    wireBoRows(panel);
   }
   function renderBenefitsPanel() {
     // "Available to get" lists only benefits still reachable from here: bonuses carried by
@@ -646,18 +673,20 @@ async function boot() {
     // this controller is a thin caller, so optimize selectionView, not refresh. The degraded path
     // (uncapped or no table) stays permissive and cheap.
     if (table && Number.isFinite(state.pointCap)) {
-      const view = selectionView(model, cons, table, state.selected, state.pointCap);
+      const view = selectionView(model, cons, table, state.selected, state.pointCap, baseline?.selected ?? null);
       curMin = view.minCost;
       // The cap can never sit below the validity floor (raise a stale/over-tight restored link).
       if (state.pointCap < curMin) state = { selected: state.selected, pointCap: curMin };
       reach = view.reach;
       curBuildOrder = view.buildOrder;
       curBuildOrderStates = view.buildOrderStates;
+      curTransition = view.transition;
     } else {
       curMin = state.selected.size;
       reach = permissiveReach();
       curBuildOrder = null;
       curBuildOrderStates = null;
+      curTransition = null;
     }
     document.body.classList.toggle("comparing", baseline !== null);
     updateNarrow();
@@ -710,7 +739,8 @@ async function boot() {
         boInfo = { kind: "empty" };
       }
     }
-    paintBuildOrder(curBuildOrder, boInfo);
+    if (curTransition) paintTransition(curTransition);
+    else paintBuildOrder(curBuildOrder, boInfo);
     const uncapped = !Number.isFinite(state.pointCap);
     capToggle.textContent = uncapped ? "∞" : String(state.pointCap);
     capToggle.title = uncapped

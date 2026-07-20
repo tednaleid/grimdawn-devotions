@@ -3,8 +3,9 @@
 // ABOUTME: (post-step have/need in the Affinity panel's visual language). Pure string output.
 import type { Affinity, DevotionModel } from "../core/types";
 import { AFFINITIES } from "../core/types";
-import type { StepState } from "../core/orderLegality";
+import type { StepState, TransStep } from "../core/orderLegality";
 import type { BuildStep, Vec } from "../core/reachability";
+import type { TransitionRung } from "../core/transitionOrder";
 import type { AssetManifest } from "../ports/DataSource";
 import { affinityOrb } from "./affinityColors";
 import type { Localization } from "../ports/Localization";
@@ -123,6 +124,60 @@ export function buildOrderHtml(
 }
 
 /**
+ * Compare mode: the baseline-to-current transition order. Same row vocabulary as the from-scratch
+ * panel above (a step's own kind is "add"/"refund" rather than "scaffold-add"/"scaffold-refund"/
+ * "complete", so a row numbers and gets art only when an add reaches the constellation's full size;
+ * the partial badge instead marks any row - add or refund - that leaves the member short of full
+ * size). A heading names the direction, and the full-respec rung carries a plain notice. Zero steps
+ * means the builds already match.
+ */
+export function transitionHtml(
+  loc: Localization,
+  model: DevotionModel,
+  manifest: AssetManifest | null,
+  steps: TransStep[],
+  rung: TransitionRung,
+): string {
+  const head = `<h2>${loc.translate("ui.panel.buildOrder")}</h2><div class="bo-compare-head">${loc.translate("ui.buildOrder.transitionHeading")}</div>`;
+  if (!steps.length) return `${head}<div class="bo-empty">${loc.translate("ui.buildOrder.transitionIdentical")}</div>`;
+  const note =
+    rung === "full-respec" ? `<div class="bo-note">${loc.translate("ui.buildOrder.fullRespecNote")}</div>` : "";
+  let n = 0;
+  const rows = steps
+    .map((s, si) => {
+      const c = model.constellations.get(s.conId);
+      const cr = CROSSROADS[s.conId];
+      const name = stepConName(loc, model, s.conId);
+      const artName = c?.background?.image?.split("/").pop() ?? "";
+      const art = manifest?.images[artName];
+      const completes = s.kind === "add" && !!c && s.to === c.starIds.length;
+      // Crossroads have no art; their art-column cell holds a dot in the granted affinity's color.
+      const dot = cr ? `<span class="bo-art">${affinityOrb(cr.affinity)}</span>` : "";
+      const img = art && completes ? `<img class="bo-art" src="${esc(art.url)}" alt=""/>` : "";
+      const delta = s.to - s.from;
+      const held = `<span class="bo-held">${s.heldAfter}</span>`;
+      if (completes) {
+        n++;
+        const artCell = img || dot;
+        return `<div class="bo-step bo-complete" data-con-id="${esc(s.conId)}" data-step-i="${si}"><span class="bo-n">${n}</span>${artCell}<span class="bo-name">${esc(name)}</span><span class="bo-pts">+${delta}</span>${held}</div>`;
+      }
+      const label = loc.translate(s.kind === "add" ? "ui.buildOrder.add" : "ui.buildOrder.refund");
+      const cls = s.kind === "add" ? "bo-add" : "bo-refund";
+      // Empty art-column cell (or the crossroads dot) so the five grid columns line up with complete rows.
+      const artCell = dot || `<span class="bo-art"></span>`;
+      // A step landing short of full size (add or refund) is a deliberate partial member: annotate it
+      // so the row does not read as a full constellation.
+      const partial =
+        s.to > 0 && c && s.to < c.starIds.length
+          ? ` <span class="bo-partial">${loc.translate("ui.buildOrder.partial", { taken: s.to, total: c.starIds.length })}</span>`
+          : "";
+      return `<div class="bo-step ${cls}" data-con-id="${esc(s.conId)}" data-step-i="${si}"><span class="bo-n"></span>${artCell}<span class="bo-name">${label} ${esc(name)}${partial}</span><span class="bo-pts">${delta > 0 ? "+" : ""}${delta}</span>${held}</div>`;
+    })
+    .join("");
+  return `${head}${note}<div class="bo-list">${rows}</div>`;
+}
+
+/**
  * The hover/tap popup for one build-order step: the post-step have/need table in the Affinity
  * panel's visual language (same classes, no filter-toggle attributes - the popup is display-only).
  * The step's own effect folds into the table as dimmed parentheticals: its grant appears in the
@@ -130,9 +185,14 @@ export function buildOrderHtml(
  * (N). `state` comes from the verifying replay via SelectionView.buildOrderStates, so the numbers
  * are the ones the legality judge saw.
  */
-export function buildStepPopupHtml(loc: Localization, model: DevotionModel, step: BuildStep, state: StepState): string {
+export function buildStepPopupHtml(
+  loc: Localization,
+  model: DevotionModel,
+  step: BuildStep | TransStep,
+  state: StepState,
+): string {
   const name = esc(stepConName(loc, model, step.conId));
-  const sign = step.kind === "scaffold-refund" ? "-" : "+";
+  const sign = step.kind === "scaffold-refund" || step.kind === "refund" ? "-" : "+";
   const rows = AFFINITIES.map((a, i) => {
     const n = state.need[i]!;
     const g = state.conGrant[i]!;
