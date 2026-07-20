@@ -142,3 +142,138 @@ export function gateBuildOrder(
   const r = replayBuildOrder(allCons, target, steps, cap);
   return r.error === null ? { steps, states: r.states } : null;
 }
+
+/** One step of a baseline-to-current transition: star counts, not points. `from`/`to` are the
+ *  constellation's standing star count before/after the step; `heldAfter` is the running total. */
+export interface TransStep {
+  kind: "add" | "refund";
+  conId: string;
+  from: number;
+  to: number;
+  heldAfter: number;
+}
+
+/**
+ * The transition verification walk with its states exposed. Replays `steps` from the standing
+ * `base` build, re-deriving validity from scratch at each step: standing grants come only from
+ * COMPLETE constellations (star count at full size), standing requirements from every STARTED one,
+ * and coverage must hold at the conservative mid-step point (an add's requirement stands before its
+ * grant lands; a refund loses the grant at its first refunded star while the requirement stands
+ * until zero). Cap rule: an ADD must land at or under `cap` and the end state must fit `cap`;
+ * refunds may pass through over-cap totals (how a baseline larger than the live cap legally tears
+ * down). The end state must equal `cur` exactly. Unlike replayBuildOrder, `cur` members never
+ * override lookups: partiality is expressed through star counts, so grants and sizes come from the
+ * full definitions in `allCons`. Grant sums are capped (addCap) like the rest of this module -
+ * verdict-equivalent to uncapped sums because no requirement exceeds CAP_MAX, and it makes the
+ * states' `have` match the Affinity panel. `error` is null when legal, else the first violation;
+ * `states` holds one post-step entry per step that completed its checks. Pure.
+ */
+export function replayTransition(
+  allCons: ReachCon[],
+  base: ReachCon[],
+  cur: ReachCon[],
+  steps: TransStep[],
+  cap: number,
+): { error: string | null; states: StepState[] } {
+  const conOf = new Map(allCons.map((c) => [c.id, c]));
+  const counts = new Map<string, number>(base.map((b) => [b.id, b.size]));
+  const states: StepState[] = [];
+  const total = () => [...counts.values()].reduce((a, b) => a + b, 0);
+  const fail = (error: string) => ({ error, states });
+  // Standing validity with the conservative override: `pending` is a con whose requirement must
+  // count but whose grant must not (add completing / refund starting).
+  const check = (label: string, pending: string | null): string | null => {
+    let grant = zero();
+    let req = zero();
+    for (const [id, n] of counts) {
+      if (n <= 0) continue;
+      const c = conOf.get(id)!;
+      req = maxV(req, c.req);
+      if (n >= c.size && id !== pending) grant = addCap(grant, c.grant);
+    }
+    if (pending) {
+      const pc = conOf.get(pending);
+      if (pc) req = maxV(req, pc.req);
+    }
+    return covers(grant, req) ? null : `${label}: requirement uncovered`;
+  };
+  // The post-step standing state (fresh structures per call), the popup's data source.
+  const standingState = (): { have: Vec; need: Vec; needSource: Map<number, string[]> } => {
+    let have = zero();
+    let need = zero();
+    const needSource = new Map<number, string[]>();
+    for (const [id, n] of counts) {
+      if (n <= 0) continue;
+      const c = conOf.get(id)!;
+      need = maxV(need, c.req);
+      if (n >= c.size) have = addCap(have, c.grant);
+      for (let i = 0; i < 5; i++)
+        if (c.req[i]! > 0) {
+          const list = needSource.get(i) ?? [];
+          list.push(id);
+          needSource.set(i, list);
+        }
+    }
+    return { have, need, needSource };
+  };
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i]!;
+    const c = conOf.get(s.conId);
+    if (!c) return fail(`step ${i}: unknown constellation ${s.conId}`);
+    const cur0 = counts.get(s.conId) ?? 0;
+    if (cur0 !== s.from) return fail(`step ${i} (${s.conId}): from=${s.from} but standing count is ${cur0}`);
+    if (s.to < 0 || s.to > c.size) return fail(`step ${i} (${s.conId}): to=${s.to} out of range`);
+    if (s.kind === "add" && s.to <= s.from) return fail(`step ${i} (${s.conId}): add must increase count`);
+    if (s.kind === "refund" && s.to >= s.from) return fail(`step ${i} (${s.conId}): refund must decrease count`);
+    counts.set(s.conId, s.to);
+    const mid = check(`step ${i} (${s.conId}) mid`, s.conId);
+    if (mid) return fail(mid);
+    const end = check(`step ${i} (${s.conId}) end`, null);
+    if (end) return fail(end);
+    const t = total();
+    if (s.kind === "add" && t > cap) return fail(`step ${i} (${s.conId}): cap exceeded (${t} > ${cap})`);
+    if (t !== s.heldAfter) return fail(`step ${i} (${s.conId}): heldAfter=${s.heldAfter} but total is ${t}`);
+    // Grant delta the popup shows: only a step that completes (add to full size) or un-completes
+    // (refund from full size) the constellation moves its grant.
+    const conGrant =
+      (s.kind === "add" && s.to === c.size) || (s.kind === "refund" && s.from === c.size) ? c.grant : zero();
+    const st = standingState();
+    states.push({ ...st, conReq: c.req, conGrant });
+    if (s.to === 0) counts.delete(s.conId);
+  }
+  if (total() > cap) return fail(`end state over cap (${total()} > ${cap})`);
+  const want = new Map(cur.map((c) => [c.id, c.size]));
+  if (want.size !== counts.size) return fail(`end state mismatch: ${counts.size} standing, ${want.size} wanted`);
+  for (const [id, n] of want) if (counts.get(id) !== n) return fail(`end state mismatch at ${id}`);
+  return { error: null, states };
+}
+
+/** The transition replay's verdict alone: null when every step is legal in-game. */
+export function verifyTransition(
+  allCons: ReachCon[],
+  base: ReachCon[],
+  cur: ReachCon[],
+  steps: TransStep[],
+  cap: number,
+): string | null {
+  return replayTransition(allCons, base, cur, steps, cap).error;
+}
+
+/** A verified transition together with the per-step states its verifying replay produced. */
+export interface GatedTransition {
+  steps: TransStep[];
+  states: StepState[];
+}
+
+/** The verified-or-absent gate for transitions: steps pass through, with states, only when legal. */
+export function gateTransition(
+  allCons: ReachCon[],
+  base: ReachCon[],
+  cur: ReachCon[],
+  steps: TransStep[] | null,
+  cap: number,
+): GatedTransition | null {
+  if (!steps) return null;
+  const r = replayTransition(allCons, base, cur, steps, cap);
+  return r.error === null ? { steps, states: r.states } : null;
+}
