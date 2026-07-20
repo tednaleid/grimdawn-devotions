@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "СЗ",
   "ui.buildOrder.dir.se": "ЮВ",
   "ui.buildOrder.dir.sw": "ЮЗ",
-  "ui.buildOrder.fullRespecNote": "Пошаговый путь не найден. Этот порядок, полная перестройка.",
+  "ui.buildOrder.fullRespecNote": "Пошаговый путь не найден. Этот порядок является полной перестройкой.",
   "ui.buildOrder.incompleteAffinity": "Незавершённая сборка: не хватает сродства {deficit}.",
   "ui.buildOrder.noLegalPath": "Легального пути к этой сборке не существует.",
   "ui.buildOrder.noPathCap": "Нет пути к этой сборке менее чем за {minCap} очков.",

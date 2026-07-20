@@ -126,7 +126,9 @@ export function buildOrderHtml(
 /**
  * Compare mode: the baseline-to-current transition order. Same row vocabulary as the from-scratch
  * panel above (a step's own kind is "add"/"refund" rather than "scaffold-add"/"scaffold-refund"/
- * "complete", so a row numbers and gets art only when an add reaches the constellation's full size;
+ * "complete", so a row numbers and gets art only when an add reaches the constellation's full size
+ * AND the constellation survives to the end of the transition - transient scaffolds keep the plain
+ * Add vocabulary even at full size;
  * the partial badge instead marks any row - add or refund - that leaves the member short of full
  * size). A heading names the direction, and the full-respec rung carries a plain notice. Zero steps
  * means the builds already match.
