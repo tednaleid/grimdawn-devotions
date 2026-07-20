@@ -724,6 +724,119 @@ EOF
 
 ---
 
+### Task 4b: Best-of-both schedule selection (Ted-approved revision after Task 4's measurement)
+
+Task 4's greedy-first-if-legal mechanism failed the launch gate (corpus churn 81 to 610, 87/150 builds worse) while improving the repro build (26 to 4). Ted chose the best-of-both revision: emit BOTH candidate schedules and return the better by the objective (fewer churn points, then fewer steps, greedy on a full tie). Projected from the two per-build CSVs: churn 81 to 35, steps 2741 to 2711, worsened 0, repro (4, 23).
+
+**Files:**
+- Modify: `web/src/core/reachability.ts` (add exported `churnPoints` beside `BuildStep`; replace `buildOrderPath` JSDoc + body)
+- Delete: `web/test/support/order-metrics.ts` (the metric moves to core — the engine now selects on it)
+- Modify: `web/test/order-metrics.test.ts`, `web/scripts/order-quality.ts`, `web/scripts/build-order-validate.ts` (import `churnPoints` from core)
+
+**Interfaces:**
+- Consumes: `needDrivenOrder`, `emitSchedule`, `sampledConstruction`, `buildParts` (all existing).
+- Produces: `export function churnPoints(steps: BuildStep[]): number` in `web/src/core/reachability.ts` (Task 5 imports it from there); best-of-both `buildOrderPath` (public contract unchanged); refreshed `.superpowers/sdd/order-quality-after.csv` / `.txt`.
+
+- [ ] **Step 1: Move churnPoints into core**
+
+In `web/src/core/reachability.ts`, directly after the `BuildStep` type, add:
+
+```ts
+/** Points spent on non-crossroads scaffolds in a schedule: the churn the ordering minimizes
+ *  (crossroads are free by definition - the objective is zero when a build bootstraps from
+ *  crossroads alone). Exported as the shared quality metric for tests and harnesses. */
+export function churnPoints(steps: BuildStep[]): number {
+  let pts = 0;
+  for (const s of steps) if (s.kind === "scaffold-add" && !s.conId.startsWith("crossroads_")) pts += s.points;
+  return pts;
+}
+```
+
+Delete `web/test/support/order-metrics.ts`. Update the three importers:
+- `web/test/order-metrics.test.ts`: `import { churnPoints } from "../src/core/reachability";`
+- `web/scripts/order-quality.ts`: fold `churnPoints` into the existing `../src/core/reachability` import
+- `web/scripts/build-order-validate.ts`: fold `churnPoints` into the existing `../src/core/reachability` import
+
+Run: `just test test/order-metrics.test.ts`
+Expected: 2 pass.
+
+- [ ] **Step 2: Replace buildOrderPath with the best-of-both selection**
+
+```ts
+/**
+ * A legal constellation-level order that assembles the self-covering build `B` within `budget` points
+ * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
+ * grants cover it. Two candidate orders are emitted (emitSchedule holds the exact scaffold SET
+ * peakToReach picks and drains refunds per the in-game rules, docs/devotion-system.md): the
+ * need-driven greedy order (needDrivenOrder: the build builds itself, usually from crossroads alone)
+ * and the sampled peak-minimizing witness order (sampledConstruction). Neither generator dominates -
+ * the greedy wins cap-tight builds the sampler scaffolds heavily, the sampler's bootstrap heuristic
+ * wins typical builds the greedy misorders - so the better schedule by the ordering objective is
+ * returned: fewer churn points (churnPoints), then fewer steps, the greedy on a full tie. Per-build
+ * best-of-both is never worse than either generator alone. Returns null when neither order fits the
+ * budget or a held scaffold can never be legally refunded - the honest "not validly buildable"
+ * signal. No order is better than an illegal order. Input is canonicalized (sorted by constellation
+ * id), so the output is a pure function of the build set - every caller gets the identical order.
+ */
+export function buildOrderPath(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  budget = BUDGET,
+  tries = 16,
+  peakNodeCap = 3000,
+): BuildStep[] | null {
+  B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: the order is a function of the build SET
+  const parts = buildParts(cons, B);
+  if (!parts) return null; // not self-covering
+  if (parts.totalSize > budget) return null;
+  const nd = needDrivenOrder(cons, B);
+  const viaGreedy = nd ? emitSchedule(nd.order, nd.tail, parts.pool, table, budget) : null;
+  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
+  const viaSampler = sc.peak <= budget ? emitSchedule(sc.order, sc.tail, parts.pool, table, budget) : null;
+  if (!viaGreedy || !viaSampler) return viaGreedy ?? viaSampler;
+  const g = churnPoints(viaGreedy);
+  const s = churnPoints(viaSampler);
+  if (g !== s) return g < s ? viaGreedy : viaSampler;
+  return viaGreedy.length <= viaSampler.length ? viaGreedy : viaSampler;
+}
+```
+
+- [ ] **Step 3: Run the build-order suites, then the full suite**
+
+Run: `just test test/build-order-path.test.ts test/build-order-oracle.test.ts test/build-order-tightcap.test.ts test/build-order-popup.test.ts test/need-driven-order.test.ts`
+Expected: all pass; "the confirmed false-reach build has no order within 55" must still pass (both emissions enforce the cap).
+
+Run: `just test`
+Expected: all pass.
+
+- [ ] **Step 4: Re-measure**
+
+```bash
+just order-quality > .superpowers/sdd/order-quality-after.csv 2> .superpowers/sdd/order-quality-after.txt
+cat .superpowers/sdd/order-quality-after.txt
+paste -d, .superpowers/sdd/order-quality-baseline.csv .superpowers/sdd/order-quality-after.csv | awk -F, '
+  NR > 1 && $1 != "repro" {
+    if ($2 == "none" && $5 != "none") gained++;
+    else if ($2 != "none" && $5 == "none") lost++;
+    else if ($2 != "none") { if ($5+0 < $2+0) imp++; else if ($5+0 == $2+0) unch++; else wors++; }
+  }
+  END { printf "improved=%d unchanged=%d worsened=%d gained=%d lost=%d\n", imp, unch, wors, gained, lost }'
+```
+
+Expected (projection; report actuals): aggregate churn 35, steps 2711, repro churn 4 steps 23, `worsened=0 lost=0`. Any `worsened > 0` or `lost > 0` contradicts the selection's no-worse guarantee — report it as a bug rather than accepting it.
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add web/src/core/reachability.ts web/test/support/order-metrics.ts web/test/order-metrics.test.ts web/scripts/order-quality.ts web/scripts/build-order-validate.ts
+git commit -F - <<'EOF'
+feat(order): best-of-both schedule selection (churn, then steps); churnPoints moves to core
+EOF
+```
+
+---
+
 ### Task 5: Quality pins, harness comparison, docs, launch-gate verdict
 
 **Files:**
@@ -744,11 +857,7 @@ From `.superpowers/sdd/order-quality-after.txt` read `orders=N churn=C steps=S |
 
 - [ ] **Step 2: Write the failing pin tests**
 
-In `web/test/build-order-oracle.test.ts`, add the import:
-
-```ts
-import { churnPoints } from "./support/order-metrics";
-```
+In `web/test/build-order-oracle.test.ts`, fold `churnPoints` into the existing `../src/core/reachability` import (it lives in core as of Task 4b).
 
 Append at the end of the file, substituting the derived values (record the raw measured numbers and the baseline in the comment):
 

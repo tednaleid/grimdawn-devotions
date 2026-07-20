@@ -49,7 +49,7 @@ they compose with:
 
 **1. The greedy order generator.** A pure function
 
-    needDrivenOrder(cons, table, B):
+    needDrivenOrder(cons, B):
       { order: ReachCon[]; tail: ReachCon[] } | null
 
 Forward-constructs an order of B's granting members, deterministically, no
@@ -79,18 +79,28 @@ randomness:
 - Returns null only when B is not self-covering (mirroring `buildParts`),
   so callers have one honest no-order signal.
 
-**2. buildOrderPath restructured: generate, then emit.** The emission loop
-(the per-member `peakToReach` need-sets, the `drainRefunds` legality
-draining, the cap guards, the tail placement) is extracted into a private
-`emitSchedule(order, tail, ...): BuildStep[] | null` used by both paths.
-`buildOrderPath` becomes: canonicalize input (unchanged contract), try
-`emitSchedule(needDrivenOrder(...))`, and if that returns null (cap bust,
-undrainable scaffold), fall back to the current sampler path
-(`emitSchedule(sampledConstruction(...).order)`) exactly as today. The
-public signature and the honest-null semantics are unchanged;
-`buildOrderEscalated` and `minBuildableCap` inherit both paths
-automatically. On builds where the greedy lands (the common case), the
-per-click cost DROPS - the sampler never runs.
+**2. buildOrderPath restructured: emit both, keep the better.** The
+emission loop (the per-member `peakToReach` need-sets, the `drainRefunds`
+legality draining, the cap guards, the tail placement) is extracted into a
+private `emitSchedule(order, tail, pool, table, budget): BuildStep[] | null`
+shared by both order generators. `buildOrderPath` becomes: canonicalize
+input (unchanged contract), emit the need-driven order and the sampled
+witness order, and return the better schedule by the ordering objective:
+fewer churn points (`churnPoints`, which moves into the core beside
+`BuildStep` since the engine now selects on it), then fewer steps, the
+greedy on a full tie. Null only when neither emits. The public signature
+and the honest-null semantics are unchanged; `buildOrderEscalated` and
+`minBuildableCap` inherit automatically.
+
+Revised during execution: the original greedy-first-if-legal mechanism
+kept legal but scaffold-heavy greedy orders and regressed the corpus
+(aggregate churn 81 to 610, 87 of 150 builds worse). Neither generator
+dominates - the greedy wins cap-tight builds the sampler scaffolds
+heavily, the sampler's bootstrap heuristic wins typical builds the greedy
+misorders - so the per-build best of both is taken; it is never worse
+than either generator alone. Measured: corpus churn 81 to 35, steps 2741
+to 2711, worsened 0, repro churn 26 to 4 and steps 35 to 23. The cost is
+one extra emission per click; `just perf` must stay regression-free.
 
 **3. Metrics and pins.** `just build-order-validate` gains per-group churn
 metrics (scaffold points bought-then-refunded, total steps) reported next
