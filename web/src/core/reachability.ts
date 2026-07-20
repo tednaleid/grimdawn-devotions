@@ -688,32 +688,20 @@ export type BuildStep =
   | { kind: "scaffold-refund"; conId: string; points: number; heldAfter: number };
 
 /**
- * A legal constellation-level order that assembles the self-covering build `B` within `budget` points
- * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
- * grants cover it. Replays the sampled construction order (sampledConstruction) and, at each step, asks
- * peakToReach for the actual scaffold SET to hold (crossroads-biased), diffing consecutive sets into
- * add/refund events. Refunds obey the in-game rule (docs/devotion-system.md, "removal cannot strand a
- * dependent"): a scaffold is refunded only when everything still standing keeps its requirement covered
- * without it; refunds not yet safe stay held and are retried after later adds. Returns null when no
- * sampled order fits the budget, or when a held scaffold can never be legally refunded - the honest
- * "not validly buildable" signal. No order is better than an illegal order. Input is canonicalized
- * (sorted by constellation id), so the output is a pure function of the build set - every caller
- * (panel, test, script) gets the identical order.
+ * Emit the add/complete/refund schedule for a member `order` plus zero-grant `tail`: at each step,
+ * hold the exact scaffold SET peakToReach picks (crossroads-biased), draining refunds the moment
+ * they are legal (docs/devotion-system.md: removal cannot strand a dependent). Null when any step
+ * would exceed `budget` or a held scaffold can never be legally refunded - the honest signal that
+ * this ORDER does not work; the caller decides what other order to try. This is buildOrderPath's
+ * legality-bearing loop, extracted so more than one order generator can feed it.
  */
-export function buildOrderPath(
-  cons: ReachCon[],
+function emitSchedule(
+  order: ReachCon[],
+  tail: ReachCon[],
+  pool: ReachCon[],
   table: CoverTable,
-  B: ReachCon[],
-  budget = BUDGET,
-  tries = 16,
-  peakNodeCap = 3000,
+  budget: number,
 ): BuildStep[] | null {
-  B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: the order is a function of the build SET
-  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
-  if (sc.peak > budget) return null;
-  const parts = buildParts(cons, B);
-  if (!parts) return null; // not self-covering
-  const pool = parts.pool;
   const REPLAY_CAP = 300_000; // cold path: find the exact min subset, immune to the sampling node cap
   const steps: BuildStep[] = [];
   let grant: Vec = zero();
@@ -748,7 +736,7 @@ export function buildOrderPath(
       }
     }
   };
-  for (const m of sc.order) {
+  for (const m of order) {
     mreq = maxV(mreq, m.req);
     const def: Vec = [
       Math.max(0, mreq[0] - grant[0]),
@@ -780,12 +768,41 @@ export function buildOrderPath(
   }
   drainRefunds(new Set());
   if (held.length) return null; // a scaffold no drain can legally refund: honest null, never an illegal step
-  for (const t of sc.tail) {
+  for (const t of tail) {
     running += t.size;
     steps.push({ kind: "complete", conId: t.id, points: t.size, heldAfter: running });
     if (running > budget) return null;
   }
   return steps;
+}
+
+/**
+ * A legal constellation-level order that assembles the self-covering build `B` within `budget` points
+ * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
+ * grants cover it. Replays the sampled construction order (sampledConstruction) and, at each step, asks
+ * peakToReach for the actual scaffold SET to hold (crossroads-biased), diffing consecutive sets into
+ * add/refund events. Refunds obey the in-game rule (docs/devotion-system.md, "removal cannot strand a
+ * dependent"): a scaffold is refunded only when everything still standing keeps its requirement covered
+ * without it; refunds not yet safe stay held and are retried after later adds. Returns null when no
+ * sampled order fits the budget, or when a held scaffold can never be legally refunded - the honest
+ * "not validly buildable" signal. No order is better than an illegal order. Input is canonicalized
+ * (sorted by constellation id), so the output is a pure function of the build set - every caller
+ * (panel, test, script) gets the identical order.
+ */
+export function buildOrderPath(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  budget = BUDGET,
+  tries = 16,
+  peakNodeCap = 3000,
+): BuildStep[] | null {
+  B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: the order is a function of the build SET
+  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
+  if (sc.peak > budget) return null;
+  const parts = buildParts(cons, B);
+  if (!parts) return null; // not self-covering
+  return emitSchedule(sc.order, sc.tail, parts.pool, table, budget);
 }
 
 /** The on-demand escalation behind the "Find valid order" button: the same schedule at high tries, to
