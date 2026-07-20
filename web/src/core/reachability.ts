@@ -680,6 +680,82 @@ export function minPeakSampledOrder(
   return peak <= budget ? [...order, ...tail] : null;
 }
 
+/**
+ * Need-driven greedy member ordering: the build builds itself. Forward-constructs an order of B's
+ * granting members so each is activated by the accumulated grants of the members already placed,
+ * plus the ever-present crossroads seed (one point per color is always reachable through a
+ * refundable crossroads; the emission replay decides whether one is actually bought). Among
+ * candidates it picks the densest contributor to the still-deficient colors (points granted in
+ * deficient colors per star - the Scholar's Light tiebreak), ratios compared exactly by
+ * cross-multiplication, ties broken by id. When nothing activates, the build is genuinely stuck
+ * without scaffolding: it places the member with the smallest summed deficit and lets the emission
+ * replay buy exactly that gap. Zero-grant members go to `tail`, placed last. Canonicalized and
+ * deterministic like buildOrderPath; null only when B is not self-covering (one honest signal).
+ */
+export function needDrivenOrder(
+  cons: ReachCon[],
+  B: ReachCon[],
+): { order: ReachCon[]; tail: ReachCon[] } | null {
+  B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: a function of the SET
+  const parts = buildParts(cons, B);
+  if (!parts) return null; // not self-covering
+  const { G } = parts;
+  const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
+  const tail = B.filter((c) => !grants(c));
+  let seed = zero();
+  for (const c of cons) if (c.id.startsWith("crossroads_")) seed = addCap(seed, c.grant);
+  const placed = new Array(G.length).fill(false);
+  const order: ReachCon[] = [];
+  let grant = zero();
+  while (order.length < G.length) {
+    const avail = addCap(grant, seed);
+    // Deficient colors: what unplaced members still demand beyond the accumulated grants.
+    const deficit = zero();
+    for (let i = 0; i < G.length; i++) {
+      if (placed[i]) continue;
+      for (let k = 0; k < 5; k++) {
+        const short = G[i]!.req[k]! - grant[k]!;
+        if (short > deficit[k]!) deficit[k] = short;
+      }
+    }
+    let pick = -1;
+    let pickPts = 0;
+    let pickSize = 1;
+    for (let i = 0; i < G.length; i++) {
+      if (placed[i] || !covers(avail, G[i]!.req)) continue;
+      let pts = 0;
+      for (let k = 0; k < 5; k++) if (deficit[k]! > 0) pts += G[i]!.grant[k]!;
+      if (
+        pick < 0 ||
+        pts * pickSize > pickPts * G[i]!.size ||
+        (pts * pickSize === pickPts * G[i]!.size && G[i]!.id < G[pick]!.id)
+      ) {
+        pick = i;
+        pickPts = pts;
+        pickSize = G[i]!.size;
+      }
+    }
+    if (pick < 0) {
+      // Genuinely stuck: place the member with the smallest summed deficit; the emission replay's
+      // peakToReach buys exactly that gap (crossroads-biased, minimal) and refunds it legally.
+      let pickDef = Infinity;
+      for (let i = 0; i < G.length; i++) {
+        if (placed[i]) continue;
+        let d = 0;
+        for (let k = 0; k < 5; k++) d += Math.max(0, G[i]!.req[k]! - grant[k]!);
+        if (d < pickDef || (d === pickDef && G[i]!.id < G[pick]!.id)) {
+          pick = i;
+          pickDef = d;
+        }
+      }
+    }
+    placed[pick] = true;
+    order.push(G[pick]!);
+    grant = addCap(grant, G[pick]!.grant);
+  }
+  return { order, tail };
+}
+
 /** One step of a guided build order. `points` is the constellation's star count (negative on refund);
  *  `heldAfter` is the running points held after the step, which never exceeds the cap. */
 export type BuildStep =
