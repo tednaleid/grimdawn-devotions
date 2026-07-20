@@ -852,15 +852,16 @@ function emitSchedule(
 /**
  * A legal constellation-level order that assembles the self-covering build `B` within `budget` points
  * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
- * grants cover it. Replays the sampled construction order (sampledConstruction) and, at each step, asks
- * peakToReach for the actual scaffold SET to hold (crossroads-biased), diffing consecutive sets into
- * add/refund events. Refunds obey the in-game rule (docs/devotion-system.md, "removal cannot strand a
- * dependent"): a scaffold is refunded only when everything still standing keeps its requirement covered
- * without it; refunds not yet safe stay held and are retried after later adds. Returns null when no
- * sampled order fits the budget, or when a held scaffold can never be legally refunded - the honest
- * "not validly buildable" signal. No order is better than an illegal order. Input is canonicalized
- * (sorted by constellation id), so the output is a pure function of the build set - every caller
- * (panel, test, script) gets the identical order.
+ * grants cover it. Orders the granting members need-driven first (needDrivenOrder: each member
+ * activated by what already stands plus at most a refundable crossroads, scaffolding only when
+ * genuinely stuck), and falls back to the sampled peak-minimizing order (sampledConstruction) when
+ * the greedy's order cannot be emitted within budget - so any build with an order under the sampler
+ * alone still gets one; orders are gained, never lost. Emission (emitSchedule) holds the exact
+ * scaffold SET peakToReach picks and drains refunds per the in-game rule (docs/devotion-system.md,
+ * "removal cannot strand a dependent"). Returns null when neither order fits the budget or a held
+ * scaffold can never be legally refunded - the honest "not validly buildable" signal. No order is
+ * better than an illegal order. Input is canonicalized (sorted by constellation id), so the output
+ * is a pure function of the build set - every caller (panel, test, script) gets the identical order.
  */
 export function buildOrderPath(
   cons: ReachCon[],
@@ -871,10 +872,21 @@ export function buildOrderPath(
   peakNodeCap = 3000,
 ): BuildStep[] | null {
   B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: the order is a function of the build SET
-  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
-  if (sc.peak > budget) return null;
   const parts = buildParts(cons, B);
   if (!parts) return null; // not self-covering
+  if (parts.totalSize > budget) return null;
+  // Greedy first: the need-driven order usually bootstraps from crossroads alone (zero churn) and
+  // skips the sampler entirely. Emission is the authority on whether it fits the cap - orderPeak
+  // would be a cheaper pre-check but ignores refunds, so it would wrongly reject orders whose
+  // refunds keep the running total under budget.
+  const nd = needDrivenOrder(cons, B);
+  if (nd) {
+    const viaGreedy = emitSchedule(nd.order, nd.tail, parts.pool, table, budget);
+    if (viaGreedy) return viaGreedy;
+  }
+  // Fallback: the sampled witness order, exactly as before the greedy existed.
+  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
+  if (sc.peak > budget) return null;
   return emitSchedule(sc.order, sc.tail, parts.pool, table, budget);
 }
 
