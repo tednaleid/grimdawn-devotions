@@ -17,6 +17,7 @@ import { mulberry32 } from "../test/support/reach-oracle";
 import { genSelfCovering } from "../test/support/walk-fuzzer";
 import { minPeakCost } from "../test/support/costed-oracle";
 import { verifyBuildOrder } from "../src/core/orderLegality";
+import { churnPoints } from "../test/support/order-metrics";
 
 const argNum = (flag: string, def: number): number => {
   const i = process.argv.indexOf(flag);
@@ -60,6 +61,8 @@ interface Tally {
   bail: number; // oracle could not decide (too many granting members)
   illegal: number; // a produced order failed replay (FALSE-POSITIVE; must be 0)
   selfCov: number;
+  churn: number; // scaffold churn points across accepted orders (quality, not legality)
+  stepsTotal: number; // total steps across accepted orders
   examples: { fn: string[]; falseNeg: string[] };
 }
 const fresh = (): Tally => ({
@@ -72,6 +75,8 @@ const fresh = (): Tally => ({
   bail: 0,
   illegal: 0,
   selfCov: 0,
+  churn: 0,
+  stepsTotal: 0,
   examples: { fn: [], falseNeg: [] },
 });
 
@@ -88,6 +93,8 @@ function classify(B: ReachCon[], t: Tally): Cat {
     if (t.examples.fn.length < 8) t.examples.fn.push("ILLEGAL@live: " + fmt(B));
   } else if (live) {
     t.liveFound++;
+    t.churn += churnPoints(live);
+    t.stepsTotal += live.length;
     return "live-found";
   }
   // live missed (or was illegal): try the escalated search
@@ -97,6 +104,8 @@ function classify(B: ReachCon[], t: Tally): Cat {
     if (t.examples.fn.length < 8) t.examples.fn.push("ILLEGAL@esc: " + fmt(B));
   } else if (esc) {
     t.recoverable++;
+    t.churn += churnPoints(esc);
+    t.stepsTotal += esc.length;
     return "recoverable";
   }
   // no witness at any tries: the oracle decides whether one provably exists
@@ -131,6 +140,8 @@ function report(label: string, t: Tally): void {
   console.log(`    self-covering, peak>55:          ${t.noOrderPeak}`);
   console.log(`  oracle bailed (>18 granters):      ${t.bail}`);
   console.log(`  FALSE-POSITIVE (illegal path):     ${t.illegal}  <-- must be 0`);
+  const found = t.liveFound + t.recoverable;
+  console.log(`  quality: churn=${t.churn} pts, steps=${t.stepsTotal} across ${found} orders`);
   if (t.examples.falseNeg.length) {
     console.log(`  false-negative examples:`);
     for (const e of t.examples.falseNeg) console.log(`    ${e}`);

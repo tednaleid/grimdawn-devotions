@@ -350,6 +350,11 @@ build-order-validate *ARGS:
 hunt-tight-cap *ARGS:
     cd "{{justfile_directory()}}/web" && bun scripts/hunt-tight-cap.ts {{ARGS}}
 
+# Build-order quality metrics on the pinned 150-seed corpus + the reproduction URL: per-build
+# churn/steps CSV on stdout, aggregates on stderr. The launch-gate before/after comparison tool.
+order-quality:
+    cd "{{justfile_directory()}}/web" && bun scripts/order-quality.ts
+
 # Type-check the web sources (no emit)
 typecheck:
     cd "{{justfile_directory()}}/web" && bunx tsc --noEmit
