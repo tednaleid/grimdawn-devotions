@@ -15,7 +15,7 @@
 - **Witness boundary (never touch):** `sampledConstruction`, `minPeakSampled`, `minPeakSampledOrder`, `orderPeak`, `peakToReach`, and the classify/dimming path in `web/src/core/reachability.ts` must not change in any way. The sampler is the engine's reachability witness.
 - **Oracle independence:** `web/src/core/orderLegality.ts` must not change at all.
 - **Extraction, not rewrite:** `emitSchedule` is the existing emission loop moved verbatim (canRefund, drainRefunds, cap guards, push order all unmodified).
-- **Public contract unchanged:** `buildOrderPath(cons, table, B, budget = BUDGET, tries = 16, peakNodeCap = 3000): BuildStep[] | null`; canonicalized input (sorted by id at entry); honest null; deterministic (same build set, any member order, any call site, byte-identical output — guarded by `web/test/build-order-path.test.ts`).
+- **Public contract unchanged:** `buildOrderPath(cons, table, B, budget = BUDGET, tries = 16, peakNodeCap = 3000): BuildStep[] | null`; canonicalized input (sorted by id at entry); honest null; deterministic (same build set, any member order, any call site, byte-identical output - guarded by `web/test/build-order-path.test.ts`).
 - **Launch gate (spec, hard):** aggregate scaffold churn strictly lower than baseline; aggregate steps no higher; zero orders lost (every build with an order on main still has one); reproduction URL at crossroads-only scaffolding and low-twenties steps (down from 35). Failing any line means the branch does not merge.
 - **Validity bar (spec, hard):** every displayed order still flows through `gateBuildOrder`; the seeded oracle sweep, tight-cap fixtures, and panel-agreement tests must show zero failures against the greedy's output.
 - **Churn definition:** points of `scaffold-add` steps whose `conId` does not start with `"crossroads_"`. Crossroads bootstrapping is free by definition (the objective's "zero when the build can bootstrap from crossroads alone").
@@ -26,9 +26,9 @@
 
 ## Pre-existing test landscape (read before Task 4)
 
-- `web/test/build-order-path.test.ts:131` "the confirmed false-reach build has no order within 55" is backed by an exact-oracle proof (min peak 56). It MUST stay null under the greedy: emission enforces the cap, so no order can be emitted. If this test fails, the wiring is buggy — stop and investigate; do not update the test.
+- `web/test/build-order-path.test.ts:131` "the confirmed false-reach build has no order within 55" is backed by an exact-oracle proof (min peak 56). It MUST stay null under the greedy: emission enforces the cap, so no order can be emitted. If this test fails, the wiring is buggy - stop and investigate; do not update the test.
 - `web/test/build-order-popup.test.ts`, `web/test/build-order-oracle.test.ts`, `web/test/build-order-tightcap.test.ts`, and `web/e2e/smoke.ts` are order-agnostic (they search by step kind and assert legality/shape, not specific sequences). They should stay green when the repro URL's order changes. One contingency is spelled out in Task 4 Step 4.
-- `web/test/build-order.test.ts` and `web/test/reach-peakcost.test.ts` exercise `minPeakSampledOrder`/`minPeakSampled` only — untouched by this work.
+- `web/test/build-order.test.ts` and `web/test/reach-peakcost.test.ts` exercise `minPeakSampledOrder`/`minPeakSampled` only - untouched by this work.
 
 ---
 
@@ -80,7 +80,7 @@ test("a crossroads-only bootstrap has zero churn", () => {
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `just test test/order-metrics.test.ts`
-Expected: FAIL — cannot resolve `./support/order-metrics`.
+Expected: FAIL - cannot resolve `./support/order-metrics`.
 
 - [ ] **Step 3: Implement the metric helper**
 
@@ -254,9 +254,9 @@ EOF
 
 **Interfaces:**
 - Consumes: existing private `buildParts`, `sampledConstruction`, `peakToReach`, `zero`, `maxV`, `addCap`, `covers`, `INF`, types `ReachCon`, `Vec`, `CoverTable`, `BuildStep`.
-- Produces: private `function emitSchedule(order: ReachCon[], tail: ReachCon[], pool: ReachCon[], table: CoverTable, budget: number): BuildStep[] | null` — Task 4 calls it for both paths.
+- Produces: private `function emitSchedule(order: ReachCon[], tail: ReachCon[], pool: ReachCon[], table: CoverTable, budget: number): BuildStep[] | null` - Task 4 calls it for both paths.
 
-This is a pure extraction. The emission loop moves verbatim; only `sc.order` becomes the `order` parameter and `sc.tail` becomes `tail`. Every existing test must pass unchanged — the determinism tests (`web/test/build-order-path.test.ts`) prove byte-identical output.
+This is a pure extraction. The emission loop moves verbatim; only `sc.order` becomes the `order` parameter and `sc.tail` becomes `tail`. Every existing test must pass unchanged - the determinism tests (`web/test/build-order-path.test.ts`) prove byte-identical output.
 
 - [ ] **Step 1: Confirm the suite is green before touching anything**
 
@@ -405,7 +405,7 @@ EOF
 
 **Interfaces:**
 - Consumes: private `buildParts`, helpers `zero`/`addCap`/`covers`, types `ReachCon`, `Vec`.
-- Produces: `export function needDrivenOrder(cons: ReachCon[], B: ReachCon[]): { order: ReachCon[]; tail: ReachCon[] } | null` — Task 4 wires it into `buildOrderPath`.
+- Produces: `export function needDrivenOrder(cons: ReachCon[], B: ReachCon[]): { order: ReachCon[]; tail: ReachCon[] } | null` - Task 4 wires it into `buildOrderPath`.
 
 Behavior (from the spec): forward-construct an order of B's granting members. Candidates are unplaced granting members whose requirement is covered by accumulated grants plus the crossroads seed (one point per color, derived from the `crossroads_*` constellations in `cons`). Pick the candidate with the highest (points granted in still-deficient colors) per star, ratio compared exactly by cross-multiplication, ties by id. When no candidate exists, place the unplaced member with the smallest summed deficit against accumulated grants (ties by id) and let the emission replay buy the gap. Zero-grant members go to `tail`. Null only when B is not self-covering.
 
@@ -487,7 +487,7 @@ test("equal scores break by id and the result is a pure function of the set", ()
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `just test test/need-driven-order.test.ts`
-Expected: FAIL — `needDrivenOrder` is not exported.
+Expected: FAIL - `needDrivenOrder` is not exported.
 
 - [ ] **Step 3: Implement needDrivenOrder**
 
@@ -652,7 +652,7 @@ export function buildOrderPath(
 
 Run: `just test test/build-order-path.test.ts test/build-order-oracle.test.ts test/build-order-tightcap.test.ts test/need-driven-order.test.ts`
 Expected: all pass. In particular:
-- "the confirmed false-reach build has no order within 55" MUST still pass (emission enforces the cap; if it fails, the wiring is buggy — stop and investigate, do not touch the test).
+- "the confirmed false-reach build has no order within 55" MUST still pass (emission enforces the cap; if it fails, the wiring is buggy - stop and investigate, do not touch the test).
 - The seeded oracle sweep now judges the greedy's output; zero failures required.
 - The canonicalization/determinism tests now prove the greedy path is deterministic.
 
@@ -661,9 +661,9 @@ Expected: all pass. In particular:
 Run: `just test`
 Expected: all pass. The popup tests (`test/build-order-popup.test.ts`) search steps by kind, not position, so the repro URL's new order should satisfy them.
 
-- [ ] **Step 4: Contingency — only if the popup refund-delta test failed**
+- [ ] **Step 4: Contingency - only if the popup refund-delta test failed**
 
-If `test/build-order-popup.test.ts` "a refund step's grant delta is negative" fails with `fi = -1`, the repro build's new order needs no scaffolds at all (nothing to refund) — an improvement that starves that test's fixture. In that case widen that one test's search to the first tight-cap fixture build (guaranteed refund-heavy), leaving every other popup test on `REPRO_HASH`:
+If `test/build-order-popup.test.ts` "a refund step's grant delta is negative" fails with `fi = -1`, the repro build's new order needs no scaffolds at all (nothing to refund) - an improvement that starves that test's fixture. In that case widen that one test's search to the first tight-cap fixture build (guaranteed refund-heavy), leaving every other popup test on `REPRO_HASH`:
 
 ```ts
 import tightCap from "./fixtures/tight-cap-builds.json";
@@ -703,7 +703,7 @@ paste -d, .superpowers/sdd/order-quality-baseline.csv .superpowers/sdd/order-qua
   END { printf "improved=%d unchanged=%d worsened=%d gained=%d lost=%d\n", imp, unch, wors, gained, lost }'
 ```
 
-Copy into your task report: the after aggregate line, the baseline aggregate line (from Task 1's report), and the distribution line. Expected direction: churn strictly down, steps down, `lost=0`, repro at churn=0 and low-twenties steps. Do NOT hide a miss — Task 5 assembles the launch gate from these numbers and a failing line stops the merge.
+Copy into your task report: the after aggregate line, the baseline aggregate line (from Task 1's report), and the distribution line. Expected direction: churn strictly down, steps down, `lost=0`, repro at churn=0 and low-twenties steps. Do NOT hide a miss - Task 5 assembles the launch gate from these numbers and a failing line stops the merge.
 
 If `wors > 0`, also list the worsened builds with their before/after churn:
 
@@ -730,7 +730,7 @@ Task 4's greedy-first-if-legal mechanism failed the launch gate (corpus churn 81
 
 **Files:**
 - Modify: `web/src/core/reachability.ts` (add exported `churnPoints` beside `BuildStep`; replace `buildOrderPath` JSDoc + body)
-- Delete: `web/test/support/order-metrics.ts` (the metric moves to core — the engine now selects on it)
+- Delete: `web/test/support/order-metrics.ts` (the metric moves to core - the engine now selects on it)
 - Modify: `web/test/order-metrics.test.ts`, `web/scripts/order-quality.ts`, `web/scripts/build-order-validate.ts` (import `churnPoints` from core)
 
 **Interfaces:**
@@ -824,7 +824,7 @@ paste -d, .superpowers/sdd/order-quality-baseline.csv .superpowers/sdd/order-qua
   END { printf "improved=%d unchanged=%d worsened=%d gained=%d lost=%d\n", imp, unch, wors, gained, lost }'
 ```
 
-Expected (projection; report actuals): aggregate churn 35, steps 2711, repro churn 4 steps 23, `worsened=0 lost=0`. Any `worsened > 0` or `lost > 0` contradicts the selection's no-worse guarantee — report it as a bug rather than accepting it.
+Expected (projection; report actuals): aggregate churn 35, steps 2711, repro churn 4 steps 23, `worsened=0 lost=0`. Any `worsened > 0` or `lost > 0` contradicts the selection's no-worse guarantee - report it as a bug rather than accepting it.
 
 - [ ] **Step 5: Commit**
 
@@ -973,7 +973,7 @@ Write into the task report a table with one row per criterion, each marked PASS 
 6. Validity: FALSE-POSITIVE 0 in every harness group; full suite, fuzz, e2e green
 7. Perf: no regression
 
-If ANY of 1, 2, 3, 5, 6 is FAIL, or 7 shows a real regression: STOP after committing. Report the verdict to Ted and do not proceed to merging — the spec's launch gate says the branch does not merge. The worsened-tail row (4) is Ted's judgment call; surface it either way.
+If ANY of 1, 2, 3, 5, 6 is FAIL, or 7 shows a real regression: STOP after committing. Report the verdict to Ted and do not proceed to merging - the spec's launch gate says the branch does not merge. The worsened-tail row (4) is Ted's judgment call; surface it either way.
 
 - [ ] **Step 9: Commit**
 

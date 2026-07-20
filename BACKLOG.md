@@ -397,3 +397,21 @@ falls back to English. Extend the guard to iterate all 13 catalogs.
 
 Pointers: the `REQUIRED` loop at `web/test/appCatalog.test.ts:150-153` and the
 per-locale test block below it.
+
+## Need-driven ordering: small follow-ups from the final review
+
+Three non-blocking items from the need-driven-ordering branch review, in
+priority order:
+
+1. A unit test pinning needDrivenOrder's deficient-colors-only scoring: a
+   mutant that sums grants over ALL colors (not just deficient ones) passes
+   the current six unit tests and is caught only indirectly by the aggregate
+   churn pins.
+2. A cross-reference comment on REPRO_HASH in web/scripts/order-quality.ts
+   ("must match web/test/build-order-oracle.test.ts"), mirroring the comment
+   SEEDS already carries.
+3. A shared hasGrant helper for the grants predicate duplicated verbatim in
+   buildParts and needDrivenOrder.
+
+Pointers: the score loop and grants predicate in web/src/core/reachability.ts
+(needDrivenOrder, buildParts); web/test/need-driven-order.test.ts.
