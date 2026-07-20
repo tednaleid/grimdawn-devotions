@@ -7,15 +7,27 @@ legal refunds and adds a player can execute in-game. The transition-order
 spike (2026-07-18-transition-order-spike-design.md, Findings) established
 viability: on realistic small-delta pairs the incremental path exists about
 96 percent of the time, beats teardown+rebuild on moved points 96 percent of
-the time, is churn-free by construction, and computes at roughly half the
-cost of the from-scratch order already run per click.
+the time, is churn-free by construction, and computed at roughly half the
+cost of the from-scratch order of its day (the ratio must be re-measured;
+see Performance).
+
+Resumed 2026-07-20. Three efforts shipped while this was parked and are now
+substrate this design builds on rather than work it contains: Phase 0
+shipped as the build-order validity effort (see below); the panel gained a
+per-step affinity popup fed by the verifying replay's states (one walk, two
+outputs); and from-scratch orders became churn-minimized (best-of-both:
+need-driven greedy versus sampled witness, selected by fewer `churnPoints`
+then fewer steps). The phases below are edited in place to match.
 
 ## The hard invariant: verified or absent
 
 No order is better than an illegal order. Every order the build-order panel
 renders - transition, full-respec fallback, and the existing from-scratch
-order alike - must pass the independent legality replay (the spike's oracle,
-promoted into core) before display, per click, in production. A candidate
+order alike - must pass an independent legality replay before display, per
+click, in production. For from-scratch orders this shipped as
+web/src/core/orderLegality.ts (`replayBuildOrder`/`gateBuildOrder`); the
+transition oracle joins that module, following its rules (type-only imports
+from reachability, no shared engine code). A candidate
 that fails verification is discarded and the panel degrades to the next
 rung; the last resort is the honest empty state. Displaying an unverified
 order is structurally impossible, not merely tested against. The check is a
@@ -27,35 +39,20 @@ cannot be refunded when the refund would leave any standing constellation
 requirements. This is the strict reading of the "removal cannot strand a
 dependent" rule in docs/devotion-system.md.
 
-## Phase 0: fix the live refund-ordering bug (independently shippable)
+## Phase 0: shipped (build-order validity effort, 2026-07-19)
 
-The spike discovered that `buildOrderPath` (web/src/core/reachability.ts)
-emits scaffold-refund batches in held-array order, not dependency order. On
-43 of 999 sampled builds (4.3 percent) the emitted order refunds a
-constellation whose grant still sustains another standing member - for
-example completing Bard's Harp and then refunding Panther, stranding Bard's
-Harp's requirement. Under the confirmed strict rule these orders are not
-executable in-game past the stranding step. Reproduction links (seeds 86,
-97, 113 of the diagnostic search) are recorded in the session ledger.
-
-The fix: order each refund batch so that no refund strands a standing
-requirement - refund only members whose grant is not load-bearing for what
-remains, iterating until the batch drains (the spike's `drain()` in
-web/scripts/transition-spike.ts is the reference pattern). This corrects
-the panel for the affected builds today and is what the transition
-fallback rung later relies on.
-
-Guard: a CI test replays seeded from-scratch orders through the promoted
-oracle and asserts zero rejections, converting the spike's discovery into a
-permanent regression net.
-
-Documentation in the same change: docs/devotion-system.md gains the
-strict-reading clarification of the refund rule (confirmed in-game);
-docs/reachability-engine.md gains the verified-or-absent enforcement
-invariant; CLAUDE.md gains a short invariant entry alongside the URL-state
-and i18n invariants so future sessions inherit the rule.
-
-Phase 0 ships on its own before the rest of the feature.
+The refund-ordering bug this phase described was fixed and deployed as its
+own effort while this design was parked. What landed, and what this feature
+now builds on: legality-ordered refund draining in `buildOrderPath`
+(`drainRefunds`); the independent oracle module web/src/core/orderLegality.ts
+(`replayBuildOrder`, `verifyBuildOrder`, `gateBuildOrder`) with per-step
+`StepState`s from the same verifying walk; the verified-or-absent gate in
+`selectionView` (the panel renders only oracle-proven orders); permanent
+regression nets (the 150-seed sweep and repro URL in
+web/test/build-order-oracle.test.ts, the tight-cap corpus, the offline
+`just build-order-validate` harness); and the documentation set (strict
+rule 5 in docs/devotion-system.md, the enforcement invariant in
+docs/reachability-engine.md, the CLAUDE.md invariant entry).
 
 ## Phase 1: test harness first
 
@@ -63,7 +60,12 @@ Promote the spike's pure pieces into permanent test infrastructure and
 close the realism gaps its final review measured:
 
 - Promote `verifyTransition` (the oracle) and the pair generators out of
-  web/scripts/transition-spike.ts into the harness the feature's tests use.
+  web/scripts/transition-spike.ts. The oracle joins
+  web/src/core/orderLegality.ts, matching the shipped module's idioms: a
+  replay that returns both the verdict and per-step `StepState`s (one walk,
+  two outputs - the popup needs the states, see phase 2), a thin
+  verdict-only wrapper, and a verified-or-absent gate; type-only imports
+  from reachability. The pair generators go to the test-support harness.
   The oracle is the exact legality bar, not a conservative proxy.
 - Star-level mutations: pairs where shared constellations differ in star
   count (partials and resizes). The spike corpus was whole-constellation
@@ -88,8 +90,15 @@ exports:
   spike with two rungs: incremental (seeded replay, prefer-held bias,
   two-pass refund scheduling with the eager-schedule budget fallback), else
   full-respec (reverse of the baseline's from-scratch order, then the
-  current build's from-scratch order). Every rung's output is
-  oracle-verified before it is returned.
+  current build's from-scratch order - both now the churn-minimized
+  best-of-both orders `buildOrderPath` ships, inherited for free). Every
+  rung's output is oracle-verified before it is returned.
+- The panel's per-step affinity popup works in compare mode: the verifying
+  replay's `StepState`s ride along with whichever rung's order is shown
+  (the gate returns steps and states together, as `gateBuildOrder` does
+  today), so hovering a transition step - refunds of baseline members
+  included - shows the have/need standing at that point. Popup numbers are
+  the judge's numbers by construction, never a second computation.
 - The teardown-1 rung is dropped. The spike measured it winning about 1 in
   5,400 pairs, and its candidate search is the sole cause of the runtime
   tail on zero-slack pairs (build size equals cap, a common mid-leveling
@@ -102,8 +111,8 @@ exports:
   treated as a none pair.
 - `selectionView` gains an optional baseline parameter. When comparing, the
   transition computation replaces the from-scratch `buildOrderPath` call,
-  keeping the per-click cost roughly flat (the spike measured the
-  incremental rung at 0.5 to 0.6 times the from-scratch cost).
+  keeping the per-click cost roughly flat (see Performance for the
+  re-measurement caveat).
 
 ## Phase 3: panel rendering and internationalization
 
@@ -119,19 +128,21 @@ exports:
   transition automatically (it always reads baseline to current).
 - No new URL state: the baseline already rides in `cs=`/`cp=`, and every
   rendered state round-trips through the existing hash.
-- The stale "Find valid order" ABOUTME line in buildOrderView.ts is
-  corrected while the file is open.
 - E2e smoke: enter compare, diverge the build, assert the panel shows a
   transition beginning with a refund step; press Swap and assert the
   direction flips; exit compare and assert the from-scratch order returns.
 
 ## Performance
 
-The spike's numbers, which phase 2 inherits and the perf harness should
-confirm: incremental rung about 0.7 ms per pair (0.5 to 0.6 times the live
-from-scratch cost), zero-slack tail cured by dropping teardown-1. The
-existing per-click budget (`just perf`, selectionView) is the bar; compare
-mode replaces one order computation with another rather than adding one.
+The spike measured the incremental rung at about 0.7 ms per pair, roughly
+half the from-scratch cost of its day, with the zero-slack tail cured by
+dropping teardown-1. The from-scratch baseline has since changed
+(best-of-both runs two emissions per click), so the ratio is stale and the
+absolute numbers must be re-measured, not assumed. The bar is unchanged:
+the existing per-click budget (`just perf`, selectionView) shows no
+regression; compare mode replaces one order computation with another
+rather than adding one. Note the fallback rungs call `buildOrderPath`,
+which now pays the two-emission cost itself.
 
 ## Non-goals
 
@@ -151,4 +162,8 @@ reading was confirmed in-game, making the oracle the exact legality bar and
 the live panel's refund ordering a real bug; verified-or-absent is the
 feature's hard invariant, stated by the project owner as "I'd rather not
 ship the feature than have it suggest an illegal path"; phase 0 ships first
-because trust in the panel precedes adding to it.
+because trust in the panel precedes adding to it. Resumed 2026-07-20 by the
+project owner after phase 0 (the validity effort), the step popup, and
+need-driven ordering all shipped; the spec was edited in place to build on
+that substrate, and the branch was rebased onto the deployed main (spike
+code and tests pass the full gate unchanged).
