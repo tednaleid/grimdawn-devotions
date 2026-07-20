@@ -24,6 +24,12 @@ Decided during design:
 - **Quality gets a CI net like legality did:** the seeded corpus test pins
   aggregate churn points and step totals; a regression fails CI loudly.
   Individual orders stay unpinned so legal reshuffles do not break tests.
+- **Launch gate:** the greedy earns its complexity only if it is
+  definitively better, measured before/after on identical inputs. If the
+  numbers do not show it, the branch does not merge (see Acceptance).
+- **Validity bar unchanged:** every displayed order still passes the
+  independent oracle's gate. A shorter illegal plan is worse than no plan
+  at all; the empty state remains the honest fallback.
 - Built on the `need-driven-ordering` branch from the deployed main.
 
 ## The boundary that shapes the architecture
@@ -149,9 +155,28 @@ rule.
 
 ## Acceptance
 
-- The reproduction URL's order: churn and steps at or below their pins
-  (target: crossroads-only scaffolding, low-twenties steps).
-- Seeded corpus: zero oracle failures (unchanged bar) AND aggregate
-  churn/step pins hold.
-- Full gate, `just fuzz`, `just e2e`, `just perf` green; per-click cost on
-  greedy-hit builds at or below today's.
+Two bars, both hard. Failing either one means the branch does not merge.
+
+**Definitively better, or not launched.** Baseline numbers are captured on
+main with the same harness before the algorithm lands, so the comparison
+is like for like. The final task records, on the 150-seed corpus and every
+`just build-order-validate` group:
+
+- aggregate scaffold churn strictly lower than baseline;
+- aggregate steps no higher than baseline;
+- zero orders lost: every build with an order on main still has one;
+- the per-build distribution (improved / unchanged / worsened churn)
+  recorded; a material worsened tail blocks launch even if the aggregate
+  improves;
+- the reproduction URL's order at or below its pins (target:
+  crossroads-only scaffolding, low-twenties steps versus 35 today).
+
+**Valid, always.** Verified-or-absent stays structural: the greedy adds no
+new render path, so every displayed order still flows through the oracle's
+gate (`gateBuildOrder`) and an illegal schedule is withheld - the panel's
+empty state, never a wrong order. The seeded-corpus oracle sweep,
+`just fuzz`, the tight-cap fixtures, and the panel-agreement test all run
+against the greedy's output with zero failures.
+
+And as before: full gate, `just e2e`, `just perf` green; per-click cost on
+greedy-hit builds at or below today's.
