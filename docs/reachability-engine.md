@@ -102,8 +102,9 @@ An order-exact minimum-construction-peak DP (`minPeakCost`) lives on branch
 (it searches ~100 real scaffolds per query), but it is sound by construction, so it
 serves as the validation oracle: the arbiter in `just realmap-hunt` and the ground
 truth in the costed-oracle tests. The shipped engine returns only a verdict; the
-guided build order builds its construction schedule from the same sampled witness
-(`buildOrderPath`), not from this DP.
+guided build order (`buildOrderPath`) builds its construction schedule from its
+own order generators (the need-driven greedy and the sampled witness, next
+section), not from this DP.
 
 ## The guided build order: legal at every step, verified or absent
 
