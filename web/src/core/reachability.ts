@@ -760,6 +760,15 @@ export type BuildStep =
   | { kind: "scaffold-add"; conId: string; points: number; heldAfter: number }
   | { kind: "scaffold-refund"; conId: string; points: number; heldAfter: number };
 
+/** Points spent on non-crossroads scaffolds in a schedule: the churn the ordering minimizes
+ *  (crossroads are free by definition - the objective is zero when a build bootstraps from
+ *  crossroads alone). Exported as the shared quality metric for tests and harnesses. */
+export function churnPoints(steps: BuildStep[]): number {
+  let pts = 0;
+  for (const s of steps) if (s.kind === "scaffold-add" && !s.conId.startsWith("crossroads_")) pts += s.points;
+  return pts;
+}
+
 /**
  * Emit the add/complete/refund schedule for a member `order` plus zero-grant `tail`: at each step,
  * hold the exact scaffold SET peakToReach picks (crossroads-biased), draining refunds the moment
@@ -852,16 +861,17 @@ function emitSchedule(
 /**
  * A legal constellation-level order that assembles the self-covering build `B` within `budget` points
  * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
- * grants cover it. Orders the granting members need-driven first (needDrivenOrder: each member
- * activated by what already stands plus at most a refundable crossroads, scaffolding only when
- * genuinely stuck), and falls back to the sampled peak-minimizing order (sampledConstruction) when
- * the greedy's order cannot be emitted within budget - so any build with an order under the sampler
- * alone still gets one; orders are gained, never lost. Emission (emitSchedule) holds the exact
- * scaffold SET peakToReach picks and drains refunds per the in-game rule (docs/devotion-system.md,
- * "removal cannot strand a dependent"). Returns null when neither order fits the budget or a held
- * scaffold can never be legally refunded - the honest "not validly buildable" signal. No order is
- * better than an illegal order. Input is canonicalized (sorted by constellation id), so the output
- * is a pure function of the build set - every caller (panel, test, script) gets the identical order.
+ * grants cover it. Two candidate orders are emitted (emitSchedule holds the exact scaffold SET
+ * peakToReach picks and drains refunds per the in-game rules, docs/devotion-system.md): the
+ * need-driven greedy order (needDrivenOrder: the build builds itself, usually from crossroads alone)
+ * and the sampled peak-minimizing witness order (sampledConstruction). Neither generator dominates -
+ * the greedy wins cap-tight builds the sampler scaffolds heavily, the sampler's bootstrap heuristic
+ * wins typical builds the greedy misorders - so the better schedule by the ordering objective is
+ * returned: fewer churn points (churnPoints), then fewer steps, the greedy on a full tie. Per-build
+ * best-of-both is never worse than either generator alone. Returns null when neither order fits the
+ * budget or a held scaffold can never be legally refunded - the honest "not validly buildable"
+ * signal. No order is better than an illegal order. Input is canonicalized (sorted by constellation
+ * id), so the output is a pure function of the build set - every caller gets the identical order.
  */
 export function buildOrderPath(
   cons: ReachCon[],
@@ -875,19 +885,15 @@ export function buildOrderPath(
   const parts = buildParts(cons, B);
   if (!parts) return null; // not self-covering
   if (parts.totalSize > budget) return null;
-  // Greedy first: the need-driven order usually bootstraps from crossroads alone (zero churn) and
-  // skips the sampler entirely. Emission is the authority on whether it fits the cap - orderPeak
-  // would be a cheaper pre-check but ignores refunds, so it would wrongly reject orders whose
-  // refunds keep the running total under budget.
   const nd = needDrivenOrder(cons, B);
-  if (nd) {
-    const viaGreedy = emitSchedule(nd.order, nd.tail, parts.pool, table, budget);
-    if (viaGreedy) return viaGreedy;
-  }
-  // Fallback: the sampled witness order, exactly as before the greedy existed.
+  const viaGreedy = nd ? emitSchedule(nd.order, nd.tail, parts.pool, table, budget) : null;
   const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
-  if (sc.peak > budget) return null;
-  return emitSchedule(sc.order, sc.tail, parts.pool, table, budget);
+  const viaSampler = sc.peak <= budget ? emitSchedule(sc.order, sc.tail, parts.pool, table, budget) : null;
+  if (!viaGreedy || !viaSampler) return viaGreedy ?? viaSampler;
+  const g = churnPoints(viaGreedy);
+  const s = churnPoints(viaSampler);
+  if (g !== s) return g < s ? viaGreedy : viaSampler;
+  return viaGreedy.length <= viaSampler.length ? viaGreedy : viaSampler;
 }
 
 /** The on-demand escalation behind the "Find valid order" button: the same schedule at high tries, to

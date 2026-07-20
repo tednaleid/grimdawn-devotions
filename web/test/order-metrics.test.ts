@@ -1,7 +1,7 @@
 // ABOUTME: Unit tests for the build-order quality metrics: churn counts non-crossroads scaffold-add
 // ABOUTME: points only (crossroads bootstrapping is free by definition; completes are the build itself).
 import { test, expect } from "bun:test";
-import { churnPoints } from "./support/order-metrics";
+import { churnPoints } from "../src/core/reachability";
 import type { BuildStep } from "../src/core/reachability";
 
 test("churn counts non-crossroads scaffold-add points only", () => {

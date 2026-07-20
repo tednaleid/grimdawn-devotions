@@ -10,6 +10,7 @@ import {
   buildReachCons,
   buildCoverTable,
   buildOrderPath,
+  churnPoints,
   type ReachCon,
   type Vec,
 } from "../src/core/reachability";
@@ -17,7 +18,6 @@ import { mulberry32 } from "../test/support/reach-oracle";
 import { genSelfCovering } from "../test/support/walk-fuzzer";
 import { minPeakCost } from "../test/support/costed-oracle";
 import { verifyBuildOrder } from "../src/core/orderLegality";
-import { churnPoints } from "../test/support/order-metrics";
 
 const argNum = (flag: string, def: number): number => {
   const i = process.argv.indexOf(flag);

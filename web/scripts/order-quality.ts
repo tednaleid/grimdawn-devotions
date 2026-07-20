@@ -1,9 +1,8 @@
 // ABOUTME: Build-order quality over the pinned 150-seed corpus + the reproduction URL: per-build
 // ABOUTME: churn/steps CSV on stdout, aggregates on stderr. The launch-gate before/after tool.
-import { buildOrderPath, selectionSummary, BUDGET } from "../src/core/reachability";
+import { buildOrderPath, selectionSummary, BUDGET, churnPoints } from "../src/core/reachability";
 import { model, cons, table, generateValidBuild, mulberry32 } from "./reachability-fuzz";
 import { canonicalStarIds, decodeHash } from "../src/core/urlState";
-import { churnPoints } from "../test/support/order-metrics";
 
 const SEEDS = 150; // must match web/test/build-order-oracle.test.ts
 console.log("build,churn,steps");
