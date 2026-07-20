@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "NW",
   "ui.buildOrder.dir.se": "SE",
   "ui.buildOrder.dir.sw": "SW",
-  "ui.buildOrder.fullRespecNote": "Żadna przyrostowa ścieżka nie mieści się w limicie punktów. Ta kolejność to pełna przebudowa.",
+  "ui.buildOrder.fullRespecNote": "Nie znaleziono przyrostowej ścieżki. Ta kolejność to pełna przebudowa.",
   "ui.buildOrder.incompleteAffinity": "Niekompletna budowa: wymaga powinowactwa {deficit}.",
   "ui.buildOrder.noLegalPath": "Nie istnieje legalna ścieżka do tej budowy.",
   "ui.buildOrder.noPathCap": "Nie ma ścieżki do tej budowy w mniej niż {minCap} punktów.",

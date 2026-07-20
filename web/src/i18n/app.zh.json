@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "NW",
   "ui.buildOrder.dir.se": "SE",
   "ui.buildOrder.dir.sw": "SW",
-  "ui.buildOrder.fullRespecNote": "没有增量路径能满足点数上限。此顺序为完全重建。",
+  "ui.buildOrder.fullRespecNote": "未找到增量路径。此顺序为完全重建。",
   "ui.buildOrder.incompleteAffinity": "构建未完成: 还需要{deficit}点亲和。",
   "ui.buildOrder.noLegalPath": "不存在通往此构建的合法路径。",
   "ui.buildOrder.noPathCap": "无法在少于{minCap}点的情况下达成此构建。",

@@ -1297,6 +1297,9 @@ export function selectionView(
       };
     }
   }
+  // Verified or absent: render only orders the independent oracle proves legal at every step;
+  // anything else is withheld and the panel shows its honest empty state instead. The verifying
+  // replay's per-step states ride along for the step popup - one walk, two outputs.
   const raw = members.length ? buildOrderPath(cons, table, members, cap, 16) : null;
   const gated = gateBuildOrder(cons, members, raw, cap);
   return {

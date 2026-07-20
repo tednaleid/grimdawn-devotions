@@ -53,6 +53,7 @@ test("states: one per completed step, capped have, need from started members", (
   expect(r.error).toBeNull();
   expect(r.states.length).toBe(2);
   expect(r.states[0]!.have).toEqual(v(1)); // G complete
+  expect(r.states[0]!.conGrant).toEqual(v(1)); // G completes with its grant
   expect(r.states[1]!.have).toEqual(v(2)); // G + M complete
   expect(r.states[1]!.need).toEqual(v(1)); // M demands 1 Ascendant
   expect(r.states[1]!.needSource.get(0)).toEqual(["m"]);

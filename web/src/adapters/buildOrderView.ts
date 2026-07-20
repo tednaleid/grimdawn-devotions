@@ -142,6 +142,13 @@ export function transitionHtml(
   if (!steps.length) return `${head}<div class="bo-empty">${loc.translate("ui.buildOrder.transitionIdentical")}</div>`;
   const note =
     rung === "full-respec" ? `<div class="bo-note">${loc.translate("ui.buildOrder.fullRespecNote")}</div>` : "";
+  // A constellation is TRANSIENT when its LAST step in this transition ends at 0: bought (or held)
+  // along the way but gone by the end. An add that reaches full size for a transient constellation is
+  // scaffolding, not a member of the resulting build, so it stays an unnumbered Add row below rather
+  // than claiming a numbered bo-complete slot.
+  const finalTo = new Map<string, number>();
+  for (const s of steps) finalTo.set(s.conId, s.to);
+  const transient = new Set([...finalTo].filter(([, to]) => to === 0).map(([conId]) => conId));
   let n = 0;
   const rows = steps
     .map((s, si) => {
@@ -150,7 +157,7 @@ export function transitionHtml(
       const name = stepConName(loc, model, s.conId);
       const artName = c?.background?.image?.split("/").pop() ?? "";
       const art = manifest?.images[artName];
-      const completes = s.kind === "add" && !!c && s.to === c.starIds.length;
+      const completes = s.kind === "add" && !!c && s.to === c.starIds.length && !transient.has(s.conId);
       // Crossroads have no art; their art-column cell holds a dot in the granted affinity's color.
       const dot = cr ? `<span class="bo-art">${affinityOrb(cr.affinity)}</span>` : "";
       const img = art && completes ? `<img class="bo-art" src="${esc(art.url)}" alt=""/>` : "";

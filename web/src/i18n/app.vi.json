@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "TB",
   "ui.buildOrder.dir.se": "ĐN",
   "ui.buildOrder.dir.sw": "TN",
-  "ui.buildOrder.fullRespecNote": "Không có đường tăng dần nào vừa giới hạn điểm. Thứ tự này là xây lại toàn bộ.",
+  "ui.buildOrder.fullRespecNote": "Không tìm thấy đường tăng dần. Thứ tự này là xây lại toàn bộ.",
   "ui.buildOrder.incompleteAffinity": "Bản dựng chưa hoàn chỉnh: cần thêm {deficit} ái lực.",
   "ui.buildOrder.noLegalPath": "Không tồn tại cách hợp lệ nào để đạt bản dựng này.",
   "ui.buildOrder.noPathCap": "Không có cách nào để đạt bản dựng này trong ít hơn {minCap} điểm.",

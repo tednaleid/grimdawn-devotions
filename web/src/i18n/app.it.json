@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "NO",
   "ui.buildOrder.dir.se": "SE",
   "ui.buildOrder.dir.sw": "SO",
-  "ui.buildOrder.fullRespecNote": "Nessun percorso incrementale rientra nel limite di punti. Questo ordine è una ricostruzione completa.",
+  "ui.buildOrder.fullRespecNote": "Nessun percorso incrementale è stato trovato. Questo ordine è una ricostruzione completa.",
   "ui.buildOrder.incompleteAffinity": "Build incompleta: richiede {deficit} di affinità.",
   "ui.buildOrder.noLegalPath": "Non esiste un percorso valido per questa build.",
   "ui.buildOrder.noPathCap": "Nessun percorso per questa build in meno di {minCap} punti.",

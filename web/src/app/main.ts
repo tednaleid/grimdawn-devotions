@@ -630,7 +630,7 @@ async function boot() {
     // Comparing but no verified transition order (the none pair): the from-scratch panel still
     // renders, with a leading notice that it is showing the current build rather than a transition.
     const note =
-      baseline !== null
+      baseline !== null && baseline.selected.size > 0
         ? `<div class="bo-note">${localization.translate("ui.buildOrder.transitionUnavailable")}</div>`
         : "";
     panel.innerHTML = note + buildOrderHtml(localization, model, data.manifest, steps, noOrder);

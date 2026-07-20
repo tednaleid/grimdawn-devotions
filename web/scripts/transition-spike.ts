@@ -12,10 +12,8 @@ import { mutatePair, randomPair } from "../test/support/transition-pairs";
 const covers = (g: Vec, d: Vec): boolean =>
   g[0] >= d[0] && g[1] >= d[1] && g[2] >= d[2] && g[3] >= d[3] && g[4] >= d[4];
 
-export { type TransStep };
 export const verifyTransition = (base: ReachCon[], cur: ReachCon[], steps: TransStep[], cap: number) =>
   coreVerifyTransition(cons, base, cur, steps, cap);
-export { mutatePair, randomPair };
 
 const BUDGET = 55;
 

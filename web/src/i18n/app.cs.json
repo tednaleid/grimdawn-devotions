@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "SZ",
   "ui.buildOrder.dir.se": "JV",
   "ui.buildOrder.dir.sw": "JZ",
-  "ui.buildOrder.fullRespecNote": "Žádná postupná cesta se nevejde do limitu bodů. Toto pořadí je úplná přestavba.",
+  "ui.buildOrder.fullRespecNote": "Žádná postupná cesta nebyla nalezena. Toto pořadí je úplná přestavba.",
   "ui.buildOrder.incompleteAffinity": "Neúplné sestavení: chybí {deficit} afinity.",
   "ui.buildOrder.noLegalPath": "K tomuto sestavení neexistuje platná cesta.",
   "ui.buildOrder.noPathCap": "Neexistuje cesta k tomuto sestavení v méně než {minCap} bodech.",

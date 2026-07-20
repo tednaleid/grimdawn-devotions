@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "NW",
   "ui.buildOrder.dir.se": "SE",
   "ui.buildOrder.dir.sw": "SW",
-  "ui.buildOrder.fullRespecNote": "점진적 경로가 포인트 상한에 맞지 않습니다. 이 순서는 전체 재구축입니다.",
+  "ui.buildOrder.fullRespecNote": "점진적 경로를 찾지 못했습니다. 이 순서는 전체 재구축입니다.",
   "ui.buildOrder.incompleteAffinity": "미완성 빌드: {deficit}가 필요합니다.",
   "ui.buildOrder.noLegalPath": "이 빌드로 가는 유효한 경로가 존재하지 않습니다.",
   "ui.buildOrder.noPathCap": "{minCap} 포인트 미만으로는 이 빌드에 도달할 경로가 없습니다.",

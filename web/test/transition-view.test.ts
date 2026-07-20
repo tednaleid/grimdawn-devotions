@@ -34,6 +34,34 @@ test("refund rows carry bo-refund and negative deltas; add rows bo-add or bo-com
   expect(html).toMatch(/bo-(add|complete)/);
 });
 
+test("a transient scaffold's add-to-full-size step renders bo-add, not bo-complete", () => {
+  // TRANSIENT: a conId whose LAST step in the transition ends at to === 0 (bought or held along the
+  // way, gone by the end). The full-respec up-phase's crossroads scaffolds provide these in this
+  // fixture: added to full size (1 star) to unlock a refund, then refunded back out.
+  const finalTo = new Map<string, number>();
+  for (const s of t.steps) finalTo.set(s.conId, s.to);
+  const transientAdds = t.steps
+    .map((s, si) => ({ s, si }))
+    .filter(({ s }) => {
+      const c = model.constellations.get(s.conId);
+      return s.kind === "add" && !!c && s.to === c.starIds.length && finalTo.get(s.conId) === 0;
+    });
+  expect(transientAdds.length).toBeGreaterThan(0); // the fixture must actually exercise this case
+  const html = transitionHtml(enLoc, model, null, t.steps, t.rung);
+  for (const { s, si } of transientAdds) {
+    const row = html.match(new RegExp(`<div class="bo-step ([\\w-]+)" data-con-id="${s.conId}" data-step-i="${si}">`));
+    expect(row).not.toBeNull();
+    expect(row![1]).toBe("bo-add");
+  }
+  // A surviving constellation's add-to-full-size step still earns a numbered bo-complete row.
+  const survives = t.steps.some((s) => {
+    const c = model.constellations.get(s.conId);
+    return s.kind === "add" && !!c && s.to === c.starIds.length && finalTo.get(s.conId) !== 0;
+  });
+  expect(survives).toBe(true);
+  expect(html).toContain("bo-complete");
+});
+
 test("the full-respec rung shows its plain notice", () => {
   const html = transitionHtml(enLoc, model, null, t.steps, "full-respec");
   expect(html).toContain("full rebuild");

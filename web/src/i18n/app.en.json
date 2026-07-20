@@ -68,7 +68,7 @@
   "ui.buildOrder.selectPrompt": "Select a self-covering build to see its order.",
   "ui.buildOrder.partial": "({taken}/{total})",
   "ui.buildOrder.transitionHeading": "Baseline to current build",
-  "ui.buildOrder.fullRespecNote": "No incremental path fits the point cap. This order is a full rebuild.",
+  "ui.buildOrder.fullRespecNote": "No incremental path was found. This order is a full rebuild.",
   "ui.buildOrder.transitionIdentical": "The baseline and current build match. Nothing to change.",
   "ui.buildOrder.transitionUnavailable": "No transition order found. Showing the current build from scratch.",
   "aff.ascendant": "Ascendant",

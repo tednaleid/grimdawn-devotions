@@ -139,7 +139,7 @@
   "ui.buildOrder.dir.nw": "NW",
   "ui.buildOrder.dir.se": "SO",
   "ui.buildOrder.dir.sw": "SW",
-  "ui.buildOrder.fullRespecNote": "Kein schrittweiser Pfad passt in das Punktelimit. Diese Reihenfolge ist ein kompletter Neuaufbau.",
+  "ui.buildOrder.fullRespecNote": "Kein schrittweiser Pfad wurde gefunden. Diese Reihenfolge ist ein kompletter Neuaufbau.",
   "ui.buildOrder.incompleteAffinity": "Unvollständiger Aufbau: benötigt {deficit} Affinität.",
   "ui.buildOrder.noLegalPath": "Es gibt keinen gültigen Weg zu diesem Aufbau.",
   "ui.buildOrder.noPathCap": "Kein Weg zu diesem Aufbau mit weniger als {minCap} Punkten.",

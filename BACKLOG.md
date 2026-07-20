@@ -415,3 +415,19 @@ priority order:
 
 Pointers: the score loop and grants predicate in web/src/core/reachability.ts
 (needDrivenOrder, buildParts); web/test/need-driven-order.test.ts.
+
+## Build-order renderers: shared step-row template
+
+`buildOrderHtml` and `transitionHtml` each carry their own art/dot/row markup;
+a shared `renderStepRow` would prevent drift.
+
+Pointers: web/src/adapters/buildOrderView.ts (both renderers).
+
+## Reachability data guard: requirements never exceed CAP_MAX
+
+The capped/uncapped verdict equivalence in the legality oracles assumes every
+constellation requirement is at most CAP_MAX per color; nothing pins that
+against a future data extraction. Add a one-test guard over cons.
+
+Pointers: CAP_MAX in web/src/core/reachability.ts, orderLegality.ts,
+transitionOrder.ts; a new assertion in web/test (e.g. beside the model tests).

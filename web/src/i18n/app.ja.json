@@ -138,7 +138,7 @@
   "ui.buildOrder.dir.nw": "NW",
   "ui.buildOrder.dir.se": "SE",
   "ui.buildOrder.dir.sw": "SW",
-  "ui.buildOrder.fullRespecNote": "段階的な経路がポイント上限に収まりません。この順序は完全な再構築です。",
+  "ui.buildOrder.fullRespecNote": "段階的な経路が見つかりませんでした。この順序は完全な再構築です。",
   "ui.buildOrder.incompleteAffinity": "未完成のビルド: {deficit}の属性が必要です。",
   "ui.buildOrder.noLegalPath": "このビルドへの正当な経路は存在しません。",
   "ui.buildOrder.noPathCap": "{minCap}ポイント未満でこのビルドに到達する経路はありません。",
