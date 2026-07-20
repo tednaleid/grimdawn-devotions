@@ -13,7 +13,7 @@ import {
   type BuildStep,
 } from "../src/core/reachability";
 import { verifyTransition as coreVerifyTransition, type TransStep } from "../src/core/orderLegality";
-import { cons, table, generateValidBuild, isValidBuild, mulberry32 } from "./reachability-fuzz";
+import { cons, table, mulberry32 } from "./reachability-fuzz";
 import { mutatePair, randomPair } from "../test/support/transition-pairs";
 
 const zero = (): Vec => [0, 0, 0, 0, 0];

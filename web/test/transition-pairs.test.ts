@@ -51,6 +51,9 @@ test("swapPair removes a load-bearing granter and regrows to a valid build", () 
     expect(isValidBuild(p.cur)).toBeTrue();
     const curIds = new Set(p.cur.map((c) => c.id));
     expect(p.base.some((c) => !curIds.has(c.id))).toBeTrue(); // something was removed
+    const removed = p.base.filter((c) => !curIds.has(c.id));
+    expect(removed.length).toBeGreaterThan(0);
+    expect(removed.some((m) => !isValidBuild(p.base.filter((c) => c.id !== m.id)))).toBeTrue();
   }
   expect(found).toBeGreaterThan(0);
 });
