@@ -4,7 +4,8 @@
 // ABOUTME: its requirement met). minCost is bracketed by a fast cover-table lower bound (sound for
 // ABOUTME: "dim") and a constructibility-aware greedy upper bound (sound for "reachable").
 import { AFFINITIES, type DevotionModel, type StarId } from "./types";
-import { gateBuildOrder, type StepState } from "./orderLegality";
+import { gateBuildOrder, gateTransition, type StepState, type TransStep } from "./orderLegality";
+import { transitionOrderPath, type TransitionRung } from "./transitionOrder";
 
 export type Vec = [number, number, number, number, number]; // order = AFFINITIES
 // Hard per-color cap: the max requirement that gates anything; affinity beyond this is worthless.
@@ -1255,6 +1256,10 @@ export interface SelectionView {
   reach: ReachView; // reachabilityForSelection: dimming, reachable stars, and the affinity panel vectors
   buildOrder: BuildStep[] | null; // live (tries=16) oracle-verified order to assemble the selection, or null (verified or absent)
   buildOrderStates: StepState[] | null; // per-step post-states from the verifying replay; present exactly when buildOrder is
+  /** Compare mode: the verified baseline-to-current transition, with its replay's states; null
+   *  when not comparing or when no rung produced a verified order (the panel then falls back to
+   *  the from-scratch order). */
+  transition: { steps: TransStep[]; states: StepState[]; rung: TransitionRung } | null;
 }
 
 /**
@@ -1271,14 +1276,34 @@ export function selectionView(
   table: CoverTable,
   selected: Set<StarId>,
   cap = BUDGET,
+  baseline: Set<StarId> | null = null,
 ): SelectionView {
   const minCost = selectionMinCost(model, cons, table, selected);
   const reach = reachabilityForSelection(model, cons, table, selected, Math.max(cap, minCost));
   const members = selectionSummary(model, selected).built;
+  // Compare mode: the transition REPLACES the from-scratch computation (roughly flat per-click
+  // cost); a none pair falls back to the from-scratch order so compare never shows less than today.
+  if (baseline && baseline.size > 0) {
+    const baseMembers = selectionSummary(model, baseline).built;
+    const raw = transitionOrderPath(cons, table, baseMembers, members, cap, 16);
+    const gated = raw ? gateTransition(cons, baseMembers, members, raw.steps, cap) : null;
+    if (gated) {
+      return {
+        minCost,
+        reach,
+        buildOrder: null,
+        buildOrderStates: null,
+        transition: { steps: gated.steps, states: gated.states, rung: raw!.rung },
+      };
+    }
+  }
   const raw = members.length ? buildOrderPath(cons, table, members, cap, 16) : null;
-  // Verified or absent: render only orders the independent oracle proves legal at every step;
-  // anything else is withheld and the panel shows its honest empty state instead. The verifying
-  // replay's per-step states ride along for the step popup - one walk, two outputs.
   const gated = gateBuildOrder(cons, members, raw, cap);
-  return { minCost, reach, buildOrder: gated?.steps ?? null, buildOrderStates: gated?.states ?? null };
+  return {
+    minCost,
+    reach,
+    buildOrder: gated?.steps ?? null,
+    buildOrderStates: gated?.states ?? null,
+    transition: null,
+  };
 }
