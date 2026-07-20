@@ -140,6 +140,17 @@ them and refunds each the moment the in-game rules allow. Its contract:
   walk, two outputs) to feed the panel's step popup, so the have/need numbers a
   user hovers are exactly the numbers the judge saw.
 
+While comparing, the panel shows a baseline-to-current TRANSITION instead: a
+two-rung ladder (web/src/core/transitionOrder.ts) tries an incremental seeded
+replay (kept members stand, baseline-only members serve as pre-paid scaffolds,
+two-pass refund scheduling), then falls back to a full respec built from the
+churn-minimized from-scratch orders. Every rung's output must pass the
+transition oracle (`replayTransition` in web/src/core/orderLegality.ts, the
+same one-walk-two-outputs pattern) before display, and the popup's states come
+from that verifying replay. A pair with no verified transition falls back to
+the current build's from-scratch order, so compare mode never shows less than
+the normal panel.
+
 The regression net: oracle unit tests (web/test/order-legality.test.ts), the
 real-build fixture replay and determinism pins (web/test/build-order-path.test.ts),
 a seeded 150-build panel-path sweep plus the live-site reproduction URL

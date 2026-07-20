@@ -433,9 +433,50 @@ try {
     (await readParam("s")) === sPre && (await readParam("cs")) === csPre,
     "Swap again restores the original orientation",
   );
+  // Transition: the swap divergence above only adds a star, which alone yields an adds-only
+  // transition. Re-baseline while the swap star is still selected, then deselect it (clicking a
+  // selected leaf star removes it) so the current build lacks something the baseline has,
+  // forcing a refund step.
+  await cdp.evaluate(`document.getElementById('set-baseline').click()`);
+  for (let i = 0; i < 20; i++) {
+    await Bun.sleep(100);
+    if (await cdp.evaluate<boolean>("document.querySelector('.cmp-bar') !== null")) break;
+  }
+  await cdp.evaluate(
+    `document.querySelector('circle[data-star-id="${swapStar}"]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}))`,
+  );
+  let transitionHead = false;
+  for (let i = 0; i < 20; i++) {
+    await Bun.sleep(100);
+    if (await cdp.evaluate<boolean>("document.querySelector('#build-order-panel .bo-compare-head') !== null")) {
+      transitionHead = true;
+      break;
+    }
+  }
+  check(transitionHead, "comparing with a removal shows the transition panel (direction heading present)");
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('#build-order-panel .bo-refund').length")) > 0,
+    "the transition contains a refund step for the removed member",
+  );
+  await cdp.evaluate(`document.getElementById('cmp-swap').click()`);
+  await Bun.sleep(150);
+  check(
+    await cdp.evaluate<boolean>("document.querySelector('#build-order-panel .bo-compare-head') !== null"),
+    "swap keeps the transition panel (direction always reads baseline to current)",
+  );
+  await cdp.evaluate(`document.getElementById('cmp-swap').click()`); // restore orientation
+  await Bun.sleep(150);
   // Exit compare and restore the pre-swap build so the sections below start from the same state.
   await cdp.evaluate(`document.getElementById('cmp-revert').click()`);
   await Bun.sleep(150);
+  check(
+    await cdp.evaluate<boolean>("document.querySelector('#build-order-panel .bo-compare-head') === null"),
+    "exiting compare restores the from-scratch build order",
+  );
+  check(
+    cdp.consoleErrors.length === 0,
+    `no console errors after the transition checks (got ${cdp.consoleErrors.length})`,
+  );
 
   // --- History-aware URL state (docs/superpowers/specs/2026-07-14-url-history-design.md) ---
   // Restore budget first: the earlier "empties" check parked the cap at the validity floor,
