@@ -692,10 +692,7 @@ export function minPeakSampledOrder(
  * replay buy exactly that gap. Zero-grant members go to `tail`, placed last. Canonicalized and
  * deterministic like buildOrderPath; null only when B is not self-covering (one honest signal).
  */
-export function needDrivenOrder(
-  cons: ReachCon[],
-  B: ReachCon[],
-): { order: ReachCon[]; tail: ReachCon[] } | null {
+export function needDrivenOrder(cons: ReachCon[], B: ReachCon[]): { order: ReachCon[]; tail: ReachCon[] } | null {
   B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: a function of the SET
   const parts = buildParts(cons, B);
   if (!parts) return null; // not self-covering
