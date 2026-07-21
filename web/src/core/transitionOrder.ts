@@ -1,6 +1,6 @@
 // ABOUTME: Baseline-to-current transition orders for compare mode: a best-of-candidates selection
-// ABOUTME: (deterministic state walk, incremental seeded replay, full-respec rebuild) returning the
-// ABOUTME: oracle-verified schedule that moves the fewest points, or null when none verifies.
+// ABOUTME: (state walk in both directions via schedule reversal, incremental seeded replay, full
+// ABOUTME: respec) returning the oracle-verified schedule moving the fewest points, or null.
 import { peakToReach, buildOrderPath, INF } from "./reachability";
 import type { ReachCon, Vec, CoverTable, BuildStep } from "./reachability";
 import { verifyTransition, type TransStep } from "./orderLegality";
@@ -580,8 +580,8 @@ export function transitionOrderPath(
     const size = cur.reduce((a, c) => a + c.size, 0);
     return size <= cap ? { steps: [], rung: "incremental" } : null;
   }
-  // Best of all verified candidates by (moved points, steps, candidate order). Today's two
-  // candidates stay in the pool, so no pair can do worse than before the walk existed.
+  // Best of all verified candidates by (moved points, steps, candidate order). The pre-walk
+  // candidates stay in the pool unmodified, so no pair can do worse than any earlier engine.
   const clean = (steps: TransStep[] | null) => steps && verifyTransition(cons, base, cur, steps, cap) === null;
   const moved = (steps: TransStep[]) => steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
   const candidates: { steps: TransStep[]; rung: TransitionRung }[] = [];
