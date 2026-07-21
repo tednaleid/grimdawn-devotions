@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript (bun), bun:test, just recipes. Spec: `docs/superpowers/specs/2026-07-20-transition-state-walk-design.md`. Branch: `compare-transition` (held from merge until this gate passes).
 
-**Spec deviations (deliberate, small):** (1) move 2 generalizes from "refund a non-target" to "refund toward target", which also covers shrink-resizes (a shared member standing above its target count); (2) the spec's teardown condition ("the smallest whose removal unblocks progress") is realized as smallest-legal-first with the step budget as guard: "does it unblock" is answered by trying it, deterministically; (3) move 1 prefers never-torn candidates over re-adds of torn members, found by the Task 2 stuck-teardown test: with all deficits covered, the density score is uninformative and the plain id tie-break re-added the just-torn member.
+**Spec deviations (deliberate, small):** (1) move 2 generalizes from "refund a non-target" to "refund toward target", which also covers shrink-resizes (a shared member standing above its target count); (2) the spec's teardown condition ("the smallest whose removal unblocks progress") is realized as smallest-legal-first with the step budget as guard: "does it unblock" is answered by trying it, deterministically; (3) move 1 prefers never-torn candidates over re-adds of torn members, found by the Task 2 stuck-teardown test: with all deficits covered, the density score is uninformative and the plain id tie-break re-added the just-torn member; (4) move 2 skips load-bearing members (refunding a member whose exclusion would grow an outstanding deficit only forces a re-buy; found on the owner's pair, where the walk cycled add-scaffold/refund-scaffold and never reached the teardown) and scores candidates by effective standing grant, so a partial counts as zero-grant (the Ghoul observation). With (4) the owner's direction resolves at exactly the hand path (9 steps, 32 moved, walk-won); the swapped direction stays at full respec 130 (the walk returns null there) and REVERSED_PIN records that honest measurement.
 
 ## Global Constraints
 
@@ -151,6 +151,23 @@ test("every walk result on 20 small-delta pairs is oracle-clean", () => {
   }
   expect(produced).toBeGreaterThan(10);
 });
+
+test("a load-bearing scaffold is not refunded while its beneficiary is pending", () => {
+  // X's grant is the only cover for pending T's requirement; cap blocks adding T while B stands.
+  // Without the exclusion, the walk toggles X (refund as "free", re-add as scaffold) and never
+  // reaches the teardown of B; with it, X waits until T completes and self-sustains.
+  const B = con("blob", 4, z(), z());
+  const X = con("prop", 1, z(), v(0, 1));
+  const T = con("target", 3, v(0, 1), v(0, 3));
+  const all = [B, X, T];
+  const walk = stateWalkTransition(all, buildCoverTable(all), [B, X], [B, T], 7);
+  expect(walk).not.toBeNull();
+  expect(verifyTransition(all, [B, X], [B, T], walk!, 7)).toBeNull();
+  const xRefund = walk!.findIndex((s) => s.conId === "prop" && s.kind === "refund");
+  const tAdd = walk!.findIndex((s) => s.conId === "target" && s.kind === "add");
+  expect(tAdd).toBeGreaterThanOrEqual(0);
+  expect(xRefund).toBeGreaterThan(tAdd);
+});
 ```
 
 - [ ] **Step 2: Run the tests to verify they fail**
@@ -168,8 +185,9 @@ In `web/src/core/transitionOrder.ts`, after `teardownRebuild`, add:
  * board toward the current build, one oracle-legal move at a time. Priorities each iteration:
  * (1) complete a target member, never-torn candidates before re-adds of torn ones, then the densest
  * contributor to the outstanding deficits per moved star, ties by id; (2) free points - refund any
- * standing constellation above its target count, zero-grant members first, then the grant least
- * useful to the remaining deficits, ties by id; (3) add one scaffold from peakToReach's minimal
+ * standing constellation above its target count whose grant no outstanding deficit leans on,
+ * zero-effective-grant members first, then the grant least useful to the remaining deficits, ties
+ * by id; (3) add one scaffold from peakToReach's minimal
  * crossroads-biased set when it fits; (4) only
  * when stuck, tear down a standing at-target member (smallest legal first, ties by id, each torn
  * at most once) - it rejoins the pool and move 1 re-adds it later. Bounded: total moved points may
@@ -234,17 +252,19 @@ export function stateWalkTransition(
     steps.push({ kind, conId: id, from, to, heldAfter: running });
     if (to === 0) counts.delete(id);
   };
-  const standingGrant = (): Vec => {
+  const standingGrant = (excl: string | null = null): Vec => {
     let g = zero();
     for (const [id, n] of counts) {
+      if (id === excl) continue;
       const c = conById.get(id)!;
       if (n >= c.size) g = addCap(g, c.grant);
     }
     return g;
   };
-  // What the not-yet-at-target members still demand beyond the standing complete grants.
-  const deficitVec = (): Vec => {
-    const g = standingGrant();
+  // What the not-yet-at-target members still demand beyond the standing complete grants
+  // (optionally pretending one standing member is gone, to ask whether it is load-bearing).
+  const deficitVec = (excl: string | null = null): Vec => {
+    const g = standingGrant(excl);
     const d = zero();
     for (const [id, size] of want) {
       if ((counts.get(id) ?? 0) === size) continue;
@@ -296,18 +316,26 @@ export function stateWalkTransition(
         continue;
       }
     }
-    // 2. Free points: refund anything standing above its target, zero-grant first, then the grant
-    // least useful to the remaining deficits, ties by id. Covers leftovers, spent scaffolds, and
-    // shrink-resizes alike (refund toward target, not just to zero).
+    // 2. Free points: refund anything standing above its target whose grant no outstanding
+    // deficit leans on (a load-bearing scaffold would only be re-bought; it waits until its
+    // beneficiary completes and self-sustains). Zero-effective-grant members first (a partial
+    // grants nothing, the Ghoul observation), then the grant least useful to the remaining
+    // deficits, ties by id. Covers leftovers, spent scaffolds, and shrink-resizes alike
+    // (refund toward target, not just to zero).
     {
       const cands: { id: string; free: number; useful: number }[] = [];
       for (const [id, n] of counts) {
         const target = want.get(id) ?? 0;
         if (n <= target || !probe("refund", id, target)) continue;
         const c = conById.get(id)!;
+        const granting = n >= c.size; // only a complete member's grant is standing
+        if (granting) {
+          const dx = deficitVec(id);
+          if (dx.some((x, i) => x > d[i]!)) continue; // load-bearing: not free
+        }
         let useful = 0;
-        for (let i = 0; i < 5; i++) if (d[i]! > 0) useful += c.grant[i]!;
-        cands.push({ id, free: grantSum(c) === 0 ? 0 : 1, useful });
+        if (granting) for (let i = 0; i < 5; i++) if (d[i]! > 0) useful += c.grant[i]!;
+        cands.push({ id, free: granting && grantSum(c) > 0 ? 1 : 0, useful });
       }
       if (cands.length) {
         cands.sort((a, b) => a.free - b.free || a.useful - b.useful || (a.id < b.id ? -1 : 1));
