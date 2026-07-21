@@ -589,3 +589,125 @@ git commit -F - <<'EOF'
 feat(transition): aggregate moved-points pins; selection docs; launch-gate verdict
 EOF
 ```
+
+---
+
+### Task 5: The reversed-walk candidate (both directions resolve when either does)
+
+Added after the branch demo: the owner's URL displays the eel-to-ghoul direction (the URL's
+`cs` hash is the baseline), which is exactly the direction where the walk returns null and the
+panel falls back to the 130-moved full respec. A legal schedule traversed backward visits the
+same board states in reverse, so the walk's ghoul-to-eel schedule reversed is a legal
+eel-to-ghoul schedule (verified against the oracle in a scratch check: 9 steps, 32 moved,
+ORACLE-LEGAL). This task adds that reversal as a fourth selection candidate.
+
+**Files:**
+- Modify: `web/src/core/transitionOrder.ts` (a private `reverseSteps` helper + one candidate in `transitionOrderPath`, JSDoc updated)
+- Modify: `web/test/transition-order.test.ts` (the swapped-direction test tightens to incremental at or below 32; `REVERSED_PIN` retired; aggregate pins re-derived if the measurement drops)
+- Modify: `web/scripts/transition-spike.ts` (winner column gains the `walk-reversed` value)
+- Modify: `docs/reachability-engine.md` (candidate list sentence), `BACKLOG.md` (swapped-direction entry updated to the residual: pairs where the walk nulls in both directions)
+
+**Interfaces:**
+- Consumes: `stateWalkTransition` (exported), the Task 3 selection body, `TransStep`.
+- Produces: `transitionOrderPath` signature unchanged; the selection pool gains the reversed opposite-direction walk, verified like every candidate.
+
+- [ ] **Step 1: Tighten the swapped-direction test (RED first)**
+
+In `web/test/transition-order.test.ts`, delete the `REVERSED_PIN` constant and its comment block, and REPLACE the test "the owner's pair swapped is oracle-clean and no worse than full respec" with:
+
+```ts
+test("the owner's pair swapped resolves incrementally via the reversed walk", () => {
+  const [pair] = urlFixturePairs();
+  const res = transitionOrderPath(cons, table, pair!.cur, pair!.base, 55);
+  clean(pair!.cur, pair!.base, res, 55);
+  expect(res!.rung).toBe("incremental");
+  const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  expect(moved).toBeLessThanOrEqual(32); // the forward walk's schedule reversed: same 32 moved
+});
+```
+
+Run: `just test test/transition-order.test.ts`
+Expected: this test FAILS (today the swapped direction is full-respec at 130 moved) - the RED that proves the pin bites.
+
+- [ ] **Step 2: Implement the reversal candidate**
+
+In `web/src/core/transitionOrder.ts`, after `stateWalkTransition`, add:
+
+```ts
+/**
+ * Reverse a transition schedule: the same board states traversed backward, adds becoming
+ * refunds and refunds becoming adds. Turns a walk of the opposite direction (cur to base)
+ * into a base-to-cur candidate. startTotal is the reversed schedule's starting board total
+ * (the base build's star count). The result is verified like any candidate, never trusted.
+ */
+function reverseSteps(steps: TransStep[], startTotal: number): TransStep[] {
+  const rev: TransStep[] = [];
+  let running = startTotal;
+  for (let i = steps.length - 1; i >= 0; i--) {
+    const s = steps[i]!;
+    running += s.from - s.to;
+    rev.push({
+      kind: s.kind === "add" ? "refund" : "add",
+      conId: s.conId,
+      from: s.to,
+      to: s.from,
+      heldAfter: running,
+    });
+  }
+  return rev;
+}
+```
+
+In `transitionOrderPath`, insert the reversed candidate between the walk and the two-pass replay (candidate order becomes: walk, reversed walk, two-pass, full respec):
+
+```ts
+  const walk = stateWalkTransition(cons, table, base, cur, cap);
+  if (clean(walk)) candidates.push({ steps: walk!, rung: "incremental" });
+  const back = stateWalkTransition(cons, table, cur, base, cap);
+  if (back) {
+    const rev = reverseSteps(back, base.reduce((a, c) => a + c.size, 0));
+    if (clean(rev)) candidates.push({ steps: rev, rung: "incremental" });
+  }
+```
+
+Update `transitionOrderPath`'s doc comment to name the four candidates. No other changes to the selection.
+
+Run: `just test test/transition-order.test.ts test/transition-walk.test.ts test/selection-transition.test.ts test/transition-view.test.ts`
+Expected: all pass, including the tightened swapped test (GREEN).
+
+- [ ] **Step 3: Winner column and re-measurement**
+
+In `web/scripts/transition-spike.ts`, extend the winner computation: if the selection returned null, `none`; else if `res.rung === "full-respec"`, `full-respec`; else if the steps JSON-equal the direct walk's, `walk`; else if they JSON-equal the two-pass replay's, `two-pass`; else `walk-reversed` (the only remaining incremental candidate). Then re-measure:
+
+```bash
+just spike-transition --pairs 100 --csv > .superpowers/sdd/transition-after2.csv 2> .superpowers/sdd/transition-after2-report.txt
+tail -5 .superpowers/sdd/transition-after2-report.txt
+awk -F, 'NR>1 { m[$1]+=$4; n[$1]++ } END { for (c in m) printf "%s: pairs=%d moved=%d\n", c, n[c], m[c] }' .superpowers/sdd/transition-after2.csv
+paste -d, .superpowers/sdd/transition-after.csv .superpowers/sdd/transition-after2.csv | awk -F, '
+  NR > 1 { if ($9+0 > $4+0) { worse++; print "WORSE:", $1, $2, $4, "->", $9 } else if ($9+0 < $4+0) better++; else same++ }
+  END { printf "better=%d same=%d worse=%d\n", better, same, worse }'
+awk -F, 'NR>1 { w[$1","$5]++ } END { for (k in w) print k, w[k] }' .superpowers/sdd/transition-after2.csv
+```
+
+(Both CSVs have five columns here, so the after2 moved field is $9 in the paste.) Expected: zero oracle failures; worse=0 versus the pre-reversal branch state (structural - the pool only grew); per-corpus totals at or below the Task 4 values. Copy all lines into the report.
+
+- [ ] **Step 4: Re-derive pins if totals dropped; docs; backlog**
+
+If the small-delta, resize, or swap sweep totals changed, update `SMALL_DELTA_MOVED_PIN` / `RESIZE_MOVED_PIN` / `SWAP_MOVED_PIN` with the same `ceil(measured * 1.02)` formula and comments recording old and new measured values; prove any changed pin bites once (set to -1, watch fail, restore). In `docs/reachability-engine.md`, the candidate sentence now names the walk in both directions (the opposite-direction walk's schedule reversed and verified). In `BACKLOG.md`, rewrite the "Transition walk: swapped-direction incompleteness" entry: the reversed-walk candidate ships in this task; the residual is pairs where the walk returns null in BOTH directions; wider move-4 teardown eligibility and approach C remain the recorded levers.
+
+- [ ] **Step 5: Full gate and commit**
+
+```bash
+just test
+just e2e
+just perf > .superpowers/sdd/perf-walk2.txt 2>&1
+```
+
+Compare perf headline numbers to `.superpowers/sdd/perf-walk.txt` (one extra deterministic walk per compare-mode call; parity expected). Then:
+
+```bash
+git add web/src/core/transitionOrder.ts web/test/transition-order.test.ts web/scripts/transition-spike.ts docs/reachability-engine.md BACKLOG.md
+git commit -F - <<'EOF'
+feat(transition): reversed-walk candidate; both directions resolve when either does
+EOF
+```
