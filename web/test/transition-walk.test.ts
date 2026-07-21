@@ -89,3 +89,34 @@ test("a load-bearing scaffold is not refunded while its beneficiary is pending",
   expect(tAdd).toBeGreaterThanOrEqual(0);
   expect(xRefund).toBeGreaterThan(tAdd);
 });
+
+test("zero-grant targets are added last, granting targets first", () => {
+  // Both targets are addable from the start (no reqs, roomy cap); the zero-granter's id sorts
+  // first alphabetically, so only the granting-first preference can put the granter ahead.
+  const helper = con("helper", 2, z(), z());
+  const granter = con("bbb-granter", 2, z(), v(2));
+  const inert = con("aaa-inert", 2, z(), z());
+  const all = [helper, granter, inert];
+  const walk = stateWalkTransition(all, buildCoverTable(all), [helper], [helper, granter, inert], 55)!;
+  expect(walk).not.toBeNull();
+  const adds = walk.filter((s) => s.kind === "add").map((s) => s.conId);
+  expect(adds[0]).toBe("bbb-granter");
+  expect(adds[adds.length - 1]).toBe("aaa-inert");
+});
+
+test("the teardown tears a zero-grant member before a load-bearing granter", () => {
+  // L props S's requirement; T needs S's chaos grant and two slots of cap room. Tearing the
+  // granter S first (the old smallest-then-id order, "shared" < "zed") dead-ends into extra
+  // churn; tearing the inert Z first frees the room directly.
+  const L = con("leftover", 3, z(), v(3));
+  const S = con("shared", 2, v(3), v(0, 3));
+  const Z = con("zed", 2, z(), z());
+  const T = con("target", 2, v(0, 3), v(3));
+  const all = [L, S, Z, T];
+  const walk = stateWalkTransition(all, buildCoverTable(all), [L, S, Z], [S, Z, T], 7)!;
+  expect(walk).not.toBeNull();
+  expect(verifyTransition(all, [L, S, Z], [S, Z, T], walk, 7)).toBeNull();
+  expect(walk.some((s) => s.conId === "shared" && s.kind === "refund")).toBeFalse();
+  const moved = walk.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  expect(moved).toBeLessThanOrEqual(9); // tear zed, add target, refund leftover, re-add zed
+});

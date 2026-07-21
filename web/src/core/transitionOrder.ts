@@ -331,16 +331,17 @@ export function teardownRebuild(
 /**
  * The state walk: a deterministic greedy over actual game states, from the baseline's standing
  * board toward the current build, one oracle-legal move at a time. Priorities each iteration:
- * (1) complete a target member, never-torn candidates before re-adds of torn ones, then the densest
- * contributor to the outstanding deficits per moved star, ties by id; (2) free points - refund any
- * standing constellation above its target count whose grant no outstanding deficit leans on,
- * zero-effective-grant members first, then the grant least useful to the remaining deficits, ties
- * by id; (3) add one scaffold from peakToReach's minimal
- * crossroads-biased set when it fits; (4) only when stuck, tear down a standing at-target member
- * (smallest legal first, ties by id, each torn at most once) - it rejoins the pool and move 1
- * re-adds it later. Bounded: total moved points may not exceed four times the theoretical minimum;
- * exceeding it, or having no legal move, returns null. The walk is a candidate, not an authority:
- * callers verify its output like any other.
+ * (1) complete a target member, never-torn candidates before re-adds of torn ones, then a full-size
+ * add of a granting constellation before any zero-effective-grant add (a partial add grants nothing
+ * and sorts with the inert), then the densest contributor to the outstanding deficits per moved
+ * star, ties by id; (2) free points - refund any standing constellation above its target count
+ * whose grant no outstanding deficit leans on, zero-effective-grant members first, then the grant
+ * least useful to the remaining deficits, ties by id; (3) add one scaffold from peakToReach's
+ * minimal crossroads-biased set when it fits; (4) only when stuck, tear down a standing at-target
+ * member - zero-effective-grant members first (nothing can lean on them), then smallest, ties by
+ * id, each torn at most once - it rejoins the pool and move 1 re-adds it later. Bounded: total moved
+ * points may not exceed four times the theoretical minimum; exceeding it, or having no legal move,
+ * returns null. The walk is a candidate, not an authority: callers verify its output like any other.
  */
 export function stateWalkTransition(
   cons: ReachCon[],
@@ -439,6 +440,7 @@ export function stateWalkTransition(
       let pickPts = 0;
       let pickDelta = 1;
       let pickTorn = 1;
+      let pickGrants = 0;
       for (const [id, size] of want) {
         const at = counts.get(id) ?? 0;
         if (at >= size || !probe("add", id, size)) continue;
@@ -447,16 +449,20 @@ export function stateWalkTransition(
         if (size === c.size) for (let i = 0; i < 5; i++) if (d[i]! > 0) pts += c.grant[i]!;
         const delta = size - at;
         const torn = tornOnce.has(id) ? 1 : 0;
+        const grants = size === c.size && grantSum(c) > 0 ? 1 : 0;
         if (
           pick === null ||
           torn < pickTorn ||
           (torn === pickTorn &&
-            (pts * pickDelta > pickPts * delta || (pts * pickDelta === pickPts * delta && id < pick)))
+            (grants > pickGrants ||
+              (grants === pickGrants &&
+                (pts * pickDelta > pickPts * delta || (pts * pickDelta === pickPts * delta && id < pick)))))
         ) {
           pick = id;
           pickPts = pts;
           pickDelta = delta;
           pickTorn = torn;
+          pickGrants = grants;
         }
       }
       if (pick !== null) {
@@ -519,7 +525,11 @@ export function stateWalkTransition(
           return t > 0 && (counts.get(id) ?? 0) === t && !tornOnce.has(id);
         })
         .map((id) => conById.get(id)!)
-        .sort((a, b) => a.size - b.size || (a.id < b.id ? -1 : 1));
+        .sort((a, b) => {
+          const ga = want.get(a.id) === a.size && grantSum(a) > 0 ? 1 : 0;
+          const gb = want.get(b.id) === b.size && grantSum(b) > 0 ? 1 : 0;
+          return ga - gb || a.size - b.size || (a.id < b.id ? -1 : 1);
+        });
       let torn = false;
       for (const c of tearCands)
         if (probe("refund", c.id, 0)) {
