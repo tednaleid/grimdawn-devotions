@@ -38,7 +38,7 @@ interface PairResult {
   usNanosFromScratch: number;
   steps: TransStep[] | null; // kept only so report() can print sample orders; not part of the metrics
   incRejected: boolean; // incrementalTransition produced steps, but the selection settled on full-respec/none
-  winner: "walk" | "two-pass" | "full-respec" | "none"; // which candidate the selection actually returned
+  winner: "walk" | "walk-reversed" | "two-pass" | "full-respec" | "none"; // which candidate the selection actually returned
 }
 
 function measure(corpus: PairResult["corpus"], base: ReachCon[], cur: ReachCon[], cap: number): PairResult {
@@ -56,16 +56,20 @@ function measure(corpus: PairResult["corpus"], base: ReachCon[], cur: ReachCon[]
   const walkSteps = stateWalkTransition(cons, table, base, cur, cap);
   const incSteps = incrementalTransition(cons, table, base, cur, cap);
   const incRejected = (!res || res.rung === "full-respec") && incSteps !== null;
-  // Which candidate the selection actually returned: compare the winning steps against the walk's
-  // and the two-pass replay's own output (JSON-equal, since transitionOrderPath re-derives both
-  // candidates identically). Neither match means the full respec won.
+  // Which candidate the selection actually returned. Rung-aware: a null selection is none, a
+  // full-respec rung is full-respec, and among incremental winners the steps are compared
+  // (JSON-equal, since transitionOrderPath re-derives the walk and two-pass replay identically)
+  // against the direct walk's and the two-pass replay's own output. Neither match means the
+  // reversed opposite-direction walk won - the only remaining incremental candidate.
   const winner: PairResult["winner"] = !res
     ? "none"
-    : walkSteps !== null && JSON.stringify(walkSteps) === JSON.stringify(res.steps)
-      ? "walk"
-      : incSteps !== null && JSON.stringify(incSteps) === JSON.stringify(res.steps)
-        ? "two-pass"
-        : "full-respec";
+    : res.rung === "full-respec"
+      ? "full-respec"
+      : walkSteps !== null && JSON.stringify(walkSteps) === JSON.stringify(res.steps)
+        ? "walk"
+        : incSteps !== null && JSON.stringify(incSteps) === JSON.stringify(res.steps)
+          ? "two-pass"
+          : "walk-reversed";
   const bc = new Map(base.map((c) => [c.id, c.size]));
   const cc = new Map(cur.map((c) => [c.id, c.size]));
   let theoreticalMin = 0;

@@ -536,11 +536,35 @@ export function stateWalkTransition(
 }
 
 /**
- * Best of all verified candidates - the state walk, the seeded replay, and full respec - each
- * verified by the transition oracle before entering the pool (verified or absent). The winner is
- * chosen by fewest moved points, then fewest steps, then candidate order (walk, replay, respec).
- * The identity edge returns the empty transition only when the build fits the cap; a base equal to
- * cur but over cap is a none pair. Deterministic.
+ * Reverse a transition schedule: the same board states traversed backward, adds becoming
+ * refunds and refunds becoming adds. Turns a walk of the opposite direction (cur to base)
+ * into a base-to-cur candidate. startTotal is the reversed schedule's starting board total
+ * (the base build's star count). The result is verified like any candidate, never trusted.
+ */
+function reverseSteps(steps: TransStep[], startTotal: number): TransStep[] {
+  const rev: TransStep[] = [];
+  let running = startTotal;
+  for (let i = steps.length - 1; i >= 0; i--) {
+    const s = steps[i]!;
+    running += s.from - s.to;
+    rev.push({
+      kind: s.kind === "add" ? "refund" : "add",
+      conId: s.conId,
+      from: s.to,
+      to: s.from,
+      heldAfter: running,
+    });
+  }
+  return rev;
+}
+
+/**
+ * Best of all verified candidates - the state walk, the opposite-direction walk reversed, the
+ * seeded replay, and full respec - each verified by the transition oracle before entering the
+ * pool (verified or absent). The winner is chosen by fewest moved points, then fewest steps, then
+ * candidate order (walk, reversed walk, replay, respec). The identity edge returns the empty
+ * transition only when the build fits the cap; a base equal to cur but over cap is a none pair.
+ * Deterministic.
  */
 export function transitionOrderPath(
   cons: ReachCon[],
@@ -563,6 +587,14 @@ export function transitionOrderPath(
   const candidates: { steps: TransStep[]; rung: TransitionRung }[] = [];
   const walk = stateWalkTransition(cons, table, base, cur, cap);
   if (clean(walk)) candidates.push({ steps: walk!, rung: "incremental" });
+  const back = stateWalkTransition(cons, table, cur, base, cap);
+  if (back) {
+    const rev = reverseSteps(
+      back,
+      base.reduce((a, c) => a + c.size, 0),
+    );
+    if (clean(rev)) candidates.push({ steps: rev, rung: "incremental" });
+  }
   const s0 = seededReplay(cons, table, conById, delta, cap, tries);
   if (clean(s0)) candidates.push({ steps: s0!, rung: "incremental" });
   const s2 = teardownRebuild(cons, table, base, cur, cap);

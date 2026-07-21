@@ -141,14 +141,18 @@ them and refunds each the moment the in-game rules allow. Its contract:
   user hovers are exactly the numbers the judge saw.
 
 While comparing, the panel shows a baseline-to-current TRANSITION instead:
-`transitionOrderPath` (web/src/core/transitionOrder.ts) computes three
+`transitionOrderPath` (web/src/core/transitionOrder.ts) computes four
 candidate schedules and selects among them by fewest moved points, then fewest
 steps. The state walk is a deterministic greedy over actual game states, one
 oracle-legal move at a time - complete a target member, refund whatever is free
 (standing above target with no outstanding deficit leaning on its grant), add a
 minimal scaffold, and, only when none of those apply, tear down a standing
-member so it rejoins the pool for a later re-add. The seeded two-pass replay
-holds kept members,
+member so it rejoins the pool for a later re-add. Run in both directions, its
+opposite-direction schedule (current to baseline) reversed - adds becoming
+refunds, refunds becoming adds, order flipped - is a second, independent
+candidate for the baseline-to-current direction: a legal schedule traversed
+backward visits the same board states in reverse, so when either direction's
+walk resolves, both do. The seeded two-pass replay holds kept members,
 treats baseline-only members as pre-paid scaffolds, and schedules refunds in a
 second pass. The full respec reverses the baseline's own from-scratch order,
 then plays the current build's. Every candidate's output must pass the

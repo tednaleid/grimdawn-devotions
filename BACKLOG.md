@@ -432,17 +432,19 @@ against a future data extraction. Add a one-test guard over cons.
 Pointers: CAP_MAX in web/src/core/reachability.ts, orderLegality.ts,
 transitionOrder.ts; a new assertion in web/test (e.g. beside the model tests).
 
-## Transition walk: swapped-direction incompleteness (teardown eligibility, approach C)
+## Transition walk: both-directions-null residual (teardown eligibility, approach C)
 
-The state walk resolves the owner's pair in its real direction (9 steps, 32
-moved) but returns null in the swapped direction, which falls back to the
-130-moved full respec. Likely lever: move 4's teardown eligibility is
-intentionally narrow (only want-members standing exactly at target), so
-baseline-only leftovers and shrink candidates can never be torn for cap room.
-Widening it, or the spec's deferred approach C (truncated respec), are the
-recorded next steps if the full-respec tail matters in practice. Safe today:
-a null walk just means the selection picks another verified candidate.
+The reversed-walk candidate resolves the owner's pair in both directions: the state walk still
+returns null for the swapped (eel-to-ghoul) direction, but the opposite-direction (ghoul-to-eel)
+walk's schedule reversed is oracle-verified and enters the selection pool, so the swapped pair now
+resolves incrementally (9 steps, 32 moved) instead of falling back to the 130-moved full respec. A
+legal schedule traversed backward visits the same board states in reverse, so either direction's
+walk resolving is enough - only a pair where the walk returns null in BOTH directions still falls
+back to the two-pass replay or full respec. Likely lever for that residual: move 4's teardown
+eligibility is intentionally narrow (only want-members standing exactly at target), so
+baseline-only leftovers and shrink candidates can never be torn for cap room. Widening it, or the
+spec's deferred approach C (truncated respec), are the recorded next steps if the full-respec tail
+matters in practice.
 
-Pointers: stateWalkTransition move 4 in web/src/core/transitionOrder.ts;
-approach C in docs/superpowers/specs/2026-07-20-transition-state-walk-design.md
-(non-goals); swapped-direction pin REVERSED_PIN in web/test/transition-order.test.ts.
+Pointers: stateWalkTransition move 4 and reverseSteps in web/src/core/transitionOrder.ts; approach
+C in docs/superpowers/specs/2026-07-20-transition-state-walk-design.md (non-goals).

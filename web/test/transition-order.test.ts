@@ -14,21 +14,16 @@ const clean = (base: any, cur: any, res: any, cap: number) => {
   expect(err).toBeNull();
 };
 
-// Measured after the state-walk fix landed (fewest-moved-points selection over walk, replay, and
-// full respec): the swapped direction still resolves only via full respec (walk and replay both
-// return null for cur->base), so 130 is the exact moved count - unchanged from the pre-walk bound
-// it replaces, not an improvement, but confirmed no worse.
-const REVERSED_PIN = 130;
-
-// Aggregate moved-points pins (the state-walk selection net, Task 4): total moved points across
+// Aggregate moved-points pins (the best-of-candidates selection net): total moved points across
 // each sweep's produced pairs, 2% slack (ceil(measured * 1.02)). Baseline is the pre-walk two-rung
-// ladder (incremental replay, else full respec) on the identical seeded pairs; measured is this
-// task's best-of-candidates selection (walk, replay, full respec). Update these deliberately when
-// the algorithm improves; a silent regression must fail here.
-// small-delta: baseline=908 measured=712. resize: baseline=25 measured=25 (already at floor - the
-// walk cannot beat the ladder where the ladder already achieved the theoretical minimum). swap:
-// baseline=275 measured=157.
-const SMALL_DELTA_MOVED_PIN = 727;
+// ladder (incremental replay, else full respec) on the identical seeded pairs; measured is the
+// current selection. Update these deliberately when the algorithm improves; a silent regression
+// must fail here.
+// small-delta: baseline=908, Task 4 (walk added) measured=712, Task 5 (reversed-walk candidate
+// added) measured=520. resize: baseline=25 measured=25, unchanged through Task 5 (already at floor
+// - the walk cannot beat the ladder where the ladder already achieved the theoretical minimum).
+// swap: baseline=275 measured=157, unchanged through Task 5.
+const SMALL_DELTA_MOVED_PIN = 531;
 const RESIZE_MOVED_PIN = 26;
 const SWAP_MOVED_PIN = 161;
 
@@ -100,12 +95,13 @@ test("the owner's pair resolves incrementally at or below the hand path's 32 mov
   if (firstAdd >= 0) expect(ghoulRefund).toBeLessThan(firstAdd);
 });
 
-test("the owner's pair swapped is oracle-clean and no worse than full respec", () => {
+test("the owner's pair swapped resolves incrementally via the reversed walk", () => {
   const [pair] = urlFixturePairs();
   const res = transitionOrderPath(cons, table, pair!.cur, pair!.base, 55);
   clean(pair!.cur, pair!.base, res, 55);
+  expect(res!.rung).toBe("incremental");
   const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
-  expect(moved).toBeLessThanOrEqual(REVERSED_PIN); // the measured value; see the REVERSED_PIN comment
+  expect(moved).toBeLessThanOrEqual(32); // the forward walk's schedule reversed: same 32 moved
 });
 
 test("selection never returns more moved points than the full respec candidate", () => {
