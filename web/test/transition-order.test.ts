@@ -1,6 +1,6 @@
-// ABOUTME: Tests for the transition-order engine (core/transitionOrder): the two-rung ladder is
-// ABOUTME: oracle-clean on every corpus (small-delta, resize, swap, real-URL), deterministic, and
-// ABOUTME: honors the identity and over-cap edges. Ported from the spike suite, minus teardown-1.
+// ABOUTME: Tests for the transition-order engine (core/transitionOrder): the best-of-candidates
+// ABOUTME: selection (walk, two-pass replay, full respec) is oracle-clean on every corpus, moves
+// ABOUTME: pinned few points, is deterministic, and honors the identity and over-cap edges.
 import { test, expect } from "bun:test";
 import { transitionOrderPath, teardownRebuild, incrementalTransition } from "../src/core/transitionOrder";
 import { verifyTransition } from "../src/core/orderLegality";

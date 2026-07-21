@@ -1,6 +1,7 @@
 // ABOUTME: Offline harness for baseline-to-current transition build orders (compare mode): runs the
-// ABOUTME: core two-rung engine (src/core/transitionOrder.ts) over generated pairs, checks every order
-// ABOUTME: against the independent legality oracle, and reports go/no-go numbers plus per-rung metrics.
+// ABOUTME: core best-of-candidates selection (src/core/transitionOrder.ts) over generated pairs, checks
+// ABOUTME: every order against the independent legality oracle, and reports go/no-go numbers plus
+// ABOUTME: per-rung and per-winner metrics.
 // ABOUTME: Run via `just spike-transition [--pairs N] [--seed S]`.
 // ABOUTME: Spec: docs/superpowers/specs/2026-07-18-transition-order-spike-design.md
 import { buildOrderPath, type ReachCon, type Vec } from "../src/core/reachability";
@@ -36,7 +37,7 @@ interface PairResult {
   usNanos: number;
   usNanosFromScratch: number;
   steps: TransStep[] | null; // kept only so report() can print sample orders; not part of the metrics
-  incRejected: boolean; // incrementalTransition produced steps, but the ladder settled on full-respec/none
+  incRejected: boolean; // incrementalTransition produced steps, but the selection settled on full-respec/none
   winner: "walk" | "two-pass" | "full-respec" | "none"; // which candidate the selection actually returned
 }
 
