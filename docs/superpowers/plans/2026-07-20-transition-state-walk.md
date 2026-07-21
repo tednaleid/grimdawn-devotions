@@ -711,3 +711,348 @@ git commit -F - <<'EOF'
 feat(transition): reversed-walk candidate; both directions resolve when either does
 EOF
 ```
+
+---
+
+### Task 6: The peephole simplifier (verify-gated churn removal)
+
+Found in owner testing: on a pair whose winner is the reversed walk, the display contained
+add-then-refund of Yugol (a zero-grant tier 3 absent from the target build) - the mirrored
+image of the forward walk's tear/re-add churn. A scratch check proved removing the cancelling
+pair verifies: 14 steps/64 moved became 12 steps/52 moved, oracle-legal. This task adds a
+general peephole: every candidate is simplified by deleting exactly-cancelling step pairs
+whenever the oracle still verifies the shortened schedule, then the selection runs on the
+simplified candidates. Verify-gated, so it can only remove moved points, never add them.
+
+**Files:**
+- Modify: `web/src/core/transitionOrder.ts` (exported `simplifySteps`, `respecRung` helper, candidate pool refactored through a `consider` helper)
+- Modify: `web/test/support/transition-pairs.ts` (second fixture pair from the owner's churn URL)
+- Modify: `web/test/transition-order.test.ts` (churn-pair fixture test; pins re-derived if sweep totals drop)
+- Modify: `web/scripts/transition-spike.ts` (winner detection compares against simplified candidates)
+
+**Interfaces:**
+- Consumes: the Task 5 selection (`transitionOrderPath` with four candidates), `verifyTransition`, `reverseSteps`.
+- Produces: `export function simplifySteps(cons: ReachCon[], base: ReachCon[], cur: ReachCon[], steps: TransStep[], cap: number): TransStep[]` (used by the harness); `transitionOrderPath` signature unchanged.
+
+- [ ] **Step 1: Add the churn fixture pair and its failing test (RED first)**
+
+In `web/test/support/transition-pairs.ts`, `urlFixturePairs` returns a second entry. The churn
+URL's current build (its `s` hash) with the eel-side as base (its `cs` hash, already the
+existing CUR constant):
+
+```ts
+export function urlFixturePairs(): { label: string; base: ReachCon[]; cur: ReachCon[] }[] {
+  const CUR = "p=55&s=AAAAgAAHAAAAAAAAAAAAPADAwQf44AEAAIA_AAD8AAAAAAAAAAAAAPAD4AMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfg";
+  const BASE = "p=55&s=AAAAAAAAAADABgAAAAAAPADAwQcA4AEAAIA_AAD8AAAAAAAAAPABAPAD4AMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfg";
+  const CHURN_CUR = "p=55&s=AAAAAAB_AADAPgAAAAAAPADAwQcA4AEA-AMAAAAAAAAAAAAAAAAAAPAD4AMAAAAAAAAAAAAAAAAAAAD4Aw";
+  return [
+    { label: "eel-pair", base: members(BASE), cur: members(CUR) },
+    { label: "yugol-churn-pair", base: members(CUR), cur: members(CHURN_CUR) },
+  ];
+}
+```
+
+In `web/test/transition-order.test.ts`, add:
+
+```ts
+test("the churn pair: a zero-grant tier 3 absent from the target is never re-added", () => {
+  const pair = urlFixturePairs().find((p) => p.label === "yugol-churn-pair")!;
+  const res = transitionOrderPath(cons, table, pair.base, pair.cur, 55);
+  clean(pair.base, pair.cur, res, 55);
+  expect(res!.rung).toBe("incremental");
+  // yugol is in the baseline only; its refund is real, but the add/refund churn is not
+  expect(res!.steps.some((s) => s.conId.includes("yugol") && s.kind === "add")).toBeFalse();
+  const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  expect(moved).toBeLessThanOrEqual(52); // measured with the peephole; was 64 with the churn
+});
+```
+
+Run: `just test test/transition-order.test.ts`
+Expected: the new test FAILS (today the winner re-adds yugol and moves 64) - the RED.
+
+- [ ] **Step 2: Implement simplifySteps and rewire the candidate pool**
+
+In `web/src/core/transitionOrder.ts`, after `reverseSteps`, add:
+
+```ts
+/**
+ * Peephole simplifier: repeatedly remove pairs of steps that exactly cancel (a constellation
+ * leaving and returning to the same star count, with no other move of its own in between)
+ * whenever the oracle still verifies the shortened schedule. Every removal is verify-gated,
+ * so the result is oracle-clean by construction and never moves more points than the input.
+ * Deterministic: the leftmost removable pair is taken each round, to a fixpoint.
+ */
+export function simplifySteps(
+  cons: ReachCon[],
+  base: ReachCon[],
+  cur: ReachCon[],
+  steps: TransStep[],
+  cap: number,
+): TransStep[] {
+  const baseTotal = base.reduce((a, c) => a + c.size, 0);
+  let out = steps;
+  let changed = true;
+  while (changed) {
+    changed = false;
+    outer: for (let i = 0; i < out.length; i++) {
+      const a = out[i]!;
+      for (let j = i + 1; j < out.length; j++) {
+        const b = out[j]!;
+        if (b.conId !== a.conId) continue;
+        if (a.from === b.to && a.to === b.from) {
+          const kept = out.filter((_, k) => k !== i && k !== j);
+          let running = baseTotal;
+          const rebuilt = kept.map((s) => {
+            running += s.to - s.from;
+            return { ...s, heldAfter: running };
+          });
+          if (verifyTransition(cons, base, cur, rebuilt, cap) === null) {
+            out = rebuilt;
+            changed = true;
+            break outer;
+          }
+        }
+        break; // an intervening move of the same constellation blocks the pair with i
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * A simplified full respec that no longer tears every baseline member down is not honestly a
+ * "full rebuild" (the panel's notice keys off the rung); re-derive the tag from the schedule.
+ */
+function respecRung(steps: TransStep[], base: ReachCon[]): TransitionRung {
+  const zeroed = new Set(steps.filter((s) => s.kind === "refund" && s.to === 0).map((s) => s.conId));
+  return base.every((c) => zeroed.has(c.id)) ? "full-respec" : "incremental";
+}
+```
+
+In `transitionOrderPath`, replace the four candidate pushes with a shared `consider` helper
+(everything else - the identity edge, `clean`, `moved`, the best-of loop - stays verbatim):
+
+```ts
+  const candidates: { steps: TransStep[]; rung: TransitionRung }[] = [];
+  const consider = (steps: TransStep[] | null, rung: TransitionRung): void => {
+    if (!clean(steps)) return;
+    const simplified = simplifySteps(cons, base, cur, steps!, cap);
+    candidates.push({
+      steps: simplified,
+      rung: rung === "full-respec" ? respecRung(simplified, base) : rung,
+    });
+  };
+  consider(stateWalkTransition(cons, table, base, cur, cap), "incremental");
+  const back = stateWalkTransition(cons, table, cur, base, cap);
+  consider(back && reverseSteps(back, base.reduce((a, c) => a + c.size, 0)), "incremental");
+  consider(seededReplay(cons, table, conById, delta, cap, tries), "incremental");
+  consider(teardownRebuild(cons, table, base, cur, cap), "full-respec");
+```
+
+Update the function's JSDoc: candidates are simplified before selection; the respec's rung is
+re-derived after simplification. Note for the reviewer: `simplifySteps` preserves
+verification (the input is verified and every reduction re-verifies), so `consider` needs no
+second verify after simplification.
+
+Run: `just test test/transition-order.test.ts test/transition-walk.test.ts test/selection-transition.test.ts test/transition-view.test.ts`
+Expected: all pass including the churn-pair test (GREEN). The eel-pair pins are unaffected:
+its yugol tear/re-add pair does NOT verify when removed (the teardown is genuinely needed for
+cap room - removal was hand-checked to violate the cap), so the 9-step/32-moved schedules
+survive the peephole unchanged.
+
+- [ ] **Step 3: Winner detection catches up; re-measure**
+
+In `web/scripts/transition-spike.ts`, the winner comparison now compares `res.steps` against
+the SIMPLIFIED raw candidates: import `simplifySteps`, and where `walkSteps`/`incSteps` are
+computed, wrap each non-null value with `simplifySteps(cons, base, cur, X, cap)` before the
+JSON comparisons. The rung-aware structure (none / full-respec / walk / two-pass /
+walk-reversed) stays.
+
+```bash
+just spike-transition --pairs 100 --csv > .superpowers/sdd/transition-after3.csv 2> .superpowers/sdd/transition-after3-report.txt
+tail -5 .superpowers/sdd/transition-after3-report.txt
+awk -F, 'NR>1 { m[$1]+=$4; n[$1]++ } END { for (c in m) printf "%s: pairs=%d moved=%d\n", c, n[c], m[c] }' .superpowers/sdd/transition-after3.csv
+paste -d, .superpowers/sdd/transition-after2.csv .superpowers/sdd/transition-after3.csv | awk -F, '
+  NR > 1 { if ($9+0 > $4+0) { worse++; print "WORSE:", $1, $2, $4, "->", $9 } else if ($9+0 < $4+0) better++; else same++ }
+  END { printf "better=%d same=%d worse=%d\n", better, same, worse }'
+awk -F, 'NR>1 { w[$1","$5]++ } END { for (k in w) print k, w[k] }' .superpowers/sdd/transition-after3.csv
+```
+
+Expected: zero oracle failures; worse=0 versus the pre-peephole branch (structural - each
+candidate's moved points can only shrink or hold, so the per-pair minimum can only shrink or
+hold); totals at or below the after2 values. Copy all lines into the report.
+
+- [ ] **Step 4: Pins re-derived if totals dropped; full gate; commit**
+
+Update any of `SMALL_DELTA_MOVED_PIN`/`RESIZE_MOVED_PIN`/`SWAP_MOVED_PIN` whose measured
+sweep totals changed (`ceil(measured * 1.02)`, comment history extended, changed pins proven
+to bite via the -1 negative control). Then:
+
+```bash
+just test
+just e2e
+just perf > .superpowers/sdd/perf-walk3.txt 2>&1
+```
+
+Compare perf to `.superpowers/sdd/perf-walk2.txt` (simplification adds a few verify calls per
+compare-mode invocation; parity expected). Commit:
+
+```bash
+git add web/src/core/transitionOrder.ts web/test/support/transition-pairs.ts web/test/transition-order.test.ts web/scripts/transition-spike.ts
+git commit -F - <<'EOF'
+feat(transition): verify-gated peephole simplifier; churn pair pinned clean
+EOF
+```
+
+---
+
+### Task 7: Zero-grant ordering (add granting members first, tear zero-granters first)
+
+Owner-requested heuristic: tier 3 constellations and partial tier 1/2 placements grant no
+affinity, so a build should add them last (their points stay liquid for scaffolding) and a
+teardown should remove them first (nothing can lean on them). Move 2 already refunds
+zero-effective-grant members first (the Ghoul fix); this task brings moves 1 and 4 in line.
+Unlike the peephole this changes the walk's output, so the corpus no-pair-worse comparison is
+the empirical gate: any regression is a stop-and-decide, not a shrug.
+
+**Files:**
+- Modify: `web/src/core/transitionOrder.ts` (`stateWalkTransition` moves 1 and 4 only, JSDoc updated)
+- Modify: `web/test/transition-walk.test.ts` (two new unit tests, hand-traced below)
+- Modify: `web/test/transition-order.test.ts` (pins re-derived if sweep totals change)
+
+**Interfaces:**
+- Consumes/produces: unchanged signatures throughout; walk internals only.
+
+- [ ] **Step 1: Write the two failing unit tests (RED first)**
+
+Append to `web/test/transition-walk.test.ts`:
+
+```ts
+test("zero-grant targets are added last, granting targets first", () => {
+  // Both targets are addable from the start (no reqs, roomy cap); the zero-granter's id sorts
+  // first alphabetically, so only the granting-first preference can put the granter ahead.
+  const helper = con("helper", 2, z(), z());
+  const granter = con("bbb-granter", 2, z(), v(2));
+  const inert = con("aaa-inert", 2, z(), z());
+  const all = [helper, granter, inert];
+  const walk = stateWalkTransition(all, buildCoverTable(all), [helper], [helper, granter, inert], 55)!;
+  expect(walk).not.toBeNull();
+  const adds = walk.filter((s) => s.kind === "add").map((s) => s.conId);
+  expect(adds[0]).toBe("bbb-granter");
+  expect(adds[adds.length - 1]).toBe("aaa-inert");
+});
+
+test("the teardown tears a zero-grant member before a load-bearing granter", () => {
+  // L props S's requirement; T needs S's chaos grant and two slots of cap room. Tearing the
+  // granter S first (the old smallest-then-id order, "shared" < "zed") dead-ends into extra
+  // churn; tearing the inert Z first frees the room directly.
+  const L = con("leftover", 3, z(), v(3));
+  const S = con("shared", 2, v(3), v(0, 3));
+  const Z = con("zed", 2, z(), z());
+  const T = con("target", 2, v(0, 3), v(3));
+  const all = [L, S, Z, T];
+  const walk = stateWalkTransition(all, buildCoverTable(all), [L, S, Z], [S, Z, T], 7)!;
+  expect(walk).not.toBeNull();
+  expect(verifyTransition(all, [L, S, Z], [S, Z, T], walk, 7)).toBeNull();
+  expect(walk.some((s) => s.conId === "shared" && s.kind === "refund")).toBeFalse();
+  const moved = walk.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  expect(moved).toBeLessThanOrEqual(9); // tear zed, add target, refund leftover, re-add zed
+});
+```
+
+Run: `just test test/transition-walk.test.ts`
+Expected: both FAIL on the current code (the inert add comes first by id; the teardown picks
+"shared" by id at equal size, hand-traced to 13 moved with a torn granter).
+
+- [ ] **Step 2: Implement the two ordering changes**
+
+In `stateWalkTransition` move 1, the selection gains a granting tier between the torn tier and
+the density score (a full-size add of a granting constellation outranks any zero-effective-
+grant add; partial adds grant nothing and sort with the inert):
+
+```ts
+      let pick: string | null = null;
+      let pickPts = 0;
+      let pickDelta = 1;
+      let pickTorn = 1;
+      let pickGrants = 0;
+      for (const [id, size] of want) {
+        const at = counts.get(id) ?? 0;
+        if (at >= size || !probe("add", id, size)) continue;
+        const c = conById.get(id)!;
+        let pts = 0;
+        if (size === c.size) for (let i = 0; i < 5; i++) if (d[i]! > 0) pts += c.grant[i]!;
+        const delta = size - at;
+        const torn = tornOnce.has(id) ? 1 : 0;
+        const grants = size === c.size && grantSum(c) > 0 ? 1 : 0;
+        if (
+          pick === null ||
+          torn < pickTorn ||
+          (torn === pickTorn &&
+            (grants > pickGrants ||
+              (grants === pickGrants &&
+                (pts * pickDelta > pickPts * delta ||
+                  (pts * pickDelta === pickPts * delta && id < pick)))))
+        ) {
+          pick = id;
+          pickPts = pts;
+          pickDelta = delta;
+          pickTorn = torn;
+          pickGrants = grants;
+        }
+      }
+```
+
+In move 4, the teardown sort tears zero-effective-grant members first (a member standing at a
+partial target grants nothing and counts as zero-grant), then smallest, ties by id:
+
+```ts
+      const tearCands = [...counts.keys()]
+        .filter((id) => {
+          const t = want.get(id) ?? 0;
+          return t > 0 && (counts.get(id) ?? 0) === t && !tornOnce.has(id);
+        })
+        .map((id) => conById.get(id)!)
+        .sort((a, b) => {
+          const ga = (want.get(a.id) === a.size && grantSum(a) > 0 ? 1 : 0);
+          const gb = (want.get(b.id) === b.size && grantSum(b) > 0 ? 1 : 0);
+          return ga - gb || a.size - b.size || (a.id < b.id ? -1 : 1);
+        });
+```
+
+Update the walk's JSDoc: move 1 adds granting members before zero-effective-grant ones; move 4
+tears zero-effective-grant members first, then smallest.
+
+Run: `just test test/transition-walk.test.ts test/transition-order.test.ts test/selection-transition.test.ts test/transition-view.test.ts`
+Expected: all pass, including the eel-pair 32-moved pins and the churn-pair test (GREEN).
+
+- [ ] **Step 3: Re-measure with the gate teeth**
+
+```bash
+just spike-transition --pairs 100 --csv > .superpowers/sdd/transition-after4.csv 2> .superpowers/sdd/transition-after4-report.txt
+tail -5 .superpowers/sdd/transition-after4-report.txt
+awk -F, 'NR>1 { m[$1]+=$4; n[$1]++ } END { for (c in m) printf "%s: pairs=%d moved=%d\n", c, n[c], m[c] }' .superpowers/sdd/transition-after4.csv
+paste -d, .superpowers/sdd/transition-after3.csv .superpowers/sdd/transition-after4.csv | awk -F, '
+  NR > 1 { if ($9+0 > $4+0) { worse++; print "WORSE:", $1, $2, $4, "->", $9 } else if ($9+0 < $4+0) better++; else same++ }
+  END { printf "better=%d same=%d worse=%d\n", better, same, worse }'
+awk -F, 'NR>1 { w[$1","$5]++ } END { for (k in w) print k, w[k] }' .superpowers/sdd/transition-after4.csv
+```
+
+Expected: zero oracle failures. worse is NOT structural here - the walk's output changed. If
+worse=0, proceed. If ANY pair is worse, STOP: copy the WORSE lines into the report and report
+DONE_WITH_CONCERNS naming them; the controller and owner decide (the peephole from Task 6 and
+the unchanged candidates bound the damage, but a regression is an owner decision, not an
+implementer shrug).
+
+- [ ] **Step 4: Pins, full gate, commit**
+
+Re-derive changed pins (same formula, history comment, negative control). Then `just test`,
+`just e2e`, `just perf > .superpowers/sdd/perf-walk4.txt 2>&1` (compare to perf-walk3.txt).
+Commit:
+
+```bash
+git add web/src/core/transitionOrder.ts web/test/transition-walk.test.ts web/test/transition-order.test.ts
+git commit -F - <<'EOF'
+feat(transition): granting targets add first, zero-granters tear first
+EOF
+```
