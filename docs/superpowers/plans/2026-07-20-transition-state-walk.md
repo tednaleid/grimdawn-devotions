@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript (bun), bun:test, just recipes. Spec: `docs/superpowers/specs/2026-07-20-transition-state-walk-design.md`. Branch: `compare-transition` (held from merge until this gate passes).
 
-**Spec deviations (deliberate, small):** (1) move 2 generalizes from "refund a non-target" to "refund toward target", which also covers shrink-resizes (a shared member standing above its target count); (2) the spec's teardown condition ("the smallest whose removal unblocks progress") is realized as smallest-legal-first with the step budget as guard — "does it unblock" is answered by trying it, deterministically.
+**Spec deviations (deliberate, small):** (1) move 2 generalizes from "refund a non-target" to "refund toward target", which also covers shrink-resizes (a shared member standing above its target count); (2) the spec's teardown condition ("the smallest whose removal unblocks progress") is realized as smallest-legal-first with the step budget as guard: "does it unblock" is answered by trying it, deterministically; (3) move 1 prefers never-torn candidates over re-adds of torn members, found by the Task 2 stuck-teardown test: with all deficits covered, the density score is uninformative and the plain id tie-break re-added the just-torn member.
 
 ## Global Constraints
 
@@ -21,7 +21,7 @@
 - Terminology: "moved points" for a schedule = sum of `|to - from|` over its steps.
 - All new files start with two `ABOUTME:` lines. Docs: no emojis, emdashes, or hyperbole.
 - Run tests via `just` from the repo root. Commit with `git commit -F - <<'EOF'` heredoc; never `--no-verify`. Pre-commit gate takes 1-3 min. Measurement artifacts in `.superpowers/sdd/` (gitignored); headline numbers additionally in task reports.
-- The owner's pair hashes (already in `web/test/support/transition-pairs.ts` `urlFixturePairs`): base = ghoul-side, cur = eel-side — this IS the owner's direction. The reference hand path (9 steps, 32 moved, oracle-verified): refund ghoul 4 to 0; add eel 0 to 3; add crossroads_chaos 0 to 1; refund kraken 5 to 0; refund yugol_the_insatiable_night 6 to 0; add crossroads_order 0 to 1; add tortoise 0 to 5; refund crossroads_order 1 to 0; add yugol_the_insatiable_night 0 to 6.
+- The owner's pair hashes (already in `web/test/support/transition-pairs.ts` `urlFixturePairs`): base = ghoul-side, cur = eel-side - this IS the owner's direction. The reference hand path (9 steps, 32 moved, oracle-verified): refund ghoul 4 to 0; add eel 0 to 3; add crossroads_chaos 0 to 1; refund kraken 5 to 0; refund yugol_the_insatiable_night 6 to 0; add crossroads_order 0 to 1; add tortoise 0 to 5; refund crossroads_order 1 to 0; add yugol_the_insatiable_night 0 to 6.
 
 ---
 
@@ -32,11 +32,11 @@
 
 **Interfaces:**
 - Consumes: the existing harness (`measure`, `report`, corpora loops) and `PairResult` (which already carries `corpus`, `rung`, `moved`).
-- Produces: `just spike-transition --csv` printing one line per pair to stdout: `corpus,index,rung,moved` (header line first), aggregates still on the normal report path (use stderr for the report when `--csv` is set, or suppress the report — implementer's choice, disclosed); baseline file `.superpowers/sdd/transition-baseline.csv` (read by Task 4).
+- Produces: `just spike-transition --csv` printing one line per pair to stdout: `corpus,index,rung,moved` (header line first), aggregates still on the normal report path (use stderr for the report when `--csv` is set, or suppress the report - implementer's choice, disclosed); baseline file `.superpowers/sdd/transition-baseline.csv` (read by Task 4).
 
 - [ ] **Step 1: Add the CSV mode**
 
-In `web/scripts/transition-spike.ts`, add a `--csv` flag beside the existing flag parsing. When set, after all `results` are collected, print `corpus,index,rung,moved` then one line per result in collection order (index = position within its corpus). Route the human report to stderr in CSV mode so stdout stays clean. Pair generation is already seeded and deterministic, so line N always describes the same pair across runs — that is what makes before/after diffing valid.
+In `web/scripts/transition-spike.ts`, add a `--csv` flag beside the existing flag parsing. When set, after all `results` are collected, print `corpus,index,rung,moved` then one line per result in collection order (index = position within its corpus). Route the human report to stderr in CSV mode so stdout stays clean. Pair generation is already seeded and deterministic, so line N always describes the same pair across runs - that is what makes before/after diffing valid.
 
 - [ ] **Step 2: Capture the baseline (BEFORE any algorithm change)**
 
@@ -46,7 +46,7 @@ tail -5 .superpowers/sdd/transition-baseline-report.txt
 awk -F, 'NR>1 { m[$1]+=$4; n[$1]++ } END { for (c in m) printf "%s: pairs=%d moved=%d\n", c, n[c], m[c] }' .superpowers/sdd/transition-baseline.csv
 ```
 
-Expected: the report shows zero oracle failures; the awk summary prints per-corpus totals. Copy the per-corpus totals into your task report — these are the launch-gate "before" numbers.
+Expected: the report shows zero oracle failures; the awk summary prints per-corpus totals. Copy the per-corpus totals into your task report - these are the launch-gate "before" numbers.
 
 - [ ] **Step 3: Full suite, then commit**
 
@@ -70,7 +70,7 @@ EOF
 
 **Interfaces:**
 - Consumes: the module's existing local helpers (`zero`, `addCap`, `maxV`, `covers`, `REPLAY_CAP`), `peakToReach`/`INF` (already imported), types `ReachCon`, `Vec`, `CoverTable`, `TransStep`.
-- Produces: `export function stateWalkTransition(cons: ReachCon[], table: CoverTable, base: ReachCon[], cur: ReachCon[], cap: number): TransStep[] | null` — Task 3 wires it into the selection.
+- Produces: `export function stateWalkTransition(cons: ReachCon[], table: CoverTable, base: ReachCon[], cur: ReachCon[], cap: number): TransStep[] | null` - Task 3 wires it into the selection.
 
 - [ ] **Step 1: Write the failing unit tests**
 
@@ -156,7 +156,7 @@ test("every walk result on 20 small-delta pairs is oracle-clean", () => {
 - [ ] **Step 2: Run the tests to verify they fail**
 
 Run: `just test test/transition-walk.test.ts`
-Expected: FAIL — `stateWalkTransition` is not exported.
+Expected: FAIL - `stateWalkTransition` is not exported.
 
 - [ ] **Step 3: Implement the walk**
 
@@ -166,10 +166,11 @@ In `web/src/core/transitionOrder.ts`, after `teardownRebuild`, add:
 /**
  * The state walk: a deterministic greedy over actual game states, from the baseline's standing
  * board toward the current build, one oracle-legal move at a time. Priorities each iteration:
- * (1) complete a target member, need-driven (densest contributor to the outstanding deficits per
- * moved star, ties by id); (2) free points - refund any standing constellation above its target
- * count, zero-grant members first, then the grant least useful to the remaining deficits, ties by
- * id; (3) add one scaffold from peakToReach's minimal crossroads-biased set when it fits; (4) only
+ * (1) complete a target member, never-torn candidates before re-adds of torn ones, then the densest
+ * contributor to the outstanding deficits per moved star, ties by id; (2) free points - refund any
+ * standing constellation above its target count, zero-grant members first, then the grant least
+ * useful to the remaining deficits, ties by id; (3) add one scaffold from peakToReach's minimal
+ * crossroads-biased set when it fits; (4) only
  * when stuck, tear down a standing at-target member (smallest legal first, ties by id, each torn
  * at most once) - it rejoins the pool and move 1 re-adds it later. Bounded: total moved points may
  * not exceed four times the theoretical minimum; exceeding it, or having no legal move, returns
@@ -262,11 +263,14 @@ export function stateWalkTransition(
   while (!done()) {
     if (movedTotal > budget) return null;
     const d = deficitVec();
-    // 1. Complete a target member: densest deficit contribution per moved star, ties by id.
+    // 1. Complete a target member: never-torn candidates before re-adds of torn ones (re-adding
+    // a just-torn member would recreate the state the teardown escaped), then densest deficit
+    // contribution per moved star, ties by id.
     {
       let pick: string | null = null;
       let pickPts = 0;
       let pickDelta = 1;
+      let pickTorn = 1;
       for (const [id, size] of want) {
         const at = counts.get(id) ?? 0;
         if (at >= size || !probe("add", id, size)) continue;
@@ -274,14 +278,17 @@ export function stateWalkTransition(
         let pts = 0;
         if (size === c.size) for (let i = 0; i < 5; i++) if (d[i]! > 0) pts += c.grant[i]!;
         const delta = size - at;
+        const torn = tornOnce.has(id) ? 1 : 0;
         if (
           pick === null ||
-          pts * pickDelta > pickPts * delta ||
-          (pts * pickDelta === pickPts * delta && id < pick)
+          torn < pickTorn ||
+          (torn === pickTorn &&
+            (pts * pickDelta > pickPts * delta || (pts * pickDelta === pickPts * delta && id < pick)))
         ) {
           pick = id;
           pickPts = pts;
           pickDelta = delta;
+          pickTorn = torn;
         }
       }
       if (pick !== null) {
@@ -384,7 +391,7 @@ EOF
 
 - [ ] **Step 1: Write the failing fixture tests**
 
-In `web/test/transition-order.test.ts`, REPLACE the test "the Eel pair (real URL): oracle-clean; Ghoul refunds before any add" with (the old full-respec pin was explicitly provisional — its own comment says a replay improvement should consciously revisit it; this is that revisit):
+In `web/test/transition-order.test.ts`, REPLACE the test "the Eel pair (real URL): oracle-clean; Ghoul refunds before any add" with (the old full-respec pin was explicitly provisional - its own comment says a replay improvement should consciously revisit it; this is that revisit):
 
 ```ts
 test("the owner's pair resolves incrementally at or below the hand path's 32 moved points", () => {
@@ -428,7 +435,7 @@ test("selection never returns more moved points than the full respec candidate",
 - [ ] **Step 2: Run to verify the new tests fail**
 
 Run: `just test test/transition-order.test.ts`
-Expected: the replaced test FAILS (today's rung is full-respec at 130 moved) — this is the RED that proves the pin bites. The selection test may pass already (the ladder never beats full respec by construction today); that is fine.
+Expected: the replaced test FAILS (today's rung is full-respec at 130 moved) - this is the RED that proves the pin bites. The selection test may pass already (the ladder never beats full respec by construction today); that is fine.
 
 - [ ] **Step 3: Implement the selection**
 
@@ -474,7 +481,7 @@ export function transitionOrderPath(
 Run a one-off to get the swapped direction's moved points (a bun -e or scratch script through `transitionOrderPath`), set `REVERSED_PIN` to that exact value with the recording comment.
 
 Run: `just test test/transition-order.test.ts test/transition-walk.test.ts test/selection-transition.test.ts test/transition-view.test.ts`
-Expected: all pass. Watch specifically: `selection-transition.test.ts`'s panel-agreement and replaced-not-stacked tests must hold with the walk winning (they are order-agnostic); `transition-view.test.ts` uses the pair's transition — if the popup refund-delta or bo-refund assertions fail because the new 9-ish-step order lacks the step shape they search for, verify the order actually contains a refund of a complete granting member (the yugol teardown provides one) and report BLOCKED rather than editing those tests if it does not.
+Expected: all pass. Watch specifically: `selection-transition.test.ts`'s panel-agreement and replaced-not-stacked tests must hold with the walk winning (they are order-agnostic); `transition-view.test.ts` uses the pair's transition - if the popup refund-delta or bo-refund assertions fail because the new 9-ish-step order lacks the step shape they search for, verify the order actually contains a refund of a complete granting member (the yugol teardown provides one) and report BLOCKED rather than editing those tests if it does not.
 
 Run: `just test`
 Expected: all pass.
@@ -515,7 +522,7 @@ paste -d, .superpowers/sdd/transition-baseline.csv .superpowers/sdd/transition-a
   END { printf "better=%d same=%d worse=%d\n", better, same, worse }'
 ```
 
-Expected: zero oracle failures in the report; `worse=0` (structural — any WORSE line is a bug in the selection, report BLOCKED); per-corpus totals strictly below baseline. Also summarize the winner distribution per corpus (`awk -F, 'NR>1 { w[$1","$5]++ } END { for (k in w) print k, w[k] }' .superpowers/sdd/transition-after.csv`). Copy all lines into your task report.
+Expected: zero oracle failures in the report; `worse=0` (structural - any WORSE line is a bug in the selection, report BLOCKED); per-corpus totals strictly below baseline. Also summarize the winner distribution per corpus (`awk -F, 'NR>1 { w[$1","$5]++ } END { for (k in w) print k, w[k] }' .superpowers/sdd/transition-after.csv`). Copy all lines into your task report.
 
 - [ ] **Step 2: Add the aggregate pins**
 
@@ -526,7 +533,7 @@ Expected: all pass with the derived pins.
 
 - [ ] **Step 3: Docs**
 
-In `docs/reachability-engine.md`, the compare-mode transition paragraph: replace the two-rung ladder sentence with the selection reality — the state walk (one oracle-legal move at a time: target adds, free-point refunds, minimal scaffolds, stuck-only shared teardowns), the two-pass replay, and the full respec all compute, and the best verified schedule by fewest moved points renders; the full-rebuild notice appears only when the full respec wins. Rewrite in place, no dated notes, no emojis/emdashes/hyperbole.
+In `docs/reachability-engine.md`, the compare-mode transition paragraph: replace the two-rung ladder sentence with the selection reality - the state walk (one oracle-legal move at a time: target adds, free-point refunds, minimal scaffolds, stuck-only shared teardowns), the two-pass replay, and the full respec all compute, and the best verified schedule by fewest moved points renders; the full-rebuild notice appears only when the full respec wins. Rewrite in place, no dated notes, no emojis/emdashes/hyperbole.
 
 - [ ] **Step 4: The heavy checks and the launch-gate verdict**
 
@@ -544,7 +551,7 @@ Compare `perf-walk.txt` headline numbers to `.superpowers/sdd/perf-baseline.txt`
 4. Per-pair worse=0
 5. Full suite, e2e, perf green
 
-If ANY row is FAIL: still commit, then report DONE_WITH_CONCERNS naming the row — the controller stops the merge.
+If ANY row is FAIL: still commit, then report DONE_WITH_CONCERNS naming the row - the controller stops the merge.
 
 - [ ] **Step 5: Commit**
 

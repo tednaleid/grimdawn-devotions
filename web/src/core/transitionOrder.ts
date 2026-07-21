@@ -331,7 +331,7 @@ export function teardownRebuild(
 /**
  * The state walk: a deterministic greedy over actual game states, from the baseline's standing
  * board toward the current build, one oracle-legal move at a time. Priorities each iteration:
- * (1) complete a target member — never-torn candidates before re-adds of torn ones, then the densest
+ * (1) complete a target member, never-torn candidates before re-adds of torn ones, then the densest
  * contributor to the outstanding deficits per moved star, ties by id; (2) free points - refund any
  * standing constellation above its target count, zero-grant members first, then the grant least
  * useful to the remaining deficits, ties by id; (3) add one scaffold from peakToReach's minimal
