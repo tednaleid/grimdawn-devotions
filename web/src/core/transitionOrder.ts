@@ -536,9 +536,11 @@ export function stateWalkTransition(
 }
 
 /**
- * The two-rung escalation ladder: incremental, else full respec, each verified by the transition
- * oracle before return (verified or absent). The identity edge returns the empty transition only
- * when the build fits the cap; a base equal to cur but over cap is a none pair. Deterministic.
+ * Best of all verified candidates - the state walk, the seeded replay, and full respec - each
+ * verified by the transition oracle before entering the pool (verified or absent). The winner is
+ * chosen by fewest moved points, then fewest steps, then candidate order (walk, replay, respec).
+ * The identity edge returns the empty transition only when the build fits the cap; a base equal to
+ * cur but over cap is a none pair. Deterministic.
  */
 export function transitionOrderPath(
   cons: ReachCon[],
@@ -554,10 +556,24 @@ export function transitionOrderPath(
     const size = cur.reduce((a, c) => a + c.size, 0);
     return size <= cap ? { steps: [], rung: "incremental" } : null;
   }
+  // Best of all verified candidates by (moved points, steps, candidate order). Today's two
+  // candidates stay in the pool, so no pair can do worse than before the walk existed.
   const clean = (steps: TransStep[] | null) => steps && verifyTransition(cons, base, cur, steps, cap) === null;
+  const moved = (steps: TransStep[]) => steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  const candidates: { steps: TransStep[]; rung: TransitionRung }[] = [];
+  const walk = stateWalkTransition(cons, table, base, cur, cap);
+  if (clean(walk)) candidates.push({ steps: walk!, rung: "incremental" });
   const s0 = seededReplay(cons, table, conById, delta, cap, tries);
-  if (clean(s0)) return { steps: s0!, rung: "incremental" };
+  if (clean(s0)) candidates.push({ steps: s0!, rung: "incremental" });
   const s2 = teardownRebuild(cons, table, base, cur, cap);
-  if (clean(s2)) return { steps: s2!, rung: "full-respec" };
-  return null;
+  if (clean(s2)) candidates.push({ steps: s2!, rung: "full-respec" });
+  if (!candidates.length) return null;
+  let best = candidates[0]!;
+  for (const c of candidates.slice(1))
+    if (
+      moved(c.steps) < moved(best.steps) ||
+      (moved(c.steps) === moved(best.steps) && c.steps.length < best.steps.length)
+    )
+      best = c;
+  return best;
 }

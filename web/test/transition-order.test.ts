@@ -14,6 +14,12 @@ const clean = (base: any, cur: any, res: any, cap: number) => {
   expect(err).toBeNull();
 };
 
+// Measured after the state-walk fix landed (fewest-moved-points selection over walk, replay, and
+// full respec): the swapped direction still resolves only via full respec (walk and replay both
+// return null for cur->base), so 130 is the exact moved count - unchanged from the pre-walk bound
+// it replaces, not an improvement, but confirmed no worse.
+const REVERSED_PIN = 130;
+
 test("30 small-delta pairs are oracle-clean; the majority resolve incrementally", () => {
   const rng = mulberry32(1234);
   let produced = 0;
@@ -59,17 +65,39 @@ test("load-bearing swap pairs are oracle-clean", () => {
   expect(produced).toBeGreaterThan(0);
 });
 
-test("the Eel pair (real URL): oracle-clean; Ghoul refunds before any add", () => {
+test("the owner's pair resolves incrementally at or below the hand path's 32 moved points", () => {
   const [pair] = urlFixturePairs();
   const res = transitionOrderPath(cons, table, pair!.base, pair!.cur, 55);
   clean(pair!.base, pair!.cur, res, 55);
-  // The spike pinned this pair at full-respec; teardown-1 removal does not change that. A future
-  // replay improvement that resolves it incrementally should consciously revisit this pin.
-  expect(res!.rung).toBe("full-respec");
+  expect(res!.rung).toBe("incremental");
+  const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  expect(moved).toBeLessThanOrEqual(32); // the owner's hand path bound (9 steps, 32 moved)
+  // the zero-grant Ghoul partial is free points: it still refunds before any add
   const ghoulRefund = res!.steps.findIndex((s) => s.conId.includes("ghoul") && s.kind === "refund");
   const firstAdd = res!.steps.findIndex((s) => s.kind === "add");
   expect(ghoulRefund).toBeGreaterThanOrEqual(0);
   if (firstAdd >= 0) expect(ghoulRefund).toBeLessThan(firstAdd);
+});
+
+test("the owner's pair swapped is oracle-clean and no worse than full respec", () => {
+  const [pair] = urlFixturePairs();
+  const res = transitionOrderPath(cons, table, pair!.cur, pair!.base, 55);
+  clean(pair!.cur, pair!.base, res, 55);
+  const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  expect(moved).toBeLessThanOrEqual(REVERSED_PIN); // measured after the walk lands; expect far below 130
+});
+
+test("selection never returns more moved points than the full respec candidate", () => {
+  const rng = mulberry32(31337);
+  for (let i = 0; i < 20; i++) {
+    const pair = mutatePair(rng);
+    if (!pair) continue;
+    const res = transitionOrderPath(cons, table, pair.base, pair.cur, 55);
+    const td = teardownRebuild(cons, table, pair.base, pair.cur, 55);
+    if (!res || !td || verifyTransition(cons, pair.base, pair.cur, td, 55) !== null) continue;
+    const moved = (s: typeof res.steps) => s.reduce((a, x) => a + Math.abs(x.to - x.from), 0);
+    expect(moved(res.steps)).toBeLessThanOrEqual(moved(td));
+  }
 });
 
 test("teardownRebuild is oracle-clean whenever it exists", () => {
