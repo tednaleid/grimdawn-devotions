@@ -72,3 +72,20 @@ test("every walk result on 20 small-delta pairs is oracle-clean", () => {
   }
   expect(produced).toBeGreaterThan(10);
 });
+
+test("a load-bearing scaffold is not refunded while its beneficiary is pending", () => {
+  // X's grant is the only cover for pending T's requirement; cap blocks adding T while B stands.
+  // Without the exclusion, the walk toggles X (refund as "free", re-add as scaffold) and never
+  // reaches the teardown of B; with it, X waits until T completes and self-sustains.
+  const B = con("blob", 4, z(), z());
+  const X = con("prop", 1, z(), v(0, 1));
+  const T = con("target", 3, v(0, 1), v(0, 3));
+  const all = [B, X, T];
+  const walk = stateWalkTransition(all, buildCoverTable(all), [B, X], [B, T], 7);
+  expect(walk).not.toBeNull();
+  expect(verifyTransition(all, [B, X], [B, T], walk!, 7)).toBeNull();
+  const xRefund = walk!.findIndex((s) => s.conId === "prop" && s.kind === "refund");
+  const tAdd = walk!.findIndex((s) => s.conId === "target" && s.kind === "add");
+  expect(tAdd).toBeGreaterThanOrEqual(0);
+  expect(xRefund).toBeGreaterThan(tAdd);
+});
