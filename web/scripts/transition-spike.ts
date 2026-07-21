@@ -5,7 +5,12 @@
 // ABOUTME: Spec: docs/superpowers/specs/2026-07-18-transition-order-spike-design.md
 import { buildOrderPath, type ReachCon, type Vec } from "../src/core/reachability";
 import { verifyTransition as coreVerifyTransition, type TransStep } from "../src/core/orderLegality";
-import { transitionOrderPath, teardownRebuild, incrementalTransition } from "../src/core/transitionOrder";
+import {
+  transitionOrderPath,
+  teardownRebuild,
+  incrementalTransition,
+  stateWalkTransition,
+} from "../src/core/transitionOrder";
 import { cons, table, mulberry32 } from "./reachability-fuzz";
 import { mutatePair, randomPair } from "../test/support/transition-pairs";
 
@@ -32,6 +37,7 @@ interface PairResult {
   usNanosFromScratch: number;
   steps: TransStep[] | null; // kept only so report() can print sample orders; not part of the metrics
   incRejected: boolean; // incrementalTransition produced steps, but the ladder settled on full-respec/none
+  winner: "walk" | "two-pass" | "full-respec" | "none"; // which candidate the selection actually returned
 }
 
 function measure(corpus: PairResult["corpus"], base: ReachCon[], cur: ReachCon[], cap: number): PairResult {
@@ -43,11 +49,22 @@ function measure(corpus: PairResult["corpus"], base: ReachCon[], cur: ReachCon[]
   const moved = res ? res.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0) : 0;
   const td = teardownRebuild(cons, table, base, cur, cap);
   const movedTeardown = td ? td.reduce((a, s) => a + Math.abs(s.to - s.from), 0) : null;
-  // Per-rung oracle rejections: when the ladder did not settle on incremental, ask whether the
-  // incremental rung alone had produced a (self-validated, but not oracle-verified here) candidate
-  // anyway - a demotion the ladder's own oracle gate silently absorbed.
-  const incRejected =
-    (!res || res.rung === "full-respec") && incrementalTransition(cons, table, base, cur, cap) !== null;
+  // Per-rung oracle rejections: when the selection did not settle on incremental, ask whether the
+  // two-pass rung alone had produced a (self-validated, but not oracle-verified here) candidate
+  // anyway - a demotion the selection's own oracle gate silently absorbed.
+  const walkSteps = stateWalkTransition(cons, table, base, cur, cap);
+  const incSteps = incrementalTransition(cons, table, base, cur, cap);
+  const incRejected = (!res || res.rung === "full-respec") && incSteps !== null;
+  // Which candidate the selection actually returned: compare the winning steps against the walk's
+  // and the two-pass replay's own output (JSON-equal, since transitionOrderPath re-derives both
+  // candidates identically). Neither match means the full respec won.
+  const winner: PairResult["winner"] = !res
+    ? "none"
+    : walkSteps !== null && JSON.stringify(walkSteps) === JSON.stringify(res.steps)
+      ? "walk"
+      : incSteps !== null && JSON.stringify(incSteps) === JSON.stringify(res.steps)
+        ? "two-pass"
+        : "full-respec";
   const bc = new Map(base.map((c) => [c.id, c.size]));
   const cc = new Map(cur.map((c) => [c.id, c.size]));
   let theoreticalMin = 0;
@@ -79,6 +96,7 @@ function measure(corpus: PairResult["corpus"], base: ReachCon[], cur: ReachCon[]
     usNanos: t1 - t0, usNanosFromScratch: t2 - t1,
     steps: res?.steps ?? null,
     incRejected,
+    winner,
   };
 }
 
@@ -215,12 +233,12 @@ if (import.meta.main) {
 
   if (csvMode) {
     // Print CSV to stdout with per-corpus indices
-    console.log("corpus,index,rung,moved");
+    console.log("corpus,index,rung,moved,winner");
     const indices = new Map<PairResult["corpus"], number>();
     for (const result of results) {
       const corpus = result.corpus;
       const idx = indices.get(corpus) ?? 0;
-      console.log(`${corpus},${idx},${result.rung},${result.moved}`);
+      console.log(`${corpus},${idx},${result.rung},${result.moved},${result.winner}`);
       indices.set(corpus, idx + 1);
     }
     // Report to stderr

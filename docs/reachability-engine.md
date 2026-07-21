@@ -140,16 +140,25 @@ them and refunds each the moment the in-game rules allow. Its contract:
   walk, two outputs) to feed the panel's step popup, so the have/need numbers a
   user hovers are exactly the numbers the judge saw.
 
-While comparing, the panel shows a baseline-to-current TRANSITION instead: a
-two-rung ladder (web/src/core/transitionOrder.ts) tries an incremental seeded
-replay (kept members stand, baseline-only members serve as pre-paid scaffolds,
-two-pass refund scheduling), then falls back to a full respec built from the
-churn-minimized from-scratch orders. Every rung's output must pass the
+While comparing, the panel shows a baseline-to-current TRANSITION instead:
+`transitionOrderPath` (web/src/core/transitionOrder.ts) computes three
+candidate schedules and selects among them by fewest moved points, then fewest
+steps. The state walk is a deterministic greedy over actual game states, one
+oracle-legal move at a time - complete a target member, refund whatever is free
+(standing above target with no outstanding deficit leaning on its grant), add a
+minimal scaffold, and, only when none of those apply, tear down a standing
+member so it rejoins the pool for a later re-add. The seeded two-pass replay
+holds kept members,
+treats baseline-only members as pre-paid scaffolds, and schedules refunds in a
+second pass. The full respec reverses the baseline's own from-scratch order,
+then plays the current build's. Every candidate's output must pass the
 transition oracle (`replayTransition` in web/src/core/orderLegality.ts, the
-same one-walk-two-outputs pattern) before display, and the popup's states come
-from that verifying replay. A pair with no verified transition falls back to
-the current build's from-scratch order, so compare mode never shows less than
-the normal panel.
+same one-walk-two-outputs pattern) before it enters the pool; only verified
+candidates compete, and the winner is displayed. A pair with no verified
+transition falls back to the current build's from-scratch order, so compare
+mode never shows less than the normal panel. The panel's full-rebuild notice
+appears only when the full respec wins - the common case is the state walk or
+the two-pass replay, not a teardown.
 
 The regression net: oracle unit tests (web/test/order-legality.test.ts), the
 real-build fixture replay and determinism pins (web/test/build-order-path.test.ts),

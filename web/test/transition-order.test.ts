@@ -20,10 +20,23 @@ const clean = (base: any, cur: any, res: any, cap: number) => {
 // it replaces, not an improvement, but confirmed no worse.
 const REVERSED_PIN = 130;
 
+// Aggregate moved-points pins (the state-walk selection net, Task 4): total moved points across
+// each sweep's produced pairs, 2% slack (ceil(measured * 1.02)). Baseline is the pre-walk two-rung
+// ladder (incremental replay, else full respec) on the identical seeded pairs; measured is this
+// task's best-of-candidates selection (walk, replay, full respec). Update these deliberately when
+// the algorithm improves; a silent regression must fail here.
+// small-delta: baseline=908 measured=712. resize: baseline=25 measured=25 (already at floor - the
+// walk cannot beat the ladder where the ladder already achieved the theoretical minimum). swap:
+// baseline=275 measured=157.
+const SMALL_DELTA_MOVED_PIN = 727;
+const RESIZE_MOVED_PIN = 26;
+const SWAP_MOVED_PIN = 161;
+
 test("30 small-delta pairs are oracle-clean; the majority resolve incrementally", () => {
   const rng = mulberry32(1234);
   let produced = 0;
   let incremental = 0;
+  let totalMoved = 0;
   for (let i = 0; i < 60 && produced < 30; i++) {
     const pair = mutatePair(rng);
     if (!pair) continue;
@@ -32,14 +45,17 @@ test("30 small-delta pairs are oracle-clean; the majority resolve incrementally"
     produced++;
     clean(pair.base, pair.cur, res, 55);
     if (res.rung === "incremental") incremental++;
+    totalMoved += res.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
   }
   expect(produced).toBeGreaterThan(20);
   expect(incremental).toBeGreaterThan(produced / 2); // guards the central claim, not just legality
+  expect(totalMoved).toBeLessThanOrEqual(SMALL_DELTA_MOVED_PIN);
 });
 
 test("resize pairs (star-level partials) are oracle-clean", () => {
   const rng = mulberry32(77);
   let produced = 0;
+  let totalMoved = 0;
   for (let i = 0; i < 60 && produced < 10; i++) {
     const pair = resizePair(rng);
     if (!pair) continue;
@@ -47,13 +63,16 @@ test("resize pairs (star-level partials) are oracle-clean", () => {
     if (!res) continue;
     produced++;
     clean(pair.base, pair.cur, res, 55);
+    totalMoved += res.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
   }
   expect(produced).toBeGreaterThan(5);
+  expect(totalMoved).toBeLessThanOrEqual(RESIZE_MOVED_PIN);
 });
 
 test("load-bearing swap pairs are oracle-clean", () => {
   const rng = mulberry32(88);
   let produced = 0;
+  let totalMoved = 0;
   for (let i = 0; i < 120 && produced < 5; i++) {
     const pair = swapPair(rng);
     if (!pair) continue;
@@ -61,8 +80,10 @@ test("load-bearing swap pairs are oracle-clean", () => {
     if (!res) continue;
     produced++;
     clean(pair.base, pair.cur, res, 55);
+    totalMoved += res.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
   }
   expect(produced).toBeGreaterThan(0);
+  expect(totalMoved).toBeLessThanOrEqual(SWAP_MOVED_PIN);
 });
 
 test("the owner's pair resolves incrementally at or below the hand path's 32 moved points", () => {
