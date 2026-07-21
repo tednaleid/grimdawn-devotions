@@ -84,11 +84,12 @@ test("the owner's pair swapped is oracle-clean and no worse than full respec", (
   const res = transitionOrderPath(cons, table, pair!.cur, pair!.base, 55);
   clean(pair!.cur, pair!.base, res, 55);
   const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
-  expect(moved).toBeLessThanOrEqual(REVERSED_PIN); // measured after the walk lands; expect far below 130
+  expect(moved).toBeLessThanOrEqual(REVERSED_PIN); // the measured value; see the REVERSED_PIN comment
 });
 
 test("selection never returns more moved points than the full respec candidate", () => {
   const rng = mulberry32(31337);
+  let compared = 0;
   for (let i = 0; i < 20; i++) {
     const pair = mutatePair(rng);
     if (!pair) continue;
@@ -97,7 +98,9 @@ test("selection never returns more moved points than the full respec candidate",
     if (!res || !td || verifyTransition(cons, pair.base, pair.cur, td, 55) !== null) continue;
     const moved = (s: typeof res.steps) => s.reduce((a, x) => a + Math.abs(x.to - x.from), 0);
     expect(moved(res.steps)).toBeLessThanOrEqual(moved(td));
+    compared++;
   }
+  expect(compared).toBeGreaterThan(0);
 });
 
 test("teardownRebuild is oracle-clean whenever it exists", () => {
