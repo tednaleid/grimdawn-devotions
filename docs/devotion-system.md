@@ -48,9 +48,11 @@ Order used throughout the code is `[ascendant, chaos, eldritch, order, primordia
 | primordial | blue          | 20 |
 
 The "engine cap" is the highest requirement any constellation imposes in that
-color. Affinity beyond it gates nothing, so the engine clamps there (`CAP_MAX` in
-`web/src/core/reachability.ts`). Chaos is the scarcest: nothing requires more than
-8, and chaos sources are comparatively few.
+color. Affinity beyond it gates nothing, so the engine clamps its internal search
+vectors there (`CAP_MAX` in `web/src/core/reachability.ts`). The clamp never
+reaches the UI: displayed totals (the Affinity panel's have column, build-order
+step states) are the true uncapped in-game sums. Chaos is the scarcest: nothing
+requires more than 8, and chaos sources are comparatively few.
 
 ## The Crossroads
 

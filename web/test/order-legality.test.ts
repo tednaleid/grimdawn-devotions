@@ -54,6 +54,16 @@ test("an add that lands over the cap is illegal", () => {
   expect(verifyBuildOrder(CONS, [G], steps, 0)).toMatch(/cap exceeded/);
 });
 
+test("step states report the true affinity total, uncapped", () => {
+  // Chaos requirements max out at 8 map-wide; three completed 4-chaos granters hold a true total of
+  // 12. A have capped at 8 would hide the surplus from the popup (the affinity panel's bug shape).
+  const granters = [con("a", 1, z(), v(0, 4)), con("b", 1, z(), v(0, 4)), con("c", 1, z(), v(0, 4))];
+  const steps = [complete(granters[0]!, 1), complete(granters[1]!, 2), complete(granters[2]!, 3)];
+  const r = replayBuildOrder(granters, granters, steps, 55);
+  expect(r.error).toBeNull();
+  expect(r.states[2]!.have).toEqual(v(0, 12));
+});
+
 test("a wrong heldAfter is rejected", () => {
   const steps: BuildStep[] = [{ kind: "complete", conId: "g", points: 1, heldAfter: 5 }];
   expect(verifyBuildOrder(CONS, [G], steps, 55)).toMatch(/heldAfter/);

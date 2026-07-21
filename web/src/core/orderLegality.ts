@@ -3,16 +3,17 @@
 // ABOUTME: states so the panel's popup shows exactly what the judge saw (the verified-or-absent gate).
 import type { BuildStep, ReachCon, Vec } from "./reachability";
 
-// Deliberately duplicated from reachability.ts (its private CAP_MAX): the oracle must not import engine code. Keep in sync.
-const CAP_MAX: Vec = [20, 8, 20, 10, 20];
+// Grants sum uncapped, as in the game (the engine's CAP_MAX clamp is a cover-table concern that must
+// not leak here): requirements bound what `covers` compares, so no cap changes a verdict, and the
+// exposed step states show the player's true totals.
 const zero = (): Vec => [0, 0, 0, 0, 0];
-const addCap = (g: Vec, x: Vec): Vec => g.map((n, i) => Math.min(n + x[i]!, CAP_MAX[i]!)) as Vec;
+const addV = (g: Vec, x: Vec): Vec => g.map((n, i) => n + x[i]!) as Vec;
 const maxV = (a: Vec, b: Vec): Vec => a.map((n, i) => Math.max(n, b[i]!)) as Vec;
 const covers = (g: Vec, d: Vec): boolean => g.every((n, i) => n >= d[i]!);
 
 /** Post-step affinity state for one build-order step, from the same replay that judges legality. */
 export interface StepState {
-  have: Vec; // capped grant sum of standing complete constellations after the step
+  have: Vec; // grant sum of standing complete constellations after the step (the true in-game total)
   need: Vec; // elementwise max requirement over standing constellations after the step
   needSource: Map<number, string[]>; // per color index, the standing constellation ids demanding it
   conReq: Vec; // the step's own constellation requirement (target-override lookup)
@@ -54,7 +55,7 @@ export function replayBuildOrder(
     const needSource = new Map<number, string[]>();
     for (const id of standing) {
       const c = conOf.get(id)!;
-      have = addCap(have, c.grant);
+      have = addV(have, c.grant);
       need = maxV(need, c.req);
       for (let i = 0; i < 5; i++)
         if (c.req[i]! > 0) {
@@ -73,7 +74,7 @@ export function replayBuildOrder(
     for (const id of standing) {
       const c = conOf.get(id)!;
       req = maxV(req, c.req);
-      if (id !== pending) grant = addCap(grant, c.grant);
+      if (id !== pending) grant = addV(grant, c.grant);
     }
     if (!standing.has(pending)) req = maxV(req, conOf.get(pending)!.req);
     return covers(grant, req) ? null : `${label}: requirement uncovered`;

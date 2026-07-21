@@ -61,7 +61,7 @@ test("the final step's state agrees with the Affinity panel (supply/target)", ()
   const view = selectionView(model, cons, table, decoded!.selected, 55);
   const last = view.buildOrderStates![view.buildOrderStates!.length - 1]!;
   const summary = selectionSummary(model, decoded!.selected);
-  expect(last.have).toEqual(summary.supply);
+  expect(last.have).toEqual(summary.supplyUncapped);
   expect(last.need).toEqual(summary.target);
 });
 

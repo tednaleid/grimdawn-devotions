@@ -50,6 +50,7 @@ const addCap = (g: Vec, x: Vec): Vec => [
   Math.min(g[3] + x[3], CAP_MAX[3]!),
   Math.min(g[4] + x[4], CAP_MAX[4]!),
 ];
+const addV = (g: Vec, x: Vec): Vec => [g[0] + x[0], g[1] + x[1], g[2] + x[2], g[3] + x[3], g[4] + x[4]];
 const maxV = (a: Vec, b: Vec): Vec => [
   Math.max(a[0], b[0]),
   Math.max(a[1], b[1]),
@@ -136,19 +137,22 @@ export function buildCoverTable(cons: ReachCon[]): CoverTable {
 function claimSummary(claimed: ReachCon[]) {
   let req = zero(),
     grant = zero(),
+    grantUncapped = zero(),
     own = 0;
   for (const c of claimed) {
     req = maxV(req, c.req);
     grant = addCap(grant, c.grant);
+    grantUncapped = addV(grantUncapped, c.grant);
     own += c.size;
   }
-  return { req, grant, own };
+  return { req, grant, grantUncapped, own };
 }
 
 /** A normalized start point for the minCost bracket, derived from a raw star selection. */
 export interface ReachState {
   own: number; // total selected stars (all count against budget); equals sum of `built` sizes
-  supply: Vec; // affinity from COMPLETED constellations only
+  supply: Vec; // affinity from COMPLETED constellations only, capped at CAP_MAX (cover-table indexing)
+  supplyUncapped: Vec; // the same sum uncapped: the true in-game total (what displays show)
   target: Vec; // elementwise-max requirement over STARTED constellations
   startedIds: Set<string>;
   partialFinish: { id: string; remaining: number; grant: Vec; req: Vec }[];
@@ -169,6 +173,7 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
     selByCon.set(star.constellationId, (selByCon.get(star.constellationId) ?? 0) + 1);
   }
   let supply = zero(),
+    supplyUncapped = zero(),
     target = zero();
   const startedIds = new Set<string>();
   const partialFinish: ReachState["partialFinish"] = [];
@@ -182,6 +187,7 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
     const grant = vecOf(c.affinityBonus);
     if (count >= c.starIds.length) {
       supply = addCap(supply, grant);
+      supplyUncapped = addV(supplyUncapped, grant);
       built.push({ id: conId, size: c.starIds.length, req, grant });
     } else {
       built.push({ id: conId, size: count, req, grant: zero() });
@@ -189,7 +195,7 @@ export function selectionSummary(model: DevotionModel, selected: Set<string>): R
         partialFinish.push({ id: conId, remaining: c.starIds.length - count, grant, req });
     }
   }
-  return { own, supply, target, startedIds, partialFinish, built };
+  return { own, supply, supplyUncapped, target, startedIds, partialFinish, built };
 }
 
 /** The unselected path to a star: the star plus every unselected transitive predecessor. Predecessors
@@ -210,10 +216,11 @@ export function pathToStar(model: DevotionModel, selected: Set<StarId>, starId: 
 
 /** Treat a fully-claimed set as a selection state: every claim is a completed member. */
 export function stateFromClaimed(claimed: ReachCon[]): ReachState {
-  const { req, grant, own } = claimSummary(claimed);
+  const { req, grant, grantUncapped, own } = claimSummary(claimed);
   return {
     own,
     supply: grant,
+    supplyUncapped: grantUncapped,
     target: req,
     startedIds: new Set(claimed.map((c) => c.id)),
     partialFinish: [],
@@ -1160,7 +1167,7 @@ export interface ReachView {
   // reachable at the sweep budget: all unselected stars of a completable constellation, plus the stars
   // within reach of a partially enterable one (path cost <= maxK - see reachabilityForSelection).
   reachableStars: Set<StarId>;
-  have: Vec;
+  have: Vec; // true in-game affinity total from completed constellations (uncapped; the panel's have column)
   need: Vec;
   needSource: Map<number, string[]>;
 }
@@ -1227,7 +1234,8 @@ export function reachabilityForSelection(
       if (selCount + pathToStar(model, selected, sid).size <= maxK) reachableStars.add(sid);
     }
   }
-  // panel: have = supply, need = target, needSource = started cons defining each color's max.
+  // panel: have = supplyUncapped (the true total, not the engine's CAP_MAX-clamped supply),
+  // need = target, needSource = started cons defining each color's max.
   const needSource = new Map<number, string[]>();
   for (let i = 0; i < 5; i++) {
     if (st.target[i] === 0) continue;
@@ -1238,7 +1246,7 @@ export function reachabilityForSelection(
     }
     needSource.set(i, src);
   }
-  return { completable, reachableStars, have: st.supply, need: st.target, needSource };
+  return { completable, reachableStars, have: st.supplyUncapped, need: st.target, needSource };
 }
 
 /** The full engine result one UI refresh needs for a selection: the validity floor and the sweep. */

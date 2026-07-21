@@ -255,6 +255,30 @@ test("selectionSummary splits started vs completed and tracks partial finishes",
   expect(s.partialFinish.length).toBe(0);
 });
 
+test("selectionSummary: supplyUncapped carries the true total where supply caps at the max requirement", () => {
+  // Chaos supply caps at 8 (the map's max chaos requirement) for cover-table indexing; the true
+  // in-game total from three completed 4-chaos granters is 12.
+  const m = modelFromCons([
+    { id: "g1", size: 1, req: [0, 0, 0, 0, 0], grant: [0, 4, 0, 0, 0] },
+    { id: "g2", size: 1, req: [0, 0, 0, 0, 0], grant: [0, 4, 0, 0, 0] },
+    { id: "g3", size: 1, req: [0, 0, 0, 0, 0], grant: [0, 4, 0, 0, 0] },
+  ]);
+  const s = selectionSummary(m, new Set(["g1:0", "g2:0", "g3:0"]));
+  expect(s.supply).toEqual([0, 8, 0, 0, 0]); // engine-internal, capped
+  expect(s.supplyUncapped).toEqual([0, 12, 0, 0, 0]); // what the player actually has
+});
+
+test("user-reported: the panel's chaos have is the true total, not the max-requirement cap", () => {
+  // Share link from the report: completed chaos granters total 10 while Dying God (requires 8, the
+  // map's chaos max) is started. The panel showed have 8 / need 8, hiding the 2-point surplus that
+  // makes a 1-chaos granter (the chaos Crossroads) safely refundable.
+  const hash = "p=55&s=AAAAgAIHAAAAAAAAwAPAwwMAAHgAAAAAAAAAAAD8AAAAAAAAAPABAACAHwAAAAAAAAAA-AEAAAAAHwAAAAAA4Ac";
+  const sel = decodeHash(hash, starCanon)!.selected;
+  const view = reachabilityForSelection(realModel, cons, cover, sel, 55);
+  expect(view.need[1]).toBe(8);
+  expect(view.have[1]).toBe(10);
+});
+
 test("reachabilityForSelection: a startable-but-not-completable constellation keeps a reachable first star", () => {
   // Synthetic Crook/Anvil at budget 6: Crook (5 stars, grants ascendant 5) is complete; Anvil (4 stars, needs ascendant 1).
   const model: any = modelFromCons([

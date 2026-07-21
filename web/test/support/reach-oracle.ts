@@ -33,7 +33,8 @@ export function stateFromCounts(S: Counts, cons: ReachCon[]): ReachState {
         partialFinish.push({ id: c.id, remaining: c.size - S[i]!, grant: c.grant, req: c.req });
     }
   }
-  return { own, supply, target, startedIds, partialFinish, built };
+  // This oracle never caps its supply sum, so the uncapped vector is the same one.
+  return { own, supply, supplyUncapped: supply, target, startedIds, partialFinish, built };
 }
 
 export function mulberry32(a: number) {
