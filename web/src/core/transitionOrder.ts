@@ -329,6 +329,202 @@ export function teardownRebuild(
 }
 
 /**
+ * The state walk: a deterministic greedy over actual game states, from the baseline's standing
+ * board toward the current build, one oracle-legal move at a time. Priorities each iteration:
+ * (1) complete a target member — never-torn candidates before re-adds of torn ones, then the densest
+ * contributor to the outstanding deficits per moved star, ties by id; (2) free points - refund any
+ * standing constellation above its target count, zero-grant members first, then the grant least
+ * useful to the remaining deficits, ties by id; (3) add one scaffold from peakToReach's minimal
+ * crossroads-biased set when it fits; (4) only when stuck, tear down a standing at-target member
+ * (smallest legal first, ties by id, each torn at most once) - it rejoins the pool and move 1
+ * re-adds it later. Bounded: total moved points may not exceed four times the theoretical minimum;
+ * exceeding it, or having no legal move, returns null. The walk is a candidate, not an authority:
+ * callers verify its output like any other.
+ */
+export function stateWalkTransition(
+  cons: ReachCon[],
+  table: CoverTable,
+  base: ReachCon[],
+  cur: ReachCon[],
+  cap: number,
+): TransStep[] | null {
+  const conById = new Map(cons.map((c) => [c.id, c]));
+  const want = new Map(cur.map((c) => [c.id, c.size]));
+  const counts = new Map<string, number>(base.map((c) => [c.id, c.size]));
+  const steps: TransStep[] = [];
+  const tornOnce = new Set<string>();
+  let running = [...counts.values()].reduce((a, b) => a + b, 0);
+  let theoreticalMin = 0;
+  for (const [id, n] of counts) theoreticalMin += Math.abs(n - (want.get(id) ?? 0));
+  for (const [id, n] of want) if (!counts.has(id)) theoreticalMin += n;
+  const budget = Math.max(theoreticalMin, 1) * 4;
+  let movedTotal = 0;
+
+  // The oracle's standing rule (capped, verdict-equivalent): complete grants cover every started
+  // requirement, with `pending` counted as requirement but not grant (the mid-step point).
+  const valid = (pending: string | null): boolean => {
+    let grant = zero();
+    let req = zero();
+    for (const [id, n] of counts) {
+      if (n <= 0) continue;
+      const c = conById.get(id)!;
+      req = maxV(req, c.req);
+      if (n >= c.size && id !== pending) grant = addCap(grant, c.grant);
+    }
+    if (pending) {
+      const pc = conById.get(pending);
+      if (pc) req = maxV(req, pc.req);
+    }
+    return covers(grant, req);
+  };
+  const restore = (id: string, from: number): void => {
+    if (from === 0) counts.delete(id);
+    else counts.set(id, from);
+  };
+  // Would this move be legal? Mutates and restores; emit() re-applies for real.
+  const probe = (kind: "add" | "refund", id: string, to: number): boolean => {
+    const from = counts.get(id) ?? 0;
+    if (kind === "add" ? to <= from : to >= from) return false;
+    if (kind === "add" && running + (to - from) > cap) return false;
+    counts.set(id, to);
+    const ok = valid(id) && valid(null);
+    restore(id, from);
+    return ok;
+  };
+  const emit = (kind: "add" | "refund", id: string, to: number): void => {
+    const from = counts.get(id) ?? 0;
+    counts.set(id, to);
+    running += to - from;
+    movedTotal += Math.abs(to - from);
+    steps.push({ kind, conId: id, from, to, heldAfter: running });
+    if (to === 0) counts.delete(id);
+  };
+  const standingGrant = (): Vec => {
+    let g = zero();
+    for (const [id, n] of counts) {
+      const c = conById.get(id)!;
+      if (n >= c.size) g = addCap(g, c.grant);
+    }
+    return g;
+  };
+  // What the not-yet-at-target members still demand beyond the standing complete grants.
+  const deficitVec = (): Vec => {
+    const g = standingGrant();
+    const d = zero();
+    for (const [id, size] of want) {
+      if ((counts.get(id) ?? 0) === size) continue;
+      const c = conById.get(id)!;
+      for (let i = 0; i < 5; i++) d[i] = Math.max(d[i]!, Math.max(0, c.req[i]! - g[i]!));
+    }
+    return d;
+  };
+  const done = (): boolean => {
+    if (counts.size !== want.size) return false;
+    for (const [id, n] of want) if (counts.get(id) !== n) return false;
+    return true;
+  };
+  const grantSum = (c: ReachCon) => c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4];
+
+  while (!done()) {
+    if (movedTotal > budget) return null;
+    const d = deficitVec();
+    // 1. Complete a target member: never-torn candidates before re-adds of torn ones (re-adding
+    // a just-torn member would recreate the state the teardown escaped), then densest deficit
+    // contribution per moved star, ties by id.
+    {
+      let pick: string | null = null;
+      let pickPts = 0;
+      let pickDelta = 1;
+      let pickTorn = 1;
+      for (const [id, size] of want) {
+        const at = counts.get(id) ?? 0;
+        if (at >= size || !probe("add", id, size)) continue;
+        const c = conById.get(id)!;
+        let pts = 0;
+        if (size === c.size) for (let i = 0; i < 5; i++) if (d[i]! > 0) pts += c.grant[i]!;
+        const delta = size - at;
+        const torn = tornOnce.has(id) ? 1 : 0;
+        if (
+          pick === null ||
+          torn < pickTorn ||
+          (torn === pickTorn &&
+            (pts * pickDelta > pickPts * delta || (pts * pickDelta === pickPts * delta && id < pick)))
+        ) {
+          pick = id;
+          pickPts = pts;
+          pickDelta = delta;
+          pickTorn = torn;
+        }
+      }
+      if (pick !== null) {
+        emit("add", pick, want.get(pick)!);
+        continue;
+      }
+    }
+    // 2. Free points: refund anything standing above its target, zero-grant first, then the grant
+    // least useful to the remaining deficits, ties by id. Covers leftovers, spent scaffolds, and
+    // shrink-resizes alike (refund toward target, not just to zero).
+    {
+      const cands: { id: string; free: number; useful: number }[] = [];
+      for (const [id, n] of counts) {
+        const target = want.get(id) ?? 0;
+        if (n <= target || !probe("refund", id, target)) continue;
+        const c = conById.get(id)!;
+        let useful = 0;
+        for (let i = 0; i < 5; i++) if (d[i]! > 0) useful += c.grant[i]!;
+        cands.push({ id, free: grantSum(c) === 0 ? 0 : 1, useful });
+      }
+      if (cands.length) {
+        cands.sort((a, b) => a.free - b.free || a.useful - b.useful || (a.id < b.id ? -1 : 1));
+        const r = cands[0]!;
+        emit("refund", r.id, want.get(r.id) ?? 0);
+        continue;
+      }
+    }
+    // 3. Scaffold: one constellation from peakToReach's minimal set for the binding deficit.
+    {
+      const need: ReachCon[] = [];
+      const pool = cons.filter((c) => !want.has(c.id) && (counts.get(c.id) ?? 0) === 0);
+      const sz = peakToReach(pool, table, d, standingGrant(), REPLAY_CAP, {
+        collect: need,
+        preferSmall: true,
+      });
+      if (sz < INF && sz > 0) {
+        let added = false;
+        for (const s of need)
+          if (probe("add", s.id, s.size)) {
+            emit("add", s.id, s.size);
+            added = true;
+            break;
+          }
+        if (added) continue;
+      }
+    }
+    // 4. Teardown, only when stuck: smallest legal at-target member, ties by id, each torn once.
+    {
+      const tearCands = [...counts.keys()]
+        .filter((id) => {
+          const t = want.get(id) ?? 0;
+          return t > 0 && (counts.get(id) ?? 0) === t && !tornOnce.has(id);
+        })
+        .map((id) => conById.get(id)!)
+        .sort((a, b) => a.size - b.size || (a.id < b.id ? -1 : 1));
+      let torn = false;
+      for (const c of tearCands)
+        if (probe("refund", c.id, 0)) {
+          emit("refund", c.id, 0);
+          tornOnce.add(c.id);
+          torn = true;
+          break;
+        }
+      if (torn) continue;
+    }
+    return null; // no legal move of any kind: genuinely stuck
+  }
+  return steps;
+}
+
+/**
  * The two-rung escalation ladder: incremental, else full respec, each verified by the transition
  * oracle before return (verified or absent). The identity edge returns the empty transition only
  * when the build fits the cap; a base equal to cur but over cap is a none pair. Deterministic.
