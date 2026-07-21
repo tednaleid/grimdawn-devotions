@@ -103,5 +103,9 @@ export function urlFixturePairs(): { label: string; base: ReachCon[]; cur: Reach
   const members = (hash: string) => selectionSummary(model, decodeHash(hash, canonical)!.selected).built;
   const CUR = "p=55&s=AAAAgAAHAAAAAAAAAAAAPADAwQf44AEAAIA_AAD8AAAAAAAAAAAAAPAD4AMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfg";
   const BASE = "p=55&s=AAAAAAAAAADABgAAAAAAPADAwQcA4AEAAIA_AAD8AAAAAAAAAPABAPAD4AMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAfg";
-  return [{ label: "eel-pair", base: members(BASE), cur: members(CUR) }];
+  const CHURN_CUR = "p=55&s=AAAAAAB_AADAPgAAAAAAPADAwQcA4AEA-AMAAAAAAAAAAAAAAAAAAPAD4AMAAAAAAAAAAAAAAAAAAAD4Aw";
+  return [
+    { label: "eel-pair", base: members(BASE), cur: members(CUR) },
+    { label: "yugol-churn-pair", base: members(CUR), cur: members(CHURN_CUR) },
+  ];
 }

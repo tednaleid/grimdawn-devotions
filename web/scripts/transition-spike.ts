@@ -11,6 +11,7 @@ import {
   teardownRebuild,
   incrementalTransition,
   stateWalkTransition,
+  simplifySteps,
 } from "../src/core/transitionOrder";
 import { cons, table, mulberry32 } from "./reachability-fuzz";
 import { mutatePair, randomPair } from "../test/support/transition-pairs";
@@ -58,16 +59,19 @@ function measure(corpus: PairResult["corpus"], base: ReachCon[], cur: ReachCon[]
   const incRejected = (!res || res.rung === "full-respec") && incSteps !== null;
   // Which candidate the selection actually returned. Rung-aware: a null selection is none, a
   // full-respec rung is full-respec, and among incremental winners the steps are compared
-  // (JSON-equal, since transitionOrderPath re-derives the walk and two-pass replay identically)
-  // against the direct walk's and the two-pass replay's own output. Neither match means the
-  // reversed opposite-direction walk won - the only remaining incremental candidate.
+  // (JSON-equal, since transitionOrderPath re-derives the walk and two-pass replay identically,
+  // then simplifies each candidate the same way) against the direct walk's and the two-pass
+  // replay's own simplified output. Neither match means the reversed opposite-direction walk
+  // won - the only remaining incremental candidate.
+  const walkSimplified = walkSteps !== null ? simplifySteps(cons, base, cur, walkSteps, cap) : null;
+  const incSimplified = incSteps !== null ? simplifySteps(cons, base, cur, incSteps, cap) : null;
   const winner: PairResult["winner"] = !res
     ? "none"
     : res.rung === "full-respec"
       ? "full-respec"
-      : walkSteps !== null && JSON.stringify(walkSteps) === JSON.stringify(res.steps)
+      : walkSimplified !== null && JSON.stringify(walkSimplified) === JSON.stringify(res.steps)
         ? "walk"
-        : incSteps !== null && JSON.stringify(incSteps) === JSON.stringify(res.steps)
+        : incSimplified !== null && JSON.stringify(incSimplified) === JSON.stringify(res.steps)
           ? "two-pass"
           : "walk-reversed";
   const bc = new Map(base.map((c) => [c.id, c.size]));

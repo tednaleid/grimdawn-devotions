@@ -559,12 +559,67 @@ function reverseSteps(steps: TransStep[], startTotal: number): TransStep[] {
 }
 
 /**
+ * Peephole simplifier: repeatedly remove pairs of steps that exactly cancel (a constellation
+ * leaving and returning to the same star count, with no other move of its own in between)
+ * whenever the oracle still verifies the shortened schedule. Every removal is verify-gated,
+ * so the result is oracle-clean by construction and never moves more points than the input.
+ * Deterministic: the leftmost removable pair is taken each round, to a fixpoint.
+ */
+export function simplifySteps(
+  cons: ReachCon[],
+  base: ReachCon[],
+  cur: ReachCon[],
+  steps: TransStep[],
+  cap: number,
+): TransStep[] {
+  const baseTotal = base.reduce((a, c) => a + c.size, 0);
+  let out = steps;
+  let changed = true;
+  while (changed) {
+    changed = false;
+    outer: for (let i = 0; i < out.length; i++) {
+      const a = out[i]!;
+      for (let j = i + 1; j < out.length; j++) {
+        const b = out[j]!;
+        if (b.conId !== a.conId) continue;
+        if (a.from === b.to && a.to === b.from) {
+          const kept = out.filter((_, k) => k !== i && k !== j);
+          let running = baseTotal;
+          const rebuilt = kept.map((s) => {
+            running += s.to - s.from;
+            return { ...s, heldAfter: running };
+          });
+          if (verifyTransition(cons, base, cur, rebuilt, cap) === null) {
+            out = rebuilt;
+            changed = true;
+            break outer;
+          }
+        }
+        break; // an intervening move of the same constellation blocks the pair with i
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * A simplified full respec that no longer tears every baseline member down is not honestly a
+ * "full rebuild" (the panel's notice keys off the rung); re-derive the tag from the schedule.
+ */
+function respecRung(steps: TransStep[], base: ReachCon[]): TransitionRung {
+  const zeroed = new Set(steps.filter((s) => s.kind === "refund" && s.to === 0).map((s) => s.conId));
+  return base.every((c) => zeroed.has(c.id)) ? "full-respec" : "incremental";
+}
+
+/**
  * Best of all verified candidates - the state walk, the opposite-direction walk reversed, the
  * seeded replay, and full respec - each verified by the transition oracle before entering the
- * pool (verified or absent). The winner is chosen by fewest moved points, then fewest steps, then
- * candidate order (walk, reversed walk, replay, respec). The identity edge returns the empty
- * transition only when the build fits the cap; a base equal to cur but over cap is a none pair.
- * Deterministic.
+ * pool (verified or absent), then simplified by the verify-gated peephole (`simplifySteps`)
+ * before the selection runs; a simplified respec's rung is re-derived (`respecRung`), since
+ * shedding its full teardown/rebuild shape means it is no longer honestly a full respec. The
+ * winner is chosen by fewest moved points, then fewest steps, then candidate order (walk,
+ * reversed walk, replay, respec). The identity edge returns the empty transition only when the
+ * build fits the cap; a base equal to cur but over cap is a none pair. Deterministic.
  */
 export function transitionOrderPath(
   cons: ReachCon[],
@@ -584,21 +639,29 @@ export function transitionOrderPath(
   // candidates stay in the pool unmodified, so no pair can do worse than any earlier engine.
   const clean = (steps: TransStep[] | null) => steps && verifyTransition(cons, base, cur, steps, cap) === null;
   const moved = (steps: TransStep[]) => steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  // simplifySteps preserves verification (the input is verified and every reduction re-verifies),
+  // so consider needs no second verify after simplification.
   const candidates: { steps: TransStep[]; rung: TransitionRung }[] = [];
-  const walk = stateWalkTransition(cons, table, base, cur, cap);
-  if (clean(walk)) candidates.push({ steps: walk!, rung: "incremental" });
+  const consider = (steps: TransStep[] | null, rung: TransitionRung): void => {
+    if (!clean(steps)) return;
+    const simplified = simplifySteps(cons, base, cur, steps!, cap);
+    candidates.push({
+      steps: simplified,
+      rung: rung === "full-respec" ? respecRung(simplified, base) : rung,
+    });
+  };
+  consider(stateWalkTransition(cons, table, base, cur, cap), "incremental");
   const back = stateWalkTransition(cons, table, cur, base, cap);
-  if (back) {
-    const rev = reverseSteps(
-      back,
-      base.reduce((a, c) => a + c.size, 0),
-    );
-    if (clean(rev)) candidates.push({ steps: rev, rung: "incremental" });
-  }
-  const s0 = seededReplay(cons, table, conById, delta, cap, tries);
-  if (clean(s0)) candidates.push({ steps: s0!, rung: "incremental" });
-  const s2 = teardownRebuild(cons, table, base, cur, cap);
-  if (clean(s2)) candidates.push({ steps: s2!, rung: "full-respec" });
+  consider(
+    back &&
+      reverseSteps(
+        back,
+        base.reduce((a, c) => a + c.size, 0),
+      ),
+    "incremental",
+  );
+  consider(seededReplay(cons, table, conById, delta, cap, tries), "incremental");
+  consider(teardownRebuild(cons, table, base, cur, cap), "full-respec");
   if (!candidates.length) return null;
   let best = candidates[0]!;
   for (const c of candidates.slice(1))

@@ -20,12 +20,15 @@ const clean = (base: any, cur: any, res: any, cap: number) => {
 // current selection. Update these deliberately when the algorithm improves; a silent regression
 // must fail here.
 // small-delta: baseline=908, Task 4 (walk added) measured=712, Task 5 (reversed-walk candidate
-// added) measured=520. resize: baseline=25 measured=25, unchanged through Task 5 (already at floor
-// - the walk cannot beat the ladder where the ladder already achieved the theoretical minimum).
-// swap: baseline=275 measured=157, unchanged through Task 5.
-const SMALL_DELTA_MOVED_PIN = 531;
+// added) measured=520, Task 6 (peephole simplifier) measured=510. resize: baseline=25 measured=25,
+// unchanged through Task 6 (already at floor - the walk cannot beat the ladder where the ladder
+// already achieved the theoretical minimum, and there is no churn left for the peephole to
+// remove). swap: baseline=275 measured=157 through Task 5, Task 6 (peephole simplifier)
+// measured=73 - the load-bearing swap corpus carried the most add/refund churn for the peephole
+// to find.
+const SMALL_DELTA_MOVED_PIN = 521;
 const RESIZE_MOVED_PIN = 26;
-const SWAP_MOVED_PIN = 161;
+const SWAP_MOVED_PIN = 75;
 
 test("30 small-delta pairs are oracle-clean; the majority resolve incrementally", () => {
   const rng = mulberry32(1234);
@@ -102,6 +105,17 @@ test("the owner's pair swapped resolves incrementally via the reversed walk", ()
   expect(res!.rung).toBe("incremental");
   const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
   expect(moved).toBeLessThanOrEqual(32); // the forward walk's schedule reversed: same 32 moved
+});
+
+test("the churn pair: a zero-grant tier 3 absent from the target is never re-added", () => {
+  const pair = urlFixturePairs().find((p) => p.label === "yugol-churn-pair")!;
+  const res = transitionOrderPath(cons, table, pair.base, pair.cur, 55);
+  clean(pair.base, pair.cur, res, 55);
+  expect(res!.rung).toBe("incremental");
+  // yugol is in the baseline only; its refund is real, but the add/refund churn is not
+  expect(res!.steps.some((s) => s.conId.includes("yugol") && s.kind === "add")).toBeFalse();
+  const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
+  expect(moved).toBeLessThanOrEqual(52); // measured with the peephole; was 64 with the churn
 });
 
 test("selection never returns more moved points than the full respec candidate", () => {
