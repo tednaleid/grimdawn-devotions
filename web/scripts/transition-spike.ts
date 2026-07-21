@@ -119,59 +119,59 @@ function pickSamples(rs: PairResult[], n: number): PairResult[] {
   return picked.slice(0, n);
 }
 
-function report(results: PairResult[]): void {
+function report(results: PairResult[], logger: (s: string) => void = console.log): void {
   const corpora: PairResult["corpus"][] = ["small-delta", "random", "near-cap", "tight-cap"];
   let oracleFailures = 0;
-  console.log(`\ntransition-order spike report: ${results.length} pairs total\n`);
+  logger(`\ntransition-order spike report: ${results.length} pairs total\n`);
   for (const corpus of corpora) {
     const rs = results.filter((r) => r.corpus === corpus);
     if (!rs.length) continue;
-    console.log(`${corpus} (${rs.length} pairs)`);
+    logger(`${corpus} (${rs.length} pairs)`);
     for (const rung of RUNGS) {
       const n = rs.filter((r) => r.rung === rung).length;
-      if (n) console.log(`  rung ${rung}: ${n} (${pctStr(n, rs.length)})`);
+      if (n) logger(`  rung ${rung}: ${n} (${pctStr(n, rs.length)})`);
     }
     const incRej = rs.filter((r) => r.incRejected).length;
-    console.log(`  incremental oracle rejections (demotions): ${incRej}`);
+    logger(`  incremental oracle rejections (demotions): ${incRej}`);
     const failures = rs.filter((r) => r.oracleError !== null);
     oracleFailures += failures.length;
     if (failures.length) {
-      console.log(red(`  ORACLE FAILURES: ${failures.length}`));
-      for (const f of failures.slice(0, 5)) console.log(red(`    ${f.oracleError}`));
+      logger(red(`  ORACLE FAILURES: ${failures.length}`));
+      for (const f of failures.slice(0, 5)) logger(red(`    ${f.oracleError}`));
     } else {
-      console.log(`  oracle failures: 0`);
+      logger(`  oracle failures: 0`);
     }
     const beatsElig = rs.filter((r) => r.rung !== "none" && r.movedTeardown !== null);
     const beatsCount = beatsElig.filter((r) => r.moved < r.movedTeardown!).length;
-    console.log(`  beats teardown+rebuild: ${pctStr(beatsCount, beatsElig.length)} (${beatsCount}/${beatsElig.length})`);
+    logger(`  beats teardown+rebuild: ${pctStr(beatsCount, beatsElig.length)} (${beatsCount}/${beatsElig.length})`);
     const ratios = rs.filter((r) => r.rung !== "none" && r.theoreticalMin > 0).map((r) => r.moved / r.theoreticalMin);
-    console.log(`  moved/theoreticalMin: ${fmtRatio(ratios)}`);
+    logger(`  moved/theoreticalMin: ${fmtRatio(ratios)}`);
     const readdPairs = rs.filter((r) => r.churnReaddCons > 0).length;
     const readdEvents = rs.reduce((a, r) => a + r.churnReaddCons, 0);
     const coveredPairs = rs.filter((r) => r.churnCoveredAdds > 0).length;
     const coveredEvents = rs.reduce((a, r) => a + r.churnCoveredAdds, 0);
-    console.log(`  churn refund-then-readd: ${readdPairs} pairs (${pctStr(readdPairs, rs.length)}), ${readdEvents} events`);
-    console.log(`  churn uncovered-by-held scaffold add: ${coveredPairs} pairs (${pctStr(coveredPairs, rs.length)}), ${coveredEvents} events`);
+    logger(`  churn refund-then-readd: ${readdPairs} pairs (${pctStr(readdPairs, rs.length)}), ${readdEvents} events`);
+    logger(`  churn uncovered-by-held scaffold add: ${coveredPairs} pairs (${pctStr(coveredPairs, rs.length)}), ${coveredEvents} events`);
     const transNs = rs.map((r) => r.usNanos);
     const scratchNs = rs.map((r) => r.usNanosFromScratch);
-    console.log(`  runtime transition:    p50 ${toMs(median(transNs)).toFixed(3)} ms  p95 ${toMs(percentile(transNs, 0.95)).toFixed(3)} ms`);
-    console.log(`  runtime from-scratch:  p50 ${toMs(median(scratchNs)).toFixed(3)} ms  p95 ${toMs(percentile(scratchNs, 0.95)).toFixed(3)} ms`);
-    console.log("");
+    logger(`  runtime transition:    p50 ${toMs(median(transNs)).toFixed(3)} ms  p95 ${toMs(percentile(transNs, 0.95)).toFixed(3)} ms`);
+    logger(`  runtime from-scratch:  p50 ${toMs(median(scratchNs)).toFixed(3)} ms  p95 ${toMs(percentile(scratchNs, 0.95)).toFixed(3)} ms`);
+    logger("");
   }
 
   const smallDelta = results.filter((r) => r.corpus === "small-delta");
   const samples = pickSamples(smallDelta, 10);
-  console.log(`sample small-delta orders (${samples.length}):`);
+  logger(`sample small-delta orders (${samples.length}):`);
   samples.forEach((r, i) => {
-    console.log(`  [${i + 1}] rung=${r.rung} moved=${r.moved} theoreticalMin=${r.theoreticalMin}`);
-    r.steps!.forEach((s, j) => console.log(`    ${j + 1}. ${formatStep(s)}`));
+    logger(`  [${i + 1}] rung=${r.rung} moved=${r.moved} theoreticalMin=${r.theoreticalMin}`);
+    r.steps!.forEach((s, j) => logger(`    ${j + 1}. ${formatStep(s)}`));
   });
 
   if (oracleFailures > 0) {
-    console.log(red(`\nFAIL: ${oracleFailures} oracle failure(s) across all corpora.`));
+    logger(red(`\nFAIL: ${oracleFailures} oracle failure(s) across all corpora.`));
     process.exit(1);
   }
-  console.log(`\nOK: zero oracle failures across ${results.length} pairs.`);
+  logger(`\nOK: zero oracle failures across ${results.length} pairs.`);
 }
 
 if (import.meta.main) {
@@ -180,8 +180,10 @@ if (import.meta.main) {
     const i = args.indexOf(name);
     return i >= 0 ? Number(args[i + 1]) : dflt;
   };
+  const hasFlag = (name: string) => args.includes(name);
   const nPairs = flag("--pairs", 200);
   const seed = flag("--seed", 1);
+  const csvMode = hasFlag("--csv");
   const rng = mulberry32(seed);
   const results: PairResult[] = [];
   while (results.filter((r) => r.corpus === "small-delta").length < nPairs) {
@@ -203,12 +205,27 @@ if (import.meta.main) {
     if (p && sz(p.base) >= 53 && sz(p.cur) >= 53) results.push(measure("near-cap", p.base, p.cur, BUDGET));
   }
   const nearCapCount = results.filter((r) => r.corpus === "near-cap").length;
-  if (nearCapCount < wantQuarter) console.log(`near-cap corpus short: ${nearCapCount}/${wantQuarter}`);
+  if (!csvMode && nearCapCount < wantQuarter) console.log(`near-cap corpus short: ${nearCapCount}/${wantQuarter}`);
   for (let got = 0; got < wantQuarter; ) {
     const p = mutatePair(rng);
     if (!p) continue;
     got++;
     results.push(measure("tight-cap", p.base, p.cur, Math.min(sz(p.base), sz(p.cur))));
   }
-  report(results);
+
+  if (csvMode) {
+    // Print CSV to stdout with per-corpus indices
+    console.log("corpus,index,rung,moved");
+    const indices = new Map<PairResult["corpus"], number>();
+    for (const result of results) {
+      const corpus = result.corpus;
+      const idx = indices.get(corpus) ?? 0;
+      console.log(`${corpus},${idx},${result.rung},${result.moved}`);
+      indices.set(corpus, idx + 1);
+    }
+    // Report to stderr
+    report(results, console.error);
+  } else {
+    report(results);
+  }
 }
