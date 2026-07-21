@@ -61,8 +61,9 @@ function measure(corpus: PairResult["corpus"], base: ReachCon[], cur: ReachCon[]
   // full-respec rung is full-respec, and among incremental winners the steps are compared
   // (JSON-equal, since transitionOrderPath re-derives the walk and two-pass replay identically,
   // then simplifies each candidate the same way) against the direct walk's and the two-pass
-  // replay's own simplified output. Neither match means the reversed opposite-direction walk
-  // won - the only remaining incremental candidate.
+  // replay's own simplified output. Neither match almost always means the reversed
+  // opposite-direction walk won (a respec relabeled incremental by its simplification would
+  // also land here; the corpus shows zero such winners).
   const walkSimplified = walkSteps !== null ? simplifySteps(cons, base, cur, walkSteps, cap) : null;
   const incSimplified = incSteps !== null ? simplifySteps(cons, base, cur, incSteps, cap) : null;
   const winner: PairResult["winner"] = !res

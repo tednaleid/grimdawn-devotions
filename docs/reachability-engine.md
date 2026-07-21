@@ -157,12 +157,19 @@ treats baseline-only members as pre-paid scaffolds, and schedules refunds in a
 second pass. The full respec reverses the baseline's own from-scratch order,
 then plays the current build's. Every candidate's output must pass the
 transition oracle (`replayTransition` in web/src/core/orderLegality.ts, the
-same one-walk-two-outputs pattern) before it enters the pool; only verified
-candidates compete, and the winner is displayed. A pair with no verified
-transition falls back to the current build's from-scratch order, so compare
-mode never shows less than the normal panel. The panel's full-rebuild notice
-appears only when the full respec wins - the common case is the state walk or
-the two-pass replay, not a teardown.
+same one-walk-two-outputs pattern) before it enters the pool. A verified
+candidate is then simplified by a verify-gated peephole (`simplifySteps`):
+pairs of steps that exactly cancel (a constellation leaving and returning to
+the same star count) are removed whenever the oracle still verifies the
+shortened schedule, so no candidate carries tear-down-and-rebuild churn the
+rules never required. Only verified candidates compete, and the winner is
+displayed. A pair with no verified transition falls back to the current
+build's from-scratch order, so compare mode never shows less than the normal
+panel. The panel's full-rebuild notice tracks the schedule's actual shape: a
+respec candidate whose simplification no longer tears every baseline member
+down is relabeled incremental, so the notice appears only when the displayed
+order really rebuilds everything - the common case is the state walk or the
+two-pass replay, not a teardown.
 
 The regression net: oracle unit tests (web/test/order-legality.test.ts), the
 real-build fixture replay and determinism pins (web/test/build-order-path.test.ts),
