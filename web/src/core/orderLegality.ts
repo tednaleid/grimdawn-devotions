@@ -163,9 +163,10 @@ export interface TransStep {
  * refunds may pass through over-cap totals (how a baseline larger than the live cap legally tears
  * down). The end state must equal `cur` exactly. Unlike replayBuildOrder, `cur` members never
  * override lookups: partiality is expressed through star counts, so grants and sizes come from the
- * full definitions in `allCons`. Grant sums are capped (addCap) like the rest of this module -
- * verdict-equivalent to uncapped sums because no requirement exceeds CAP_MAX, and it makes the
- * states' `have` match the Affinity panel. `error` is null when legal, else the first violation;
+ * full definitions in `allCons`. Grant sums are uncapped (addV) like the rest of this module -
+ * no requirement exceeds the engine's CAP_MAX, so capping never changes a verdict, and the
+ * states' `have` shows the true in-game totals the Affinity panel displays. `error` is null when
+ * legal, else the first violation;
  * `states` holds one post-step entry per step that completed its checks. Pure.
  */
 export function replayTransition(
@@ -189,7 +190,7 @@ export function replayTransition(
       if (n <= 0) continue;
       const c = conOf.get(id)!;
       req = maxV(req, c.req);
-      if (n >= c.size && id !== pending) grant = addCap(grant, c.grant);
+      if (n >= c.size && id !== pending) grant = addV(grant, c.grant);
     }
     if (pending) {
       const pc = conOf.get(pending);
@@ -206,7 +207,7 @@ export function replayTransition(
       if (n <= 0) continue;
       const c = conOf.get(id)!;
       need = maxV(need, c.req);
-      if (n >= c.size) have = addCap(have, c.grant);
+      if (n >= c.size) have = addV(have, c.grant);
       for (let i = 0; i < 5; i++)
         if (c.req[i]! > 0) {
           const list = needSource.get(i) ?? [];

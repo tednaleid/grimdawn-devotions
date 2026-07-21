@@ -5,7 +5,7 @@ import { peakToReach, buildOrderPath, INF } from "./reachability";
 import type { ReachCon, Vec, CoverTable, BuildStep } from "./reachability";
 import { verifyTransition, type TransStep } from "./orderLegality";
 
-const CAP_MAX: Vec = [20, 8, 20, 10, 20]; // per-color affinity cap; keep in sync (see orderLegality)
+const CAP_MAX: Vec = [20, 8, 20, 10, 20]; // per-color affinity cap; keep in sync (see reachability)
 const zero = (): Vec => [0, 0, 0, 0, 0];
 const add = (g: Vec, x: Vec): Vec => [g[0] + x[0], g[1] + x[1], g[2] + x[2], g[3] + x[3], g[4] + x[4]];
 const addCap = (g: Vec, x: Vec): Vec => g.map((n, i) => Math.min(n + x[i]!, CAP_MAX[i]!)) as Vec;
@@ -362,7 +362,8 @@ export function stateWalkTransition(
   const budget = Math.max(theoreticalMin, 1) * 4;
   let movedTotal = 0;
 
-  // The oracle's standing rule (capped, verdict-equivalent): complete grants cover every started
+  // The oracle's standing rule (capped here where the oracle sums uncapped - verdict-equivalent,
+  // since no requirement exceeds CAP_MAX): complete grants cover every started
   // requirement, with `pending` counted as requirement but not grant (the mid-step point).
   const valid = (pending: string | null): boolean => {
     let grant = zero();

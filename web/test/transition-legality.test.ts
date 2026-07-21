@@ -47,7 +47,7 @@ test("an end state over the cap is a violation", () => {
   expect(verifyTransition(CONS, [G, M, N], [G, M, N], [], 3)).toContain("over cap");
 });
 
-test("states: one per completed step, capped have, need from started members", () => {
+test("states: one per completed step, uncapped have, need from started members", () => {
   const steps = [step("add", G, 0, 1, 1), step("add", M, 0, 2, 3)];
   const r = replayTransition(CONS, [], [G, M], steps, 55);
   expect(r.error).toBeNull();
