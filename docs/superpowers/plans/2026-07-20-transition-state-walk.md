@@ -391,7 +391,7 @@ export function stateWalkTransition(
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `just test test/transition-walk.test.ts`
-Expected: 5 pass. Triage note: the stuck-teardown test's scenario was hand-traced during design (tear `shared`, add `target`, refund `leftover`, re-add `shared`); if it fails, instrument which move list came up empty at the stuck state rather than adjusting priorities blindly, and report BLOCKED if the cause is unclear.
+Expected: 6 pass (five original tests plus the load-bearing-scaffold test from deviation 4). Triage note: the stuck-teardown test's scenario was hand-traced during design (tear `shared`, add `target`, refund `leftover`, re-add `shared`); if it fails, instrument which move list came up empty at the stuck state rather than adjusting priorities blindly, and report BLOCKED if the cause is unclear.
 
 - [ ] **Step 5: Full suite, then commit**
 
@@ -441,7 +441,7 @@ test("the owner's pair swapped is oracle-clean and no worse than full respec", (
   const res = transitionOrderPath(cons, table, pair!.cur, pair!.base, 55);
   clean(pair!.cur, pair!.base, res, 55);
   const moved = res!.steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
-  expect(moved).toBeLessThanOrEqual(REVERSED_PIN); // measured after the walk lands; expect far below 130
+  expect(moved).toBeLessThanOrEqual(REVERSED_PIN); // the measured value (130, unchanged; see deviation 4)
 });
 
 test("selection never returns more moved points than the full respec candidate", () => {

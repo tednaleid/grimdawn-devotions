@@ -431,3 +431,18 @@ against a future data extraction. Add a one-test guard over cons.
 
 Pointers: CAP_MAX in web/src/core/reachability.ts, orderLegality.ts,
 transitionOrder.ts; a new assertion in web/test (e.g. beside the model tests).
+
+## Transition walk: swapped-direction incompleteness (teardown eligibility, approach C)
+
+The state walk resolves the owner's pair in its real direction (9 steps, 32
+moved) but returns null in the swapped direction, which falls back to the
+130-moved full respec. Likely lever: move 4's teardown eligibility is
+intentionally narrow (only want-members standing exactly at target), so
+baseline-only leftovers and shrink candidates can never be torn for cap room.
+Widening it, or the spec's deferred approach C (truncated respec), are the
+recorded next steps if the full-respec tail matters in practice. Safe today:
+a null walk just means the selection picks another verified candidate.
+
+Pointers: stateWalkTransition move 4 in web/src/core/transitionOrder.ts;
+approach C in docs/superpowers/specs/2026-07-20-transition-state-walk-design.md
+(non-goals); swapped-direction pin REVERSED_PIN in web/test/transition-order.test.ts.

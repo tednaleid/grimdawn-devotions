@@ -1,6 +1,6 @@
-// ABOUTME: Baseline-to-current transition orders for compare mode: a two-rung ladder (incremental
-// ABOUTME: seeded replay with two-pass refund scheduling, else full-respec via the churn-minimized
-// ABOUTME: from-scratch orders), every rung's output verified by the transition oracle before return.
+// ABOUTME: Baseline-to-current transition orders for compare mode: a best-of-candidates selection
+// ABOUTME: (deterministic state walk, incremental seeded replay, full-respec rebuild) returning the
+// ABOUTME: oracle-verified schedule that moves the fewest points, or null when none verifies.
 import { peakToReach, buildOrderPath, INF } from "./reachability";
 import type { ReachCon, Vec, CoverTable, BuildStep } from "./reachability";
 import { verifyTransition, type TransStep } from "./orderLegality";
@@ -51,7 +51,7 @@ interface PlaceEntry {
 }
 
 /**
- * The seeded replay for one ladder rung (the spike's subject; the oracle is its correctness authority).
+ * The seeded replay candidate (the spike's subject; the oracle is its correctness authority).
  *
  * `kept` are the shared members standing throughout - their grants seed the permanent supply. `held` are
  * pre-paid scaffolds standing at step zero (baseline-only members). `toPlace` are the members to add
