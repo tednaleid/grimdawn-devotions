@@ -433,8 +433,9 @@ export function stateWalkTransition(
     if (movedTotal > budget) return null;
     const d = deficitVec();
     // 1. Complete a target member: never-torn candidates before re-adds of torn ones (re-adding
-    // a just-torn member would recreate the state the teardown escaped), then densest deficit
-    // contribution per moved star, ties by id.
+    // a just-torn member would recreate the state the teardown escaped), then granting adds
+    // before zero-effective-grant ones (a tier 3 or a partial grants nothing; its points stay
+    // liquid until the end), then densest deficit contribution per moved star, ties by id.
     {
       let pick: string | null = null;
       let pickPts = 0;
@@ -517,7 +518,8 @@ export function stateWalkTransition(
         if (added) continue;
       }
     }
-    // 4. Teardown, only when stuck: smallest legal at-target member, ties by id, each torn once.
+    // 4. Teardown, only when stuck: zero-effective-grant members first (nothing can lean on
+    // them), then smallest, ties by id; each torn at most once.
     {
       const tearCands = [...counts.keys()]
         .filter((id) => {
@@ -645,8 +647,9 @@ export function transitionOrderPath(
     const size = cur.reduce((a, c) => a + c.size, 0);
     return size <= cap ? { steps: [], rung: "incremental" } : null;
   }
-  // Best of all verified candidates by (moved points, steps, candidate order). The pre-walk
-  // candidates stay in the pool unmodified, so no pair can do worse than any earlier engine.
+  // Best of all verified candidates by (moved points, steps, candidate order). Every earlier
+  // engine's candidate is still generated and only ever shrunk by the verify-gated peephole,
+  // so no pair can do worse than any earlier engine.
   const clean = (steps: TransStep[] | null) => steps && verifyTransition(cons, base, cur, steps, cap) === null;
   const moved = (steps: TransStep[]) => steps.reduce((a, s) => a + Math.abs(s.to - s.from), 0);
   // simplifySteps preserves verification (the input is verified and every reduction re-verifies),
