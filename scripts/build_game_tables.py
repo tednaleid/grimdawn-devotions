@@ -33,9 +33,14 @@ def _add(tags: set[str], tag: str | None) -> None:
         tags.add(tag)
 
 
-def collect_referenced_tags(devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None) -> set[str]:
+def collect_referenced_tags(
+    devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None, rr: dict | None = None
+) -> set[str]:
     """Every *_tag value referenced in devotions.json (constellation/power/pet/weapon),
-    plus every game tag value in stat-tags.json and stat-format-tags.json."""
+    plus every game tag value in stat-tags.json and stat-format-tags.json, plus the
+    name/parent tags of every resistance-reduction source. RR sources whose name/parent
+    could not resolve to a real tag carry a synthesized x: placeholder (no game text
+    exists), so only tag-prefixed values are collected."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
@@ -50,6 +55,10 @@ def collect_referenced_tags(devotions: dict, stat_tags: dict, stat_format_tags: 
             wr = s.get("weapon_requirement")
             if wr:
                 _add(tags, wr.get("description_tag"))
+    for s in (rr or {}).get("sources", []):
+        for key in (s.get("name"), s.get("parent")):
+            if key and key.startswith("tag"):
+                tags.add(key)
     tags.update(stat_tags.values())
     tags.update((stat_format_tags or {}).values())
     return tags
@@ -72,6 +81,8 @@ def main(argv=None) -> int:
     ap.add_argument("--stat-tags", required=True, type=Path)
     ap.add_argument("--stat-format-tags", type=Path,
                     help="Optional stat-format-tags.json (raw stat id -> value-embedded game tag)")
+    ap.add_argument("--rr", type=Path,
+                    help="Optional resistance-reduction.json (adds its source name/parent tags)")
     ap.add_argument("--text-dir", required=True, type=Path)
     ap.add_argument("--lang", required=True, help="Language code, e.g. en (used only for logging)")
     ap.add_argument("--out", required=True, type=Path)
@@ -80,7 +91,8 @@ def main(argv=None) -> int:
     devotions = json.loads(args.devotions.read_text(encoding="utf-8"))
     stat_tags = json.loads(args.stat_tags.read_text(encoding="utf-8"))
     stat_format_tags = json.loads(args.stat_format_tags.read_text(encoding="utf-8")) if args.stat_format_tags else {}
-    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags)
+    rr = json.loads(args.rr.read_text(encoding="utf-8")) if args.rr else {}
+    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr)
 
     text_table = load_translations(args.text_dir)
     table = build_table(referenced, text_table)

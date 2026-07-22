@@ -57,6 +57,16 @@ check("collects stat-format-tags values", "DefenseConvert" in referenced, True)
 check("referenced tag count", len(referenced), 8)
 check("collect works without stat-format-tags", "tagConA" in bgt.collect_referenced_tags(devotions, stat_tags), True)
 
+# --- rr sources: tag-prefixed name/parent collected; synthesized x: keys skipped ---
+rr = {"sources": [
+    {"name": "tagClass04SkillName07B", "parent": "tagDevotion_A13"},
+    {"name": "x:rr:records/skills/foo.dbr", "parent": "x:rritem:records/items/bar.dbr"},
+]}
+ref_rr = bgt.collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr)
+check("collects rr name tag", "tagClass04SkillName07B" in ref_rr, True)
+check("collects rr parent tag", "tagDevotion_A13" in ref_rr, True)
+check("skips synthesized rr keys", any(t.startswith("x:") for t in ref_rr), False)
+
 # --- build_table: resolves against a text table, cleans control codes, omits unresolved tags
 text_table = {
     "tagConA": "^oConstellation A^n",
