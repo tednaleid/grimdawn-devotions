@@ -9,7 +9,9 @@ import {
   storeLocale,
 } from "../../adapters/localizationAdapter";
 import { mountLanguagePicker } from "../../adapters/languagePicker";
-import { aggregate } from "../core/aggregate";
+import { aggregate, type LogicalSource } from "../core/aggregate";
+import { applyView, groupView } from "../core/filter";
+import { renderTable } from "../adapters/tableView";
 import { decodeHash, encodeHash, type ViewState } from "../core/urlState";
 
 async function boot() {
@@ -32,15 +34,27 @@ async function boot() {
   const tableEl = document.getElementById("rr-table") as HTMLElement;
   const headerEl = document.querySelector("header") as HTMLElement;
 
+  // Injected resolvers keep the pure core i18n-free: names/parents resolve through the current locale.
+  const nameOf = (s: LogicalSource) => localization.gameText(s.name);
+  const parentKeyOf = (s: LogicalSource) => s.parent;
+
   // The whole view lives here, decoded from the hash; render reads it, changes re-encode it.
   let view: ViewState = decodeHash(location.hash, knownIds);
   function applyHash(hash: string): void {
     view = decodeHash(hash, knownIds);
   }
 
+  const handlers = {
+    onView(next: ViewState, mode: "push" | "replace" = "push"): void {
+      view = next;
+      refresh(mode);
+    },
+  };
+
   function render(): void {
-    // Stub until the table/ledger/primer views land (Tasks 8-10); proves the data + boot path.
-    tableEl.textContent = localization.translate("rr.loading.count", { count: logical.length });
+    const sorted = applyView(logical, view, nameOf);
+    const groups = groupView(sorted, view, parentKeyOf);
+    renderTable(tableEl, localization, logical, groups, view, handlers);
   }
 
   function refresh(urlMode: "push" | "replace" = "push"): void {

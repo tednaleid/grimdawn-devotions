@@ -57,14 +57,20 @@ const rrEntry = rr.outputs.find((o) => o.kind === "entry-point");
 if (!rrEntry) throw new Error("bundle: no RR entry-point output");
 const rrJsName = rrEntry.path.split(/[\\/]/).pop()!; // rr-main-<hash>.js
 
+// The RR page's own scoped stylesheet, hashed like styles.css and copied into its subfolder.
+const rrCssBytes = await Bun.file("src/rr/rr.css").bytes();
+const rrCssName = `rr-${createHash("sha256").update(rrCssBytes).digest("hex").slice(0, 8)}.css`;
+await Bun.write(`dist/resistance-reduction/${rrCssName}`, rrCssBytes);
+
 let rrHtml = await Bun.file("resistance-reduction.html").text();
 rrHtml = rrHtml
   .replace('src="./rr-main.js"', `src="./${rrJsName}"`)
-  .replace('href="../styles.css"', `href="../${cssName}"`);
-if (rrHtml.includes('"./rr-main.js"') || rrHtml.includes('"../styles.css"')) {
+  .replace('href="../styles.css"', `href="../${cssName}"`)
+  .replace('href="./rr.css"', `href="./${rrCssName}"`);
+if (rrHtml.includes('"./rr-main.js"') || rrHtml.includes('"../styles.css"') || rrHtml.includes('"./rr.css"')) {
   throw new Error("bundle: resistance-reduction.html still has un-hashed asset refs after rewrite");
 }
-if (!rrHtml.includes(rrJsName) || !rrHtml.includes(cssName)) {
+if (!rrHtml.includes(rrJsName) || !rrHtml.includes(cssName) || !rrHtml.includes(rrCssName)) {
   throw new Error("bundle: hashed RR asset refs not present after rewrite");
 }
 await Bun.write("dist/resistance-reduction/index.html", rrHtml);
