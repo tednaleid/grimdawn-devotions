@@ -26,6 +26,14 @@ test("damage-type Fire includes an Elemental source", () => {
   ).toBe(true);
 });
 
+test("default rr sort reads in application order: stacking, then percent, then flat", () => {
+  const out = applyView(logical, view({ sortKey: "rr", sortDir: 1 }), nameOf);
+  const rank = { stacking: 0, "reduced-percent": 1, "reduced-flat": 2 } as const;
+  const ranks = out.map((s) => rank[s.rrType]);
+  for (let i = 1; i < ranks.length; i++) expect(ranks[i]!).toBeGreaterThanOrEqual(ranks[i - 1]!);
+  expect(out[0]!.rrType).toBe("stacking");
+});
+
 test("sort by value orders by |valueAtMax|", () => {
   const asc = applyView(logical, view({ sortKey: "value", sortDir: 1 }), nameOf);
   const mags = asc.map((s) => Math.abs(s.valueAtMax ?? 0));

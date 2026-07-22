@@ -6,6 +6,14 @@ import type { ViewState } from "./urlState";
 
 type NameOf = (s: LogicalSource) => string;
 
+// Rank the RR types by the order the ledger applies them (stack, then mult, then flat),
+// so sorting by the RR column ascending reads in application order rather than alphabetically.
+const RR_RANK: Record<LogicalSource["rrType"], number> = {
+  stacking: 0,
+  "reduced-percent": 1,
+  "reduced-flat": 2,
+};
+
 function matchesFilters(s: LogicalSource, view: ViewState, nameOf: NameOf): boolean {
   if (view.fRR && s.rrType !== view.fRR) return false;
   if (view.fCat && s.category !== view.fCat) return false;
@@ -27,7 +35,7 @@ function sortKeyValue(s: LogicalSource, key: string, nameOf: NameOf): string | n
     case "cat":
       return s.category;
     case "rr":
-      return s.rrType;
+      return RR_RANK[s.rrType];
     case "typesLabel":
       return s.resistances.join(",");
     case "value":
