@@ -101,12 +101,34 @@ def _name_descriptor(rec, rec_path, tags, game_en):
     return register(tag or f"x:rr:{rec_path}", text, game_en)
 
 
-def _ultimate(rec):
-    v = rec.get("skillUltimateLevel", "").strip()
+def _int(v):
+    v = (v or "").strip()
     try:
         return int(float(v)) if v else None
     except ValueError:
         return None
+
+
+def rank_fields(raw, rec):
+    """(values_per_rank, max_rank, value_at_max, ultimate_rank, value_at_ultimate).
+
+    Class skills/modifiers use skillMaxLevel (base cap) and skillUltimateLevel (+skills
+    overcap) to pick base vs overcap values. A devotion proc (skillMaxLevel <= 1) has a
+    single value at the granted celestial-power level, which is the array's full extent."""
+    arr = parse_array(raw)
+    smax = _int(rec.get("skillMaxLevel"))
+    sult = _int(rec.get("skillUltimateLevel"))
+    if smax and smax > 1:
+        max_rank = smax
+        v_max = level_array_value(raw, smax)
+        ult_rank = sult if (sult and sult > smax) else None
+        v_ult = level_array_value(raw, ult_rank) if ult_rank else None
+    else:
+        max_rank = len(arr)
+        v_max = arr[-1] if arr else None
+        ult_rank = None
+        v_ult = None
+    return arr, max_rank, v_max, ult_rank, v_ult
 
 
 def _num(s):
@@ -120,9 +142,8 @@ def _num(s):
         return None
 
 
-def source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, token):
-    arr = parse_array(rec[field])
-    ult = _ultimate(rec)
+def source_from_offensive(tags, game_en, rec_path, rec, field, rr_type, token):
+    arr, max_rank, v_max, ult_rank, v_ult = rank_fields(rec[field], rec)
     base = field[:-len("Min")]  # e.g. offensiveElementalResistanceReductionAbsolute
     dur = rec.get(base + "DurationMin", "").strip()
     chance = rec.get(base + "Chance", "").strip()
@@ -135,10 +156,10 @@ def source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, toke
         "rr_type": rr_type,
         "resistances": token_to_resistances(token),
         "values_per_rank": arr,
-        "max_rank": len(arr),
-        "ultimate_rank": ult,
-        "value_at_max": arr[-1] if arr else None,
-        "value_at_ultimate": level_array_value(rec[field], ult) if ult else None,
+        "max_rank": max_rank,
+        "ultimate_rank": ult_rank,
+        "value_at_max": v_max,
+        "value_at_ultimate": v_ult,
         "duration_seconds": _num(dur),
         "cooldown_seconds": _num(rec.get("skillCooldownTime", "")),
         "trigger_chance_percent": _num(chance),
@@ -241,7 +262,7 @@ def stacking_sources(db, tags, game_en, rec_path, rec, ctx):
         arr = parse_array(raw)
         if not arr or arr[-1] >= 0:  # only negative = reduction
             continue
-        hits.append((field, token, raw, arr))
+        hits.append((token, raw, arr))
     if not hits:
         return []
     # Template gate: debuffs pass clean; self-buff templates are excluded (a self-applied
@@ -261,17 +282,17 @@ def stacking_sources(db, tags, game_en, rec_path, rec, ctx):
     else:
         note = f"unusual template {tmpl}; verify enemy-facing"
     out = []
-    ult = _ultimate(rec)
-    for field, token, raw, arr in hits:
+    for token, raw, _arr in hits:
+        arr, max_rank, v_max, ult_rank, v_ult = rank_fields(raw, rec)
         out.append({
             "id": rec_path.replace("/", ":").removesuffix(".dbr") + f":stacking:{token}",
             "name": _name_descriptor(rec, rec_path, tags, game_en),
             "parent": None, "record_path": rec_path, "category": None,
             "rr_type": RR_STACKING,
             "resistances": token_to_resistances(token),
-            "values_per_rank": arr, "max_rank": len(arr), "ultimate_rank": ult,
-            "value_at_max": arr[-1],
-            "value_at_ultimate": level_array_value(raw, ult) if ult else None,
+            "values_per_rank": arr, "max_rank": max_rank, "ultimate_rank": ult_rank,
+            "value_at_max": v_max,
+            "value_at_ultimate": v_ult,
             "duration_seconds": _num(rec.get("skillActiveDuration", "")),
             "cooldown_seconds": _num(rec.get("skillCooldownTime", "")),
             "trigger_chance_percent": None,
@@ -308,7 +329,7 @@ def classify_trigger(rec) -> str:
     return "debuff"
 
 
-def _parent_descriptor(db, tags, game_en, rec_path, rec):
+def _parent_descriptor(tags, game_en, rec_path, rec):
     """Localizable parent label. For skill sources this is the skill's own name for now;
     mastery/constellation parent resolution is a follow-up (the UI can also join against
     devotions.json). Item sources get their item name via attribute_items."""
@@ -336,7 +357,7 @@ def build_item_skill_map(db):
     return m
 
 
-def item_category(item_path, rec) -> str:
+def item_category(rec) -> str:
     cls = rec.get("Class", "")
     classif = rec.get("itemClassification", "").strip()
     if cls == "ItemArtifact":
@@ -352,7 +373,7 @@ def item_category(item_path, rec) -> str:
     return "item granted"
 
 
-def _item_name_descriptor(db, tags, game_en, item_path, rec):
+def _item_name_descriptor(tags, game_en, item_path, rec):
     tag = rec.get("itemNameTag", "").strip()
     text = tags.get(tag) if tag else None
     return register(tag or f"x:rritem:{item_path}", text, game_en)
@@ -372,8 +393,8 @@ def attribute_items(db, tags, game_en, sources):
             continue
         item_path, is_mod = info
         item_rec = db.get(item_path)
-        s["category"] = "item skill modifier" if is_mod else item_category(item_path, item_rec)
-        s["parent"] = _item_name_descriptor(db, tags, game_en, item_path, item_rec)
+        s["category"] = "item skill modifier" if is_mod else item_category(item_rec)
+        s["parent"] = _item_name_descriptor(tags, game_en, item_path, item_rec)
         if is_mod and s["notes"].startswith("modifier base not resolved"):
             s["notes"] = f"item skill modifier via {item_path}"
 
@@ -388,16 +409,39 @@ def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> li
             if hit:
                 rr_type, token = hit
                 sources.append(
-                    source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, token))
+                    source_from_offensive(tags, game_en, rec_path, rec, field, rr_type, token))
         sources.extend(stacking_sources(db, tags, game_en, rec_path, rec, ctx))
     for s in sources:
         rec = db.get(s["record_path"])
         s["category"] = classify_category(s["record_path"], rec)
         s["trigger"] = classify_trigger(rec)
         if s["parent"] is None:
-            s["parent"] = _parent_descriptor(db, tags, game_en, s["record_path"], rec)
+            s["parent"] = _parent_descriptor(tags, game_en, s["record_path"], rec)
     attribute_items(db, tags, game_en, sources)
     return sources
+
+
+def print_summary(sources, exclusions):
+    """Audit summary to stderr: counts per type/category, exclusions, and the unsure list."""
+    from collections import Counter
+    by_type = Counter(s["rr_type"] for s in sources)
+    by_cat = Counter(s["category"] for s in sources)
+    # "unsure" = a note that asks for verification, not the informative provenance notes
+    # (e.g. "item skill modifier via <item>") that attribution attaches.
+    unsure = [s for s in sources if "verify" in s["notes"]]
+    p = lambda *a: print(*a, file=sys.stderr)
+    p("\n=== RR EXTRACTION SUMMARY ===")
+    p(f"  sources: {len(sources)}")
+    p("  by rr_type: " + ", ".join(f"{k}={v}" for k, v in sorted(by_type.items())))
+    p("  by category: " + ", ".join(f"{k}={v}" for k, v in sorted(by_cat.items())))
+    p(f"  excluded: {len(exclusions)}")
+    for reason, n in Counter(e["reason"] for e in exclusions).items():
+        p(f"    - {reason}: {n}")
+    p(f"  unsure (carry a verify note): {len(unsure)}")
+    for s in unsure[:15]:
+        p(f"    - {s['record_path']}: {s['notes']}")
+    if len(unsure) > 15:
+        p(f"    ... and {len(unsure) - 15} more")
 
 
 def main(argv=None) -> int:
@@ -431,6 +475,7 @@ def main(argv=None) -> int:
     doc = {"meta": meta, "sources": sources}
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Wrote {args.out}  ({len(sources)} sources)")
+    print_summary(sources, EXCLUSIONS)
     return 0
 
 

@@ -70,7 +70,9 @@ check("viper duration 3", viper and viper[0]["duration_seconds"] == 3)
 
 morale = find(lambda s: s["record_path"].endswith("skills/playerclass01/warcry2.dbr")
               and s["rr_type"] == "reduced-flat")
-check("break morale flat physical 45", morale and morale[0]["value_at_max"] == 45
+# Base max (rank 12) = 35; overcap (rank 22) = 45. value_at_max is base, not the array end.
+check("break morale flat physical base 35 / overcap 45",
+      morale and morale[0]["value_at_max"] == 35 and morale[0]["value_at_ultimate"] == 45
       and morale[0]["resistances"] == ["Physical"])
 
 estorm = find(lambda s: s["record_path"].endswith("skills/devotion/tier2_01c_skill.dbr")
@@ -82,7 +84,9 @@ check("elemental storm flat 32", estorm and estorm[0]["value_at_max"] == 32
 vuln = find(lambda s: s["record_path"].endswith("skills/playerclass03/curse2.dbr"))
 check("vulnerability present (all stacking)", vuln and all(s["rr_type"] == "stacking" for s in vuln))
 vuln_elem = [s for s in vuln if s["resistances"] == "Elemental"]
-check("vulnerability stacking elemental -35", vuln_elem and vuln_elem[0]["value_at_max"] == -35)
+# Base max (rank 10) = -25; overcap (rank 20) = -35.
+check("vulnerability stacking elemental base -25 / overcap -35",
+      vuln_elem and vuln_elem[0]["value_at_max"] == -25 and vuln_elem[0]["value_at_ultimate"] == -35)
 
 nc = find(lambda s: s["record_path"].endswith("skills/playerclass04/veilofshadows2.dbr"))
 check("night's chill present (stacking)", nc and nc[0]["rr_type"] == "stacking")
@@ -94,7 +98,9 @@ check("night's chill covers Cold/Pierce/Poison&Acid/Vitality",
       {"Cold", "Pierce", "Poison & Acid", "Vitality"} <= nc_res)
 
 censure = find(lambda s: s["record_path"].endswith("skills/playerclass07/auracensure1_buff.dbr"))
-check("aura of censure stacking elemental -35", censure and censure[0]["value_at_max"] == -35)
+# Base max (rank 12) = -25; overcap (rank 22) = -35.
+check("aura of censure stacking elemental base -25 / overcap -35",
+      censure and censure[0]["value_at_max"] == -25 and censure[0]["value_at_ultimate"] == -35)
 
 # --- Task 6: category, parent, trigger + item attribution ---
 check("every source has a category", all(s["category"] for s in doc["sources"]))
@@ -105,6 +111,17 @@ check("break morale is a mastery/modifier skill",
 item_cats = {"component", "augment", "relic", "set bonus", "item granted", "item skill modifier", "monster infrequent"}
 item_sources = find(lambda s: s["category"] in item_cats)
 check("item-attributed RR sources exist", len(item_sources) >= 1)
+
+# --- Task 7: determinism + rr_type coverage ---
+out2 = Path(tempfile.mkdtemp()) / "rr2.json"
+subprocess.run([sys.executable, str(here / "parse_rr.py"),
+    "--records-dir", str(root / "extracted/records"),
+    "--text-dir", str(root / "extracted/text_en"),
+    "--out", str(out2), "--game-version", "test"], check=True)
+doc2 = json.loads(out2.read_text(encoding="utf-8"))
+check("deterministic sources across runs", doc["sources"] == doc2["sources"])
+check("has stacking, flat, and percent sources",
+      {"stacking", "reduced-flat", "reduced-percent"} <= {s["rr_type"] for s in doc["sources"]})
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
