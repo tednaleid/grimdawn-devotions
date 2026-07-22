@@ -169,10 +169,15 @@ The exact resolution is worked out in the plan; the guard is that
   Enter/Space toggling and `aria-pressed` for state). Our rows carry no other
   interactive element, so a full-row target is unambiguous. Controls: search + the
   five filters + sort (click headers) + a group-by selector (none / mastery /
-  constellation / item). **Dropped**: the confidence column (all authoritative); a
-  small marker instead flags the ~41 sources carrying a verify-note. **Simplified**:
-  the trigger column shows the coarse classification we have rather than the
-  prototype's rich text.
+  constellation / item). **Dropped** (all prototype artifacts of reconciling
+  unreliable community sources; we read the source of truth): the `Cite`/src-link
+  column, the `Conf.` confidence column, and the `Conflicts` column. Conflict
+  behavior is not per-row data - it is determined by `rr_type` (multiplicative and
+  flat take the single highest; stacking is additive), explained once in the
+  primer and shown live in the ledger (winning source vs. struck-through losers).
+  A small marker instead flags the ~41 sources carrying a verify-note.
+  **Simplified**: the trigger column shows the coarse classification we have rather
+  than the prototype's rich text.
 - **Ledger**: the prototype's sidebar - starting-resistance input, per-resistance
   lines with the stack/mult/flat breakdown, the chain, and the comparison bar -
   ported and localized, reading its selection and `R0` from the URL state.
