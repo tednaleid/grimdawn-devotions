@@ -164,6 +164,8 @@ def source_from_offensive(tags, game_en, rec_path, rec, field, rr_type, token):
         "cooldown_seconds": _num(rec.get("skillCooldownTime", "")),
         "trigger_chance_percent": _num(chance),
         "trigger": None,   # Task 6 classification
+        "proc_condition": None,  # item autocast triggerType, filled by attribute_items
+        "mythical": False,       # Tier-3 granting item, filled by attribute_items
         "per_resistance_values": None,
         "notes": "",
     }
@@ -296,7 +298,8 @@ def stacking_sources(db, tags, game_en, rec_path, rec, ctx):
             "duration_seconds": _num(rec.get("skillActiveDuration", "")),
             "cooldown_seconds": _num(rec.get("skillCooldownTime", "")),
             "trigger_chance_percent": None,
-            "trigger": None, "per_resistance_values": None,
+            "trigger": None, "proc_condition": None, "mythical": False,
+            "per_resistance_values": None,
             "notes": note,
         })
     return out
@@ -409,40 +412,60 @@ ITEM_SKILL_FIELDS = (
     + [f"modifierSkillName{i}" for i in range(1, 6)]
 )
 
+# An item's style tag marks its tier; Tier 3 is the endgame "Mythical" version, which the
+# game prepends "Mythical" to. We use it to name the top-tier grant so it is not confused
+# with the lower-value base item of the same name.
+TIER3_STYLE_TAG = "tagStyleUniqueTier3"
+
+
+def _item_grant_meta(rec):
+    """(granted_level, autocast_controller, mythical) for an item that grants a skill.
+    itemSkillLevelEq pins the rank the item grants the skill at; a proc carries an
+    itemSkillAutoController (chance + trigger condition); Tier 3 marks the Mythical item."""
+    level = _int(rec.get("itemSkillLevelEq", "")) or _int(rec.get("itemSkillLevel", ""))
+    controller = rec.get("itemSkillAutoController", "").replace("\\", "/").strip() or None
+    mythical = rec.get("itemStyleTag", "").strip() == TIER3_STYLE_TAG
+    return level, controller, mythical
+
 
 def build_item_skill_map(db):
-    """skill record_path -> (item record_path, is_item_skill_modifier). First item wins.
+    """skill record_path -> grant dict {item, is_mod, level, controller, mythical}.
 
     An item names a granted/augment/modifier skill directly, but the RR often lives on a
     record that skill reaches downstream (a buffSkillName it applies, or a pet it summons
-    whose skills carry the debuff). So after mapping the directly-named skills we walk each
-    forward through every ';'-separated .dbr under records/skills/itemskills*, attributing
-    those reached records to the same item, so item-granted buffs/pet skills get the item
-    parent instead of falling back to their internal skill name."""
-    direct: list[tuple[str, str, bool]] = []  # (skill_path, item_path, is_mod)
+    whose skills carry the debuff). So we walk each named skill forward through every
+    ';'-separated .dbr under records/skills/itemskills*, attributing those reached records
+    to the same item, so item-granted buffs/pet skills get the item parent instead of
+    falling back to their internal skill name. When several items grant one skill at
+    different ranks (a base item and its higher-level Mythical version), the highest-level
+    grant wins, so the row shows the top-tier value and names the item that provides it."""
+    m: dict[str, dict] = {}
     items_root = db.root / "records/items"
     for p in sorted(items_root.rglob("*.dbr")):
         rel = p.relative_to(db.root).as_posix()
         rec = db.get(rel)
+        level, controller, mythical = _item_grant_meta(rec)
         for f in ITEM_SKILL_FIELDS:
             v = rec.get(f, "").replace("\\", "/").strip()
-            if v.endswith(".dbr"):
-                direct.append((v, rel, f.startswith("modifierSkillName")))
-    m: dict[str, tuple[str, bool]] = {}
-    for skill, item, is_mod in direct:
-        stack = [skill]
-        seen: set[str] = set()
-        while stack:
-            cur = stack.pop().replace("\\", "/").strip()
-            if cur in seen or "/itemskills" not in cur:
+            if not v.endswith(".dbr"):
                 continue
-            seen.add(cur)
-            m.setdefault(cur, (item, is_mod))
-            for v in db.get(cur).values():
-                for part in v.split(";"):
-                    ref = part.replace("\\", "/").strip()
-                    if ref.endswith(".dbr") and "/itemskills" in ref:
-                        stack.append(ref)
+            grant = {"item": rel, "is_mod": f.startswith("modifierSkillName"),
+                     "level": level, "controller": controller, "mythical": mythical}
+            stack = [v]
+            seen: set[str] = set()
+            while stack:
+                cur = stack.pop().replace("\\", "/").strip()
+                if cur in seen or "/itemskills" not in cur:
+                    continue
+                seen.add(cur)
+                prev = m.get(cur)
+                if prev is None or (grant["level"] or 0) > (prev["level"] or 0):
+                    m[cur] = grant
+                for vv in db.get(cur).values():
+                    for part in vv.split(";"):
+                        ref = part.replace("\\", "/").strip()
+                        if ref.endswith(".dbr") and "/itemskills" in ref:
+                            stack.append(ref)
     return m
 
 
@@ -478,23 +501,55 @@ def _item_name_descriptor(tags, game_en, rec, fallback_key):
     return fallback_key
 
 
+def _apply_grant_level(s, level):
+    """Value an item-granted skill at the rank the item pins (itemSkillLevelEq), not the
+    skill's max rank. Item-granted skills do not overcap with +skills, so clear the
+    ultimate (+skills) fields the class-skill path fills in."""
+    arr = s["values_per_rank"]
+    if not level or not arr:
+        return
+    s["value_at_max"] = arr[min(level, len(arr)) - 1]
+    s["max_rank"] = level
+    s["ultimate_rank"] = None
+    s["value_at_ultimate"] = None
+
+
+def _apply_proc(db, s, controller):
+    """Read the item's autocast controller for the proc chance and trigger condition
+    (e.g. 10% AttackEnemy), so a granted debuff reads as the proc it really is rather than
+    an always-on effect."""
+    if not controller:
+        return
+    rec = db.get(controller)
+    s["trigger_chance_percent"] = _int(rec.get("chanceToRun", ""))
+    cond = rec.get("triggerType", "").strip()
+    if cond:
+        s["proc_condition"] = cond
+
+
 def attribute_items(db, tags, game_en, sources):
     """Override category/parent for item-owned RR sources. Only skills under
     records/skills/itemskills are item-owned; a class or devotion skill that an item
     merely references (grants +skills to, e.g. gloves referencing War Cry -> Break Morale)
-    keeps its intrinsic category."""
+    keeps its intrinsic category. A granted skill is valued at the rank its item pins,
+    attributed to the highest-level (Mythical when Tier 3) granting item, and carries that
+    item's proc chance and trigger condition when it procs."""
     m = build_item_skill_map(db)
     for s in sources:
         if "/itemskills" not in s["record_path"]:
             continue
-        info = m.get(s["record_path"])
-        if not info:
+        grant = m.get(s["record_path"])
+        if not grant:
             continue
-        item_path, is_mod = info
+        item_path = grant["item"]
         item_rec = db.get(item_path)
-        s["category"] = "item skill modifier" if is_mod else item_category(item_rec)
+        s["category"] = "item skill modifier" if grant["is_mod"] else item_category(item_rec)
         s["parent"] = _item_name_descriptor(tags, game_en, item_rec, s["name"])
-        if is_mod and s["notes"].startswith("modifier base not resolved"):
+        s["mythical"] = grant["mythical"]
+        if not grant["is_mod"]:
+            _apply_grant_level(s, grant["level"])
+            _apply_proc(db, s, grant["controller"])
+        if grant["is_mod"] and s["notes"].startswith("modifier base not resolved"):
             s["notes"] = f"item skill modifier via {item_path}"
 
 

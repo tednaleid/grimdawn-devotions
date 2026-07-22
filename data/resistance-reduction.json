@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
-    "generated_utc": "2026-07-22T18:57:27Z",
+    "generated_utc": "2026-07-22T22:32:00Z",
     "berserker_present": false
   },
   "sources": [
@@ -44,6 +44,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -85,6 +87,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -126,6 +130,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -167,6 +173,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -208,6 +216,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -249,6 +259,8 @@
       "cooldown_seconds": 1.5,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -290,6 +302,8 @@
       "cooldown_seconds": 1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -331,6 +345,8 @@
       "cooldown_seconds": 1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -367,6 +383,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -389,6 +407,8 @@
       "cooldown_seconds": 2.5,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -411,6 +431,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -433,6 +455,8 @@
       "cooldown_seconds": 3,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -453,8 +477,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2.5,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -478,6 +504,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -498,8 +526,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -522,15 +552,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_aetherblaze:reduced-flat",
       "name": "tagItemSkillD022Name",
-      "parent": "tagMedalD010",
+      "parent": "tagRingD010",
       "record_path": "records/skills/itemskills/legendary/item_aetherblaze.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -545,8 +577,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -561,14 +595,16 @@
       "values_per_rank": [
         20
       ],
-      "max_rank": 2,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": 20,
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -592,13 +628,15 @@
       "cooldown_seconds": 0.3,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_sacredbalance:reduced-flat",
       "name": "tagItemSkillD167Name",
-      "parent": "tagItemSetD002Name",
+      "parent": "tagItemSetD002BName",
       "record_path": "records/skills/itemskills/legendary/item_sacredbalance.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -613,15 +651,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_valdunclip:reduced-flat",
       "name": "tagItemSkillD233Name",
-      "parent": "tagItemSetD019Name",
+      "parent": "tagItemSetD019BName",
       "record_path": "records/skills/itemskills/legendary/item_valdunclip.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -638,6 +678,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -659,15 +701,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 33,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:pets:petskill_arcanewisp_zap:reduced-flat",
       "name": "tagItemSkillD246NamePetSkill",
-      "parent": "tagItemSetD024Name",
+      "parent": "tagItemSetD024BName",
       "record_path": "records/skills/itemskills/pets/petskill_arcanewisp_zap.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -682,8 +726,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -705,8 +751,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -728,8 +776,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -752,6 +802,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": 15,
       "trigger": "passive aura",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -767,14 +819,16 @@
         12,
         15
       ],
-      "max_rank": 2,
+      "max_rank": 1,
       "ultimate_rank": null,
-      "value_at_max": 15,
+      "value_at_max": 12,
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -795,8 +849,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -818,8 +874,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 2,
       "cooldown_seconds": 2.5,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -842,6 +900,8 @@
       "cooldown_seconds": 4,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -864,6 +924,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll"
     },
@@ -886,6 +948,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll"
     },
@@ -908,6 +972,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -930,6 +996,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -952,6 +1020,8 @@
       "cooldown_seconds": -0.5,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -974,6 +1044,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -996,6 +1068,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1018,6 +1092,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1040,6 +1116,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1062,6 +1140,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1084,6 +1164,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1106,6 +1188,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1128,6 +1212,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1150,6 +1236,8 @@
       "cooldown_seconds": -1.3,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1175,8 +1263,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
+      "proc_condition": "Block",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1197,8 +1287,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 2,
       "cooldown_seconds": 25,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1221,6 +1313,8 @@
       "cooldown_seconds": 5.5,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1241,8 +1335,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 2,
       "cooldown_seconds": 0.5,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 25,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1265,6 +1361,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1287,6 +1385,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1309,6 +1409,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1331,6 +1433,8 @@
       "cooldown_seconds": 1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1353,6 +1457,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1375,6 +1481,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1397,6 +1505,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1419,6 +1529,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1441,6 +1553,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1463,6 +1577,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1487,6 +1603,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1532,6 +1650,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1575,6 +1695,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1598,6 +1720,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1641,6 +1765,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1663,6 +1789,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1685,6 +1813,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1728,6 +1858,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1771,6 +1903,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1793,6 +1927,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1829,6 +1965,8 @@
       "cooldown_seconds": 1.5,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1853,8 +1991,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1875,8 +2015,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 1,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1899,6 +2041,8 @@
       "cooldown_seconds": 4,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1921,6 +2065,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll"
     },
@@ -1943,6 +2089,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll"
     },
@@ -1965,6 +2113,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1985,8 +2135,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2009,6 +2161,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2031,6 +2185,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2074,6 +2230,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2117,6 +2275,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2165,6 +2325,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2213,6 +2375,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2256,6 +2420,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2299,6 +2465,8 @@
       "cooldown_seconds": 1,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2342,6 +2510,8 @@
       "cooldown_seconds": 1,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2385,6 +2555,8 @@
       "cooldown_seconds": 1,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2428,6 +2600,8 @@
       "cooldown_seconds": 1,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2466,6 +2640,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2490,6 +2666,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2514,13 +2692,15 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:granted:item_anticlottinginjection_buff:stacking:Bleeding",
       "name": "tagItemSkillC040Name",
-      "parent": "tagWeaponGun2hC006",
+      "parent": "tagWeaponGun2hC006B",
       "record_path": "records/skills/itemskills/granted/item_anticlottinginjection_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2532,14 +2712,16 @@
         -12,
         -15
       ],
-      "max_rank": 3,
+      "max_rank": 2,
       "ultimate_rank": null,
-      "value_at_max": -15,
+      "value_at_max": -12,
       "value_at_ultimate": null,
       "duration_seconds": null,
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2565,6 +2747,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "unusual template skillbuff_passive.tpl; verify enemy-facing"
     },
@@ -2589,6 +2773,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2611,17 +2797,19 @@
       "value_at_ultimate": null,
       "duration_seconds": 8,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:item_chillingsurge_buff:stacking:Fire",
       "name": "tagItemSkillC094Name",
-      "parent": "tagNecklaceC023",
+      "parent": "tagItemSkillC094Name",
       "record_path": "records/skills/itemskills/item_chillingsurge_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Fire"
@@ -2637,15 +2825,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": 8,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
+      "proc_condition": "Block",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:item_cursecrushedresolve_buff:stacking:Life",
       "name": "tagItemSkillC044Name",
-      "parent": "tagGDX1RingC101",
+      "parent": "tagWeaponBluntC008",
       "record_path": "records/skills/itemskills/item_cursecrushedresolve_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2661,8 +2851,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 8,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 25,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2681,21 +2873,23 @@
         -12,
         -15
       ],
-      "max_rank": 2,
+      "max_rank": 3,
       "ultimate_rank": null,
-      "value_at_max": -12,
+      "value_at_max": -15,
       "value_at_ultimate": null,
       "duration_seconds": 8,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:item_eyeofthaddeus_buff:stacking:Bleeding",
       "name": "tagItemSkillC128Name",
-      "parent": "tagItemSetC009Name",
+      "parent": "tagItemSetC009BName",
       "record_path": "records/skills/itemskills/item_eyeofthaddeus_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2712,15 +2906,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 50,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:item_eyeofthaddeus_buff:stacking:Pierce",
       "name": "tagItemSkillC128Name",
-      "parent": "tagItemSetC009Name",
+      "parent": "tagItemSetC009BName",
       "record_path": "records/skills/itemskills/item_eyeofthaddeus_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2737,8 +2933,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 50,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2757,14 +2955,16 @@
         -8,
         -10
       ],
-      "max_rank": 3,
+      "max_rank": 2,
       "ultimate_rank": null,
-      "value_at_max": -10,
+      "value_at_max": -8,
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2783,14 +2983,16 @@
         -8,
         -10
       ],
-      "max_rank": 3,
+      "max_rank": 2,
       "ultimate_rank": null,
-      "value_at_max": -10,
+      "value_at_max": -8,
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2814,8 +3016,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 50,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2838,8 +3042,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2862,8 +3068,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2887,8 +3095,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2912,8 +3122,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2936,8 +3148,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2954,7 +3168,7 @@
       "values_per_rank": [
         -8
       ],
-      "max_rank": 2,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -8,
       "value_at_ultimate": null,
@@ -2962,6 +3176,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2978,7 +3194,7 @@
       "values_per_rank": [
         -8
       ],
-      "max_rank": 2,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -8,
       "value_at_ultimate": null,
@@ -2986,6 +3202,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3009,8 +3227,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3034,8 +3254,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3058,8 +3280,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 6,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3082,8 +3306,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 6,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3106,8 +3332,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 6,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3130,15 +3358,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 6,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_invokersfury_buff:stacking:Aether",
       "name": "tagItemSkillD117Name",
-      "parent": "tagItemSetD011Name",
+      "parent": "tagItemSetD011BName",
       "record_path": "records/skills/itemskills/legendary/item_invokersfury_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3155,15 +3385,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_invokersfury_buff:stacking:Elemental",
       "name": "tagItemSkillD117Name",
-      "parent": "tagItemSetD011Name",
+      "parent": "tagItemSetD011BName",
       "record_path": "records/skills/itemskills/legendary/item_invokersfury_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3178,8 +3410,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3201,8 +3435,10 @@
       "value_at_ultimate": null,
       "duration_seconds": null,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3226,8 +3462,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3251,8 +3489,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3276,8 +3516,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3301,8 +3543,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3325,8 +3569,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3349,8 +3595,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3376,6 +3624,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3401,6 +3651,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3424,8 +3676,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 6,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3449,8 +3703,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 6,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3476,6 +3732,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3501,6 +3759,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3526,6 +3786,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3551,6 +3813,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3576,6 +3840,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3601,6 +3867,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3624,6 +3892,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3649,6 +3919,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3674,6 +3946,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3699,6 +3973,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3724,6 +4000,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3749,13 +4027,15 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "contagious debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_reapermark_buff:stacking:Cold",
       "name": "tagItemSkillD159Name",
-      "parent": "tagItemSetD015Name",
+      "parent": "tagItemSetD015BName",
       "record_path": "records/skills/itemskills/legendary/item_reapermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3774,13 +4054,15 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_reapermark_buff:stacking:Pierce",
       "name": "tagItemSkillD159Name",
-      "parent": "tagItemSetD015Name",
+      "parent": "tagItemSetD015BName",
       "record_path": "records/skills/itemskills/legendary/item_reapermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3799,6 +4081,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3822,8 +4106,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3847,8 +4133,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3872,8 +4160,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3894,8 +4184,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3918,8 +4210,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -3942,15 +4236,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 0.5,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_venomwrath_buff:stacking:Pierce",
       "name": "tagItemSkillD242Name",
-      "parent": "tagItemSetD020Name",
+      "parent": "tagItemSetD020BName",
       "record_path": "records/skills/itemskills/legendary/item_venomwrath_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3967,15 +4263,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 0.5,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 33,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:legendary:item_venomwrath_buff:stacking:Poison",
       "name": "tagItemSkillD242Name",
-      "parent": "tagItemSetD020Name",
+      "parent": "tagItemSetD020BName",
       "record_path": "records/skills/itemskills/legendary/item_venomwrath_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3992,8 +4290,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 0.5,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 33,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4017,8 +4317,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4041,8 +4343,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4059,7 +4363,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4067,6 +4371,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4083,7 +4389,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4091,6 +4397,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4107,7 +4415,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4115,6 +4423,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4131,7 +4441,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4139,6 +4449,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4155,7 +4467,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4163,6 +4475,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4179,7 +4493,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4187,6 +4501,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4203,7 +4519,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4211,6 +4527,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4227,7 +4545,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4235,6 +4553,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4251,7 +4571,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4259,6 +4579,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4275,7 +4597,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 1,
+      "max_rank": 6,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4283,6 +4605,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4305,8 +4629,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "contagious debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4329,8 +4655,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "contagious debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4355,6 +4683,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4379,6 +4709,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4403,6 +4735,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4427,6 +4761,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4451,6 +4787,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4473,6 +4811,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4497,6 +4837,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4521,6 +4863,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4545,6 +4889,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4567,8 +4913,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 50,
       "trigger": "debuff",
+      "proc_condition": "Block",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4591,8 +4939,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 25,
       "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4615,8 +4965,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 25,
       "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4641,6 +4993,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4665,6 +5019,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4689,6 +5045,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4711,6 +5069,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4735,6 +5095,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4759,6 +5121,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4783,6 +5147,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4807,6 +5173,8 @@
       "cooldown_seconds": 30,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4829,6 +5197,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4853,6 +5223,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4877,6 +5249,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4901,6 +5275,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4925,6 +5301,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4947,6 +5325,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4971,6 +5351,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4995,6 +5377,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5019,6 +5403,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5043,6 +5429,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5065,8 +5453,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5089,8 +5479,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5113,8 +5505,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5137,8 +5531,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 33,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5161,8 +5557,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 33,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5186,8 +5584,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5210,8 +5610,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5235,8 +5637,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5260,8 +5664,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5284,8 +5690,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5308,8 +5716,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5332,8 +5742,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5350,14 +5762,16 @@
       "values_per_rank": [
         -10
       ],
-      "max_rank": 2,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -10,
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5374,14 +5788,16 @@
       "values_per_rank": [
         -10
       ],
-      "max_rank": 2,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -10,
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5404,8 +5820,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 4,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5428,8 +5846,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 4,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5453,8 +5873,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5478,8 +5900,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5502,8 +5926,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5526,8 +5952,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5552,6 +5980,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5576,6 +6006,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5600,6 +6032,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5622,6 +6056,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5646,6 +6082,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5670,6 +6108,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5694,6 +6134,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5718,6 +6160,8 @@
       "cooldown_seconds": 8,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5732,14 +6176,16 @@
       "values_per_rank": [
         -15
       ],
-      "max_rank": 1,
+      "max_rank": 2,
       "ultimate_rank": null,
       "value_at_max": -15,
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5763,8 +6209,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5788,8 +6236,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5814,6 +6264,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5838,6 +6290,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5862,6 +6316,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5886,6 +6342,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5910,6 +6368,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5932,6 +6392,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "field/trap",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5956,6 +6418,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "field/trap",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -5980,6 +6444,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "field/trap",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -6002,6 +6468,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -6024,8 +6492,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -6046,15 +6516,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 15,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskillsgdx1:silvermark_buff:stacking:Cold",
       "name": "tagGDX1ItemSkillC107Name",
-      "parent": "tagGDX1ItemSetC102Name",
+      "parent": "tagGDX1ItemSetC102BName",
       "record_path": "records/skills/itemskillsgdx1/silvermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -6071,15 +6543,17 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskillsgdx1:silvermark_buff:stacking:Pierce",
       "name": "tagGDX1ItemSkillC107Name",
-      "parent": "tagGDX1ItemSetC102Name",
+      "parent": "tagGDX1ItemSetC102BName",
       "record_path": "records/skills/itemskillsgdx1/silvermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -6096,8 +6570,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -6122,6 +6598,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/b103_shield.dbr"
     },
@@ -6146,6 +6624,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/weapons/blunt1h/f104a_blunt.dbr"
     },
@@ -6170,6 +6650,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/weapons/blunt1h/f104a_blunt.dbr"
     },
@@ -6194,6 +6676,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/accessories/necklaces/f109a_necklace.dbr"
     },
@@ -6218,6 +6702,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/accessories/necklaces/f109a_necklace.dbr"
     },
@@ -6240,6 +6726,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/accessories/necklaces/f110a_necklace.dbr"
     },
@@ -6264,6 +6752,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/melee2h/d104_axe2h.dbr"
     },
@@ -6288,6 +6778,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/melee2h/d104_axe2h.dbr"
     },
@@ -6312,6 +6804,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/melee2h/d104_axe2h.dbr"
     },
@@ -6336,6 +6830,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/melee2h/d104_axe2h.dbr"
     },
@@ -6360,6 +6856,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/caster/d116_scepter.dbr"
     },
@@ -6384,6 +6882,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/caster/d116_scepter.dbr"
     },
@@ -6408,6 +6908,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/caster/d119_scepter.dbr"
     },
@@ -6432,6 +6934,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr"
     },
@@ -6456,6 +6960,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr"
     },
@@ -6480,6 +6986,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr"
     },
@@ -6504,6 +7012,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr"
     },
@@ -6528,6 +7038,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04e.dbr"
     },
@@ -6552,6 +7064,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr"
     },
@@ -6576,6 +7090,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr"
     },
@@ -6600,6 +7116,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr"
     },
@@ -6624,6 +7142,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr"
     },
@@ -6648,6 +7168,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07h.dbr"
     },
@@ -6672,6 +7194,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08i.dbr"
     },
@@ -6696,6 +7220,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
     },
@@ -6720,6 +7246,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
     },
@@ -6744,6 +7272,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
     },
@@ -6768,6 +7298,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03g.dbr"
     },
@@ -6790,6 +7322,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03h.dbr"
     },
@@ -6814,6 +7348,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr"
     },
@@ -6838,6 +7374,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr"
     },
@@ -6862,6 +7400,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr"
     },
@@ -6886,6 +7426,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr"
     },
@@ -6910,6 +7452,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07j.dbr"
     },
@@ -6934,6 +7478,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/d111_focus.dbr"
     },
@@ -6958,6 +7504,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/d111_focus.dbr"
     },
@@ -6982,6 +7530,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/d106_head.dbr"
     },
@@ -7004,6 +7554,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/blunt1h/d102_blunt.dbr"
     },
@@ -7028,6 +7580,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/d108_necklace.dbr"
     },
@@ -7052,6 +7606,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/d108_necklace.dbr"
     },
@@ -7074,6 +7630,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/d120_necklace.dbr"
     },
@@ -7098,6 +7656,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d111.dbr"
     },
@@ -7120,6 +7680,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d111.dbr"
     },
@@ -7144,6 +7706,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d111.dbr"
     },
@@ -7168,6 +7732,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d112.dbr"
     },
@@ -7192,6 +7758,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d118.dbr"
     },
@@ -7216,6 +7784,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d118.dbr"
     },
@@ -7240,6 +7810,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d121.dbr"
     },
@@ -7264,6 +7836,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d121.dbr"
     },
@@ -7288,6 +7862,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d122.dbr"
     },
@@ -7312,6 +7888,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d122.dbr"
     },
@@ -7336,6 +7914,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/d104_shield.dbr"
     },
@@ -7360,6 +7940,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/swords1h/d106_sword.dbr"
     },
@@ -7384,6 +7966,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/caster/b016a_dagger.dbr"
     },
@@ -7408,6 +7992,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/caster/b102a_dagger.dbr"
     },
@@ -7432,6 +8018,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/b104a_focus.dbr"
     },
@@ -7456,6 +8044,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/b111a_focus.dbr"
     },
@@ -7480,6 +8070,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/guns1h/b101a_gun1h.dbr"
     },
@@ -7504,6 +8096,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/b104a_head.dbr"
     },
@@ -7528,6 +8122,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/b104a_head.dbr"
     },
@@ -7552,6 +8148,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/blunt1h/b005_blunt.dbr"
     },
@@ -7576,6 +8174,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/blunt1h/b015a_blunt.dbr"
     },
@@ -7598,6 +8198,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/blunt1h/b101a_blunt.dbr"
     },
@@ -7622,6 +8224,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/melee2h/b008a_blunt2h.dbr"
     },
@@ -7646,6 +8250,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/b007a_necklace.dbr"
     },
@@ -7670,6 +8276,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/b007a_necklace.dbr"
     },
@@ -7694,6 +8302,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/b014a_shield.dbr"
     },
@@ -7718,6 +8328,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/b014a_shield.dbr"
     },
@@ -7742,6 +8354,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/swords1h/b010c_sword.dbr"
     },
@@ -7766,6 +8380,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/swords1h/b010c_sword.dbr"
     },
@@ -7790,6 +8406,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/swords1h/b010a_sword.dbr"
     },
@@ -7814,6 +8432,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/swords1h/b010a_sword.dbr"
     },
@@ -7838,6 +8458,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/swords1h/b101a_sword.dbr"
     },
@@ -7862,6 +8484,8 @@
       "cooldown_seconds": -1.5,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/melee2h/d002_axe2h.dbr"
     },
@@ -7886,6 +8510,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/caster/d005_scepter.dbr"
     },
@@ -7910,6 +8536,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/caster/d011_dagger.dbr"
     },
@@ -7934,6 +8562,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/caster/d014_dagger.dbr"
     },
@@ -7958,6 +8588,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/caster/d014_dagger.dbr"
     },
@@ -7982,6 +8614,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/focus/d003_focus.dbr"
     },
@@ -8006,6 +8640,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/focus/d006_focus.dbr"
     },
@@ -8030,6 +8666,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/focus/d006_focus.dbr"
     },
@@ -8054,6 +8692,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/focus/d010_focus.dbr"
     },
@@ -8078,6 +8718,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/guns2h/d003_gun2h.dbr"
     },
@@ -8102,6 +8744,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/guns2h/d004_gun2h.dbr"
     },
@@ -8124,6 +8768,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearhead/d002_head.dbr"
     },
@@ -8148,6 +8794,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearhead/d004_head.dbr"
     },
@@ -8172,6 +8820,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearhead/d004_head.dbr"
     },
@@ -8196,6 +8846,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearhead/d018_head.dbr"
     },
@@ -8220,6 +8872,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearhead/d024_head.dbr"
     },
@@ -8244,6 +8898,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearhead/d024_head.dbr"
     },
@@ -8268,6 +8924,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearhead/d025_head.dbr"
     },
@@ -8292,6 +8950,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/blunt1h/d001_blunt.dbr"
     },
@@ -8316,6 +8976,8 @@
       "cooldown_seconds": -0.5,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/blunt1h/d002_blunt.dbr"
     },
@@ -8340,6 +9002,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/blunt1h/d004_blunt.dbr"
     },
@@ -8364,6 +9028,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/melee2h/d001_blunt2h.dbr"
     },
@@ -8388,6 +9054,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/melee2h/d004_blunt2h.dbr"
     },
@@ -8412,6 +9080,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearaccessories/necklaces/d013_necklace.dbr"
     },
@@ -8436,6 +9106,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearaccessories/necklaces/d013_necklace.dbr"
     },
@@ -8460,6 +9132,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d002b.dbr"
     },
@@ -8484,6 +9158,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d010b.dbr"
     },
@@ -8508,6 +9184,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d024b.dbr"
     },
@@ -8532,6 +9210,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d024b.dbr"
     },
@@ -8556,6 +9236,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/shields/d006_shield.dbr"
     },
@@ -8580,6 +9262,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/upgraded/gearweapons/melee2h/d007_sword2h.dbr"
     },
@@ -8603,8 +9287,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8628,8 +9314,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8652,8 +9340,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8676,8 +9366,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 6,
       "cooldown_seconds": 2,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 20,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8701,6 +9393,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8726,6 +9420,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8750,6 +9446,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8774,6 +9472,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8798,6 +9498,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8820,8 +9522,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 50,
       "trigger": "contagious debuff",
+      "proc_condition": "Block",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8844,8 +9548,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 3,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 50,
       "trigger": "contagious debuff",
+      "proc_condition": "Block",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8870,6 +9576,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8892,8 +9600,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8916,8 +9626,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": 1,
-      "trigger_chance_percent": null,
+      "trigger_chance_percent": 10,
       "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -8942,6 +9654,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/weapons/axe1h/f203a_axe.dbr"
     },
@@ -8966,6 +9680,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/weapons/caster/f208a_scepter.dbr"
     },
@@ -8990,6 +9706,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/weapons/caster/f208a_scepter.dbr"
     },
@@ -9014,6 +9732,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/weapons/melee2h/f203a_sword2h.dbr"
     },
@@ -9038,6 +9758,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/faction/weapons/melee2h/f203a_sword2h.dbr"
     },
@@ -9062,6 +9784,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/axe1h/d204_axe.dbr"
     },
@@ -9086,6 +9810,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/caster/d211_dagger.dbr"
     },
@@ -9110,6 +9836,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/d217_focus.dbr"
     },
@@ -9134,6 +9862,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/d217_focus.dbr"
     },
@@ -9158,6 +9888,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/guns2h/d204_gun2h.dbr"
     },
@@ -9182,6 +9914,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/guns2h/d204_gun2h.dbr"
     },
@@ -9206,6 +9940,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/d207_head.dbr"
     },
@@ -9228,6 +9964,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/d207_head.dbr"
     },
@@ -9252,6 +9990,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/blunt1h/d203_blunt.dbr"
     },
@@ -9274,6 +10014,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/d213_necklace.dbr"
     },
@@ -9298,6 +10040,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/d216_necklace.dbr"
     },
@@ -9322,6 +10066,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/d216_necklace.dbr"
     },
@@ -9346,6 +10092,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d205.dbr"
     },
@@ -9370,6 +10118,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d205.dbr"
     },
@@ -9394,6 +10144,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d205.dbr"
     },
@@ -9418,6 +10170,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -9442,6 +10196,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d221.dbr"
     },
@@ -9466,6 +10222,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d221.dbr"
     },
@@ -9490,6 +10248,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d222.dbr"
     },
@@ -9514,6 +10274,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/lootsets/itemset_d222.dbr"
     },
@@ -9538,6 +10300,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/d204_shield.dbr"
     },
@@ -9562,6 +10326,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/d204_shield.dbr"
     },
@@ -9586,6 +10352,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/d204_shield.dbr"
     },
@@ -9610,6 +10378,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/d209_shield.dbr"
     },
@@ -9634,6 +10404,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/axe1h/b202a_axe.dbr"
     },
@@ -9658,6 +10430,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/axe1h/b206c_axe.dbr"
     },
@@ -9682,6 +10456,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/axe1h/b206a_axe.dbr"
     },
@@ -9706,6 +10482,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/b203a_focus.dbr"
     },
@@ -9730,6 +10508,8 @@
       "cooldown_seconds": -1,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/focus/b203a_focus.dbr"
     },
@@ -9754,6 +10534,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/guns2h/b201c_gun2h.dbr"
     },
@@ -9778,6 +10560,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/guns2h/b201c_gun2h.dbr"
     },
@@ -9802,6 +10586,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/guns2h/b201a_gun2h.dbr"
     },
@@ -9826,6 +10612,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/guns2h/b201a_gun2h.dbr"
     },
@@ -9850,6 +10638,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/b203a_head.dbr"
     },
@@ -9874,6 +10664,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/b203a_head.dbr"
     },
@@ -9898,6 +10690,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/b207a_head.dbr"
     },
@@ -9922,6 +10716,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/b207a_head.dbr"
     },
@@ -9946,6 +10742,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearaccessories/necklaces/b203a_necklace.dbr"
     },
@@ -9970,6 +10768,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/shields/b201a_shield.dbr"
     },
@@ -9995,6 +10795,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10019,6 +10821,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10043,6 +10847,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10068,6 +10874,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10093,6 +10901,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10118,6 +10928,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10143,6 +10955,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10190,6 +11004,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10235,6 +11051,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10280,6 +11098,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -10327,6 +11147,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10374,6 +11196,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10421,6 +11245,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10464,6 +11290,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10507,6 +11335,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10550,6 +11380,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10591,6 +11423,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10634,6 +11468,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10677,6 +11513,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10720,6 +11558,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10763,6 +11603,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10806,6 +11648,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10849,6 +11693,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10894,6 +11740,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10939,6 +11787,8 @@
       "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -10988,6 +11838,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11037,6 +11889,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11060,6 +11914,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11085,6 +11941,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11110,6 +11968,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11134,6 +11994,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11158,6 +12020,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11180,6 +12044,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11223,6 +12089,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11266,6 +12134,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11289,6 +12159,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11313,6 +12185,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11337,6 +12211,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11359,6 +12235,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11383,6 +12261,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11405,6 +12285,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11429,6 +12311,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11451,6 +12335,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11473,6 +12359,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11518,6 +12406,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11563,6 +12453,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11608,6 +12500,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11651,6 +12545,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11694,6 +12590,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11737,6 +12635,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11780,6 +12680,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11823,6 +12725,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -11847,6 +12751,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11871,6 +12777,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11895,6 +12803,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11919,6 +12829,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11943,6 +12855,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11967,6 +12881,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -11991,6 +12907,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12015,6 +12933,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12039,6 +12959,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12063,6 +12985,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12087,6 +13011,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12111,6 +13037,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12135,6 +13063,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12159,6 +13089,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": "modifier base not resolved to an enemy debuff; verify"
     },
@@ -12204,6 +13136,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -12247,6 +13181,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -12292,6 +13228,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -12337,6 +13275,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -12382,6 +13322,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -12427,6 +13369,8 @@
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
       "per_resistance_values": null,
       "notes": ""
     }

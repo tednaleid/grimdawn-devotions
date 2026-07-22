@@ -144,5 +144,33 @@ conduit = find(lambda s: "/eldritchwhispers/" in s["record_path"])
 check("conduit modifiers attribute to the amulet, not the skill",
       conduit and all(c["parent"].startswith("tag") and c["parent"] != c["name"] for c in conduit))
 
+# --- item-granted skills valued at the rank the item pins, not the skill's max rank ---
+# Scion of Bitter Winds: base grants the debuff at rank 1 (-8%), the Tier-3 Mythical at
+# rank 2 (-10%). Highest grant wins, so the row is -10% and flagged mythical, and it carries
+# the item's 10%-on-attack proc rather than reading as an always-on debuff.
+bitter = find(lambda s: s["record_path"].endswith("legendary/bitterwinds_buff.dbr")
+              and s["resistances"] == ["Cold"])
+check("bitter winds valued at highest granted rank (-10)",
+      bitter and bitter[0]["value_at_max"] == -10 and bitter[0]["max_rank"] == 2)
+check("bitter winds is flagged mythical (Tier 3 grant)", bitter and bitter[0]["mythical"] is True)
+check("bitter winds carries its 10% AttackEnemy proc",
+      bitter and bitter[0]["trigger_chance_percent"] == 10
+      and bitter[0]["proc_condition"] == "AttackEnemy")
+# item-granted skills do not overcap with +skills, so the ultimate fields are cleared.
+check("bitter winds has no overcap", bitter and bitter[0]["value_at_ultimate"] is None)
+
+# A rank no item grants is never reported: Flamebrand's array is [-8,-8,-10] but it is only
+# granted through rank 2, so the row is -8, not the array-end -10.
+flame = find(lambda s: s["record_path"].endswith("itemskills/item_flamebrand_buff.dbr")
+             and s["resistances"] == ["Fire"])
+check("flamebrand reports the granted rank (-8), not the array end (-10)",
+      flame and flame[0]["value_at_max"] == -8)
+
+# A non-proc granted debuff (no autocast controller) keeps a null proc chance/condition.
+anticlot = find(lambda s: s["record_path"].endswith("item_anticlottinginjection_buff.dbr"))
+check("non-proc grant has no proc chance",
+      anticlot and anticlot[0]["trigger_chance_percent"] is None
+      and anticlot[0]["proc_condition"] is None)
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
