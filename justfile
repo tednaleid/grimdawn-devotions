@@ -11,6 +11,7 @@ gd_version  := env_var_or_default("GD_VERSION", "1.2.1.x")
 records_dir := justfile_directory() / "extracted/records"
 text_dir    := justfile_directory() / "extracted/text_en"
 out         := justfile_directory() / "data/devotions.json"
+out_rr      := justfile_directory() / "data/resistance-reduction.json"
 
 # Default: show available recipes
 default:
@@ -159,6 +160,17 @@ parse *ARGS:
     mkdir -p "$(dirname "{{out}}")"
     uv run scripts/parse_devotions.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out}}" \
+        --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
+
+# Parse extracted records into resistance-reduction.json (re-run after a patch / re-extract).
+parse-rr *ARGS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    manifest="{{gd_dir}}/../../appmanifest_219990.acf"
+    buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    mkdir -p "$(dirname "{{out_rr}}")"
+    uv run scripts/parse_rr.py \
+        --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out_rr}}" \
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
 
 # Full pipeline: extract then parse
