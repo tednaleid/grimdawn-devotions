@@ -163,8 +163,12 @@ The exact resolution is worked out in the plan; the guard is that
   fully localized.
 - **Table**: one row per logical source with a resistance list. Columns: source
   (name + parent), category, RR type (badge), damage types, value (base / overcap),
-  trigger, duration/CD, and a select checkbox feeding the ledger. Controls: search
-  + the five filters + sort (click headers) + a group-by selector (none / mastery /
+  trigger, duration/CD. **Selection is whole-row click** (not a checkbox column):
+  clicking anywhere on a row toggles its ledger selection, selected rows get the
+  highlighted `selrow` treatment, and rows are keyboard-accessible (focusable, with
+  Enter/Space toggling and `aria-pressed` for state). Our rows carry no other
+  interactive element, so a full-row target is unambiguous. Controls: search + the
+  five filters + sort (click headers) + a group-by selector (none / mastery /
   constellation / item). **Dropped**: the confidence column (all authoritative); a
   small marker instead flags the ~41 sources carrying a verify-note. **Simplified**:
   the trigger column shows the coarse classification we have rather than the
