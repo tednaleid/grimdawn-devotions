@@ -1,0 +1,83 @@
+// ABOUTME: Pure debuff-ledger resolution: stack sum, then single-highest multiplicative, then flat.
+// ABOUTME: Sign-aware multiplicative step cannot cross zero on its own; matches the in-game order.
+import type { LogicalSource } from "./aggregate";
+
+/** The ten enemy resistances RR can reduce (Poison & Acid and Vitality are single types). */
+export const RESISTANCES = [
+  "Fire",
+  "Cold",
+  "Lightning",
+  "Poison & Acid",
+  "Vitality",
+  "Aether",
+  "Chaos",
+  "Pierce",
+  "Bleeding",
+  "Physical",
+] as const;
+
+/** The three types "Elemental" expands to inside the ledger. */
+export const ELEMENTAL = ["Fire", "Cold", "Lightning"] as const;
+
+export interface LedgerLine {
+  resistance: string;
+  final: number;
+  sumStack: number;
+  maxMult: number;
+  maxFlat: number;
+  bestMult: LogicalSource | null;
+  bestFlat: LogicalSource | null;
+  stackSources: LogicalSource[];
+}
+
+/** The reduction a source applies to `resistance`, or null when it does not hit it. */
+function hitValue(source: LogicalSource, resistance: string): number | null {
+  const res = source.resistances;
+  let token: string | null = null;
+  if (res.includes("All")) token = "All";
+  else if (res.includes("Elemental") && (ELEMENTAL as readonly string[]).includes(resistance)) token = "Elemental";
+  else if (res.includes(resistance)) token = resistance;
+  if (token === null) return null;
+  const v = source.perResistance[token];
+  return v ?? source.valueAtMax;
+}
+
+/** Resolve the final resistance per affected type for a selection and starting value r0. */
+export function resolveLedger(selected: LogicalSource[], r0: number): LedgerLine[] {
+  const lines: LedgerLine[] = [];
+  for (const resistance of RESISTANCES) {
+    let sumStack = 0;
+    let maxMult = 0;
+    let maxFlat = 0;
+    let bestMult: LogicalSource | null = null;
+    let bestFlat: LogicalSource | null = null;
+    const stackSources: LogicalSource[] = [];
+    let affected = false;
+
+    for (const s of selected) {
+      const v = hitValue(s, resistance);
+      if (v === null) continue;
+      affected = true;
+      if (s.rrType === "stacking") {
+        sumStack += Math.abs(v);
+        stackSources.push(s);
+      } else if (s.rrType === "reduced-percent") {
+        if (v > maxMult) {
+          maxMult = v;
+          bestMult = s;
+        }
+      } else if (v > maxFlat) {
+        maxFlat = v;
+        bestFlat = s;
+      }
+    }
+    if (!affected) continue;
+
+    const base = r0 - sumStack;
+    const sgn = Math.sign(base);
+    const afterMult = base * (1 - (sgn * maxMult) / 100);
+    const final = afterMult - maxFlat;
+    lines.push({ resistance, final, sumStack, maxMult, maxFlat, bestMult, bestFlat, stackSources });
+  }
+  return lines;
+}
