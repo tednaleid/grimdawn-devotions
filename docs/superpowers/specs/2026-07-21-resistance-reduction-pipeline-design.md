@@ -56,33 +56,58 @@ three RR types map to three distinct `.dbr` field families:
 |---|---|---|---|
 | **Multiplicative** (single highest applies) | `X% Reduced target's Resistance` | `offensive<Type>ResistanceReductionPercentMin` (+ `...DurationMin`, `...Chance`, `...XOR`, `...Global`) | Viper (`skills/devotion/tier1_13d.dbr`): `offensiveElementalResistanceReductionPercentMin` = 20, duration 3s |
 | **Flat** (single highest applies) | `X Reduced target's Resistance` | `offensive<Type>ResistanceReductionAbsoluteMin` (+ same siblings) | Break Morale (`skills/playerclass01/warcry2.dbr`): `offensivePhysicalResistanceReductionAbsoluteMin` array -> 45; Elemental Storm (`skills/devotion/tier2_01c_skill.dbr`): `offensiveElementalResistanceReductionAbsoluteMin` array -> 32 |
-| **Stacking** (additive, unlimited) | `-X% [type] Resistance` | **`defensive<Type>Resistance` with a negative value**, on an enemy-facing debuff record | Vulnerability (`skills/playerclass03/curse2.dbr`) and Aura of Censure (`skills/playerclass07/auracensure1_buff.dbr`): `defensiveElementalResistance` = -3 ... -35 |
+| **Stacking** (additive, unlimited) | `-X% [type] Resistance` | **a negative `defensive<Type>` value** (bare, per-type) or the `defensiveElementalResistance` aggregate, on an enemy-facing debuff/modifier record | Night's Chill modifier (`skills/playerclass04/veilofshadows2.dbr`): `defensiveCold` / `defensivePierce` / `defensivePoison` / `defensiveLife` = -3 ... -35; Vulnerability (`skills/playerclass03/curse2.dbr`) and Aura of Censure (`skills/playerclass07/auracensure1_buff.dbr`): `defensiveElementalResistance` = -3 ... -35 |
+
+The stacking family reuses the **same bare `defensive<Type>` field name that
+monster records use for their own resistances** (positive on a creature = has
+resistance; negative on a debuff/modifier = reduces the target's). It has two
+naming forms that both occur: bare per-type (`defensiveCold`, `defensivePoison`,
+`defensiveLife`, ...) and the elemental aggregate `defensiveElementalResistance`.
+An earlier draft of this spec named it `defensive<Type>Resistance` and counted 62
+records; that only matched the elemental aggregate and missed every per-type
+source. The true population is characterized below.
 
 `<Type>` -> resistance mapping (kept distinct; **not** expanded downstream):
 
-- `Total` -> `All` resistances
-- `Elemental` -> Fire, Cold, Lightning (an "elemental" marker, expanded by the consumer)
-- otherwise the single type: Physical, Pierce, Fire, Cold, Lightning, Poison
-  (Poison & Acid), Aether, Chaos, Bleeding, Life (Vitality)
+- Stacking `<Type>` tokens seen (bare `defensive<Type>`): `Physical`, `Pierce`,
+  `Fire`, `Cold`, `Lightning`, `Poison` (-> "Poison & Acid"), `Aether`, `Chaos`,
+  `Life` (-> "Vitality"), `Bleeding`; plus the `defensiveElementalResistance`
+  aggregate -> `Elemental`.
+- The offensive-reduction families (flat + multiplicative) only ever carry three
+  `<Type>` tokens across the whole extraction: `Total` (1103) -> `All`,
+  `Elemental` (16), `Physical` (6). There is **no** per-single-element or exotic
+  flat/multiplicative RR; those types only appear in the stacking family. Record
+  this constraint - it bounds the flat/mult sweep to three field names per suffix.
+- `Total` -> `All` resistances; `Elemental` -> Fire, Cold, Lightning (an
+  "elemental" marker, expanded by the consumer, never pre-expanded here).
 
 ### The stacking family is the only hard part
 
-The stacking type reuses the same field name (`defensive<Type>Resistance`) that
-the game uses to *grant* resistance to the player and pets - 722+ occurrences in
-skills alone, nearly all positive and irrelevant. The disambiguation is
-tractable because the negative sign already filters the population to a small,
-inspectable set. Characterized from the extraction: **62 skill records** carry a
-negative `defensive<Type>Resistance`, and the template name classifies them:
+The stacking type reuses the same bare `defensive<Type>` field name the game uses
+to *grant* resistance to players, pets, and monsters - hundreds of positive,
+irrelevant occurrences. The negative sign filters the population to a bounded,
+inspectable set. Characterized from the extraction: **280 skill records** carry a
+negative `defensive<Type>` (per-type or the elemental aggregate), and the
+template name classifies them:
 
-- `skillbuff_debuf` / `skillbuff_debuftrap` / `skillbuff_contageous` (41) ->
-  enemy-facing debuffs = real RR. **Include.**
-- `skill_modifier` (18) -> adds RR onto a parent skill (Vulnerability is one).
-  **Include iff the modified parent resolves to an enemy-facing debuff.**
+- `skillbuff_debuf` (109) / `skillbuff_contageous` (21) / `skillbuff_debuftrap`
+  (5) / `skillbuff_debuffreeze` (4) -> enemy-facing debuffs = real RR.
+  **Include** (139 records).
+- `skill_modifier` (136) -> adds RR onto a parent skill (Night's Chill and
+  Vulnerability are these). **Include iff the modified parent resolves to an
+  enemy-facing debuff/aura** (Veil of Shadow's toggled aura is; a self-buff
+  parent is not).
 - `skill_buffselfduration` (3) -> self-applied. **Exclude**, recording the record
   path and reason in the summary (do not silently drop).
+- `skillbuff_passive` (1) and `monster.tpl` (1) -> edge cases; inspect and either
+  classify or include-with-a-note.
 
 Any negative-defensive record that does not fit these buckets is **included with
-a note** rather than guessed at or dropped, per the rigor rules below.
+a note** rather than guessed at or dropped, per the rigor rules below. The
+`skill_modifier` bucket (136) is the largest and needs parent resolution: a
+modifier's RR is real only when it modifies an enemy-facing skill, so the sweep
+must resolve each modifier to the skill it augments (the parent references the
+modifier via `modifierSkill*` / the skill tree wiring; resolve during build).
 
 ## Architecture
 
@@ -189,10 +214,12 @@ resolution.
   delta - our record-read value vs. their community number - so we know the
   catalogue covers at least the prototype's set and understand each discrepancy.
 - **Guard test** pinning a handful of exemplars so a future extraction can't
-  silently regress the field mapping: Viper multiplicative Elemental 20%,
-  Break Morale flat Physical array -> 45, Elemental Storm flat Elemental array ->
-  32, Vulnerability stacking Elemental array -> 35. Mirrors the existing data
-  guard tests.
+  silently regress the field mapping, covering both stacking naming forms: Viper
+  multiplicative Elemental 20%, Break Morale flat Physical array -> 45, Elemental
+  Storm flat Elemental array -> 32, Vulnerability stacking `defensiveElemental
+  Resistance` array -> 35, and Night's Chill stacking bare per-type
+  (`defensiveCold`/`defensivePierce`/`defensivePoison`/`defensiveLife`) array ->
+  35. Mirrors the existing data guard tests.
 - **Devotions parity**: `data/devotions.json` is byte-identical before and after
   the shared-helper refactor.
 - **Re-runnable check**: running the script twice on the same extraction produces
