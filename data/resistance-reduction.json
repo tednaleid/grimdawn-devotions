@@ -2,14 +2,14 @@
   "meta": {
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
-    "generated_utc": "2026-07-22T04:18:12Z",
+    "generated_utc": "2026-07-22T04:53:27Z",
     "berserker_present": false
   },
   "sources": [
     {
       "id": "records:skills:devotion:pets:petskill_hound_passive:reduced-flat",
       "name": "tagDevotionEffectB12_Pet01",
-      "parent": "tagDevotionEffectB12_Pet01",
+      "parent": "tagDevotion_B12",
       "record_path": "records/skills/devotion/pets/petskill_hound_passive.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -50,7 +50,7 @@
     {
       "id": "records:skills:devotion:pets:petskill_hound_plaguebreath:reduced-flat",
       "name": "tagDevotionEffectB12_Pet02",
-      "parent": "tagDevotionEffectB12_Pet02",
+      "parent": "tagDevotion_B12",
       "record_path": "records/skills/devotion/pets/petskill_hound_plaguebreath.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -91,7 +91,7 @@
     {
       "id": "records:skills:devotion:pets:petskill_hound_plagueswipe:reduced-flat",
       "name": "x:rr:records/skills/devotion/pets/petskill_hound_plagueswipe.dbr",
-      "parent": "x:rr:records/skills/devotion/pets/petskill_hound_plagueswipe.dbr",
+      "parent": "tagDevotion_B12",
       "record_path": "records/skills/devotion/pets/petskill_hound_plagueswipe.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -132,7 +132,7 @@
     {
       "id": "records:skills:devotion:pets:petskill_skeleton_basicattack:reduced-flat",
       "name": "tagDevotionEffectB10_Pet01",
-      "parent": "tagDevotionEffectB10_Pet01",
+      "parent": "tagDevotion_B10",
       "record_path": "records/skills/devotion/pets/petskill_skeleton_basicattack.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -173,7 +173,7 @@
     {
       "id": "records:skills:devotion:pets:petskill_skeleton_charge:reduced-flat",
       "name": "x:rr:records/skills/devotion/pets/petskill_skeleton_charge.dbr",
-      "parent": "x:rr:records/skills/devotion/pets/petskill_skeleton_charge.dbr",
+      "parent": "tagDevotion_B10",
       "record_path": "records/skills/devotion/pets/petskill_skeleton_charge.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -214,7 +214,7 @@
     {
       "id": "records:skills:devotion:tier2_01c_skill:reduced-flat",
       "name": "tagDevotionEffectB01",
-      "parent": "tagDevotionEffectB01",
+      "parent": "tagDevotion_B01",
       "record_path": "records/skills/devotion/tier2_01c_skill.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -255,7 +255,7 @@
     {
       "id": "records:skills:devotion:tier2_02f_skill:reduced-flat",
       "name": "tagDevotionEffectB02",
-      "parent": "tagDevotionEffectB02",
+      "parent": "tagDevotion_B02",
       "record_path": "records/skills/devotion/tier2_02f_skill.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -296,7 +296,7 @@
     {
       "id": "records:skills:devotion:tier2_18f_skill:reduced-flat",
       "name": "tagDevotionEffectB18",
-      "parent": "tagDevotionEffectB18",
+      "parent": "tagDevotion_B18",
       "record_path": "records/skills/devotion/tier2_18f_skill.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -337,7 +337,7 @@
     {
       "id": "records:skills:devotion:tier3_15f_skill_petbonus:reduced-flat",
       "name": "x:rr:records/skills/devotion/tier3_15f_skill_petbonus.dbr",
-      "parent": "x:rr:records/skills/devotion/tier3_15f_skill_petbonus.dbr",
+      "parent": "tagGDX1Devotion_C102",
       "record_path": "records/skills/devotion/tier3_15f_skill_petbonus.dbr",
       "category": "devotion",
       "rr_type": "reduced-flat",
@@ -373,7 +373,7 @@
     {
       "id": "records:skills:itemskills:componentskills:comp_aethertendril_01:reduced-flat",
       "name": "tagCompSkillA002Name",
-      "parent": "x:rritem:records/items/materia/compa_aethersteelbolts.dbr",
+      "parent": "tagCompA057Name",
       "record_path": "records/skills/itemskills/componentskills/comp_aethertendril_01.dbr",
       "category": "component",
       "rr_type": "reduced-flat",
@@ -395,7 +395,7 @@
     {
       "id": "records:skills:itemskills:componentskills:comp_poisonbomb_02:reduced-flat",
       "name": "tagCompSkillA023Name",
-      "parent": "x:rritem:records/items/materia/compa_venomtippedammo.dbr",
+      "parent": "tagCompA033Name",
       "record_path": "records/skills/itemskills/componentskills/comp_poisonbomb_02.dbr",
       "category": "component",
       "rr_type": "reduced-flat",
@@ -417,7 +417,7 @@
     {
       "id": "records:skills:itemskills:componentskills:comp_sacredstrike_01:reduced-flat",
       "name": "tagCompSkillA025Name",
-      "parent": "x:rritem:records/items/materia/compa_blessedsteel.dbr",
+      "parent": "tagCompA012Name",
       "record_path": "records/skills/itemskills/componentskills/comp_sacredstrike_01.dbr",
       "category": "component",
       "rr_type": "reduced-flat",
@@ -439,7 +439,7 @@
     {
       "id": "records:skills:itemskills:componentskills:compb_dreegsinfinitegaze_proc_01:reduced-flat",
       "name": "tagCompSkillB004Name",
-      "parent": "x:rritem:records/items/materia/compb_markofdreeg.dbr",
+      "parent": "tagCompB012Name",
       "record_path": "records/skills/itemskills/componentskills/compb_dreegsinfinitegaze_proc_01.dbr",
       "category": "component",
       "rr_type": "reduced-flat",
@@ -530,7 +530,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_aetherblaze:reduced-flat",
       "name": "tagItemSkillD022Name",
-      "parent": "tagRingD010",
+      "parent": "tagMedalD010",
       "record_path": "records/skills/itemskills/legendary/item_aetherblaze.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -598,7 +598,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_sacredbalance:reduced-flat",
       "name": "tagItemSkillD167Name",
-      "parent": "x:rritem:records/items/lootsets/itemset_d002.dbr",
+      "parent": "tagItemSetD002Name",
       "record_path": "records/skills/itemskills/legendary/item_sacredbalance.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -621,7 +621,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_valdunclip:reduced-flat",
       "name": "tagItemSkillD233Name",
-      "parent": "x:rritem:records/items/lootsets/itemset_d019.dbr",
+      "parent": "tagItemSetD019Name",
       "record_path": "records/skills/itemskills/legendary/item_valdunclip.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -644,7 +644,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_witchinghour_petbonus:reduced-flat",
       "name": "x:rr:records/skills/itemskills/legendary/item_witchinghour_petbonus.dbr",
-      "parent": "x:rr:records/skills/itemskills/legendary/item_witchinghour_petbonus.dbr",
+      "parent": "tagWeaponGun2hD002",
       "record_path": "records/skills/itemskills/legendary/item_witchinghour_petbonus.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -667,7 +667,7 @@
     {
       "id": "records:skills:itemskills:pets:petskill_arcanewisp_zap:reduced-flat",
       "name": "tagItemSkillD246NamePetSkill",
-      "parent": "tagItemSkillD246NamePetSkill",
+      "parent": "tagItemSetD024Name",
       "record_path": "records/skills/itemskills/pets/petskill_arcanewisp_zap.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -690,7 +690,7 @@
     {
       "id": "records:skills:itemskills:pets:petskill_blackscourge_chaosnova:reduced-flat",
       "name": "tagItemSkillD053_Pet01",
-      "parent": "tagItemSkillD053_Pet01",
+      "parent": "tagWeaponCaster1hD002",
       "record_path": "records/skills/itemskills/pets/petskill_blackscourge_chaosnova.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -713,7 +713,7 @@
     {
       "id": "records:skills:itemskills:pets:petskill_blackscourge_chomp:reduced-flat",
       "name": "tagDevotionEffectC09_Pet01",
-      "parent": "tagDevotionEffectC09_Pet01",
+      "parent": "tagWeaponCaster1hD002",
       "record_path": "records/skills/itemskills/pets/petskill_blackscourge_chomp.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -736,7 +736,7 @@
     {
       "id": "records:skills:itemskills:relics:relic_malediction:reduced-flat",
       "name": "tagRelicSkillD002Name",
-      "parent": "x:rritem:records/items/gearrelic/d002_relic.dbr",
+      "parent": "tagRelicD002",
       "record_path": "records/skills/itemskills/relics/relic_malediction.dbr",
       "category": "relic",
       "rr_type": "reduced-flat",
@@ -826,7 +826,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:kriegwrath:reduced-flat",
       "name": "tagGDX1ItemSkillD158Name",
-      "parent": "x:rritem:records/items/lootsets/itemset_d101.dbr",
+      "parent": "tagGDX1ItemSetD101Name",
       "record_path": "records/skills/itemskillsgdx1/legendary/kriegwrath.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -848,7 +848,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_demo3:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_demo3.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_02c.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_demo3.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_demo3.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -870,7 +870,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_soldier2:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier2.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_01b.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier2.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier2.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -958,7 +958,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d101_recklesspower:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d101_recklesspower.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d101.dbr",
+      "parent": "tagGDX1ItemSetD101Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d101_recklesspower.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -980,7 +980,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d110_bladearc:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d110_bladearc.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d110.dbr",
+      "parent": "tagGDX1ItemSetD110Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d110_bladearc.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1002,7 +1002,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d116_deadlyaim:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d116_deadlyaim.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d116.dbr",
+      "parent": "tagGDX1ItemSetD116Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d116_deadlyaim.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1112,7 +1112,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d005_doombolt:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d005_doombolt.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d005b.dbr",
+      "parent": "tagItemSetD005BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d005_doombolt.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1134,7 +1134,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d008_canisterbomb:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d008_canisterbomb.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d008b.dbr",
+      "parent": "tagItemSetD008BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d008_canisterbomb.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1183,9 +1183,9 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:bysmielcommand_buff:reduced-flat",
       "name": "tagGDX2ItemSkillD240Name",
-      "parent": "tagGDX2ItemSkillD240Name",
+      "parent": "tagGDX2NecklaceD213",
       "record_path": "records/skills/itemskillsgdx2/legendary/bysmielcommand_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "reduced-flat",
       "resistances": "All",
       "values_per_rank": [
@@ -1205,7 +1205,7 @@
     {
       "id": "records:skills:itemskillsgdx2:runes:teleport_c204:reduced-flat",
       "name": "tagGDX2RuneSkillC204",
-      "parent": "x:rritem:records/items/enchants/runes/c204_rune.dbr",
+      "parent": "tagGDX2RuneC204",
       "record_path": "records/skills/itemskillsgdx2/runes/teleport_c204.dbr",
       "category": "augment",
       "rr_type": "reduced-flat",
@@ -1227,7 +1227,7 @@
     {
       "id": "records:skills:itemskillsgdx2:set_stormserpentorb:reduced-flat",
       "name": "tagGDX2ItemSkillC202Name",
-      "parent": "x:rritem:records/items/lootsets/itemset_c202.dbr",
+      "parent": "tagGDX2ItemSetC202Name",
       "record_path": "records/skills/itemskillsgdx2/set_stormserpentorb.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -1315,7 +1315,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d202_callidortempest:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d202_callidortempest.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d202.dbr",
+      "parent": "tagGDX2ItemSetD202Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d202_callidortempest.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1337,7 +1337,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_smite:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_smite.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d205.dbr",
+      "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_smite.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1359,7 +1359,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d212_mogdrogenpact:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d212_mogdrogenpact.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d212.dbr",
+      "parent": "tagGDX2ItemSetD212Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d212_mogdrogenpact.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1381,7 +1381,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d215_devastation:reduced-flat",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d215_devastation.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d215.dbr",
+      "parent": "tagGDX2ItemSetD215Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d215_devastation.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1469,7 +1469,7 @@
     {
       "id": "records:skills:playerclass01:warcry1b:reduced-flat",
       "name": "tagClass01SkillName04C",
-      "parent": "tagClass01SkillName04C",
+      "parent": "tagClass01SkillName00A",
       "record_path": "records/skills/playerclass01/warcry1b.dbr",
       "category": "mastery skill",
       "rr_type": "reduced-flat",
@@ -1493,7 +1493,7 @@
     {
       "id": "records:skills:playerclass01:warcry2:reduced-flat",
       "name": "tagClass01SkillName04B",
-      "parent": "tagClass01SkillName04B",
+      "parent": "tagClass01SkillName00A",
       "record_path": "records/skills/playerclass01/warcry2.dbr",
       "category": "modifier",
       "rr_type": "reduced-flat",
@@ -1538,7 +1538,7 @@
     {
       "id": "records:skills:playerclass02:blackwater3:reduced-flat",
       "name": "tagClass02SkillName08C",
-      "parent": "tagClass02SkillName08C",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/blackwater3.dbr",
       "category": "mastery skill",
       "rr_type": "reduced-flat",
@@ -1581,7 +1581,7 @@
     {
       "id": "records:skills:playerclass03:pets:modifier_caster_d108_summonrifthound:reduced-flat",
       "name": "x:rr:records/skills/playerclass03/pets/modifier_caster_d108_summonrifthound.dbr",
-      "parent": "x:rr:records/skills/playerclass03/pets/modifier_caster_d108_summonrifthound.dbr",
+      "parent": "tagClass03SkillName00",
       "record_path": "records/skills/playerclass03/pets/modifier_caster_d108_summonrifthound.dbr",
       "category": "mastery skill",
       "rr_type": "reduced-flat",
@@ -1604,7 +1604,7 @@
     {
       "id": "records:skills:playerclass05:arcanemissile2:reduced-flat",
       "name": "tagClass05SkillName01B",
-      "parent": "tagClass05SkillName01B",
+      "parent": "tagClass05SkillName00",
       "record_path": "records/skills/playerclass05/arcanemissile2.dbr",
       "category": "modifier",
       "rr_type": "reduced-flat",
@@ -1647,7 +1647,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_focus_d209_runeofkalastor:reduced-flat",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_focus_d209_runeofkalastor.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_focus_d209_runeofkalastor.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_focus_d209_runeofkalastor.dbr",
       "category": "modifier",
       "rr_type": "reduced-flat",
@@ -1669,7 +1669,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_shield_b010_runeofkalastor:reduced-flat",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_shield_b010_runeofkalastor.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_shield_b010_runeofkalastor.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_shield_b010_runeofkalastor.dbr",
       "category": "modifier",
       "rr_type": "reduced-flat",
@@ -1691,7 +1691,7 @@
     {
       "id": "records:skills:playerclass08:ravenousearth3:reduced-flat",
       "name": "tagGDX1Class08SkillName04C",
-      "parent": "tagGDX1Class08SkillName04C",
+      "parent": "tagGDX1Class08SkillName00A",
       "record_path": "records/skills/playerclass08/ravenousearth3.dbr",
       "category": "mastery skill",
       "rr_type": "reduced-flat",
@@ -1734,7 +1734,7 @@
     {
       "id": "records:skills:playerclass09:wpattack02:reduced-flat",
       "name": "tagGDX2Class09SkillName13A",
-      "parent": "tagGDX2Class09SkillName13A",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/wpattack02.dbr",
       "category": "mastery skill",
       "rr_type": "reduced-flat",
@@ -1799,7 +1799,7 @@
     {
       "id": "records:skills:devotion:tier3_14f_skill:reduced-percent",
       "name": "tagGDX1DevotionEffectC101",
-      "parent": "tagGDX1DevotionEffectC101",
+      "parent": "tagGDX1Devotion_C101",
       "record_path": "records/skills/devotion/tier3_14f_skill.dbr",
       "category": "devotion",
       "rr_type": "reduced-percent",
@@ -1883,7 +1883,7 @@
     {
       "id": "records:skills:itemskills:relics:relic_terror:reduced-percent",
       "name": "tagRelicSkillC005Name",
-      "parent": "x:rritem:records/items/gearrelic/c005_relic.dbr",
+      "parent": "tagRelicC005",
       "record_path": "records/skills/itemskills/relics/relic_terror.dbr",
       "category": "relic",
       "rr_type": "reduced-percent",
@@ -1905,7 +1905,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_soldier5:reduced-percent",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier5.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_01e.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier5.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier5.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-percent",
@@ -1927,7 +1927,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set3_soldier1:reduced-percent",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_soldier1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_01j.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_soldier1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_soldier1.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-percent",
@@ -1993,7 +1993,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:touchofchaos:reduced-percent",
       "name": "tagGDX2ItemSkillD231Name",
-      "parent": "x:rritem:records/items/lootsets/itemset_d210.dbr",
+      "parent": "tagGDX2ItemSetD210Name",
       "record_path": "records/skills/itemskillsgdx2/legendary/touchofchaos.dbr",
       "category": "item granted",
       "rr_type": "reduced-percent",
@@ -2015,7 +2015,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d211_ravenousearth:reduced-percent",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d211_ravenousearth.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d211.dbr",
+      "parent": "tagGDX2ItemSetD211Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d211_ravenousearth.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-percent",
@@ -2037,7 +2037,7 @@
     {
       "id": "records:skills:devotion:pets:petskill_wizardstrap_detonate01_buff:stacking:Aether",
       "name": "tagDevotionEffectB09_Pet01",
-      "parent": "tagDevotionEffectB09_Pet01",
+      "parent": "tagDevotion_B09",
       "record_path": "records/skills/devotion/pets/petskill_wizardstrap_detonate01_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2080,7 +2080,7 @@
     {
       "id": "records:skills:devotion:pets:petskill_wizardstrap_detonate01_buff:stacking:Lightning",
       "name": "tagDevotionEffectB09_Pet01",
-      "parent": "tagDevotionEffectB09_Pet01",
+      "parent": "tagDevotion_B09",
       "record_path": "records/skills/devotion/pets/petskill_wizardstrap_detonate01_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2123,7 +2123,7 @@
     {
       "id": "records:skills:devotion:tier1_08e_skill_buff:stacking:Physical",
       "name": "tagDevotionEffectA08",
-      "parent": "tagDevotionEffectA08",
+      "parent": "tagDevotion_A08",
       "record_path": "records/skills/devotion/tier1_08e_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2171,7 +2171,7 @@
     {
       "id": "records:skills:devotion:tier1_08e_skill_buff:stacking:Pierce",
       "name": "tagDevotionEffectA08",
-      "parent": "tagDevotionEffectA08",
+      "parent": "tagDevotion_A08",
       "record_path": "records/skills/devotion/tier1_08e_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2219,7 +2219,7 @@
     {
       "id": "records:skills:devotion:tier2_04g_skill_buff:stacking:Bleeding",
       "name": "tagDevotionEffectB04",
-      "parent": "tagDevotionEffectB04",
+      "parent": "tagDevotion_B04",
       "record_path": "records/skills/devotion/tier2_04g_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2262,7 +2262,7 @@
     {
       "id": "records:skills:devotion:tier2_11e_skill_buff:stacking:Chaos",
       "name": "tagDevotionEffectB11",
-      "parent": "tagDevotionEffectB11",
+      "parent": "tagDevotion_B11",
       "record_path": "records/skills/devotion/tier2_11e_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2305,7 +2305,7 @@
     {
       "id": "records:skills:devotion:tier2_11e_skill_buff:stacking:Fire",
       "name": "tagDevotionEffectB11",
-      "parent": "tagDevotionEffectB11",
+      "parent": "tagDevotion_B11",
       "record_path": "records/skills/devotion/tier2_11e_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2348,7 +2348,7 @@
     {
       "id": "records:skills:devotion:tier2_32d_skill_buff:stacking:Cold",
       "name": "tagGDX1DevotionEffectB101",
-      "parent": "tagGDX1DevotionEffectB101",
+      "parent": "tagGDX1Devotion_B101",
       "record_path": "records/skills/devotion/tier2_32d_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2391,7 +2391,7 @@
     {
       "id": "records:skills:devotion:tier2_32d_skill_buff:stacking:Poison",
       "name": "tagGDX1DevotionEffectB101",
-      "parent": "tagGDX1DevotionEffectB101",
+      "parent": "tagGDX1Devotion_B101",
       "record_path": "records/skills/devotion/tier2_32d_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2434,7 +2434,7 @@
     {
       "id": "records:skills:devotion:tier3_18f_skill_buff:stacking:Life",
       "name": "tagGDX1DevotionEffectC105",
-      "parent": "tagGDX1DevotionEffectC105",
+      "parent": "tagGDX1Devotion_C105",
       "record_path": "records/skills/devotion/tier3_18f_skill_buff.dbr",
       "category": "devotion",
       "rr_type": "stacking",
@@ -2472,9 +2472,9 @@
     {
       "id": "records:skills:itemskills:componentskills:compb_solaelsflame_01_buff:stacking:Chaos",
       "name": "tagCompSkillB005Name",
-      "parent": "tagCompSkillB005Name",
+      "parent": "tagCompB011Name",
       "record_path": "records/skills/itemskills/componentskills/compb_solaelsflame_01_buff.dbr",
-      "category": "item granted",
+      "category": "component",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -2496,9 +2496,9 @@
     {
       "id": "records:skills:itemskills:componentskills:compb_solaelsflame_01_buff:stacking:Life",
       "name": "tagCompSkillB005Name",
-      "parent": "tagCompSkillB005Name",
+      "parent": "tagCompB011Name",
       "record_path": "records/skills/itemskills/componentskills/compb_solaelsflame_01_buff.dbr",
-      "category": "item granted",
+      "category": "component",
       "rr_type": "stacking",
       "resistances": [
         "Vitality"
@@ -2520,7 +2520,7 @@
     {
       "id": "records:skills:itemskills:granted:item_anticlottinginjection_buff:stacking:Bleeding",
       "name": "tagItemSkillC040Name",
-      "parent": "tagItemSkillC040Name",
+      "parent": "tagWeaponGun2hC006",
       "record_path": "records/skills/itemskills/granted/item_anticlottinginjection_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2595,7 +2595,7 @@
     {
       "id": "records:skills:itemskills:item_bleedvulnerability_buff_01:stacking:Bleeding",
       "name": "tagItemSkillB006Name",
-      "parent": "tagItemSkillB006Name",
+      "parent": "tagGDX2WeaponGun2hC201",
       "record_path": "records/skills/itemskills/item_bleedvulnerability_buff_01.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2619,7 +2619,7 @@
     {
       "id": "records:skills:itemskills:item_chillingsurge_buff:stacking:Fire",
       "name": "tagItemSkillC094Name",
-      "parent": "tagItemSkillC094Name",
+      "parent": "tagNecklaceC023",
       "record_path": "records/skills/itemskills/item_chillingsurge_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2645,7 +2645,7 @@
     {
       "id": "records:skills:itemskills:item_cursecrushedresolve_buff:stacking:Life",
       "name": "tagItemSkillC044Name",
-      "parent": "tagItemSkillC044Name",
+      "parent": "tagGDX1RingC101",
       "record_path": "records/skills/itemskills/item_cursecrushedresolve_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2669,7 +2669,7 @@
     {
       "id": "records:skills:itemskills:item_curseofburrwitch_buff:stacking:Chaos",
       "name": "tagItemSkillC111Name",
-      "parent": "tagItemSkillC111Name",
+      "parent": "tagWeaponCrossbow2hC003",
       "record_path": "records/skills/itemskills/item_curseofburrwitch_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2695,7 +2695,7 @@
     {
       "id": "records:skills:itemskills:item_eyeofthaddeus_buff:stacking:Bleeding",
       "name": "tagItemSkillC128Name",
-      "parent": "tagItemSkillC128Name",
+      "parent": "tagItemSetC009Name",
       "record_path": "records/skills/itemskills/item_eyeofthaddeus_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2720,7 +2720,7 @@
     {
       "id": "records:skills:itemskills:item_eyeofthaddeus_buff:stacking:Pierce",
       "name": "tagItemSkillC128Name",
-      "parent": "tagItemSkillC128Name",
+      "parent": "tagItemSetC009Name",
       "record_path": "records/skills/itemskills/item_eyeofthaddeus_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2745,7 +2745,7 @@
     {
       "id": "records:skills:itemskills:item_flamebrand_buff:stacking:Aether",
       "name": "tagItemSkillC117Name",
-      "parent": "tagItemSkillC117Name",
+      "parent": "tagWeaponSwordC009",
       "record_path": "records/skills/itemskills/item_flamebrand_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2771,7 +2771,7 @@
     {
       "id": "records:skills:itemskills:item_flamebrand_buff:stacking:Fire",
       "name": "tagItemSkillC117Name",
-      "parent": "tagItemSkillC117Name",
+      "parent": "tagWeaponSwordC009",
       "record_path": "records/skills/itemskills/item_flamebrand_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2797,7 +2797,7 @@
     {
       "id": "records:skills:itemskills:item_ignite_buff:stacking:Physical",
       "name": "tagItemSkillC112Name",
-      "parent": "tagItemSkillC112Name",
+      "parent": "tagWeaponGun2hC003",
       "record_path": "records/skills/itemskills/item_ignite_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2822,7 +2822,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_agony_buff:stacking:Physical",
       "name": "tagItemSkillD025Name",
-      "parent": "tagItemSkillD025Name",
+      "parent": "tagWeaponBluntD003",
       "record_path": "records/skills/itemskills/legendary/item_agony_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2846,7 +2846,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_agony_buff:stacking:Poison",
       "name": "tagItemSkillD025Name",
-      "parent": "tagItemSkillD025Name",
+      "parent": "tagWeaponBluntD003",
       "record_path": "records/skills/itemskills/legendary/item_agony_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2870,7 +2870,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_ascendantswrath_buff:stacking:Aether",
       "name": "tagItemSkillD029Name",
-      "parent": "tagItemSkillD029Name",
+      "parent": "tagWeaponCaster1hD003",
       "record_path": "records/skills/itemskills/legendary/item_ascendantswrath_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2895,9 +2895,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_blackmark_buff:stacking:Chaos",
       "name": "tagItemSkillD251Name",
-      "parent": "tagItemSkillD251Name",
+      "parent": "tagFocusD015",
       "record_path": "records/skills/itemskills/legendary/item_blackmark_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -2920,9 +2920,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_blackmark_buff:stacking:Life",
       "name": "tagItemSkillD251Name",
-      "parent": "tagItemSkillD251Name",
+      "parent": "tagFocusD015",
       "record_path": "records/skills/itemskills/legendary/item_blackmark_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Vitality"
@@ -2944,7 +2944,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_chillingpresence_buff:stacking:Cold",
       "name": "tagItemSkillD050Name",
-      "parent": "tagItemSkillD050Name",
+      "parent": "tagWeaponCaster1hD008",
       "record_path": "records/skills/itemskills/legendary/item_chillingpresence_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2968,7 +2968,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_chillingpresence_buff:stacking:Lightning",
       "name": "tagItemSkillD050Name",
-      "parent": "tagItemSkillD050Name",
+      "parent": "tagWeaponCaster1hD008",
       "record_path": "records/skills/itemskills/legendary/item_chillingpresence_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -2992,7 +2992,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_darkflame_buff:stacking:Chaos",
       "name": "tagItemSkillD062Name",
-      "parent": "tagItemSkillD062Name",
+      "parent": "tagWeaponGun1hD004",
       "record_path": "records/skills/itemskills/legendary/item_darkflame_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3017,7 +3017,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_darkflame_buff:stacking:Fire",
       "name": "tagItemSkillD062Name",
-      "parent": "tagItemSkillD062Name",
+      "parent": "tagWeaponGun1hD004",
       "record_path": "records/skills/itemskills/legendary/item_darkflame_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3042,7 +3042,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_eternalhaunt_buff:stacking:Aether",
       "name": "tagItemSkillD083Name",
-      "parent": "tagItemSkillD083Name",
+      "parent": "tagRingD008",
       "record_path": "records/skills/itemskills/legendary/item_eternalhaunt_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3066,7 +3066,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_eternalhaunt_buff:stacking:Cold",
       "name": "tagItemSkillD083Name",
-      "parent": "tagItemSkillD083Name",
+      "parent": "tagRingD008",
       "record_path": "records/skills/itemskills/legendary/item_eternalhaunt_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3090,9 +3090,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_harbingermark_buff:stacking:Chaos",
       "name": "tagItemSkillD106Name",
-      "parent": "tagItemSkillD106Name",
+      "parent": "tagWeaponCrossbow2hD005",
       "record_path": "records/skills/itemskills/legendary/item_harbingermark_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -3114,9 +3114,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_harbingermark_buff:stacking:Physical",
       "name": "tagItemSkillD106Name",
-      "parent": "tagItemSkillD106Name",
+      "parent": "tagWeaponCrossbow2hD005",
       "record_path": "records/skills/itemskills/legendary/item_harbingermark_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Physical"
@@ -3138,7 +3138,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_invokersfury_buff:stacking:Aether",
       "name": "tagItemSkillD117Name",
-      "parent": "tagItemSkillD117Name",
+      "parent": "tagItemSetD011Name",
       "record_path": "records/skills/itemskills/legendary/item_invokersfury_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3163,7 +3163,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_invokersfury_buff:stacking:Elemental",
       "name": "tagItemSkillD117Name",
-      "parent": "tagItemSkillD117Name",
+      "parent": "tagItemSetD011Name",
       "record_path": "records/skills/itemskills/legendary/item_invokersfury_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3186,9 +3186,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_iskandratear_buff:stacking:Elemental",
       "name": "tagItemSkillD257Name",
-      "parent": "tagItemSkillD257Name",
+      "parent": "tagFocusD014",
       "record_path": "records/skills/itemskills/legendary/item_iskandratear_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": "Elemental",
       "values_per_rank": [
@@ -3209,7 +3209,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_markofchthon_buff:stacking:Chaos",
       "name": "tagItemSkillD128Name",
-      "parent": "tagItemSkillD128Name",
+      "parent": "tagWeaponCaster1hD013",
       "record_path": "records/skills/itemskills/legendary/item_markofchthon_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3234,7 +3234,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_markofchthon_buff:stacking:Life",
       "name": "tagItemSkillD128Name",
-      "parent": "tagItemSkillD128Name",
+      "parent": "tagWeaponCaster1hD013",
       "record_path": "records/skills/itemskills/legendary/item_markofchthon_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3259,7 +3259,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_markofthedeceiver_buff:stacking:Aether",
       "name": "tagItemSkillD130Name",
-      "parent": "tagItemSkillD130Name",
+      "parent": "tagFocusD003",
       "record_path": "records/skills/itemskills/legendary/item_markofthedeceiver_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3284,7 +3284,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_markofthedeceiver_buff:stacking:Chaos",
       "name": "tagItemSkillD130Name",
-      "parent": "tagItemSkillD130Name",
+      "parent": "tagFocusD003",
       "record_path": "records/skills/itemskills/legendary/item_markofthedeceiver_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3309,7 +3309,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_markofthefallen_buff:stacking:Life",
       "name": "tagItemSkillD131Name",
-      "parent": "tagItemSkillD131Name",
+      "parent": "tagRingD001",
       "record_path": "records/skills/itemskills/legendary/item_markofthefallen_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3333,7 +3333,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_moonglow_buff:stacking:Cold",
       "name": "tagItemSkillD142Name",
-      "parent": "tagItemSkillD142Name",
+      "parent": "tagWeaponAxeD002",
       "record_path": "records/skills/itemskills/legendary/item_moonglow_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3407,7 +3407,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_plagueofdreeg_buff:stacking:Chaos",
       "name": "tagItemSkillD151Name",
-      "parent": "tagItemSkillD151Name",
+      "parent": "tagWeaponBluntD005",
       "record_path": "records/skills/itemskills/legendary/item_plagueofdreeg_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3432,7 +3432,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_plagueofdreeg_buff:stacking:Poison",
       "name": "tagItemSkillD151Name",
-      "parent": "tagItemSkillD151Name",
+      "parent": "tagWeaponBluntD005",
       "record_path": "records/skills/itemskills/legendary/item_plagueofdreeg_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3755,7 +3755,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_reapermark_buff:stacking:Cold",
       "name": "tagItemSkillD159Name",
-      "parent": "tagItemSkillD159Name",
+      "parent": "tagItemSetD015Name",
       "record_path": "records/skills/itemskills/legendary/item_reapermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3780,7 +3780,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_reapermark_buff:stacking:Pierce",
       "name": "tagItemSkillD159Name",
-      "parent": "tagItemSkillD159Name",
+      "parent": "tagItemSetD015Name",
       "record_path": "records/skills/itemskills/legendary/item_reapermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3805,9 +3805,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_ulzuinsflame_buff:stacking:Fire",
       "name": "tagItemSkillD193Name",
-      "parent": "tagItemSkillD193Name",
+      "parent": "tagWeaponGun2hD006",
       "record_path": "records/skills/itemskills/legendary/item_ulzuinsflame_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Fire"
@@ -3830,9 +3830,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_ulzuinsflame_buff:stacking:Lightning",
       "name": "tagItemSkillD193Name",
-      "parent": "tagItemSkillD193Name",
+      "parent": "tagWeaponGun2hD006",
       "record_path": "records/skills/itemskills/legendary/item_ulzuinsflame_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Lightning"
@@ -3855,9 +3855,9 @@
     {
       "id": "records:skills:itemskills:legendary:item_ulzuinsflame_buff:stacking:Physical",
       "name": "tagItemSkillD193Name",
-      "parent": "tagItemSkillD193Name",
+      "parent": "tagWeaponGun2hD006",
       "record_path": "records/skills/itemskills/legendary/item_ulzuinsflame_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Physical"
@@ -3880,7 +3880,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_unmake_buff:stacking:Elemental",
       "name": "tagItemSkillD195Name",
-      "parent": "tagItemSkillD195Name",
+      "parent": "tagFocusD004",
       "record_path": "records/skills/itemskills/legendary/item_unmake_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3902,7 +3902,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_unmake_buff:stacking:Physical",
       "name": "tagItemSkillD195Name",
-      "parent": "tagItemSkillD195Name",
+      "parent": "tagFocusD004",
       "record_path": "records/skills/itemskills/legendary/item_unmake_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3926,7 +3926,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_venomofblackmatriarch_buff:stacking:Physical",
       "name": "tagItemSkillD200Name",
-      "parent": "tagItemSkillD200Name",
+      "parent": "tagRingD007",
       "record_path": "records/skills/itemskills/legendary/item_venomofblackmatriarch_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3950,7 +3950,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_venomwrath_buff:stacking:Pierce",
       "name": "tagItemSkillD242Name",
-      "parent": "tagItemSkillD242Name",
+      "parent": "tagItemSetD020Name",
       "record_path": "records/skills/itemskills/legendary/item_venomwrath_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -3975,7 +3975,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_venomwrath_buff:stacking:Poison",
       "name": "tagItemSkillD242Name",
-      "parent": "tagItemSkillD242Name",
+      "parent": "tagItemSetD020Name",
       "record_path": "records/skills/itemskills/legendary/item_venomwrath_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4000,7 +4000,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_warpfire_buff:stacking:Aether",
       "name": "tagItemSkillD207Name",
-      "parent": "tagItemSkillD207Name",
+      "parent": "tagWeaponCaster1hD010",
       "record_path": "records/skills/itemskills/legendary/item_warpfire_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4025,7 +4025,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_warpfire_buff:stacking:Fire",
       "name": "tagItemSkillD207Name",
-      "parent": "tagItemSkillD207Name",
+      "parent": "tagWeaponCaster1hD010",
       "record_path": "records/skills/itemskills/legendary/item_warpfire_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4049,9 +4049,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Aether",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Aether"
@@ -4073,9 +4073,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Bleeding",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Bleeding"
@@ -4097,9 +4097,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Chaos",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -4121,9 +4121,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Cold",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Cold"
@@ -4145,9 +4145,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Fire",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Fire"
@@ -4169,9 +4169,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Life",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Vitality"
@@ -4193,9 +4193,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Lightning",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Lightning"
@@ -4217,9 +4217,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Physical",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Physical"
@@ -4241,9 +4241,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Pierce",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Pierce"
@@ -4265,9 +4265,9 @@
     {
       "id": "records:skills:itemskills:pets:petskill_harbinger_spectralmiasma_buff:stacking:Poison",
       "name": "tagItemSkillD020PetSkillName",
-      "parent": "tagItemSkillD020PetSkillName",
+      "parent": "tagWeaponSwordB001",
       "record_path": "records/skills/itemskills/pets/petskill_harbinger_spectralmiasma_buff.dbr",
-      "category": "item granted",
+      "category": "monster infrequent",
       "rr_type": "stacking",
       "resistances": [
         "Poison & Acid"
@@ -4289,9 +4289,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_corruption_buff:stacking:Chaos",
       "name": "tagRelicSkillB007Name",
-      "parent": "tagRelicSkillB007Name",
+      "parent": "tagRelicB007",
       "record_path": "records/skills/itemskills/relics/relic_corruption_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -4313,9 +4313,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_corruption_buff:stacking:Poison",
       "name": "tagRelicSkillB007Name",
-      "parent": "tagRelicSkillB007Name",
+      "parent": "tagRelicB007",
       "record_path": "records/skills/itemskills/relics/relic_corruption_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Poison & Acid"
@@ -4337,9 +4337,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_haunt_buff:stacking:Aether",
       "name": "tagRelicSkillC007Name",
-      "parent": "tagRelicSkillC007Name",
+      "parent": "tagRelicC007",
       "record_path": "records/skills/itemskills/relics/relic_haunt_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Aether"
@@ -4361,9 +4361,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_haunt_buff:stacking:Life",
       "name": "tagRelicSkillC007Name",
-      "parent": "tagRelicSkillC007Name",
+      "parent": "tagRelicC007",
       "record_path": "records/skills/itemskills/relics/relic_haunt_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Vitality"
@@ -4385,9 +4385,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_necrosis_buff:stacking:Aether",
       "name": "tagRelicSkillD009Name",
-      "parent": "tagRelicSkillD009Name",
+      "parent": "tagRelicD009",
       "record_path": "records/skills/itemskills/relics/relic_necrosis_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Aether"
@@ -4409,9 +4409,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_necrosis_buff:stacking:Bleeding",
       "name": "tagRelicSkillD009Name",
-      "parent": "tagRelicSkillD009Name",
+      "parent": "tagRelicD009",
       "record_path": "records/skills/itemskills/relics/relic_necrosis_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Bleeding"
@@ -4433,9 +4433,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_necrosis_buff:stacking:Chaos",
       "name": "tagRelicSkillD009Name",
-      "parent": "tagRelicSkillD009Name",
+      "parent": "tagRelicD009",
       "record_path": "records/skills/itemskills/relics/relic_necrosis_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -4457,9 +4457,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_necrosis_buff:stacking:Elemental",
       "name": "tagRelicSkillD009Name",
-      "parent": "tagRelicSkillD009Name",
+      "parent": "tagRelicD009",
       "record_path": "records/skills/itemskills/relics/relic_necrosis_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": "Elemental",
       "values_per_rank": [
@@ -4479,9 +4479,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_necrosis_buff:stacking:Life",
       "name": "tagRelicSkillD009Name",
-      "parent": "tagRelicSkillD009Name",
+      "parent": "tagRelicD009",
       "record_path": "records/skills/itemskills/relics/relic_necrosis_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Vitality"
@@ -4503,9 +4503,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_necrosis_buff:stacking:Pierce",
       "name": "tagRelicSkillD009Name",
-      "parent": "tagRelicSkillD009Name",
+      "parent": "tagRelicD009",
       "record_path": "records/skills/itemskills/relics/relic_necrosis_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Pierce"
@@ -4527,9 +4527,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_necrosis_buff:stacking:Poison",
       "name": "tagRelicSkillD009Name",
-      "parent": "tagRelicSkillD009Name",
+      "parent": "tagRelicD009",
       "record_path": "records/skills/itemskills/relics/relic_necrosis_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Poison & Acid"
@@ -4551,9 +4551,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_reckoning_buff:stacking:Physical",
       "name": "tagRelicSkillD006Name",
-      "parent": "tagRelicSkillD006Name",
+      "parent": "tagRelicD006",
       "record_path": "records/skills/itemskills/relics/relic_reckoning_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Physical"
@@ -4575,9 +4575,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_torment_buff:stacking:Life",
       "name": "tagRelicSkillC006Name",
-      "parent": "tagRelicSkillC006Name",
+      "parent": "tagRelicC006",
       "record_path": "records/skills/itemskills/relics/relic_torment_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Vitality"
@@ -4599,9 +4599,9 @@
     {
       "id": "records:skills:itemskills:relics:relic_torment_buff:stacking:Physical",
       "name": "tagRelicSkillC006Name",
-      "parent": "tagRelicSkillC006Name",
+      "parent": "tagRelicC006",
       "record_path": "records/skills/itemskills/relics/relic_torment_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Physical"
@@ -4813,7 +4813,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:luminaripresence_buff:stacking:Elemental",
       "name": "tagGDX1ItemSkillC109Name",
-      "parent": "tagGDX1ItemSkillC109Name",
+      "parent": "tagGDX1ItemSetC106Name",
       "record_path": "records/skills/itemskillsgdx1/granted/luminaripresence_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4835,7 +4835,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:luminaripresence_buff:stacking:Pierce",
       "name": "tagGDX1ItemSkillC109Name",
-      "parent": "tagGDX1ItemSkillC109Name",
+      "parent": "tagGDX1ItemSetC106Name",
       "record_path": "records/skills/itemskillsgdx1/granted/luminaripresence_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4859,7 +4859,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Aether",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4883,7 +4883,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Bleeding",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4907,7 +4907,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Chaos",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4931,7 +4931,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Elemental",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4953,7 +4953,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Life",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4977,7 +4977,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Physical",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5001,7 +5001,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Pierce",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5025,7 +5025,7 @@
     {
       "id": "records:skills:itemskillsgdx1:granted:ravagergaze_buff:stacking:Poison",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadC108",
       "record_path": "records/skills/itemskillsgdx1/granted/ravagergaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5049,7 +5049,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:combustion_buff:stacking:Chaos",
       "name": "tagGDX1ItemSkillD140Name",
-      "parent": "tagGDX1ItemSkillD140Name",
+      "parent": "tagGDX1RingD104",
       "record_path": "records/skills/itemskillsgdx1/legendary/combustion_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5073,7 +5073,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:combustion_buff:stacking:Fire",
       "name": "tagGDX1ItemSkillD140Name",
-      "parent": "tagGDX1ItemSkillD140Name",
+      "parent": "tagGDX1RingD104",
       "record_path": "records/skills/itemskillsgdx1/legendary/combustion_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5097,7 +5097,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:combustion_buff:stacking:Physical",
       "name": "tagGDX1ItemSkillD140Name",
-      "parent": "tagGDX1ItemSkillD140Name",
+      "parent": "tagGDX1RingD104",
       "record_path": "records/skills/itemskillsgdx1/legendary/combustion_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5121,7 +5121,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:curseofvoid_buff:stacking:Chaos",
       "name": "tagGDX1ItemSkillD142Name",
-      "parent": "tagGDX1ItemSkillD142Name",
+      "parent": "tagGDX1RingD114",
       "record_path": "records/skills/itemskillsgdx1/legendary/curseofvoid_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5145,7 +5145,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:curseofvoid_buff:stacking:Life",
       "name": "tagGDX1ItemSkillD142Name",
-      "parent": "tagGDX1ItemSkillD142Name",
+      "parent": "tagGDX1RingD114",
       "record_path": "records/skills/itemskillsgdx1/legendary/curseofvoid_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5169,7 +5169,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:dreadfire_buff:stacking:Aether",
       "name": "tagGDX1ItemSkillD120Name",
-      "parent": "tagGDX1ItemSkillD120Name",
+      "parent": "tagGDX1WeaponCaster1hD101",
       "record_path": "records/skills/itemskillsgdx1/legendary/dreadfire_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5194,7 +5194,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:dreadfire_buff:stacking:Fire",
       "name": "tagGDX1ItemSkillD120Name",
-      "parent": "tagGDX1ItemSkillD120Name",
+      "parent": "tagGDX1WeaponCaster1hD101",
       "record_path": "records/skills/itemskillsgdx1/legendary/dreadfire_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5218,7 +5218,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:fiendsgaze_buff:stacking:Chaos",
       "name": "tagGDX1ItemSkillD111Name",
-      "parent": "tagGDX1ItemSkillD111Name",
+      "parent": "tagGDX1FocusD103",
       "record_path": "records/skills/itemskillsgdx1/legendary/fiendsgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5243,7 +5243,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:fiendsgaze_buff:stacking:Fire",
       "name": "tagGDX1ItemSkillD111Name",
-      "parent": "tagGDX1ItemSkillD111Name",
+      "parent": "tagGDX1FocusD103",
       "record_path": "records/skills/itemskillsgdx1/legendary/fiendsgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5268,7 +5268,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:foulcontagion_buff:stacking:Life",
       "name": "tagGDX1ItemSkillD110Name",
-      "parent": "tagGDX1ItemSkillD110Name",
+      "parent": "tagGDX1FocusD102",
       "record_path": "records/skills/itemskillsgdx1/legendary/foulcontagion_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5292,7 +5292,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:foulcontagion_buff:stacking:Poison",
       "name": "tagGDX1ItemSkillD110Name",
-      "parent": "tagGDX1ItemSkillD110Name",
+      "parent": "tagGDX1FocusD102",
       "record_path": "records/skills/itemskillsgdx1/legendary/foulcontagion_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5316,7 +5316,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:insanity_buff:stacking:Aether",
       "name": "tagGDX1ItemSkillD104Name",
-      "parent": "tagGDX1ItemSkillD104Name",
+      "parent": "tagGDX1WeaponAxeD104",
       "record_path": "records/skills/itemskillsgdx1/legendary/insanity_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5340,7 +5340,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:markofblade_buff:stacking:Physical",
       "name": "tagGDX1ItemSkillD141Name",
-      "parent": "tagGDX1ItemSkillD141Name",
+      "parent": "tagGDX1RingD113",
       "record_path": "records/skills/itemskillsgdx1/legendary/markofblade_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5364,7 +5364,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:markofblade_buff:stacking:Pierce",
       "name": "tagGDX1ItemSkillD141Name",
-      "parent": "tagGDX1ItemSkillD141Name",
+      "parent": "tagGDX1RingD113",
       "record_path": "records/skills/itemskillsgdx1/legendary/markofblade_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5388,9 +5388,9 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:markofrimetongue_buff:stacking:Cold",
       "name": "tagGDX1ItemSkillD182Name",
-      "parent": "tagGDX1ItemSkillD182Name",
+      "parent": "tagGDX1NecklaceD124",
       "record_path": "records/skills/itemskillsgdx1/legendary/markofrimetongue_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Cold"
@@ -5412,9 +5412,9 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:markofrimetongue_buff:stacking:Pierce",
       "name": "tagGDX1ItemSkillD182Name",
-      "parent": "tagGDX1ItemSkillD182Name",
+      "parent": "tagGDX1NecklaceD124",
       "record_path": "records/skills/itemskillsgdx1/legendary/markofrimetongue_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Pierce"
@@ -5436,7 +5436,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:mortalcoil_buff:stacking:Life",
       "name": "tagGDX1ItemSkillD105Name",
-      "parent": "tagGDX1ItemSkillD105Name",
+      "parent": "tagGDX1WeaponGun1hD101",
       "record_path": "records/skills/itemskillsgdx1/legendary/mortalcoil_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5461,7 +5461,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:mortalcoil_buff:stacking:Poison",
       "name": "tagGDX1ItemSkillD105Name",
-      "parent": "tagGDX1ItemSkillD105Name",
+      "parent": "tagGDX1WeaponGun1hD101",
       "record_path": "records/skills/itemskillsgdx1/legendary/mortalcoil_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5486,7 +5486,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerbite_buff:stacking:Bleeding",
       "name": "tagGDX1ItemSkillD103Name",
-      "parent": "tagGDX1ItemSkillD103Name",
+      "parent": "tagGDX1WeaponAxeD101",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerbite_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5510,7 +5510,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerbite_buff:stacking:Life",
       "name": "tagGDX1ItemSkillD103Name",
-      "parent": "tagGDX1ItemSkillD103Name",
+      "parent": "tagGDX1WeaponAxeD101",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerbite_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5534,7 +5534,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Aether",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5558,7 +5558,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Bleeding",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5582,7 +5582,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Chaos",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5606,7 +5606,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Elemental",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5628,7 +5628,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Life",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5652,7 +5652,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Physical",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5676,7 +5676,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Pierce",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5700,7 +5700,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:ravagerdeathgaze_buff:stacking:Poison",
       "name": "tagGDX1ItemSkillD146Name",
-      "parent": "tagGDX1ItemSkillD146Name",
+      "parent": "tagGDX1HeadD111",
       "record_path": "records/skills/itemskillsgdx1/legendary/ravagerdeathgaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5724,7 +5724,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:runeofelgoloth_buff:stacking:Elemental",
       "name": "tagGDX1ItemSkillD121Name",
-      "parent": "tagGDX1ItemSkillD121Name",
+      "parent": "tagGDX1WeaponCaster1hD105",
       "record_path": "records/skills/itemskillsgdx1/legendary/runeofelgoloth_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5746,7 +5746,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:stormcage_buff:stacking:Aether",
       "name": "tagGDX1ItemSkillD115Name",
-      "parent": "tagGDX1ItemSkillD115Name",
+      "parent": "tagGDX1WeaponGun1hD103",
       "record_path": "records/skills/itemskillsgdx1/legendary/stormcage_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5771,7 +5771,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:stormcage_buff:stacking:Lightning",
       "name": "tagGDX1ItemSkillD115Name",
-      "parent": "tagGDX1ItemSkillD115Name",
+      "parent": "tagGDX1WeaponGun1hD103",
       "record_path": "records/skills/itemskillsgdx1/legendary/stormcage_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5796,7 +5796,7 @@
     {
       "id": "records:skills:itemskillsgdx1:pets:petskill_bloodwraith_vampiricaura_buff:stacking:Bleeding",
       "name": "tagGDX1ItemPetBloodWraith_Skill02",
-      "parent": "tagGDX1ItemPetBloodWraith_Skill02",
+      "parent": "tagGDX1ItemSetD123Name",
       "record_path": "records/skills/itemskillsgdx1/pets/petskill_bloodwraith_vampiricaura_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5820,7 +5820,7 @@
     {
       "id": "records:skills:itemskillsgdx1:pets:petskill_bloodwraith_vampiricaura_buff:stacking:Life",
       "name": "tagGDX1ItemPetBloodWraith_Skill02",
-      "parent": "tagGDX1ItemPetBloodWraith_Skill02",
+      "parent": "tagGDX1ItemSetD123Name",
       "record_path": "records/skills/itemskillsgdx1/pets/petskill_bloodwraith_vampiricaura_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -5844,9 +5844,9 @@
     {
       "id": "records:skills:itemskillsgdx1:pets:petskill_deathstalker_auraofdarkness_buff:stacking:Bleeding",
       "name": "tagGDX1RelicSkillD114_Skill",
-      "parent": "tagGDX1RelicSkillD114_Skill",
+      "parent": "tagGDX1RelicD114",
       "record_path": "records/skills/itemskillsgdx1/pets/petskill_deathstalker_auraofdarkness_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Bleeding"
@@ -5868,9 +5868,9 @@
     {
       "id": "records:skills:itemskillsgdx1:pets:petskill_deathstalker_auraofdarkness_buff:stacking:Physical",
       "name": "tagGDX1RelicSkillD114_Skill",
-      "parent": "tagGDX1RelicSkillD114_Skill",
+      "parent": "tagGDX1RelicD114",
       "record_path": "records/skills/itemskillsgdx1/pets/petskill_deathstalker_auraofdarkness_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Physical"
@@ -5892,9 +5892,9 @@
     {
       "id": "records:skills:itemskillsgdx1:pets:petskill_deathstalker_auraofdarkness_buff:stacking:Poison",
       "name": "tagGDX1RelicSkillD114_Skill",
-      "parent": "tagGDX1RelicSkillD114_Skill",
+      "parent": "tagGDX1RelicD114",
       "record_path": "records/skills/itemskillsgdx1/pets/petskill_deathstalker_auraofdarkness_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Poison & Acid"
@@ -5986,7 +5986,7 @@
     {
       "id": "records:skills:itemskillsgdx1:pets:petskill_stormrune_stormeruption_buff:stacking:Elemental",
       "name": "tagGDX1ItemSkillD184PetSkill",
-      "parent": "tagGDX1ItemSkillD184PetSkill",
+      "parent": "tagGDX1ItemSetD113Name",
       "record_path": "records/skills/itemskillsgdx1/pets/petskill_stormrune_stormeruption_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -6008,9 +6008,9 @@
     {
       "id": "records:skills:itemskillsgdx1:relics:ignaffarcombustion_buff:stacking:Chaos",
       "name": "tagGDX1RelicSkillD112Name",
-      "parent": "tagGDX1RelicSkillD112Name",
+      "parent": "tagGDX1RelicD112",
       "record_path": "records/skills/itemskillsgdx1/relics/ignaffarcombustion_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -6032,9 +6032,9 @@
     {
       "id": "records:skills:itemskillsgdx1:relics:ignaffarcombustion_buff:stacking:Elemental",
       "name": "tagGDX1RelicSkillD112Name",
-      "parent": "tagGDX1RelicSkillD112Name",
+      "parent": "tagGDX1RelicD112",
       "record_path": "records/skills/itemskillsgdx1/relics/ignaffarcombustion_buff.dbr",
-      "category": "item granted",
+      "category": "relic",
       "rr_type": "stacking",
       "resistances": "Elemental",
       "values_per_rank": [
@@ -6054,7 +6054,7 @@
     {
       "id": "records:skills:itemskillsgdx1:silvermark_buff:stacking:Cold",
       "name": "tagGDX1ItemSkillC107Name",
-      "parent": "tagGDX1ItemSkillC107Name",
+      "parent": "tagGDX1ItemSetC102Name",
       "record_path": "records/skills/itemskillsgdx1/silvermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -6079,7 +6079,7 @@
     {
       "id": "records:skills:itemskillsgdx1:silvermark_buff:stacking:Pierce",
       "name": "tagGDX1ItemSkillC107Name",
-      "parent": "tagGDX1ItemSkillC107Name",
+      "parent": "tagGDX1ItemSetC102Name",
       "record_path": "records/skills/itemskillsgdx1/silvermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -6414,7 +6414,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Life",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6438,7 +6438,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Poison",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6462,7 +6462,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6486,7 +6486,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Chaos",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6510,7 +6510,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_nightblade5:stacking:Life",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_nightblade5.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04e.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_nightblade5.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_nightblade5.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6534,7 +6534,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Pierce",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6558,7 +6558,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Poison",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6582,7 +6582,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6606,7 +6606,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Physical",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6630,7 +6630,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_inquisitor3:stacking:Physical",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_inquisitor3.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07h.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_inquisitor3.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_inquisitor3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6654,7 +6654,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_necro4:stacking:Chaos",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_necro4.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08i.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_necro4.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_necro4.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6678,7 +6678,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6702,7 +6702,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Chaos",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6726,7 +6726,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Fire",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6750,7 +6750,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist3:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist3.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03g.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist3.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6774,7 +6774,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist4:stacking:Elemental",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist4.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03h.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist4.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist4.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6796,7 +6796,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Pierce",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6820,7 +6820,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Poison",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6844,7 +6844,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Chaos",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6868,7 +6868,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Physical",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6892,7 +6892,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set3_inquisitor1:stacking:Poison",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_inquisitor1.dbr",
-      "parent": "x:rritem:records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07j.dbr",
+      "parent": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_inquisitor1.dbr",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7080,7 +7080,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d111_flashfreeze:stacking:Cold",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_flashfreeze.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d111.dbr",
+      "parent": "tagGDX1ItemSetD111Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_flashfreeze.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7104,7 +7104,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d111_veilofshadow:stacking:Elemental",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_veilofshadow.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d111.dbr",
+      "parent": "tagGDX1ItemSetD111Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_veilofshadow.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7126,7 +7126,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d111_veilofshadow:stacking:Fire",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_veilofshadow.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d111.dbr",
+      "parent": "tagGDX1ItemSetD111Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_veilofshadow.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7150,7 +7150,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d112_soulsiphon:stacking:Life",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d112_soulsiphon.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d112.dbr",
+      "parent": "tagGDX1ItemSetD112Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d112_soulsiphon.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7174,7 +7174,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d118_illomen:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d118_illomen.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d118.dbr",
+      "parent": "tagGDX1ItemSetD118Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d118_illomen.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7198,7 +7198,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d118_illomen:stacking:Life",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d118_illomen.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d118.dbr",
+      "parent": "tagGDX1ItemSetD118Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d118_illomen.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7222,7 +7222,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d121_auraofcensure:stacking:Life",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d121_auraofcensure.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d121.dbr",
+      "parent": "tagGDX1ItemSetD121Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d121_auraofcensure.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7246,7 +7246,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d121_auraofcensure:stacking:Poison",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d121_auraofcensure.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d121.dbr",
+      "parent": "tagGDX1ItemSetD121Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d121_auraofcensure.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7270,7 +7270,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d122_bladetrap:stacking:Cold",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d122_bladetrap.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d122.dbr",
+      "parent": "tagGDX1ItemSetD122Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d122_bladetrap.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7294,7 +7294,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d122_bladetrap:stacking:Pierce",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d122_bladetrap.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d122.dbr",
+      "parent": "tagGDX1ItemSetD122Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d122_bladetrap.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7553,7 +7553,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/gearweapons/blunt1h/b005b_blunt.dbr"
+      "notes": "item skill modifier via records/items/gearweapons/blunt1h/b005_blunt.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace1h_b015_curseoffrailty:stacking:Poison",
@@ -8442,7 +8442,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d002_veilofshadow:stacking:Fire",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d002_veilofshadow.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d002b.dbr",
+      "parent": "tagItemSetD002BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d002_veilofshadow.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -8466,7 +8466,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d010_curseoffrailty:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d010_curseoffrailty.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d010b.dbr",
+      "parent": "tagItemSetD010BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d010_curseoffrailty.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -8490,7 +8490,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d024_siphonsouls:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d024_siphonsouls.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d024b.dbr",
+      "parent": "tagItemSetD024BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d024_siphonsouls.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -8514,7 +8514,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d024_siphonsouls:stacking:Fire",
       "name": "x:rr:records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d024_siphonsouls.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d024b.dbr",
+      "parent": "tagItemSetD024BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d024_siphonsouls.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -8586,7 +8586,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:bitterwinds_buff:stacking:Cold",
       "name": "tagGDX2ItemSkillD241Name",
-      "parent": "tagGDX2ItemSkillD241Name",
+      "parent": "tagGDX2WeaponCaster1hD203",
       "record_path": "records/skills/itemskillsgdx2/legendary/bitterwinds_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8611,7 +8611,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:bitterwinds_buff:stacking:Poison",
       "name": "tagGDX2ItemSkillD241Name",
-      "parent": "tagGDX2ItemSkillD241Name",
+      "parent": "tagGDX2WeaponCaster1hD203",
       "record_path": "records/skills/itemskillsgdx2/legendary/bitterwinds_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8636,7 +8636,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:blightlordgift2_buff:stacking:Fire",
       "name": "tagGDX2ItemSkillD232Name",
-      "parent": "tagGDX2ItemSkillD232Name",
+      "parent": "tagGDX2ItemSetD211Name",
       "record_path": "records/skills/itemskillsgdx2/legendary/blightlordgift2_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8660,7 +8660,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:blightlordgift2_buff:stacking:Life",
       "name": "tagGDX2ItemSkillD232Name",
-      "parent": "tagGDX2ItemSkillD232Name",
+      "parent": "tagGDX2ItemSetD211Name",
       "record_path": "records/skills/itemskillsgdx2/legendary/blightlordgift2_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8684,7 +8684,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:celestialpresence_buff:stacking:Elemental",
       "name": "tagGDX2ItemSkillD209Name",
-      "parent": "tagGDX2ItemSkillD209Name",
+      "parent": "tagGDX2WeaponCaster1hD204",
       "record_path": "records/skills/itemskillsgdx2/legendary/celestialpresence_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8707,7 +8707,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:celestialpresence_buff:stacking:Physical",
       "name": "tagGDX2ItemSkillD209Name",
-      "parent": "tagGDX2ItemSkillD209Name",
+      "parent": "tagGDX2WeaponCaster1hD204",
       "record_path": "records/skills/itemskillsgdx2/legendary/celestialpresence_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8732,7 +8732,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:cryptstalkeraura_buff:stacking:Aether",
       "name": "tagGDX2ItemSkillD259Name",
-      "parent": "tagGDX2ItemSkillD259Name",
+      "parent": "tagGDX2WeaponBluntD207",
       "record_path": "records/skills/itemskillsgdx2/legendary/cryptstalkeraura_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8756,7 +8756,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:cryptstalkeraura_buff:stacking:Bleeding",
       "name": "tagGDX2ItemSkillD259Name",
-      "parent": "tagGDX2ItemSkillD259Name",
+      "parent": "tagGDX2WeaponBluntD207",
       "record_path": "records/skills/itemskillsgdx2/legendary/cryptstalkeraura_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8780,7 +8780,7 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:cryptstalkeraura_buff:stacking:Life",
       "name": "tagGDX2ItemSkillD259Name",
-      "parent": "tagGDX2ItemSkillD259Name",
+      "parent": "tagGDX2WeaponBluntD207",
       "record_path": "records/skills/itemskillsgdx2/legendary/cryptstalkeraura_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8804,9 +8804,9 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:voidsoul_buff:stacking:Chaos",
       "name": "tagGDX2ItemSkillD244Name",
-      "parent": "tagGDX2ItemSkillD244Name",
+      "parent": "tagGDX2ShieldD205",
       "record_path": "records/skills/itemskillsgdx2/legendary/voidsoul_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Chaos"
@@ -8828,9 +8828,9 @@
     {
       "id": "records:skills:itemskillsgdx2:legendary:voidsoul_buff:stacking:Life",
       "name": "tagGDX2ItemSkillD244Name",
-      "parent": "tagGDX2ItemSkillD244Name",
+      "parent": "tagGDX2ShieldD205",
       "record_path": "records/skills/itemskillsgdx2/legendary/voidsoul_buff.dbr",
-      "category": "item granted",
+      "category": "set bonus",
       "rr_type": "stacking",
       "resistances": [
         "Vitality"
@@ -8852,7 +8852,7 @@
     {
       "id": "records:skills:itemskillsgdx2:pets:petskill_eldritchlizard_raptoraura_buff:stacking:Poison",
       "name": "tagGDX2ItemSkillD233_Pet02",
-      "parent": "tagGDX2ItemSkillD233_Pet02",
+      "parent": "tagGDX2ItemSetD212Name",
       "record_path": "records/skills/itemskillsgdx2/pets/petskill_eldritchlizard_raptoraura_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8876,7 +8876,7 @@
     {
       "id": "records:skills:itemskillsgdx2:set_festerblaze_buff:stacking:Fire",
       "name": "tagGDX2ItemSkillC204Name",
-      "parent": "tagGDX2ItemSkillC204Name",
+      "parent": "tagGDX2ItemSetC203Name",
       "record_path": "records/skills/itemskillsgdx2/set_festerblaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -8900,7 +8900,7 @@
     {
       "id": "records:skills:itemskillsgdx2:set_festerblaze_buff:stacking:Life",
       "name": "tagGDX2ItemSkillC204Name",
-      "parent": "tagGDX2ItemSkillC204Name",
+      "parent": "tagGDX2ItemSetC203Name",
       "record_path": "records/skills/itemskillsgdx2/set_festerblaze_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -9328,7 +9328,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Aether",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d205.dbr",
+      "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -9352,7 +9352,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Fire",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d205.dbr",
+      "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -9376,7 +9376,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Lightning",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d205.dbr",
+      "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -9424,7 +9424,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d221_wordofpain:stacking:Bleeding",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d221_wordofpain.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d221.dbr",
+      "parent": "tagGDX2ItemSetD221Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d221_wordofpain.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -9448,7 +9448,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d221_wordofpain:stacking:Pierce",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d221_wordofpain.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d221.dbr",
+      "parent": "tagGDX2ItemSetD221Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d221_wordofpain.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -9472,7 +9472,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d222_veilofshadow:stacking:Chaos",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d222_veilofshadow.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d222.dbr",
+      "parent": "tagGDX2ItemSetD222Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d222_veilofshadow.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -9496,7 +9496,7 @@
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d222_veilofshadow:stacking:Fire",
       "name": "x:rr:records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d222_veilofshadow.dbr",
-      "parent": "x:rritem:records/items/lootsets/itemset_d222.dbr",
+      "parent": "tagGDX2ItemSetD222Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d222_veilofshadow.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -9976,7 +9976,7 @@
     {
       "id": "records:skills:playerclass02:pets:modifier_caster_d211_thermitemine:stacking:Life",
       "name": "x:rr:records/skills/playerclass02/pets/modifier_caster_d211_thermitemine.dbr",
-      "parent": "x:rr:records/skills/playerclass02/pets/modifier_caster_d211_thermitemine.dbr",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/modifier_caster_d211_thermitemine.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10001,7 +10001,7 @@
     {
       "id": "records:skills:playerclass02:pets:modifier_focus_b019_thermitemine:stacking:Fire",
       "name": "x:rr:records/skills/playerclass02/pets/modifier_focus_b019_thermitemine.dbr",
-      "parent": "x:rr:records/skills/playerclass02/pets/modifier_focus_b019_thermitemine.dbr",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/modifier_focus_b019_thermitemine.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10025,7 +10025,7 @@
     {
       "id": "records:skills:playerclass02:pets:modifier_gun2h_f203_thermitemine:stacking:Chaos",
       "name": "x:rr:records/skills/playerclass02/pets/modifier_gun2h_f203_thermitemine.dbr",
-      "parent": "x:rr:records/skills/playerclass02/pets/modifier_gun2h_f203_thermitemine.dbr",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/modifier_gun2h_f203_thermitemine.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10049,7 +10049,7 @@
     {
       "id": "records:skills:playerclass02:pets:modifier_thermitemine_caster_d110:stacking:Cold",
       "name": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_caster_d110.dbr",
-      "parent": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_caster_d110.dbr",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_caster_d110.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10074,7 +10074,7 @@
     {
       "id": "records:skills:playerclass02:pets:modifier_thermitemine_casterf110:stacking:Chaos",
       "name": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
-      "parent": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10099,7 +10099,7 @@
     {
       "id": "records:skills:playerclass02:pets:modifier_thermitemine_casterf110:stacking:Fire",
       "name": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
-      "parent": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10124,7 +10124,7 @@
     {
       "id": "records:skills:playerclass02:pets:modifier_thermitemine_gun1h_d114:stacking:Life",
       "name": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_gun1h_d114.dbr",
-      "parent": "x:rr:records/skills/playerclass02/pets/modifier_thermitemine_gun1h_d114.dbr",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_gun1h_d114.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10149,7 +10149,7 @@
     {
       "id": "records:skills:playerclass02:pets:thermitemine_skill_flare1_buff:stacking:Elemental",
       "name": "tagClass02SkillName06C",
-      "parent": "tagClass02SkillName06C",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/thermitemine_skill_flare1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10196,7 +10196,7 @@
     {
       "id": "records:skills:playerclass02:pets:thermitemine_skill_flare2:stacking:Aether",
       "name": "tagClass02SkillName06B",
-      "parent": "tagClass02SkillName06B",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/thermitemine_skill_flare2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10241,7 +10241,7 @@
     {
       "id": "records:skills:playerclass02:pets:thermitemine_skill_flare2:stacking:Chaos",
       "name": "tagClass02SkillName06B",
-      "parent": "tagClass02SkillName06B",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/thermitemine_skill_flare2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10286,7 +10286,7 @@
     {
       "id": "records:skills:playerclass02:pets:thermitemineaether_skill_flare1_buff:stacking:Elemental",
       "name": "tagClass02SkillName06C",
-      "parent": "tagClass02SkillName06C",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/thermitemineaether_skill_flare1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10333,7 +10333,7 @@
     {
       "id": "records:skills:playerclass02:pets:thermiteminecold_skill_flare1_buff:stacking:Elemental",
       "name": "tagClass02SkillName06C",
-      "parent": "tagClass02SkillName06C",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/thermiteminecold_skill_flare1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10380,7 +10380,7 @@
     {
       "id": "records:skills:playerclass02:pets:thermiteminevitality_skill_flare1_buff:stacking:Elemental",
       "name": "tagClass02SkillName06C",
-      "parent": "tagClass02SkillName06C",
+      "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/thermiteminevitality_skill_flare1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10427,7 +10427,7 @@
     {
       "id": "records:skills:playerclass03:curse1_buff:stacking:Bleeding",
       "name": "tagClass03SkillName06A",
-      "parent": "tagClass03SkillName06A",
+      "parent": "tagClass03SkillName00",
       "record_path": "records/skills/playerclass03/curse1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10470,7 +10470,7 @@
     {
       "id": "records:skills:playerclass03:curse1_buff:stacking:Physical",
       "name": "tagClass03SkillName06A",
-      "parent": "tagClass03SkillName06A",
+      "parent": "tagClass03SkillName00",
       "record_path": "records/skills/playerclass03/curse1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10513,7 +10513,7 @@
     {
       "id": "records:skills:playerclass03:curse2:stacking:Chaos",
       "name": "tagClass03SkillName06B",
-      "parent": "tagClass03SkillName06B",
+      "parent": "tagClass03SkillName00",
       "record_path": "records/skills/playerclass03/curse2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10556,7 +10556,7 @@
     {
       "id": "records:skills:playerclass03:curse2:stacking:Elemental",
       "name": "tagClass03SkillName06B",
-      "parent": "tagClass03SkillName06B",
+      "parent": "tagClass03SkillName00",
       "record_path": "records/skills/playerclass03/curse2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10597,7 +10597,7 @@
     {
       "id": "records:skills:playerclass03:curse2:stacking:Life",
       "name": "tagClass03SkillName06B",
-      "parent": "tagClass03SkillName06B",
+      "parent": "tagClass03SkillName00",
       "record_path": "records/skills/playerclass03/curse2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10640,7 +10640,7 @@
     {
       "id": "records:skills:playerclass03:curse2:stacking:Poison",
       "name": "tagClass03SkillName06B",
-      "parent": "tagClass03SkillName06B",
+      "parent": "tagClass03SkillName00",
       "record_path": "records/skills/playerclass03/curse2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10683,7 +10683,7 @@
     {
       "id": "records:skills:playerclass04:veilofshadows2:stacking:Cold",
       "name": "tagClass04SkillName07B",
-      "parent": "tagClass04SkillName07B",
+      "parent": "tagClass04SkillName00",
       "record_path": "records/skills/playerclass04/veilofshadows2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10726,7 +10726,7 @@
     {
       "id": "records:skills:playerclass04:veilofshadows2:stacking:Life",
       "name": "tagClass04SkillName07B",
-      "parent": "tagClass04SkillName07B",
+      "parent": "tagClass04SkillName00",
       "record_path": "records/skills/playerclass04/veilofshadows2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10769,7 +10769,7 @@
     {
       "id": "records:skills:playerclass04:veilofshadows2:stacking:Pierce",
       "name": "tagClass04SkillName07B",
-      "parent": "tagClass04SkillName07B",
+      "parent": "tagClass04SkillName00",
       "record_path": "records/skills/playerclass04/veilofshadows2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10812,7 +10812,7 @@
     {
       "id": "records:skills:playerclass04:veilofshadows2:stacking:Poison",
       "name": "tagClass04SkillName07B",
-      "parent": "tagClass04SkillName07B",
+      "parent": "tagClass04SkillName00",
       "record_path": "records/skills/playerclass04/veilofshadows2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10855,7 +10855,7 @@
     {
       "id": "records:skills:playerclass05:chillingsurge2:stacking:Physical",
       "name": "tagClass05SkillName16B",
-      "parent": "tagClass05SkillName16B",
+      "parent": "tagClass05SkillName00",
       "record_path": "records/skills/playerclass05/chillingsurge2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -10900,7 +10900,7 @@
     {
       "id": "records:skills:playerclass05:chillingsurge_buff:stacking:Fire",
       "name": "tagClass05SkillName16A",
-      "parent": "tagClass05SkillName16A",
+      "parent": "tagClass05SkillName00",
       "record_path": "records/skills/playerclass05/chillingsurge_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10945,7 +10945,7 @@
     {
       "id": "records:skills:playerclass06:devouringswarm1_buff:stacking:Bleeding",
       "name": "tagClass06SkillName15A",
-      "parent": "tagClass06SkillName15A",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/devouringswarm1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -10994,7 +10994,7 @@
     {
       "id": "records:skills:playerclass06:devouringswarm1_buff:stacking:Life",
       "name": "tagClass06SkillName15A",
-      "parent": "tagClass06SkillName15A",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/devouringswarm1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -11043,7 +11043,7 @@
     {
       "id": "records:skills:playerclass06:pets:modifier_caster_b202_winddevil:stacking:Elemental",
       "name": "x:rr:records/skills/playerclass06/pets/modifier_caster_b202_winddevil.dbr",
-      "parent": "x:rr:records/skills/playerclass06/pets/modifier_caster_b202_winddevil.dbr",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/pets/modifier_caster_b202_winddevil.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11066,7 +11066,7 @@
     {
       "id": "records:skills:playerclass06:pets:modifier_caster_d008_winddevil:stacking:Cold",
       "name": "x:rr:records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
-      "parent": "x:rr:records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11091,7 +11091,7 @@
     {
       "id": "records:skills:playerclass06:pets:modifier_caster_d008_winddevil:stacking:Lightning",
       "name": "x:rr:records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
-      "parent": "x:rr:records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11116,7 +11116,7 @@
     {
       "id": "records:skills:playerclass06:pets:modifier_eldritchwhispers_set1_shaman5:stacking:Poison",
       "name": "x:rr:records/skills/playerclass06/pets/modifier_eldritchwhispers_set1_shaman5.dbr",
-      "parent": "x:rr:records/skills/playerclass06/pets/modifier_eldritchwhispers_set1_shaman5.dbr",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/pets/modifier_eldritchwhispers_set1_shaman5.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11140,7 +11140,7 @@
     {
       "id": "records:skills:playerclass06:pets:modifier_focus_d219_winddevil:stacking:Aether",
       "name": "x:rr:records/skills/playerclass06/pets/modifier_focus_d219_winddevil.dbr",
-      "parent": "x:rr:records/skills/playerclass06/pets/modifier_focus_d219_winddevil.dbr",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/pets/modifier_focus_d219_winddevil.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11164,7 +11164,7 @@
     {
       "id": "records:skills:playerclass06:pets:modifier_head_d019_winddevil:stacking:Elemental",
       "name": "x:rr:records/skills/playerclass06/pets/modifier_head_d019_winddevil.dbr",
-      "parent": "x:rr:records/skills/playerclass06/pets/modifier_head_d019_winddevil.dbr",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/pets/modifier_head_d019_winddevil.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11186,7 +11186,7 @@
     {
       "id": "records:skills:playerclass06:pets:petskill_whirlwind_exposure:stacking:Elemental",
       "name": "tagClass06SkillName04B",
-      "parent": "tagClass06SkillName04B",
+      "parent": "tagClass06SkillName00",
       "record_path": "records/skills/playerclass06/pets/petskill_whirlwind_exposure.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11229,7 +11229,7 @@
     {
       "id": "records:skills:playerclass07:auracensure1_buff:stacking:Elemental",
       "name": "tagGDX1Class07SkillName09A",
-      "parent": "tagGDX1Class07SkillName09A",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/auracensure1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -11272,7 +11272,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_axe1h_b203_inquisitorseal2:stacking:Elemental",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_axe1h_b203_inquisitorseal2.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_axe1h_b203_inquisitorseal2.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_axe1h_b203_inquisitorseal2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11295,7 +11295,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_eldritchwhispersset1_inquisitor5:stacking:Chaos",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_eldritchwhispersset1_inquisitor5.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_eldritchwhispersset1_inquisitor5.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_eldritchwhispersset1_inquisitor5.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11319,7 +11319,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_gun2h_d203_inquisitorseal:stacking:Physical",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_gun2h_d203_inquisitorseal.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_gun2h_d203_inquisitorseal.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_gun2h_d203_inquisitorseal.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11343,7 +11343,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_head_b101_inquisitorseal:stacking:Elemental",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_head_b101_inquisitorseal.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_head_b101_inquisitorseal.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_head_b101_inquisitorseal.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11365,7 +11365,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_head_d213_inquisitorseal2:stacking:Aether",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_head_d213_inquisitorseal2.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_head_d213_inquisitorseal2.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_head_d213_inquisitorseal2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11389,7 +11389,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_set_d113_inquisitorseal:stacking:Elemental",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_set_d113_inquisitorseal.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_set_d113_inquisitorseal.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_set_d113_inquisitorseal.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11411,7 +11411,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_set_d205_inquisitorseal:stacking:Aether",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_set_d205_inquisitorseal.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_set_d205_inquisitorseal.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_set_d205_inquisitorseal.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11435,7 +11435,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_set_d205_inquisitorseal:stacking:Elemental",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_set_d205_inquisitorseal.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_set_d205_inquisitorseal.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_set_d205_inquisitorseal.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11457,7 +11457,7 @@
     {
       "id": "records:skills:playerclass07:pets:modifier_sword2h_d106_inquisitorseal2:stacking:Elemental",
       "name": "x:rr:records/skills/playerclass07/pets/modifier_sword2h_d106_inquisitorseal2.dbr",
-      "parent": "x:rr:records/skills/playerclass07/pets/modifier_sword2h_d106_inquisitorseal2.dbr",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/pets/modifier_sword2h_d106_inquisitorseal2.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11479,7 +11479,7 @@
     {
       "id": "records:skills:playerclass07:wordofpain3:stacking:Aether",
       "name": "tagGDX1Class07SkillName01C",
-      "parent": "tagGDX1Class07SkillName01C",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/wordofpain3.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11524,7 +11524,7 @@
     {
       "id": "records:skills:playerclass07:wordofpain3:stacking:Chaos",
       "name": "tagGDX1Class07SkillName01C",
-      "parent": "tagGDX1Class07SkillName01C",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/wordofpain3.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11569,7 +11569,7 @@
     {
       "id": "records:skills:playerclass07:wordofpain3:stacking:Pierce",
       "name": "tagGDX1Class07SkillName01C",
-      "parent": "tagGDX1Class07SkillName01C",
+      "parent": "tagGDX1Class07SkillName00A",
       "record_path": "records/skills/playerclass07/wordofpain3.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11614,7 +11614,7 @@
     {
       "id": "records:skills:playerclass08:spectralarmor2_buff:stacking:Aether",
       "name": "tagGDX1Class08SkillName06B",
-      "parent": "tagGDX1Class08SkillName06B",
+      "parent": "tagGDX1Class08SkillName00A",
       "record_path": "records/skills/playerclass08/spectralarmor2_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -11657,7 +11657,7 @@
     {
       "id": "records:skills:playerclass08:spectralarmor2_buff:stacking:Cold",
       "name": "tagGDX1Class08SkillName06B",
-      "parent": "tagGDX1Class08SkillName06B",
+      "parent": "tagGDX1Class08SkillName00A",
       "record_path": "records/skills/playerclass08/spectralarmor2_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -11700,7 +11700,7 @@
     {
       "id": "records:skills:playerclass08:spectralarmor2_buff:stacking:Life",
       "name": "tagGDX1Class08SkillName06B",
-      "parent": "tagGDX1Class08SkillName06B",
+      "parent": "tagGDX1Class08SkillName00A",
       "record_path": "records/skills/playerclass08/spectralarmor2_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -11743,7 +11743,7 @@
     {
       "id": "records:skills:playerclass08:spectralarmor2_buff:stacking:Physical",
       "name": "tagGDX1Class08SkillName06B",
-      "parent": "tagGDX1Class08SkillName06B",
+      "parent": "tagGDX1Class08SkillName00A",
       "record_path": "records/skills/playerclass08/spectralarmor2_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -11786,7 +11786,7 @@
     {
       "id": "records:skills:playerclass08:spectralarmor2_buff:stacking:Poison",
       "name": "tagGDX1Class08SkillName06B",
-      "parent": "tagGDX1Class08SkillName06B",
+      "parent": "tagGDX1Class08SkillName00A",
       "record_path": "records/skills/playerclass08/spectralarmor2_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -11829,7 +11829,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_caster_d113_conjurecelestialguardian:stacking:Life",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11853,7 +11853,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_caster_d113_conjurecelestialguardian:stacking:Poison",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11877,7 +11877,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_eldritchwhispers_set1_oathkeeper3:stacking:Aether",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11901,7 +11901,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_eldritchwhispers_set1_oathkeeper3:stacking:Chaos",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11925,7 +11925,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_focus_d214_conjurecelestialguardian:stacking:Lightning",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_focus_d214_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_focus_d214_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_focus_d214_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11949,7 +11949,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_gun2h_b203_conjurecelestialguardian:stacking:Fire",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_gun2h_b203_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_gun2h_b203_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_gun2h_b203_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11973,7 +11973,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_head_d213_conjurecelestialguardian:stacking:Aether",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_head_d213_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_head_d213_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_head_d213_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -11997,7 +11997,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_necklace_b203_conjurecelestialguardian:stacking:Bleeding",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -12021,7 +12021,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_necklace_b203_conjurecelestialguardian:stacking:Life",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -12045,7 +12045,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_necklace_d108_conjurecelestialguardian:stacking:Aether",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -12069,7 +12069,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_necklace_d108_conjurecelestialguardian:stacking:Fire",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -12093,7 +12093,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_set_d211_conjurecelestialguardian_02:stacking:Fire",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_set_d211_conjurecelestialguardian_02.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_set_d211_conjurecelestialguardian_02.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_set_d211_conjurecelestialguardian_02.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -12117,7 +12117,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_set_d215_conjurecelestialguardian:stacking:Fire",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -12141,7 +12141,7 @@
     {
       "id": "records:skills:playerclass09:pets:modifier_set_d215_conjurecelestialguardian:stacking:Lightning",
       "name": "x:rr:records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
-      "parent": "x:rr:records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
       "category": "modifier",
       "rr_type": "stacking",
@@ -12165,7 +12165,7 @@
     {
       "id": "records:skills:playerclass09:pets:petskill_celestialguardian_celestialwrath1_buff:stacking:Bleeding",
       "name": "tagGDX2Class09SkillName08B",
-      "parent": "tagGDX2Class09SkillName08B",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/petskill_celestialguardian_celestialwrath1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -12210,7 +12210,7 @@
     {
       "id": "records:skills:playerclass09:pets:petskill_celestialguardian_celestialwrath1_buff:stacking:Elemental",
       "name": "tagGDX2Class09SkillName08B",
-      "parent": "tagGDX2Class09SkillName08B",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/petskill_celestialguardian_celestialwrath1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -12253,7 +12253,7 @@
     {
       "id": "records:skills:playerclass09:pets:petskill_celestialguardian_celestialwrath1_buff:stacking:Physical",
       "name": "tagGDX2Class09SkillName08B",
-      "parent": "tagGDX2Class09SkillName08B",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/petskill_celestialguardian_celestialwrath1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -12298,7 +12298,7 @@
     {
       "id": "records:skills:playerclass09:pets:petskill_celestialguardian_celestialwrath1b_buff:stacking:Bleeding",
       "name": "tagGDX2Class09SkillName08B",
-      "parent": "tagGDX2Class09SkillName08B",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/petskill_celestialguardian_celestialwrath1b_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -12343,7 +12343,7 @@
     {
       "id": "records:skills:playerclass09:pets:petskill_celestialguardian_celestialwrath1b_buff:stacking:Life",
       "name": "tagGDX2Class09SkillName08B",
-      "parent": "tagGDX2Class09SkillName08B",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/petskill_celestialguardian_celestialwrath1b_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
@@ -12388,7 +12388,7 @@
     {
       "id": "records:skills:playerclass09:pets:petskill_celestialguardian_celestialwrath1b_buff:stacking:Poison",
       "name": "tagGDX2Class09SkillName08B",
-      "parent": "tagGDX2Class09SkillName08B",
+      "parent": "tagGDX2Class09SkillName00A",
       "record_path": "records/skills/playerclass09/pets/petskill_celestialguardian_celestialwrath1b_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",

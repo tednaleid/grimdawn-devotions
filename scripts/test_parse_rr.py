@@ -123,5 +123,13 @@ check("deterministic sources across runs", doc["sources"] == doc2["sources"])
 check("has stacking, flat, and percent sources",
       {"stacking", "reduced-flat", "reduced-percent"} <= {s["rr_type"] for s in doc["sources"]})
 
+# --- Task (page-1): real parent names (mastery / constellation / item) ---
+# A class skill's parent is its mastery, not its own name.
+nc_all = find(lambda s: s["record_path"].endswith("skills/playerclass04/veilofshadows2.dbr"))
+check("night's chill parent differs from name", nc_all and nc_all[0]["parent"] != nc_all[0]["name"])
+# A devotion's parent is its constellation, not its own name.
+est = find(lambda s: s["record_path"].endswith("skills/devotion/tier2_01c_skill.dbr"))
+check("elemental storm parent differs from name", est and est[0]["parent"] != est[0]["name"])
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

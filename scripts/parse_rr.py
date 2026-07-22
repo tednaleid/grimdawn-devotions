@@ -329,10 +329,77 @@ def classify_trigger(rec) -> str:
     return "debuff"
 
 
-def _parent_descriptor(tags, game_en, rec_path, rec):
-    """Localizable parent label. For skill sources this is the skill's own name for now;
-    mastery/constellation parent resolution is a follow-up (the UI can also join against
-    devotions.json). Item sources get their item name via attribute_items."""
+_PLAYERCLASS_RE = re.compile(r"/playerclass(\d+)/")
+
+
+def build_class_masteries(db, tags, game_en):
+    """playerclass dir number -> mastery name key. The mastery's display name lives on
+    records/skills/playerclassNN/_classtraining_classNN.dbr's skillDisplayName tag."""
+    out: dict[str, str] = {}
+    skills_root = db.root / "records/skills"
+    for p in sorted(skills_root.glob("playerclass*/_classtraining_class*.dbr")):
+        rel = p.relative_to(db.root).as_posix()
+        m = _PLAYERCLASS_RE.search(rel)
+        if not m:
+            continue
+        tag = db.get(rel).get("skillDisplayName", "").strip()
+        if tag:
+            out[m.group(1)] = register(tag, tags.get(tag), game_en)
+    return out
+
+
+def build_devotion_parents(db, tags, game_en, devotions_path):
+    """devotion record_path -> constellation name key. Walks each constellation's stars
+    and their celestial-power skills forward through every referenced .dbr under
+    records/skills/devotion (following ';'-separated spawn/skill lists, e.g. a proc that
+    summons pets whose skills carry the RR), first constellation to reach a record wins."""
+    out: dict[str, str] = {}
+    try:
+        doc = json.loads(Path(devotions_path).read_text(encoding="utf-8"))
+    except OSError:
+        return out
+    dev_root = "records/skills/devotion/"
+    for c in doc.get("constellations", []):
+        tag = c.get("name_tag")
+        if not tag:
+            continue
+        key = register(tag, tags.get(tag), game_en)
+        stack = []
+        for s in c.get("stars", []):
+            if s.get("dbr"):
+                stack.append(s["dbr"])
+            cp = s.get("celestial_power")
+            if cp and cp.get("dbr"):
+                stack.append(cp["dbr"])
+        seen = set()
+        while stack:
+            cur = stack.pop().replace("\\", "/").strip()
+            if cur in seen or not cur.startswith(dev_root):
+                continue
+            seen.add(cur)
+            out.setdefault(cur, key)
+            for v in db.get(cur).values():
+                for part in v.split(";"):
+                    ref = part.replace("\\", "/").strip()
+                    if ref.endswith(".dbr") and ref.startswith(dev_root):
+                        stack.append(ref)
+    return out
+
+
+def _parent_descriptor(tags, game_en, rec_path, rec, class_masteries, devotion_parents):
+    """Localizable parent label: the mastery name for a class skill, the constellation
+    name for a devotion, else the skill's own name. Item sources are set separately by
+    attribute_items; a class/devotion skill an item merely grants keeps its real parent."""
+    if "/devotion/" in rec_path:
+        parent = devotion_parents.get(rec_path)
+        if parent:
+            return parent
+    else:
+        m = _PLAYERCLASS_RE.search(rec_path)
+        if m:
+            parent = class_masteries.get(m.group(1))
+            if parent:
+                return parent
     return _name_descriptor(rec, rec_path, tags, game_en)
 
 
@@ -344,16 +411,38 @@ ITEM_SKILL_FIELDS = (
 
 
 def build_item_skill_map(db):
-    """skill record_path -> (item record_path, is_item_skill_modifier). First item wins."""
-    m: dict[str, tuple[str, bool]] = {}
+    """skill record_path -> (item record_path, is_item_skill_modifier). First item wins.
+
+    An item names a granted/augment/modifier skill directly, but the RR often lives on a
+    record that skill reaches downstream (a buffSkillName it applies, or a pet it summons
+    whose skills carry the debuff). So after mapping the directly-named skills we walk each
+    forward through every ';'-separated .dbr under records/skills/itemskills*, attributing
+    those reached records to the same item, so item-granted buffs/pet skills get the item
+    parent instead of falling back to their internal skill name."""
+    direct: list[tuple[str, str, bool]] = []  # (skill_path, item_path, is_mod)
     items_root = db.root / "records/items"
-    for p in items_root.rglob("*.dbr"):
+    for p in sorted(items_root.rglob("*.dbr")):
         rel = p.relative_to(db.root).as_posix()
         rec = db.get(rel)
         for f in ITEM_SKILL_FIELDS:
             v = rec.get(f, "").replace("\\", "/").strip()
             if v.endswith(".dbr"):
-                m.setdefault(v, (rel, f.startswith("modifierSkillName")))
+                direct.append((v, rel, f.startswith("modifierSkillName")))
+    m: dict[str, tuple[str, bool]] = {}
+    for skill, item, is_mod in direct:
+        stack = [skill]
+        seen: set[str] = set()
+        while stack:
+            cur = stack.pop().replace("\\", "/").strip()
+            if cur in seen or "/itemskills" not in cur:
+                continue
+            seen.add(cur)
+            m.setdefault(cur, (item, is_mod))
+            for v in db.get(cur).values():
+                for part in v.split(";"):
+                    ref = part.replace("\\", "/").strip()
+                    if ref.endswith(".dbr") and "/itemskills" in ref:
+                        stack.append(ref)
     return m
 
 
@@ -373,10 +462,20 @@ def item_category(rec) -> str:
     return "item granted"
 
 
-def _item_name_descriptor(tags, game_en, item_path, rec):
-    tag = rec.get("itemNameTag", "").strip()
-    text = tags.get(tag) if tag else None
-    return register(tag or f"x:rritem:{item_path}", text, game_en)
+# Item display names live in different fields by template: equippables/monster-infrequents
+# use itemNameTag, sets use setName, and relics/components/runes carry the name in
+# description. Unique loot affixes (lootrandomizer.tpl) have no name of their own - the name
+# belongs to the item they roll onto - so those fall back to the granted skill's name.
+_DESCRIPTION_NAME_TEMPLATES = ("itemartifact.tpl", "itemrelic.tpl", "itemenchantment.tpl")
+
+
+def _item_name_descriptor(tags, game_en, rec, fallback_key):
+    tag = rec.get("itemNameTag", "").strip() or rec.get("setName", "").strip()
+    if not tag and template_name(rec) in _DESCRIPTION_NAME_TEMPLATES:
+        tag = rec.get("description", "").strip()
+    if tag:
+        return register(tag, tags.get(tag), game_en)
+    return fallback_key
 
 
 def attribute_items(db, tags, game_en, sources):
@@ -394,7 +493,7 @@ def attribute_items(db, tags, game_en, sources):
         item_path, is_mod = info
         item_rec = db.get(item_path)
         s["category"] = "item skill modifier" if is_mod else item_category(item_rec)
-        s["parent"] = _item_name_descriptor(tags, game_en, item_path, item_rec)
+        s["parent"] = _item_name_descriptor(tags, game_en, item_rec, s["name"])
         if is_mod and s["notes"].startswith("modifier base not resolved"):
             s["notes"] = f"item skill modifier via {item_path}"
 
@@ -418,10 +517,13 @@ def is_player_relevant(rec_path: str) -> bool:
     return "/nonplayerskills" not in rec_path and "/base_template" not in rec_path
 
 
-def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> list[dict]:
+def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str],
+                    devotions_path) -> list[dict]:
     """Sweep the extraction and return one dict per RR source."""
     sources: list[dict] = []
     ctx = {"index": reverse_ref_index(db), "mmap": build_modifier_base(db)}
+    class_masteries = build_class_masteries(db, tags, game_en)
+    devotion_parents = build_devotion_parents(db, tags, game_en, devotions_path)
     for rec_path, rec in iter_skill_records(db):
         if not is_player_relevant(rec_path):
             if _carries_rr(rec):
@@ -439,7 +541,8 @@ def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> li
         s["category"] = classify_category(s["record_path"], rec)
         s["trigger"] = classify_trigger(rec)
         if s["parent"] is None:
-            s["parent"] = _parent_descriptor(tags, game_en, s["record_path"], rec)
+            s["parent"] = _parent_descriptor(
+                tags, game_en, s["record_path"], rec, class_masteries, devotion_parents)
     attribute_items(db, tags, game_en, sources)
     return sources
 
@@ -452,11 +555,15 @@ def print_summary(sources, exclusions):
     # "unsure" = a note that asks for verification, not the informative provenance notes
     # (e.g. "item skill modifier via <item>") that attribution attaches.
     unsure = [s for s in sources if "verify" in s["notes"]]
+    # A parent still equal to the source's own name means we could not resolve a real
+    # mastery/constellation/item and fell back to the skill name.
+    parent_fallbacks = [s for s in sources if s["parent"] == s["name"]]
     p = lambda *a: print(*a, file=sys.stderr)
     p("\n=== RR EXTRACTION SUMMARY ===")
     p(f"  sources: {len(sources)}")
     p("  by rr_type: " + ", ".join(f"{k}={v}" for k, v in sorted(by_type.items())))
     p("  by category: " + ", ".join(f"{k}={v}" for k, v in sorted(by_cat.items())))
+    p(f"  parent fell back to skill name: {len(parent_fallbacks)}")
     p(f"  excluded: {len(exclusions)}")
     for reason, n in Counter(e["reason"] for e in exclusions).items():
         p(f"    - {reason}: {n}")
@@ -471,6 +578,9 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Parse Grim Dawn RR sources into resistance-reduction.json")
     ap.add_argument("--records-dir", required=True, type=Path)
     ap.add_argument("--text-dir", required=True, type=Path)
+    ap.add_argument("--devotions", type=Path,
+                    default=Path(__file__).resolve().parent.parent / "data/devotions.json",
+                    help="devotions.json, source of the constellation parent names")
     ap.add_argument("--out", default=Path("resistance-reduction.json"), type=Path)
     ap.add_argument("--game-version", default="unknown")
     ap.add_argument("--steam-buildid", default=None)
@@ -486,7 +596,7 @@ def main(argv=None) -> int:
         return 2
 
     game_en: dict[str, str] = {}
-    sources = collect_sources(db, tags, game_en)
+    sources = collect_sources(db, tags, game_en, args.devotions)
     sources.sort(key=lambda s: (s["rr_type"], s["record_path"]))
 
     meta = {

@@ -171,6 +171,7 @@ parse-rr *ARGS:
     mkdir -p "$(dirname "{{out_rr}}")"
     uv run scripts/parse_rr.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out_rr}}" \
+        --devotions "{{out}}" \
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
 
 # Full pipeline: extract then parse
