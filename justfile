@@ -443,7 +443,18 @@ build: cover-table
 
 # Serve web/dist locally for development (does not cd into dist, so rebuilds are not blocked)
 serve: build
+    @echo "  Planner:              http://localhost:5173/"
+    @echo "  Resistance reduction: http://localhost:5173/resistance-reduction/"
     bunx serve "{{justfile_directory()}}/web/dist" -l 5173
+
+# Open the resistance-reduction page in the default browser (run in another shell while `serve` is up)
+open-rr:
+    #!/usr/bin/env bash
+    url="http://localhost:5173/resistance-reduction/"
+    if command -v powershell.exe >/dev/null 2>&1; then powershell.exe -NoProfile -Command "Start-Process '$url'"
+    elif command -v open >/dev/null 2>&1; then open "$url"
+    elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$url"
+    else echo "open manually: $url"; fi
 
 # Stop a running dev server (frees port 5173). Safe to run when nothing is listening.
 stop:
