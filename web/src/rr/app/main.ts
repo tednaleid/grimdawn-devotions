@@ -11,7 +11,9 @@ import {
 import { mountLanguagePicker } from "../../adapters/languagePicker";
 import { aggregate, type LogicalSource } from "../core/aggregate";
 import { applyView, groupView } from "../core/filter";
+import { resolveLedger } from "../core/ledger";
 import { renderTable } from "../adapters/tableView";
+import { renderLedger } from "../adapters/ledgerView";
 import { decodeHash, encodeHash, type ViewState } from "../core/urlState";
 
 async function boot() {
@@ -32,6 +34,7 @@ async function boot() {
   });
 
   const tableEl = document.getElementById("rr-table") as HTMLElement;
+  const ledgerEl = document.getElementById("rr-ledger") as HTMLElement;
   const headerEl = document.querySelector("header") as HTMLElement;
 
   // Injected resolvers keep the pure core i18n-free: names/parents resolve through the current locale.
@@ -50,11 +53,20 @@ async function boot() {
       refresh(mode);
     },
   };
+  const ledgerHandlers = {
+    onR0(next: number): void {
+      // r0 typing coalesces into one history entry, like search.
+      view = { ...view, r0: next };
+      refresh("replace");
+    },
+  };
 
   function render(): void {
     const sorted = applyView(logical, view, nameOf);
     const groups = groupView(sorted, view, parentKeyOf);
     renderTable(tableEl, localization, logical, groups, view, handlers);
+    const selected = logical.filter((s) => view.sel.has(s.id));
+    renderLedger(ledgerEl, localization, resolveLedger(selected, view.r0), view.r0, ledgerHandlers);
   }
 
   function refresh(urlMode: "push" | "replace" = "push"): void {

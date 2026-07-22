@@ -28,6 +28,9 @@ export interface LedgerLine {
   bestMult: LogicalSource | null;
   bestFlat: LogicalSource | null;
   stackSources: LogicalSource[];
+  // The overridden mult/flat sources hitting this resistance (single-highest wins; these lose).
+  multLosers: LogicalSource[];
+  flatLosers: LogicalSource[];
 }
 
 /** The token a source matches for `resistance` (All / Elemental / the type itself), or null. */
@@ -45,7 +48,7 @@ export function sourceHits(source: LogicalSource, resistance: string): boolean {
 }
 
 /** The reduction a source applies to `resistance`, or null when it does not hit it. */
-function hitValue(source: LogicalSource, resistance: string): number | null {
+export function sourceValue(source: LogicalSource, resistance: string): number | null {
   const token = matchedToken(source, resistance);
   if (token === null) return null;
   const v = source.perResistance[token];
@@ -62,23 +65,29 @@ export function resolveLedger(selected: LogicalSource[], r0: number): LedgerLine
     let bestMult: LogicalSource | null = null;
     let bestFlat: LogicalSource | null = null;
     const stackSources: LogicalSource[] = [];
+    const multSources: LogicalSource[] = [];
+    const flatSources: LogicalSource[] = [];
     let affected = false;
 
     for (const s of selected) {
-      const v = hitValue(s, resistance);
+      const v = sourceValue(s, resistance);
       if (v === null) continue;
       affected = true;
       if (s.rrType === "stacking") {
         sumStack += Math.abs(v);
         stackSources.push(s);
       } else if (s.rrType === "reduced-percent") {
+        multSources.push(s);
         if (v > maxMult) {
           maxMult = v;
           bestMult = s;
         }
-      } else if (v > maxFlat) {
-        maxFlat = v;
-        bestFlat = s;
+      } else {
+        flatSources.push(s);
+        if (v > maxFlat) {
+          maxFlat = v;
+          bestFlat = s;
+        }
       }
     }
     if (!affected) continue;
@@ -87,7 +96,18 @@ export function resolveLedger(selected: LogicalSource[], r0: number): LedgerLine
     const sgn = Math.sign(base);
     const afterMult = base * (1 - (sgn * maxMult) / 100);
     const final = afterMult - maxFlat;
-    lines.push({ resistance, final, sumStack, maxMult, maxFlat, bestMult, bestFlat, stackSources });
+    lines.push({
+      resistance,
+      final,
+      sumStack,
+      maxMult,
+      maxFlat,
+      bestMult,
+      bestFlat,
+      stackSources,
+      multLosers: multSources.filter((s) => s !== bestMult),
+      flatLosers: flatSources.filter((s) => s !== bestFlat),
+    });
   }
   return lines;
 }
