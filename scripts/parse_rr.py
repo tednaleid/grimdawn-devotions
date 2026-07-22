@@ -148,9 +148,143 @@ def source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, toke
     }
 
 
+DEBUFF_TEMPLATES = {
+    "skillbuff_debuf.tpl", "skillbuff_contageous.tpl",
+    "skillbuff_debuftrap.tpl", "skillbuff_debuffreeze.tpl",
+}
+SELF_TEMPLATES = {"skill_buffselfduration.tpl"}
+MODIFIER_TEMPLATE = "skill_modifier.tpl"
+
+EXCLUSIONS: list = []  # {record_path, reason} for the summary
+
+
+def template_name(rec) -> str:
+    return rec.get("templateName", "").rsplit("/", 1)[-1]
+
+
+def reverse_ref_index(db):
+    """Map each referenced 'records/.../x.dbr' -> [record paths that reference it]."""
+    index: dict[str, list[str]] = {}
+    for rec_path, rec in iter_skill_records(db):
+        for v in rec.values():
+            if v.endswith(".dbr") and "records/" in v:
+                ref = v.replace("\\", "/").strip()
+                index.setdefault(ref, []).append(rec_path)
+    return index
+
+
+def build_modifier_base(db):
+    """modifier record_path -> the base skill it augments, read from the class trees.
+    In a _classtree_*.dbr the skillNameNN entries list each base skill followed by its
+    modifier(s); a modifier's base is the nearest preceding non-modifier entry."""
+    mmap: dict[str, str] = {}
+    skills_root = db.root / "records/skills"
+    for p in sorted(skills_root.rglob("_classtree_*.dbr")):
+        rec = db.get(p.relative_to(db.root).as_posix())
+        entries = []
+        for k, v in rec.items():
+            m = re.fullmatch(r"skillName(\d+)", k)
+            if m and v.strip():
+                entries.append((int(m.group(1)), v.replace("\\", "/").strip()))
+        entries.sort()
+        last_base = None
+        for _, ref in entries:
+            if template_name(db.get(ref)) == MODIFIER_TEMPLATE:
+                if last_base:
+                    mmap[ref] = last_base
+            else:
+                last_base = ref
+    return mmap
+
+
+def _reaches_debuff(db, ref, depth=4) -> bool:
+    """True when a skill (or its buffSkillName/petSkillName chain) is a debuff template."""
+    seen = set()
+    stack = [(ref, depth)]
+    while stack:
+        cur, d = stack.pop()
+        cur = cur.replace("\\", "/").strip()
+        if not cur or cur in seen or d < 0:
+            continue
+        seen.add(cur)
+        rec = db.get(cur)
+        if template_name(rec) in DEBUFF_TEMPLATES:
+            return True
+        for f in ("buffSkillName", "petSkillName"):
+            nxt = rec.get(f, "").strip()
+            if nxt:
+                stack.append((nxt, d - 1))
+    return False
+
+
+def is_enemy_facing_modifier(db, rec_path, ctx) -> bool:
+    """A skill_modifier is enemy-facing when the base skill it augments (via the class
+    tree) reaches a debuff template, or, failing a tree link, when a skill referencing
+    it does. Covers toggled auras (Veil of Shadow's base -> its _buff debuff)."""
+    base = ctx["mmap"].get(rec_path)
+    if base and _reaches_debuff(db, base):
+        return True
+    for referrer in ctx["index"].get(rec_path, []):
+        if _reaches_debuff(db, referrer, depth=2):
+            return True
+    return False
+
+
+def stacking_sources(db, tags, game_en, rec_path, rec, ctx):
+    """Zero or more stacking sources from one record's negative defensive<Type> fields."""
+    tmpl = template_name(rec)
+    hits = []
+    for field, raw in rec.items():
+        token = stacking_token(field)
+        if not token:
+            continue
+        arr = parse_array(raw)
+        if not arr or arr[-1] >= 0:  # only negative = reduction
+            continue
+        hits.append((field, token, raw, arr))
+    if not hits:
+        return []
+    # Template gate: debuffs pass clean; self-buff templates are excluded (a self-applied
+    # negative resistance is a player downside, not enemy RR). A modifier's negative
+    # defensive resistance always reduces a target's resistance, so it is included even when
+    # its base skill is item- or pet-wired (not in a class tree); we only annotate the ones
+    # we could not confirm reach an enemy debuff, per the include-with-a-note rigor rule.
+    note = ""
+    if tmpl in DEBUFF_TEMPLATES:
+        pass
+    elif tmpl == MODIFIER_TEMPLATE:
+        if not is_enemy_facing_modifier(db, rec_path, ctx):
+            note = "modifier base not resolved to an enemy debuff; verify"
+    elif tmpl in SELF_TEMPLATES:
+        EXCLUSIONS.append({"record_path": rec_path, "reason": f"self template {tmpl}"})
+        return []
+    else:
+        note = f"unusual template {tmpl}; verify enemy-facing"
+    out = []
+    ult = _ultimate(rec)
+    for field, token, raw, arr in hits:
+        out.append({
+            "id": rec_path.replace("/", ":").removesuffix(".dbr") + f":stacking:{token}",
+            "name": _name_descriptor(rec, rec_path, tags, game_en),
+            "parent": None, "record_path": rec_path, "category": None,
+            "rr_type": RR_STACKING,
+            "resistances": token_to_resistances(token),
+            "values_per_rank": arr, "max_rank": len(arr), "ultimate_rank": ult,
+            "value_at_max": arr[-1],
+            "value_at_ultimate": level_array_value(raw, ult) if ult else None,
+            "duration_seconds": _num(rec.get("skillActiveDuration", "")),
+            "cooldown_seconds": _num(rec.get("skillCooldownTime", "")),
+            "trigger_chance_percent": None,
+            "trigger": None, "per_resistance_values": None,
+            "notes": note,
+        })
+    return out
+
+
 def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> list[dict]:
     """Sweep the extraction and return one dict per RR source."""
     sources: list[dict] = []
+    ctx = {"index": reverse_ref_index(db), "mmap": build_modifier_base(db)}
     for rec_path, rec in iter_skill_records(db):
         for field in rec:
             hit = classify_offensive_field(field)
@@ -158,6 +292,7 @@ def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> li
                 rr_type, token = hit
                 sources.append(
                     source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, token))
+        sources.extend(stacking_sources(db, tags, game_en, rec_path, rec, ctx))
     return sources
 
 

@@ -78,5 +78,23 @@ estorm = find(lambda s: s["record_path"].endswith("skills/devotion/tier2_01c_ski
 check("elemental storm flat 32", estorm and estorm[0]["value_at_max"] == 32
       and estorm[0]["resistances"] == "Elemental")
 
+# --- Task 5: stacking sweep (negative defensive + templates + modifier parents) ---
+vuln = find(lambda s: s["record_path"].endswith("skills/playerclass03/curse2.dbr"))
+check("vulnerability present (all stacking)", vuln and all(s["rr_type"] == "stacking" for s in vuln))
+vuln_elem = [s for s in vuln if s["resistances"] == "Elemental"]
+check("vulnerability stacking elemental -35", vuln_elem and vuln_elem[0]["value_at_max"] == -35)
+
+nc = find(lambda s: s["record_path"].endswith("skills/playerclass04/veilofshadows2.dbr"))
+check("night's chill present (stacking)", nc and nc[0]["rr_type"] == "stacking")
+nc_res = set()
+for s in nc:
+    r = s["resistances"]
+    nc_res |= set(r if isinstance(r, list) else [r])
+check("night's chill covers Cold/Pierce/Poison&Acid/Vitality",
+      {"Cold", "Pierce", "Poison & Acid", "Vitality"} <= nc_res)
+
+censure = find(lambda s: s["record_path"].endswith("skills/playerclass07/auracensure1_buff.dbr"))
+check("aura of censure stacking elemental -35", censure and censure[0]["value_at_max"] == -35)
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
