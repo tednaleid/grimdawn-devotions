@@ -523,6 +523,16 @@ def _humanize(rec_path: str) -> str:
     return " ".join(w.capitalize() for w in words) or stem
 
 
+# A "Conduit" amulet grants one random skill modifier drawn from a folder its item record
+# does not link back to (the pool is wired through dynamic loot tables), so build_item_skill_map
+# can only reach the nameless roll affix. Map the modifier folder to the granting amulet so those
+# rows name the item the player equips. Verified exhaustive: eldritchwhispers is the only RR
+# modifier folder granted purely via lootrandomizer pools (re-check on a new version / new Conduits).
+MODIFIER_POOL_ITEMS = {
+    "/eldritchwhispers/": "records/items/gearaccessories/necklaces/d113c_necklace.dbr",
+}
+
+
 def _display_name_tag(db, skill_path, depth=2):
     """The skillDisplayName tag for a skill, following buffSkillName when the skill record
     itself is unnamed - a skill's name often lives on the buff it applies (the internal
@@ -562,6 +572,12 @@ def resolve_names(db, tags, game_en, sources, mmap):
                 s["name"] = s["parent"]
             else:
                 s["name"] = register(_humanize(s["record_path"]), None, game_en)
+        # Attribute a Conduit's random-roll modifier to the amulet the player equips.
+        for folder, item_path in MODIFIER_POOL_ITEMS.items():
+            if folder in s["record_path"]:
+                s["parent"] = _item_name_descriptor(tags, game_en, db.get(item_path), s["name"])
+                s["category"] = "item skill modifier"
+                break
         # An unresolved parent (no real item/mastery/constellation) collapses to the name,
         # so the UI never shows a synthesized key in either column.
         if s["parent"].startswith("x:"):

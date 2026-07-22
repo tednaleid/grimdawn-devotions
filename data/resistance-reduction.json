@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
-    "generated_utc": "2026-07-22T15:49:11Z",
+    "generated_utc": "2026-07-22T17:27:14Z",
     "berserker_present": false
   },
   "sources": [
@@ -848,7 +848,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_demo3:reduced-flat",
       "name": "tagClass02SkillName01A",
-      "parent": "tagClass02SkillName01A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_demo3.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -870,7 +870,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_soldier2:reduced-flat",
       "name": "tagClass01SkillName04A",
-      "parent": "tagClass01SkillName04A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier2.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1905,7 +1905,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_soldier5:reduced-percent",
       "name": "tagClass01SkillName05A",
-      "parent": "tagClass01SkillName05A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier5.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-percent",
@@ -1927,7 +1927,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set3_soldier1:reduced-percent",
       "name": "tagClass01SkillName05A",
-      "parent": "tagClass01SkillName05A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_soldier1.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-percent",
@@ -6414,7 +6414,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Life",
       "name": "tagGDX1Class07SkillName02A",
-      "parent": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6438,7 +6438,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Poison",
       "name": "tagGDX1Class07SkillName02A",
-      "parent": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6462,7 +6462,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Aether",
       "name": "tagGDX1Class08SkillName07A",
-      "parent": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6486,7 +6486,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Chaos",
       "name": "tagGDX1Class08SkillName07A",
-      "parent": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6510,7 +6510,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_nightblade5:stacking:Life",
       "name": "tagClass04SkillName11A",
-      "parent": "tagClass04SkillName11A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_nightblade5.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6534,7 +6534,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Pierce",
       "name": "tagClass03SkillName13A",
-      "parent": "tagClass03SkillName13A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6558,7 +6558,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Poison",
       "name": "tagClass03SkillName13A",
-      "parent": "tagClass03SkillName13A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6582,7 +6582,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Aether",
       "name": "tagClass05SkillName16A",
-      "parent": "tagClass05SkillName16A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6606,7 +6606,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Physical",
       "name": "tagClass05SkillName16A",
-      "parent": "tagClass05SkillName16A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6630,7 +6630,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_inquisitor3:stacking:Physical",
       "name": "tagGDX1Class07SkillName02A",
-      "parent": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_inquisitor3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6654,7 +6654,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_necro4:stacking:Chaos",
       "name": "tagGDX1Class08SkillName08A",
-      "parent": "tagGDX1Class08SkillName08A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_necro4.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6678,7 +6678,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Aether",
       "name": "tagClass04SkillName07A",
-      "parent": "tagClass04SkillName07A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6702,7 +6702,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Chaos",
       "name": "tagClass04SkillName07A",
-      "parent": "tagClass04SkillName07A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6726,7 +6726,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Fire",
       "name": "tagClass04SkillName07A",
-      "parent": "tagClass04SkillName07A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6750,7 +6750,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist3:stacking:Aether",
       "name": "tagClass03SkillName13A",
-      "parent": "tagClass03SkillName13A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6774,7 +6774,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist4:stacking:Elemental",
       "name": "tagClass03SkillName06A",
-      "parent": "tagClass03SkillName06A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist4.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6796,7 +6796,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Pierce",
       "name": "tagClass06SkillName15A",
-      "parent": "tagClass06SkillName15A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6820,7 +6820,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Poison",
       "name": "tagClass06SkillName15A",
-      "parent": "tagClass06SkillName15A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6844,7 +6844,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Chaos",
       "name": "tagClass06SkillName15A",
-      "parent": "tagClass06SkillName15A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6868,7 +6868,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Physical",
       "name": "tagClass06SkillName15A",
-      "parent": "tagClass06SkillName15A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6892,7 +6892,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set3_inquisitor1:stacking:Poison",
       "name": "tagGDX1Class07SkillName02A",
-      "parent": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1NecklaceD113C",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",

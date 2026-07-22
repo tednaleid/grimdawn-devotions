@@ -138,6 +138,11 @@ check("no source shows a raw x: placeholder name", len(synth_names) == 0)
 doombolt = find(lambda s: s["record_path"].endswith("skillmodifiers/legendary/axe2h_d206_doombolt.dbr"))
 tag = doombolt[0]["name"] if doombolt else ""
 check("doom bolt modifier borrows the modified skill's name tag", tag.startswith("tag"))
+# The Conduit of Eldritch Whispers rolls a random skill modifier from a folder its item record
+# does not link back to; those modifiers are attributed to the amulet (a distinct real name).
+conduit = find(lambda s: "/eldritchwhispers/" in s["record_path"])
+check("conduit modifiers attribute to the amulet, not the skill",
+      conduit and all(c["parent"].startswith("tag") and c["parent"] != c["name"] for c in conduit))
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
