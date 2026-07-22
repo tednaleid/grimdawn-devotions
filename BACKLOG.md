@@ -448,3 +448,34 @@ matters in practice.
 
 Pointers: stateWalkTransition move 4 and reverseSteps in web/src/core/transitionOrder.ts; approach
 C in docs/superpowers/specs/2026-07-20-transition-state-walk-design.md (non-goals).
+
+## Downloadable offline build (parked)
+
+A user asked for a downloadable version they could open locally without the site being served.
+Everything is static (no backend), but the current `dist/` cannot be opened by double-clicking
+`index.html` over `file://` in Chrome or Firefox: (1) the bundle loads as an external ES module
+(`<script type="module" src>`), which those browsers block over `file://` (Safari allows it), and
+(2) the app `fetch()`es all its data at runtime (`data/devotions.json`,
+`assets/devotions/manifest.json`, `data/cover-table.bin`, `data/reach.wasm`, and the i18n catalogs),
+and `file://` fetch is blocked in Chrome/Firefox. So a zip of the loose folder fundamentally needs a
+local server; only an all-inlined artifact opens by double-click.
+
+Two shapes: (A) zip `dist/` plus a tiny launcher that starts a local server, works everywhere but
+needs the user to run/trust something; (B) one self-contained HTML file with everything inlined
+(IIFE/classic script instead of a module, CSS inline, JSON catalogs inline, `reach.wasm` +
+`cover-table.bin` base64-embedded and decoded to bytes at startup). Full inlined payload is roughly
+3.5-4 MB. `cover-table.bin` (1.8M) and `reach.wasm` (60K) are both optional with graceful fallback,
+so a minimal file could drop ~1.9 MB at the cost of slower reachability and no dimming.
+
+Parked because the site is about to become multi-page (a resistance-reduction page alongside the
+planner): a single inlined HTML assumes one page, so option B needs rethinking once the page set is
+known (inline multiple pages vs. accept the must-be-served folder). Revisit after the multi-page
+shape lands.
+
+Pointers: the hexagonal design makes option B additive, not a rewrite - `DataSource` is a port with
+`httpDataSource` as one adapter (web/src/adapters/httpDataSource.ts), and the localization adapter
+already takes a `fetchImpl` (web/src/adapters/localizationAdapter.ts); an embedded DataSource plus a
+fetch shim covers the runtime, and a `just` packaging recipe inlines the assets. WASM already
+instantiates from raw bytes (`WebAssembly.compile`, not `instantiateStreaming`), so base64 bytes work
+unchanged. No dynamic `import()`/`import.meta` in source, so an IIFE build is clean. URL-hash state
+works fine under `file://`, but a copied `file://` link is not shareable across machines.
