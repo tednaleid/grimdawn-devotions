@@ -523,20 +523,41 @@ def _humanize(rec_path: str) -> str:
     return " ".join(w.capitalize() for w in words) or stem
 
 
+def _display_name_tag(db, skill_path, depth=2):
+    """The skillDisplayName tag for a skill, following buffSkillName when the skill record
+    itself is unnamed - a skill's name often lives on the buff it applies (the internal
+    'lightningnet1' skill is nameless; its buff is 'Storm Box of Elgoloth'). None if
+    nothing in the short chain names it."""
+    seen = set()
+    cur = skill_path
+    for _ in range(depth + 1):
+        cur = (cur or "").replace("\\", "/").strip()
+        if not cur or cur in seen:
+            break
+        seen.add(cur)
+        rec = db.get(cur)
+        tag = rec.get("skillDisplayName", "").strip()
+        if tag:
+            return tag
+        cur = rec.get("buffSkillName", "").strip()
+    return None
+
+
 def resolve_names(db, tags, game_en, sources, mmap):
     """Give a real display name to sources whose own record has no skillDisplayName
     (buffs, pet bonuses, skill modifiers). A modifier borrows the skill it modifies
-    (item-paired first, then the class tree); anything still nameless takes its parent
-    (the item / mastery / constellation), and a final humanized stem guarantees no source
-    ever shows a raw synthesized key."""
+    (item-paired first, then the class tree), resolving that skill's name through its buff
+    chain; failing that it takes its own buff-chain name, then its parent (item / mastery /
+    constellation), with a humanized stem as the final resort - so no source ever shows a
+    raw synthesized key and an item skill modifier reads as the skill it augments."""
     modmod = build_modifier_modified(db)
     for s in sources:
         rec = db.get(s["record_path"])
         if not rec.get("skillDisplayName", "").strip():
             modified = modmod.get(s["record_path"]) or mmap.get(s["record_path"])
-            mtag = db.get(modified).get("skillDisplayName", "").strip() if modified else ""
-            if mtag:
-                s["name"] = register(mtag, tags.get(mtag), game_en)
+            tag = (_display_name_tag(db, modified) if modified else None) or _display_name_tag(db, s["record_path"])
+            if tag:
+                s["name"] = register(tag, tags.get(tag), game_en)
             elif not s["parent"].startswith("x:"):
                 s["name"] = s["parent"]
             else:

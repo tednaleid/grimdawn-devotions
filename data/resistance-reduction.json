@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
-    "generated_utc": "2026-07-22T14:26:04Z",
+    "generated_utc": "2026-07-22T15:49:11Z",
     "berserker_present": false
   },
   "sources": [
@@ -1358,7 +1358,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d212_mogdrogenpact:reduced-flat",
-      "name": "tagGDX2ItemSetD212Name",
+      "name": "tagClass06SkillName05A",
       "parent": "tagGDX2ItemSetD212Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d212_mogdrogenpact.dbr",
       "category": "item skill modifier",
@@ -6103,7 +6103,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:craft_shield_b103_illomen:stacking:Physical",
-      "name": "tagGDX1ShieldB103",
+      "name": "tagGDX1Class08SkillName08A",
       "parent": "tagGDX1ShieldB103",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/craft_shield_b103_illomen.dbr",
       "category": "item skill modifier",
@@ -6127,7 +6127,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:faction:mace1h_f104_soulsiphon:stacking:Bleeding",
-      "name": "tagGDX1WeaponBluntF104",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX1WeaponBluntF104",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/faction/mace1h_f104_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -6151,7 +6151,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:faction:mace1h_f104_soulsiphon:stacking:Life",
-      "name": "tagGDX1WeaponBluntF104",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX1WeaponBluntF104",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/faction/mace1h_f104_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -6175,7 +6175,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:faction:necklace_f109_stormbox:stacking:Aether",
-      "name": "tagGDX1NecklaceF109",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagGDX1NecklaceF109",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/faction/necklace_f109_stormbox.dbr",
       "category": "item skill modifier",
@@ -6199,7 +6199,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:faction:necklace_f109_stormbox:stacking:Lightning",
-      "name": "tagGDX1NecklaceF109",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagGDX1NecklaceF109",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/faction/necklace_f109_stormbox.dbr",
       "category": "item skill modifier",
@@ -6223,7 +6223,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:faction:necklace_f110_wordofpain:stacking:Elemental",
-      "name": "tagGDX1NecklaceF110",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX1NecklaceF110",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/faction/necklace_f110_wordofpain.dbr",
       "category": "item skill modifier",
@@ -6245,7 +6245,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:axe2h_d104_bloodypox:stacking:Bleeding",
-      "name": "tagGDX1WeaponMelee2hD101",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX1WeaponMelee2hD101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/axe2h_d104_bloodypox.dbr",
       "category": "item skill modifier",
@@ -6269,7 +6269,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:axe2h_d104_bloodypox:stacking:Life",
-      "name": "tagGDX1WeaponMelee2hD101",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX1WeaponMelee2hD101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/axe2h_d104_bloodypox.dbr",
       "category": "item skill modifier",
@@ -6293,7 +6293,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:axe2h_d104_devouringswarm:stacking:Bleeding",
-      "name": "tagGDX1WeaponMelee2hD101",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX1WeaponMelee2hD101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/axe2h_d104_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -6317,7 +6317,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:axe2h_d104_devouringswarm:stacking:Life",
-      "name": "tagGDX1WeaponMelee2hD101",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX1WeaponMelee2hD101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/axe2h_d104_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -6341,7 +6341,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:caster_d116_stormbox:stacking:Aether",
-      "name": "tagGDX1WeaponCaster1hD116",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagGDX1WeaponCaster1hD116",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/caster_d116_stormbox.dbr",
       "category": "item skill modifier",
@@ -6365,7 +6365,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:caster_d116_stormbox:stacking:Lightning",
-      "name": "tagGDX1WeaponCaster1hD116",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagGDX1WeaponCaster1hD116",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/caster_d116_stormbox.dbr",
       "category": "item skill modifier",
@@ -6389,7 +6389,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:caster_d119_wordofpain:stacking:Life",
-      "name": "tagGDX1WeaponCaster1hD118",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX1WeaponCaster1hD118",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/caster_d119_wordofpain.dbr",
       "category": "item skill modifier",
@@ -6413,8 +6413,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Life",
-      "name": "Inquisitor",
-      "parent": "Inquisitor",
+      "name": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1Class07SkillName02A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6437,8 +6437,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Poison",
-      "name": "Inquisitor",
-      "parent": "Inquisitor",
+      "name": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1Class07SkillName02A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6461,8 +6461,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Aether",
-      "name": "Necro",
-      "parent": "Necro",
+      "name": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX1Class08SkillName07A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6485,8 +6485,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Chaos",
-      "name": "Necro",
-      "parent": "Necro",
+      "name": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX1Class08SkillName07A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6509,8 +6509,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_nightblade5:stacking:Life",
-      "name": "Nightblade",
-      "parent": "Nightblade",
+      "name": "tagClass04SkillName11A",
+      "parent": "tagClass04SkillName11A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_nightblade5.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6533,8 +6533,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Pierce",
-      "name": "Occultist",
-      "parent": "Occultist",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagClass03SkillName13A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6557,8 +6557,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Poison",
-      "name": "Occultist",
-      "parent": "Occultist",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagClass03SkillName13A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_occultist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6581,8 +6581,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Aether",
-      "name": "Arcanist",
-      "parent": "Arcanist",
+      "name": "tagClass05SkillName16A",
+      "parent": "tagClass05SkillName16A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6605,8 +6605,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Physical",
-      "name": "Arcanist",
-      "parent": "Arcanist",
+      "name": "tagClass05SkillName16A",
+      "parent": "tagClass05SkillName16A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6629,8 +6629,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_inquisitor3:stacking:Physical",
-      "name": "Inquisitor",
-      "parent": "Inquisitor",
+      "name": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1Class07SkillName02A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_inquisitor3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6653,8 +6653,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_necro4:stacking:Chaos",
-      "name": "Necro",
-      "parent": "Necro",
+      "name": "tagGDX1Class08SkillName08A",
+      "parent": "tagGDX1Class08SkillName08A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_necro4.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6677,8 +6677,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Aether",
-      "name": "Nightblade",
-      "parent": "Nightblade",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagClass04SkillName07A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6701,8 +6701,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Chaos",
-      "name": "Nightblade",
-      "parent": "Nightblade",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagClass04SkillName07A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6725,8 +6725,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Fire",
-      "name": "Nightblade",
-      "parent": "Nightblade",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagClass04SkillName07A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6749,8 +6749,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist3:stacking:Aether",
-      "name": "Occultist",
-      "parent": "Occultist",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagClass03SkillName13A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6773,8 +6773,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist4:stacking:Elemental",
-      "name": "Occultist",
-      "parent": "Occultist",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagClass03SkillName06A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_occultist4.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6795,8 +6795,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Pierce",
-      "name": "Shaman",
-      "parent": "Shaman",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagClass06SkillName15A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6819,8 +6819,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Poison",
-      "name": "Shaman",
-      "parent": "Shaman",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagClass06SkillName15A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6843,8 +6843,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Chaos",
-      "name": "Shaman",
-      "parent": "Shaman",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagClass06SkillName15A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6867,8 +6867,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Physical",
-      "name": "Shaman",
-      "parent": "Shaman",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagClass06SkillName15A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6891,8 +6891,8 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set3_inquisitor1:stacking:Poison",
-      "name": "Inquisitor",
-      "parent": "Inquisitor",
+      "name": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1Class07SkillName02A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set3_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -6915,7 +6915,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:focus_d111_stormbox:stacking:Cold",
-      "name": "tagGDX1FocusD111",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagGDX1FocusD111",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/focus_d111_stormbox.dbr",
       "category": "item skill modifier",
@@ -6939,7 +6939,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:focus_d111_stormbox:stacking:Lightning",
-      "name": "tagGDX1FocusD111",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagGDX1FocusD111",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/focus_d111_stormbox.dbr",
       "category": "item skill modifier",
@@ -6963,7 +6963,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:head_d106_bloodypox:stacking:Poison",
-      "name": "tagGDX1HeadD102",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX1HeadD102",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/head_d106_bloodypox.dbr",
       "category": "item skill modifier",
@@ -6987,7 +6987,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:mace1h_d102_auraofcensure:stacking:Elemental",
-      "name": "tagGDX1WeaponBluntD101",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagGDX1WeaponBluntD101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/mace1h_d102_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7009,7 +7009,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:necklace_d108_auraofcensure:stacking:Aether",
-      "name": "tagGDX1NecklaceD102",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagGDX1NecklaceD102",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/necklace_d108_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7033,7 +7033,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:necklace_d108_auraofcensure:stacking:Fire",
-      "name": "tagGDX1NecklaceD102",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagGDX1NecklaceD102",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/necklace_d108_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7057,7 +7057,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:necklace_d120_veilofshadow:stacking:Elemental",
-      "name": "tagGDX1NecklaceD120",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX1NecklaceD120",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/necklace_d120_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -7079,7 +7079,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d111_flashfreeze:stacking:Cold",
-      "name": "tagGDX1ItemSetD111Name",
+      "name": "tagClass05SkillName16A",
       "parent": "tagGDX1ItemSetD111Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_flashfreeze.dbr",
       "category": "item skill modifier",
@@ -7103,7 +7103,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d111_veilofshadow:stacking:Elemental",
-      "name": "tagGDX1ItemSetD111Name",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX1ItemSetD111Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -7125,7 +7125,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d111_veilofshadow:stacking:Fire",
-      "name": "tagGDX1ItemSetD111Name",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX1ItemSetD111Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d111_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -7149,7 +7149,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d112_soulsiphon:stacking:Life",
-      "name": "tagGDX1ItemSetD112Name",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX1ItemSetD112Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d112_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -7173,7 +7173,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d118_illomen:stacking:Aether",
-      "name": "tagGDX1ItemSetD118Name",
+      "name": "tagGDX1Class08SkillName08A",
       "parent": "tagGDX1ItemSetD118Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d118_illomen.dbr",
       "category": "item skill modifier",
@@ -7197,7 +7197,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d118_illomen:stacking:Life",
-      "name": "tagGDX1ItemSetD118Name",
+      "name": "tagGDX1Class08SkillName08A",
       "parent": "tagGDX1ItemSetD118Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d118_illomen.dbr",
       "category": "item skill modifier",
@@ -7221,7 +7221,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d121_auraofcensure:stacking:Life",
-      "name": "tagGDX1ItemSetD121Name",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagGDX1ItemSetD121Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d121_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7245,7 +7245,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d121_auraofcensure:stacking:Poison",
-      "name": "tagGDX1ItemSetD121Name",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagGDX1ItemSetD121Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d121_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7269,7 +7269,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d122_bladetrap:stacking:Cold",
-      "name": "tagGDX1ItemSetD122Name",
+      "name": "tagClass04SkillName11A",
       "parent": "tagGDX1ItemSetD122Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d122_bladetrap.dbr",
       "category": "item skill modifier",
@@ -7293,7 +7293,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:set_d122_bladetrap:stacking:Pierce",
-      "name": "tagGDX1ItemSetD122Name",
+      "name": "tagClass04SkillName11A",
       "parent": "tagGDX1ItemSetD122Name",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/set_d122_bladetrap.dbr",
       "category": "item skill modifier",
@@ -7317,7 +7317,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:shield_d104_bloodypox:stacking:Bleeding",
-      "name": "tagGDX1ShieldD101",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX1ShieldD101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/shield_d104_bloodypox.dbr",
       "category": "item skill modifier",
@@ -7341,7 +7341,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:sword1h_d106_siphonsouls:stacking:Fire",
-      "name": "tagGDX1WeaponSwordD106",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX1WeaponSwordD106",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/sword1h_d106_siphonsouls.dbr",
       "category": "item skill modifier",
@@ -7365,7 +7365,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:caster_b016_veilofshadows:stacking:Aether",
-      "name": "tagWeaponCaster1hB016",
+      "name": "tagClass04SkillName07A",
       "parent": "tagWeaponCaster1hB016",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/caster_b016_veilofshadows.dbr",
       "category": "item skill modifier",
@@ -7389,7 +7389,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:caster_b102_veilofshadows:stacking:Cold",
-      "name": "tagGDX1WeaponCaster1hB102",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX1WeaponCaster1hB102",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/caster_b102_veilofshadows.dbr",
       "category": "item skill modifier",
@@ -7413,7 +7413,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:focus_b104_stormbox:stacking:Lightning",
-      "name": "tagGDX1FocusB104",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagGDX1FocusB104",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/focus_b104_stormbox.dbr",
       "category": "item skill modifier",
@@ -7437,7 +7437,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:focus_b111_auraofcensure:stacking:Life",
-      "name": "tagGDX1FocusB111",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagGDX1FocusB111",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/focus_b111_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7461,7 +7461,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:gun1h_b101_devouringswarm:stacking:Life",
-      "name": "tagGDX1WeaponGun1hB101",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX1WeaponGun1hB101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/gun1h_b101_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -7485,7 +7485,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:head_b104_soulsiphon:stacking:Bleeding",
-      "name": "tagGDX1HeadB104",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX1HeadB104",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/head_b104_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -7509,7 +7509,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:head_b104_soulsiphon:stacking:Life",
-      "name": "tagGDX1HeadB104",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX1HeadB104",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/head_b104_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -7533,7 +7533,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace1h_b005_flashfreeze:stacking:Cold",
-      "name": "tagWeaponBluntB006",
+      "name": "tagClass05SkillName16A",
       "parent": "tagWeaponBluntB006",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/mace1h_b005_flashfreeze.dbr",
       "category": "item skill modifier",
@@ -7557,7 +7557,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace1h_b015_curseoffrailty:stacking:Poison",
-      "name": "tagWeaponBluntB015",
+      "name": "tagClass03SkillName06A",
       "parent": "tagWeaponBluntB015",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/mace1h_b015_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -7581,7 +7581,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace1h_b101_wordofpain:stacking:Elemental",
-      "name": "tagGDX1WeaponBluntB101",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX1WeaponBluntB101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/mace1h_b101_wordofpain.dbr",
       "category": "item skill modifier",
@@ -7603,7 +7603,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace2h_b008_soulsiphon:stacking:Life",
-      "name": "tagWeaponMelee2hB009",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagWeaponMelee2hB009",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/mace2h_b008_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -7627,7 +7627,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:necklace_b007_illomen:stacking:Cold",
-      "name": "tagNecklaceB007",
+      "name": "tagGDX1Class08SkillName08A",
       "parent": "tagNecklaceB007",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/necklace_b007_illomen.dbr",
       "category": "item skill modifier",
@@ -7651,7 +7651,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:necklace_b007_illomen:stacking:Life",
-      "name": "tagNecklaceB007",
+      "name": "tagGDX1Class08SkillName08A",
       "parent": "tagNecklaceB007",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/necklace_b007_illomen.dbr",
       "category": "item skill modifier",
@@ -7675,7 +7675,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:shield_b014_flashfreeze:stacking:Cold",
-      "name": "tagShieldB015",
+      "name": "tagClass05SkillName16A",
       "parent": "tagShieldB015",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/shield_b014_flashfreeze.dbr",
       "category": "item skill modifier",
@@ -7699,7 +7699,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:shield_b014_veilofshadow:stacking:Cold",
-      "name": "tagShieldB015",
+      "name": "tagClass04SkillName07A",
       "parent": "tagShieldB015",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/shield_b014_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -7723,7 +7723,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:sword1h_b010_bloodypox:stacking:Bleeding",
-      "name": "tagWeaponSwordB010",
+      "name": "tagClass03SkillName13A",
       "parent": "tagWeaponSwordB010",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/sword1h_b010_bloodypox.dbr",
       "category": "item skill modifier",
@@ -7747,7 +7747,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:sword1h_b010_bloodypox:stacking:Life",
-      "name": "tagWeaponSwordB010",
+      "name": "tagClass03SkillName13A",
       "parent": "tagWeaponSwordB010",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/sword1h_b010_bloodypox.dbr",
       "category": "item skill modifier",
@@ -7771,7 +7771,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:sword1h_b010_bloodypox_low:stacking:Bleeding",
-      "name": "tagWeaponSwordB010",
+      "name": "tagClass03SkillName13A",
       "parent": "tagWeaponSwordB010",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/sword1h_b010_bloodypox_low.dbr",
       "category": "item skill modifier",
@@ -7795,7 +7795,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:sword1h_b010_bloodypox_low:stacking:Life",
-      "name": "tagWeaponSwordB010",
+      "name": "tagClass03SkillName13A",
       "parent": "tagWeaponSwordB010",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/sword1h_b010_bloodypox_low.dbr",
       "category": "item skill modifier",
@@ -7819,7 +7819,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:sword1h_b101_devouringswarm:stacking:Bleeding",
-      "name": "tagGDX1WeaponSwordB101",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX1WeaponSwordB101",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/sword1h_b101_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -7843,7 +7843,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:axe2h_d002_soulsiphon:stacking:Bleeding",
-      "name": "tagWeaponMelee2hD002B",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagWeaponMelee2hD002B",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/axe2h_d002_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -7867,7 +7867,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:caster_d005_flashfreeze:stacking:Cold",
-      "name": "tagWeaponCaster1hD005",
+      "name": "tagClass05SkillName16A",
       "parent": "tagWeaponCaster1hD005",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/caster_d005_flashfreeze.dbr",
       "category": "item skill modifier",
@@ -7891,7 +7891,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:caster_d011_wordofpain:stacking:Lightning",
-      "name": "tagWeaponCaster1hD011",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagWeaponCaster1hD011",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/caster_d011_wordofpain.dbr",
       "category": "item skill modifier",
@@ -7915,7 +7915,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:caster_d014_auraofcensure:stacking:Life",
-      "name": "tagWeaponCaster1hD014",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagWeaponCaster1hD014",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/caster_d014_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7939,7 +7939,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:caster_d014_auraofcensure:stacking:Poison",
-      "name": "tagWeaponCaster1hD014",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagWeaponCaster1hD014",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/caster_d014_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -7963,7 +7963,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:focus_d003_curseoffrailty:stacking:Aether",
-      "name": "tagFocusD003",
+      "name": "tagClass03SkillName06A",
       "parent": "tagFocusD003",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/focus_d003_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -7987,7 +7987,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:focus_d006_illomen:stacking:Cold",
-      "name": "tagFocusD006",
+      "name": "tagGDX1Class08SkillName08A",
       "parent": "tagFocusD006",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/focus_d006_illomen.dbr",
       "category": "item skill modifier",
@@ -8011,7 +8011,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:focus_d006_illomen:stacking:Life",
-      "name": "tagFocusD006",
+      "name": "tagGDX1Class08SkillName08A",
       "parent": "tagFocusD006",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/focus_d006_illomen.dbr",
       "category": "item skill modifier",
@@ -8035,7 +8035,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:focus_d010_veilofshadow:stacking:Poison",
-      "name": "tagFocusD010",
+      "name": "tagClass04SkillName07A",
       "parent": "tagFocusD010",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/focus_d010_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8059,7 +8059,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:gun2h_d003_veilofshadow:stacking:Cold",
-      "name": "tagWeaponCrossbow2hD003B",
+      "name": "tagClass04SkillName07A",
       "parent": "tagWeaponCrossbow2hD003B",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/gun2h_d003_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8083,7 +8083,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:gun2h_d004_stormbox:stacking:Lightning",
-      "name": "tagWeaponCrossbow2hD004",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagWeaponCrossbow2hD004",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/gun2h_d004_stormbox.dbr",
       "category": "item skill modifier",
@@ -8107,7 +8107,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:head_d002_stormbox:stacking:Elemental",
-      "name": "tagHeadD002",
+      "name": "tagGDX1Class07SkillName02A",
       "parent": "tagHeadD002",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/head_d002_stormbox.dbr",
       "category": "item skill modifier",
@@ -8129,7 +8129,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:head_d004_bloodypox:stacking:Bleeding",
-      "name": "tagHeadD004",
+      "name": "tagClass03SkillName13A",
       "parent": "tagHeadD004",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/head_d004_bloodypox.dbr",
       "category": "item skill modifier",
@@ -8153,7 +8153,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:head_d004_bloodypox:stacking:Life",
-      "name": "tagHeadD004",
+      "name": "tagClass03SkillName13A",
       "parent": "tagHeadD004",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/head_d004_bloodypox.dbr",
       "category": "item skill modifier",
@@ -8177,7 +8177,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:head_d018_veilofshadow:stacking:Cold",
-      "name": "tagHeadD018",
+      "name": "tagClass04SkillName07A",
       "parent": "tagHeadD018",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/head_d018_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8201,7 +8201,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:head_d024_bloodypox:stacking:Pierce",
-      "name": "tagHeadD024",
+      "name": "tagClass03SkillName13A",
       "parent": "tagHeadD024",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/head_d024_bloodypox.dbr",
       "category": "item skill modifier",
@@ -8225,7 +8225,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:head_d024_bloodypox:stacking:Poison",
-      "name": "tagHeadD024",
+      "name": "tagClass03SkillName13A",
       "parent": "tagHeadD024",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/head_d024_bloodypox.dbr",
       "category": "item skill modifier",
@@ -8249,7 +8249,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:head_d025_wordofpain:stacking:Chaos",
-      "name": "tagHeadD025",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagHeadD025",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/head_d025_wordofpain.dbr",
       "category": "item skill modifier",
@@ -8273,7 +8273,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:mace1h_d001_curseoffrailty:stacking:Life",
-      "name": "tagWeaponBluntD001",
+      "name": "tagClass03SkillName06A",
       "parent": "tagWeaponBluntD001",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/mace1h_d001_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -8297,7 +8297,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:mace1h_d002_flashfreeze:stacking:Cold",
-      "name": "tagWeaponBluntD002",
+      "name": "tagClass05SkillName16A",
       "parent": "tagWeaponBluntD002",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/mace1h_d002_flashfreeze.dbr",
       "category": "item skill modifier",
@@ -8321,7 +8321,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:mace1h_d004_veilofshadow:stacking:Fire",
-      "name": "tagWeaponBluntD004",
+      "name": "tagClass04SkillName07A",
       "parent": "tagWeaponBluntD004",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/mace1h_d004_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8345,7 +8345,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:mace2h_d001_auraofcensure:stacking:Physical",
-      "name": "tagWeaponMelee2hD001",
+      "name": "tagGDX1Class07SkillName09A",
       "parent": "tagWeaponMelee2hD001",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/mace2h_d001_auraofcensure.dbr",
       "category": "item skill modifier",
@@ -8369,7 +8369,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:mace2h_d004_curseoffrailty:stacking:Chaos",
-      "name": "tagWeaponMelee2hD004",
+      "name": "tagClass03SkillName06A",
       "parent": "tagWeaponMelee2hD004",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/mace2h_d004_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -8393,7 +8393,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:necklace_d013_veilofshadow:stacking:Cold",
-      "name": "tagNecklaceD013",
+      "name": "tagClass04SkillName07A",
       "parent": "tagNecklaceD013",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/necklace_d013_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8417,7 +8417,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:necklace_d013_veilofshadow:stacking:Pierce",
-      "name": "tagNecklaceD013",
+      "name": "tagClass04SkillName07A",
       "parent": "tagNecklaceD013",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/necklace_d013_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8441,7 +8441,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d002_veilofshadow:stacking:Fire",
-      "name": "tagItemSetD002BName",
+      "name": "tagClass04SkillName07A",
       "parent": "tagItemSetD002BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d002_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8465,7 +8465,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d010_curseoffrailty:stacking:Aether",
-      "name": "tagItemSetD010BName",
+      "name": "tagClass03SkillName06A",
       "parent": "tagItemSetD010BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d010_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -8489,7 +8489,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d024_siphonsouls:stacking:Aether",
-      "name": "tagItemSetD024BName",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagItemSetD024BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d024_siphonsouls.dbr",
       "category": "item skill modifier",
@@ -8513,7 +8513,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:set_d024_siphonsouls:stacking:Fire",
-      "name": "tagItemSetD024BName",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagItemSetD024BName",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/set_d024_siphonsouls.dbr",
       "category": "item skill modifier",
@@ -8537,7 +8537,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:shield_d006_wordofpain:stacking:Physical",
-      "name": "tagShieldD006",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagShieldD006",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/shield_d006_wordofpain.dbr",
       "category": "item skill modifier",
@@ -8561,7 +8561,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:sword2h_d007_veilofshadow:stacking:Cold",
-      "name": "tagWeaponMelee2hD007",
+      "name": "tagClass04SkillName07A",
       "parent": "tagWeaponMelee2hD007",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/sword2h_d007_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -8923,7 +8923,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:faction:axe1h_f203_curseoffrailty:stacking:Physical",
-      "name": "tagGDX2WeaponAxeF203",
+      "name": "tagClass03SkillName06A",
       "parent": "tagGDX2WeaponAxeF203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/faction/axe1h_f203_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -8947,7 +8947,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:faction:caster_f208_wordofpain:stacking:Chaos",
-      "name": "tagGDX2WeaponCaster1hF208",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponCaster1hF208",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/faction/caster_f208_wordofpain.dbr",
       "category": "item skill modifier",
@@ -8971,7 +8971,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:faction:caster_f208_wordofpain:stacking:Life",
-      "name": "tagGDX2WeaponCaster1hF208",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponCaster1hF208",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/faction/caster_f208_wordofpain.dbr",
       "category": "item skill modifier",
@@ -8995,7 +8995,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:faction:sword2h_f203_devouringswarm:stacking:Bleeding",
-      "name": "tagGDX2WeaponMelee2hF203",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX2WeaponMelee2hF203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/faction/sword2h_f203_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -9019,7 +9019,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:faction:sword2h_f203_devouringswarm:stacking:Pierce",
-      "name": "tagGDX2WeaponMelee2hF203",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX2WeaponMelee2hF203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/faction/sword2h_f203_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -9043,7 +9043,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:axe1h_d204_devouringswarm:stacking:Bleeding",
-      "name": "tagGDX2WeaponAxeD202",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX2WeaponAxeD202",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/axe1h_d204_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -9067,7 +9067,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:caster_d211_siphonsoul:stacking:Fire",
-      "name": "tagGDX2WeaponCaster1hD207",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2WeaponCaster1hD207",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/caster_d211_siphonsoul.dbr",
       "category": "item skill modifier",
@@ -9091,7 +9091,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:focus_d217_curseoffrailty:stacking:Bleeding",
-      "name": "tagGDX2FocusD209",
+      "name": "tagClass03SkillName06A",
       "parent": "tagGDX2FocusD209",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/focus_d217_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -9115,7 +9115,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:focus_d217_curseoffrailty:stacking:Pierce",
-      "name": "tagGDX2FocusD209",
+      "name": "tagClass03SkillName06A",
       "parent": "tagGDX2FocusD209",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/focus_d217_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -9139,7 +9139,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:gun2h_d204_bloodypox:stacking:Aether",
-      "name": "tagGDX2WeaponGun2hD202",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX2WeaponGun2hD202",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/gun2h_d204_bloodypox.dbr",
       "category": "item skill modifier",
@@ -9163,7 +9163,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:gun2h_d204_bloodypox:stacking:Life",
-      "name": "tagGDX2WeaponGun2hD202",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX2WeaponGun2hD202",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/gun2h_d204_bloodypox.dbr",
       "category": "item skill modifier",
@@ -9187,7 +9187,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:head_d207_veilofshadows:stacking:Aether",
-      "name": "tagGDX2HeadD203",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2HeadD203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/head_d207_veilofshadows.dbr",
       "category": "item skill modifier",
@@ -9211,7 +9211,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:head_d207_veilofshadows:stacking:Elemental",
-      "name": "tagGDX2HeadD203",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2HeadD203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/head_d207_veilofshadows.dbr",
       "category": "item skill modifier",
@@ -9233,7 +9233,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:mace1h_d203_soulsiphon:stacking:Physical",
-      "name": "tagGDX2WeaponBluntD201",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2WeaponBluntD201",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/mace1h_d203_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9257,7 +9257,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:necklace_d213_soulsiphon:stacking:Elemental",
-      "name": "tagGDX2NecklaceD208",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2NecklaceD208",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/necklace_d213_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9279,7 +9279,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:necklace_d216_curseoffrailty:stacking:Chaos",
-      "name": "tagGDX2NecklaceD211",
+      "name": "tagClass03SkillName06A",
       "parent": "tagGDX2NecklaceD211",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/necklace_d216_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -9303,7 +9303,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:necklace_d216_curseoffrailty:stacking:Physical",
-      "name": "tagGDX2NecklaceD211",
+      "name": "tagClass03SkillName06A",
       "parent": "tagGDX2NecklaceD211",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/necklace_d216_curseoffrailty.dbr",
       "category": "item skill modifier",
@@ -9327,7 +9327,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Aether",
-      "name": "tagGDX2ItemSetD205Name",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9351,7 +9351,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Fire",
-      "name": "tagGDX2ItemSetD205Name",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9375,7 +9375,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Lightning",
-      "name": "tagGDX2ItemSetD205Name",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9423,7 +9423,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d221_wordofpain:stacking:Bleeding",
-      "name": "tagGDX2ItemSetD221Name",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2ItemSetD221Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d221_wordofpain.dbr",
       "category": "item skill modifier",
@@ -9447,7 +9447,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d221_wordofpain:stacking:Pierce",
-      "name": "tagGDX2ItemSetD221Name",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2ItemSetD221Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d221_wordofpain.dbr",
       "category": "item skill modifier",
@@ -9471,7 +9471,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d222_veilofshadow:stacking:Chaos",
-      "name": "tagGDX2ItemSetD222Name",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2ItemSetD222Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d222_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -9495,7 +9495,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d222_veilofshadow:stacking:Fire",
-      "name": "tagGDX2ItemSetD222Name",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2ItemSetD222Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d222_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -9519,7 +9519,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:shield_d204_veilofshadows:stacking:Cold",
-      "name": "tagGDX2ShieldD202",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2ShieldD202",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/shield_d204_veilofshadows.dbr",
       "category": "item skill modifier",
@@ -9543,7 +9543,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:shield_d204_veilofshadows:stacking:Life",
-      "name": "tagGDX2ShieldD202",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2ShieldD202",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/shield_d204_veilofshadows.dbr",
       "category": "item skill modifier",
@@ -9567,7 +9567,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:shield_d204_veilofshadows:stacking:Lightning",
-      "name": "tagGDX2ShieldD202",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2ShieldD202",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/shield_d204_veilofshadows.dbr",
       "category": "item skill modifier",
@@ -9591,7 +9591,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:shield_d209_devouringswarm:stacking:Poison",
-      "name": "tagGDX2ShieldD207",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX2ShieldD207",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/shield_d209_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -9615,7 +9615,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:axe1h_b202_veilofshadow:stacking:Fire",
-      "name": "tagGDX2WeaponAxeB202",
+      "name": "tagClass04SkillName07A",
       "parent": "tagGDX2WeaponAxeB202",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/axe1h_b202_veilofshadow.dbr",
       "category": "item skill modifier",
@@ -9639,7 +9639,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:axe1h_b206_wordofpain:stacking:Life",
-      "name": "tagGDX2WeaponAxeB206",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponAxeB206",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/axe1h_b206_wordofpain.dbr",
       "category": "item skill modifier",
@@ -9663,7 +9663,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:axe1h_b206_wordofpain_low:stacking:Life",
-      "name": "tagGDX2WeaponAxeB206",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponAxeB206",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/axe1h_b206_wordofpain_low.dbr",
       "category": "item skill modifier",
@@ -9687,7 +9687,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:focus_b203_soulsiphon:stacking:Fire",
-      "name": "tagGDX2FocusB203",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2FocusB203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/focus_b203_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9711,7 +9711,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:focus_b203_soulsiphon:stacking:Life",
-      "name": "tagGDX2FocusB203",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2FocusB203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/focus_b203_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9735,7 +9735,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:gun2h_b201_wordofpain:stacking:Bleeding",
-      "name": "tagGDX2WeaponGun2hB201",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponGun2hB201",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/gun2h_b201_wordofpain.dbr",
       "category": "item skill modifier",
@@ -9759,7 +9759,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:gun2h_b201_wordofpain:stacking:Pierce",
-      "name": "tagGDX2WeaponGun2hB201",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponGun2hB201",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/gun2h_b201_wordofpain.dbr",
       "category": "item skill modifier",
@@ -9783,7 +9783,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:gun2h_b201_wordofpain_low:stacking:Bleeding",
-      "name": "tagGDX2WeaponGun2hB201",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponGun2hB201",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/gun2h_b201_wordofpain_low.dbr",
       "category": "item skill modifier",
@@ -9807,7 +9807,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:gun2h_b201_wordofpain_low:stacking:Pierce",
-      "name": "tagGDX2WeaponGun2hB201",
+      "name": "tagGDX1Class07SkillName01A",
       "parent": "tagGDX2WeaponGun2hB201",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/gun2h_b201_wordofpain_low.dbr",
       "category": "item skill modifier",
@@ -9831,7 +9831,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:head_b203_devouringswarm:stacking:Life",
-      "name": "tagGDX2HeadB203",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX2HeadB203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/head_b203_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -9855,7 +9855,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:head_b203_devouringswarm:stacking:Physical",
-      "name": "tagGDX2HeadB203",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX2HeadB203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/head_b203_devouringswarm.dbr",
       "category": "item skill modifier",
@@ -9879,7 +9879,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:head_b207_bloodypox:stacking:Bleeding",
-      "name": "tagGDX2HeadB207",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX2HeadB207",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/head_b207_bloodypox.dbr",
       "category": "item skill modifier",
@@ -9903,7 +9903,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:head_b207_bloodypox:stacking:Life",
-      "name": "tagGDX2HeadB207",
+      "name": "tagClass03SkillName13A",
       "parent": "tagGDX2HeadB207",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/head_b207_bloodypox.dbr",
       "category": "item skill modifier",
@@ -9927,7 +9927,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:necklace_b203_soulsiphon:stacking:Bleeding",
-      "name": "tagGDX2NecklaceB203",
+      "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2NecklaceB203",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/necklace_b203_soulsiphon.dbr",
       "category": "item skill modifier",
@@ -9951,7 +9951,7 @@
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:shield_b201_devouringswarm:stacking:Bleeding",
-      "name": "tagGDX2ShieldB201",
+      "name": "tagClass06SkillName15A",
       "parent": "tagGDX2ShieldB201",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/shield_b201_devouringswarm.dbr",
       "category": "item skill modifier",
