@@ -480,32 +480,73 @@ instantiates from raw bytes (`WebAssembly.compile`, not `instantiateStreaming`),
 unchanged. No dynamic `import()`/`import.meta` in source, so an IIFE build is clean. URL-hash state
 works fine under `file://`, but a copied `file://` link is not shareable across machines.
 
-## Monster resistance survey (per-type distribution)
+## Monster stats survey + explorer page (sub-project 3)
 
-A re-runnable survey of enemy defensive resistances derived from the game files,
-so we can show what enemy resistances actually look like per damage type (are
-they uniform, or is Physical generally softer than Lightning?) and ground the
-resistance-reduction page's ledger in real numbers instead of a hand-typed
-"enemy starting resistance %".
+A re-runnable survey that extracts **all monster stats** (not just resistances)
+from the game files into a queryable committed dataset, plus a dedicated explorer
+page (same shape as the resistance-reduction page) that lets users search/filter
+monsters and graph distributions - e.g. filter to Nemesis-tier monsters and see
+the per-type resistance distribution as a heatmap/histogram. Secondary payoff: it
+grounds the RR page's ledger with real difficulty/tier presets instead of a
+hand-typed "enemy starting resistance %".
 
-Feasibility confirmed against the extraction: monster resistances live as
-`defensive<Type>` fields (Physical, Pierce, Fire, Cold, Lightning, Poison,
-Aether, Chaos, Bleeding, Life=Vitality, Elemental) on ~4,149 `creatures/`
-records (plus the `endlessdungeon/` set); an absent field means 0% to that type.
-Example: an Aetherial Abomination carries Physical 20 / Pierce 25 / Aether 25 and
-0 elsewhere, while an Aetherial Colossus carries Lightning 70 / Fire 35 / Aether
-25 / Vitality 25 / Physical 20 / Pierce 20 - so the per-type spread is real.
-Tier is `monsterClassification` (Common / Champion / Hero / Boss / Nemesis),
-spawn level is a `charLevel` equation (e.g. `(charLevel*1.1)+2`), and the base
-resistances are per-monster with Normal/Elite/Ultimate adding a global offset on
-top (constants live in `game/gameengine.dbr` - resolve the exact per-difficulty
-bumps during this sub-project's design).
+### What the extraction found (confirmed against the records)
 
-Intended as sub-project 3 of the resistance-reduction initiative, built after the
-RR page ships: its own `scripts/parse_*.py` + committed `data/*.json` + `just`
-recipe (mirroring the devotions and RR parsers), then a per-type histogram on the
-RR page and difficulty/tier presets that replace the ledger's manual enemy-
-resistance input. Needs its own brainstorm/spec: how to aggregate (per tier x
-difficulty? filter out summons/props/friendly NPCs under `creatures/`?), and the
-exact `gameengine.dbr` difficulty scaling. Related: the RR pipeline spec at
-docs/superpowers/specs/2026-07-21-resistance-reduction-pipeline-design.md.
+- **Resistances** are bare `defensive<Type>` fields (positive = resistance):
+  Physical, Pierce, Fire, Cold, Lightning, Poison (= Poison & Acid), Aether,
+  Chaos, Life (= Vitality), Bleeding, plus the Elemental aggregate. An absent
+  field = 0% to that type. The spread is real: an Aetherial Abomination is
+  Physical 20 / Pierce 25 / Aether 25 and 0 elsewhere; an Aetherial Colossus is
+  Lightning 70 / Fire 35 / Aether 25 / Vitality 25 / Physical 20 / Pierce 20.
+  (Note: `defensive<Type>` bare is the monster's own resistance; a *negative*
+  `defensive<Type>` on a skill record is the RR debuff the RR pipeline extracts -
+  same field name, opposite sign and context.)
+- **Record location gotcha:** stat records are the base-named `.dbr` under
+  `records/creatures/` (~4,149) + the `endlessdungeon/` set. The `*_boss.dbr`
+  siblings are `charanimationtable.tpl` animation tables, NOT stats - do not read
+  those. Each real creature record is large (~1,000 fields) and carries stats
+  inline: `defensive*`, `characterLife`, `characterOffensive/DefensiveAbility`,
+  attributes, `monsterClassification` (Common / Champion / Hero / Boss / Nemesis),
+  `charLevel`/`minLevel`/`maxLevel`, `characterAttributeEquations` (-> a
+  `bios/bio_*.dbr` scaling record), and `skillName1..10` (its ability records).
+- **A monster's abilities** live under `records/skills/nonplayerskills/` (+ the
+  `nonplayerskillsgdx1` / `gdx2` expansion dirs), referenced from `skillNameN` -
+  exactly the records the RR pipeline *excludes* as player-irrelevant. If the
+  page wants to show "what this monster casts" (incl. the RR it inflicts), join
+  those in.
+- **Level scaling:** `charLevel` is an equation (e.g. `(charLevel*1.1)+2`); base
+  resistances are per-monster with Normal/Elite/Ultimate adding a **global**
+  offset on top (constants in `game/gameengine.dbr` - resolve exact per-difficulty
+  bumps during design).
+
+### Biggest transferable lesson from the RR work: variant/tier de-duplication
+
+Items turned out to be heavily level-versioned (689 item records -> 402 names),
+and the RR pipeline dodged that only because it keys sources on the shared
+*skill* record. Monsters have the same problem in a different shape: `_a01/_b01/
+_c01` tier variants, `_summon` spawns, and hero/boss/difficulty variants of "the
+same" monster. **Decide the logical-monster vs raw-record grain up front** and
+plan a dedup/aggregation strategy, plus a filter to drop props / summons /
+friendly NPCs / `hiddenFromCombat` / `invincible` records under `creatures/`
+(the analogue of the RR pipeline's `nonplayerskills` exclusion).
+
+### Reuse from the RR initiative (don't rebuild)
+
+- **Shared parser helpers:** `scripts/gd_dbr.py` (`read_dbr`, `load_translations`,
+  `DB`, `level_array_value`, `register`) - the monster parser is its third
+  consumer. Follow the established pattern: `scripts/parse_*.py` -> committed
+  `data/*.json` -> a `just` recipe wired into `just all` -> extend
+  `scripts/build_game_tables.py` so monster **name** tags (the creature
+  `description` tag / `tagCreature*`) land in `data/i18n/game.<lang>.json` for all
+  13 languages.
+- **Page architecture is a near-template:** `web/src/rr/` (hexagonal
+  `core/model.ts` + `aggregate.ts` + `filter.ts` + `urlState.ts` + adapters + a
+  second bundle entry in `web/scripts/bundle.ts`, all view state in the URL hash,
+  i18n via `rr.*` catalog keys). The monster explorer is the same skeleton with a
+  **heatmap/histogram view replacing the ledger**; model/filter/urlState/aggregate
+  are largely copy-adapt.
+
+Built after the RR page ships. Needs its own brainstorm/spec (the dedup grain, the
+`gameengine.dbr` difficulty scaling, and which stats beyond resistances to surface).
+Related: the RR pipeline spec (`docs/superpowers/specs/2026-07-21-resistance-reduction-pipeline-design.md`)
+and page spec (`docs/superpowers/specs/2026-07-21-resistance-reduction-page-design.md`).
