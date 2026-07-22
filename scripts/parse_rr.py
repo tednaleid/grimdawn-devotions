@@ -19,7 +19,71 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gd_dbr import DB, load_translations, register  # noqa: E402,F401
+from gd_dbr import DB, level_array_value, load_translations, register  # noqa: E402,F401
+
+import re  # noqa: E402
+
+RR_PERCENT = "reduced-percent"
+RR_FLAT = "reduced-flat"
+RR_STACKING = "stacking"
+
+ELEMENTAL = ["Fire", "Cold", "Lightning"]
+
+# Bare defensive<Type> tokens that are RR when negative (per the spec's Step 0).
+STACKING_TOKENS = {
+    "Physical", "Pierce", "Fire", "Cold", "Lightning",
+    "Poison", "Aether", "Chaos", "Life", "Bleeding",
+}
+# Token -> display label where the game name differs from the field token.
+TYPE_LABEL = {"Poison": "Poison & Acid", "Life": "Vitality"}
+
+_OFFENSIVE_RE = re.compile(
+    r"^offensive(Total|Elemental|Physical)ResistanceReduction(Absolute|Percent)Min$")
+
+
+def classify_offensive_field(field: str):
+    """(rr_type, token) for an offensive RR *value* field, else None. Siblings
+    (DurationMin/Chance) return None so only the value field yields a source."""
+    m = _OFFENSIVE_RE.match(field)
+    if not m:
+        return None
+    token, suffix = m.group(1), m.group(2)
+    return (RR_PERCENT if suffix == "Percent" else RR_FLAT, token)
+
+
+def stacking_token(field: str):
+    """The stacking <Type> token for a bare defensive<Type> field (or the
+    defensiveElementalResistance aggregate), else None."""
+    if field in ("defensiveElementalResistance", "defensiveElemental"):
+        return "Elemental"
+    m = re.fullmatch(r"defensive([A-Za-z]+)", field)
+    if m and m.group(1) in STACKING_TOKENS:
+        return m.group(1)
+    return None
+
+
+def token_to_resistances(token: str):
+    """Kept distinct, never pre-expanded: 'All' | 'Elemental' | [labels]."""
+    if token == "Total":
+        return "All"
+    if token == "Elemental":
+        return "Elemental"
+    return [TYPE_LABEL.get(token, token)]
+
+
+def parse_array(raw: str) -> list:
+    """';'-separated per-rank numbers -> list (int when whole)."""
+    out = []
+    for part in raw.split(";"):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            f = round(float(part), 4)
+        except ValueError:
+            continue
+        out.append(int(f) if f == int(f) else f)
+    return out
 
 
 def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> list[dict]:
