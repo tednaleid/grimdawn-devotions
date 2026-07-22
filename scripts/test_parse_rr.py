@@ -96,5 +96,15 @@ check("night's chill covers Cold/Pierce/Poison&Acid/Vitality",
 censure = find(lambda s: s["record_path"].endswith("skills/playerclass07/auracensure1_buff.dbr"))
 check("aura of censure stacking elemental -35", censure and censure[0]["value_at_max"] == -35)
 
+# --- Task 6: category, parent, trigger + item attribution ---
+check("every source has a category", all(s["category"] for s in doc["sources"]))
+check("every source has a trigger", all(s["trigger"] for s in doc["sources"]))
+check("viper category devotion", viper and viper[0]["category"] == "devotion")
+check("break morale is a mastery/modifier skill",
+      morale and morale[0]["category"] in {"mastery skill", "modifier"})
+item_cats = {"component", "augment", "relic", "set bonus", "item granted", "item skill modifier", "monster infrequent"}
+item_sources = find(lambda s: s["category"] in item_cats)
+check("item-attributed RR sources exist", len(item_sources) >= 1)
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

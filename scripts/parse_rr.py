@@ -281,6 +281,103 @@ def stacking_sources(db, tags, game_en, rec_path, rec, ctx):
     return out
 
 
+def classify_category(rec_path, rec) -> str:
+    """Category from the record's path and template. Item-granted skills are refined
+    by attribute_items; this is the skill-intrinsic default."""
+    tmpl = template_name(rec)
+    if "/devotion/" in rec_path:
+        return "devotion"
+    if "/itemskills" in rec_path:
+        return "item skill modifier" if tmpl == MODIFIER_TEMPLATE else "item granted"
+    if tmpl == MODIFIER_TEMPLATE:
+        return "modifier"
+    return "mastery skill"
+
+
+def classify_trigger(rec) -> str:
+    """Coarse trigger classification from the record's template/wiring."""
+    tmpl = template_name(rec)
+    if "debuftrap" in tmpl:
+        return "field/trap"
+    if "contageous" in tmpl:
+        return "contagious debuff"
+    if "toggled" in template_name(rec) or rec.get("buffSkillName", "").strip():
+        return "passive aura"
+    if "/pets/" in rec.get("templateName", ""):
+        return "pet aura"
+    return "debuff"
+
+
+def _parent_descriptor(db, tags, game_en, rec_path, rec):
+    """Localizable parent label. For skill sources this is the skill's own name for now;
+    mastery/constellation parent resolution is a follow-up (the UI can also join against
+    devotions.json). Item sources get their item name via attribute_items."""
+    return _name_descriptor(rec, rec_path, tags, game_en)
+
+
+ITEM_SKILL_FIELDS = (
+    ["itemSkillName"]
+    + [f"augmentSkillName{i}" for i in range(1, 6)]
+    + [f"modifierSkillName{i}" for i in range(1, 6)]
+)
+
+
+def build_item_skill_map(db):
+    """skill record_path -> (item record_path, is_item_skill_modifier). First item wins."""
+    m: dict[str, tuple[str, bool]] = {}
+    items_root = db.root / "records/items"
+    for p in items_root.rglob("*.dbr"):
+        rel = p.relative_to(db.root).as_posix()
+        rec = db.get(rel)
+        for f in ITEM_SKILL_FIELDS:
+            v = rec.get(f, "").replace("\\", "/").strip()
+            if v.endswith(".dbr"):
+                m.setdefault(v, (rel, f.startswith("modifierSkillName")))
+    return m
+
+
+def item_category(item_path, rec) -> str:
+    cls = rec.get("Class", "")
+    classif = rec.get("itemClassification", "").strip()
+    if cls == "ItemArtifact":
+        return "relic"
+    if cls == "ItemRelic":  # GD internal name for craftable components (materia/)
+        return "component"
+    if "Enchantment" in cls or "Augment" in cls:
+        return "augment"
+    if rec.get("itemSetName", "").strip():
+        return "set bonus"
+    if classif == "Rare":  # monster-infrequent items are the "Rare" (green) rarity
+        return "monster infrequent"
+    return "item granted"
+
+
+def _item_name_descriptor(db, tags, game_en, item_path, rec):
+    tag = rec.get("itemNameTag", "").strip()
+    text = tags.get(tag) if tag else None
+    return register(tag or f"x:rritem:{item_path}", text, game_en)
+
+
+def attribute_items(db, tags, game_en, sources):
+    """Override category/parent for item-owned RR sources. Only skills under
+    records/skills/itemskills are item-owned; a class or devotion skill that an item
+    merely references (grants +skills to, e.g. gloves referencing War Cry -> Break Morale)
+    keeps its intrinsic category."""
+    m = build_item_skill_map(db)
+    for s in sources:
+        if "/itemskills" not in s["record_path"]:
+            continue
+        info = m.get(s["record_path"])
+        if not info:
+            continue
+        item_path, is_mod = info
+        item_rec = db.get(item_path)
+        s["category"] = "item skill modifier" if is_mod else item_category(item_path, item_rec)
+        s["parent"] = _item_name_descriptor(db, tags, game_en, item_path, item_rec)
+        if is_mod and s["notes"].startswith("modifier base not resolved"):
+            s["notes"] = f"item skill modifier via {item_path}"
+
+
 def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> list[dict]:
     """Sweep the extraction and return one dict per RR source."""
     sources: list[dict] = []
@@ -293,6 +390,13 @@ def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> li
                 sources.append(
                     source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, token))
         sources.extend(stacking_sources(db, tags, game_en, rec_path, rec, ctx))
+    for s in sources:
+        rec = db.get(s["record_path"])
+        s["category"] = classify_category(s["record_path"], rec)
+        s["trigger"] = classify_trigger(rec)
+        if s["parent"] is None:
+            s["parent"] = _parent_descriptor(db, tags, game_en, s["record_path"], rec)
+    attribute_items(db, tags, game_en, sources)
     return sources
 
 
