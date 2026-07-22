@@ -21,6 +21,8 @@ export interface RrSource {
   cooldownSeconds: number | null;
   triggerChancePercent: number | null;
   trigger: string;
+  procCondition: string | null;
+  mythical: boolean;
   perResistanceValues: Record<string, number> | null;
   notes: string;
 }
@@ -42,6 +44,8 @@ interface RawSource {
   cooldown_seconds: number | null;
   trigger_chance_percent: number | null;
   trigger: string;
+  proc_condition: string | null;
+  mythical: boolean;
   per_resistance_values: Record<string, number> | null;
   notes: string;
 }
@@ -64,6 +68,8 @@ function mapSource(r: RawSource): RrSource {
     cooldownSeconds: r.cooldown_seconds,
     triggerChancePercent: r.trigger_chance_percent,
     trigger: r.trigger,
+    procCondition: r.proc_condition ?? null,
+    mythical: r.mythical ?? false,
     perResistanceValues: r.per_resistance_values,
     notes: r.notes ?? "",
   };

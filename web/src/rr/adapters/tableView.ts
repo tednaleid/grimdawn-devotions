@@ -78,15 +78,29 @@ function durLabel(loc: Localization, s: LogicalSource): string {
   return s.durationSeconds != null ? loc.translate("rr.dur.seconds", { s: s.durationSeconds }) : "—";
 }
 
+export function triggerLabel(loc: Localization, s: LogicalSource): string {
+  // An item-granted proc reads as its chance + condition ("10% on attack"); everything else
+  // keeps the coarse trigger category (debuff, aura, trap...).
+  if (s.triggerChancePercent != null && s.procCondition) {
+    const when = loc.translate(`rr.proc.${s.procCondition}`);
+    return loc.translate("rr.proc.fmt", { chance: s.triggerChancePercent, when });
+  }
+  return loc.translate(triggerKey(s.trigger));
+}
+
 function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string {
   const verify = s.verifyNote ? ` <span class="verify" title="${esc(loc.translate("rr.verify.title"))}">*</span>` : "";
   const roll = s.rollNote
     ? `<span class="roll" title="${esc(loc.translate("rr.roll.title"))}">${esc(loc.translate("rr.roll.tag"))}</span>`
     : "";
-  const name = esc(loc.gameText(s.name));
-  const parent = esc(loc.gameText(s.parent));
-  // Omit the parent subtext when it duplicates the name (nameless sources borrow the parent name).
-  const parentText = parent && parent !== name ? parent : "";
+  const gtName = loc.gameText(s.name);
+  const gtParent = loc.gameText(s.parent);
+  // A Tier-3 grant is the Mythical version of the item, which the game names "Mythical <item>";
+  // apply that to whichever field shows the item (its parent line, or the name when nameless).
+  const withMyth = (t: string) => (s.mythical ? loc.translate("rr.tier.mythicalName", { name: t }) : t);
+  const hasParent = Boolean(gtParent) && gtParent !== gtName;
+  const name = esc(hasParent ? gtName : withMyth(gtName));
+  const parentText = hasParent ? esc(withMyth(gtParent)) : "";
   // The roll marker qualifies the source, not the damage type: this bonus only appears on a specific
   // random roll of the item, so it belongs on the source's item/parent line.
   const meta = [parentText, roll].filter(Boolean).join(" ");
@@ -97,7 +111,7 @@ function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string
     <td>${rrBadge(loc, s.rrType)}</td>
     <td>${esc(typesLabel(loc, s))}${verify}</td>
     <td class="val">${esc(valLabel(loc, s))}</td>
-    <td>${esc(loc.translate(triggerKey(s.trigger)))}</td>
+    <td>${esc(triggerLabel(loc, s))}</td>
     <td>${esc(durLabel(loc, s))}</td>
   </tr>`;
 }
