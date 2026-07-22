@@ -130,6 +130,14 @@ check("night's chill parent differs from name", nc_all and nc_all[0]["parent"] !
 # A devotion's parent is its constellation, not its own name.
 est = find(lambda s: s["record_path"].endswith("skills/devotion/tier2_01c_skill.dbr"))
 check("elemental storm parent differs from name", est and est[0]["parent"] != est[0]["name"])
+# No source keeps a synthesized x: placeholder as its display name: a nameless skill
+# modifier borrows the skill it modifies, else the parent (item/mastery/constellation).
+synth_names = [s for s in doc["sources"] if s["name"].startswith("x:")]
+check("no source shows a raw x: placeholder name", len(synth_names) == 0)
+# A nameless item skill modifier resolves to the skill it modifies (Doom Bolt).
+doombolt = find(lambda s: s["record_path"].endswith("skillmodifiers/legendary/axe2h_d206_doombolt.dbr"))
+tag = doombolt[0]["name"] if doombolt else ""
+check("doom bolt modifier borrows the modified skill's name tag", tag.startswith("tag"))
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

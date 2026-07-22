@@ -498,6 +498,55 @@ def attribute_items(db, tags, game_en, sources):
             s["notes"] = f"item skill modifier via {item_path}"
 
 
+def build_modifier_modified(db):
+    """modifier skill record_path -> the skill it modifies, read from item
+    modifierSkillNameN/modifiedSkillNameN pairs. Lets a nameless item skill modifier
+    borrow the modified skill's display name (a Doom Bolt modifier reads as 'Doom Bolt')."""
+    out: dict[str, str] = {}
+    items_root = db.root / "records/items"
+    for p in sorted(items_root.rglob("*.dbr")):
+        rec = db.get(p.relative_to(db.root).as_posix())
+        for i in range(1, 6):
+            mod = rec.get(f"modifierSkillName{i}", "").replace("\\", "/").strip()
+            base = rec.get(f"modifiedSkillName{i}", "").replace("\\", "/").strip()
+            if mod.endswith(".dbr") and base.endswith(".dbr"):
+                out.setdefault(mod, base)
+    return out
+
+
+def _humanize(rec_path: str) -> str:
+    """A readable label from a record stem, the last resort when nothing names a source:
+    drop set/rank/buff noise, split camelCase and underscores, title-case."""
+    stem = rec_path.rsplit("/", 1)[-1].removesuffix(".dbr")
+    stem = re.sub(r"set\d+_|_buff|_petbonus|_mod\d*|\d+$", "", stem)
+    words = re.sub(r"([a-z])([A-Z])", r"\1 \2", stem.replace("_", " ")).split()
+    return " ".join(w.capitalize() for w in words) or stem
+
+
+def resolve_names(db, tags, game_en, sources, mmap):
+    """Give a real display name to sources whose own record has no skillDisplayName
+    (buffs, pet bonuses, skill modifiers). A modifier borrows the skill it modifies
+    (item-paired first, then the class tree); anything still nameless takes its parent
+    (the item / mastery / constellation), and a final humanized stem guarantees no source
+    ever shows a raw synthesized key."""
+    modmod = build_modifier_modified(db)
+    for s in sources:
+        rec = db.get(s["record_path"])
+        if not rec.get("skillDisplayName", "").strip():
+            modified = modmod.get(s["record_path"]) or mmap.get(s["record_path"])
+            mtag = db.get(modified).get("skillDisplayName", "").strip() if modified else ""
+            if mtag:
+                s["name"] = register(mtag, tags.get(mtag), game_en)
+            elif not s["parent"].startswith("x:"):
+                s["name"] = s["parent"]
+            else:
+                s["name"] = register(_humanize(s["record_path"]), None, game_en)
+        # An unresolved parent (no real item/mastery/constellation) collapses to the name,
+        # so the UI never shows a synthesized key in either column.
+        if s["parent"].startswith("x:"):
+            s["parent"] = s["name"]
+
+
 def _carries_rr(rec) -> bool:
     """True if a record has any RR field (offensive reduction or negative stacking defensive)."""
     for f, raw in rec.items():
@@ -544,6 +593,7 @@ def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str],
             s["parent"] = _parent_descriptor(
                 tags, game_en, s["record_path"], rec, class_masteries, devotion_parents)
     attribute_items(db, tags, game_en, sources)
+    resolve_names(db, tags, game_en, sources, ctx["mmap"])
     return sources
 
 

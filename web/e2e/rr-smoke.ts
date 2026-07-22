@@ -154,6 +154,11 @@ try {
   check(leaked.length === 0, `no raw rr.* keys leak (${leaked.slice(0, 3).join(",")})`);
   const firstName = await cdp.evaluate<string>("document.querySelector('tr[data-id] td.name')?.textContent ?? ''");
   check(firstName.length > 0 && !firstName.startsWith("tag"), `source name resolves: "${firstName.slice(0, 30)}"`);
+  // No source shows a raw synthesized key or record path in its name.
+  const rawNames = await cdp.evaluate<number>(
+    "[...document.querySelectorAll('tr[data-id] td.name')].filter(c => /x:|records\\//.test(c.textContent||'')).length",
+  );
+  check(rawNames === 0, `no raw x:/record-path source names (${rawNames})`);
 
   // Filter through the hash: RR-type = stacking narrows the table to stacking rows only.
   await cdp.evaluate(`location.hash = "#rr=stacking"`);
