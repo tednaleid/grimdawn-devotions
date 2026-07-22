@@ -174,7 +174,7 @@ parse-rr *ARGS:
         --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
 
 # Full pipeline: extract then parse
-all: extract parse i18n-tables
+all: extract parse parse-rr i18n-tables
 
 # KEEPS the committed dataset (data/devotions.json, data/stat_labels.json) — those only
 # regenerate via `just parse` on Windows, so clean must never delete them.
