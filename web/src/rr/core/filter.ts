@@ -14,7 +14,7 @@ const RR_RANK: Record<LogicalSource["rrType"], number> = {
   "reduced-flat": 2,
 };
 
-function matchesFilters(s: LogicalSource, view: ViewState, nameOf: NameOf): boolean {
+function matchesFilters(s: LogicalSource, view: ViewState, nameOf: NameOf, parentOf: NameOf): boolean {
   if (view.fRR && s.rrType !== view.fRR) return false;
   if (view.fCat && s.category !== view.fCat) return false;
   if (view.fPar && s.parent !== view.fPar) return false;
@@ -22,7 +22,9 @@ function matchesFilters(s: LogicalSource, view: ViewState, nameOf: NameOf): bool
   if (view.fType && !sourceHits(s, view.fType)) return false;
   if (view.q) {
     const q = view.q.toLowerCase();
-    const hay = `${nameOf(s)} ${s.parent} ${s.category} ${s.resistances.join(" ")}`.toLowerCase();
+    // Search resolved display text (name + parent/item), so "conduit" matches its resolved
+    // parent name rather than the raw tag key.
+    const hay = `${nameOf(s)} ${parentOf(s)} ${s.category} ${s.resistances.join(" ")}`.toLowerCase();
     if (!hay.includes(q)) return false;
   }
   return true;
@@ -47,9 +49,15 @@ function sortKeyValue(s: LogicalSource, key: string, nameOf: NameOf): string | n
   }
 }
 
-/** Filter then sort the logical sources for the current view. Stable, pure. */
-export function applyView(sources: LogicalSource[], view: ViewState, nameOf: NameOf): LogicalSource[] {
-  const filtered = sources.filter((s) => matchesFilters(s, view, nameOf));
+/** Filter then sort the logical sources for the current view. Stable, pure. `parentOf` resolves
+ *  the parent/item display text so search matches it (defaults to the raw parent key). */
+export function applyView(
+  sources: LogicalSource[],
+  view: ViewState,
+  nameOf: NameOf,
+  parentOf: NameOf = (s) => s.parent,
+): LogicalSource[] {
+  const filtered = sources.filter((s) => matchesFilters(s, view, nameOf, parentOf));
   const dir = view.sortDir;
   return filtered.sort((a, b) => {
     const va = sortKeyValue(a, view.sortKey, nameOf);

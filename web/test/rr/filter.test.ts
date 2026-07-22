@@ -26,6 +26,18 @@ test("damage-type Fire includes an Elemental source", () => {
   ).toBe(true);
 });
 
+test("search matches the resolved parent/item name, not the raw tag", () => {
+  const conduit = logical.find((s) => s.parent === "tagGDX1NecklaceD113C");
+  expect(conduit).toBeDefined();
+  const parentOf = (s: { parent: string }) =>
+    s.parent === "tagGDX1NecklaceD113C" ? "Conduit of Eldritch Whispers" : s.parent;
+  // Raw-key resolver: "conduit" finds nothing (the bug); resolved parent: it finds the Conduit rows.
+  expect(applyView(logical, view({ q: "conduit" }), nameOf).length).toBe(0);
+  const hits = applyView(logical, view({ q: "conduit" }), nameOf, parentOf);
+  expect(hits.length).toBeGreaterThan(0);
+  expect(hits.every((s) => s.parent === "tagGDX1NecklaceD113C")).toBe(true);
+});
+
 test("default rr sort reads in application order: stacking, then percent, then flat", () => {
   const out = applyView(logical, view({ sortKey: "rr", sortDir: 1 }), nameOf);
   const rank = { stacking: 0, "reduced-percent": 1, "reduced-flat": 2 } as const;

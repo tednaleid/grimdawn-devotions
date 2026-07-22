@@ -49,6 +49,7 @@ async function boot() {
 
   // Injected resolvers keep the pure core i18n-free: names/parents resolve through the current locale.
   const nameOf = (s: LogicalSource) => localization.gameText(s.name);
+  const parentNameOf = (s: LogicalSource) => localization.gameText(s.parent);
   const parentKeyOf = (s: LogicalSource) => s.parent;
 
   // The whole view lives here, decoded from the hash; render reads it, changes re-encode it.
@@ -72,7 +73,7 @@ async function boot() {
   };
 
   function render(): void {
-    const sorted = applyView(logical, view, nameOf);
+    const sorted = applyView(logical, view, nameOf, parentNameOf);
     const groups = groupView(sorted, view, parentKeyOf);
     renderTable(tableEl, localization, logical, groups, view, handlers);
     const selected = logical.filter((s) => view.sel.has(s.id));
