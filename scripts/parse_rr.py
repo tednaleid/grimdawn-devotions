@@ -86,9 +86,79 @@ def parse_array(raw: str) -> list:
     return out
 
 
+def iter_skill_records(db: DB):
+    """Yield (posix record path like 'records/skills/...', parsed record) for every .dbr under skills."""
+    skills_root = db.root / "records/skills"
+    for p in sorted(skills_root.rglob("*.dbr")):
+        rel = p.relative_to(db.root).as_posix()
+        yield rel, db.get(rel)
+
+
+def _name_descriptor(rec, rec_path, tags, game_en):
+    """Localizable name: resolve skillDisplayName tag, else a stable synthesized key."""
+    tag = rec.get("skillDisplayName", "").strip()
+    text = tags.get(tag) if tag else None
+    return register(tag or f"x:rr:{rec_path}", text, game_en)
+
+
+def _ultimate(rec):
+    v = rec.get("skillUltimateLevel", "").strip()
+    try:
+        return int(float(v)) if v else None
+    except ValueError:
+        return None
+
+
+def _num(s):
+    s = (s or "").strip()
+    if not s or ";" in s:
+        return None
+    try:
+        f = round(float(s), 4)
+        return int(f) if f == int(f) else f
+    except ValueError:
+        return None
+
+
+def source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, token):
+    arr = parse_array(rec[field])
+    ult = _ultimate(rec)
+    base = field[:-len("Min")]  # e.g. offensiveElementalResistanceReductionAbsolute
+    dur = rec.get(base + "DurationMin", "").strip()
+    chance = rec.get(base + "Chance", "").strip()
+    return {
+        "id": rec_path.replace("/", ":").removesuffix(".dbr") + f":{rr_type}",
+        "name": _name_descriptor(rec, rec_path, tags, game_en),
+        "parent": None,   # filled by category/parent pass (Task 6)
+        "record_path": rec_path,
+        "category": None,  # Task 6
+        "rr_type": rr_type,
+        "resistances": token_to_resistances(token),
+        "values_per_rank": arr,
+        "max_rank": len(arr),
+        "ultimate_rank": ult,
+        "value_at_max": arr[-1] if arr else None,
+        "value_at_ultimate": level_array_value(rec[field], ult) if ult else None,
+        "duration_seconds": _num(dur),
+        "cooldown_seconds": _num(rec.get("skillCooldownTime", "")),
+        "trigger_chance_percent": _num(chance),
+        "trigger": None,   # Task 6 classification
+        "per_resistance_values": None,
+        "notes": "",
+    }
+
+
 def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> list[dict]:
-    """Sweep the extraction and return one dict per RR source. Filled in by later tasks."""
-    return []
+    """Sweep the extraction and return one dict per RR source."""
+    sources: list[dict] = []
+    for rec_path, rec in iter_skill_records(db):
+        for field in rec:
+            hit = classify_offensive_field(field)
+            if hit:
+                rr_type, token = hit
+                sources.append(
+                    source_from_offensive(db, tags, game_en, rec_path, rec, field, rr_type, token))
+    return sources
 
 
 def main(argv=None) -> int:

@@ -58,5 +58,25 @@ check("token Life label", rr.token_to_resistances("Life") == ["Vitality"])
 check("array parse", rr.parse_array("10.0;15.0;20.0") == [10, 15, 20])
 check("array negative", rr.parse_array("-3.0;-6.0")[-1] == -6)
 
+# --- Task 4: offensive sweep (flat + multiplicative) ---
+def find(pred):
+    return [s for s in doc["sources"] if pred(s)]
+
+viper = find(lambda s: s["record_path"].endswith("skills/devotion/tier1_13d.dbr"))
+check("viper present", len(viper) == 1)
+check("viper mult 20 elemental", viper and viper[0]["rr_type"] == "reduced-percent"
+      and viper[0]["value_at_max"] == 20 and viper[0]["resistances"] == "Elemental")
+check("viper duration 3", viper and viper[0]["duration_seconds"] == 3)
+
+morale = find(lambda s: s["record_path"].endswith("skills/playerclass01/warcry2.dbr")
+              and s["rr_type"] == "reduced-flat")
+check("break morale flat physical 45", morale and morale[0]["value_at_max"] == 45
+      and morale[0]["resistances"] == ["Physical"])
+
+estorm = find(lambda s: s["record_path"].endswith("skills/devotion/tier2_01c_skill.dbr")
+              and s["rr_type"] == "reduced-flat")
+check("elemental storm flat 32", estorm and estorm[0]["value_at_max"] == 32
+      and estorm[0]["resistances"] == "Elemental")
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
