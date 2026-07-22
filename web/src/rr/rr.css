@@ -254,6 +254,10 @@
   color: var(--rr-ember);
   cursor: help;
 }
+.rr-page .roll {
+  cursor: help;
+  opacity: 0.85;
+}
 .rr-page .rr-group-head td {
   background: #1d190f;
   font-family: var(--rr-mono);

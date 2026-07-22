@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
-    "generated_utc": "2026-07-22T17:27:14Z",
+    "generated_utc": "2026-07-22T18:57:27Z",
     "berserker_present": false
   },
   "sources": [
@@ -865,7 +865,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": ""
+      "notes": "random-roll"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_soldier2:reduced-flat",
@@ -887,7 +887,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": ""
+      "notes": "random-roll"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:focus_d112_sigilofconsumption:reduced-flat",
@@ -1922,7 +1922,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": ""
+      "notes": "random-roll"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set3_soldier1:reduced-percent",
@@ -1944,7 +1944,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": ""
+      "notes": "random-roll"
     },
     {
       "id": "records:skills:itemskillsgdx2:legendary:guardianbite:reduced-percent",
@@ -6433,7 +6433,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Poison",
@@ -6457,7 +6457,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07a.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Aether",
@@ -6481,7 +6481,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Chaos",
@@ -6505,7 +6505,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08b.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_nightblade5:stacking:Life",
@@ -6529,7 +6529,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04e.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04e.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Pierce",
@@ -6553,7 +6553,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_occultist2:stacking:Poison",
@@ -6577,7 +6577,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03b.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Aether",
@@ -6601,7 +6601,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Physical",
@@ -6625,7 +6625,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_05g.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_inquisitor3:stacking:Physical",
@@ -6649,7 +6649,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07h.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07h.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_necro4:stacking:Chaos",
@@ -6673,7 +6673,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08i.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_08i.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Aether",
@@ -6697,7 +6697,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Chaos",
@@ -6721,7 +6721,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Fire",
@@ -6745,7 +6745,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_04f.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist3:stacking:Aether",
@@ -6769,7 +6769,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03g.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03g.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_occultist4:stacking:Elemental",
@@ -6791,7 +6791,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03h.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_03h.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Pierce",
@@ -6815,7 +6815,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Poison",
@@ -6839,7 +6839,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06f.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Chaos",
@@ -6863,7 +6863,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Physical",
@@ -6887,7 +6887,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_06h.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set3_inquisitor1:stacking:Poison",
@@ -6911,7 +6911,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07j.dbr"
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_07j.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:focus_d111_stormbox:stacking:Cold",

@@ -168,6 +168,7 @@ const REQUIRED = [
   "rr.value.overcap",
   "rr.dur.seconds",
   "rr.verify.title",
+  "rr.roll.title",
   "rr.trigger.debuff",
   "rr.trigger.fieldtrap",
   "rr.trigger.contagiousdebuff",

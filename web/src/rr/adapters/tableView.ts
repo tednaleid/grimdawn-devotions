@@ -80,6 +80,7 @@ function durLabel(loc: Localization, s: LogicalSource): string {
 
 function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string {
   const verify = s.verifyNote ? ` <span class="verify" title="${esc(loc.translate("rr.verify.title"))}">*</span>` : "";
+  const roll = s.rollNote ? ` <span class="roll" title="${esc(loc.translate("rr.roll.title"))}">⚄</span>` : "";
   const name = esc(loc.gameText(s.name));
   const parent = esc(loc.gameText(s.parent));
   // Omit the parent subtext when it duplicates the name (nameless sources borrow the parent name).
@@ -88,7 +89,7 @@ function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string
     <td class="name">${name}${parentSpan}</td>
     <td>${esc(loc.translate(categoryKey(s.category)))}</td>
     <td>${rrBadge(loc, s.rrType)}</td>
-    <td>${esc(typesLabel(loc, s))}${verify}</td>
+    <td>${esc(typesLabel(loc, s))}${verify}${roll}</td>
     <td class="val">${esc(valLabel(loc, s))}</td>
     <td>${esc(loc.translate(triggerKey(s.trigger)))}</td>
     <td>${esc(durLabel(loc, s))}</td>

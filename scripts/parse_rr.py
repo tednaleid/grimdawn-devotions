@@ -572,11 +572,14 @@ def resolve_names(db, tags, game_en, sources, mmap):
                 s["name"] = s["parent"]
             else:
                 s["name"] = register(_humanize(s["record_path"]), None, game_en)
-        # Attribute a Conduit's random-roll modifier to the amulet the player equips.
+        # Attribute a Conduit's random-roll modifier to the amulet the player equips, and flag it:
+        # the amulet rolls ONE augment from a pool, so this source needs that specific roll (identified
+        # by its skill + damage type + value), not merely any copy of the amulet.
         for folder, item_path in MODIFIER_POOL_ITEMS.items():
             if folder in s["record_path"]:
                 s["parent"] = _item_name_descriptor(tags, game_en, db.get(item_path), s["name"])
                 s["category"] = "item skill modifier"
+                s["notes"] = f"random-roll; {s['notes']}".strip("; ")
                 break
         # An unresolved parent (no real item/mastery/constellation) collapses to the name,
         # so the UI never shows a synthesized key in either column.

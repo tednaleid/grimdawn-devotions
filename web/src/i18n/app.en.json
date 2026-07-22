@@ -253,6 +253,7 @@
   "rr.value.overcap": "/ ~{v} overcap",
   "rr.dur.seconds": "{s}s",
   "rr.verify.title": "Reaches an enemy debuff via a path we could not fully confirm; verify in-game.",
+  "rr.roll.title": "Random roll: the Conduit amulet grants one skill augment from a pool, so you need a copy rolled with this specific augment (the skill, damage type, and value shown), not just any Conduit of Eldritch Whispers.",
   "rr.trigger.debuff": "Debuff",
   "rr.trigger.fieldtrap": "Field / trap",
   "rr.trigger.contagiousdebuff": "Contagious debuff",
