@@ -479,3 +479,33 @@ fetch shim covers the runtime, and a `just` packaging recipe inlines the assets.
 instantiates from raw bytes (`WebAssembly.compile`, not `instantiateStreaming`), so base64 bytes work
 unchanged. No dynamic `import()`/`import.meta` in source, so an IIFE build is clean. URL-hash state
 works fine under `file://`, but a copied `file://` link is not shareable across machines.
+
+## Monster resistance survey (per-type distribution)
+
+A re-runnable survey of enemy defensive resistances derived from the game files,
+so we can show what enemy resistances actually look like per damage type (are
+they uniform, or is Physical generally softer than Lightning?) and ground the
+resistance-reduction page's ledger in real numbers instead of a hand-typed
+"enemy starting resistance %".
+
+Feasibility confirmed against the extraction: monster resistances live as
+`defensive<Type>` fields (Physical, Pierce, Fire, Cold, Lightning, Poison,
+Aether, Chaos, Bleeding, Life=Vitality, Elemental) on ~4,149 `creatures/`
+records (plus the `endlessdungeon/` set); an absent field means 0% to that type.
+Example: an Aetherial Abomination carries Physical 20 / Pierce 25 / Aether 25 and
+0 elsewhere, while an Aetherial Colossus carries Lightning 70 / Fire 35 / Aether
+25 / Vitality 25 / Physical 20 / Pierce 20 - so the per-type spread is real.
+Tier is `monsterClassification` (Common / Champion / Hero / Boss / Nemesis),
+spawn level is a `charLevel` equation (e.g. `(charLevel*1.1)+2`), and the base
+resistances are per-monster with Normal/Elite/Ultimate adding a global offset on
+top (constants live in `game/gameengine.dbr` - resolve the exact per-difficulty
+bumps during this sub-project's design).
+
+Intended as sub-project 3 of the resistance-reduction initiative, built after the
+RR page ships: its own `scripts/parse_*.py` + committed `data/*.json` + `just`
+recipe (mirroring the devotions and RR parsers), then a per-type histogram on the
+RR page and difficulty/tier presets that replace the ledger's manual enemy-
+resistance input. Needs its own brainstorm/spec: how to aggregate (per tier x
+difficulty? filter out summons/props/friendly NPCs under `creatures/`?), and the
+exact `gameengine.dbr` difficulty scaling. Related: the RR pipeline spec at
+docs/superpowers/specs/2026-07-21-resistance-reduction-pipeline-design.md.
