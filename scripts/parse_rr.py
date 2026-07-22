@@ -399,11 +399,34 @@ def attribute_items(db, tags, game_en, sources):
             s["notes"] = f"item skill modifier via {item_path}"
 
 
+def _carries_rr(rec) -> bool:
+    """True if a record has any RR field (offensive reduction or negative stacking defensive)."""
+    for f, raw in rec.items():
+        if classify_offensive_field(f):
+            return True
+        if stacking_token(f):
+            arr = parse_array(raw)
+            if arr and arr[-1] < 0:
+                return True
+    return False
+
+
+def is_player_relevant(rec_path: str) -> bool:
+    """Monster/boss/NPC ability records and base templates are player-irrelevant; the spec
+    excludes them (counted in the summary), keeping the catalogue to reachable sources.
+    Matches the base 'nonplayerskills' dir and the expansion variants (nonplayerskillsgdx1/2)."""
+    return "/nonplayerskills" not in rec_path and "/base_template" not in rec_path
+
+
 def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str]) -> list[dict]:
     """Sweep the extraction and return one dict per RR source."""
     sources: list[dict] = []
     ctx = {"index": reverse_ref_index(db), "mmap": build_modifier_base(db)}
     for rec_path, rec in iter_skill_records(db):
+        if not is_player_relevant(rec_path):
+            if _carries_rr(rec):
+                EXCLUSIONS.append({"record_path": rec_path, "reason": "monster-only skill"})
+            continue
         for field in rec:
             hit = classify_offensive_field(field)
             if hit:
