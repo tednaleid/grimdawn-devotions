@@ -30,13 +30,23 @@ export interface LedgerLine {
   stackSources: LogicalSource[];
 }
 
+/** The token a source matches for `resistance` (All / Elemental / the type itself), or null. */
+function matchedToken(source: LogicalSource, resistance: string): string | null {
+  const res = source.resistances;
+  if (res.includes("All")) return "All";
+  if (res.includes("Elemental") && (ELEMENTAL as readonly string[]).includes(resistance)) return "Elemental";
+  if (res.includes(resistance)) return resistance;
+  return null;
+}
+
+/** Whether a source reduces `resistance` (with All/Elemental expansion). */
+export function sourceHits(source: LogicalSource, resistance: string): boolean {
+  return matchedToken(source, resistance) !== null;
+}
+
 /** The reduction a source applies to `resistance`, or null when it does not hit it. */
 function hitValue(source: LogicalSource, resistance: string): number | null {
-  const res = source.resistances;
-  let token: string | null = null;
-  if (res.includes("All")) token = "All";
-  else if (res.includes("Elemental") && (ELEMENTAL as readonly string[]).includes(resistance)) token = "Elemental";
-  else if (res.includes(resistance)) token = resistance;
+  const token = matchedToken(source, resistance);
   if (token === null) return null;
   const v = source.perResistance[token];
   return v ?? source.valueAtMax;
