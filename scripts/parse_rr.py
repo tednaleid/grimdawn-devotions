@@ -418,11 +418,35 @@ ITEM_SKILL_FIELDS = (
 TIER3_STYLE_TAG = "tagStyleUniqueTier3"
 
 
+# A granted rank is usually a scalar, but some items scale it with the item's own level via a
+# small formula ("itemLevel/4+1"). We admit only itemLevel arithmetic and evaluate it against
+# the item level, so highest-rank-wins selection ranks these grants correctly.
+_LEVEL_FORMULA_RE = re.compile(r"^[\d.+\-*/() ]*itemlevel[\d.+\-*/() ]*$", re.IGNORECASE)
+
+
+def _grant_level(rec):
+    """The rank an item grants its skill at: a scalar itemSkillLevelEq/itemSkillLevel, or an
+    itemLevel formula evaluated against the item's own level. Array-valued forms stay None."""
+    raw = rec.get("itemSkillLevelEq", "").strip() or rec.get("itemSkillLevel", "").strip()
+    if not raw:
+        return None
+    lvl = _int(raw)
+    if lvl is not None:
+        return lvl
+    if _LEVEL_FORMULA_RE.match(raw):
+        item_level = _int(rec.get("itemLevel", "")) or 0
+        try:  # trusted build-time game data; the regex admits only itemLevel arithmetic
+            return int(eval(raw, {"__builtins__": {}}, {"itemLevel": item_level, "itemlevel": item_level}))
+        except Exception:
+            return None
+    return None
+
+
 def _item_grant_meta(rec):
     """(granted_level, autocast_controller, mythical) for an item that grants a skill.
     itemSkillLevelEq pins the rank the item grants the skill at; a proc carries an
     itemSkillAutoController (chance + trigger condition); Tier 3 marks the Mythical item."""
-    level = _int(rec.get("itemSkillLevelEq", "")) or _int(rec.get("itemSkillLevel", ""))
+    level = _grant_level(rec)
     controller = rec.get("itemSkillAutoController", "").replace("\\", "/").strip() or None
     mythical = rec.get("itemStyleTag", "").strip() == TIER3_STYLE_TAG
     return level, controller, mythical
@@ -503,12 +527,14 @@ def _item_name_descriptor(tags, game_en, rec, fallback_key):
 
 def _apply_grant_level(s, level):
     """Value an item-granted skill at the rank the item pins (itemSkillLevelEq), not the
-    skill's max rank. Item-granted skills do not overcap with +skills, so clear the
-    ultimate (+skills) fields the class-skill path fills in."""
+    skill's max rank. A level past the array is a level-scaled grant that reaches the skill's
+    top rank, where the max-rank value already computed is authoritative, so we leave it; we
+    only re-pick a value for a fixed lower rank (a base item below its Mythical version).
+    Item-granted skills do not overcap with +skills, so clear the ultimate fields."""
     arr = s["values_per_rank"]
-    if not level or not arr:
+    if not level or not arr or level > len(arr):
         return
-    s["value_at_max"] = arr[min(level, len(arr)) - 1]
+    s["value_at_max"] = arr[level - 1]
     s["max_rank"] = level
     s["ultimate_rank"] = None
     s["value_at_ultimate"] = None

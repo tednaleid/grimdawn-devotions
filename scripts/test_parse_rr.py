@@ -166,6 +166,15 @@ flame = find(lambda s: s["record_path"].endswith("itemskills/item_flamebrand_buf
 check("flamebrand reports the granted rank (-8), not the array end (-10)",
       flame and flame[0]["value_at_max"] == -8)
 
+# A grant whose rank is an itemLevel formula ("itemLevel/4+1") must still rank highest so the
+# top-tier (Mythical) item wins selection: Chilling Surge's highest grant is a Tier-3 item that
+# procs 100% when hit, not the base item's 30%-on-block. The value stays the max-rank -45.
+chill = find(lambda s: s["record_path"].endswith("item_chillingsurge_buff.dbr")
+             and s["resistances"] == ["Fire"])
+check("formula-level grant still selects the Mythical top-tier item",
+      chill and chill[0]["mythical"] is True and chill[0]["value_at_max"] == -45
+      and chill[0]["trigger_chance_percent"] == 100 and chill[0]["proc_condition"] == "HitByEnemy")
+
 # A non-proc granted debuff (no autocast controller) keeps a null proc chance/condition.
 anticlot = find(lambda s: s["record_path"].endswith("item_anticlottinginjection_buff.dbr"))
 check("non-proc grant has no proc chance",

@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.2.1.x",
     "steam_buildid": "19149150",
-    "generated_utc": "2026-07-22T22:32:00Z",
+    "generated_utc": "2026-07-22T22:51:22Z",
     "berserker_present": false
   },
   "sources": [
@@ -512,7 +512,7 @@
     {
       "id": "records:skills:itemskills:item_blackstar:reduced-flat",
       "name": "tagItemSkillC107Name",
-      "parent": "tagMedalC021",
+      "parent": "tagGDX2NecklaceC202",
       "record_path": "records/skills/itemskills/item_blackstar.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -2800,16 +2800,16 @@
       "trigger_chance_percent": 20,
       "trigger": "debuff",
       "proc_condition": "AttackEnemy",
-      "mythical": false,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
     {
       "id": "records:skills:itemskills:item_chillingsurge_buff:stacking:Fire",
       "name": "tagItemSkillC094Name",
-      "parent": "tagItemSkillC094Name",
+      "parent": "tagNecklaceC023",
       "record_path": "records/skills/itemskills/item_chillingsurge_buff.dbr",
-      "category": "monster infrequent",
+      "category": "item granted",
       "rr_type": "stacking",
       "resistances": [
         "Fire"
@@ -2825,10 +2825,10 @@
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": 8,
-      "trigger_chance_percent": 30,
+      "trigger_chance_percent": 100,
       "trigger": "debuff",
-      "proc_condition": "Block",
-      "mythical": false,
+      "proc_condition": "HitByEnemy",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -4363,7 +4363,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4389,7 +4389,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4415,7 +4415,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4441,7 +4441,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4467,7 +4467,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4493,7 +4493,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4519,7 +4519,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4545,7 +4545,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4571,7 +4571,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -4597,7 +4597,7 @@
       "values_per_rank": [
         -12
       ],
-      "max_rank": 6,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -12,
       "value_at_ultimate": null,
@@ -6176,7 +6176,7 @@
       "values_per_rank": [
         -15
       ],
-      "max_rank": 2,
+      "max_rank": 1,
       "ultimate_rank": null,
       "value_at_max": -15,
       "value_at_ultimate": null,
