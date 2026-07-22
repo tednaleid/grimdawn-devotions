@@ -80,7 +80,9 @@ function durLabel(loc: Localization, s: LogicalSource): string {
 
 function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string {
   const verify = s.verifyNote ? ` <span class="verify" title="${esc(loc.translate("rr.verify.title"))}">*</span>` : "";
-  const roll = s.rollNote ? ` <span class="roll" title="${esc(loc.translate("rr.roll.title"))}">⚄</span>` : "";
+  const roll = s.rollNote
+    ? ` <span class="roll" title="${esc(loc.translate("rr.roll.title"))}">${esc(loc.translate("rr.roll.tag"))}</span>`
+    : "";
   const name = esc(loc.gameText(s.name));
   const parent = esc(loc.gameText(s.parent));
   // Omit the parent subtext when it duplicates the name (nameless sources borrow the parent name).

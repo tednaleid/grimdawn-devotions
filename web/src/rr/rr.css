@@ -256,7 +256,17 @@
 }
 .rr-page .roll {
   cursor: help;
-  opacity: 0.85;
+  display: inline-block;
+  font-family: var(--rr-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--rr-ember);
+  border: 1px solid var(--rr-ember);
+  border-radius: 3px;
+  padding: 0 3px;
+  vertical-align: 1px;
 }
 .rr-page .rr-group-head td {
   background: #1d190f;
