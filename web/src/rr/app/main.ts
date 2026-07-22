@@ -14,6 +14,7 @@ import { applyView, groupView } from "../core/filter";
 import { resolveLedger } from "../core/ledger";
 import { renderTable } from "../adapters/tableView";
 import { renderLedger } from "../adapters/ledgerView";
+import { renderPrimer } from "../adapters/primerView";
 import { decodeHash, encodeHash, type ViewState } from "../core/urlState";
 
 async function boot() {
@@ -35,7 +36,16 @@ async function boot() {
 
   const tableEl = document.getElementById("rr-table") as HTMLElement;
   const ledgerEl = document.getElementById("rr-ledger") as HTMLElement;
+  const primerEl = document.getElementById("rr-primer") as HTMLElement;
   const headerEl = document.querySelector("header") as HTMLElement;
+
+  // Static chrome text, re-applied after a language switch (like the planner's applyChrome).
+  function applyChrome(): void {
+    document.title = localization.translate("rr.title");
+    (document.getElementById("rr-title") as HTMLElement).textContent = localization.translate("rr.title");
+    (document.getElementById("rr-planner-link") as HTMLElement).textContent = localization.translate("rr.plannerLink");
+    renderPrimer(primerEl, localization);
+  }
 
   // Injected resolvers keep the pure core i18n-free: names/parents resolve through the current locale.
   const nameOf = (s: LogicalSource) => localization.gameText(s.name);
@@ -89,9 +99,11 @@ async function boot() {
       storeLocale(locale);
       localization = await loadLocalization({ base: "..", available: SUPPORTED_LOCALES, preferred: [locale] });
       picker.setCurrent(localization.locale, localization.translate("ui.lang.label"));
+      applyChrome();
       refresh("replace");
     },
   });
+  applyChrome();
 
   // Back/Forward, bookmark clicks, hand-edited URLs; our own pushState never fires hashchange.
   window.addEventListener("hashchange", () => {

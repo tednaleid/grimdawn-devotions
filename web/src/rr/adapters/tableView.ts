@@ -35,6 +35,10 @@ export function triggerKey(trigger: string): string {
   return `rr.trigger.${trigger.replace(/[^a-z]/gi, "").toLowerCase()}`;
 }
 
+export function categoryKey(category: string): string {
+  return `rr.cat.${category.replace(/[^a-z]/gi, "").toLowerCase()}`;
+}
+
 export function typesLabel(loc: Localization, s: LogicalSource): string {
   if (s.resistances.includes("All")) return loc.translate("rr.types.all");
   if (s.resistances.includes("Elemental")) {
@@ -78,7 +82,7 @@ function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string
   const verify = s.verifyNote ? ` <span class="verify" title="${esc(loc.translate("rr.verify.title"))}">*</span>` : "";
   return `<tr class="${s.rrType}${selected ? " selrow" : ""}" data-id="${esc(s.id)}" role="button" tabindex="0" aria-pressed="${selected}">
     <td class="name">${esc(loc.gameText(s.name))}<span class="parent">${esc(loc.gameText(s.parent))}</span></td>
-    <td>${esc(s.category)}</td>
+    <td>${esc(loc.translate(categoryKey(s.category)))}</td>
     <td>${rrBadge(loc, s.rrType)}</td>
     <td>${esc(typesLabel(loc, s))}${verify}</td>
     <td class="val">${esc(valLabel(loc, s))}</td>
@@ -136,7 +140,9 @@ function syncControls(el: HTMLElement, loc: Localization, all: LogicalSource[], 
     loc.translate("rr.ctl.allRr"),
   );
 
-  const cats = facet(all, (s) => s.category).map((c) => ({ value: c, label: c }));
+  const cats = facet(all, (s) => s.category)
+    .map((c) => ({ value: c, label: loc.translate(categoryKey(c)) }))
+    .sort((a, b) => a.label.localeCompare(b.label));
   el.querySelector<HTMLSelectElement>("#rr-fCat")!.innerHTML = optionList(
     cats,
     view.fCat,
