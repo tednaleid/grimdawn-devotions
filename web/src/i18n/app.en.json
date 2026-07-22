@@ -254,7 +254,7 @@
   "rr.dur.seconds": "{s}s",
   "rr.verify.title": "Reaches an enemy debuff via a path we could not fully confirm; verify in-game.",
   "rr.roll.tag": "roll",
-  "rr.roll.title": "Random roll: the Conduit amulet grants one skill augment from a pool, so you need a copy rolled with this specific augment (the skill, damage type, and value shown), not just any Conduit of Eldritch Whispers.",
+  "rr.roll.title": "Random roll: this reduction comes from a unique prefix on the Conduit of Eldritch Whispers, not the base amulet. Each prefix modifies a different skill, so you need the copy whose prefix modifies the skill shown here, with the damage type and value shown.",
   "rr.trigger.debuff": "Debuff",
   "rr.trigger.fieldtrap": "Field / trap",
   "rr.trigger.contagiousdebuff": "Contagious debuff",

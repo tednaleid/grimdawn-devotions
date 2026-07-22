@@ -81,17 +81,21 @@ function durLabel(loc: Localization, s: LogicalSource): string {
 function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string {
   const verify = s.verifyNote ? ` <span class="verify" title="${esc(loc.translate("rr.verify.title"))}">*</span>` : "";
   const roll = s.rollNote
-    ? ` <span class="roll" title="${esc(loc.translate("rr.roll.title"))}">${esc(loc.translate("rr.roll.tag"))}</span>`
+    ? `<span class="roll" title="${esc(loc.translate("rr.roll.title"))}">${esc(loc.translate("rr.roll.tag"))}</span>`
     : "";
   const name = esc(loc.gameText(s.name));
   const parent = esc(loc.gameText(s.parent));
   // Omit the parent subtext when it duplicates the name (nameless sources borrow the parent name).
-  const parentSpan = parent && parent !== name ? `<span class="parent">${parent}</span>` : "";
+  const parentText = parent && parent !== name ? parent : "";
+  // The roll marker qualifies the source, not the damage type: this bonus only appears on a specific
+  // random roll of the item, so it belongs on the source's item/parent line.
+  const meta = [parentText, roll].filter(Boolean).join(" ");
+  const parentSpan = meta ? `<span class="parent">${meta}</span>` : "";
   return `<tr class="${s.rrType}${selected ? " selrow" : ""}" data-id="${esc(s.id)}" role="button" tabindex="0" aria-pressed="${selected}">
     <td class="name">${name}${parentSpan}</td>
     <td>${esc(loc.translate(categoryKey(s.category)))}</td>
     <td>${rrBadge(loc, s.rrType)}</td>
-    <td>${esc(typesLabel(loc, s))}${verify}${roll}</td>
+    <td>${esc(typesLabel(loc, s))}${verify}</td>
     <td class="val">${esc(valLabel(loc, s))}</td>
     <td>${esc(loc.translate(triggerKey(s.trigger)))}</td>
     <td>${esc(durLabel(loc, s))}</td>
