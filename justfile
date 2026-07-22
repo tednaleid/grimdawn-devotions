@@ -481,3 +481,4 @@ install-e2e:
 # own pipe and ws transports do not connect under bun on Windows. Run install-e2e once first.
 e2e: build
     cd "{{justfile_directory()}}/web" && bun e2e/smoke.ts
+    cd "{{justfile_directory()}}/web" && bun e2e/rr-smoke.ts
