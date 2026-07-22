@@ -1,0 +1,41 @@
+<!-- ABOUTME: HTML shell for the Grim Dawn Resistance Reduction reference page. -->
+<!-- ABOUTME: Declares the layout (header, primer, source table, debuff ledger) and loads rr-main.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grim Dawn Resistance Reduction</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <script>
+    // Mirror the planner's boot-fail recovery: a cached shell can outlive the hashed entry it names.
+    function bootFailed() {
+      try {
+        if (!sessionStorage.getItem("rrBootReloaded")) {
+          sessionStorage.setItem("rrBootReloaded", "1");
+          location.reload();
+          return;
+        }
+      } catch (e) {}
+      var el = document.getElementById("boot-loading");
+      if (el)
+        el.innerHTML =
+          '<p>Couldn\'t load the page.</p><button type="button" onclick="location.reload()">Reload</button>';
+    }
+  </script>
+</head>
+<body class="rr-page">
+  <header>
+    <a id="rr-planner-link" href="../">Devotion Planner</a>
+    <h1 id="rr-title">Resistance Reduction</h1>
+  </header>
+  <div id="rr-primer"></div>
+  <main id="rr-main">
+    <div id="rr-table">
+      <div id="boot-loading" role="status"><div class="boot-spinner" aria-hidden="true"></div><p>Loading…</p></div>
+    </div>
+    <aside id="rr-ledger"></aside>
+  </main>
+  <script type="module" src="./rr-main.js" onerror="bootFailed()"></script>
+</body>
+</html>

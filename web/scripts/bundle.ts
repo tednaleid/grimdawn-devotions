@@ -39,4 +39,34 @@ if (!html.includes(jsName) || !html.includes(cssName)) {
 }
 await Bun.write("dist/index.html", html);
 
-console.log(`bundled dist: ${jsName}, ${cssName} (buildId ${buildId})`);
+// Second page: the RR reference, its own bundle under dist/resistance-reduction/, sharing the
+// hashed styles.css from the parent dir. Named rr-main to avoid colliding with the planner's main.
+const rr = await Bun.build({
+  entrypoints: ["src/rr/app/main.ts"],
+  outdir: "dist/resistance-reduction",
+  target: "browser",
+  minify: true,
+  sourcemap: "linked",
+  naming: "rr-[name]-[hash].[ext]", // dist/resistance-reduction/rr-main-<hash>.js
+});
+if (!rr.success) {
+  for (const log of rr.logs) console.error(log);
+  throw new Error("bundle: RR Bun.build failed");
+}
+const rrEntry = rr.outputs.find((o) => o.kind === "entry-point");
+if (!rrEntry) throw new Error("bundle: no RR entry-point output");
+const rrJsName = rrEntry.path.split(/[\\/]/).pop()!; // rr-main-<hash>.js
+
+let rrHtml = await Bun.file("resistance-reduction.html").text();
+rrHtml = rrHtml
+  .replace('src="./rr-main.js"', `src="./${rrJsName}"`)
+  .replace('href="../styles.css"', `href="../${cssName}"`);
+if (rrHtml.includes('"./rr-main.js"') || rrHtml.includes('"../styles.css"')) {
+  throw new Error("bundle: resistance-reduction.html still has un-hashed asset refs after rewrite");
+}
+if (!rrHtml.includes(rrJsName) || !rrHtml.includes(cssName)) {
+  throw new Error("bundle: hashed RR asset refs not present after rewrite");
+}
+await Bun.write("dist/resistance-reduction/index.html", rrHtml);
+
+console.log(`bundled dist: ${jsName}, ${cssName}, ${rrJsName} (buildId ${buildId})`);
