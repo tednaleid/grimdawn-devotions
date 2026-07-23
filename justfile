@@ -189,6 +189,11 @@ parse-rr *ARGS:
         --devotions "{{out}}" \
         --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
 
+# Diff the regenerated data/*.json against the committed baseline: assert devotion structure is stable,
+# report tuning + RR changes. Run after regenerating, before committing. Exits non-zero on a structural break.
+diff-data:
+    uv run scripts/diff_data.py --devotions "{{out}}" --rr "{{out_rr}}"
+
 # Full pipeline: extract then parse
 all: extract parse parse-rr i18n-tables
 
