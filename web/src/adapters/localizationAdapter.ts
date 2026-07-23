@@ -2,6 +2,7 @@
 // ABOUTME: Degrades to English then raw keys if a catalog is missing; the UI never blocks on i18n.
 import { makeLocalization } from "../core/localization";
 import { pickLocale } from "../core/locale";
+import { withVersion } from "./assetVersion";
 import type { Localization } from "../ports/Localization";
 
 // The 13 locales shipped (game + app catalogs both exist for each).
@@ -85,9 +86,10 @@ export async function loadLocalization(
   const preferred = opts.preferred ?? (typeof navigator !== "undefined" ? navigator.languages : ["en"]);
   const fetchImpl = opts.fetchImpl ?? fetch;
   const locale = pickLocale(preferred, available);
-  const fallback = await getJson(fetchImpl, `${base}/i18n/app.en.json`);
-  const active = locale === "en" ? fallback : await getJson(fetchImpl, `${base}/i18n/app.${locale}.json`);
-  const gameFallback = await getJson(fetchImpl, `${base}/data/i18n/game.en.json`);
-  const gameActive = locale === "en" ? gameFallback : await getJson(fetchImpl, `${base}/data/i18n/game.${locale}.json`);
+  const fallback = await getJson(fetchImpl, withVersion(`${base}/i18n/app.en.json`));
+  const active = locale === "en" ? fallback : await getJson(fetchImpl, withVersion(`${base}/i18n/app.${locale}.json`));
+  const gameFallback = await getJson(fetchImpl, withVersion(`${base}/data/i18n/game.en.json`));
+  const gameActive =
+    locale === "en" ? gameFallback : await getJson(fetchImpl, withVersion(`${base}/data/i18n/game.${locale}.json`));
   return makeLocalization(active, fallback, locale, gameActive, gameFallback);
 }

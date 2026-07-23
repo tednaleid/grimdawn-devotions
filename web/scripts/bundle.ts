@@ -1,10 +1,36 @@
 // ABOUTME: Builds the planner's JS/CSS into web/dist with content-hashed, minified filenames.
 // ABOUTME: Bundles main.ts (Bun.build), hashes styles.css, and rewrites the asset refs in index.html.
 import { createHash } from "node:crypto";
+import { readdirSync, readFileSync } from "node:fs";
 import { computeBuildId } from "../src/adapters/coverTableBlob";
 
-// buildId tags the data ?v= and is checked against the cover blob; it is data-only by design.
+// buildId identifies the planner data (devotions.json) and is checked against the cover blob.
 const buildId = computeBuildId(await Bun.file("../data/devotions.json").text());
+
+// assetVersion tags the ?v= on every runtime-fetched JSON (planner + RR data, and all i18n catalogs),
+// so a deploy that changes ANY of them busts returning visitors' caches. buildId alone can't: it only
+// reflects devotions.json, so an i18n-only change would leave it unchanged. Hash the source files (in a
+// stable order) before the build recipe copies them into dist.
+function assetVersionHash(): string {
+  const jsonIn = (dir: string) =>
+    readdirSync(dir)
+      .filter((f) => f.endsWith(".json"))
+      .sort()
+      .map((f) => `${dir}/${f}`);
+  const files = [
+    "../data/devotions.json",
+    "../data/resistance-reduction.json",
+    ...jsonIn("src/i18n"), // app.<locale>.json (UI chrome)
+    ...jsonIn("../data/i18n"), // game.<locale>.json (game text)
+  ];
+  const h = createHash("sha256");
+  for (const f of files) {
+    h.update(f);
+    h.update(readFileSync(f));
+  }
+  return h.digest("hex").slice(0, 16);
+}
+const assetVersion = assetVersionHash();
 
 const result = await Bun.build({
   entrypoints: ["src/app/main.ts"],
@@ -13,7 +39,7 @@ const result = await Bun.build({
   minify: true,
   sourcemap: "linked", // emits main-<hash>.js.map; only fetched when devtools is open
   naming: "[name]-[hash].[ext]", // dist/main-<hash>.js
-  define: { __BUILD_ID__: JSON.stringify(buildId) },
+  define: { __BUILD_ID__: JSON.stringify(buildId), __ASSET_V__: JSON.stringify(assetVersion) },
 });
 if (!result.success) {
   for (const log of result.logs) console.error(log);
@@ -48,6 +74,7 @@ const rr = await Bun.build({
   minify: true,
   sourcemap: "linked",
   naming: "rr-[name]-[hash].[ext]", // dist/resistance-reduction/rr-main-<hash>.js
+  define: { __ASSET_V__: JSON.stringify(assetVersion) },
 });
 if (!rr.success) {
   for (const log of rr.logs) console.error(log);
@@ -75,4 +102,4 @@ if (!rrHtml.includes(rrJsName) || !rrHtml.includes(cssName) || !rrHtml.includes(
 }
 await Bun.write("dist/resistance-reduction/index.html", rrHtml);
 
-console.log(`bundled dist: ${jsName}, ${cssName}, ${rrJsName} (buildId ${buildId})`);
+console.log(`bundled dist: ${jsName}, ${cssName}, ${rrJsName} (buildId ${buildId}, assetV ${assetVersion})`);
