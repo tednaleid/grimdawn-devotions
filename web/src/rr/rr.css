@@ -273,7 +273,9 @@
 }
 @media (max-width: 1020px) {
   .rr-page #rr-main {
-    grid-template-columns: 1fr;
+    /* minmax(0,…) lets the column shrink below the table's min-width so the table scrolls
+       inside .tablewrap and the filter chips wrap to the viewport instead of overflowing. */
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

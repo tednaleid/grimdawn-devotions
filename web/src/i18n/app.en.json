@@ -248,7 +248,7 @@
   "rr.badge.reduced-flat": "X RED",
   "rr.types.all": "All resistances",
   "rr.types.elemental": "Elemental",
-  "rr.value.reduced": "{v}% Reduced",
+  "rr.value.reduced": "{v}% mult",
   "rr.value.flat": "{v} flat",
   "rr.value.overcap": "/ ~{v} overcap",
   "rr.dur.seconds": "{s}s",
