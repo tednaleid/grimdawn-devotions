@@ -9,7 +9,15 @@ import doc from "../../../data/resistance-reduction.json";
 
 const logical = aggregate(parseCatalogue(doc).sources);
 const nameOf = (s: { name: string }) => s.name;
-const view = (patch: Partial<ViewState>): ViewState => ({ ...DEFAULT_VIEW, ...patch });
+// Start from cleared facets (not DEFAULT_VIEW's devotion+skill source default) so each test drives
+// the exact filter it means to; an empty source set applies no constraint (see the test below).
+const view = (patch: Partial<ViewState>): ViewState => ({
+  ...DEFAULT_VIEW,
+  fType: new Set(),
+  fRR: new Set(),
+  fCat: new Set(),
+  ...patch,
+});
 
 test("RR-type filter narrows to one type", () => {
   const out = applyView(logical, view({ fRR: new Set(["stacking"]) }), nameOf);

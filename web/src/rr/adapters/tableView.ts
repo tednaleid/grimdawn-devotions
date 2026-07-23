@@ -2,7 +2,7 @@
 // ABOUTME: Whole-row click/keyboard toggles ledger selection; every change round-trips through onView.
 import type { Localization } from "../../ports/Localization";
 import type { LogicalSource } from "../core/aggregate";
-import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES } from "../core/facets";
+import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES, DEFAULT_COARSE_CATEGORIES } from "../core/facets";
 import type { ViewState } from "../core/urlState";
 
 export interface TableHandlers {
@@ -199,8 +199,10 @@ function wire(el: HTMLElement): void {
     next.has(val) ? next.delete(val) : next.add(val);
     fire({ [facetKey]: next } as Partial<ViewState>);
   });
+  // Reset restores the default view, not a bare "show everything": the source facet returns to its
+  // devotion+skill default rather than clearing to all (which would surprise users with a flood of items).
   el.querySelector<HTMLButtonElement>("#rr-reset")!.addEventListener("click", () => {
-    fire({ q: "", fType: new Set(), fRR: new Set(), fCat: new Set() });
+    fire({ q: "", fType: new Set(), fRR: new Set(), fCat: new Set(DEFAULT_COARSE_CATEGORIES) });
   });
   // Sort: click a header (toggle dir when re-clicking the active key).
   el.querySelector("thead")!.addEventListener("click", (e) => {

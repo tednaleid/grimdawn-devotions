@@ -1,6 +1,6 @@
 // ABOUTME: The RR page ViewState (every view-changing control) and its default; hash codec added in Task 6.
 // ABOUTME: ViewState is the single source of view state; main.ts round-trips it through the URL hash.
-import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES } from "./facets";
+import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES, DEFAULT_COARSE_CATEGORIES } from "./facets";
 
 export interface ViewState {
   q: string;
@@ -17,7 +17,7 @@ export const DEFAULT_VIEW: ViewState = {
   q: "",
   fType: new Set(),
   fRR: new Set(),
-  fCat: new Set(),
+  fCat: new Set(DEFAULT_COARSE_CATEGORIES),
   sortKey: "rr",
   sortDir: 1,
   sel: new Set(),
@@ -55,7 +55,9 @@ export function encodeHash(view: ViewState): string {
   put("q", view.q);
   putSet(parts, "type", view.fType);
   putSet(parts, "rr", view.fRR);
-  putSet(parts, "cat", view.fCat);
+  // The source facet has a non-empty default, so it is always emitted (even when empty): this keeps
+  // the cleared "show all" state (`source=`) distinct from an absent key, which decodes to the default.
+  parts.push(`source=${[...view.fCat].map(encodeURIComponent).join(",")}`);
   parts.push(`sort=${encodeURIComponent(view.sortKey)}:${view.sortDir}`);
   if (view.r0 !== DEFAULT_VIEW.r0) parts.push(`r0=${view.r0}`);
   if (view.sel.size) parts.push(`sel=${[...view.sel].map(encodeURIComponent).join(",")}`);
@@ -64,7 +66,15 @@ export function encodeHash(view: ViewState): string {
 
 /** Decode a hash body onto DEFAULT_VIEW; tolerates garbage and drops sel ids not in knownIds. */
 export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
-  const v: ViewState = { ...DEFAULT_VIEW, fType: new Set(), fRR: new Set(), fCat: new Set(), sel: new Set() };
+  // fCat starts at the default selection (not empty): a hash with no `source` key means "the default",
+  // while `source=` (present but empty) means the user cleared it to show all.
+  const v: ViewState = {
+    ...DEFAULT_VIEW,
+    fType: new Set(),
+    fRR: new Set(),
+    fCat: new Set(DEFAULT_COARSE_CATEGORIES),
+    sel: new Set(),
+  };
   const body = hash.startsWith("#") ? hash.slice(1) : hash;
   for (const pair of body.split("&")) {
     const eq = pair.indexOf("=");
@@ -81,7 +91,7 @@ export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
       v.fRR = readSet(rawVal, RR_VALUES);
       continue;
     }
-    if (key === "cat") {
+    if (key === "source") {
       v.fCat = readSet(rawVal, CAT_VALUES);
       continue;
     }

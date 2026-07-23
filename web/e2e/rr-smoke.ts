@@ -146,8 +146,22 @@ try {
 
   const rendered = await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n > 0);
   check(rendered, "page loads and renders table rows");
+
+  // Default view: devotion + skill sources only (items are opt-in), so the item chip is present and off.
+  const defaultRows = await cdp.evaluate<number>("document.querySelectorAll('tr[data-id]').length");
+  const itemOff = await cdp.evaluate<string>(
+    `document.querySelector('.chip[data-facet="fCat"][data-val="item"]')?.getAttribute('aria-pressed') ?? ''`,
+  );
+  check(
+    itemOff === "false" && defaultRows > 20 && defaultRows < 120,
+    `default view is devotion+skill only (${defaultRows} rows, item chip off)`,
+  );
+
+  // Enabling every source reveals the full catalogue; use it as the baseline for the filter checks below.
+  await cdp.evaluate(`location.hash = "#source=devotion,skill,item"`);
+  await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n > defaultRows);
   const rows = await cdp.evaluate<number>("document.querySelectorAll('tr[data-id]').length");
-  check(rows > 250, `renders the full catalogue (${rows} rows)`);
+  check(rows > 250, `enabling all sources shows the full catalogue (${rows} rows)`);
 
   // Localization: no raw rr.* keys leaked, and source names resolve to real text (not raw tags).
   const leaked = await cdp.evaluate<string[]>("(document.body.innerText.match(/rr\\.[a-zA-Z.]+/g) || [])");
@@ -160,8 +174,8 @@ try {
   );
   check(rawNames === 0, `no raw x:/record-path source names (${rawNames})`);
 
-  // Filter through the hash: RR-type = stacking narrows the table to stacking rows only.
-  await cdp.evaluate(`location.hash = "#rr=stacking"`);
+  // Filter through the hash: RR-type = stacking narrows the (all-sources) table to stacking rows only.
+  await cdp.evaluate(`location.hash = "#source=devotion,skill,item&rr=stacking"`);
   await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n < rows);
   const stackingRows = await cdp.evaluate<number>("document.querySelectorAll('tr[data-id]').length");
   const allStacking = await cdp.evaluate<boolean>(
@@ -169,9 +183,9 @@ try {
   );
   check(stackingRows > 0 && stackingRows < rows && allStacking, `RR-type filter narrows to stacking (${stackingRows})`);
 
-  // Damage-type facet chip: clicking Fire narrows the table, and every remaining row's damage
-  // cell is Fire itself or a fold-in source (Elemental/All resistances).
-  await cdp.evaluate(`location.hash = ""`);
+  // Damage-type facet chip: clicking Fire narrows the (all-sources) table, and every remaining row's
+  // damage cell is Fire itself or a fold-in source (Elemental/All resistances).
+  await cdp.evaluate(`location.hash = "#source=devotion,skill,item"`);
   await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n === rows);
   await cdp.evaluate(`document.querySelector('.chip[data-facet="fType"][data-val="Fire"]').click()`);
   await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n < rows);
@@ -181,9 +195,9 @@ try {
   );
   check(fireRows > 0 && fireRows < rows && allFireOrFoldIn, `damage chip filters to Fire + fold-in (${fireRows})`);
 
-  // Clear the filter, click a row: the ledger computes and the hash records the selection.
+  // Back to the default view, click a row: the ledger computes and the hash records the selection.
   await cdp.evaluate(`location.hash = ""`);
-  await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n === rows);
+  await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n === defaultRows);
   await cdp.evaluate("document.querySelector('tr[data-id]').click()");
   await waitFor<number>(cdp, "document.querySelectorAll('#rr-ledger .resline').length", (n) => n > 0);
   const reslines = await cdp.evaluate<number>("document.querySelectorAll('#rr-ledger .resline').length");
