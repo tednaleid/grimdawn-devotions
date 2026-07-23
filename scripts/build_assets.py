@@ -52,6 +52,10 @@ def main(argv=None) -> int:
                 continue
             if not args.include_nebula and "nebula" in e.lower():
                 continue
+            # The in-game selector buttons and zoom controls also live under skills/devotion/, but the
+            # web planner draws its own map and never references them; skip them so we do not ship dead art.
+            if re.match(r"devotionbuttons_|devotion_zoom", Path(e).stem.lower()):
+                continue
             chosen[Path(e).stem] = (arc, e)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
