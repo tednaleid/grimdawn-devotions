@@ -16,7 +16,8 @@ BASE = {
     "constellations": [
         {"id": "c1", "name_tag": "t1", "tier": 1, "point_cost": 2,
          "affinity_required": {"a": 1}, "affinity_bonus": {"a": 5},
-         "stars": [{"index": 0, "bonuses": {"str": 10}, "celestial_power": None}]},
+         "stars": [{"index": 0, "bonuses": {"str": 10}, "pet_bonuses": {"petcrit": 8},
+                    "celestial_power": {"stats": {"dmg": 100}, "pet": None}}]},
     ],
 }
 
@@ -29,7 +30,7 @@ def clone(d):
 def test_stable_is_clean():
     errors, changes = dd.diff_devotions(BASE, clone(BASE))
     assert errors == [], errors
-    assert changes == [], changes
+    assert changes == {}, changes
 
 
 def test_removed_constellation_is_structural_error():
@@ -53,12 +54,31 @@ def test_point_cost_total_change_is_error():
     assert errors, errors
 
 
-def test_bonus_value_change_is_tuning():
+def test_player_bonus_change_is_tuning():
     new = clone(BASE)
     new["constellations"][0]["stars"][0]["bonuses"]["str"] = 12
     errors, changes = dd.diff_devotions(BASE, new)
     assert errors == [], errors
-    assert any("str" in c and "12" in c for c in changes), changes
+    lines = changes.get("c1", [])
+    assert any("str" in ln and "12" in ln and "pet" not in ln for ln in lines), lines
+
+
+def test_pet_bonus_change_is_tuning_and_labeled_pet():
+    new = clone(BASE)
+    new["constellations"][0]["stars"][0]["pet_bonuses"]["petcrit"] = 5
+    errors, changes = dd.diff_devotions(BASE, new)
+    assert errors == [], errors
+    lines = changes.get("c1", [])
+    assert any("(pet)" in ln and "8 -> 5" in ln for ln in lines), lines
+
+
+def test_celestial_power_stat_change_is_tuning():
+    new = clone(BASE)
+    new["constellations"][0]["stars"][0]["celestial_power"]["stats"]["dmg"] = 120
+    errors, changes = dd.diff_devotions(BASE, new)
+    assert errors == [], errors
+    lines = changes.get("c1", [])
+    assert any("[power]" in ln and "100 -> 120" in ln for ln in lines), lines
 
 
 def test_rr_added_removed_changed():

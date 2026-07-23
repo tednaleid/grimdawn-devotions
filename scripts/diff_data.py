@@ -10,6 +10,45 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Friendly labels for the devotion stat keys a balance patch commonly touches; unknown keys fall back
+# to the raw key (still unambiguous). Kept deliberately small and hand-checked rather than replicating
+# the web app's full stat-format engine.
+STAT_LABELS = {
+    "offensiveCritDamageModifier": "Crit Damage %",
+    "retaliationTotalDamageModifier": "Total Retaliation Damage %",
+    "retaliationPhysicalModifier": "Physical Retaliation %",
+    "retaliationPoisonModifier": "Acid/Poison Retaliation %",
+    "retaliationFireModifier": "Fire Retaliation %",
+    "retaliationColdModifier": "Cold Retaliation %",
+    "retaliationLightningModifier": "Lightning Retaliation %",
+    "characterOffensiveAbility": "Offensive Ability",
+    "characterOffensiveAbilityModifier": "Offensive Ability %",
+    "characterDefensiveAbility": "Defensive Ability",
+    "characterDefensiveAbilityModifier": "Defensive Ability %",
+    "characterTotalSpeedModifier": "Total Speed %",
+    "characterAttackSpeedModifier": "Attack Speed %",
+    "characterSpellCastSpeedModifier": "Cast Speed %",
+    "characterRunSpeedModifier": "Movement Speed %",
+    "characterStrength": "Physique",
+    "characterDexterity": "Cunning",
+    "characterIntelligence": "Spirit",
+    "characterLife": "Health",
+    "characterLifeModifier": "Health %",
+    "defensiveAbsorptionModifier": "Damage Absorption %",
+    "defensiveProtection": "Armor",
+    "defensiveProtectionModifier": "Armor %",
+    "skillCooldownReduction": "Cooldown Reduction %",
+    "skillCooldownTime": "Cooldown (s)",
+}
+
+
+def _stat_label(key: str) -> str:
+    return STAT_LABELS.get(key, key)
+
+
+def _fmt(v) -> str:
+    return "none" if v is None else str(v)
+
 
 def _load_working(path: str):
     return json.loads(Path(path).read_text(encoding="utf-8"))
@@ -34,10 +73,30 @@ def _load_baseline(path: str):
     return json.loads(r.stdout)
 
 
+def _load_gametext(path: str) -> dict:
+    """Flat tag -> English text map (data/i18n/game.en.json), for resolving constellation names."""
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except OSError:
+        return {}
+
+
+def _diff_map(out: list, prefix: str, old_map: dict | None, new_map: dict | None) -> None:
+    """Append 'prefix: Label OLD -> NEW' for every key whose value differs between the two maps."""
+    om, nm = old_map or {}, new_map or {}
+    for k in sorted(set(om) | set(nm)):
+        ov, nv = om.get(k), nm.get(k)
+        if ov != nv:
+            out.append(f"{prefix}{_stat_label(k)} {_fmt(ov)} -> {_fmt(nv)}")
+
+
 def diff_devotions(old: dict, new: dict):
-    """Return (errors, changes): errors are structural (must be empty to pass); changes are tuning info."""
+    """Return (errors, changes): errors are structural (must be empty to pass); changes maps a
+    constellation id to its list of stat-change lines, covering player bonuses, PET bonuses, and the
+    celestial power's own stats + granted pet stats. (Celestial-power stats are stored at max rank
+    only, so a scaling-with-rank tweak that keeps the same max value will not appear.)"""
     errors: list[str] = []
-    changes: list[str] = []
+    changes: dict[str, list[str]] = {}
     by_id = lambda doc: {c["id"]: c for c in doc.get("constellations", [])}
     o, n = by_id(old), by_id(new)
     o_ids, n_ids = set(o), set(n)
@@ -62,16 +121,22 @@ def diff_devotions(old: dict, new: dict):
         if len(os_) != len(ns_):
             errors.append(f"{cid}: star count changed {len(os_)} -> {len(ns_)}")
             continue
+        cl: list[str] = []
         for field in ("affinity_required", "affinity_bonus"):
             if oc.get(field) != nc.get(field):
-                changes.append(f"{cid}: {field} {oc.get(field)} -> {nc.get(field)}")
+                cl.append(f"{field}: {oc.get(field)} -> {nc.get(field)}")
         for a, b in zip(os_, ns_):
-            ab, bb = a.get("bonuses", {}), b.get("bonuses", {})
-            for k in sorted(set(ab) | set(bb)):
-                if ab.get(k) != bb.get(k):
-                    changes.append(f"{cid} star{a.get('index')}: {k} {ab.get(k)} -> {bb.get(k)}")
-            if bool(a.get("celestial_power")) != bool(b.get("celestial_power")):
-                changes.append(f"{cid} star{a.get('index')}: celestial_power presence changed")
+            si = a.get("index")
+            _diff_map(cl, f"star{si}: ", a.get("bonuses"), b.get("bonuses"))
+            _diff_map(cl, f"star{si} (pet): ", a.get("pet_bonuses"), b.get("pet_bonuses"))
+            ocp, ncp = a.get("celestial_power"), b.get("celestial_power")
+            if bool(ocp) != bool(ncp):
+                cl.append(f"star{si}: celestial power {'added' if ncp else 'removed'}")
+            elif ocp and ncp:
+                _diff_map(cl, f"star{si} [power]: ", ocp.get("stats"), ncp.get("stats"))
+                _diff_map(cl, f"star{si} [power/pet]: ", ocp.get("pet"), ncp.get("pet"))
+        if cl:
+            changes[cid] = cl
     return errors, changes
 
 
@@ -97,12 +162,19 @@ def _meta_line(old: dict, new: dict) -> str:
             f"v{nm.get('game_version')} (build {nm.get('steam_buildid')})")
 
 
+def _con_name(con: dict, gametext: dict) -> str:
+    """Resolved constellation display name (game text), falling back to the id."""
+    return gametext.get(con.get("name_tag", ""), con.get("id", "?"))
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--devotions", default="data/devotions.json")
     ap.add_argument("--rr", default="data/resistance-reduction.json")
+    ap.add_argument("--game-text", default="data/i18n/game.en.json", help="tag->name map for readable names")
     args = ap.parse_args(argv)
     exit_code = 0
+    gametext = _load_gametext(args.game_text)
 
     print("=== devotions.json ===")
     new_dev = _load_working(args.devotions)
@@ -119,10 +191,16 @@ def main(argv=None) -> int:
             exit_code = 1
         else:
             print(f"  STRUCTURE: stable ({len(new_dev.get('constellations', []))} constellations) OK")
+        # Group per constellation, sorted by resolved name, covering player + pet + celestial-power stats.
+        n_by_id = {c["id"]: c for c in new_dev.get("constellations", [])}
+        total = sum(len(v) for v in changes.values())
         if changes:
-            print(f"  TUNING CHANGES ({len(changes)}):")
-            for c in changes:
-                print(f"    {c}")
+            print(f"  TUNING CHANGES ({total} across {len(changes)} constellations):")
+            for cid in sorted(changes, key=lambda i: _con_name(n_by_id.get(i, {"id": i}), gametext).lower()):
+                print(f"    {_con_name(n_by_id.get(cid, {'id': cid}), gametext)}:")
+                for line in changes[cid]:
+                    print(f"      {line}")
+            print("  NOTE: celestial-power stats are max-rank; a scaling change that keeps the same max is not shown.")
         else:
             print("  TUNING CHANGES: none")
 
