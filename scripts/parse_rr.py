@@ -687,6 +687,23 @@ def is_player_relevant(rec_path: str) -> bool:
     return "/nonplayerskills" not in rec_path and "/base_template" not in rec_path
 
 
+def drop_unidentified_modifiers(tags, sources):
+    """Exclude skill_modifier sources we could only name by their own mastery. When a
+    modifier's name resolves to the same label as its parent, the row reads as a bare class
+    name ('Inquisitor', 'Oathkeeper') with no way to tell which item or skill it is: these
+    are item/pet-granted modifiers living under the class folders that item attribution
+    cannot reach. Named class modifiers (Vulnerability, Night's Chill, Break Morale) resolve
+    to a real skill name distinct from their mastery and are kept."""
+    label = lambda k: (tags.get(k) or k).strip()
+    kept = []
+    for s in sources:
+        if s["category"] == "modifier" and label(s["name"]) == label(s["parent"]):
+            EXCLUSIONS.append({"record_path": s["record_path"], "reason": "unidentified modifier (name == mastery)"})
+        else:
+            kept.append(s)
+    return kept
+
+
 def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str],
                     devotions_path) -> list[dict]:
     """Sweep the extraction and return one dict per RR source."""
@@ -715,7 +732,7 @@ def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str],
                 tags, game_en, s["record_path"], rec, class_masteries, devotion_parents)
     attribute_items(db, tags, game_en, sources)
     resolve_names(db, tags, game_en, sources, ctx["mmap"])
-    return sources
+    return drop_unidentified_modifiers(tags, sources)
 
 
 def print_summary(sources, exclusions):

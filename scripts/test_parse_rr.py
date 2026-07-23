@@ -181,5 +181,18 @@ check("non-proc grant has no proc chance",
       anticlot and anticlot[0]["trigger_chance_percent"] is None
       and anticlot[0]["proc_condition"] is None)
 
+# --- unidentified modifiers (name collapses to the bare mastery) are excluded ---
+# Named class modifiers survive; the item/pet-granted ones that read as a bare class name
+# ('Inquisitor', 'Oathkeeper', 'Demolitionist', 'Shaman') are dropped, not shown unverifiable.
+mods = find(lambda s: s["category"] == "modifier")
+check("kept modifiers all resolve to a real skill name (name != parent)",
+      mods and all(s["name"] != s["parent"] for s in mods))
+check("Vulnerability survives the modifier cleanup",
+      any(s["record_path"].endswith("curse2.dbr") for s in mods))
+check("Night's Chill survives the modifier cleanup",
+      any(s["record_path"].endswith("veilofshadows2.dbr") for s in mods))
+check("the Inquisitor Seal item modifiers were excluded",
+      not find(lambda s: "inquisitorseal" in s["record_path"]))
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

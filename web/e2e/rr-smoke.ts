@@ -147,7 +147,7 @@ try {
   const rendered = await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n > 0);
   check(rendered, "page loads and renders table rows");
   const rows = await cdp.evaluate<number>("document.querySelectorAll('tr[data-id]').length");
-  check(rows > 300, `renders the full catalogue (${rows} rows)`);
+  check(rows > 250, `renders the full catalogue (${rows} rows)`);
 
   // Localization: no raw rr.* keys leaked, and source names resolve to real text (not raw tags).
   const leaked = await cdp.evaluate<string[]>("(document.body.innerText.match(/rr\\.[a-zA-Z.]+/g) || [])");

@@ -17,9 +17,9 @@ test("ids are unique and stable", () => {
   expect(new Set(ids).size).toBe(ids.length);
 });
 
-test("aggregates to ~304 logical sources", () => {
-  expect(logical.length).toBeGreaterThan(280);
-  expect(logical.length).toBeLessThan(340);
+test("aggregates to ~274 logical sources", () => {
+  expect(logical.length).toBeGreaterThan(250);
+  expect(logical.length).toBeLessThan(320);
 });
 
 test("perResistance carries each token's base value", () => {
