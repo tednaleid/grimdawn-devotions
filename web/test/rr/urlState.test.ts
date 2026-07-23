@@ -33,7 +33,7 @@ test("multi-select facets round-trip as equal sets", () => {
   const known = new Set<string>();
   const v: ViewState = {
     ...DEFAULT_VIEW,
-    fType: new Set(["Fire", "Cold"]),
+    fType: new Set(["Fire", "Cold", "Poison & Acid"]),
     fRR: new Set(["stacking"]),
     fCat: new Set(["item", "skill"]),
   };

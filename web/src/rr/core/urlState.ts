@@ -1,5 +1,6 @@
 // ABOUTME: The RR page ViewState (every view-changing control) and its default; hash codec added in Task 6.
 // ABOUTME: ViewState is the single source of view state; main.ts round-trips it through the URL hash.
+import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES } from "./facets";
 
 export interface ViewState {
   q: string;
@@ -23,20 +24,9 @@ export const DEFAULT_VIEW: ViewState = {
   r0: 100,
 };
 
-const RR_VALUES = new Set(["stacking", "reduced-percent", "reduced-flat"]);
-const CAT_VALUES = new Set(["devotion", "skill", "item"]);
-const DMG_VALUES = new Set([
-  "Physical",
-  "Pierce",
-  "Fire",
-  "Cold",
-  "Lightning",
-  "Poison & Acid",
-  "Aether",
-  "Chaos",
-  "Vitality",
-  "Bleeding",
-]);
+const RR_VALUES = new Set(RR_TYPES);
+const CAT_VALUES = new Set(COARSE_CATEGORIES);
+const DMG_VALUES = new Set(DAMAGE_TYPES);
 
 function putSet(parts: string[], key: string, set: Set<string>): void {
   if (set.size) parts.push(`${key}=${[...set].map(encodeURIComponent).join(",")}`);
@@ -81,6 +71,20 @@ export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
     if (eq < 0) continue;
     const key = pair.slice(0, eq);
     const rawVal = pair.slice(eq + 1);
+    // Set-valued keys tolerate per-token decode failures via readSet, so they read rawVal directly
+    // rather than sharing the outer decode below (a malformed token would otherwise drop the whole list).
+    if (key === "type") {
+      v.fType = readSet(rawVal, DMG_VALUES);
+      continue;
+    }
+    if (key === "rr") {
+      v.fRR = readSet(rawVal, RR_VALUES);
+      continue;
+    }
+    if (key === "cat") {
+      v.fCat = readSet(rawVal, CAT_VALUES);
+      continue;
+    }
     let val: string;
     try {
       val = decodeURIComponent(rawVal);
@@ -90,15 +94,6 @@ export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
     switch (key) {
       case "q":
         v.q = val;
-        break;
-      case "type":
-        v.fType = readSet(rawVal, DMG_VALUES);
-        break;
-      case "rr":
-        v.fRR = readSet(rawVal, RR_VALUES);
-        break;
-      case "cat":
-        v.fCat = readSet(rawVal, CAT_VALUES);
         break;
       case "sort": {
         const [k, d] = val.split(":");

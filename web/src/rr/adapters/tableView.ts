@@ -2,6 +2,7 @@
 // ABOUTME: Whole-row click/keyboard toggles ledger selection; every change round-trips through onView.
 import type { Localization } from "../../ports/Localization";
 import type { LogicalSource } from "../core/aggregate";
+import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES } from "../core/facets";
 import type { ViewState } from "../core/urlState";
 
 export interface TableHandlers {
@@ -9,10 +10,8 @@ export interface TableHandlers {
 }
 
 // Single-instance page: the latest render inputs, so the wired-once listeners see current state.
+// Render helpers take loc/all/sorted as direct params; only view/handlers are read by the wired-once listeners.
 let ctx: {
-  loc: Localization;
-  all: LogicalSource[];
-  sorted: LogicalSource[];
   view: ViewState;
   handlers: TableHandlers;
 } | null = null;
@@ -116,34 +115,20 @@ function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string
   </tr>`;
 }
 
-const DMG = [
-  "Physical",
-  "Pierce",
-  "Fire",
-  "Cold",
-  "Lightning",
-  "Poison & Acid",
-  "Aether",
-  "Chaos",
-  "Vitality",
-  "Bleeding",
-];
-const RR_CHIPS: LogicalSource["rrType"][] = ["stacking", "reduced-percent", "reduced-flat"];
-const CAT_CHIPS = ["devotion", "skill", "item"] as const;
-
 function chip(facetKey: string, value: string, label: string, pressed: boolean, cls = ""): string {
   return `<button type="button" class="chip ${cls}" data-facet="${facetKey}" data-val="${esc(value)}" aria-pressed="${pressed}">${esc(label)}</button>`;
 }
 
 function facetGroup(loc: Localization, labelKey: string, chips: string): string {
-  return `<div class="facet"><span class="lab">${esc(loc.translate(labelKey))}</span><div class="chips" role="group">${chips}</div></div>`;
+  const labId = `rr-facet-lab-${labelKey.replace(/\./g, "-")}`;
+  return `<div class="facet"><span class="lab" id="${labId}">${esc(loc.translate(labelKey))}</span><div class="chips" role="group" aria-labelledby="${labId}">${chips}</div></div>`;
 }
 
 /** Pure markup for the three chip facet groups; aria-pressed reflects the current view's sets. */
 export function facetsMarkup(loc: Localization, view: ViewState): string {
-  const dmg = DMG.map((d) => chip("fType", d, d, view.fType.has(d))).join("");
-  const rr = RR_CHIPS.map((r) => chip("fRR", r, loc.translate(`rr.badge.${r}`), view.fRR.has(r), `rr-${r}`)).join("");
-  const cat = CAT_CHIPS.map((c) => chip("fCat", c, loc.translate(`rr.coarse.${c}`), view.fCat.has(c))).join("");
+  const dmg = DAMAGE_TYPES.map((d) => chip("fType", d, d, view.fType.has(d))).join("");
+  const rr = RR_TYPES.map((r) => chip("fRR", r, loc.translate(`rr.badge.${r}`), view.fRR.has(r), `rr-${r}`)).join("");
+  const cat = COARSE_CATEGORIES.map((c) => chip("fCat", c, loc.translate(`rr.coarse.${c}`), view.fCat.has(c))).join("");
   return (
     facetGroup(loc, "rr.ctl.type", dmg) + facetGroup(loc, "rr.ctl.rr", rr) + facetGroup(loc, "rr.ctl.category", cat)
   );
@@ -256,7 +241,7 @@ export function renderTable(
   view: ViewState,
   handlers: TableHandlers,
 ): void {
-  ctx = { loc, all, sorted, view, handlers };
+  ctx = { view, handlers };
   if (!el.querySelector(".rr-controls")) {
     el.innerHTML = skeleton(loc);
     wire(el);
