@@ -1,13 +1,15 @@
 /* ABOUTME: Scoped styles for the RR reference page (primer, source table, debuff ledger). */
 /* ABOUTME: Ported from the desktop prototype; every rule is scoped under .rr-page. */
 .rr-page {
-  --rr-bg: #100e0b;
-  --rr-panel: #1a1712;
-  --rr-panel2: #211d16;
-  --rr-line: #37301f;
-  --rr-ink: #e8e0cf;
-  --rr-mut: #9a8f7a;
-  --rr-ember: #d9a441;
+  /* Palette shared with the devotion planner (web/src/styles.css): cool GitHub-dark ground,
+     gold accent. The three RR-type hues (stack/mult/flat) below are this page's own semantics. */
+  --rr-bg: #0d1117;
+  --rr-panel: #161b22;
+  --rr-panel2: #1c2330;
+  --rr-line: #30363d;
+  --rr-ink: #e6edf3;
+  --rr-mut: #9aa4b2;
+  --rr-ember: #f0c14b;
   --rr-stack: #7fb069;
   --rr-mult: #b08fd8;
   --rr-flat: #e06c4f;
@@ -37,11 +39,10 @@
   gap: 16px;
   padding: 18px 24px 14px;
   border-bottom: 1px solid var(--rr-line);
-  background: radial-gradient(1200px 300px at 20% -80%, #2b2312 0%, transparent 70%), var(--rr-bg);
+  background: radial-gradient(1200px 300px at 20% -80%, #1b2740 0%, transparent 70%), var(--rr-bg);
 }
 .rr-page header h1 {
   margin: 0;
-  font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
   font-weight: 700;
   font-size: clamp(20px, 3vw, 28px);
 }
@@ -64,7 +65,6 @@
 }
 .rr-page #rr-primer h2 {
   margin: 0 0 8px;
-  font-family: Georgia, serif;
   font-size: 16px;
   color: var(--rr-ember);
 }
@@ -210,13 +210,13 @@
 }
 .rr-page .chip:hover {
   color: var(--rr-ink);
-  border-color: #4b4227;
+  border-color: #444c56;
 }
 .rr-page .chip[aria-pressed="true"] {
   color: var(--rr-ink);
-  background: #2c2413;
+  background: rgba(240, 193, 75, 0.12);
   border-color: var(--rr-ember);
-  box-shadow: inset 0 0 0 1px rgba(217, 164, 65, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(240, 193, 75, 0.35);
 }
 .rr-page .chip.rr-stacking[aria-pressed="true"] {
   background: var(--rr-stack-dim);
@@ -256,7 +256,7 @@
 }
 .rr-page .reset:hover {
   color: var(--rr-ink);
-  border-color: #4b4227;
+  border-color: #444c56;
 }
 .rr-page .chip:focus-visible,
 .rr-page .reset:focus-visible {
@@ -299,7 +299,7 @@
   font-size: 12.5px;
 }
 .rr-page th {
-  background: #241f16;
+  background: var(--rr-panel2);
   cursor: pointer;
   position: sticky;
   top: 0;
@@ -322,10 +322,10 @@
   cursor: pointer;
 }
 .rr-page tbody tr:hover {
-  background: #221e15;
+  background: rgba(255, 255, 255, 0.05);
 }
 .rr-page tbody tr.selrow {
-  background: #2a2413;
+  background: rgba(240, 193, 75, 0.1);
   box-shadow: inset 3px 0 0 var(--rr-ember);
 }
 .rr-page td.val {
@@ -382,7 +382,7 @@
   top: 12px;
   border: 1px solid var(--rr-ember);
   border-radius: 6px;
-  background: linear-gradient(180deg, #221c10 0%, var(--rr-panel) 60px);
+  background: linear-gradient(180deg, #1b2531 0%, var(--rr-panel) 60px);
   padding: 14px 16px;
   box-shadow:
     0 0 0 1px #000,
@@ -390,7 +390,6 @@
 }
 .rr-page #rr-ledger h2 {
   margin: 0 0 2px;
-  font-family: Georgia, serif;
   font-size: 17px;
   color: var(--rr-ember);
 }
@@ -422,7 +421,6 @@
   gap: 8px;
 }
 .rr-page .resline .rname {
-  font-family: Georgia, serif;
   font-size: 14px;
 }
 .rr-page .resline .final {
@@ -494,7 +492,7 @@
   position: relative;
   height: 10px;
   margin-top: 6px;
-  background: #0b0a08;
+  background: #0a0d12;
   border: 1px solid var(--rr-line);
   border-radius: 5px;
   overflow: hidden;
