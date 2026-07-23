@@ -372,9 +372,9 @@ exports[`characterization: en surfaces are stable 1`] = `
             "rows": [
               {
                 "base": "—",
-                "delta": "+5",
+                "delta": "+8",
                 "id": "offensiveCritDamageModifier",
-                "now": "+5%",
+                "now": "+8%",
                 "role": "subject",
                 "subLabel": "",
                 "verdict": "up",
@@ -1108,7 +1108,7 @@ exports[`characterization: en surfaces are stable 1`] = `
                 "base": "",
                 "delta": "",
                 "id": "offensiveCritDamageModifier",
-                "now": "+5%",
+                "now": "+8%",
                 "role": "subject",
                 "subLabel": "",
                 "verdict": "",
@@ -1643,7 +1643,7 @@ exports[`characterization: en surfaces are stable 1`] = `
             {
               "dim": "pct",
               "id": "offensiveCritDamageModifier",
-              "value": "+5%",
+              "value": "+8%",
             },
           ],
           "subject": "Crit Damage",
@@ -2084,7 +2084,11 @@ exports[`characterization: en surfaces are stable 1`] = `
         },
         {
           "label": "Poison Damage over 5 Seconds",
-          "value": "1560",
+          "value": "2360",
+        },
+        {
+          "label": "Reduced target's Damage for 5 Seconds",
+          "value": "16%",
         },
         {
           "label": "Seconds of Confusion",
@@ -2219,7 +2223,7 @@ exports[`characterization: en surfaces are stable 1`] = `
         {
           "id": "offensiveCritDamageModifier",
           "label": "Crit Damage",
-          "value": "+5%",
+          "value": "+8%",
         },
         {
           "id": "characterOffensiveAbility",
@@ -2819,9 +2823,9 @@ exports[`characterization: zh surfaces are stable 1`] = `
             "rows": [
               {
                 "base": "—",
-                "delta": "+5",
+                "delta": "+8",
                 "id": "offensiveCritDamageModifier",
-                "now": "+5%",
+                "now": "+8%",
                 "role": "subject",
                 "subLabel": "",
                 "verdict": "up",
@@ -3555,7 +3559,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
                 "base": "",
                 "delta": "",
                 "id": "offensiveCritDamageModifier",
-                "now": "+5%",
+                "now": "+8%",
                 "role": "subject",
                 "subLabel": "",
                 "verdict": "",
@@ -4118,7 +4122,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
             {
               "dim": "pct",
               "id": "offensiveCritDamageModifier",
-              "value": "+5%",
+              "value": "+8%",
             },
           ],
           "subject": "暴击伤害",
@@ -4590,7 +4594,11 @@ exports[`characterization: zh surfaces are stable 1`] = `
         },
         {
           "label": "5秒内的毒素伤害",
-          "value": "1560",
+          "value": "2360",
+        },
+        {
+          "label": "降低目标的伤害（持续5秒）",
+          "value": "16%",
         },
         {
           "label": "Seconds of 混乱",
@@ -4730,7 +4738,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
         {
           "id": "offensiveCritDamageModifier",
           "label": "暴击伤害",
-          "value": "+5%",
+          "value": "+8%",
         },
       ],
     },

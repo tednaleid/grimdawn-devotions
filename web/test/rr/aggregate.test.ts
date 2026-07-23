@@ -17,9 +17,11 @@ test("ids are unique and stable", () => {
   expect(new Set(ids).size).toBe(ids.length);
 });
 
-test("aggregates to ~274 logical sources", () => {
-  expect(logical.length).toBeGreaterThan(250);
-  expect(logical.length).toBeLessThan(320);
+test("aggregates to a plausible source count (grows as expansions add items)", () => {
+  // ~374 after Fangs of Asterkarn (1.3.0.0); a wide band catches gross breakage (aggregation
+  // collapsing to nothing or exploding) while tolerating a content patch adding item sources.
+  expect(logical.length).toBeGreaterThan(340);
+  expect(logical.length).toBeLessThan(450);
 });
 
 test("perResistance carries each token's base value", () => {
