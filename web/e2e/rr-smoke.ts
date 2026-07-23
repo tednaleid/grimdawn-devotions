@@ -169,6 +169,18 @@ try {
   );
   check(stackingRows > 0 && stackingRows < rows && allStacking, `RR-type filter narrows to stacking (${stackingRows})`);
 
+  // Damage-type facet chip: clicking Fire narrows the table, and every remaining row's damage
+  // cell is Fire itself or a fold-in source (Elemental/All resistances).
+  await cdp.evaluate(`location.hash = ""`);
+  await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n === rows);
+  await cdp.evaluate(`document.querySelector('.chip[data-facet="fType"][data-val="Fire"]').click()`);
+  await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n < rows);
+  const fireRows = await cdp.evaluate<number>("document.querySelectorAll('tr[data-id]').length");
+  const allFireOrFoldIn = await cdp.evaluate<boolean>(
+    `[...document.querySelectorAll('tr[data-id]')].every(r => { const t = r.cells[3].textContent || ""; return t.includes("Fire") || t.includes("Elemental") || t.includes("All resistances"); })`,
+  );
+  check(fireRows > 0 && fireRows < rows && allFireOrFoldIn, `damage chip filters to Fire + fold-in (${fireRows})`);
+
   // Clear the filter, click a row: the ledger computes and the hash records the selection.
   await cdp.evaluate(`location.hash = ""`);
   await waitFor<number>(cdp, "document.querySelectorAll('tr[data-id]').length", (n) => n === rows);
