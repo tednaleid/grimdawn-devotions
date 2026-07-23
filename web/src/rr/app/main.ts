@@ -10,7 +10,7 @@ import {
 } from "../../adapters/localizationAdapter";
 import { mountLanguagePicker } from "../../adapters/languagePicker";
 import { aggregate, type LogicalSource } from "../core/aggregate";
-import { applyView, groupView } from "../core/filter";
+import { applyView } from "../core/filter";
 import { resolveLedger } from "../core/ledger";
 import { renderTable } from "../adapters/tableView";
 import { renderLedger } from "../adapters/ledgerView";
@@ -50,7 +50,6 @@ async function boot() {
   // Injected resolvers keep the pure core i18n-free: names/parents resolve through the current locale.
   const nameOf = (s: LogicalSource) => localization.gameText(s.name);
   const parentNameOf = (s: LogicalSource) => localization.gameText(s.parent);
-  const parentKeyOf = (s: LogicalSource) => s.parent;
 
   // The whole view lives here, decoded from the hash; render reads it, changes re-encode it.
   let view: ViewState = decodeHash(location.hash, knownIds);
@@ -74,8 +73,7 @@ async function boot() {
 
   function render(): void {
     const sorted = applyView(logical, view, nameOf, parentNameOf);
-    const groups = groupView(sorted, view, parentKeyOf);
-    renderTable(tableEl, localization, logical, groups, view, handlers);
+    renderTable(tableEl, localization, logical, sorted, view, handlers);
     const selected = logical.filter((s) => view.sel.has(s.id));
     renderLedger(ledgerEl, localization, resolveLedger(selected, view.r0), view.r0, ledgerHandlers);
   }

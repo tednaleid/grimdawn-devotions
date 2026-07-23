@@ -14,12 +14,21 @@ const RR_RANK: Record<LogicalSource["rrType"], number> = {
   "reduced-flat": 2,
 };
 
+const COARSE: Record<string, "devotion" | "skill" | "item"> = {
+  devotion: "devotion",
+  "mastery skill": "skill",
+  modifier: "skill",
+};
+
+/** Map a fine category (as stored on a source) to its coarse facet bucket. */
+export function coarseCategory(fine: string): "devotion" | "skill" | "item" {
+  return COARSE[fine] ?? "item";
+}
+
 function matchesFilters(s: LogicalSource, view: ViewState, nameOf: NameOf, parentOf: NameOf): boolean {
-  if (view.fRR && s.rrType !== view.fRR) return false;
-  if (view.fCat && s.category !== view.fCat) return false;
-  if (view.fPar && s.parent !== view.fPar) return false;
-  if (view.fTrig && s.trigger !== view.fTrig) return false;
-  if (view.fType && !sourceHits(s, view.fType)) return false;
+  if (view.fRR.size && !view.fRR.has(s.rrType)) return false;
+  if (view.fCat.size && !view.fCat.has(coarseCategory(s.category))) return false;
+  if (view.fType.size && ![...view.fType].some((t) => sourceHits(s, t))) return false;
   if (view.q) {
     const q = view.q.toLowerCase();
     // Search resolved display text (name + parent/item), so "conduit" matches its resolved
@@ -69,24 +78,4 @@ export function applyView(
     if (cmp === 0) cmp = a.id.localeCompare(b.id);
     return cmp * dir;
   });
-}
-
-/** Partition sorted sources into sections. group "none" is a single unnamed section. */
-export function groupView(
-  sorted: LogicalSource[],
-  view: ViewState,
-  keyOf: (s: LogicalSource) => string,
-): { key: string; items: LogicalSource[] }[] {
-  if (view.group === "none") return [{ key: "", items: sorted }];
-  const sections = new Map<string, LogicalSource[]>();
-  for (const s of sorted) {
-    const k = keyOf(s);
-    let items = sections.get(k);
-    if (!items) {
-      items = [];
-      sections.set(k, items);
-    }
-    items.push(s);
-  }
-  return [...sections.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([key, items]) => ({ key, items }));
 }

@@ -1,9 +1,10 @@
-// ABOUTME: Tests pure filter/sort/group over logical sources driven by a ViewState.
+// ABOUTME: Tests pure filter/sort over logical sources driven by a ViewState.
 import { test, expect } from "bun:test";
 import { parseCatalogue } from "../../src/rr/core/model";
 import { aggregate } from "../../src/rr/core/aggregate";
-import { applyView, groupView } from "../../src/rr/core/filter";
+import { applyView, coarseCategory } from "../../src/rr/core/filter";
 import { DEFAULT_VIEW, type ViewState } from "../../src/rr/core/urlState";
+import { sourceHits } from "../../src/rr/core/ledger";
 import doc from "../../../data/resistance-reduction.json";
 
 const logical = aggregate(parseCatalogue(doc).sources);
@@ -11,19 +12,35 @@ const nameOf = (s: { name: string }) => s.name;
 const view = (patch: Partial<ViewState>): ViewState => ({ ...DEFAULT_VIEW, ...patch });
 
 test("RR-type filter narrows to one type", () => {
-  const out = applyView(logical, view({ fRR: "stacking" }), nameOf);
+  const out = applyView(logical, view({ fRR: new Set(["stacking"]) }), nameOf);
   expect(out.length).toBeGreaterThan(0);
   expect(out.every((s) => s.rrType === "stacking")).toBe(true);
 });
 
-test("damage-type Fire includes an Elemental source", () => {
-  const out = applyView(logical, view({ fType: "Fire" }), nameOf);
+test("damage-type Fire folds in Elemental and All sources (OR within the facet)", () => {
+  const out = applyView(logical, view({ fType: new Set(["Fire"]) }), nameOf);
   expect(out.some((s) => s.resistances.includes("Elemental"))).toBe(true);
-  expect(
-    out.every(
-      (s) => s.resistances.includes("Fire") || s.resistances.includes("Elemental") || s.resistances.includes("All"),
-    ),
-  ).toBe(true);
+  expect(out.some((s) => s.resistances.includes("All"))).toBe(true);
+  expect(out.every((s) => sourceHits(s, "Fire"))).toBe(true);
+});
+
+test("damage type AND category: every result matches both facets", () => {
+  const out = applyView(logical, view({ fType: new Set(["Fire"]), fCat: new Set(["devotion"]) }), nameOf);
+  expect(out.length).toBeGreaterThan(0);
+  expect(out.every((s) => coarseCategory(s.category) === "devotion" && sourceHits(s, "Fire"))).toBe(true);
+});
+
+test("coarseCategory maps fine categories to devotion/skill/item", () => {
+  expect(coarseCategory("relic")).toBe("item");
+  expect(coarseCategory("mastery skill")).toBe("skill");
+  expect(coarseCategory("modifier")).toBe("skill");
+  expect(coarseCategory("devotion")).toBe("devotion");
+  expect(coarseCategory("item skill modifier")).toBe("item");
+});
+
+test("empty facet set applies no constraint", () => {
+  const out = applyView(logical, view({ fType: new Set() }), nameOf);
+  expect(out.length).toBe(logical.length);
 });
 
 test("search matches the resolved parent/item name, not the raw tag", () => {
@@ -50,15 +67,4 @@ test("sort by value orders by |valueAtMax|", () => {
   const asc = applyView(logical, view({ sortKey: "value", sortDir: 1 }), nameOf);
   const mags = asc.map((s) => Math.abs(s.valueAtMax ?? 0));
   for (let i = 1; i < mags.length; i++) expect(mags[i]!).toBeGreaterThanOrEqual(mags[i - 1]!);
-});
-
-test("group by category yields buckets; none yields one", () => {
-  const sorted = applyView(logical, view({}), nameOf);
-  const one = groupView(sorted, view({ group: "none" }), (s) => s.category);
-  expect(one.length).toBe(1);
-  expect(one[0]!.items.length).toBe(sorted.length);
-
-  const buckets = groupView(sorted, view({ group: "item" }), (s) => s.category);
-  expect(buckets.length).toBeGreaterThan(1);
-  expect(buckets.some((b) => b.key === "devotion")).toBe(true);
 });

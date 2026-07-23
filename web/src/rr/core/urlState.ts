@@ -3,33 +3,58 @@
 
 export interface ViewState {
   q: string;
-  fType: string;
-  fRR: string;
-  fCat: string;
-  fPar: string;
-  fTrig: string;
+  fType: Set<string>;
+  fRR: Set<string>;
+  fCat: Set<string>;
   sortKey: string;
   sortDir: 1 | -1;
-  group: "none" | "mastery" | "constellation" | "item";
   sel: Set<string>;
   r0: number;
 }
 
 export const DEFAULT_VIEW: ViewState = {
   q: "",
-  fType: "",
-  fRR: "",
-  fCat: "",
-  fPar: "",
-  fTrig: "",
+  fType: new Set(),
+  fRR: new Set(),
+  fCat: new Set(),
   sortKey: "rr",
   sortDir: 1,
-  group: "none",
   sel: new Set(),
   r0: 100,
 };
 
-const GROUPS = new Set(["none", "mastery", "constellation", "item"]);
+const RR_VALUES = new Set(["stacking", "reduced-percent", "reduced-flat"]);
+const CAT_VALUES = new Set(["devotion", "skill", "item"]);
+const DMG_VALUES = new Set([
+  "Physical",
+  "Pierce",
+  "Fire",
+  "Cold",
+  "Lightning",
+  "Poison & Acid",
+  "Aether",
+  "Chaos",
+  "Vitality",
+  "Bleeding",
+]);
+
+function putSet(parts: string[], key: string, set: Set<string>): void {
+  if (set.size) parts.push(`${key}=${[...set].map(encodeURIComponent).join(",")}`);
+}
+
+function readSet(val: string, allowed: Set<string>): Set<string> {
+  const out = new Set<string>();
+  for (const raw of val.split(",")) {
+    let t: string;
+    try {
+      t = decodeURIComponent(raw);
+    } catch {
+      continue;
+    }
+    if (allowed.has(t)) out.add(t);
+  }
+  return out;
+}
 
 /** Encode the full view into a `key=value&...` hash body (no leading '#'); empties are omitted. */
 export function encodeHash(view: ViewState): string {
@@ -38,13 +63,10 @@ export function encodeHash(view: ViewState): string {
     if (v) parts.push(`${k}=${encodeURIComponent(v)}`);
   };
   put("q", view.q);
-  put("type", view.fType);
-  put("rr", view.fRR);
-  put("cat", view.fCat);
-  put("par", view.fPar);
-  put("trig", view.fTrig);
+  putSet(parts, "type", view.fType);
+  putSet(parts, "rr", view.fRR);
+  putSet(parts, "cat", view.fCat);
   parts.push(`sort=${encodeURIComponent(view.sortKey)}:${view.sortDir}`);
-  if (view.group !== "none") parts.push(`group=${view.group}`);
   if (view.r0 !== DEFAULT_VIEW.r0) parts.push(`r0=${view.r0}`);
   if (view.sel.size) parts.push(`sel=${[...view.sel].map(encodeURIComponent).join(",")}`);
   return parts.join("&");
@@ -52,15 +74,16 @@ export function encodeHash(view: ViewState): string {
 
 /** Decode a hash body onto DEFAULT_VIEW; tolerates garbage and drops sel ids not in knownIds. */
 export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
-  const v: ViewState = { ...DEFAULT_VIEW, sel: new Set() };
+  const v: ViewState = { ...DEFAULT_VIEW, fType: new Set(), fRR: new Set(), fCat: new Set(), sel: new Set() };
   const body = hash.startsWith("#") ? hash.slice(1) : hash;
   for (const pair of body.split("&")) {
     const eq = pair.indexOf("=");
     if (eq < 0) continue;
     const key = pair.slice(0, eq);
+    const rawVal = pair.slice(eq + 1);
     let val: string;
     try {
-      val = decodeURIComponent(pair.slice(eq + 1));
+      val = decodeURIComponent(rawVal);
     } catch {
       continue;
     }
@@ -69,19 +92,13 @@ export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
         v.q = val;
         break;
       case "type":
-        v.fType = val;
+        v.fType = readSet(rawVal, DMG_VALUES);
         break;
       case "rr":
-        v.fRR = val;
+        v.fRR = readSet(rawVal, RR_VALUES);
         break;
       case "cat":
-        v.fCat = val;
-        break;
-      case "par":
-        v.fPar = val;
-        break;
-      case "trig":
-        v.fTrig = val;
+        v.fCat = readSet(rawVal, CAT_VALUES);
         break;
       case "sort": {
         const [k, d] = val.split(":");
@@ -89,9 +106,6 @@ export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
         v.sortDir = d === "-1" ? -1 : 1;
         break;
       }
-      case "group":
-        if (GROUPS.has(val)) v.group = val as ViewState["group"];
-        break;
       case "r0": {
         const n = Number(val);
         if (Number.isFinite(n)) v.r0 = n;

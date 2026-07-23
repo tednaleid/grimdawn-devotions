@@ -1,21 +1,21 @@
-// ABOUTME: Renders the RR source table (controls, sortable columns, group sections) into #rr-table.
+// ABOUTME: Renders the RR source table (search, chip facets, sortable columns) into #rr-table.
 // ABOUTME: Whole-row click/keyboard toggles ledger selection; every change round-trips through onView.
 import type { Localization } from "../../ports/Localization";
 import type { LogicalSource } from "../core/aggregate";
 import type { ViewState } from "../core/urlState";
-import { RESISTANCES } from "../core/ledger";
 
 export interface TableHandlers {
   onView(next: ViewState, mode?: "push" | "replace"): void;
 }
-interface Group {
-  key: string;
-  items: LogicalSource[];
-}
 
 // Single-instance page: the latest render inputs, so the wired-once listeners see current state.
-let ctx: { loc: Localization; all: LogicalSource[]; groups: Group[]; view: ViewState; handlers: TableHandlers } | null =
-  null;
+let ctx: {
+  loc: Localization;
+  all: LogicalSource[];
+  sorted: LogicalSource[];
+  view: ViewState;
+  handlers: TableHandlers;
+} | null = null;
 
 const COLS: { key: string; label: string }[] = [
   { key: "name", label: "rr.col.source" },
@@ -116,87 +116,55 @@ function rowHtml(loc: Localization, s: LogicalSource, selected: boolean): string
   </tr>`;
 }
 
-function optionList(values: { value: string; label: string }[], current: string, allLabel: string): string {
-  const opts = values.map(
-    (o) => `<option value="${esc(o.value)}"${o.value === current ? " selected" : ""}>${esc(o.label)}</option>`,
-  );
-  return `<option value="">${esc(allLabel)}</option>${opts.join("")}`;
+const DMG = [
+  "Physical",
+  "Pierce",
+  "Fire",
+  "Cold",
+  "Lightning",
+  "Poison & Acid",
+  "Aether",
+  "Chaos",
+  "Vitality",
+  "Bleeding",
+];
+const RR_CHIPS: LogicalSource["rrType"][] = ["stacking", "reduced-percent", "reduced-flat"];
+const CAT_CHIPS = ["devotion", "skill", "item"] as const;
+
+function chip(facetKey: string, value: string, label: string, pressed: boolean, cls = ""): string {
+  return `<button type="button" class="chip ${cls}" data-facet="${facetKey}" data-val="${esc(value)}" aria-pressed="${pressed}">${esc(label)}</button>`;
 }
 
-function facet(all: LogicalSource[], pick: (s: LogicalSource) => string): string[] {
-  return [...new Set(all.map(pick))].sort((a, b) => a.localeCompare(b));
+function facetGroup(loc: Localization, labelKey: string, chips: string): string {
+  return `<div class="facet"><span class="lab">${esc(loc.translate(labelKey))}</span><div class="chips" role="group">${chips}</div></div>`;
+}
+
+/** Pure markup for the three chip facet groups; aria-pressed reflects the current view's sets. */
+export function facetsMarkup(loc: Localization, view: ViewState): string {
+  const dmg = DMG.map((d) => chip("fType", d, d, view.fType.has(d))).join("");
+  const rr = RR_CHIPS.map((r) => chip("fRR", r, loc.translate(`rr.badge.${r}`), view.fRR.has(r), `rr-${r}`)).join("");
+  const cat = CAT_CHIPS.map((c) => chip("fCat", c, loc.translate(`rr.coarse.${c}`), view.fCat.has(c))).join("");
+  return (
+    facetGroup(loc, "rr.ctl.type", dmg) + facetGroup(loc, "rr.ctl.rr", rr) + facetGroup(loc, "rr.ctl.category", cat)
+  );
 }
 
 function skeleton(loc: Localization): string {
-  const label = (k: string, inner: string) => `<label>${esc(loc.translate(k))}${inner}</label>`;
-  const controls = `<div class="rr-controls">
-    ${label("rr.ctl.search", `<input type="search" id="rr-q" />`)}
-    ${label("rr.ctl.type", `<select id="rr-fType"></select>`)}
-    ${label("rr.ctl.rr", `<select id="rr-fRR"></select>`)}
-    ${label("rr.ctl.category", `<select id="rr-fCat"></select>`)}
-    ${label("rr.ctl.parent", `<select id="rr-fPar"></select>`)}
-    ${label("rr.ctl.trigger", `<select id="rr-fTrig"></select>`)}
-    <label class="rr-groupby">${esc(loc.translate("rr.ctl.group"))}<select id="rr-group"></select></label>
-  </div>`;
+  const search = `<div class="searchrow"><label>${esc(loc.translate("rr.ctl.search"))}<input type="search" id="rr-q" /></label></div>`;
+  const facets = `<div class="rr-facets" id="rr-facets"></div>`;
+  const footer = `<div class="barfoot"><span class="rr-count" id="rr-count"></span><button type="button" class="reset" id="rr-reset">${esc(loc.translate("rr.ctl.reset"))}</button></div>`;
+  const controls = `<div class="rr-controls">${search}${facets}${footer}</div>`;
   const heads = COLS.map(
     (c) => `<th data-sort="${c.key}">${esc(loc.translate(c.label))}<span class="arr" data-arr="${c.key}"></span></th>`,
   ).join("");
-  return `${controls}<div class="tablewrap"><table><thead><tr>${heads}</tr></thead><tbody id="rr-tbody"></tbody></table></div><div class="rr-count" id="rr-count"></div>`;
+  return `${controls}<div class="tablewrap"><table><thead><tr>${heads}</tr></thead><tbody id="rr-tbody"></tbody></table></div>`;
 }
 
-function syncControls(el: HTMLElement, loc: Localization, all: LogicalSource[], view: ViewState): void {
+function syncControls(el: HTMLElement, loc: Localization, view: ViewState): void {
   const q = el.querySelector<HTMLInputElement>("#rr-q")!;
   if (document.activeElement !== q) q.value = view.q;
 
-  const types = ["Elemental", ...RESISTANCES].map((r) => ({ value: r, label: r }));
-  el.querySelector<HTMLSelectElement>("#rr-fType")!.innerHTML = optionList(
-    types,
-    view.fType,
-    loc.translate("rr.ctl.allTypes"),
-  );
-
-  const rrTypes = ["stacking", "reduced-percent", "reduced-flat"].map((r) => ({
-    value: r,
-    label: loc.translate(`rr.badge.${r}`),
-  }));
-  el.querySelector<HTMLSelectElement>("#rr-fRR")!.innerHTML = optionList(
-    rrTypes,
-    view.fRR,
-    loc.translate("rr.ctl.allRr"),
-  );
-
-  const cats = facet(all, (s) => s.category)
-    .map((c) => ({ value: c, label: loc.translate(categoryKey(c)) }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-  el.querySelector<HTMLSelectElement>("#rr-fCat")!.innerHTML = optionList(
-    cats,
-    view.fCat,
-    loc.translate("rr.ctl.allCategories"),
-  );
-
-  const pars = [...new Set(all.map((s) => s.parent))]
-    .map((p) => ({ value: p, label: loc.gameText(p) }))
-    .sort((a, b) => a.label.localeCompare(b.label));
-  el.querySelector<HTMLSelectElement>("#rr-fPar")!.innerHTML = optionList(
-    pars,
-    view.fPar,
-    loc.translate("rr.ctl.allParents"),
-  );
-
-  const trigs = facet(all, (s) => s.trigger).map((t) => ({ value: t, label: loc.translate(triggerKey(t)) }));
-  el.querySelector<HTMLSelectElement>("#rr-fTrig")!.innerHTML = optionList(
-    trigs,
-    view.fTrig,
-    loc.translate("rr.ctl.allTriggers"),
-  );
-
-  const groups = ["none", "mastery", "constellation", "item"].map((g) => ({
-    value: g,
-    label: loc.translate(`rr.group.${g}`),
-  }));
-  el.querySelector<HTMLSelectElement>("#rr-group")!.innerHTML = groups
-    .map((g) => `<option value="${g.value}"${g.value === view.group ? " selected" : ""}>${esc(g.label)}</option>`)
-    .join("");
+  el.querySelector<HTMLElement>("#rr-facets")!.innerHTML = facetsMarkup(loc, view);
 
   el.querySelectorAll<HTMLElement>("[data-arr]").forEach((s) => {
     s.textContent = "";
@@ -205,27 +173,24 @@ function syncControls(el: HTMLElement, loc: Localization, all: LogicalSource[], 
   if (arr) arr.textContent = view.sortDir === 1 ? " ▲" : " ▼";
 }
 
-/** Pure tbody markup for the current groups: a group-head row per section (when grouped) then its rows. */
-export function bodyMarkup(loc: Localization, groups: Group[], view: ViewState): string {
-  const parts: string[] = [];
-  for (const g of groups) {
-    if (view.group !== "none") {
-      const label = g.key ? loc.gameText(g.key) : loc.translate("rr.group.ungrouped");
-      parts.push(`<tr class="rr-group-head"><td colspan="${COLS.length}">${esc(label)} (${g.items.length})</td></tr>`);
-    }
-    for (const s of g.items) parts.push(rowHtml(loc, s, view.sel.has(s.id)));
-  }
-  return parts.join("");
+/** Pure tbody markup for the current sorted rows: a flat list, no group-head rows. */
+export function bodyMarkup(loc: Localization, rows: LogicalSource[], view: ViewState): string {
+  return rows.map((s) => rowHtml(loc, s, view.sel.has(s.id))).join("");
 }
 
-function renderBody(el: HTMLElement, loc: Localization, groups: Group[], view: ViewState): void {
-  el.querySelector<HTMLElement>("#rr-tbody")!.innerHTML = bodyMarkup(loc, groups, view);
+function renderBody(el: HTMLElement, loc: Localization, sorted: LogicalSource[], view: ViewState): void {
+  el.querySelector<HTMLElement>("#rr-tbody")!.innerHTML = bodyMarkup(loc, sorted, view);
 }
 
-function renderCount(el: HTMLElement, loc: Localization, all: LogicalSource[], groups: Group[], view: ViewState): void {
-  const shown = groups.reduce((n, g) => n + g.items.length, 0);
+function renderCount(
+  el: HTMLElement,
+  loc: Localization,
+  all: LogicalSource[],
+  sorted: LogicalSource[],
+  view: ViewState,
+): void {
   el.querySelector<HTMLElement>("#rr-count")!.textContent = loc.translate("rr.count", {
-    shown,
+    shown: sorted.length,
     total: all.length,
     selected: view.sel.size,
   });
@@ -239,17 +204,18 @@ function wire(el: HTMLElement): void {
   el.querySelector<HTMLInputElement>("#rr-q")!.addEventListener("input", (e) => {
     fire({ q: (e.target as HTMLInputElement).value }, "replace");
   });
-  const sel = (id: string, key: keyof ViewState) =>
-    el.querySelector<HTMLSelectElement>(id)!.addEventListener("change", (e) => {
-      fire({ [key]: (e.target as HTMLSelectElement).value } as Partial<ViewState>);
-    });
-  sel("#rr-fType", "fType");
-  sel("#rr-fRR", "fRR");
-  sel("#rr-fCat", "fCat");
-  sel("#rr-fPar", "fPar");
-  sel("#rr-fTrig", "fTrig");
-  el.querySelector<HTMLSelectElement>("#rr-group")!.addEventListener("change", (e) => {
-    fire({ group: (e.target as HTMLSelectElement).value as ViewState["group"] });
+  // Delegated: chips are regenerated on every render, so the listener lives on the stable container.
+  el.querySelector<HTMLElement>("#rr-facets")!.addEventListener("click", (e) => {
+    const b = (e.target as Element).closest<HTMLElement>(".chip");
+    if (!b || !ctx) return;
+    const facetKey = b.dataset.facet as "fType" | "fRR" | "fCat";
+    const val = b.dataset.val!;
+    const next = new Set(ctx.view[facetKey]);
+    next.has(val) ? next.delete(val) : next.add(val);
+    fire({ [facetKey]: next } as Partial<ViewState>);
+  });
+  el.querySelector<HTMLButtonElement>("#rr-reset")!.addEventListener("click", () => {
+    fire({ q: "", fType: new Set(), fRR: new Set(), fCat: new Set() });
   });
   // Sort: click a header (toggle dir when re-clicking the active key).
   el.querySelector("thead")!.addEventListener("click", (e) => {
@@ -286,16 +252,16 @@ export function renderTable(
   el: HTMLElement,
   loc: Localization,
   all: LogicalSource[],
-  groups: Group[],
+  sorted: LogicalSource[],
   view: ViewState,
   handlers: TableHandlers,
 ): void {
-  ctx = { loc, all, groups, view, handlers };
+  ctx = { loc, all, sorted, view, handlers };
   if (!el.querySelector(".rr-controls")) {
     el.innerHTML = skeleton(loc);
     wire(el);
   }
-  syncControls(el, loc, all, view);
-  renderBody(el, loc, groups, view);
-  renderCount(el, loc, all, groups, view);
+  syncControls(el, loc, view);
+  renderBody(el, loc, sorted, view);
+  renderCount(el, loc, all, sorted, view);
 }
