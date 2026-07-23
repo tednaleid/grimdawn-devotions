@@ -7,7 +7,6 @@ set windows-shell := ["bash", "-uc"]
 # --- Configurable paths -----------------------------------------------------
 # Override on the CLI, e.g.  just gd_dir="D:/Games/Grim Dawn" extract
 gd_dir      := env_var_or_default("GD_DIR", "C:/Program Files (x86)/Steam/steamapps/common/Grim Dawn")
-gd_version  := env_var_or_default("GD_VERSION", "1.2.1.x")
 records_dir := justfile_directory() / "extracted/records"
 text_dir    := justfile_directory() / "extracted/text_en"
 out         := justfile_directory() / "data/devotions.json"
@@ -149,30 +148,46 @@ extract: _require-game-closed
     done < <(ls -d "$GD"/gdx*/ 2>/dev/null | sort -V)
     echo "Done."
 
+# Resolve the game version for parsing: read the Steam buildid from the app manifest, then map it to a
+# human-readable version via data/steam-build-versions.json. GD_VERSION overrides the map (and bootstraps
+# a brand-new build). Fails on an unknown buildid so a new release cannot silently ship the previous
+# version label. Prints one line: "<buildid> <version>".
+_game-version:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    manifest="{{gd_dir}}/../../appmanifest_219990.acf"
+    buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    if [ -z "$buildid" ]; then echo "could not read Steam buildid from $manifest" >&2; exit 1; fi
+    if [ -n "${GD_VERSION:-}" ]; then echo "$buildid $GD_VERSION"; exit 0; fi
+    map="{{justfile_directory()}}/data/steam-build-versions.json"
+    version=$(jq -r --arg b "$buildid" '.[$b] // empty' "$map")
+    if [ -z "$version" ]; then
+      echo "Unknown Steam buildid $buildid: add it to data/steam-build-versions.json (GrimTools shows the version), or pass GD_VERSION=..." >&2
+      exit 1
+    fi
+    echo "$buildid $version"
+
 # Parse extracted records into devotions.json (passes version + steam build id). Game text tables
 # (including English) are built separately by `just i18n-tables`, the single generic builder.
 parse *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
-    # Best-effort: read the Steam build id from the app manifest for provenance.
-    manifest="{{gd_dir}}/../../appmanifest_219990.acf"
-    buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    read -r buildid version < <({{just_executable()}} _game-version)
     mkdir -p "$(dirname "{{out}}")"
     uv run scripts/parse_devotions.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out}}" \
-        --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
+        --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
 
 # Parse extracted records into resistance-reduction.json (re-run after a patch / re-extract).
 parse-rr *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
-    manifest="{{gd_dir}}/../../appmanifest_219990.acf"
-    buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    read -r buildid version < <({{just_executable()}} _game-version)
     mkdir -p "$(dirname "{{out_rr}}")"
     uv run scripts/parse_rr.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out_rr}}" \
         --devotions "{{out}}" \
-        --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"} {{ARGS}}
+        --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
 
 # Full pipeline: extract then parse
 all: extract parse parse-rr i18n-tables
