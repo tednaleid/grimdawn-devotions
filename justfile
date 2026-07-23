@@ -172,7 +172,7 @@ _game-version:
 parse *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
-    read -r buildid version < <({{just_executable()}} _game-version)
+    read -r buildid version < <(just _game-version)
     mkdir -p "$(dirname "{{out}}")"
     uv run scripts/parse_devotions.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out}}" \
@@ -182,7 +182,7 @@ parse *ARGS:
 parse-rr *ARGS:
     #!/usr/bin/env bash
     set -euo pipefail
-    read -r buildid version < <({{just_executable()}} _game-version)
+    read -r buildid version < <(just _game-version)
     mkdir -p "$(dirname "{{out_rr}}")"
     uv run scripts/parse_rr.py \
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out_rr}}" \
