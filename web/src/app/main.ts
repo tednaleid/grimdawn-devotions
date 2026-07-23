@@ -8,8 +8,8 @@ import {
   storedLocale,
   storeLocale,
 } from "../adapters/localizationAdapter";
-import { mountLanguagePicker } from "../adapters/languagePicker";
-import { mountInfoPopover, type InfoPopoverText } from "../adapters/infoPopover";
+import { mountAppMenu, type AppMenuContent } from "../adapters/appMenu";
+import type { InfoPopoverText } from "../adapters/infoPopover";
 import { mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
@@ -159,8 +159,7 @@ async function boot() {
     barEl.setAttribute("aria-label", localization.translate("ui.points.budgetAria"));
   }
   applyChrome();
-  // Header info popover: the planner's provenance (description, game-data version, repo link).
-  // Mounted before the language picker so the (i) sits immediately left of the globe.
+  // The App menu's About panel: the planner's provenance (description, game-data version, repo link).
   function infoText(): InfoPopoverText {
     const date = data.meta.generatedUtc.slice(0, 10); // date portion of the ISO stamp, timezone-free
     const gameData = data.meta.gameVersion
@@ -182,21 +181,28 @@ async function boot() {
       github: localization.translate("ui.info.github"),
     };
   }
-  const info = mountInfoPopover(headerEl, GITHUB_URL);
-  info.setText(infoText());
-  // Language picker (globe button, right of the header). Switching swaps catalogs, re-applies chrome,
-  // and re-renders the views; locale is a viewer preference, never in the URL hash.
-  const picker = mountLanguagePicker(headerEl, {
-    current: localization.locale,
-    available: SUPPORTED_LOCALES,
-    names: LOCALE_NAMES,
-    label: localization.translate("ui.lang.label"),
+  // Header app menu (hamburger, right of the header): cross-app link to the RR page, the language
+  // list, and the About panel. Switching locale swaps catalogs, re-applies chrome, and re-renders;
+  // locale is a viewer preference, never in the URL hash.
+  function menuContent(): AppMenuContent {
+    return {
+      nav: { href: "resistance-reduction/", label: localization.translate("rr.title") },
+      languageHeading: localization.translate("ui.menu.language"),
+      current: localization.locale,
+      available: SUPPORTED_LOCALES,
+      names: LOCALE_NAMES,
+      info: infoText(),
+      githubUrl: GITHUB_URL,
+    };
+  }
+  const menu = mountAppMenu(headerEl, {
+    ...menuContent(),
+    menuLabel: localization.translate("ui.menu.label"),
     onSelect: async (locale) => {
       storeLocale(locale);
       localization = await loadLocalization({ base: ".", available: SUPPORTED_LOCALES, preferred: [locale] });
       applyChrome();
-      info.setText(infoText());
-      picker.setCurrent(localization.locale, localization.translate("ui.lang.label"));
+      menu.update(menuContent(), localization.translate("ui.menu.label"));
       refresh();
     },
   });

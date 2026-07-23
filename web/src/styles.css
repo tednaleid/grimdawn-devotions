@@ -105,43 +105,76 @@ header button:active {
 #reset-points {
   margin-left: auto;
 }
-/* Language picker: a globe button at the header's right edge that opens a compact locale popover. */
-.lang-picker {
+/* Header app menu: a hamburger button at the header's right edge opening one popover with a cross-app
+   link, the language list, and the About panel. Shared by both pages (both load this stylesheet). */
+.app-menu {
   position: relative;
   flex: none;
 }
-.lang-btn {
+.app-menu-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.3rem 0.45rem; /* icon fits tighter than the text buttons */
   line-height: 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
   color: #9aa4b2; /* subtle by default; brightens on hover */
 }
-.lang-btn:hover {
+.app-menu-btn:hover {
   color: #e6edf3;
 }
-.lang-menu {
+.app-menu-panel {
   position: absolute;
   top: calc(100% + 6px);
   right: 0;
-  z-index: 30;
-  margin: 0;
-  padding: 0.25rem;
-  list-style: none;
-  min-width: 9rem;
-  max-height: 60vh;
-  overflow-y: auto;
+  z-index: 40;
+  width: 17rem;
+  padding: 0.35rem;
   background: #1b2129;
   border: 1px solid #30363d;
   border-radius: 8px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  font-size: 0.85rem;
+  color: #e6edf3;
 }
-.lang-menu[hidden] {
+.app-menu-panel[hidden] {
   display: none;
 }
-/* Menu items are plain rows, not the boxed header buttons they would otherwise inherit. */
-.lang-menu button {
+.app-menu-sep {
+  border-top: 1px solid #30363d;
+  margin: 0.3rem 0;
+}
+/* Cross-app link: a plain row, kept light even on the RR page (whose global `a` color is gold). */
+.app-menu-panel a.app-menu-nav {
+  display: block;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  color: #e6edf3;
+  text-decoration: none;
+  font-weight: 600;
+}
+.app-menu-panel a.app-menu-nav:hover {
+  background: #2d333b;
+}
+.app-menu-heading {
+  display: block;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #7e8aa0;
+}
+.app-menu-langlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+/* Locale rows are plain rows, not the boxed header buttons they would otherwise inherit. */
+.app-menu-langlist button {
   display: block;
   width: 100%;
   margin: 0;
@@ -152,63 +185,33 @@ header button:active {
   padding: 0.4rem 0.6rem;
   color: #e6edf3;
   font-size: 0.85rem;
+  cursor: pointer;
 }
-.lang-menu button:hover {
+.app-menu-langlist button:hover {
   background: #2d333b;
-  border-color: transparent;
 }
-.lang-menu button.current {
+.app-menu-langlist button.current {
   font-weight: 600;
 }
-.lang-menu button.current::after {
+.app-menu-langlist button.current::after {
   content: "✓";
   float: right;
   margin-left: 0.75rem;
   color: #9aa4b2;
 }
-/* Info popover: an (i) button left of the language globe with the planner's provenance. */
-.info-popover {
-  position: relative;
-  flex: none;
+.app-menu-about {
+  padding: 0.35rem 0.6rem;
 }
-.info-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.3rem 0.45rem;
-  line-height: 0;
-  color: #9aa4b2;
-}
-.info-btn:hover {
-  color: #e6edf3;
-}
-.info-panel {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 30;
-  padding: 0.6rem 0.75rem;
-  width: 16rem;
-  background: #1b2129;
-  border: 1px solid #30363d;
-  border-radius: 8px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-  font-size: 0.85rem;
-  color: #e6edf3;
-}
-.info-panel[hidden] {
-  display: none;
-}
-.info-panel p {
+.app-menu-about p {
   margin: 0 0 0.4rem;
 }
-.info-panel p:last-child {
+.app-menu-about p:last-child {
   margin-bottom: 0;
 }
-.info-panel a {
+.app-menu-about a {
   color: #6cb6ff;
 }
-.info-version {
+.app-menu-about .info-version {
   color: #9aa4b2;
 }
 /* Points budget bar: used (spent) / min (validity floor) / headroom, with a grey cap grabber. */

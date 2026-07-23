@@ -8,7 +8,8 @@ import {
   storedLocale,
   storeLocale,
 } from "../../adapters/localizationAdapter";
-import { mountLanguagePicker } from "../../adapters/languagePicker";
+import { mountAppMenu, type AppMenuContent } from "../../adapters/appMenu";
+import type { InfoPopoverText } from "../../adapters/infoPopover";
 import { aggregate, type LogicalSource } from "../core/aggregate";
 import { applyView } from "../core/filter";
 import { resolveLedger } from "../core/ledger";
@@ -23,7 +24,7 @@ async function boot() {
     sessionStorage.removeItem("rrBootReloaded");
   } catch {}
 
-  const sources = await loadCatalogue("..");
+  const { sources, meta } = await loadCatalogue("..");
   const logical = aggregate(sources);
   const knownIds = new Set(logical.map((s) => s.id));
 
@@ -43,7 +44,6 @@ async function boot() {
   function applyChrome(): void {
     document.title = localization.translate("rr.title");
     (document.getElementById("rr-title") as HTMLElement).textContent = localization.translate("rr.title");
-    (document.getElementById("rr-planner-link") as HTMLElement).textContent = localization.translate("rr.plannerLink");
     renderPrimer(primerEl, localization);
   }
 
@@ -88,16 +88,50 @@ async function boot() {
     }
   }
 
-  // Language picker (viewer preference, never in the hash): switching swaps catalogs and re-renders.
-  const picker = mountLanguagePicker(headerEl, {
-    current: localization.locale,
-    available: SUPPORTED_LOCALES,
-    names: LOCALE_NAMES,
-    label: localization.translate("ui.lang.label"),
+  // Header app menu (hamburger): cross-app link back to the planner, the language list, and the About
+  // panel. Locale is a viewer preference (never in the hash); switching swaps catalogs and re-renders.
+  const GITHUB_URL = "https://github.com/tednaleid/grimdawn-devotions";
+  const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/";
+  function infoText(): InfoPopoverText {
+    const version = typeof meta.game_version === "string" ? meta.game_version : "";
+    const date = (typeof meta.generated_utc === "string" ? meta.generated_utc : "").slice(0, 10);
+    const gameData = version
+      ? date
+        ? localization.translate("ui.info.gameData", { version, date })
+        : localization.translate("ui.info.gameDataNoDate", { version })
+      : null;
+    const build = meta.steam_buildid
+      ? {
+          label: localization.translate("ui.info.build", { buildid: String(meta.steam_buildid) }),
+          url: `${STEAMDB_PATCHNOTES_URL}${String(meta.steam_buildid)}/`,
+        }
+      : null;
+    return {
+      label: localization.translate("ui.menu.label"),
+      description: localization.translate("rr.info.description"),
+      gameData,
+      build,
+      github: localization.translate("ui.info.github"),
+    };
+  }
+  function menuContent(): AppMenuContent {
+    return {
+      nav: { href: "../", label: localization.translate("rr.plannerLink") },
+      languageHeading: localization.translate("ui.menu.language"),
+      current: localization.locale,
+      available: SUPPORTED_LOCALES,
+      names: LOCALE_NAMES,
+      info: infoText(),
+      githubUrl: GITHUB_URL,
+    };
+  }
+  const menu = mountAppMenu(headerEl, {
+    ...menuContent(),
+    menuLabel: localization.translate("ui.menu.label"),
     onSelect: async (locale) => {
       storeLocale(locale);
       localization = await loadLocalization({ base: "..", available: SUPPORTED_LOCALES, preferred: [locale] });
-      picker.setCurrent(localization.locale, localization.translate("ui.lang.label"));
+      menu.update(menuContent(), localization.translate("ui.menu.label"));
       applyChrome();
       refresh("replace");
     },

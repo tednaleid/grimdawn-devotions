@@ -211,6 +211,14 @@ try {
   const pressed = await cdp.evaluate<number>("document.querySelectorAll('tr[aria-pressed=\"true\"]').length");
   check(restored && pressed > 0, `a shared hash restores the selection + ledger (${pressed} row selected)`);
 
+  // App menu: the hamburger opens one popover with the cross-app link, the language list, and About.
+  await cdp.evaluate(`document.querySelector('.app-menu-btn').click()`);
+  const menuOk = await cdp.evaluate<boolean>(
+    `(() => { const p = document.querySelector('.app-menu-panel'); if (!p || p.hidden) return false;
+       return !!p.querySelector('a.app-menu-nav') && !!p.querySelector('[data-locale]') && !!p.querySelector('a[href*="github.com"]'); })()`,
+  );
+  check(menuOk, "app menu opens with cross-app link, language list, and GitHub");
+
   check(cdp.consoleErrors.length === 0, `no console errors (${cdp.consoleErrors.slice(0, 2).join("; ")})`);
 
   failed = results.some((r) => !r.ok);
