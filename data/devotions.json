@@ -1,9 +1,9 @@
 {
   "meta": {
-    "game_version": "1.2.1.x",
-    "steam_buildid": "19149150",
+    "game_version": "1.3.0.0",
+    "steam_buildid": "24346246",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-07-01T05:46:25Z",
+    "generated_utc": "2026-07-23T21:24:45Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -1017,7 +1017,7 @@
               "defensivePoisonDuration": 36,
               "defensiveProtection": 70,
               "skillActiveDuration": 10,
-              "skillCooldownTime": 2.7,
+              "skillCooldownTime": 2.2,
               "skillLifeBonus": 848,
               "skillLifePercent": 10
             },
@@ -2033,7 +2033,7 @@
           },
           "bonuses": {
             "offensiveColdModifier": 24,
-            "offensiveCritDamageModifier": 8,
+            "offensiveCritDamageModifier": 5,
             "offensivePierceMax": 10,
             "offensivePierceMin": 6,
             "offensivePierceModifier": 24
@@ -2087,12 +2087,12 @@
             "y": 894
           },
           "bonuses": {
-            "offensiveCritDamageModifier": 8
+            "offensiveCritDamageModifier": 5
           },
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "offensiveCritDamageModifier": 8
+            "offensiveCritDamageModifier": 5
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_27b_petbonus.dbr"
         },
@@ -3022,12 +3022,12 @@
           },
           "bonuses": {
             "characterOffensiveAbility": 25,
-            "offensiveCritDamageModifier": 6
+            "offensiveCritDamageModifier": 5
           },
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "offensiveCritDamageModifier": 8,
+            "offensiveCritDamageModifier": 5,
             "offensiveTotalDamageModifier": 30
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_30d_petbonus.dbr"
@@ -4868,6 +4868,7 @@
           "bonuses": {
             "characterOffensiveAbilityModifier": 4,
             "offensiveSlowPoisonModifier": 50,
+            "retaliationPoisonModifier": 40,
             "retaliationTotalDamageModifier": 60
           },
           "celestial_power": null,
@@ -4907,6 +4908,7 @@
           "bonuses": {
             "characterDefensiveAbilityModifier": 4,
             "offensiveSlowPoisonModifier": 50,
+            "retaliationPoisonModifier": 40,
             "retaliationTotalDamageModifier": 60
           },
           "celestial_power": null,
@@ -5019,7 +5021,7 @@
             "y": 1769
           },
           "bonuses": {
-            "offensiveCritDamageModifier": 10,
+            "offensiveCritDamageModifier": 8,
             "offensiveFireModifier": 50,
             "offensiveSlowFireDurationModifier": 30,
             "offensiveSlowFireModifier": 50,
@@ -5495,7 +5497,7 @@
           },
           "bonuses": {
             "characterDefensiveAbility": 30,
-            "retaliationTotalDamageModifier": 60
+            "retaliationTotalDamageModifier": 40
           },
           "celestial_power": null,
           "weapon_requirement": null
@@ -5937,7 +5939,7 @@
           "bonuses": {
             "Spear2h": 1,
             "characterOffensiveAbility": 60,
-            "offensiveCritDamageModifier": 5
+            "offensiveCritDamageModifier": 8
           },
           "celestial_power": null,
           "weapon_requirement": {
@@ -6475,7 +6477,6 @@
               "defensiveProtection": 460,
               "skillActiveDuration": 5,
               "skillCooldownTime": 8,
-              "skillLifeBonus": 1550,
               "skillLifePercent": 12
             },
             "pet": null
@@ -7360,7 +7361,7 @@
           "bonuses": {
             "defensiveBlockAmountModifier": 40,
             "offensiveElementalMin": 16,
-            "retaliationTotalDamageModifier": 80
+            "retaliationTotalDamageModifier": 50
           },
           "celestial_power": null,
           "weapon_requirement": null
@@ -7399,7 +7400,7 @@
           "bonuses": {
             "Spear2h": 1,
             "offensiveTotalDamageModifier": 50,
-            "retaliationTotalDamageModifier": 100
+            "retaliationTotalDamageModifier": 80
           },
           "celestial_power": null,
           "weapon_requirement": {
@@ -7480,7 +7481,7 @@
             "Spear2h": 1,
             "characterRunSpeedModifier": 5,
             "offensiveTotalDamageModifier": 70,
-            "retaliationTotalDamageModifier": 140
+            "retaliationTotalDamageModifier": 100
           },
           "celestial_power": null,
           "weapon_requirement": {
@@ -8206,8 +8207,8 @@
           "bonuses": {
             "Dagger": 1,
             "Scepter": 1,
-            "characterOffensiveAbility": 15,
-            "offensiveCritDamageModifier": 5
+            "characterDefensiveAbility": 20,
+            "characterOffensiveAbility": 25
           },
           "celestial_power": null,
           "weapon_requirement": {
@@ -8662,7 +8663,7 @@
             "defensiveProtectionModifier": 8,
             "offensivePhysicalMin": 10,
             "offensivePhysicalModifier": 50,
-            "retaliationTotalDamageModifier": 60
+            "retaliationTotalDamageModifier": 50
           },
           "celestial_power": null,
           "weapon_requirement": {
@@ -8711,7 +8712,7 @@
             "offensiveSlowPhysicalDurationModifier": 50,
             "offensiveSlowPhysicalMin": 20,
             "offensiveSlowPhysicalModifier": 80,
-            "retaliationTotalDamageModifier": 60
+            "retaliationTotalDamageModifier": 50
           },
           "celestial_power": null,
           "weapon_requirement": {
@@ -8917,7 +8918,8 @@
           },
           "bonuses": {
             "offensiveSlowPhysicalModifier": 50,
-            "retaliationTotalDamageModifier": 60
+            "retaliationPhysicalModifier": 40,
+            "retaliationTotalDamageModifier": 40
           },
           "celestial_power": null,
           "weapon_requirement": {
@@ -9493,7 +9495,7 @@
           "bonuses": {
             "characterDefensiveAbility": 35,
             "characterLife": 300,
-            "retaliationTotalDamageModifier": 90
+            "retaliationTotalDamageModifier": 60
           },
           "celestial_power": null,
           "weapon_requirement": null
@@ -9539,7 +9541,7 @@
             "stats": {
               "defensiveBlockAmountModifier": 210,
               "defensiveProtectionModifier": 50,
-              "retaliationPhysicalMin": 525,
+              "retaliationPhysicalMin": 730,
               "skillActiveDuration": 5,
               "skillCooldownTime": 8
             },
@@ -9827,12 +9829,12 @@
             "y": 1419
           },
           "bonuses": {
-            "offensiveCritDamageModifier": 10
+            "offensiveCritDamageModifier": 6
           },
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "offensiveCritDamageModifier": 15,
+            "offensiveCritDamageModifier": 10,
             "offensiveTotalDamageModifier": 40
           },
           "pet_bonus_dbr": "records/skills/devotion/tier2_35e_petbonus.dbr"
@@ -9848,7 +9850,7 @@
             "y": 1389
           },
           "bonuses": {
-            "characterTotalSpeedModifier": 4
+            "characterTotalSpeedModifier": 6
           },
           "celestial_power": null,
           "weapon_requirement": null,
@@ -10613,7 +10615,9 @@
             "stats": {
               "offensiveConfusionMin": 1.8,
               "offensiveSlowPoisonDurationMin": 5,
-              "offensiveSlowPoisonMin": 312,
+              "offensiveSlowPoisonMin": 472,
+              "offensiveTotalDamageReductionPercentDurationMin": 5,
+              "offensiveTotalDamageReductionPercentMin": 16,
               "skillCooldownTime": 3,
               "skillTargetRadius": 10
             },
@@ -11343,7 +11347,7 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "offensiveCritDamageModifier": 10,
+            "offensiveCritDamageModifier": 6,
             "offensiveTotalDamageModifier": 80
           },
           "pet_bonus_dbr": "records/skills/devotion/tier3_08f_petbonus.dbr"
@@ -11691,13 +11695,13 @@
             "y": -2676
           },
           "bonuses": {
-            "offensiveCritDamageModifier": 8,
+            "offensiveCritDamageModifier": 5,
             "offensiveTotalDamageModifier": 50
           },
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "offensiveCritDamageModifier": 8,
+            "offensiveCritDamageModifier": 5,
             "offensiveTotalDamageModifier": 80
           },
           "pet_bonus_dbr": "records/skills/devotion/tier3_19f_petbonus.dbr"
@@ -12018,7 +12022,7 @@
               "offensiveSlowFireDurationMin": 2,
               "offensiveSlowFireMin": 270,
               "offensiveTotalDamageReductionPercentDurationMin": 3,
-              "offensiveTotalDamageReductionPercentMin": 24,
+              "offensiveTotalDamageReductionPercentMin": 26,
               "racialBonusPercentDamage": 50,
               "skillCooldownTime": 2,
               "skillTargetRadius": 5,
@@ -12647,7 +12651,7 @@
             "level": 15,
             "stats": {
               "defensiveLife": -28,
-              "defensiveSlowLifeLeach": -10,
+              "defensiveSlowLifeLeach": -8,
               "offensiveAetherMin": 185,
               "offensiveLifeMin": 185,
               "skillActiveDuration": 8
@@ -12787,7 +12791,7 @@
               "offensiveLightningMax": 280,
               "offensiveLightningMin": 175,
               "offensiveSlowLightningDurationMin": 2,
-              "offensiveSlowLightningMin": 200,
+              "offensiveSlowLightningMin": 355,
               "offensiveStunMin": 1,
               "projectileExplosionRadius": 2.4,
               "skillCooldownTime": 1,
@@ -13380,7 +13384,7 @@
           },
           "bonuses": {
             "characterOffensiveAbilityModifier": 4,
-            "offensiveCritDamageModifier": 12,
+            "offensiveCritDamageModifier": 6,
             "offensivePierceMin": 20
           },
           "celestial_power": null,
@@ -13421,7 +13425,7 @@
                 "offensiveSlowBleedingDurationMin": 2,
                 "offensiveSlowBleedingMin": 200,
                 "offensiveTotalDamageReductionPercentDurationMin": 2,
-                "offensiveTotalDamageReductionPercentMin": 15
+                "offensiveTotalDamageReductionPercentMin": 22
               }
             }
           },
@@ -13563,9 +13567,9 @@
               "offensivePhysicalReductionPercentDurationMin": 5,
               "offensivePhysicalReductionPercentMin": 20,
               "offensiveSlowPhysicalDurationMin": 5,
-              "offensiveSlowPhysicalMin": 270,
+              "offensiveSlowPhysicalMin": 320,
               "projectileExplosionRadius": 2.5,
-              "retaliationDamagePct": 24,
+              "retaliationDamagePct": 30,
               "skillActiveDuration": 1,
               "skillCooldownTime": 1,
               "weaponDamagePct": 65

@@ -1242,13 +1242,13 @@
     },
     "devotion_searchbar01_background.tex": {
       "url": "assets/devotions/devotion_searchbar01_background.webp",
-      "w": 556,
-      "h": 62
+      "w": 800,
+      "h": 160
     },
     "devotion_searchbar01_background.png": {
       "url": "assets/devotions/devotion_searchbar01_background.webp",
-      "w": 556,
-      "h": 62
+      "w": 800,
+      "h": 160
     },
     "devotion_section1.tex": {
       "url": "assets/devotions/devotion_section1.webp",
@@ -1262,13 +1262,13 @@
     },
     "devotion_sidebar_background.tex": {
       "url": "assets/devotions/devotion_sidebar_background.webp",
-      "w": 250,
-      "h": 700
+      "w": 300,
+      "h": 800
     },
     "devotion_sidebar_background.png": {
       "url": "assets/devotions/devotion_sidebar_background.webp",
-      "w": 250,
-      "h": 700
+      "w": 300,
+      "h": 800
     },
     "devotion_star_disabled.tex": {
       "url": "assets/devotions/devotion_star_disabled.webp",
@@ -1339,186 +1339,6 @@
       "url": "assets/devotions/devotion_vignetteframe.webp",
       "w": 128,
       "h": 128
-    },
-    "devotionbuttons_background.tex": {
-      "url": "assets/devotions/devotionbuttons_background.webp",
-      "w": 128,
-      "h": 128
-    },
-    "devotionbuttons_background.png": {
-      "url": "assets/devotions/devotionbuttons_background.webp",
-      "w": 128,
-      "h": 128
-    },
-    "devotionbuttons_close01_down.tex": {
-      "url": "assets/devotions/devotionbuttons_close01_down.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_close01_down.png": {
-      "url": "assets/devotions/devotionbuttons_close01_down.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_close01_over.tex": {
-      "url": "assets/devotions/devotionbuttons_close01_over.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_close01_over.png": {
-      "url": "assets/devotions/devotionbuttons_close01_over.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_close01_up.tex": {
-      "url": "assets/devotions/devotionbuttons_close01_up.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_close01_up.png": {
-      "url": "assets/devotions/devotionbuttons_close01_up.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_help01_down.tex": {
-      "url": "assets/devotions/devotionbuttons_help01_down.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_help01_down.png": {
-      "url": "assets/devotions/devotionbuttons_help01_down.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_help01_over.tex": {
-      "url": "assets/devotions/devotionbuttons_help01_over.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_help01_over.png": {
-      "url": "assets/devotions/devotionbuttons_help01_over.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_help01_up.tex": {
-      "url": "assets/devotions/devotionbuttons_help01_up.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_help01_up.png": {
-      "url": "assets/devotions/devotionbuttons_help01_up.webp",
-      "w": 34,
-      "h": 34
-    },
-    "devotionbuttons_start.tex": {
-      "url": "assets/devotions/devotionbuttons_start.webp",
-      "w": 50,
-      "h": 50
-    },
-    "devotionbuttons_start.png": {
-      "url": "assets/devotions/devotionbuttons_start.webp",
-      "w": 50,
-      "h": 50
-    },
-    "devotionbuttons_tabclosedown.tex": {
-      "url": "assets/devotions/devotionbuttons_tabclosedown.webp",
-      "w": 20,
-      "h": 40
-    },
-    "devotionbuttons_tabclosedown.png": {
-      "url": "assets/devotions/devotionbuttons_tabclosedown.webp",
-      "w": 20,
-      "h": 40
-    },
-    "devotionbuttons_tabcloseover.tex": {
-      "url": "assets/devotions/devotionbuttons_tabcloseover.webp",
-      "w": 20,
-      "h": 40
-    },
-    "devotionbuttons_tabcloseover.png": {
-      "url": "assets/devotions/devotionbuttons_tabcloseover.webp",
-      "w": 20,
-      "h": 40
-    },
-    "devotionbuttons_tabcloseup.tex": {
-      "url": "assets/devotions/devotionbuttons_tabcloseup.webp",
-      "w": 20,
-      "h": 40
-    },
-    "devotionbuttons_tabcloseup.png": {
-      "url": "assets/devotions/devotionbuttons_tabcloseup.webp",
-      "w": 20,
-      "h": 40
-    },
-    "devotionbuttons_tabopendown.tex": {
-      "url": "assets/devotions/devotionbuttons_tabopendown.webp",
-      "w": 30,
-      "h": 74
-    },
-    "devotionbuttons_tabopendown.png": {
-      "url": "assets/devotions/devotionbuttons_tabopendown.webp",
-      "w": 30,
-      "h": 74
-    },
-    "devotionbuttons_tabopenover.tex": {
-      "url": "assets/devotions/devotionbuttons_tabopenover.webp",
-      "w": 30,
-      "h": 74
-    },
-    "devotionbuttons_tabopenover.png": {
-      "url": "assets/devotions/devotionbuttons_tabopenover.webp",
-      "w": 30,
-      "h": 74
-    },
-    "devotionbuttons_tabopenup.tex": {
-      "url": "assets/devotions/devotionbuttons_tabopenup.webp",
-      "w": 30,
-      "h": 74
-    },
-    "devotionbuttons_tabopenup.png": {
-      "url": "assets/devotions/devotionbuttons_tabopenup.webp",
-      "w": 30,
-      "h": 74
-    },
-    "devotionbuttons_undo01_disabled.tex": {
-      "url": "assets/devotions/devotionbuttons_undo01_disabled.webp",
-      "w": 68,
-      "h": 34
-    },
-    "devotionbuttons_undo01_disabled.png": {
-      "url": "assets/devotions/devotionbuttons_undo01_disabled.webp",
-      "w": 68,
-      "h": 34
-    },
-    "devotionbuttons_undo01_down.tex": {
-      "url": "assets/devotions/devotionbuttons_undo01_down.webp",
-      "w": 68,
-      "h": 34
-    },
-    "devotionbuttons_undo01_down.png": {
-      "url": "assets/devotions/devotionbuttons_undo01_down.webp",
-      "w": 68,
-      "h": 34
-    },
-    "devotionbuttons_undo01_over.tex": {
-      "url": "assets/devotions/devotionbuttons_undo01_over.webp",
-      "w": 68,
-      "h": 34
-    },
-    "devotionbuttons_undo01_over.png": {
-      "url": "assets/devotions/devotionbuttons_undo01_over.webp",
-      "w": 68,
-      "h": 34
-    },
-    "devotionbuttons_undo01_up.tex": {
-      "url": "assets/devotions/devotionbuttons_undo01_up.webp",
-      "w": 68,
-      "h": 34
-    },
-    "devotionbuttons_undo01_up.png": {
-      "url": "assets/devotions/devotionbuttons_undo01_up.webp",
-      "w": 68,
-      "h": 34
     },
     "devotionicon_disabled.tex": {
       "url": "assets/devotions/devotionicon_disabled.webp",

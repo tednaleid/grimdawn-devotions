@@ -1,8 +1,8 @@
 {
   "meta": {
-    "game_version": "1.2.1.x",
-    "steam_buildid": "19149150",
-    "generated_utc": "2026-07-23T04:34:07Z",
+    "game_version": "1.3.0.0",
+    "steam_buildid": "24346246",
+    "generated_utc": "2026-07-23T21:27:47Z",
     "berserker_present": false
   },
   "sources": [
@@ -743,11 +743,11 @@
       "resistances": "All",
       "values_per_rank": [
         12,
-        16
+        24
       ],
       "max_rank": 2,
       "ultimate_rank": null,
-      "value_at_max": 16,
+      "value_at_max": 24,
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
@@ -792,15 +792,15 @@
       "rr_type": "reduced-flat",
       "resistances": "All",
       "values_per_rank": [
-        18
+        20
       ],
       "max_rank": 1,
       "ultimate_rank": null,
-      "value_at_max": 18,
+      "value_at_max": 20,
       "value_at_ultimate": null,
       "duration_seconds": 5,
       "cooldown_seconds": null,
-      "trigger_chance_percent": 15,
+      "trigger_chance_percent": null,
       "trigger": "passive aura",
       "proc_condition": null,
       "mythical": false,
@@ -810,7 +810,7 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:aetherblaze:reduced-flat",
       "name": "tagGDX1ItemSkillD177Name",
-      "parent": "tagGDX1WeaponGun2hD102",
+      "parent": "tagGDX1ItemSkillD177Name",
       "record_path": "records/skills/itemskillsgdx1/legendary/aetherblaze.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
@@ -819,15 +819,15 @@
         12,
         15
       ],
-      "max_rank": 1,
+      "max_rank": 2,
       "ultimate_rank": null,
-      "value_at_max": 12,
+      "value_at_max": 15,
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": 15,
+      "trigger_chance_percent": null,
       "trigger": "debuff",
-      "proc_condition": "AttackEnemy",
+      "proc_condition": null,
       "mythical": false,
       "per_resistance_values": null,
       "notes": ""
@@ -835,24 +835,25 @@
     {
       "id": "records:skills:itemskillsgdx1:legendary:blackstar:reduced-flat",
       "name": "tagItemSkillC107Name",
-      "parent": "tagGDX1WeaponCaster1hD102",
+      "parent": "tagGDX3RingD302",
       "record_path": "records/skills/itemskillsgdx1/legendary/blackstar.dbr",
       "category": "item granted",
       "rr_type": "reduced-flat",
       "resistances": "All",
       "values_per_rank": [
-        15
+        15,
+        24
       ],
-      "max_rank": 1,
+      "max_rank": 2,
       "ultimate_rank": null,
-      "value_at_max": 15,
+      "value_at_max": 24,
       "value_at_ultimate": null,
       "duration_seconds": 3,
       "cooldown_seconds": null,
-      "trigger_chance_percent": 10,
+      "trigger_chance_percent": 30,
       "trigger": "debuff",
-      "proc_condition": "AttackEnemy",
-      "mythical": false,
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1094,54 +1095,6 @@
       "trigger": "debuff",
       "proc_condition": null,
       "mythical": false,
-      "per_resistance_values": null,
-      "notes": ""
-    },
-    {
-      "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:sword1h_d103_markovian:reduced-flat",
-      "name": "tagClass01SkillName06A",
-      "parent": "tagGDX1WeaponSwordD101",
-      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/sword1h_d103_markovian.dbr",
-      "category": "item skill modifier",
-      "rr_type": "reduced-flat",
-      "resistances": "All",
-      "values_per_rank": [
-        18
-      ],
-      "max_rank": 1,
-      "ultimate_rank": null,
-      "value_at_max": 18,
-      "value_at_ultimate": null,
-      "duration_seconds": 5,
-      "cooldown_seconds": null,
-      "trigger_chance_percent": null,
-      "trigger": "debuff",
-      "proc_condition": null,
-      "mythical": true,
-      "per_resistance_values": null,
-      "notes": ""
-    },
-    {
-      "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:sword1h_d103_reapingedge:reduced-flat",
-      "name": "tagGDX1Class08SkillName12A",
-      "parent": "tagGDX1WeaponSwordD101",
-      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/sword1h_d103_reapingedge.dbr",
-      "category": "item skill modifier",
-      "rr_type": "reduced-flat",
-      "resistances": "All",
-      "values_per_rank": [
-        18
-      ],
-      "max_rank": 1,
-      "ultimate_rank": null,
-      "value_at_max": 18,
-      "value_at_ultimate": null,
-      "duration_seconds": 5,
-      "cooldown_seconds": null,
-      "trigger_chance_percent": null,
-      "trigger": "debuff",
-      "proc_condition": null,
-      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -1519,14 +1472,14 @@
       "rr_type": "reduced-flat",
       "resistances": "All",
       "values_per_rank": [
-        25
+        28
       ],
       "max_rank": 1,
       "ultimate_rank": null,
-      "value_at_max": 25,
+      "value_at_max": 28,
       "value_at_ultimate": null,
-      "duration_seconds": 4,
-      "cooldown_seconds": -1,
+      "duration_seconds": 5,
+      "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
@@ -1543,14 +1496,14 @@
       "rr_type": "reduced-flat",
       "resistances": "All",
       "values_per_rank": [
-        25
+        28
       ],
       "max_rank": 1,
       "ultimate_rank": null,
-      "value_at_max": 25,
+      "value_at_max": 28,
       "value_at_ultimate": null,
-      "duration_seconds": 4,
-      "cooldown_seconds": -1,
+      "duration_seconds": 5,
+      "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
@@ -1574,6 +1527,372 @@
       "value_at_max": 35,
       "value_at_ultimate": null,
       "duration_seconds": 5,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:blackstar_mi:reduced-flat",
+      "name": "tagItemSkillC107Name",
+      "parent": "tagItemSkillC107Name",
+      "record_path": "records/skills/itemskillsgdx3/blackstar_mi.dbr",
+      "category": "item granted",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "max_rank": 6,
+      "ultimate_rank": null,
+      "value_at_max": 15,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:infinity:reduced-flat",
+      "name": "tagGDX3ItemSkillD306NameB",
+      "parent": "tagGDX3WeaponCaster1hD302",
+      "record_path": "records/skills/itemskillsgdx3/legendary/infinity.dbr",
+      "category": "item granted",
+      "rr_type": "reduced-flat",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        20,
+        26
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": 26,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:stormserpentorb:reduced-flat",
+      "name": "tagGDX2ItemSkillC202Name",
+      "parent": "tagGDX3ItemAwakenedSetC202Name",
+      "record_path": "records/skills/itemskillsgdx3/legendary/stormserpentorb.dbr",
+      "category": "item granted",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        28
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 28,
+      "value_at_ultimate": null,
+      "duration_seconds": 2,
+      "cooldown_seconds": 0.5,
+      "trigger_chance_percent": 25,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:pets:petskill_livingplant_venomousseed:reduced-flat",
+      "name": "tagGDX3ItemSetD313Name",
+      "parent": "tagGDX3ItemSetD313Name",
+      "record_path": "records/skills/itemskillsgdx3/pets/petskill_livingplant_venomousseed.dbr",
+      "category": "item granted",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        28
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 28,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": 20,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:gun2h_f302_zolhantechnique:reduced-flat",
+      "name": "tagClass01SkillName06B",
+      "parent": "tagGDX3WeaponGun2hF302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/gun2h_f302_zolhantechnique.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        26
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 26,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:head_d304_warcry:reduced-flat",
+      "name": "tagClass01SkillName07A",
+      "parent": "tagGDX3HeadD301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/head_d304_warcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        24
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 24,
+      "value_at_ultimate": null,
+      "duration_seconds": 6,
+      "cooldown_seconds": -1,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:head_d314_devastation:reduced-flat",
+      "name": "tagClass05SkillName08A",
+      "parent": "tagGDX3HeadD311",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/head_d314_devastation.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        24
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 24,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:necklace_d314_cadence:reduced-flat",
+      "name": "tagClass01SkillName01A",
+      "parent": "tagGDX3NecklaceD310",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/necklace_d314_cadence.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        40
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 40,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d310_windsofasterkarn:reduced-flat",
+      "name": "tagGDX3Class10SkillName07A",
+      "parent": "tagGDX3ItemSetD310Name",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d310_windsofasterkarn.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        28
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 28,
+      "value_at_ultimate": null,
+      "duration_seconds": 2,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:sword1h_d303_cadence:reduced-flat",
+      "name": "tagClass01SkillName01A",
+      "parent": "tagGDX3WeaponSwordD301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/sword1h_d303_cadence.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        20
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 20,
+      "value_at_ultimate": null,
+      "duration_seconds": 2,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:sword2h_d304_starpact:reduced-flat",
+      "name": "tagClass05SkillName15B",
+      "parent": "tagGDX3WeaponMelee2hD301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/sword2h_d304_starpact.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        25
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 25,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:head_b315_fieldcommand:reduced-flat",
+      "name": "tagClass01SkillName09A",
+      "parent": "tagGDX3HeadB315",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/head_b315_fieldcommand.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        35
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 35,
+      "value_at_ultimate": null,
+      "duration_seconds": 2,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:shield_b302_cadence:reduced-flat",
+      "name": "tagClass01SkillName01A",
+      "parent": "tagGDX3ShieldB302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/shield_b302_cadence.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        34
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 34,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:shield_b303_fieldcommand:reduced-flat",
+      "name": "tagClass01SkillName09A",
+      "parent": "tagGDX3ShieldB303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/shield_b303_fieldcommand.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        34
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 34,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:shield_b307_overguard:reduced-flat",
+      "name": "tagClass01SkillName15A",
+      "parent": "tagGDX3ShieldB307",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/shield_b307_overguard.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        34
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 34,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
@@ -2143,6 +2462,126 @@
       "notes": ""
     },
     {
+      "id": "records:skills:itemskillsgdx3:legendary:heathentouch:reduced-percent",
+      "name": "tagGDX3ItemSkillD361Name",
+      "parent": "tagGDX3NecklaceD314",
+      "record_path": "records/skills/itemskillsgdx3/legendary/heathentouch.dbr",
+      "category": "item granted",
+      "rr_type": "reduced-percent",
+      "resistances": "All",
+      "values_per_rank": [
+        20
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 20,
+      "value_at_ultimate": null,
+      "duration_seconds": 2,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:poisondotnova_01:reduced-percent",
+      "name": "tagItemSkillB005Name",
+      "parent": "tagRingC024",
+      "record_path": "records/skills/itemskillsgdx3/legendary/poisondotnova_01.dbr",
+      "category": "item granted",
+      "rr_type": "reduced-percent",
+      "resistances": "All",
+      "values_per_rank": [
+        18
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 18,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1.5,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:pets:petskill_livingplant_poisonbloom:reduced-percent",
+      "name": "tagGDX3HeadD313",
+      "parent": "tagGDX3HeadD313",
+      "record_path": "records/skills/itemskillsgdx3/pets/petskill_livingplant_poisonbloom.dbr",
+      "category": "set bonus",
+      "rr_type": "reduced-percent",
+      "resistances": "All",
+      "values_per_rank": [
+        26
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 26,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": 20,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:focus_d304_wereravenicetalons:reduced-percent",
+      "name": "tagGDX3Class10SkillWereravenAbilityName01A",
+      "parent": "tagGDX3FocusD301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/focus_d304_wereravenicetalons.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-percent",
+      "resistances": "All",
+      "values_per_rank": [
+        20
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 20,
+      "value_at_ultimate": null,
+      "duration_seconds": 2,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d309_markovianadvantage:reduced-percent",
+      "name": "tagClass01SkillName06A",
+      "parent": "tagGDX3ItemSetD309Name",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d309_markovianadvantage.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-percent",
+      "resistances": "All",
+      "values_per_rank": [
+        25
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 25,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
       "id": "records:skills:devotion:pets:petskill_wizardstrap_detonate01_buff:stacking:Aether",
       "name": "tagDevotionEffectB09_Pet01",
       "parent": "tagDevotion_B09",
@@ -2243,11 +2682,11 @@
         "Physical"
       ],
       "values_per_rank": [
+        -4,
+        -6,
         -8,
-        -9,
         -10,
         -11,
-        -12,
         -13,
         -14,
         -15,
@@ -3987,7 +4426,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_reapermark_buff:stacking:Cold",
       "name": "tagItemSkillD159Name",
-      "parent": "tagItemSetD015BName",
+      "parent": "tagItemSkillD159Name",
       "record_path": "records/skills/itemskills/legendary/item_reapermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4002,8 +4441,8 @@
       "ultimate_rank": null,
       "value_at_max": -18,
       "value_at_ultimate": null,
-      "duration_seconds": 12,
-      "cooldown_seconds": null,
+      "duration_seconds": 8,
+      "cooldown_seconds": 2,
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
@@ -4014,7 +4453,7 @@
     {
       "id": "records:skills:itemskills:legendary:item_reapermark_buff:stacking:Pierce",
       "name": "tagItemSkillD159Name",
-      "parent": "tagItemSetD015BName",
+      "parent": "tagItemSkillD159Name",
       "record_path": "records/skills/itemskills/legendary/item_reapermark_buff.dbr",
       "category": "item granted",
       "rr_type": "stacking",
@@ -4029,11 +4468,65 @@
       "ultimate_rank": null,
       "value_at_max": -18,
       "value_at_ultimate": null,
-      "duration_seconds": 12,
-      "cooldown_seconds": null,
+      "duration_seconds": 8,
+      "cooldown_seconds": 2,
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskills:legendary:item_reapermarkproc_buff:stacking:Cold",
+      "name": "tagItemSkillD159Name",
+      "parent": "tagItemSetD015BName",
+      "record_path": "records/skills/itemskills/legendary/item_reapermarkproc_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -15,
+        -18
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": 8,
+      "cooldown_seconds": 2,
+      "trigger_chance_percent": 30,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskills:legendary:item_reapermarkproc_buff:stacking:Pierce",
+      "name": "tagItemSkillD159Name",
+      "parent": "tagItemSetD015BName",
+      "record_path": "records/skills/itemskills/legendary/item_reapermarkproc_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -15,
+        -18
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": 8,
+      "cooldown_seconds": 2,
+      "trigger_chance_percent": 30,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
       "mythical": false,
       "per_resistance_values": null,
       "notes": ""
@@ -6410,11 +6903,11 @@
       "rr_type": "stacking",
       "resistances": "Elemental",
       "values_per_rank": [
-        -14
+        -16
       ],
       "max_rank": 1,
       "ultimate_rank": null,
-      "value_at_max": -14,
+      "value_at_max": -16,
       "value_at_ultimate": null,
       "duration_seconds": 8,
       "cooldown_seconds": null,
@@ -8028,6 +8521,32 @@
       "notes": "item skill modifier via records/items/gearweapons/guns1h/b101a_gun1h.dbr"
     },
     {
+      "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:gun2h_b101_stormbox:stacking:Lightning",
+      "name": "tagGDX1Class07SkillName02A",
+      "parent": "tagGDX1WeaponGun2hB101",
+      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/gun2h_b101_stormbox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/guns2h/b101a_gun2h.dbr"
+    },
+    {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:head_b104_soulsiphon:stacking:Bleeding",
       "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX1HeadB104",
@@ -8156,10 +8675,10 @@
       "notes": "item skill modifier via records/items/gearweapons/blunt1h/b101a_blunt.dbr"
     },
     {
-      "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace2h_b008_soulsiphon:stacking:Life",
-      "name": "tagGDX1Class08SkillName07A",
+      "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace2h_b008_spectralbinding_spectralwrath:stacking:Life",
+      "name": "tagGDX1Class08SkillName06B",
       "parent": "tagWeaponMelee2hB009",
-      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/mace2h_b008_soulsiphon.dbr",
+      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/mace2h_b008_spectralbinding_spectralwrath.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
       "resistances": [
@@ -8172,14 +8691,40 @@
       "ultimate_rank": null,
       "value_at_max": -15,
       "value_at_ultimate": null,
-      "duration_seconds": 5,
-      "cooldown_seconds": -1,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
       "mythical": false,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearweapons/melee2h/b008a_blunt2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:mace2h_b010_auraofcensure:stacking:Fire",
+      "name": "tagGDX1Class07SkillName09A",
+      "parent": "tagWeaponMelee2hB010",
+      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/mace2h_b010_auraofcensure.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b010a_blunt2h.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:necklace_b007_illomen:stacking:Cold",
@@ -8416,10 +8961,62 @@
       "notes": "item skill modifier via records/items/gearweapons/swords1h/b101a_sword.dbr"
     },
     {
-      "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:axe2h_d002_soulsiphon:stacking:Bleeding",
-      "name": "tagGDX1Class08SkillName07A",
+      "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:sword2h_b009_veilofshadow:stacking:Cold",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagWeaponMelee2hB008",
+      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/sword2h_b009_veilofshadow.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b009a_sword2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx1:skillmodifiers:monsterinfrequents:sword2h_b016_wordofpain:stacking:Aether",
+      "name": "tagGDX1Class07SkillName01A",
+      "parent": "tagWeaponMelee2hB016",
+      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/monsterinfrequents/sword2h_b016_wordofpain.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b016e_blunt2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx1:skillmodifiers:upgradedgdx1:axe2h_d002_spectralbinding_spectralwrath:stacking:Bleeding",
+      "name": "tagGDX1Class08SkillName06B",
       "parent": "tagWeaponMelee2hD002B",
-      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/axe2h_d002_soulsiphon.dbr",
+      "record_path": "records/skills/itemskillsgdx1/skillmodifiers/upgradedgdx1/axe2h_d002_spectralbinding_spectralwrath.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
       "resistances": [
@@ -8433,7 +9030,7 @@
       "value_at_max": -20,
       "value_at_ultimate": null,
       "duration_seconds": null,
-      "cooldown_seconds": -1.5,
+      "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
@@ -9518,11 +10115,11 @@
         "Poison & Acid"
       ],
       "values_per_rank": [
-        -10
+        -15
       ],
       "max_rank": 1,
       "ultimate_rank": null,
-      "value_at_max": -10,
+      "value_at_max": -15,
       "value_at_ultimate": null,
       "duration_seconds": null,
       "cooldown_seconds": null,
@@ -9742,10 +10339,10 @@
       "notes": "item skill modifier via records/items/gearweapons/axe1h/d204_axe.dbr"
     },
     {
-      "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:caster_d211_siphonsoul:stacking:Fire",
-      "name": "tagGDX1Class08SkillName07A",
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:caster_d211_spectralbinding_spectralwrath:stacking:Fire",
+      "name": "tagGDX1Class08SkillName06B",
       "parent": "tagGDX2WeaponCaster1hD207",
-      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/caster_d211_siphonsoul.dbr",
+      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/caster_d211_spectralbinding_spectralwrath.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
       "resistances": [
@@ -9836,7 +10433,7 @@
       "ultimate_rank": null,
       "value_at_max": -15,
       "value_at_ultimate": null,
-      "duration_seconds": null,
+      "duration_seconds": 3,
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
@@ -9862,7 +10459,7 @@
       "ultimate_rank": null,
       "value_at_max": -15,
       "value_at_ultimate": null,
-      "duration_seconds": null,
+      "duration_seconds": 3,
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
@@ -9920,6 +10517,56 @@
       "mythical": true,
       "per_resistance_values": null,
       "notes": "item skill modifier via records/items/gearhead/d207_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:head_d213_wordofpain:stacking:Aether",
+      "name": "tagGDX1Class07SkillName01A",
+      "parent": "tagGDX2HeadD210",
+      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/head_d213_wordofpain.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/d213_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:head_d213_wordofpain:stacking:Elemental",
+      "name": "tagGDX1Class07SkillName01A",
+      "parent": "tagGDX2HeadD210",
+      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/head_d213_wordofpain.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/d213_head.dbr"
     },
     {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:mace1h_d203_soulsiphon:stacking:Physical",
@@ -10034,32 +10681,6 @@
         "Aether"
       ],
       "values_per_rank": [
-        -10
-      ],
-      "max_rank": 1,
-      "ultimate_rank": null,
-      "value_at_max": -10,
-      "value_at_ultimate": null,
-      "duration_seconds": null,
-      "cooldown_seconds": null,
-      "trigger_chance_percent": null,
-      "trigger": "debuff",
-      "proc_condition": null,
-      "mythical": false,
-      "per_resistance_values": null,
-      "notes": "item skill modifier via records/items/lootsets/itemset_d205.dbr"
-    },
-    {
-      "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Fire",
-      "name": "tagGDX1Class08SkillName07A",
-      "parent": "tagGDX2ItemSetD205Name",
-      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
-      "category": "item skill modifier",
-      "rr_type": "stacking",
-      "resistances": [
-        "Fire"
-      ],
-      "values_per_rank": [
         -15
       ],
       "max_rank": 1,
@@ -10076,15 +10697,13 @@
       "notes": "item skill modifier via records/items/lootsets/itemset_d205.dbr"
     },
     {
-      "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Lightning",
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:legendary:set_d205_soulsiphon:stacking:Elemental",
       "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2ItemSetD205Name",
       "record_path": "records/skills/itemskillsgdx2/skillmodifiers/legendary/set_d205_soulsiphon.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
-      "resistances": [
-        "Lightning"
-      ],
+      "resistances": "Elemental",
       "values_per_rank": [
         -15
       ],
@@ -10414,6 +11033,110 @@
       "notes": "item skill modifier via records/items/gearweapons/axe1h/b206a_axe.dbr"
     },
     {
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:axe2h_b205_curseoffrailty:stacking:Poison",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX2WeaponMelee2hB205",
+      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/axe2h_b205_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b205a_axe2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:axe2h_b206_devouringswarm:stacking:Life",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagGDX2WeaponMelee2hB206",
+      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/axe2h_b206_devouringswarm.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": 6,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b206c_axe2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:axe2h_b206_devouringswarm_low:stacking:Life",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagGDX2WeaponMelee2hB206",
+      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/axe2h_b206_devouringswarm_low.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": 6,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b206a_axe2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:focus_b202_bloodypox:stacking:Poison",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagGDX2FocusB202",
+      "record_path": "records/skills/itemskillsgdx2/skillmodifiers/mi/focus_b202_bloodypox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/focus/b202a_focus.dbr"
+    },
+    {
       "id": "records:skills:itemskillsgdx2:skillmodifiers:mi:focus_b203_soulsiphon:stacking:Fire",
       "name": "tagGDX1Class08SkillName07A",
       "parent": "tagGDX2FocusB203",
@@ -10726,6 +11449,2583 @@
       "notes": "item skill modifier via records/items/gearweapons/shields/b201a_shield.dbr"
     },
     {
+      "id": "records:skills:itemskillsgdx3:legendary:bleedvulnerability_buff_01:stacking:Bleeding",
+      "name": "tagItemSkillB006Name",
+      "parent": "tagGDX2WeaponGun2hC201",
+      "record_path": "records/skills/itemskillsgdx3/legendary/bleedvulnerability_buff_01.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -20
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 20,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:celestialblaze_buff:stacking:Elemental",
+      "name": "tagGDX3ItemSkillD321Name",
+      "parent": "tagGDX3NecklaceD302",
+      "record_path": "records/skills/itemskillsgdx3/legendary/celestialblaze_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -10,
+        -12
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": 6,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 30,
+      "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:hellfury_buff:stacking:Fire",
+      "name": "tagGDX3ItemSkillD324Name",
+      "parent": "tagGDX3RingD305",
+      "record_path": "records/skills/itemskillsgdx3/legendary/hellfury_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -8,
+        -10
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 20,
+      "trigger": "debuff",
+      "proc_condition": "HitByEnemy",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:markofblood_buff:stacking:Bleeding",
+      "name": "tagGDX3ItemSkillD304Name",
+      "parent": "tagGDX3WeaponMelee2hF304",
+      "record_path": "records/skills/itemskillsgdx3/legendary/markofblood_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 20,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:markofblood_buff:stacking:Chaos",
+      "name": "tagGDX3ItemSkillD304Name",
+      "parent": "tagGDX3WeaponMelee2hF304",
+      "record_path": "records/skills/itemskillsgdx3/legendary/markofblood_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 20,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:markofstonethane_buff:stacking:Physical",
+      "name": "tagGDX3ItemSkillD325Name",
+      "parent": "tagGDX3RingD304",
+      "record_path": "records/skills/itemskillsgdx3/legendary/markofstonethane_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -8,
+        -10
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:markofstonethane_buff:stacking:Pierce",
+      "name": "tagGDX3ItemSkillD325Name",
+      "parent": "tagGDX3RingD304",
+      "record_path": "records/skills/itemskillsgdx3/legendary/markofstonethane_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -8,
+        -10
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:markofthemoon_buff:stacking:Cold",
+      "name": "tagGDX3ItemSkillD367Name",
+      "parent": "tagGDX3ItemSetD304Name",
+      "record_path": "records/skills/itemskillsgdx3/legendary/markofthemoon_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 30,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:markofthemoon_buff:stacking:Pierce",
+      "name": "tagGDX3ItemSkillD367Name",
+      "parent": "tagGDX3ItemSetD304Name",
+      "record_path": "records/skills/itemskillsgdx3/legendary/markofthemoon_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 30,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemyCrit",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:mercilessend_buff:stacking:Pierce",
+      "name": "tagGDX3ItemSkillD308Name",
+      "parent": "tagGDX3RingF307",
+      "record_path": "records/skills/itemskillsgdx3/legendary/mercilessend_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": 4,
+      "cooldown_seconds": 0.5,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:repetition_buff:stacking:Aether",
+      "name": "tagGDX3ItemSkillD365Name",
+      "parent": "tagGDX3FocusC302",
+      "record_path": "records/skills/itemskillsgdx3/legendary/repetition_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": 4,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:repetition_buff:stacking:Elemental",
+      "name": "tagGDX3ItemSkillD365Name",
+      "parent": "tagGDX3FocusC302",
+      "record_path": "records/skills/itemskillsgdx3/legendary/repetition_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": 4,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "contagious debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:widowbite_buff:stacking:Life",
+      "name": "tagGDX3ItemSkillD326Name",
+      "parent": "tagGDX3RingD303",
+      "record_path": "records/skills/itemskillsgdx3/legendary/widowbite_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -10,
+        -12
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:widowbite_buff:stacking:Pierce",
+      "name": "tagGDX3ItemSkillD326Name",
+      "parent": "tagGDX3RingD303",
+      "record_path": "records/skills/itemskillsgdx3/legendary/widowbite_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -8,
+        -10
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:legendary:widowbite_buff:stacking:Poison",
+      "name": "tagGDX3ItemSkillD326Name",
+      "parent": "tagGDX3RingD303",
+      "record_path": "records/skills/itemskillsgdx3/legendary/widowbite_buff.dbr",
+      "category": "item granted",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -8,
+        -10
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 1,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Aether",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Bleeding",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Chaos",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Elemental",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Life",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Physical",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Pierce",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:nyarlathonproclamation_buff:stacking:Poison",
+      "name": "tagGDX3ItemSkillB301Name",
+      "parent": "tagGDX3HeadB303",
+      "record_path": "records/skills/itemskillsgdx3/nyarlathonproclamation_buff.dbr",
+      "category": "monster infrequent",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -4,
+        -4,
+        -5,
+        -5,
+        -6
+      ],
+      "max_rank": 5,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": 5,
+      "cooldown_seconds": 3,
+      "trigger_chance_percent": 10,
+      "trigger": "debuff",
+      "proc_condition": "AttackEnemy",
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:axe1h_c022_curseoffrailty:stacking:Life",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagWeaponAxeC008",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/axe1h_c022_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/axe1h/c022_axe.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:gun1h_c205_bloodypox:stacking:Poison",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagGDX2WeaponGun1hC201",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/gun1h_c205_bloodypox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/guns1h/c205_gun1h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:gun1h_c205_devouringswarm:stacking:Poison",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagGDX2WeaponGun1hC201",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/gun1h_c205_devouringswarm.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -14
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -14,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/guns1h/c205_gun1h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:gun2h_c203_siphonsouls:stacking:Bleeding",
+      "name": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX2WeaponGun2hC201",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/gun2h_c203_siphonsouls.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/guns2h/c203_gun2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:head_c116_wordofpain:stacking:Chaos",
+      "name": "tagGDX1Class07SkillName01A",
+      "parent": "tagGDX1HeadC105",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/head_c116_wordofpain.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearhead/c116_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:head_c116_wordofpain:stacking:Fire",
+      "name": "tagGDX1Class07SkillName01A",
+      "parent": "tagGDX1HeadC105",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/head_c116_wordofpain.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearhead/c116_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:mace1h_c022_stormbox:stacking:Lightning",
+      "name": "tagGDX1Class07SkillName02A",
+      "parent": "tagWeaponBluntC006",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/mace1h_c022_stormbox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/blunt1h/c022_blunt.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:necklace_c051_veilofshadow:stacking:Bleeding",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagNecklaceC030",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/necklace_c051_veilofshadow.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearaccessories/necklaces/c051_necklace.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:necklace_c051_veilofshadow:stacking:Life",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagNecklaceC030",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/necklace_c051_veilofshadow.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearaccessories/necklaces/c051_necklace.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:shield_c027_devouringswarm:stacking:Bleeding",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagShieldC014",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/shield_c027_devouringswarm.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/shields/c027_shield.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:shield_c303_siphonsouls:stacking:Aether",
+      "name": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX3ShieldC301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/shield_c303_siphonsouls.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/shields/c303_shield.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:awakened:shield_c303_siphonsouls:stacking:Fire",
+      "name": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX3ShieldC301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/awakened/shield_c303_siphonsouls.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/awakened/gearweapons/shields/c303_shield.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:caster_d304_wordofpain:stacking:Cold",
+      "name": "tagGDX1Class07SkillName01A",
+      "parent": "tagGDX3WeaponCaster1hF304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/caster_d304_wordofpain.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/weapons/caster/f304a_dagger.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:focus_f302_illomen:stacking:Cold",
+      "name": "tagGDX1Class08SkillName08A",
+      "parent": "tagGDX3FocusF302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/focus_f302_illomen.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/weapons/focus/f302a_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:gun1h_f302_curseoffrailty:stacking:Poison",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3WeaponGun1hF302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/gun1h_f302_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/weapons/guns1h/f302a_gun1h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:gun2h_f203_bonechillingcry:stacking:Chaos",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX2WeaponGun2hF203",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/gun2h_f203_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -18
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/weapons/guns2h/f203a_gun2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:gun2h_f203_bonechillingcry:stacking:Life",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX2WeaponGun2hF203",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/gun2h_f203_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -25
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -25,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/weapons/guns2h/f203a_gun2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:necklace_f304_curseoffrailty:stacking:Poison",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3NecklaceF304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/necklace_f304_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/accessories/necklaces/f304a_necklace.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:shield_f303_curseoffrailty:stacking:Physical",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3ShieldF303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/shield_f303_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/weapons/shields/f303a_shield.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:faction:sword2h_f303_curseoffrailty:stacking:Fire",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3WeaponMelee2hF303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/faction/sword2h_f303_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/faction/weapons/melee2h/f303a_sword2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:axe1h_d306_curseoffrailty:stacking:Fire",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3WeaponAxeD304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/axe1h_d306_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/axe1h/d306_axe.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:axe1h_d307_siphonsouls:stacking:Aether",
+      "name": "tagGDX1Class08SkillName07A",
+      "parent": "tagGDX3WeaponAxeD305",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/axe1h_d307_siphonsouls.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/axe1h/d307_axe.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:caster_d311_spectralbinding_spectralwrath:stacking:Cold",
+      "name": "tagGDX1Class08SkillName06B",
+      "parent": "tagGDX3WeaponCaster1hD307",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/caster_d311_spectralbinding_spectralwrath.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/caster/d311_scepter.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker1:stacking:Aether",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX1NecklaceD113C",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker1.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_10a.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker1:stacking:Physical",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX1NecklaceD113C",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker1.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_10a.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker2:stacking:Life",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX1NecklaceD113C",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker2.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_10b.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker2:stacking:Poison",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX1NecklaceD113C",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker2.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll; item skill modifier via records/items/lootaffixes/prefixunique/d101_conduiteldritchsecrets_10b.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:focus_d305_bonechillingcry:stacking:Bleeding",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3FocusD302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/focus_d305_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/focus/d305_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:focus_d305_bonechillingcry:stacking:Life",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3FocusD302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/focus_d305_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/focus/d305_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:focus_d305_curseoffrailty:stacking:Bleeding",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3FocusD302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/focus_d305_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/focus/d305_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:gun1h_d304_bonechillingcry:stacking:Aether",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3WeaponGun1hD301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/gun1h_d304_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/guns1h/d304_gun1h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:head_d307_bonechillingcry:stacking:Cold",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3HeadD304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/head_d307_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/d307_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:head_d307_bonechillingcry:stacking:Pierce",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3HeadD304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/head_d307_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/d307_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:head_d310_curseoffrailty:stacking:Bleeding",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3HeadD307",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/head_d310_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/d310_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:head_d312_bonechillingcry:stacking:Aether",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3HeadD309",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/head_d312_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/d312_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:head_d313_bonechillingcry:stacking:Poison",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3HeadD310",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/head_d313_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/d313_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:necklace_d309_veilofshadow:stacking:Poison",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagGDX3NecklaceD304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/necklace_d309_veilofshadow.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearaccessories/necklaces/d309_necklace.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:necklace_d311_bloodypox:stacking:Bleeding",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagGDX3NecklaceD307",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/necklace_d311_bloodypox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearaccessories/necklaces/d311_necklace.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d304_olexraflashfreeze:stacking:Pierce",
+      "name": "Set D304 Olexraflashfreeze",
+      "parent": "Set D304 Olexraflashfreeze",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d304_olexraflashfreeze.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -20
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "modifier base not resolved to an enemy debuff; verify"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d305_bonechillingcry:stacking:Chaos",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3ItemSetD305Name",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d305_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/lootsets/itemset_d305.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d305_bonechillingcry:stacking:Fire",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3ItemSetD305Name",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d305_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/lootsets/itemset_d305.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d306_curseoffrailty:stacking:Bleeding",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3ItemSetD306Name",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d306_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/lootsets/itemset_d306.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d306_curseoffrailty:stacking:Pierce",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3ItemSetD306Name",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d306_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -18
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/lootsets/itemset_d306.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:set_d315_veilofshadow:stacking:Cold",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagGDX3ItemSetD315Name",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/set_d315_veilofshadow.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -16
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/lootsets/itemset_d315.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:sword1h_d303_bonechillingcry:stacking:Chaos",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3WeaponSwordD301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/sword1h_d303_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/swords1h/d303_sword.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:sword1h_d303_bonechillingcry:stacking:Physical",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3WeaponSwordD301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/sword1h_d303_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/swords1h/d303_sword.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:sword1h_d304_devouringswarm:stacking:Pierce",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagGDX3WeaponSwordD302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/sword1h_d304_devouringswarm.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": 1,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/swords1h/d304_sword.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:sword1h_d306_bloodypox:stacking:Poison",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagGDX3WeaponSwordD304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/sword1h_d306_bloodypox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/enemygear/gear_eldritchnemesis_sword1h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:axe1h_b303_bloodypox:stacking:Bleeding",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagGDX3WeaponAxeB303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/axe1h_b303_bloodypox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/axe1h/b303a_axe.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:axe1h_b303_bloodypox:stacking:Pierce",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagGDX3WeaponAxeB303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/axe1h_b303_bloodypox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/axe1h/b303a_axe.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:axe2h_b305_bonechillingcry:stacking:Poison",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3WeaponMelee2hB305",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/axe2h_b305_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b305a_axe2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:axe2h_b313_curseoffrailty:stacking:Fire",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3WeaponMelee2hB313",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/axe2h_b313_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -18
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b313a_axe2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:focus_b305_olexraflashfreeze:stacking:Cold",
+      "name": "tagClass05SkillName16A",
+      "parent": "tagGDX3FocusB305",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/focus_b305_olexraflashfreeze.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -6
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/focus/b305a_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:focus_b308_veilofshadow:stacking:Cold",
+      "name": "tagClass04SkillName07A",
+      "parent": "tagGDX3FocusB308",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/focus_b308_veilofshadow.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/focus/b308a_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:gun1h_b005_bonechillingcry:stacking:Chaos",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagWeaponGun1hB005",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/gun1h_b005_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/guns1h/b005a_gun1h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:gun2h_b303_auraofcensure:stacking:Poison",
+      "name": "tagGDX1Class07SkillName09A",
+      "parent": "tagGDX3WeaponGun2hB303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/gun2h_b303_auraofcensure.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -16
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/guns2h/b303a_gun2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:head_b309_curseoffrailty:stacking:Bleeding",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3HeadB309",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/head_b309_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/b309a_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:head_b309_curseoffrailty:stacking:Physical",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3HeadB309",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/head_b309_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/b309a_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:head_b314_wordofpain:stacking:Chaos",
+      "name": "tagGDX1Class07SkillName01A",
+      "parent": "tagGDX3HeadB314",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/head_b314_wordofpain.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearhead/b314a_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:mace2h_b002_bonechillingcry:stacking:Bleeding",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagWeaponBluntB004",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/mace2h_b002_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": 6,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b002a_blunt2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:necklace_b301_bonechillingcry:stacking:Pierce",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3NecklaceB301",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/necklace_b301_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearaccessories/necklaces/b301a_necklace.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:necklace_b302_bloodypox:stacking:Poison",
+      "name": "Necklace B302 Bloodypox",
+      "parent": "Necklace B302 Bloodypox",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/necklace_b302_bloodypox.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "modifier base not resolved to an enemy debuff; verify"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:necklace_b302_bloodypox_low:stacking:Poison",
+      "name": "tagClass03SkillName13A",
+      "parent": "tagGDX3NecklaceB302",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/necklace_b302_bloodypox_low.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearaccessories/necklaces/b302a_necklace.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:shield_b304_curseoffrailty:stacking:Poison",
+      "name": "tagClass03SkillName06A",
+      "parent": "tagGDX3ShieldB304",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/shield_b304_curseoffrailty.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/shields/b304f_shield.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:shield_b305_devouringswarm:stacking:Aether",
+      "name": "Shield B305 Devouringswarm",
+      "parent": "Shield B305 Devouringswarm",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/shield_b305_devouringswarm.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "modifier base not resolved to an enemy debuff; verify"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:shield_b308_bonechillingcry:stacking:Chaos",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3ShieldB308",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/shield_b308_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/shields/b308a_shield.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:sword1h_b303_devouringswarm:stacking:Bleeding",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagGDX3WeaponSwordB303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/sword1h_b303_devouringswarm.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/swords1h/b303a_sword.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:sword1h_b303_devouringswarm:stacking:Chaos",
+      "name": "tagClass06SkillName15A",
+      "parent": "tagGDX3WeaponSwordB303",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/sword1h_b303_devouringswarm.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/swords1h/b303a_sword.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:mi:sword2h_b310_bonechillingcry:stacking:Aether",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3WeaponMelee2hB310",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/mi/sword2h_b310_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/b310e_sword2h.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:upgradedgdx3:caster_d208_bonechillingcry:stacking:Elemental",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX2WeaponCaster1hD204",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/upgradedgdx3/caster_d208_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/caster/d208_scepter.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:upgradedgdx3:focus_d001_bonechillingcry:stacking:Chaos",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagFocusD001",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/upgradedgdx3/focus_d001_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/upgraded/gearweapons/focus/d001_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:upgradedgdx3:focus_d001_bonechillingcry:stacking:Poison",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagFocusD001",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/upgradedgdx3/focus_d001_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/upgraded/gearweapons/focus/d001_focus.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:upgradedgdx3:head_d004_bonechillingcry:stacking:Bleeding",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagHeadD004",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/upgradedgdx3/head_d004_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/upgraded/gearhead/d004_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:upgradedgdx3:head_d004_bonechillingcry:stacking:Life",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagHeadD004",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/upgradedgdx3/head_d004_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/upgraded/gearhead/d004_head.dbr"
+    },
+    {
+      "id": "records:skills:itemskillsgdx3:skillmodifiers:upgradedgdx3:mace2h_d208_bonechillingcry:stacking:Elemental",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX2WeaponMelee2hD205",
+      "record_path": "records/skills/itemskillsgdx3/skillmodifiers/upgradedgdx3/mace2h_d208_bonechillingcry.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "item skill modifier via records/items/gearweapons/melee2h/d208_blunt2h.dbr"
+    },
+    {
       "id": "records:skills:playerclass02:pets:thermitemine_skill_flare1_buff:stacking:Elemental",
       "name": "tagClass02SkillName06C",
       "parent": "tagClass02SkillName00A",
@@ -10918,10 +14218,108 @@
       "notes": ""
     },
     {
+      "id": "records:skills:playerclass02:pets:thermiteminechaos_skill_flare1_buff:stacking:Elemental",
+      "name": "tagClass02SkillName06C",
+      "parent": "tagClass02SkillName00A",
+      "record_path": "records/skills/playerclass02/pets/thermiteminechaos_skill_flare1_buff.dbr",
+      "category": "mastery skill",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -3,
+        -5,
+        -7,
+        -9,
+        -11,
+        -13,
+        -15,
+        -17,
+        -19,
+        -21,
+        -23,
+        -25,
+        -27,
+        -28,
+        -29,
+        -30,
+        -31,
+        -32,
+        -33,
+        -34,
+        -35,
+        -36,
+        -37,
+        -38,
+        -39,
+        -40
+      ],
+      "max_rank": 16,
+      "ultimate_rank": 26,
+      "value_at_max": -30,
+      "value_at_ultimate": -40,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
       "id": "records:skills:playerclass02:pets:thermiteminecold_skill_flare1_buff:stacking:Elemental",
       "name": "tagClass02SkillName06C",
       "parent": "tagClass02SkillName00A",
       "record_path": "records/skills/playerclass02/pets/thermiteminecold_skill_flare1_buff.dbr",
+      "category": "mastery skill",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -3,
+        -5,
+        -7,
+        -9,
+        -11,
+        -13,
+        -15,
+        -17,
+        -19,
+        -21,
+        -23,
+        -25,
+        -27,
+        -28,
+        -29,
+        -30,
+        -31,
+        -32,
+        -33,
+        -34,
+        -35,
+        -36,
+        -37,
+        -38,
+        -39,
+        -40
+      ],
+      "max_rank": 16,
+      "ultimate_rank": 26,
+      "value_at_max": -30,
+      "value_at_ultimate": -40,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:thermiteminelightning_skill_flare1_buff:stacking:Elemental",
+      "name": "tagClass02SkillName06C",
+      "parent": "tagClass02SkillName00A",
+      "record_path": "records/skills/playerclass02/pets/thermiteminelightning_skill_flare1_buff.dbr",
       "category": "mastery skill",
       "rr_type": "stacking",
       "resistances": "Elemental",
@@ -12388,6 +15786,194 @@
       "value_at_ultimate": -35,
       "duration_seconds": null,
       "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass10:bonechillingcry1_buff:stacking:Bleeding",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3Class10SkillName00A",
+      "record_path": "records/skills/playerclass10/bonechillingcry1_buff.dbr",
+      "category": "mastery skill",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -6,
+        -10,
+        -13,
+        -16,
+        -19,
+        -22,
+        -25,
+        -28,
+        -31,
+        -34,
+        -37,
+        -40,
+        -41,
+        -42,
+        -43,
+        -44,
+        -45,
+        -46,
+        -47,
+        -48,
+        -49,
+        -50
+      ],
+      "max_rank": 12,
+      "ultimate_rank": 22,
+      "value_at_max": -40,
+      "value_at_ultimate": -50,
+      "duration_seconds": 12,
+      "cooldown_seconds": 6,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass10:bonechillingcry1_buff:stacking:Chaos",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3Class10SkillName00A",
+      "record_path": "records/skills/playerclass10/bonechillingcry1_buff.dbr",
+      "category": "mastery skill",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -3,
+        -5,
+        -7,
+        -9,
+        -11,
+        -13,
+        -15,
+        -17,
+        -19,
+        -21,
+        -23,
+        -25,
+        -26,
+        -27,
+        -28,
+        -29,
+        -30,
+        -31,
+        -32,
+        -33,
+        -34,
+        -35
+      ],
+      "max_rank": 12,
+      "ultimate_rank": 22,
+      "value_at_max": -25,
+      "value_at_ultimate": -35,
+      "duration_seconds": 12,
+      "cooldown_seconds": 6,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass10:bonechillingcry1_buff:stacking:Cold",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3Class10SkillName00A",
+      "record_path": "records/skills/playerclass10/bonechillingcry1_buff.dbr",
+      "category": "mastery skill",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -3,
+        -5,
+        -7,
+        -9,
+        -11,
+        -13,
+        -15,
+        -17,
+        -19,
+        -21,
+        -23,
+        -25,
+        -26,
+        -27,
+        -28,
+        -29,
+        -30,
+        -31,
+        -32,
+        -33,
+        -34,
+        -35
+      ],
+      "max_rank": 12,
+      "ultimate_rank": 22,
+      "value_at_max": -25,
+      "value_at_ultimate": -35,
+      "duration_seconds": 12,
+      "cooldown_seconds": 6,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass10:bonechillingcry1_buff:stacking:Pierce",
+      "name": "tagGDX3Class10SkillName16A",
+      "parent": "tagGDX3Class10SkillName00A",
+      "record_path": "records/skills/playerclass10/bonechillingcry1_buff.dbr",
+      "category": "mastery skill",
+      "rr_type": "stacking",
+      "resistances": [
+        "Pierce"
+      ],
+      "values_per_rank": [
+        -4,
+        -7,
+        -10,
+        -13,
+        -16,
+        -18,
+        -20,
+        -22,
+        -24,
+        -26,
+        -28,
+        -30,
+        -31,
+        -32,
+        -33,
+        -34,
+        -35,
+        -36,
+        -37,
+        -38,
+        -39,
+        -40
+      ],
+      "max_rank": 12,
+      "ultimate_rank": 22,
+      "value_at_max": -30,
+      "value_at_ultimate": -40,
+      "duration_seconds": 12,
+      "cooldown_seconds": 6,
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
