@@ -6,8 +6,8 @@
 # dependencies = ["pillow"]
 # ///
 """Extract devotion .tex from UI.arc, decode, downscale, and write optimized WebP
-plus a manifest the web app reads. Output dir is git-ignored. See
-docs/assets-and-textures.md for the .tex format."""
+plus a manifest the web app reads. The output dir (assets/devotions) is committed for the
+GitHub Pages build; regenerate it with `just assets`. See docs/assets-and-textures.md for the .tex format."""
 from __future__ import annotations
 import argparse, json, re, subprocess, sys, tempfile
 from pathlib import Path
