@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
-# ABOUTME: Builds data/i18n/game.<lang>.json: tag -> text for every game tag devotions.json and
-# ABOUTME: stat-tags.json reference. Language-independent; run once per language (see justfile `parse`).
+# ABOUTME: Builds data/i18n/game.<lang>.json: tag -> text for every game tag devotions.json,
+# ABOUTME: stat-tags.json, resistance-reduction.json, and monsters.json reference. One run per language.
 # /// script
 # requires-python = ">=3.10"
 # dependencies = []
@@ -39,9 +39,11 @@ def collect_referenced_tags(
 ) -> set[str]:
     """Every *_tag value referenced in devotions.json (constellation/power/pet/weapon),
     plus every game tag value in stat-tags.json and stat-format-tags.json, plus the
-    name/parent tags of every resistance-reduction source. RR sources whose name/parent
-    could not resolve to a real tag carry a synthesized x: placeholder (no game text
-    exists), so only tag-prefixed values are collected."""
+    name/parent tags of every resistance-reduction source, plus the name and race tags
+    of every monster in monsters.json. RR sources whose name/parent could not resolve to
+    a real tag carry a synthesized x: placeholder (no game text exists), so only
+    tag-prefixed values are collected. A monster with no resolvable race carries a null
+    race_tag, which _add skips."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
