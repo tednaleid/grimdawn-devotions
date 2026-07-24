@@ -482,6 +482,17 @@ works fine under `file://`, but a copied `file://` link is not shareable across 
 
 ## Monster stats survey + explorer page (sub-project 3)
 
+**Specced 2026-07-24 (not yet implemented):** the investigation is done and the
+v1 pipeline is designed in
+[docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md](docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md).
+That spec supersedes the exploratory notes below for anything it covers: v1 is
+resistances-first (2,970 kept records collapsing to 1,858 logical monsters keyed
+on name x classification), difficulty is a global additive offset table extracted
+from `balancingadjustment_mp+difficulty_enemies01.dbr` (3 difficulties x 4 player
+brackets) and applied in the page, and HP/DA/OA plus attacks are defined
+follow-on phases. The explorer page is a separate sub-project to brainstorm once
+`data/monsters.json` exists; the spec pins the data contract it depends on.
+
 A re-runnable survey that extracts **all monster stats** (not just resistances)
 from the game files into a queryable committed dataset, plus a dedicated explorer
 page (same shape as the resistance-reduction page) that lets users search/filter
