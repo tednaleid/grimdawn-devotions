@@ -11,6 +11,7 @@ records_dir := justfile_directory() / "extracted/records"
 text_dir    := justfile_directory() / "extracted/text_en"
 out         := justfile_directory() / "data/devotions.json"
 out_rr      := justfile_directory() / "data/resistance-reduction.json"
+out_mon     := justfile_directory() / "data/monsters.json"
 
 # Default: show available recipes
 default:
@@ -189,6 +190,16 @@ parse-rr *ARGS:
         --devotions "{{out}}" \
         --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
 
+# Parse extracted records into monsters.json (re-run after a patch / re-extract).
+parse-monsters *ARGS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    read -r buildid version < <(just _game-version)
+    mkdir -p "$(dirname "{{out_mon}}")"
+    uv run scripts/parse_monsters.py \
+        --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out_mon}}" \
+        --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
+
 # Diff the regenerated data/*.json against the committed baseline: assert devotion structure is stable,
 # report tuning + RR changes. Run after regenerating, before committing. Exits non-zero on a structural break.
 diff-data:
@@ -198,13 +209,13 @@ diff-data:
 # review the diff and deploy yourself. Requires the game installed + closed (Windows-only extraction).
 # `diff-data` exits non-zero on a devotion structural break, halting the chain. New buildids must be added
 # to data/steam-build-versions.json first (or pass GD_VERSION=...).
-migrate: extract parse parse-rr i18n-tables assets build diff-data check
+migrate: extract parse parse-rr parse-monsters i18n-tables assets build diff-data check
     @echo ""
     @echo "Migration regenerated + verified. Review the diff-data report above (before the check output)."
     @echo "Then: just e2e   (recommended), then   git add -A && git commit && git push   to deploy."
 
 # Full pipeline: extract then parse
-all: extract parse parse-rr i18n-tables
+all: extract parse parse-rr parse-monsters i18n-tables
 
 # KEEPS the committed dataset (data/devotions.json, data/stat_labels.json) — those only
 # regenerate via `just parse` on Windows, so clean must never delete them.
@@ -324,6 +335,15 @@ test *ARGS:
 # so the default suite (and the pre-commit hook) stay fast. Run before big engine changes.
 test-slow:
     cd "{{justfile_directory()}}/web" && REACH_SLOW=1 bun test test/reachability-monotonicity.test.ts
+
+# Run the Python script test suites (parsers + data tools). The web suite is `just test`.
+test-scripts:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for t in "{{justfile_directory()}}"/scripts/test_*.py; do
+        echo "--- $(basename "$t")"
+        uv run "$t"
+    done
 
 # Per-click engine perf harness. Times selectionView (the validity-floor search + dimming sweep) = the
 # EXACT work one UI click costs; this is the pure core engine to optimize so the UI is fast (no DOM). Two
@@ -448,6 +468,7 @@ build: cover-table
     bun scripts/bundle.ts
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
     cp "{{justfile_directory()}}/data/resistance-reduction.json" dist/data/resistance-reduction.json
+    cp "{{justfile_directory()}}/data/monsters.json" dist/data/monsters.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
     mkdir -p dist/data/i18n && cp "{{justfile_directory()}}/data/i18n/"*.json dist/data/i18n/
     # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that
