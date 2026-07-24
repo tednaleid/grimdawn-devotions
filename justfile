@@ -277,7 +277,7 @@ i18n-tables *LANGS:
         fi
       fi
       uv run scripts/build_game_tables.py --devotions "{{out}}" --stat-tags data/stat-tags.json \
-        --stat-format-tags data/stat-format-tags.json --rr "{{out_rr}}" \
+        --stat-format-tags data/stat-format-tags.json --rr "{{out_rr}}" --monsters "{{out_mon}}" \
         --text-dir "$tdir" --lang "$L" --out "data/i18n/game.$L.json"
       built="$built $L"
     done

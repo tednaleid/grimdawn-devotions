@@ -113,5 +113,17 @@ with tempfile.TemporaryDirectory() as tmp:
     check("main() writes resolved tags only", written, table)
     check("main() omits unresolved referenced tag", "Life" in written, False)
 
+# --- monster name + race tags are collected ---
+monsters_doc = {"monsters": [
+    {"id": "enemies.x", "name_tag": "tagMonsterX", "race_tag": "tagRace005"},
+    {"id": "enemies.y", "name_tag": "tagMonsterY", "race_tag": None},
+]}
+mon_refs = bgt.collect_referenced_tags({}, {}, {}, {}, monsters_doc)
+check("monster name tags collected", {"tagMonsterX", "tagMonsterY"} <= mon_refs, True)
+check("monster race tag collected", "tagRace005" in mon_refs, True)
+check("a null race tag is skipped", None in mon_refs, False)
+check("monsters argument is optional",
+      isinstance(bgt.collect_referenced_tags({}, {}, {}, {}), set), True)
+
 print("ALL PASSED" if failures == 0 else f"{failures} FAILURE(S)")
 raise SystemExit(1 if failures else 0)
