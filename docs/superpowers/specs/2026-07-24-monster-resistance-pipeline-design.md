@@ -346,9 +346,12 @@ monster.
         "lightning": 50, "poison": 20, "aether": 50, "chaos": 0,
         "vitality": 0, "bleeding": 0
       },
-      "variant_count": 1,
-      "variants_disagree": false,
-      "record_paths": ["records/creatures/enemies/nemesis/nemesis_aetherial_01.dbr"]
+      "variant_count": 2,
+      "variants_disagree": true,
+      "record_paths": [
+        "records/creatures/enemies/nemesis/nemesis_aetherial_01.dbr",
+        "records/creatures/enemies/special/fun/nemesis_aetherial_01.dbr"
+      ]
     }
   ],
   "difficulty_offsets": {
@@ -358,6 +361,12 @@ monster.
   }
 }
 ```
+
+Valdaran is a real worked example of the grain doing its job: a duplicate of the
+record lives under `enemies/special/fun/` with different resistances, so the pair
+collapses to one logical monster, the tie-break keeps the `nemesis/` record as
+representative, and `variants_disagree` marks the pair rather than hiding the
+conflict.
 
 Each player-count entry carries the full set of ten resistance keys; only `fire`
 is shown above to keep the example readable. The fire numbers are the real
