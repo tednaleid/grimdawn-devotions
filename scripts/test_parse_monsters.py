@@ -69,5 +69,74 @@ for c in ("Common", "Champion", "Hero", "Boss", "SuperBoss", "Quest"):
 check("rule order: non-monster reported before devotion role",
       mon.exclusion_reason("enemies/devotion/x.dbr", rec(Class="ProxyPool"), TAGS) == "not a monster record")
 
+# --- Task 2: id derivation ---
+check("id drops the .dbr suffix and flattens separators",
+      mon.monster_id("enemies/nemesis/nemesis_aetherial_01.dbr") == "enemies.nemesis.nemesis_aetherial_01")
+check("id sanitizes characters that are unsafe in a URL hash",
+      mon.monster_id("enemies/boss&quest/loghorrean_03.dbr") == "enemies.boss-quest.loghorrean_03")
+
+# --- Task 2: race tag resolution ---
+RACE_TAGS = {"tagRace005": "Aether Corruption"}
+check("race tag resolves", mon.race_tag_of({"characterRacialProfile": "Race005"}, RACE_TAGS) == "tagRace005")
+check("unresolvable race tag is dropped", mon.race_tag_of({"characterRacialProfile": "Race099"}, RACE_TAGS) is None)
+check("absent race profile is None", mon.race_tag_of({}, RACE_TAGS) is None)
+check("malformed race profile is None", mon.race_tag_of({"characterRacialProfile": "Bogus"}, RACE_TAGS) is None)
+
+# --- Task 2: collapse to the logical grain ---
+def crec(maxlv, minlv=1, **kw):
+    base = {"Class": "Monster", "description": "tagOk", "monsterClassification": "Common",
+            "maxLevel": str(maxlv), "minLevel": str(minlv)}
+    base.update(kw)
+    return base
+
+groups = {
+    ("Aetherial Bloater", "Common"): [
+        ("enemies/bloater_a01.dbr", crec(30, defensiveFire="10")),
+        ("enemies/bloater_c01.dbr", crec(90, defensiveFire="10")),
+        ("enemies/bloater_b01.dbr", crec(60, defensiveFire="10")),
+    ],
+    ("Solo Beast", "Hero"): [("enemies/hero/solo.dbr", crec(50, defensiveCold="8"))],
+}
+logical = mon.collapse_to_logical(groups, RACE_TAGS)
+by_name = {m["id"]: m for m in logical}
+check("one logical monster per (name, classification)", len(logical) == 2)
+bloater = [m for m in logical if m["variant_count"] == 3][0]
+check("representative is the highest maxLevel", bloater["id"] == "enemies.bloater_c01")
+check("variant_count counts every collapsed record", bloater["variant_count"] == 3)
+check("record_paths lists every collapsed record, representative first",
+      bloater["record_paths"][0] == "records/creatures/enemies/bloater_c01.dbr"
+      and len(bloater["record_paths"]) == 3)
+check("agreeing variants are not flagged", bloater["variants_disagree"] is False)
+check("classification carried through", bloater["classification"] == "Common")
+check("role carried through", by_name["enemies.hero.solo"]["role"] == "hero")
+check("output is sorted by id", [m["id"] for m in logical] == sorted(m["id"] for m in logical))
+check("every logical monster carries all ten resistance keys",
+      all(list(m["resistances"].keys()) == TEN for m in logical))
+
+# maxLevel ties break on minLevel, then on path
+tie = mon.collapse_to_logical({("Tie", "Common"): [
+    ("enemies/b.dbr", crec(90, 10)),
+    ("enemies/a.dbr", crec(90, 40)),
+]}, RACE_TAGS)
+check("maxLevel tie breaks on higher minLevel", tie[0]["id"] == "enemies.a")
+tie2 = mon.collapse_to_logical({("Tie", "Common"): [
+    ("enemies/z.dbr", crec(90, 10)),
+    ("enemies/a.dbr", crec(90, 10)),
+]}, RACE_TAGS)
+check("full tie breaks on lowest path", tie2[0]["id"] == "enemies.a")
+
+# disagreement detection
+dis = mon.collapse_to_logical({("Dis", "Common"): [
+    ("enemies/x_a01.dbr", crec(90, defensiveFire="10")),
+    ("enemies/x_b01.dbr", crec(50, defensiveFire="40")),
+]}, RACE_TAGS)
+check("disagreeing variants are flagged", dis[0]["variants_disagree"] is True)
+check("disagreement still reports the representative's values", dis[0]["resistances"]["fire"] == 10)
+
+# summon flag
+summ = mon.collapse_to_logical({("S", "Common"): [("enemies/x_a01_summon.dbr", crec(20))]}, RACE_TAGS)
+check("summon records are flagged", summ[0]["is_summon"] is True)
+check("non-summon records are not flagged", tie[0]["is_summon"] is False)
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

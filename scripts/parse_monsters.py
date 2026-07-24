@@ -106,3 +106,68 @@ def exclusion_reason(rel_path: str, rec: dict, tags: dict) -> str | None:
     if rec.get("monsterClassification") not in VALID_CLASSIFICATIONS:
         return "no classification"
     return None
+
+
+def monster_id(rel_path: str) -> str:
+    """Stable, language-independent, URL-safe id from the representative's path.
+
+    Derived from the path (never from display text) so ids never change with locale.
+    Separators are flattened and unsafe characters replaced so the id can sit in a
+    URL hash unescaped: 'enemies/boss&quest/x.dbr' -> 'enemies.boss-quest.x'.
+    """
+    stem = rel_path[:-4] if rel_path.endswith(".dbr") else rel_path
+    return re.sub(r"[^A-Za-z0-9_.-]", "-", stem.replace("/", "."))
+
+
+def race_tag_of(rec: dict, tags: dict) -> str | None:
+    """The tagRace0NN translation tag for a record's racial profile, else None.
+
+    Only tags that actually resolve are emitted, so the dataset never carries a
+    dangling tag the i18n table cannot fill.
+    """
+    profile = (rec.get("characterRacialProfile") or "").strip()
+    if not re.fullmatch(r"Race\d+", profile):
+        return None
+    tag = f"tag{profile}"
+    return tag if tags.get(tag) else None
+
+
+def _representative_rank(entry):
+    """Sort key selecting the representative: highest maxLevel, then highest
+    minLevel, then lexicographically lowest path. Total, so runs are reproducible."""
+    rel_path, rec = entry
+    return (
+        -(as_float(rec.get("maxLevel")) or 0.0),
+        -(as_float(rec.get("minLevel")) or 0.0),
+        rel_path,
+    )
+
+
+def collapse_to_logical(groups: dict, tags: dict) -> list[dict]:
+    """{(name, classification): [(rel_path, rec)]} -> one dict per logical monster.
+
+    Variant records (tier _[abc]NN, _summon, _pN phases) collapse onto the
+    highest-level representative. Groups whose members disagree on resistances are
+    flagged rather than silently resolved, so the page can mark them.
+    """
+    out = []
+    for (_name, classification), members in groups.items():
+        ordered = sorted(members, key=_representative_rank)
+        rel_path, rec = ordered[0]
+        resistances = resistances_of(rec)
+        out.append({
+            "id": monster_id(rel_path),
+            "name_tag": rec["description"],
+            "classification": classification,
+            "role": role_of(rel_path),
+            "race_tag": race_tag_of(rec, tags),
+            "min_level": int(as_float(rec.get("minLevel")) or 0),
+            "max_level": int(as_float(rec.get("maxLevel")) or 0),
+            "is_summon": rel_path.endswith("_summon.dbr"),
+            "resistances": resistances,
+            "variant_count": len(ordered),
+            "variants_disagree": any(resistances_of(r) != resistances for _, r in ordered[1:]),
+            "record_paths": [f"records/creatures/{p}" for p, _ in ordered],
+        })
+    out.sort(key=lambda m: m["id"])
+    return out
