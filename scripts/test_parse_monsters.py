@@ -171,5 +171,59 @@ check("normal adds no fire offset", [offs["normal"][p]["fire"] for p in "1234"] 
 check("bleeding gains its resistance from difficulty alone",
       offs["ultimate"]["4"]["bleeding"] > 0)
 
+# --- Task 4: run the real parser over the extracted tree ---
+out = Path(tempfile.mkdtemp()) / "monsters.json"
+rc = subprocess.run([sys.executable, str(here / "parse_monsters.py"),
+    "--records-dir", str(root / "extracted/records"),
+    "--text-dir", str(root / "extracted/text_en"),
+    "--out", str(out), "--game-version", "test"]).returncode
+check("parser exits 0", rc == 0)
+doc = json.loads(out.read_text(encoding="utf-8"))
+check("has meta.game_version", doc["meta"]["game_version"] == "test")
+check("has meta.generated_utc", bool(doc["meta"].get("generated_utc")))
+check("monsters is a list", isinstance(doc["monsters"], list))
+check("difficulty_offsets present", isinstance(doc["difficulty_offsets"], dict))
+
+monsters = doc["monsters"]
+# Data-derived counts: bands, not equality, so a balance patch does not fail the suite.
+check(f"logical monster count in band (got {len(monsters)})", 1400 <= len(monsters) <= 1900)
+check("ids are unique", len({m["id"] for m in monsters}) == len(monsters))
+check("every monster carries all ten resistance keys",
+      all(list(m["resistances"].keys()) == TEN for m in monsters))
+check("no monster stores display text",
+      all(m["name_tag"].startswith("tag") for m in monsters))
+check("every classification is one of the six valid values",
+      {m["classification"] for m in monsters} <= set(mon.VALID_CLASSIFICATIONS))
+check("no devotion-role monster survives", not any(m["role"] == "devotion" for m in monsters))
+check("no monster has a null classification", all(m["classification"] for m in monsters))
+check("raw records collapsed in band",
+      1400 <= sum(m["variant_count"] for m in monsters) <= 3200)
+disagreeing = [m for m in monsters if m["variants_disagree"]]
+check(f"disagreeing groups stay a small minority (got {len(disagreeing)})",
+      len(disagreeing) <= len(monsters) // 10)
+check("summons are present and flagged", any(m["is_summon"] for m in monsters))
+check("nemesis role is present", any(m["role"] == "nemesis" for m in monsters))
+
+# Valdaran (nemesis_aetherial_01) is the fixture from the spec.
+val = [m for m in monsters if m["id"] == "enemies.nemesis.nemesis_aetherial_01"]
+check("valdaran present", len(val) == 1)
+check("valdaran resistances match the record",
+      val and val[0]["resistances"]["fire"] == 20 and val[0]["resistances"]["lightning"] == 50
+      and val[0]["resistances"]["aether"] == 50 and val[0]["resistances"]["poison"] == 20
+      and val[0]["resistances"]["cold"] == 0)
+check("valdaran classification and role", val and val[0]["classification"] == "Boss" and val[0]["role"] == "nemesis")
+check("valdaran level range", val and val[0]["min_level"] == 60 and val[0]["max_level"] == 250)
+check("valdaran race tag", val and val[0]["race_tag"] == "tagRace005")
+
+# --- Task 4: determinism ---
+out2 = Path(tempfile.mkdtemp()) / "monsters2.json"
+subprocess.run([sys.executable, str(here / "parse_monsters.py"),
+    "--records-dir", str(root / "extracted/records"),
+    "--text-dir", str(root / "extracted/text_en"),
+    "--out", str(out2), "--game-version", "test"], check=True)
+doc2 = json.loads(out2.read_text(encoding="utf-8"))
+check("deterministic across runs", doc["monsters"] == doc2["monsters"])
+check("deterministic offsets across runs", doc["difficulty_offsets"] == doc2["difficulty_offsets"])
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

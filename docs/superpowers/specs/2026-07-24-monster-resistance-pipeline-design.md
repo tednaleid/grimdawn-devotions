@@ -326,11 +326,14 @@ monster.
 
 ```json
 {
-  "game_version": "1.3.0.0",
-  "steam_buildid": "...",
+  "meta": {
+    "game_version": "1.3.0.0",
+    "steam_buildid": "12345678",
+    "generated_utc": "2026-07-24T00:00:00Z"
+  },
   "monsters": [
     {
-      "id": "nemesis_aetherial_01",
+      "id": "enemies.nemesis.nemesis_aetherial_01",
       "name_tag": "tagNemesis_Aetherial01",
       "classification": "Boss",
       "role": "nemesis",

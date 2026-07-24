@@ -228,3 +228,85 @@ def difficulty_offsets(db: DB) -> dict:
             for p in PLAYER_BRACKETS:
                 out[d][p][key] = table.get(d, {}).get(p, 0)
     return out
+
+
+def iter_creature_records(db: DB):
+    """(path relative to records/creatures, record) for every .dbr under creatures/.
+
+    Sorted so a run is reproducible regardless of filesystem ordering.
+    """
+    root = db.root / "records/creatures"
+    for path in sorted(root.rglob("*.dbr")):
+        rel = path.relative_to(root).as_posix()
+        yield rel, db.get(f"records/creatures/{rel}")
+
+
+def collect_monsters(db: DB, tags: dict) -> list[dict]:
+    """Sweep creatures/, drop what is not surveyable, and collapse to the logical grain."""
+    groups: dict = {}
+    for rel_path, rec in iter_creature_records(db):
+        reason = exclusion_reason(rel_path, rec, tags)
+        if reason:
+            EXCLUSIONS.append({"record_path": f"records/creatures/{rel_path}", "reason": reason})
+            continue
+        key = (tags[rec["description"]], rec["monsterClassification"])
+        groups.setdefault(key, []).append((rel_path, rec))
+    return collapse_to_logical(groups, tags)
+
+
+def print_summary(monsters, exclusions):
+    """Audit summary to stderr: population, facet spread, and every exclusion count."""
+    from collections import Counter
+    p = lambda *a: print(*a, file=sys.stderr)
+    raw = sum(m["variant_count"] for m in monsters)
+    disagreeing = [m for m in monsters if m["variants_disagree"]]
+    collapsing = [m for m in monsters if m["variant_count"] > 1]
+    p("\n=== MONSTER EXTRACTION SUMMARY ===")
+    p(f"  kept records: {raw}  ->  logical monsters: {len(monsters)}")
+    p(f"  collapsing >1 record: {len(collapsing)}")
+    p(f"  of those, variants disagree on resistances: {len(disagreeing)}")
+    p("  by classification: " + ", ".join(
+        f"{k}={v}" for k, v in sorted(Counter(m["classification"] for m in monsters).items())))
+    p("  by role: " + ", ".join(
+        f"{k}={v}" for k, v in sorted(Counter(m["role"] for m in monsters).items())))
+    p(f"  summons: {sum(1 for m in monsters if m['is_summon'])}")
+    p(f"  no race tag: {sum(1 for m in monsters if not m['race_tag'])}")
+    p(f"  excluded: {len(exclusions)}")
+    for reason, n in sorted(Counter(e["reason"] for e in exclusions).items()):
+        p(f"    - {reason}: {n}")
+
+
+def main(argv=None) -> int:
+    ap = argparse.ArgumentParser(description="Survey monster resistances into monsters.json")
+    ap.add_argument("--records-dir", required=True, type=Path)
+    ap.add_argument("--text-dir", required=True, type=Path)
+    ap.add_argument("--out", default=Path("monsters.json"), type=Path)
+    ap.add_argument("--game-version", default="unknown")
+    ap.add_argument("--steam-buildid", default=None)
+    args = ap.parse_args(argv)
+
+    db = DB(args.records_dir.resolve())
+    if not (db.root / "records/creatures").is_dir():
+        print(f"ERROR: creatures not found under {db.root}/records", file=sys.stderr)
+        return 2
+    tags = load_translations(args.text_dir.resolve())
+    if not tags:
+        print(f"ERROR: no translations loaded from {args.text_dir}", file=sys.stderr)
+        return 2
+
+    monsters = collect_monsters(db, tags)
+    meta = {
+        "game_version": args.game_version,
+        "steam_buildid": args.steam_buildid,
+        "generated_utc": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+    doc = {"meta": meta, "monsters": monsters, "difficulty_offsets": difficulty_offsets(db)}
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
+    print(f"Wrote {args.out}  ({len(monsters)} monsters)")
+    print_summary(monsters, EXCLUSIONS)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
