@@ -92,6 +92,26 @@ def test_rr_added_removed_changed():
     assert any("s1" in c for c in changed), changed
 
 
+def _mon(mid, fire=10, cls="Common"):
+    return {"id": mid, "name_tag": "tag" + mid, "classification": cls,
+            "resistances": {"fire": fire, "cold": 0}}
+
+
+def test_monster_diff_reports_added_removed_and_changed():
+    old = {"monsters": [_mon("a"), _mon("b"), _mon("c")]}
+    new = {"monsters": [_mon("a"), _mon("b", fire=40), _mon("d")]}
+    added, removed, changed = dd.diff_monsters(old, new)
+    assert added == ["d (Common)"], added
+    assert removed == ["c (Common)"], removed
+    assert len(changed) == 1 and changed[0].startswith("b:"), changed
+    assert "fire" in changed[0] and "10" in changed[0] and "40" in changed[0], changed
+
+
+def test_monster_diff_identical_documents_are_clean():
+    doc = {"monsters": [_mon("a"), _mon("b")]}
+    assert dd.diff_monsters(doc, doc) == ([], [], []), dd.diff_monsters(doc, doc)
+
+
 def run():
     fns = [v for k, v in globals().items() if k.startswith("test_")]
     for fn in fns:

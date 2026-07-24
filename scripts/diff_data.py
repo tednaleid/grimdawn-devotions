@@ -167,10 +167,36 @@ def _con_name(con: dict, gametext: dict) -> str:
     return gametext.get(con.get("name_tag", ""), con.get("id", "?"))
 
 
+def diff_monsters(old: dict, new: dict):
+    """(added, removed, changed) description lines between two monsters.json documents.
+
+    Keyed on the stable id, so a renamed display string is not reported as a
+    remove-plus-add. Only resistance changes are reported as changes: they are the
+    dataset's payload, and facet churn shows up as an add or remove instead.
+    """
+    old_by_id = {m["id"]: m for m in old.get("monsters", [])}
+    new_by_id = {m["id"]: m for m in new.get("monsters", [])}
+    added = [f"{mid} ({new_by_id[mid].get('classification')})"
+             for mid in sorted(new_by_id.keys() - old_by_id.keys())]
+    removed = [f"{mid} ({old_by_id[mid].get('classification')})"
+               for mid in sorted(old_by_id.keys() - new_by_id.keys())]
+    changed = []
+    for mid in sorted(old_by_id.keys() & new_by_id.keys()):
+        o = old_by_id[mid].get("resistances", {})
+        n = new_by_id[mid].get("resistances", {})
+        deltas = [f"{k} {_fmt(o.get(k))} -> {_fmt(n.get(k))}"
+                  for k in sorted(o.keys() | n.keys()) if o.get(k) != n.get(k)]
+        if deltas:
+            changed.append(f"{mid}: " + ", ".join(deltas))
+    return added, removed, changed
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--devotions", default="data/devotions.json")
     ap.add_argument("--rr", default="data/resistance-reduction.json")
+    ap.add_argument("--monsters", type=Path,
+                    default=Path(__file__).resolve().parent.parent / "data/monsters.json")
     ap.add_argument("--game-text", default="data/i18n/game.en.json", help="tag->name map for readable names")
     args = ap.parse_args(argv)
     exit_code = 0
@@ -212,6 +238,23 @@ def main(argv=None) -> int:
     else:
         added, removed, changed = diff_rr(old_rr, new_rr)
         print(f"  SOURCES: +{len(added)} new, -{len(removed)} removed, {len(changed)} changed")
+        for a in added:
+            print(f"    + {a}")
+        if removed:
+            print("  REMOVED (review - regression or a legitimate removal):")
+            for r in removed:
+                print(f"    - {r}")
+        for c in changed:
+            print(f"    ~ {c}")
+
+    print("=== monsters.json ===")
+    new_mon = _load_working(args.monsters)
+    old_mon = _load_baseline(args.monsters)
+    if old_mon is None:
+        print("  (no committed baseline; skipping monster diff)")
+    else:
+        added, removed, changed = diff_monsters(old_mon, new_mon)
+        print(f"  MONSTERS: +{len(added)} new, -{len(removed)} removed, {len(changed)} changed")
         for a in added:
             print(f"    + {a}")
         if removed:
