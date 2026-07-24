@@ -56,7 +56,7 @@ design. They are a point-in-time record, not a living reference.
 non-combat records. The `*_boss.dbr` siblings are `charanimationtable.tpl`
 animation tables, not stat records, and must not be read as monsters.
 
-After the exclusion rules in "Filtering" below, 2,970 raw records remain.
+After the exclusion rules in "Filtering" below, 2,728 raw records remain.
 
 `monsterClassification` distribution across the 3,074 monsters:
 
@@ -73,6 +73,10 @@ After the exclusion rules in "Filtering" below, 2,970 raw records remain.
 Note that "Nemesis" is not a classification. Nemeses are Boss or SuperBoss
 records living under `creatures/enemies/nemesis/`, so nemesis-tier filtering
 must come from the path role, not the classification.
+
+The 51 records with no `monsterClassification` are excluded from v1 (see
+"Filtering"), so every monster in the dataset carries one of the six real
+classification values.
 
 ### Stat tiers
 
@@ -141,10 +145,23 @@ to every monster's resistance, on top of that monster's own base. On Ultimate at
 4 players, every monster in the game gets +16% fire resistance. A distribution
 view that ignores this would misrepresent the endgame that players care about.
 
-Post-migration the scaler still encodes exactly three difficulties. Whatever
-difficulty tier Fangs of Asterkarn added above Ultimate is not a fourth column in
-this record. v1 therefore models Normal, Elite, and Ultimate, and locating the
-new tier's scaling is recorded as open work rather than guessed at.
+Post-migration the scaler still encodes exactly three difficulties: the
+difficulty tier Fangs of Asterkarn added above Ultimate is not a fourth column
+in this record.
+
+**That tier does not change resistances.** It scales overall monster damage and
+health only (roughly +75% damage and +1380% health, against Ultimate's +30% and
++530%). The consequence for this design is a simplification rather than a gap:
+the three-difficulty offset table is the complete resistance model for every
+difficulty in the game, including the new one. Nothing about the new tier is
+missing from v1.
+
+The damage and health scaling matters only to the follow-on defenses phase, and
+those announced percentages do not line up exactly with the raw scaler fields
+(the record carries `offensiveTotalDamageModifier` 40 and `characterLifeModifier`
+580 at Ultimate, alongside a separate per-player-bracket
+`characterLifeMultModifier` of 0/90/180/270). That phase must reconcile which
+representation is authoritative rather than assume either one.
 
 ### Dedup grain
 
@@ -153,12 +170,12 @@ during the RR work. Filename patterns across monster records: 825 carry an
 `_[abc]NN` tier suffix, 247 are `_summon` spawns, and 14 are `_pN` boss phases.
 
 Measured against the kept records, `(resolved name x classification)` collapses
-2,970 raw records to **1,858 logical monsters**, of which 627 collapse more than
+2,728 raw records to **1,637 logical monsters**, of which 608 collapse more than
 one record.
 
-The important measurement: of those 627 collapsing groups, only **50 (7%)** have
+The important measurement: of those 608 collapsing groups, only **50 (8%)** have
 variants that disagree on their resistance values at all. Choosing a single
-representative therefore discards very little, and the 7% is small enough to
+representative therefore discards very little, and the 8% is small enough to
 report honestly rather than hide.
 
 Classification is part of the key because names genuinely span tiers: "Animated
@@ -167,26 +184,41 @@ are different opponents.
 
 ### Facets
 
-Path role distribution across kept records:
+Distributions below are across the 2,728 kept records, after every exclusion in
+"Filtering".
+
+Classification:
+
+| Classification | Records |
+| --- | --- |
+| Hero | 992 |
+| Champion | 837 |
+| Common | 476 |
+| Quest | 348 |
+| Boss | 46 |
+| SuperBoss | 29 |
+
+Path role:
 
 | Role | Records |
 | --- | --- |
 | base | 957 |
 | hero | 582 |
 | boss&quest | 517 |
-| faction | 230 |
-| devotion | 191 |
+| faction | 229 |
 | special | 168 |
-| waveevents | 96 |
+| waveevent | 144 |
 | bounties | 73 |
-| npcs | 54 |
-| waveevent | 48 |
 | nemesis | 29 |
 | anomalies | 13 |
 | ambient | 12 |
+| npcs | 4 |
 
 `waveevent` and `waveevents` are two spellings of the same concept and normalize
-to one role.
+to the single `waveevent` role, which is why that row is the sum of the two
+directories. The `devotion` role is excluded entirely (see "Filtering").
+
+246 of the kept records are `_summon` spawns.
 
 `characterRacialProfile` takes 40 distinct `Race0NN` values, which resolve to
 display names through `tagRace0NN` translation tags (Race001 Undead, Race002
@@ -195,7 +227,8 @@ on). Because they are tags, the race facet localizes through the existing game
 text table with no extra work, and it shares its id space with the racial damage
 bonuses the devotion planner already models.
 
-All 2,970 kept records carry a numeric `maxLevel`.
+Every kept record carries a numeric `maxLevel`, so the grain tie-break below
+never falls through for want of a level.
 
 ## Design
 
@@ -208,9 +241,22 @@ A creature record is kept when all of the following hold:
 - `invincible` is unset or zero.
 - `description` is present and resolves to a non-empty name through the
   translation tags.
+- The path role is not `devotion`. Those 191 records under
+  `creatures/enemies/devotion/` are devotion-related content rather than
+  opponents a player fights and surveys.
+- `monsterClassification` is one of the six real values (Common, Champion, Hero,
+  Boss, SuperBoss, Quest). The 51 records without one are dropped as
+  scaffolding rather than given a synthetic facet value.
 
-Measured exclusions from the 5,239 files: 2,165 not `Class,Monster`, 87
-`hiddenFromCombat`, 11 `invincible`, 6 with no resolvable name.
+Measured exclusions from the 5,239 files, applied in that order: 2,165 not
+`Class,Monster`, 87 `hiddenFromCombat`, 11 `invincible`, 6 with no resolvable
+name, 191 `devotion` role, 51 with no classification. Total 2,511 excluded,
+leaving 2,728 kept.
+
+The last two rules are deliberate "good enough" calls for v1: both sets are
+small and almost certainly not opponents worth surveying. Both are counted in
+the parser summary, so if either turns out to matter the evidence is visible
+rather than lost.
 
 `_summon` records and `Quest` classification records are **kept**, not dropped,
 but each is tagged so the page can default them off. Silently dropping them
@@ -234,7 +280,7 @@ reproducible across runs and machines.
 Each logical monster records `variant_count` (how many raw records collapsed
 into it), `record_paths` (all of them), and `variants_disagree` (true when the
 group's members do not share identical resistance values). The last field is what
-makes the 7% visible instead of silently averaged away.
+makes the 8% visible instead of silently averaged away.
 
 ### Fields
 
@@ -244,9 +290,10 @@ Per logical monster:
   path. Ids never contain display text, per the i18n invariant.
 - `name_tag`: the `description` tag. Display text resolves through
   `data/i18n/game.<lang>.json`, never stored inline.
-- `classification`: Common, Champion, Hero, Boss, SuperBoss, Quest, or null.
-- `role`: normalized path role (nemesis, hero, boss&quest, faction, devotion,
-  special, waveevent, bounties, npcs, anomalies, ambient, base).
+- `classification`: one of Common, Champion, Hero, Boss, SuperBoss, Quest. Never
+  null, because unclassified records are excluded.
+- `role`: normalized path role (nemesis, hero, boss&quest, faction, special,
+  waveevent, bounties, npcs, anomalies, ambient, base).
 - `race_tag`: the `tagRace0NN` tag, or null.
 - `min_level`, `max_level`.
 - `is_summon`: derived from the `_summon` filename suffix.
@@ -346,8 +393,9 @@ existing two rather than a special case:
 - Unit test of the difficulty-offset parse: the 12-entry array splits into
   3 difficulties by 4 player brackets in the right order.
 - Integration assertions against the real extracted records, pinning the
-  measured counts above (2,970 kept, 1,858 logical, Valdaran's exact resistance
-  values, and that no monster is missing any of the ten resistance keys).
+  measured counts above (2,728 kept, 1,637 logical, Valdaran's exact resistance
+  values, that no monster is missing any of the ten resistance keys, and that no
+  monster carries a `devotion` role or a null classification).
 
 The counts are data-derived, so they are expected to move on a game patch. They
 are assertions with honest bands rather than exact equality where a patch would
@@ -385,30 +433,28 @@ Stated in the spec and surfaced in the page rather than left implicit:
   Effective in-game resistance for heroes and bosses is therefore understated.
   The page must say so where it could mislead, in the same spirit as the RR
   page withholding an order it cannot prove legal.
-- **The above-Ultimate difficulty tier is not modelled.** The base scaler encodes
-  three difficulties; the new tier's scaling has not been located. v1 covers
-  Normal, Elite, and Ultimate.
-- **7% of collapsed groups have disagreeing variants.** Those carry
+- **8% of collapsed groups have disagreeing variants.** Those carry
   `variants_disagree: true` and the page should mark them rather than present a
   single number as if it were uncontested.
 - **Level-dependent stats are absent entirely in v1** (health, DA, OA), so the
   dataset describes defenses by type, not overall durability.
+- **242 records are excluded as not-worth-surveying** (191 devotion role, 51
+  unclassified). Both are counted in the parser summary; neither is believed to
+  contain real opponents.
 
-## Open work
-
-- Locate the scaling for the difficulty tier above Ultimate and extend
-  `difficulty_offsets` when found.
-- Decide whether `role: "devotion"` (191 records under `creatures/enemies/devotion/`)
-  are player-side devotion summons rather than enemies. If so they belong with
-  summons behind a default-off facet, or excluded outright.
-- Confirm whether the 51 monsters with no `monsterClassification` are real
-  opponents or scaffolding, and whether they warrant their own facet value.
+The difficulty coverage is explicitly **not** a limitation: because the tier
+above Ultimate changes only damage and health, the three-difficulty offset table
+is complete for resistances across every difficulty in the game.
 
 ## Follow-on phases
 
 - **Defenses**: evaluate `characterAttributeEquations` bio equations at a chosen
   level to surface health, offensive ability, and defensive ability. Needs a
-  level selector in the page and an equation evaluator in the parser.
+  level selector in the page and an equation evaluator in the parser. This is
+  the phase where the difficulty tiers stop being resistance-neutral: it must
+  model Ultimate's damage and health scaling and the higher tier's (roughly +75%
+  damage and +1380% health versus +30% and +530%), and reconcile those announced
+  figures against the raw scaler fields noted in "Difficulty scaling".
 - **Attacks**: classify `skillName1..N` records by skill `Class`, select the
   per-level damage entry, and aggregate by damage type. Needs its own design pass
   to define what "burst damage" means before any extraction is written.
