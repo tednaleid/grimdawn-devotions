@@ -194,5 +194,49 @@ check("Night's Chill survives the modifier cleanup",
 check("the Inquisitor Seal item modifiers were excluded",
       not find(lambda s: "inquisitorseal" in s["record_path"]))
 
+# --- collapse_redundant_sources: the three dedup rules (pure) ---
+def _src(rp, name, parent, rr_type, res, vmax, notes=""):
+    return {"record_path": rp, "name": name, "parent": parent, "rr_type": rr_type,
+            "resistances": res, "value_at_max": vmax, "notes": notes}
+
+_tags = {"nFlame": "Flame Jet", "pDemo": "Demolitionist", "nWop": "Word of Pain",
+         "pMsg": "Messenger's Repeater", "nAeth": "Aetherblaze", "pAlb": "Albrecht's Duality"}
+_collapsed = rr.collapse_redundant_sources(_tags, [
+    _src("a_verify.dbr", "nEnr", "nEnr", "stacking", ["Physical"], -15, "unusual template; verify"),
+    _src("thermitemine_skill_flare1_buff.dbr", "nFlame", "pDemo", "stacking", "Elemental", -30),
+    _src("thermitemineaether_skill_flare1_buff.dbr", "nFlame", "pDemo", "stacking", "Elemental", -30),
+    _src("gun2h_b201_wordofpain.dbr", "nWop", "pMsg", "stacking", ["Physical"], -20),
+    _src("gun2h_b201_wordofpain_low.dbr", "nWop", "pMsg", "stacking", ["Physical"], -15),
+    _src("item_aetherblaze.dbr", "nAeth", "pAlb", "reduced-flat", "All", 15),
+    _src("aetherblaze_gdx1.dbr", "nAeth", "nAeth", "reduced-flat", "All", 15),
+])
+_paths = {s["record_path"] for s in _collapsed}
+check("collapse drops a verify-note source", "a_verify.dbr" not in _paths)
+check("collapse folds identical name+subname to one (base record kept)",
+      "thermitemine_skill_flare1_buff.dbr" in _paths and "thermitemineaether_skill_flare1_buff.dbr" not in _paths)
+check("collapse keeps the stronger roll when values differ",
+      "gun2h_b201_wordofpain.dbr" in _paths and "gun2h_b201_wordofpain_low.dbr" not in _paths)
+check("collapse drops a bare orphan for its attributed twin",
+      "item_aetherblaze.dbr" in _paths and "aetherblaze_gdx1.dbr" not in _paths)
+
+# --- the same rules against the real extraction ---
+# Flame Jet's six Thermite Mine transmuter variants (base + aether/chaos/cold/lightning/vitality)
+# carry an identical -Elemental debuff and collapse to a single row.
+flamejet = find(lambda s: "thermitemine" in s["record_path"] and s["record_path"].endswith("_skill_flare1_buff.dbr"))
+check("flame jet transmuter variants collapse to one row", len(flamejet) == 1)
+# No shipped source carries a verify note; the unverifiable Enrage row is withheld.
+check("no shipped source carries a verify note", not find(lambda s: "verify" in s["notes"]))
+check("unverifiable Enrage row is dropped", not find(lambda s: s["record_path"].endswith("item_enragetarget_buff_01.dbr")))
+# An MI item's _low roll never doubles the item.
+check("war cry _low roll is collapsed away", not find(lambda s: s["record_path"].endswith("gun2h_b202_warcry_low.dbr")))
+wop = find(lambda s: s["record_path"].endswith("gun2h_b201_wordofpain.dbr"))
+check("word of pain keeps the stronger roll (-20) and drops the _low (-15)",
+      wop and wop[0]["value_at_max"] == -20
+      and not find(lambda s: s["record_path"].endswith("gun2h_b201_wordofpain_low.dbr")))
+# The unattributed Aetherblaze bare row drops in favour of its named (Albrecht's Duality) twin.
+check("bare Aetherblaze orphan dropped, attributed twin kept",
+      find(lambda s: s["record_path"].endswith("itemskills/legendary/item_aetherblaze.dbr"))
+      and not find(lambda s: s["record_path"].endswith("itemskillsgdx1/legendary/aetherblaze.dbr")))
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

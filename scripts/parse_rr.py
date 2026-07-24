@@ -270,8 +270,9 @@ def stacking_sources(db, tags, game_en, rec_path, rec, ctx):
     # Template gate: debuffs pass clean; self-buff templates are excluded (a self-applied
     # negative resistance is a player downside, not enemy RR). A modifier's negative
     # defensive resistance always reduces a target's resistance, so it is included even when
-    # its base skill is item- or pet-wired (not in a class tree); we only annotate the ones
-    # we could not confirm reach an enemy debuff, per the include-with-a-note rigor rule.
+    # its base skill is item- or pet-wired (not in a class tree); we annotate the ones we
+    # could not confirm reach an enemy debuff with a verify note, and collapse_redundant_sources
+    # then drops them, so an unverifiable source is withheld rather than shown with an asterisk.
     note = ""
     if tmpl in DEBUFF_TEMPLATES:
         pass
@@ -704,6 +705,69 @@ def drop_unidentified_modifiers(tags, sources):
     return kept
 
 
+def _label(tags, key: str) -> str:
+    """Resolved English display text for a name/parent tag, or the raw key if untranslated."""
+    return (tags.get(key) or key).strip()
+
+
+def _res_key(res):
+    """Hashable resistance identity: the 'All'/'Elemental' token, or a tuple of labels."""
+    return tuple(res) if isinstance(res, list) else (res,)
+
+
+def collapse_redundant_sources(tags, sources):
+    """Drop rows that are redundant to a viewer, keeping the catalogue honest:
+
+    1. Unverifiable: a source we could not confirm reaches an enemy (carries a 'verify' note)
+       is dropped rather than shown with an asterisk we cannot stand behind.
+    2. Same item, same skill: rows sharing a display name, subname (parent), rr_type, and
+       resistance are the same effect reaching one debuff through several records - an MI
+       item's _low roll, a Conduit's per-combo modifier records, a pet skill's transmuter
+       variants, or a base item re-issued in an expansion. Keep the strongest roll (largest
+       magnitude) so one item never lists the same skill twice.
+    3. Unattributed duplicate: a 'bare' row whose granting item never resolved (parent == its
+       own name) is dropped when a properly attributed row of the same name, rr_type,
+       resistance, and value exists.
+    """
+    kept = []
+    for s in sources:
+        if "verify" in s["notes"]:
+            EXCLUSIONS.append({"record_path": s["record_path"], "reason": "unverified enemy-facing"})
+        else:
+            kept.append(s)
+
+    groups: dict[tuple, list] = {}
+    for s in kept:
+        k = (_label(tags, s["name"]), _label(tags, s["parent"]), s["rr_type"], _res_key(s["resistances"]))
+        groups.setdefault(k, []).append(s)
+    collapsed = []
+    for members in groups.values():
+        # Strongest value wins; tie-break on the smallest record path so the base record (e.g.
+        # thermitemine_skill_flare1_buff over its transmuter variants) is the one kept.
+        best = sorted(members, key=lambda s: (-abs(s["value_at_max"] or 0), s["record_path"]))[0]
+        for m in members:
+            if m is not best:
+                EXCLUSIONS.append({"record_path": m["record_path"],
+                                   "reason": "duplicate of same item+skill (weaker or equal roll)"})
+        collapsed.append(best)
+
+    attributed = {}
+    for s in collapsed:
+        if _label(tags, s["parent"]) != _label(tags, s["name"]):
+            attributed.setdefault(
+                (_label(tags, s["name"]), s["rr_type"], _res_key(s["resistances"]), s["value_at_max"]), s)
+    final = []
+    for s in collapsed:
+        if _label(tags, s["parent"]) == _label(tags, s["name"]):
+            key = (_label(tags, s["name"]), s["rr_type"], _res_key(s["resistances"]), s["value_at_max"])
+            if key in attributed:
+                EXCLUSIONS.append({"record_path": s["record_path"],
+                                   "reason": "unattributed duplicate of a named source"})
+                continue
+        final.append(s)
+    return final
+
+
 def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str],
                     devotions_path) -> list[dict]:
     """Sweep the extraction and return one dict per RR source."""
@@ -732,7 +796,7 @@ def collect_sources(db: DB, tags: dict[str, str], game_en: dict[str, str],
                 tags, game_en, s["record_path"], rec, class_masteries, devotion_parents)
     attribute_items(db, tags, game_en, sources)
     resolve_names(db, tags, game_en, sources, ctx["mmap"])
-    return drop_unidentified_modifiers(tags, sources)
+    return collapse_redundant_sources(tags, drop_unidentified_modifiers(tags, sources))
 
 
 def print_summary(sources, exclusions):
@@ -740,8 +804,8 @@ def print_summary(sources, exclusions):
     from collections import Counter
     by_type = Counter(s["rr_type"] for s in sources)
     by_cat = Counter(s["category"] for s in sources)
-    # "unsure" = a note that asks for verification, not the informative provenance notes
-    # (e.g. "item skill modifier via <item>") that attribution attaches.
+    # "unsure" = a shipped source still carrying a verify note. collapse_redundant_sources drops
+    # every unverifiable row, so this is expected to be 0; a non-zero count is a regression.
     unsure = [s for s in sources if "verify" in s["notes"]]
     # A parent still equal to the source's own name means we could not resolve a real
     # mastery/constellation/item and fell back to the skill name.

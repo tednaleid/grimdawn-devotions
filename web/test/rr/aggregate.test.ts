@@ -18,9 +18,10 @@ test("ids are unique and stable", () => {
 });
 
 test("aggregates to a plausible source count (grows as expansions add items)", () => {
-  // ~374 after Fangs of Asterkarn (1.3.0.0); a wide band catches gross breakage (aggregation
-  // collapsing to nothing or exploding) while tolerating a content patch adding item sources.
-  expect(logical.length).toBeGreaterThan(340);
+  // ~351 after the redundant-source collapse (1.3.0.0); a wide band catches gross breakage
+  // (aggregation collapsing to nothing or exploding) while tolerating a content patch adding
+  // item sources.
+  expect(logical.length).toBeGreaterThan(320);
   expect(logical.length).toBeLessThan(450);
 });
 
