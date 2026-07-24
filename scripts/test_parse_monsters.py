@@ -138,5 +138,38 @@ summ = mon.collapse_to_logical({("S", "Common"): [("enemies/x_a01_summon.dbr", c
 check("summon records are flagged", summ[0]["is_summon"] is True)
 check("non-summon records are not flagged", tie[0]["is_summon"] is False)
 
+# --- Task 3: difficulty array splitting ---
+twelve = ";".join(str(float(n)) for n in [0,0,0,0, 4,6,8,11, 8,10,13,16])
+split = mon.split_difficulty_array(twelve)
+check("split has the three difficulties", sorted(split.keys()) == ["elite", "normal", "ultimate"])
+check("split has the four player brackets", sorted(split["elite"].keys()) == ["1", "2", "3", "4"])
+check("normal bracket values", [split["normal"][p] for p in "1234"] == [0, 0, 0, 0])
+check("elite bracket values", [split["elite"][p] for p in "1234"] == [4, 6, 8, 11])
+check("ultimate bracket values", [split["ultimate"][p] for p in "1234"] == [8, 10, 13, 16])
+check("a scalar broadcasts to every cell",
+      mon.split_difficulty_array("5.000000")["ultimate"]["4"] == 5
+      and mon.split_difficulty_array("5.000000")["normal"]["1"] == 5)
+check("a wrong-length array is rejected", mon.split_difficulty_array("1.0;2.0;3.0") is None)
+check("an empty value is rejected", mon.split_difficulty_array("") is None)
+check("a None value is rejected", mon.split_difficulty_array(None) is None)
+check("a non-numeric entry is rejected", mon.split_difficulty_array(";".join(["x"] * 12)) is None)
+
+# --- Task 3: offsets read from the real records ---
+db = mon.DB((root / "extracted/records").resolve())
+check("scaler ref resolves through gameengine.dbr",
+      mon.scaler_ref(db).endswith("balancingadjustment_mp+difficulty_enemies01.dbr"))
+offs = mon.difficulty_offsets(db)
+check("offsets cover the three difficulties", sorted(offs.keys()) == ["elite", "normal", "ultimate"])
+check("offsets cover the four player brackets", sorted(offs["ultimate"].keys()) == ["1", "2", "3", "4"])
+check("every offset cell carries all ten resistance keys",
+      all(list(offs[d][p].keys()) == TEN for d in offs for p in offs[d]))
+check("real ultimate fire offsets match the scaler record",
+      [offs["ultimate"][p]["fire"] for p in "1234"] == [8, 10, 13, 16])
+check("real elite fire offsets match the scaler record",
+      [offs["elite"][p]["fire"] for p in "1234"] == [4, 6, 8, 11])
+check("normal adds no fire offset", [offs["normal"][p]["fire"] for p in "1234"] == [0, 0, 0, 0])
+check("bleeding gains its resistance from difficulty alone",
+      offs["ultimate"]["4"]["bleeding"] > 0)
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

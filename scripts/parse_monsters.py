@@ -171,3 +171,60 @@ def collapse_to_logical(groups: dict, tags: dict) -> list[dict]:
         })
     out.sort(key=lambda m: m["id"])
     return out
+
+
+DIFFICULTIES = ("normal", "elite", "ultimate")
+PLAYER_BRACKETS = ("1", "2", "3", "4")
+
+GAMEENGINE_REF = "records/game/gameengine.dbr"
+SCALER_FALLBACK = "records/game/balancingadjustment_mp+difficulty_enemies01.dbr"
+
+
+def split_difficulty_array(value):
+    """A 12-entry '3 difficulties x 4 player brackets' array -> {difficulty: {players: v}}.
+
+    The scaler stores several fields flat when they do not vary; a scalar therefore
+    broadcasts to every cell. Any other length is rejected rather than guessed at.
+    """
+    parts = [p for p in (value or "").split(";") if p.strip() != ""]
+    nums = []
+    for p in parts:
+        v = as_float(p)
+        if v is None:
+            return None
+        nums.append(int(v) if v == int(v) else round(v, 4))
+    if not nums:
+        return None
+    if len(nums) == 1:
+        nums = nums * 12
+    if len(nums) != 12:
+        return None
+    return {
+        diff: {players: nums[di * 4 + pi] for pi, players in enumerate(PLAYER_BRACKETS)}
+        for di, diff in enumerate(DIFFICULTIES)
+    }
+
+
+def scaler_ref(db: DB) -> str:
+    """The enemy difficulty scaler the engine points at, so a patch that moves the
+    record is followed automatically rather than silently reading a stale path."""
+    ref = (db.get(GAMEENGINE_REF).get("monsterAttributePak") or "").strip()
+    return ref or SCALER_FALLBACK
+
+
+def difficulty_offsets(db: DB) -> dict:
+    """Global additive resistance offsets per difficulty and player count.
+
+    Difficulty does not rescale a monster's own resistance; it adds a flat offset to
+    every monster in the game. Kept separate from each monster's base so the page can
+    compute effective = base + offset, and so these balance constants stay in
+    extracted data rather than app code.
+    """
+    rec = db.get(scaler_ref(db))
+    out = {d: {p: {} for p in PLAYER_BRACKETS} for d in DIFFICULTIES}
+    for key, field in RESISTANCE_FIELDS.items():
+        table = split_difficulty_array(rec.get(field)) or {}
+        for d in DIFFICULTIES:
+            for p in PLAYER_BRACKETS:
+                out[d][p][key] = table.get(d, {}).get(p, 0)
+    return out
