@@ -1,5 +1,5 @@
 // ABOUTME: Pure debuff-ledger resolution: stack sum, then single-highest multiplicative, then flat.
-// ABOUTME: Sign-aware multiplicative step cannot cross zero on its own; matches the in-game order.
+// ABOUTME: The multiplicative step only reduces positive resistance (type 2 cannot go below zero).
 import type { LogicalSource } from "./aggregate";
 
 /** The ten enemy resistances RR can reduce (Poison & Acid and Vitality are single types). */
@@ -93,8 +93,10 @@ export function resolveLedger(selected: LogicalSource[], r0: number): LedgerLine
     if (!affected) continue;
 
     const base = r0 - sumStack;
-    const sgn = Math.sign(base);
-    const afterMult = base * (1 - (sgn * maxMult) / 100);
+    // Type 2 (multiplicative) reduces a percentage of the current resistance but "can not reduce
+    // resistances below zero": once stacking has driven the resistance to zero or negative, it is a
+    // no-op. It only ever shrinks a positive resistance, so it never crosses zero on its own.
+    const afterMult = base > 0 ? base * (1 - maxMult / 100) : base;
     const final = afterMult - maxFlat;
     lines.push({
       resistance,
