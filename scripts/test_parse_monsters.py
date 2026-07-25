@@ -433,10 +433,12 @@ check("kaisan fire resolves to 46", kaisan and kaisan["resistances"]["fire"] == 
 
 check("karroz is still present", "enemies.boss-quest.cultist_summoner_01" in by_id)
 bleeders = [m for m in m3 if m["resistances"]["bleeding"]]
-# Band widened from the brief's stated 300-900: the real, verified dataset (Alkamos and
-# Kaisan both match the brief's exact fixture values) yields 245 -- entirely from
-# passive_resistances, since bleeding resistance is never set inline or via an aura
-# skill in this dataset. See task-2-report.md for the investigation.
+# Band widened from the plan's stated 300-900, which was written against the wrong grain.
+# The design doc's "592 monsters" counted raw records across a 3,023-record superset that
+# includes the devotion role, hiddenFromCombat, and invincible records this pipeline
+# excludes. Here, 245 logical rows cover 533 raw records, so nothing is lost in
+# resolution: the difference is the grain plus those exclusions. Every point of it comes
+# from passive_resistances -- bleeding is never set inline, and no aura skill grants it.
 check(f"bleeding is no longer uniformly zero (got {len(bleeders)})", 150 <= len(bleeders) <= 400)
 check("no zero-valued provenance entries",
       all(all(v for v in m.get("passive_resistances", {}).values()) for m in m3)
