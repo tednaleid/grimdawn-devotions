@@ -155,6 +155,23 @@ def _skill_level(rec: dict, n: str) -> int:
     return int(v) if v and v >= 1 else 1
 
 
+def _skill_grant(srec: dict, level: int) -> dict:
+    """The nonzero resistance a skill record grants at a given rank.
+
+    Attack skills routinely carry `defensive<Type>` fields pinned to zero, so a field
+    being present says nothing about whether the skill grants anything.
+    """
+    out: dict[str, float] = {}
+    for out_key, field in RESISTANCE_FIELDS.items():
+        raw = srec.get(field)
+        if not raw:
+            continue
+        v = level_array_value(raw, level)
+        if v:
+            out[out_key] = v
+    return out
+
+
 def skill_contributions(rel_path: str, rec: dict, get_skill) -> tuple[dict, dict]:
     """(resident, aura) sparse resistance contributions from a monster's own skills.
 
@@ -172,27 +189,23 @@ def skill_contributions(rel_path: str, rec: dict, get_skill) -> tuple[dict, dict
         if not srec:
             continue
         cls = (srec.get("Class") or "").strip()
+        grant = _skill_grant(srec, _skill_level(rec, m.group(1)))
         if cls in SELF_PASSIVE_CLASSES:
             bucket = resident
         elif cls in AURA_CLASSES:
             bucket = aura
         else:
-            # Only report a skip that actually forfeits a resistance, so the summary
-            # counts real losses rather than every unrelated skill a monster carries.
-            if any(srec.get(f) for f in RESISTANCE_FIELDS.values()):
+            # Only report a skip that actually forfeits resistance. 2,177 references on
+            # current data carry a zeroed defensive field and grant nothing; counting
+            # those would make the summary read as loss where none occurred.
+            if grant:
                 reason = ("summoned entity" if cls in SUMMON_CLASSES
                           else f"unclassified skill class {cls or '(none)'}")
                 SKILL_EXCLUSIONS.append(
                     {"record_path": f"records/creatures/{rel_path}", "skill": ref.strip(), "reason": reason})
             continue
-        level = _skill_level(rec, m.group(1))
-        for out_key, field in RESISTANCE_FIELDS.items():
-            raw = srec.get(field)
-            if not raw:
-                continue
-            v = level_array_value(raw, level)
-            if v:
-                bucket[out_key] = bucket.get(out_key, 0) + v
+        for out_key, v in grant.items():
+            bucket[out_key] = bucket.get(out_key, 0) + v
     return resident, aura
 
 
@@ -426,6 +439,11 @@ def print_summary(monsters, exclusions, failed_offset_fields):
         f"{k}={v}" for k, v in sorted(Counter(m["role"] for m in monsters).items())))
     p(f"  summons: {sum(1 for m in monsters if m['is_summon'])}")
     p(f"  no race tag: {sum(1 for m in monsters if not m['race_tag'])}")
+    p(f"  with a skill resistance grant: {sum(1 for m in monsters if m.get('passive_resistances'))}")
+    p(f"  with an aura grant (recorded, not counted): {sum(1 for m in monsters if m.get('aura_resistances'))}")
+    p(f"  skill grants not counted: {len(SKILL_EXCLUSIONS)}")
+    for reason, n in sorted(Counter(e["reason"] for e in SKILL_EXCLUSIONS).items()):
+        p(f"    - {reason}: {n}")
     p(f"  excluded: {len(exclusions)}")
     for reason, n in sorted(Counter(e["reason"] for e in exclusions).items()):
         p(f"    - {reason}: {n}")

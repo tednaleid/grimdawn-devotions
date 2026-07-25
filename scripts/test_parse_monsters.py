@@ -464,5 +464,31 @@ subprocess.run([sys.executable, str(here / "parse_monsters.py"),
 check("still deterministic across runs",
       json.loads(out4.read_text(encoding="utf-8"))["monsters"] == m3)
 
+# --- Task 3 (passives): the summary reports grants and skips ---
+probe = subprocess.run([sys.executable, str(here / "parse_monsters.py"),
+    "--records-dir", str(root / "extracted/records"),
+    "--text-dir", str(root / "extracted/text_en"),
+    "--out", str(Path(tempfile.mkdtemp()) / "probe.json"), "--game-version", "test"],
+    capture_output=True, text=True)
+summary = probe.stderr
+check("summary reports monsters with a passive grant", "with a skill resistance grant:" in summary)
+check("summary reports monsters with an aura grant", "with an aura grant" in summary)
+check("summary reports skipped skill references", "skill grants not counted:" in summary)
+
+# The reason itemisation has nothing to render against real records: every skill that
+# resolves to zero is now correctly not a skip, and no creature reaches a SUMMON_CLASSES
+# record through skillName{n} (summon definitions hang off spawn skills, one level deeper
+# than this resolver follows). So seed a skip and drive print_summary directly.
+import contextlib, io
+mon.SKILL_EXCLUSIONS.append({"record_path": "records/creatures/enemies/x.dbr",
+                             "skill": "records/skills/np/minion.dbr", "reason": "summoned entity"})
+buf = io.StringIO()
+with contextlib.redirect_stderr(buf):
+    mon.print_summary(m3, [], [])
+mon.SKILL_EXCLUSIONS.pop()
+seeded = buf.getvalue()
+check("summary itemises skip reasons by reason", "- summoned entity: " in seeded)
+check("summary counts the seeded skip", "skill grants not counted: 0" not in seeded)
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

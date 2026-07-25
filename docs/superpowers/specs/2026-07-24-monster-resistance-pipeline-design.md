@@ -441,13 +441,11 @@ language independent.
 
 Stated in the spec and surfaced in the page rather than left implicit:
 
-- **Passive resistance grants are not modelled.** A monster's own skills can add
-  resistance (hero and boss records commonly reference a shared passive such as
-  `nonplayerskills/passive/resists_heroboss.dbr`). Those grants are not stored
-  in a single consistent inline field, so v1 reports the inline base only.
-  Effective in-game resistance for heroes and bosses is therefore understated.
-  The page must say so where it could mislead, in the same spirit as the RR
-  page withholding an order it cannot prove legal.
+- **Passive resistance grants are modelled as of 2026-07-25.** A monster's own
+  skills contribute to its resistance, resolved at the rank the monster pins. See
+  [2026-07-25-monster-passive-resistances-design.md](2026-07-25-monster-passive-resistances-design.md).
+  Aura and duration buffs are recorded in `aura_resistances` but deliberately not
+  folded into the headline total.
 - **8% of collapsed groups have disagreeing variants.** Those carry
   `variants_disagree: true` and the page should mark them rather than present a
   single number as if it were uncontested.
