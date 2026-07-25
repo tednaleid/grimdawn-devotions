@@ -173,6 +173,32 @@ def collapse_to_logical(groups: dict, tags: dict) -> list[dict]:
     return out
 
 
+def _member_rel_paths(monster: dict) -> list[str]:
+    """A logical monster's collapsed record paths, relative to records/creatures/.
+
+    record_paths carries the "records/creatures/" prefix; role_of and the summon
+    check both expect a path relative to that root, so strip it back off here.
+    """
+    prefix = "records/creatures/"
+    return [p[len(prefix):] if p.startswith(prefix) else p for p in monster["record_paths"]]
+
+
+def members_disagree_on_role(monster: dict) -> bool:
+    """True when a logical monster's collapsed members span more than one path role.
+
+    `role` on the output row is representative-derived: only the chosen
+    representative's role is kept, so other members' roles are recomputed here from
+    record_paths rather than stored on the row.
+    """
+    return len({role_of(p) for p in _member_rel_paths(monster)}) > 1
+
+
+def members_disagree_on_summon(monster: dict) -> bool:
+    """True when a logical monster's collapsed members mix _summon and non-_summon
+    paths. `is_summon` on the output row is likewise representative-derived."""
+    return len({p.endswith("_summon.dbr") for p in _member_rel_paths(monster)}) > 1
+
+
 DIFFICULTIES = ("normal", "elite", "ultimate")
 PLAYER_BRACKETS = ("1", "2", "3", "4")
 
@@ -212,6 +238,9 @@ def scaler_ref(db: DB) -> str:
     return ref or SCALER_FALLBACK
 
 
+FAILED_OFFSET_FIELDS: list[str] = []
+
+
 def difficulty_offsets(db: DB) -> dict:
     """Global additive resistance offsets per difficulty and player count.
 
@@ -219,11 +248,19 @@ def difficulty_offsets(db: DB) -> dict:
     every monster in the game. Kept separate from each monster's base so the page can
     compute effective = base + offset, and so these balance constants stay in
     extracted data rather than app code.
+
+    A field whose array arity is neither 1 nor 12 defaults to 0 for every difficulty
+    and player bracket, and is recorded in FAILED_OFFSET_FIELDS (mirroring the
+    EXCLUSIONS pattern) so print_summary can report it loudly instead of the whole
+    resistance column silently going to zero.
     """
     rec = db.get(scaler_ref(db))
     out = {d: {p: {} for p in PLAYER_BRACKETS} for d in DIFFICULTIES}
     for key, field in RESISTANCE_FIELDS.items():
-        table = split_difficulty_array(rec.get(field)) or {}
+        table = split_difficulty_array(rec.get(field))
+        if table is None:
+            FAILED_OFFSET_FIELDS.append(key)
+            table = {}
         for d in DIFFICULTIES:
             for p in PLAYER_BRACKETS:
                 out[d][p][key] = table.get(d, {}).get(p, 0)
@@ -254,7 +291,7 @@ def collect_monsters(db: DB, tags: dict) -> list[dict]:
     return collapse_to_logical(groups, tags)
 
 
-def print_summary(monsters, exclusions):
+def print_summary(monsters, exclusions, failed_offset_fields):
     """Audit summary to stderr: population, facet spread, and every exclusion count."""
     from collections import Counter
     p = lambda *a: print(*a, file=sys.stderr)
@@ -265,6 +302,13 @@ def print_summary(monsters, exclusions):
     p(f"  kept records: {raw}  ->  logical monsters: {len(monsters)}")
     p(f"  collapsing >1 record: {len(collapsing)}")
     p(f"  of those, variants disagree on resistances: {len(disagreeing)}")
+    # role/is_summon/level range are representative-derived (only the chosen
+    # representative's values land on the row), same as resistances above, so a
+    # collapsed group's other members can carry a different role or summon status.
+    p(f"  rows collapsing records of mixed role: "
+      f"{sum(1 for m in monsters if members_disagree_on_role(m))}")
+    p(f"  rows collapsing records of mixed summon status: "
+      f"{sum(1 for m in monsters if members_disagree_on_summon(m))}")
     p("  by classification: " + ", ".join(
         f"{k}={v}" for k, v in sorted(Counter(m["classification"] for m in monsters).items())))
     p("  by role: " + ", ".join(
@@ -274,6 +318,9 @@ def print_summary(monsters, exclusions):
     p(f"  excluded: {len(exclusions)}")
     for reason, n in sorted(Counter(e["reason"] for e in exclusions).items()):
         p(f"    - {reason}: {n}")
+    if failed_offset_fields:
+        p(f"  WARNING: difficulty offset fields failed to parse and defaulted to 0 "
+          f"for every difficulty/player bracket: {sorted(set(failed_offset_fields))}")
 
 
 def main(argv=None) -> int:
@@ -304,7 +351,7 @@ def main(argv=None) -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Wrote {args.out}  ({len(monsters)} monsters)")
-    print_summary(monsters, EXCLUSIONS)
+    print_summary(monsters, EXCLUSIONS, FAILED_OFFSET_FIELDS)
     return 0
 
 

@@ -138,6 +138,34 @@ summ = mon.collapse_to_logical({("S", "Common"): [("enemies/x_a01_summon.dbr", c
 check("summon records are flagged", summ[0]["is_summon"] is True)
 check("non-summon records are not flagged", tie[0]["is_summon"] is False)
 
+# --- role/summon facet disagreement across collapsed members (fix B) ---
+role_dis = mon.collapse_to_logical({("R", "Common"): [
+    ("enemies/hero/r_a01.dbr", crec(90)),
+    ("enemies/special/r_b01.dbr", crec(50)),
+]}, RACE_TAGS)
+check("members_disagree_on_role true when collapsed paths span roles",
+      mon.members_disagree_on_role(role_dis[0]) is True)
+check("members_disagree_on_summon false when none of the paths differ on summon status",
+      mon.members_disagree_on_summon(role_dis[0]) is False)
+
+summon_dis = mon.collapse_to_logical({("S2", "Common"): [
+    ("enemies/s_a01.dbr", crec(90)),
+    ("enemies/s_a01_summon.dbr", crec(50)),
+]}, RACE_TAGS)
+check("members_disagree_on_summon true when collapsed paths mix summon status",
+      mon.members_disagree_on_summon(summon_dis[0]) is True)
+check("members_disagree_on_role false for a single-role group",
+      mon.members_disagree_on_role(summon_dis[0]) is False)
+
+agree = mon.collapse_to_logical({("A", "Common"): [
+    ("enemies/a_a01.dbr", crec(90)),
+    ("enemies/a_b01.dbr", crec(50)),
+]}, RACE_TAGS)
+check("members_disagree_on_role false when every collapsed path shares a role",
+      mon.members_disagree_on_role(agree[0]) is False)
+check("members_disagree_on_summon false when every collapsed path shares summon status",
+      mon.members_disagree_on_summon(agree[0]) is False)
+
 # --- Task 3: difficulty array splitting ---
 twelve = ";".join(str(float(n)) for n in [0,0,0,0, 4,6,8,11, 8,10,13,16])
 split = mon.split_difficulty_array(twelve)
@@ -170,6 +198,28 @@ check("real elite fire offsets match the scaler record",
 check("normal adds no fire offset", [offs["normal"][p]["fire"] for p in "1234"] == [0, 0, 0, 0])
 check("bleeding gains its resistance from difficulty alone",
       offs["ultimate"]["4"]["bleeding"] > 0)
+
+# --- difficulty offset parse failures are recorded, not silently defaulted (fix A) ---
+class FakeDB:
+    def __init__(self, records):
+        self.records = records
+    def get(self, ref):
+        return self.records.get(ref.replace("\\", "/").strip(), {})
+
+good12 = ";".join(["1.0"] * 12)
+fake_rec = {field: good12 for field in mon.RESISTANCE_FIELDS.values()}
+fake_rec["defensiveFire"] = "1.0;2.0;3.0"  # wrong arity: neither 1 nor 12
+fake_db = FakeDB({
+    mon.GAMEENGINE_REF: {"monsterAttributePak": mon.SCALER_FALLBACK},
+    mon.SCALER_FALLBACK: fake_rec,
+})
+before_failures = list(mon.FAILED_OFFSET_FIELDS)
+fake_offs = mon.difficulty_offsets(fake_db)
+new_failures = mon.FAILED_OFFSET_FIELDS[len(before_failures):]
+check("a bad-arity field is recorded as failed", new_failures == ["fire"])
+check("a bad-arity field still defaults its offset to 0", fake_offs["ultimate"]["4"]["fire"] == 0)
+check("a good-arity field is not recorded as failed", "cold" not in new_failures)
+check("a good-arity field keeps its real parsed value", fake_offs["normal"]["1"]["cold"] == 1)
 
 # --- Task 4: run the real parser over the extracted tree ---
 out = Path(tempfile.mkdtemp()) / "monsters.json"

@@ -482,18 +482,20 @@ works fine under `file://`, but a copied `file://` link is not shareable across 
 
 ## Monster stats survey + explorer page (sub-project 3)
 
-**Specced 2026-07-24 (not yet implemented):** the investigation is done and the
-v1 pipeline is designed in
-[docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md](docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md).
-That spec supersedes the exploratory notes below for anything it covers: v1 is
-resistances-first (2,728 kept records collapsing to 1,637 logical monsters keyed
-on name x classification), difficulty is a global additive offset table extracted
-from `balancingadjustment_mp+difficulty_enemies01.dbr` (3 difficulties x 4 player
-brackets) and applied in the page, and HP/DA/OA plus attacks are defined
-follow-on phases. The difficulty tier above Ultimate scales only damage and
-health, not resistances, so the three-difficulty table is complete for v1. The
-explorer page is a separate sub-project to brainstorm once `data/monsters.json`
-exists; the spec pins the data contract it depends on.
+**v1 pipeline shipped; phase 2 (explorer page) unblocked.** The extraction
+pipeline designed in
+[docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md](docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md)
+is implemented: `scripts/parse_monsters.py` (run via `just parse-monsters`)
+produces the committed `data/monsters.json`, 2,728 kept records collapsed to
+1,637 logical monsters keyed on name x classification, with difficulty as a
+global additive offset table extracted from
+`balancingadjustment_mp+difficulty_enemies01.dbr` (3 difficulties x 4 player
+brackets) applied in the page. That spec supersedes the exploratory notes below
+for anything it covers; HP/DA/OA plus attacks remain defined follow-on phases.
+The difficulty tier above Ultimate scales only damage and health, not
+resistances, so the three-difficulty table is complete for v1. Phase 2, the
+explorer page, can now be brainstormed and specced against the real dataset;
+the spec pins the data contract it depends on.
 
 A re-runnable survey that extracts **all monster stats** (not just resistances)
 from the game files into a queryable committed dataset, plus a dedicated explorer

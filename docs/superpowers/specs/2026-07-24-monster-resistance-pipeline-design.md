@@ -1,6 +1,6 @@
 # Monster resistance survey pipeline: design
 
-Status: approved, not yet implemented
+Status: implemented
 Date: 2026-07-24
 Game version at investigation: 1.3.0.0 (Fangs of Asterkarn)
 
@@ -259,10 +259,13 @@ the parser summary, so if either turns out to matter the evidence is visible
 rather than lost.
 
 `_summon` records and `Quest` classification records are **kept**, not dropped,
-but each is tagged so the page can default them off. Silently dropping them
-would lose real opponents; tagging keeps the population honest and the choice in
-the user's hands. Every exclusion is counted and printed in the parser summary,
-following the RR parser's `EXCLUSIONS` pattern.
+and each is tagged so the page can filter on it. For `_summon` records that tag
+is representative-derived: most `_summon` records fold into a non-summon twin of
+the same creature at the logical grain, so `is_summon` on the output row survives
+only for monsters that exist solely as summons (see "Known limitations"). Silently
+dropping the records would lose real opponents; tagging keeps the population
+honest and the choice in the user's hands. Every exclusion is counted and printed
+in the parser summary, following the RR parser's `EXCLUSIONS` pattern.
 
 ### Grain
 
@@ -448,6 +451,22 @@ Stated in the spec and surfaced in the page rather than left implicit:
 - **8% of collapsed groups have disagreeing variants.** Those carry
   `variants_disagree: true` and the page should mark them rather than present a
   single number as if it were uncontested.
+- **`role`, `is_summon`, and the level range describe the representative record,
+  not every collapsed member.** Measured: 253 rows collapse records spanning more
+  than one path role, 180 rows mix summon and non-summon records, 22 rows carry
+  `is_summon: true` against 246 raw `_summon` records, and the `waveevent` role
+  collapses from 144 raw records to a single row. This is mostly the grain
+  working as designed: wave-event spawns, summon variants, and multi-phase boss
+  records are duplicate placements of a creature that already exists elsewhere,
+  so they correctly fold into that creature's row instead of appearing as
+  separate monsters. The one real consequence: `is_summon` marks monsters that
+  exist *only* as summons, not every monster that can be summoned (224 of the
+  246 `_summon` records fold into a non-summon twin), so a page defaulting
+  summons off hides only summon-only creatures. Role-based filtering is
+  otherwise complete for the case that matters most: only one row outside the
+  `nemesis` role contains a `/nemesis/` record among its collapsed members
+  (`tagEnemySummonIceCrystal`, a summoned prop from a nemesis fight, not a
+  nemesis itself), so nemesis-tier filtering is effectively unaffected.
 - **Level-dependent stats are absent entirely in v1** (health, DA, OA), so the
   dataset describes defenses by type, not overall durability.
 - **242 records are excluded as not-worth-surveying** (191 devotion role, 51

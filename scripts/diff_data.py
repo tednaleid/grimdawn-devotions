@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
-# ABOUTME: Semantic diff of regenerated game data (devotions.json + resistance-reduction.json) vs the
-# ABOUTME: git-committed baseline. Asserts devotion structure is stable; reports tuning + RR changes.
+# ABOUTME: Semantic diff of regenerated game data (devotions.json + resistance-reduction.json +
+# ABOUTME: monsters.json) vs the git-committed baseline. Asserts devotion structure is stable; reports tuning + RR + monster changes.
 # /// script
 # requires-python = ">=3.10"
 # ///
@@ -167,12 +167,39 @@ def _con_name(con: dict, gametext: dict) -> str:
     return gametext.get(con.get("name_tag", ""), con.get("id", "?"))
 
 
+def diff_offsets(old: dict, new: dict) -> list[str]:
+    """Changed-cell lines between two monsters.json 'difficulty_offsets' blocks.
+
+    Fixed shape (difficulty x player bracket x resistance key), so there is no
+    add/remove to report, only value changes: one line per changed cell in
+    'difficulty/bracket: key OLD -> NEW' form. This is the one part of the dataset
+    a balance patch can change globally, so it is diffed even though it carries no
+    per-monster id of its own.
+    """
+    o = old.get("difficulty_offsets") or {}
+    n = new.get("difficulty_offsets") or {}
+    changed: list[str] = []
+    for diff in sorted(set(o) | set(n)):
+        ob, nb = o.get(diff) or {}, n.get(diff) or {}
+        for bracket in sorted(set(ob) | set(nb)):
+            oc, nc = ob.get(bracket) or {}, nb.get(bracket) or {}
+            for key in sorted(set(oc) | set(nc)):
+                ov, nv = oc.get(key), nc.get(key)
+                if ov != nv:
+                    changed.append(f"{diff}/{bracket}: {key} {_fmt(ov)} -> {_fmt(nv)}")
+    return changed
+
+
 def diff_monsters(old: dict, new: dict):
     """(added, removed, changed) description lines between two monsters.json documents.
 
     Keyed on the stable id, so a renamed display string is not reported as a
-    remove-plus-add. Only resistance changes are reported as changes: they are the
-    dataset's payload, and facet churn shows up as an add or remove instead.
+    remove-plus-add. Only resistance changes are reported as per-monster changes;
+    a facet-only change (classification, race_tag, level range, variant_count,
+    variants_disagree) keeps the same id and is reported by neither this function
+    nor an add/remove, so it is invisible here. `diff_offsets` above separately
+    covers the difficulty_offsets block, the one global change a balance patch
+    commonly makes.
     """
     old_by_id = {m["id"]: m for m in old.get("monsters", [])}
     new_by_id = {m["id"]: m for m in new.get("monsters", [])}
@@ -262,6 +289,10 @@ def main(argv=None) -> int:
             for r in removed:
                 print(f"    - {r}")
         for c in changed:
+            print(f"    ~ {c}")
+        offset_changes = diff_offsets(old_mon, new_mon)
+        print(f"  DIFFICULTY OFFSETS: {len(offset_changes)} changed")
+        for c in offset_changes:
             print(f"    ~ {c}")
 
     return exit_code

@@ -35,8 +35,9 @@ doctor:
       *)            check winget "package manager — ships with Windows 10/11" ;;
     esac
     echo "Web data (committed; needed for build/serve):"
-    for f in data/devotions.json; do
-      if [ -f "{{justfile_directory()}}/$f" ]; then echo "  ok   $f"; ok=$((ok+1)); else echo "  MISS $f — run 'just parse'"; fail=$((fail+1)); fi
+    for f in data/devotions.json:parse data/resistance-reduction.json:parse-rr data/monsters.json:parse-monsters; do
+      path="${f%%:*}"; recipe="${f##*:}"
+      if [ -f "{{justfile_directory()}}/$path" ]; then echo "  ok   $path"; ok=$((ok+1)); else echo "  MISS $path — run 'just $recipe'"; fail=$((fail+1)); fi
     done
     if [ -d "{{justfile_directory()}}/assets/devotions" ]; then echo "  ok   assets/devotions"; ok=$((ok+1)); else echo "  warn assets/devotions missing — run 'just assets' (artwork is optional)"; fi
     echo "Extraction prereqs (optional; Windows-only, only needed to re-extract game data):"
@@ -201,7 +202,8 @@ parse-monsters *ARGS:
         --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
 
 # Diff the regenerated data/*.json against the committed baseline: assert devotion structure is stable,
-# report tuning + RR changes. Run after regenerating, before committing. Exits non-zero on a structural break.
+# report tuning + RR + monster changes. Run after regenerating, before committing. Exits non-zero on a
+# structural break.
 diff-data:
     uv run scripts/diff_data.py --devotions "{{out}}" --rr "{{out_rr}}"
 
@@ -337,6 +339,8 @@ test-slow:
     cd "{{justfile_directory()}}/web" && REACH_SLOW=1 bun test test/reachability-monotonicity.test.ts
 
 # Run the Python script test suites (parsers + data tools). The web suite is `just test`.
+# Run `just extract` first: four of the six suites hard-require extracted/records and
+# extracted/text_en, and fail with no explanation on a clean clone without it.
 test-scripts:
     #!/usr/bin/env bash
     set -euo pipefail

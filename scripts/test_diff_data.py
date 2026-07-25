@@ -112,6 +112,31 @@ def test_monster_diff_identical_documents_are_clean():
     assert dd.diff_monsters(doc, doc) == ([], [], []), dd.diff_monsters(doc, doc)
 
 
+def _offsets_doc(offsets):
+    return {"monsters": [], "difficulty_offsets": offsets}
+
+
+def test_offsets_diff_reports_changed_cells():
+    old = _offsets_doc({"normal": {"1": {"fire": 0}, "2": {"fire": 0}},
+                         "ultimate": {"1": {"fire": 8}}})
+    new = _offsets_doc({"normal": {"1": {"fire": 0}, "2": {"fire": 5}},
+                         "ultimate": {"1": {"fire": 8}}})
+    changed = dd.diff_offsets(old, new)
+    assert changed == ["normal/2: fire 0 -> 5"], changed
+
+
+def test_offsets_diff_identical_documents_are_clean():
+    doc = _offsets_doc({"normal": {"1": {"fire": 0}}, "ultimate": {"4": {"bleeding": 16}}})
+    assert dd.diff_offsets(doc, doc) == [], dd.diff_offsets(doc, doc)
+
+
+def test_offsets_diff_reports_multiple_changed_cells_sorted():
+    old = _offsets_doc({"elite": {"1": {"fire": 4}, "4": {"cold": 11}}})
+    new = _offsets_doc({"elite": {"1": {"fire": 6}, "4": {"cold": 13}}})
+    changed = dd.diff_offsets(old, new)
+    assert changed == ["elite/1: fire 4 -> 6", "elite/4: cold 11 -> 13"], changed
+
+
 def run():
     fns = [v for k, v in globals().items() if k.startswith("test_")]
     for fn in fns:
