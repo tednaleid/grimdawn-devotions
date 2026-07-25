@@ -275,5 +275,93 @@ doc2 = json.loads(out2.read_text(encoding="utf-8"))
 check("deterministic across runs", doc["monsters"] == doc2["monsters"])
 check("deterministic offsets across runs", doc["difficulty_offsets"] == doc2["difficulty_offsets"])
 
+# --- Task 1 (passives): skill level pinning ---
+check("skill level reads the pinned rank", mon._skill_level({"skillLevel3": "4.000000"}, "3") == 4)
+check("absent skill level defaults to 1", mon._skill_level({}, "3") == 1)
+check("unparseable skill level defaults to 1", mon._skill_level({"skillLevel3": "abc"}, "3") == 1)
+check("zero skill level defaults to 1", mon._skill_level({"skillLevel3": "0"}, "3") == 1)
+
+# --- Task 1 (passives): contribution bucketing by skill Class ---
+SKILLS = {
+    "records/skills/np/passive.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "100.000000"},
+    "records/skills/np/buffpassive.dbr": {"Class": "SkillBuff_Passive", "defensiveFire": "10.000000"},
+    "records/skills/np/onlife.dbr": {"Class": "Skill_PassiveOnLifeBuffSelf", "defensiveChaos": "7.000000"},
+    "records/skills/np/aura.dbr": {"Class": "Skill_BuffAttackRadiusToggled", "defensiveCold": "20.000000"},
+    "records/skills/np/toggled.dbr": {"Class": "Skill_BuffSelfToggled", "defensiveCold": "5.000000"},
+    "records/skills/np/duration.dbr": {"Class": "Skill_BuffSelfDuration", "defensiveAether": "9.000000"},
+    "records/skills/np/minion.dbr": {"Class": "Monster", "defensivePhysical": "50.000000"},
+    "records/skills/np/turret.dbr": {"Class": "Turret", "defensivePierce": "50.000000"},
+    "records/skills/np/weird.dbr": {"Class": "AttributePak", "defensiveVitalityBogus": "1", "defensiveLife": "40.000000"},
+    "records/skills/np/levelled.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "10.000000;20.000000;30.000000"},
+    "records/skills/np/nores.dbr": {"Class": "Skill_Passive", "characterLife": "500.000000"},
+}
+get_skill = lambda ref: SKILLS.get(ref.strip(), {})
+
+def contrib(skills_and_levels):
+    rec = {}
+    for i, (ref, lvl) in enumerate(skills_and_levels, start=1):
+        rec[f"skillName{i}"] = ref
+        if lvl is not None:
+            rec[f"skillLevel{i}"] = str(lvl)
+    return mon.skill_contributions("enemies/x.dbr", rec, get_skill)
+
+before = len(mon.SKILL_EXCLUSIONS)
+p, a = contrib([("records/skills/np/passive.dbr", 1)])
+check("self passive contributes to the passive bucket", p == {"bleeding": 100} and a == {})
+p, a = contrib([("records/skills/np/buffpassive.dbr", 1)])
+check("SkillBuff_Passive is resident", p == {"fire": 10})
+p, a = contrib([("records/skills/np/onlife.dbr", 1)])
+check("Skill_PassiveOnLifeBuffSelf is resident", p == {"chaos": 7})
+p, a = contrib([("records/skills/np/aura.dbr", 1)])
+check("aura class goes to the aura bucket only", a == {"cold": 20} and p == {})
+p, a = contrib([("records/skills/np/toggled.dbr", 1)])
+check("toggled class goes to the aura bucket only", a == {"cold": 5} and p == {})
+p, a = contrib([("records/skills/np/duration.dbr", 1)])
+check("duration class goes to the aura bucket only", a == {"aether": 9} and p == {})
+p, a = contrib([("records/skills/np/minion.dbr", 1)])
+check("summoned entity contributes nothing", p == {} and a == {})
+p, a = contrib([("records/skills/np/turret.dbr", 1)])
+check("turret contributes nothing", p == {} and a == {})
+p, a = contrib([("records/skills/np/weird.dbr", 1)])
+check("unclassified class contributes nothing", p == {} and a == {})
+check("skipped skills carrying a resistance are recorded",
+      len(mon.SKILL_EXCLUSIONS) - before == 3)
+check("skip reasons name summoned entity and unclassified",
+      {"summoned entity"} <= {e["reason"] for e in mon.SKILL_EXCLUSIONS[before:]}
+      and any(e["reason"].startswith("unclassified skill class") for e in mon.SKILL_EXCLUSIONS[before:]))
+
+# a skill with no tracked resistance is not recorded as an exclusion
+before2 = len(mon.SKILL_EXCLUSIONS)
+contrib([("records/skills/np/nores.dbr", 1)])
+check("a resistance-free skill is not recorded as skipped", len(mon.SKILL_EXCLUSIONS) == before2)
+
+# level pinning against a real array, and clamping past its end
+p, _ = contrib([("records/skills/np/levelled.dbr", 2)])
+check("level array picks the pinned entry", p == {"bleeding": 20})
+p, _ = contrib([("records/skills/np/levelled.dbr", 99)])
+check("level array clamps to the last entry", p == {"bleeding": 30})
+p, _ = contrib([("records/skills/np/levelled.dbr", None)])
+check("missing skill level uses rank 1", p == {"bleeding": 10})
+
+# additive across multiple skills
+p, _ = contrib([("records/skills/np/passive.dbr", 1), ("records/skills/np/levelled.dbr", 3)])
+check("contributions add across skills", p == {"bleeding": 130})
+
+# --- Task 1 (passives): combining with inline values ---
+check("tidy drops zero entries", mon._tidy({"fire": 0, "cold": 5}) == {"cold": 5})
+check("tidy keeps whole numbers whole", mon._tidy({"cold": 5.0})["cold"] == 5)
+
+rec_inline = {"defensiveFire": "10.000000", "skillName1": "records/skills/np/buffpassive.dbr", "skillLevel1": "1"}
+res = mon.resolved_resistances("enemies/x.dbr", rec_inline, get_skill)
+check("passive stacks on a nonzero inline value", res["resistances"]["fire"] == 20)
+check("combined keeps all ten keys", list(res["resistances"].keys()) == TEN)
+check("passive provenance is sparse", res["passive"] == {"fire": 10})
+check("aura provenance is empty when unused", res["aura"] == {})
+
+rec_aura = {"defensiveCold": "10.000000", "skillName1": "records/skills/np/aura.dbr", "skillLevel1": "1"}
+res_a = mon.resolved_resistances("enemies/x.dbr", rec_aura, get_skill)
+check("aura is NOT folded into the total", res_a["resistances"]["cold"] == 10)
+check("aura provenance is recorded", res_a["aura"] == {"cold": 20})
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

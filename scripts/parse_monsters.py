@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from gd_dbr import DB, load_translations  # noqa: E402
+from gd_dbr import DB, level_array_value, load_translations  # noqa: E402
 
 # Output key -> the .dbr field holding that resistance. A bare defensive<Type> on a
 # CREATURE record is that monster's own resistance; the same field name on a SKILL
@@ -130,6 +130,98 @@ def race_tag_of(rec: dict, tags: dict) -> str | None:
         return None
     tag = f"tag{profile}"
     return tag if tags.get(tag) else None
+
+
+# How a referenced skill record's resistance counts, keyed on its Class.
+# Resident: the caster's own permanent resistance, folded into the headline total.
+SELF_PASSIVE_CLASSES = {"Skill_Passive", "SkillBuff_Passive", "Skill_PassiveOnLifeBuffSelf"}
+# Conditional: recorded separately so the judgment call stays data, not a guess.
+AURA_CLASSES = {"Skill_BuffSelfDuration", "Skill_BuffSelfToggled", "Skill_BuffAttackRadiusToggled"}
+# A summoned entity's own stats. Crediting these to the summoner would corrupt
+# exactly the boss records this resolution exists to fix.
+SUMMON_CLASSES = {"Monster", "Turret", "SpiritHost", "PetPlayerScaling"}
+
+# Skill references that carried a resistance but contributed nothing, with the reason.
+SKILL_EXCLUSIONS: list[dict] = []
+
+
+def _skill_level(rec: dict, n: str) -> int:
+    """The rank a monster pins for its skillName<n>, defaulting to 1.
+
+    A monster pins each skill's rank in a skillLevel<n> sibling; that rank selects
+    the entry from the skill's per-level arrays.
+    """
+    v = as_float((rec.get(f"skillLevel{n}") or "").split(";")[0])
+    return int(v) if v and v >= 1 else 1
+
+
+def skill_contributions(rel_path: str, rec: dict, get_skill) -> tuple[dict, dict]:
+    """(resident, aura) sparse resistance contributions from a monster's own skills.
+
+    `get_skill(ref)` returns the referenced record; it is injected so this stays a
+    pure function, testable without a filesystem. Contributions are additive, both
+    across skills and later on top of the inline value.
+    """
+    resident: dict[str, float] = {}
+    aura: dict[str, float] = {}
+    for key, ref in rec.items():
+        m = re.fullmatch(r"skillName(\d+)", key)
+        if not m or not ref:
+            continue
+        srec = get_skill(ref)
+        if not srec:
+            continue
+        cls = (srec.get("Class") or "").strip()
+        if cls in SELF_PASSIVE_CLASSES:
+            bucket = resident
+        elif cls in AURA_CLASSES:
+            bucket = aura
+        else:
+            # Only report a skip that actually forfeits a resistance, so the summary
+            # counts real losses rather than every unrelated skill a monster carries.
+            if any(srec.get(f) for f in RESISTANCE_FIELDS.values()):
+                reason = ("summoned entity" if cls in SUMMON_CLASSES
+                          else f"unclassified skill class {cls or '(none)'}")
+                SKILL_EXCLUSIONS.append(
+                    {"record_path": f"records/creatures/{rel_path}", "skill": ref.strip(), "reason": reason})
+            continue
+        level = _skill_level(rec, m.group(1))
+        for out_key, field in RESISTANCE_FIELDS.items():
+            raw = srec.get(field)
+            if not raw:
+                continue
+            v = level_array_value(raw, level)
+            if v:
+                bucket[out_key] = bucket.get(out_key, 0) + v
+    return resident, aura
+
+
+def _tidy(values: dict) -> dict:
+    """Drop zero entries and normalise numbers, keeping the sparse objects sparse."""
+    out = {}
+    for k, v in values.items():
+        if not v:
+            continue
+        out[k] = int(v) if float(v) == int(v) else round(v, 4)
+    return out
+
+
+def resolved_resistances(rel_path: str, rec: dict, get_skill) -> dict:
+    """A record's combined resistances plus its sparse provenance objects.
+
+    `resistances` is inline plus resident passives, which is what a player faces.
+    Aura contributions are reported but deliberately not folded in.
+    """
+    resident, aura = skill_contributions(rel_path, rec, get_skill)
+    total = resistances_of(rec)
+    for k, v in resident.items():
+        total[k] = total[k] + v
+    return {"resistances": _tidy_total(total), "passive": _tidy(resident), "aura": _tidy(aura)}
+
+
+def _tidy_total(total: dict) -> dict:
+    """Normalise every combined value, keeping all ten keys present."""
+    return {k: (int(v) if float(v) == int(v) else round(v, 4)) for k, v in total.items()}
 
 
 def _representative_rank(entry):
