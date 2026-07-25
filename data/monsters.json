@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.3.0.0",
     "steam_buildid": "24346246",
-    "generated_utc": "2026-07-24T23:33:16Z"
+    "generated_utc": "2026-07-25T23:17:31Z"
   },
   "monsters": [
     {
@@ -183,16 +183,23 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
+        "physical": 15,
+        "pierce": 30,
         "fire": 15,
         "cold": 0,
         "lightning": 30,
         "poison": 0,
         "aether": 60,
-        "chaos": 0,
-        "vitality": 30,
-        "bleeding": 0
+        "chaos": 50,
+        "vitality": 80,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "physical": 15,
+        "pierce": 30,
+        "chaos": 50,
+        "vitality": 50,
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -213,15 +220,21 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
-        "fire": 15,
+        "pierce": 15,
+        "fire": 35,
         "cold": 0,
         "lightning": 30,
         "poison": 0,
         "aether": 60,
         "chaos": 0,
+        "vitality": 60,
+        "bleeding": 300
+      },
+      "passive_resistances": {
+        "pierce": 15,
+        "fire": 20,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 300
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -242,15 +255,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 15,
         "cold": 0,
         "lightning": 30,
         "poison": 0,
         "aether": 60,
         "chaos": 0,
+        "vitality": 60,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -273,15 +291,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -329,7 +352,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 20,
-        "pierce": 25,
+        "pierce": 55,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -338,6 +361,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -855,15 +881,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 50,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -883,15 +914,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 50,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -938,15 +974,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 25,
+        "pierce": 55,
         "fire": 25,
         "cold": 25,
         "lightning": 25,
         "poison": 0,
         "aether": 50,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -965,15 +1006,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 25,
+        "pierce": 55,
         "fire": 25,
         "cold": 25,
         "lightning": 25,
         "poison": 0,
         "aether": 50,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -1021,7 +1067,7 @@
       "is_summon": true,
       "resistances": {
         "physical": 25,
-        "pierce": 35,
+        "pierce": 40,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -1030,6 +1076,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 5
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -1048,7 +1097,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 35,
+        "pierce": 40,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -1057,6 +1106,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 5
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -1076,7 +1128,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 35,
+        "pierce": 45,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -1085,6 +1137,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -1104,7 +1159,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 35,
+        "pierce": 45,
         "fire": 80,
         "cold": 0,
         "lightning": 0,
@@ -1113,6 +1168,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -1132,7 +1190,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 35,
+        "pierce": 45,
         "fire": 0,
         "cold": 80,
         "lightning": 0,
@@ -1141,6 +1199,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -1160,7 +1221,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 35,
+        "pierce": 45,
         "fire": 0,
         "cold": 0,
         "lightning": 80,
@@ -1169,6 +1230,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -1522,7 +1586,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -1719,7 +1786,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 30,
         "pierce": 40,
         "fire": 25,
         "cold": 0,
@@ -1729,6 +1796,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 30
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -2330,11 +2400,16 @@
         "fire": 35,
         "cold": 35,
         "lightning": 35,
-        "poison": 35,
+        "poison": 41,
         "aether": 35,
         "chaos": 35,
-        "vitality": 35,
-        "bleeding": 0
+        "vitality": 41,
+        "bleeding": 35
+      },
+      "passive_resistances": {
+        "poison": 6,
+        "vitality": 6,
+        "bleeding": 35
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -2416,9 +2491,12 @@
         "lightning": 30,
         "poison": 0,
         "aether": 30,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 30,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -2443,9 +2521,12 @@
         "lightning": 30,
         "poison": 0,
         "aether": 30,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 30,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -2688,7 +2769,10 @@
         "aether": 30,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -2713,9 +2797,12 @@
         "lightning": 30,
         "poison": 0,
         "aether": 30,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 30,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -2733,7 +2820,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 45,
+        "physical": 51,
         "pierce": 45,
         "fire": 50,
         "cold": 0,
@@ -2743,6 +2830,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -2760,16 +2850,20 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 35,
+        "physical": 41,
         "pierce": 35,
         "fire": 50,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 25,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6,
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -2898,13 +2992,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 50,
         "aether": 50,
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -2923,15 +3020,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 75,
         "cold": 15,
         "lightning": 15,
         "poison": 0,
         "aether": 75,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -2951,15 +3053,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 15,
         "cold": 15,
         "lightning": 75,
         "poison": 0,
         "aether": 75,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -2979,15 +3086,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 15,
         "cold": 15,
         "lightning": 75,
         "poison": 0,
         "aether": 75,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 30,
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -3010,12 +3122,16 @@
         "pierce": 85,
         "fire": 85,
         "cold": 85,
-        "lightning": 85,
+        "lightning": 86,
         "poison": 85,
         "aether": 85,
         "chaos": 85,
         "vitality": 85,
-        "bleeding": 0
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "lightning": 1,
+        "bleeding": 85
       },
       "variant_count": 7,
       "variants_disagree": false,
@@ -3048,7 +3164,10 @@
         "aether": 25,
         "chaos": 50,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -3456,6 +3575,10 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "physical": 10,
+        "pierce": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -3481,7 +3604,10 @@
         "aether": 50,
         "chaos": 50,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -3508,7 +3634,10 @@
         "aether": 50,
         "chaos": 50,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -3643,9 +3772,13 @@
         "lightning": 35,
         "poison": 35,
         "aether": 35,
-        "chaos": 35,
+        "chaos": 41,
         "vitality": 35,
-        "bleeding": 0
+        "bleeding": 41
+      },
+      "passive_resistances": {
+        "chaos": 6,
+        "bleeding": 41
       },
       "variant_count": 6,
       "variants_disagree": false,
@@ -3913,16 +4046,21 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 30,
-        "pierce": 35,
+        "physical": 40,
+        "pierce": 50,
         "fire": 100,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 25,
+        "chaos": 35,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 10,
+        "pierce": 15,
+        "chaos": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -4145,11 +4283,15 @@
         "fire": 35,
         "cold": 35,
         "lightning": 35,
-        "poison": 50,
+        "poison": 56,
         "aether": 35,
         "chaos": 35,
         "vitality": 35,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "poison": 6,
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -4477,7 +4619,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -4605,14 +4750,18 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 0,
+        "fire": 30,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 25,
+        "chaos": 56,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 30,
+        "chaos": 31
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -4658,15 +4807,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
-        "fire": 0,
+        "pierce": 10,
+        "fire": 32,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 32,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10,
+        "fire": 32,
+        "chaos": 32
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -4903,7 +5057,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 6,
         "fire": 0,
         "cold": 50,
         "lightning": 50,
@@ -4912,6 +5066,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -4934,11 +5091,15 @@
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 50,
+        "poison": 56,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "poison": 6,
+        "bleeding": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -4965,7 +5126,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -4988,11 +5152,15 @@
         "fire": 50,
         "cold": 50,
         "lightning": 0,
-        "poison": 0,
+        "poison": 6,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "poison": 6,
+        "bleeding": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5019,7 +5187,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 23
+      },
+      "passive_resistances": {
+        "bleeding": 23
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5046,7 +5217,10 @@
         "aether": 25,
         "chaos": 80,
         "vitality": 80,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5154,8 +5328,11 @@
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 0,
+        "vitality": 6,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "vitality": 6
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -5178,12 +5355,15 @@
         "pierce": 35,
         "fire": 0,
         "cold": 45,
-        "lightning": 60,
+        "lightning": 66,
         "poison": 0,
         "aether": 45,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "lightning": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5211,7 +5391,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5239,7 +5422,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5266,7 +5452,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5294,7 +5483,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5321,7 +5513,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5349,7 +5544,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5376,7 +5574,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5404,7 +5605,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5431,7 +5635,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5459,7 +5666,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5486,7 +5696,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5514,7 +5727,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5541,7 +5757,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -5569,7 +5788,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5649,8 +5871,11 @@
         "poison": 0,
         "aether": 30,
         "chaos": 0,
-        "vitality": 30,
+        "vitality": 36,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "vitality": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5700,11 +5925,14 @@
         "fire": 33,
         "cold": 33,
         "lightning": 33,
-        "poison": 33,
+        "poison": 39,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5731,7 +5959,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5781,11 +6012,14 @@
         "fire": 50,
         "cold": 50,
         "lightning": 50,
-        "poison": 0,
+        "poison": 6,
         "aether": 0,
         "chaos": 33,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5812,7 +6046,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5839,7 +6076,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5866,7 +6106,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -5894,7 +6137,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5921,7 +6167,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5942,13 +6191,17 @@
         "physical": 8,
         "pierce": 8,
         "fire": 0,
-        "cold": 0,
+        "cold": 25,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100,
+        "cold": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -5975,7 +6228,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 40,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": true,
@@ -5998,13 +6254,17 @@
         "physical": 8,
         "pierce": 8,
         "fire": 0,
-        "cold": 0,
+        "cold": 25,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "cold": 25,
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6025,13 +6285,17 @@
         "physical": 8,
         "pierce": 8,
         "fire": 0,
-        "cold": 0,
+        "cold": 25,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "cold": 25,
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6052,13 +6316,17 @@
         "physical": 8,
         "pierce": 8,
         "fire": 0,
-        "cold": 0,
+        "cold": 25,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "cold": 25,
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6103,7 +6371,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 10,
         "pierce": 25,
         "fire": 0,
         "cold": 50,
@@ -6113,6 +6381,9 @@
         "chaos": 0,
         "vitality": 100,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 10
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6162,11 +6433,14 @@
         "fire": 0,
         "cold": 20,
         "lightning": 0,
-        "poison": 75,
+        "poison": 76,
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6299,7 +6573,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 25,
+        "pierce": 43,
         "fire": 30,
         "cold": 0,
         "lightning": 0,
@@ -6308,6 +6582,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 18
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -6356,13 +6633,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6443,7 +6723,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 45,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6542,7 +6825,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 35,
+        "physical": 41,
         "pierce": 0,
         "fire": 0,
         "cold": 50,
@@ -6552,6 +6835,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6634,7 +6920,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 6,
         "pierce": 0,
         "fire": 50,
         "cold": 50,
@@ -6644,6 +6930,9 @@
         "chaos": 25,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6886,10 +7175,14 @@
         "cold": 0,
         "lightning": 0,
         "poison": 0,
-        "aether": 40,
-        "chaos": 40,
+        "aether": 46,
+        "chaos": 46,
         "vitality": 40,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "aether": 6,
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -6934,16 +7227,21 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 25,
+        "physical": 28,
         "pierce": 25,
         "fire": 20,
         "cold": 20,
         "lightning": 20,
-        "poison": 30,
+        "poison": 36,
         "aether": 0,
         "chaos": 0,
-        "vitality": 0,
+        "vitality": 6,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 3,
+        "poison": 6,
+        "vitality": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -7240,8 +7538,11 @@
         "poison": 0,
         "aether": 30,
         "chaos": 0,
-        "vitality": 0,
+        "vitality": 6,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "vitality": 6
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -7490,16 +7791,21 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 25,
+        "physical": 28,
         "pierce": 15,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
-        "aether": 33,
+        "aether": 39,
         "chaos": 0,
-        "vitality": 33,
+        "vitality": 39,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 3,
+        "aether": 6,
+        "vitality": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -7524,9 +7830,12 @@
         "lightning": 0,
         "poison": 50,
         "aether": 25,
-        "chaos": 25,
+        "chaos": 31,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -7545,15 +7854,19 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 50,
+        "pierce": 56,
         "fire": -20,
         "cold": 50,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 6,
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -7661,7 +7974,10 @@
         "aether": 35,
         "chaos": 35,
         "vitality": 35,
-        "bleeding": 0
+        "bleeding": 35
+      },
+      "passive_resistances": {
+        "bleeding": 35
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -7720,7 +8036,10 @@
         "aether": 40,
         "chaos": 40,
         "vitality": 40,
-        "bleeding": 0
+        "bleeding": 40
+      },
+      "passive_resistances": {
+        "bleeding": 40
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -7747,7 +8066,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -7767,15 +8089,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 25,
+        "pierce": 31,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 50,
+        "poison": 56,
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "pierce": 6,
+        "poison": 6,
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -7794,7 +8121,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 6,
         "fire": 0,
         "cold": 0,
         "lightning": 50,
@@ -7803,6 +8130,9 @@
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -7860,7 +8190,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -7997,7 +8330,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8265,9 +8601,12 @@
         "lightning": 0,
         "poison": 50,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8295,6 +8634,9 @@
         "chaos": 0,
         "vitality": 35,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8368,7 +8710,7 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 25,
+        "fire": 31,
         "cold": 50,
         "lightning": 50,
         "poison": 0,
@@ -8376,6 +8718,9 @@
         "chaos": 25,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8401,8 +8746,12 @@
         "poison": 85,
         "aether": 85,
         "chaos": 85,
-        "vitality": 85,
-        "bleeding": 0
+        "vitality": 86,
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "vitality": 1,
+        "bleeding": 85
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -8457,8 +8806,12 @@
         "poison": 33,
         "aether": 0,
         "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "vitality": 6,
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "vitality": 6,
+        "bleeding": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -8477,16 +8830,20 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 25,
+        "physical": 31,
         "pierce": 25,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6,
+        "chaos": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -8506,7 +8863,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 10,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -8515,6 +8872,9 @@
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -8569,7 +8929,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8596,7 +8959,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8623,7 +8989,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8650,7 +9019,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8677,7 +9049,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8695,7 +9070,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": 0,
         "cold": 50,
@@ -8704,7 +9079,11 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "physical": 15,
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8731,7 +9110,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": true,
@@ -8760,7 +9142,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8787,7 +9172,10 @@
         "aether": 0,
         "chaos": 50,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 6
+      },
+      "passive_resistances": {
+        "bleeding": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8860,7 +9248,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 20,
-        "pierce": 50,
+        "pierce": 65,
         "fire": 40,
         "cold": 20,
         "lightning": 0,
@@ -8868,7 +9256,11 @@
         "aether": 0,
         "chaos": 20,
         "vitality": 35,
-        "bleeding": 0
+        "bleeding": 40
+      },
+      "passive_resistances": {
+        "pierce": 15,
+        "bleeding": 40
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8913,16 +9305,20 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 30,
+        "physical": 36,
         "pierce": 30,
         "fire": 20,
         "cold": 20,
         "lightning": 20,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 40,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6,
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8940,16 +9336,20 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 30,
+        "physical": 36,
         "pierce": 30,
         "fire": 20,
-        "cold": 20,
+        "cold": 26,
         "lightning": 20,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 40,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6,
+        "cold": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -8973,10 +9373,14 @@
         "cold": 20,
         "lightning": 20,
         "poison": 0,
-        "aether": 0,
-        "chaos": 0,
+        "aether": 6,
+        "chaos": 6,
         "vitality": 40,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "aether": 6,
+        "chaos": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -9003,7 +9407,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 40,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -9031,7 +9438,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 40,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -9083,11 +9493,14 @@
         "fire": 20,
         "cold": 20,
         "lightning": 20,
-        "poison": 0,
+        "poison": 6,
         "aether": 0,
         "chaos": 0,
         "vitality": 40,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -9111,11 +9524,14 @@
         "fire": 20,
         "cold": 20,
         "lightning": 20,
-        "poison": 0,
+        "poison": 6,
         "aether": 0,
         "chaos": 0,
         "vitality": 40,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 6
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -9134,7 +9550,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 35,
         "fire": 0,
         "cold": 35,
@@ -9144,6 +9560,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -9336,7 +9755,10 @@
         "aether": 85,
         "chaos": 85,
         "vitality": 85,
-        "bleeding": 0
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "bleeding": 85
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -9493,7 +9915,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 18,
+        "pierce": 28,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -9502,6 +9924,9 @@
         "chaos": 0,
         "vitality": 20,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -9766,7 +10191,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 15,
+        "pierce": 25,
         "fire": 20,
         "cold": 10,
         "lightning": 8,
@@ -9775,6 +10200,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -9797,12 +10225,15 @@
         "pierce": 33,
         "fire": 0,
         "cold": 0,
-        "lightning": 0,
+        "lightning": 1,
         "poison": 70,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "lightning": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -9827,9 +10258,15 @@
         "lightning": 0,
         "poison": 70,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
+      },
+      "aura_resistances": {
+        "poison": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -10047,16 +10484,25 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
+        "physical": 25,
+        "pierce": 25,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 50,
-        "vitality": 0,
-        "bleeding": 0
+        "poison": 25,
+        "aether": 25,
+        "chaos": 75,
+        "vitality": 25,
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "poison": 25,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 25,
+        "bleeding": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -10138,9 +10584,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 25,
+        "chaos": 45,
         "vitality": 100,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -10321,7 +10770,7 @@
       "resistances": {
         "physical": 0,
         "pierce": 15,
-        "fire": 0,
+        "fire": 30,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
@@ -10329,6 +10778,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 30
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -10562,9 +11014,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 50,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -10583,16 +11038,25 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
+        "physical": 25,
+        "pierce": 25,
         "fire": 25,
         "cold": 0,
         "lightning": 0,
-        "poison": 0,
-        "aether": 50,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "poison": 25,
+        "aether": 75,
+        "chaos": 25,
+        "vitality": 25,
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "poison": 25,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 25,
+        "bleeding": 25
       },
       "variant_count": 3,
       "variants_disagree": true,
@@ -10702,13 +11166,16 @@
         "physical": 25,
         "pierce": 20,
         "fire": 35,
-        "cold": 50,
+        "cold": 51,
         "lightning": 20,
         "poison": 0,
         "aether": 0,
         "chaos": 15,
         "vitality": 15,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -10925,7 +11392,7 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 25,
+        "fire": 39,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
@@ -10933,6 +11400,9 @@
         "chaos": 25,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 14
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -10955,12 +11425,15 @@
         "pierce": 0,
         "fire": 25,
         "cold": 0,
-        "lightning": 0,
+        "lightning": 14,
         "poison": 0,
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "lightning": 14
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -11100,7 +11573,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -11128,7 +11604,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -11156,7 +11635,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -11184,7 +11666,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -11212,7 +11697,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -11240,7 +11728,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -11268,7 +11759,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -11296,7 +11790,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -11318,13 +11815,17 @@
         "physical": 0,
         "pierce": 15,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -11664,7 +12165,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -11694,7 +12198,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -11724,7 +12231,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -11754,7 +12264,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -11782,9 +12295,14 @@
         "lightning": 0,
         "poison": 0,
         "aether": 25,
-        "chaos": 0,
-        "vitality": 60,
-        "bleeding": 0
+        "chaos": 6,
+        "vitality": 66,
+        "bleeding": 4
+      },
+      "passive_resistances": {
+        "chaos": 6,
+        "vitality": 6,
+        "bleeding": 4
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -11810,8 +12328,12 @@
         "poison": 85,
         "aether": 85,
         "chaos": 85,
-        "vitality": 85,
-        "bleeding": 0
+        "vitality": 86,
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "vitality": 1,
+        "bleeding": 85
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -11839,8 +12361,12 @@
         "poison": 85,
         "aether": 85,
         "chaos": 85,
-        "vitality": 85,
-        "bleeding": 0
+        "vitality": 86,
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "vitality": 1,
+        "bleeding": 85
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -11868,8 +12394,12 @@
         "poison": 85,
         "aether": 85,
         "chaos": 85,
-        "vitality": 85,
-        "bleeding": 0
+        "vitality": 86,
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "vitality": 1,
+        "bleeding": 85
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -11893,12 +12423,17 @@
         "pierce": 0,
         "fire": 25,
         "cold": 0,
-        "lightning": 0,
+        "lightning": 6,
         "poison": 0,
         "aether": 25,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 60,
-        "bleeding": 0
+        "bleeding": 4
+      },
+      "passive_resistances": {
+        "lightning": 6,
+        "chaos": 6,
+        "bleeding": 4
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -11922,10 +12457,15 @@
         "cold": 0,
         "lightning": 0,
         "poison": 0,
-        "aether": 25,
-        "chaos": 0,
+        "aether": 31,
+        "chaos": 6,
         "vitality": 60,
-        "bleeding": 0
+        "bleeding": 4
+      },
+      "passive_resistances": {
+        "aether": 6,
+        "chaos": 6,
+        "bleeding": 4
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -11945,14 +12485,19 @@
       "resistances": {
         "physical": 25,
         "pierce": 0,
-        "fire": 25,
+        "fire": 31,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 25,
-        "chaos": 0,
+        "chaos": 6,
         "vitality": 60,
-        "bleeding": 0
+        "bleeding": 4
+      },
+      "passive_resistances": {
+        "fire": 6,
+        "chaos": 6,
+        "bleeding": 4
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -11979,7 +12524,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -12140,10 +12688,13 @@
         "cold": 33,
         "lightning": 33,
         "poison": 0,
-        "aether": 0,
+        "aether": 6,
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "aether": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12169,8 +12720,11 @@
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 50,
+        "vitality": 56,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "vitality": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12190,7 +12744,7 @@
       "resistances": {
         "physical": 0,
         "pierce": 50,
-        "fire": 0,
+        "fire": 6,
         "cold": 33,
         "lightning": 33,
         "poison": 0,
@@ -12198,6 +12752,9 @@
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12217,7 +12774,7 @@
       "resistances": {
         "physical": 0,
         "pierce": 50,
-        "fire": 0,
+        "fire": 6,
         "cold": 33,
         "lightning": 33,
         "poison": 0,
@@ -12225,6 +12782,9 @@
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12248,10 +12808,13 @@
         "cold": 33,
         "lightning": 33,
         "poison": 0,
-        "aether": 0,
+        "aether": 6,
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "aether": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12350,16 +12913,21 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 15,
+        "physical": 18,
         "pierce": 20,
         "fire": 0,
         "cold": 0,
         "lightning": 40,
-        "poison": 0,
+        "poison": 6,
         "aether": 40,
         "chaos": 40,
-        "vitality": 0,
+        "vitality": 6,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 3,
+        "poison": 6,
+        "vitality": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12377,16 +12945,21 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 15,
+        "physical": 18,
         "pierce": 20,
         "fire": 0,
         "cold": 0,
         "lightning": 40,
-        "poison": 0,
-        "aether": 40,
+        "poison": 6,
+        "aether": 46,
         "chaos": 40,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 3,
+        "poison": 6,
+        "aether": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12549,7 +13122,10 @@
         "aether": 90,
         "chaos": 90,
         "vitality": 90,
-        "bleeding": 0
+        "bleeding": 90
+      },
+      "passive_resistances": {
+        "bleeding": 90
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12567,7 +13143,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 25,
+        "physical": 31,
         "pierce": 20,
         "fire": 0,
         "cold": 25,
@@ -12576,7 +13152,11 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "physical": 6,
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12594,7 +13174,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 25,
+        "physical": 31,
         "pierce": 20,
         "fire": 0,
         "cold": 25,
@@ -12603,7 +13183,11 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "physical": 6,
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12629,8 +13213,12 @@
         "poison": 25,
         "aether": 25,
         "chaos": 25,
-        "vitality": 25,
-        "bleeding": 0
+        "vitality": 31,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "vitality": 6,
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -12679,13 +13267,20 @@
         "physical": 25,
         "pierce": 25,
         "fire": 0,
-        "cold": 60,
+        "cold": 61,
         "lightning": 50,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
+      },
+      "aura_resistances": {
+        "physical": 30,
+        "pierce": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12704,7 +13299,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 25,
+        "pierce": 31,
         "fire": 0,
         "cold": 60,
         "lightning": 25,
@@ -12713,6 +13308,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12731,7 +13329,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 25,
+        "pierce": 31,
         "fire": 0,
         "cold": 60,
         "lightning": 25,
@@ -12740,6 +13338,9 @@
         "chaos": 25,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12758,7 +13359,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 25,
-        "pierce": 25,
+        "pierce": 31,
         "fire": 0,
         "cold": 60,
         "lightning": 25,
@@ -12767,6 +13368,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 6
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -12923,13 +13527,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -13118,7 +13725,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -13244,7 +13854,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -13254,6 +13864,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -13334,7 +13947,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -13388,7 +14004,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -13415,7 +14034,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -13712,7 +14334,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14030,13 +14655,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 50,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14115,9 +14743,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14189,7 +14820,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": 0,
         "cold": 50,
@@ -14199,6 +14830,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14516,13 +15150,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14549,7 +15186,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14603,7 +15243,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14738,7 +15381,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14813,13 +15459,17 @@
         "physical": 30,
         "pierce": 15,
         "fire": 33,
-        "cold": 33,
+        "cold": 34,
         "lightning": 33,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14846,7 +15496,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14954,7 +15607,10 @@
         "aether": 25,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -14981,7 +15637,10 @@
         "aether": 25,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -15008,7 +15667,10 @@
         "aether": 25,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -15435,7 +16097,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -15463,7 +16128,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -15491,7 +16159,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -16200,7 +16871,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -16227,7 +16901,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -16254,7 +16931,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -16673,6 +17353,9 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "pierce": 15
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -17033,7 +17716,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -17061,7 +17747,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -17089,7 +17778,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -17887,9 +18579,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 25,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 60,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -17919,6 +18614,9 @@
         "chaos": 0,
         "vitality": 60,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -18170,7 +18868,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 6,
       "variants_disagree": false,
@@ -18202,7 +18903,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -18233,7 +18937,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -18264,7 +18971,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -18294,7 +19004,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -18324,7 +19037,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -18354,7 +19070,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -18384,7 +19103,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -18412,7 +19134,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -19428,11 +20153,15 @@
         "fire": -25,
         "cold": 500,
         "lightning": 0,
-        "poison": 0,
+        "poison": 100,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "poison": 100,
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -19622,7 +20351,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": 0,
         "cold": 0,
@@ -19632,6 +20361,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -19658,7 +20390,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -19688,7 +20423,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -19719,7 +20457,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -19749,7 +20490,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -19780,7 +20524,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -19808,7 +20555,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -19836,7 +20586,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -19867,7 +20620,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -19898,7 +20654,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -20462,7 +21221,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -20491,7 +21253,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 6,
       "variants_disagree": false,
@@ -20523,7 +21288,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -20553,7 +21321,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -20583,7 +21354,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -20611,7 +21385,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -20820,7 +21597,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 20,
+        "pierce": 38,
         "fire": 20,
         "cold": 0,
         "lightning": 25,
@@ -20829,6 +21606,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 18
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -20847,7 +21627,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 30,
+        "pierce": 48,
         "fire": 30,
         "cold": 0,
         "lightning": 25,
@@ -20856,6 +21636,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 18
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -20874,7 +21657,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 40,
+        "pierce": 58,
         "fire": 40,
         "cold": 0,
         "lightning": 25,
@@ -20883,6 +21666,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 18
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -20910,6 +21696,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "poison": 26
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -22377,7 +23166,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -22405,7 +23197,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -22433,7 +23228,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -22732,13 +23530,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 30,
         "poison": 0,
         "aether": 30,
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -22795,6 +23596,9 @@
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 10
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -23121,13 +23925,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 50,
         "aether": 50,
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -23181,9 +23988,12 @@
         "lightning": 0,
         "poison": 50,
         "aether": 50,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -23516,6 +24326,9 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 2,
       "variants_disagree": false,
       "record_paths": [
@@ -23679,9 +24492,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 25,
+        "chaos": 45,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -23700,7 +24516,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 30,
         "pierce": 40,
         "fire": 25,
         "cold": 0,
@@ -23710,6 +24526,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -23727,7 +24546,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 30,
         "pierce": 40,
         "fire": 25,
         "cold": 0,
@@ -23737,6 +24556,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -23754,7 +24576,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 30,
         "pierce": 40,
         "fire": 25,
         "cold": 0,
@@ -23764,6 +24586,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -23781,7 +24606,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 30,
         "pierce": 40,
         "fire": 25,
         "cold": 0,
@@ -23791,6 +24616,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -23808,7 +24636,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 30,
         "pierce": 40,
         "fire": 25,
         "cold": 0,
@@ -23818,6 +24646,9 @@
         "chaos": 0,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 30
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -24162,13 +24993,16 @@
         "physical": 15,
         "pierce": 15,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -24277,6 +25111,9 @@
         "chaos": 25,
         "vitality": 50,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 10
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -24460,7 +25297,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 25,
+        "physical": 40,
         "pierce": 35,
         "fire": 80,
         "cold": 0,
@@ -24470,6 +25307,9 @@
         "chaos": 25,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -24572,7 +25412,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 30,
+        "physical": 45,
         "pierce": 25,
         "fire": 25,
         "cold": 20,
@@ -24582,6 +25422,9 @@
         "chaos": 100,
         "vitality": 20,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -24779,7 +25622,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -24808,7 +25654,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -24837,7 +25686,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -24866,7 +25718,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -24895,7 +25750,13 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "aura_resistances": {
+        "fire": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -25059,6 +25920,9 @@
         "chaos": 50,
         "vitality": 0,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 10
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -25245,9 +26109,15 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
+      },
+      "aura_resistances": {
+        "pierce": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -25295,13 +26165,16 @@
         "physical": 15,
         "pierce": 15,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -25656,7 +26529,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -25684,7 +26560,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -25712,7 +26591,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -25740,7 +26622,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -25768,7 +26653,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -25797,6 +26685,9 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -25816,13 +26707,16 @@
         "physical": 35,
         "pierce": 0,
         "fire": 0,
-        "cold": 35,
+        "cold": 36,
         "lightning": 0,
         "poison": 35,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -26093,7 +26987,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -26120,7 +27017,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -26147,7 +27047,10 @@
         "aether": 50,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -26174,7 +27077,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -26629,13 +27535,16 @@
         "physical": 30,
         "pierce": 40,
         "fire": 40,
-        "cold": 50,
+        "cold": 51,
         "lightning": 25,
         "poison": 25,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -27007,13 +27916,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -27039,9 +27951,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -27285,9 +28200,12 @@
         "lightning": 25,
         "poison": 0,
         "aether": 25,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -27343,6 +28261,9 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -27368,7 +28289,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -27391,13 +28315,17 @@
         "physical": 20,
         "pierce": 50,
         "fire": 35,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -27426,7 +28354,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -27455,7 +28386,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -27484,7 +28418,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -27775,16 +28712,25 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
+        "physical": 25,
+        "pierce": 25,
         "fire": -10,
         "cold": 0,
         "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 15,
-        "bleeding": 0
+        "poison": 25,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 40,
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "poison": 25,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 25,
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -27886,13 +28832,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -27944,9 +28893,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -27996,13 +28948,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -28816,6 +29771,9 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -29136,13 +30094,16 @@
         "physical": 15,
         "pierce": 15,
         "fire": 50,
-        "cold": 0,
+        "cold": 1,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 50,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -29167,9 +30128,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 50,
+        "chaos": 70,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -29360,6 +30324,9 @@
         "vitality": 60,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -29385,7 +30352,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -29412,7 +30382,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -29439,7 +30412,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -29466,7 +30442,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -29493,7 +30472,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -29619,16 +30601,25 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 15,
-        "pierce": 0,
+        "physical": 40,
+        "pierce": 25,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "poison": 25,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 25,
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "poison": 25,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 25,
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30010,7 +31001,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30037,7 +31031,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30064,7 +31061,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30085,13 +31085,17 @@
         "physical": 10,
         "pierce": 25,
         "fire": 30,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30118,7 +31122,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30145,7 +31152,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30355,13 +31365,16 @@
         "physical": 0,
         "pierce": 15,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30494,9 +31507,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -30795,6 +31811,9 @@
         "vitality": 25,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -31027,7 +32046,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": 0,
         "cold": 50,
@@ -31037,6 +32056,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -31183,6 +32205,9 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 3,
       "variants_disagree": false,
       "record_paths": [
@@ -31262,9 +32287,12 @@
         "lightning": 40,
         "poison": 0,
         "aether": 40,
-        "chaos": 40,
+        "chaos": 60,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -31282,7 +32310,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": 0,
         "cold": 0,
@@ -31292,6 +32320,9 @@
         "chaos": 40,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -31879,13 +32910,16 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 65,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -31995,6 +33029,9 @@
         "vitality": 65,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -32020,7 +33057,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32047,7 +33087,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32074,7 +33117,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32102,7 +33148,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32130,7 +33179,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32158,7 +33210,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32184,9 +33239,12 @@
         "lightning": 0,
         "poison": 15,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 10,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32447,7 +33505,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": -15,
         "cold": 0,
@@ -32457,6 +33515,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32528,7 +33589,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32538,6 +33599,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32555,7 +33619,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32565,6 +33629,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32582,7 +33649,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32592,6 +33659,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32609,16 +33679,20 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
         "lightning": 80,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20,
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32645,7 +33719,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32673,7 +33750,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32701,7 +33781,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32723,13 +33806,17 @@
         "physical": 30,
         "pierce": 15,
         "fire": 33,
-        "cold": 33,
+        "cold": 34,
         "lightning": 33,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32757,7 +33844,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -32775,7 +33865,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32785,6 +33875,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32803,7 +33896,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32813,6 +33906,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32831,7 +33927,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32841,6 +33937,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32859,7 +33958,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32869,6 +33968,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -32887,7 +33989,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -32897,6 +33999,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -33036,6 +34141,9 @@
         "chaos": 0,
         "vitality": 33,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 10
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -33191,13 +34299,16 @@
         "physical": 15,
         "pierce": 25,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 30,
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -33411,9 +34522,12 @@
         "lightning": 0,
         "poison": 50,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 20,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -33461,13 +34575,16 @@
         "physical": 0,
         "pierce": 25,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 50,
         "aether": 0,
         "chaos": 0,
         "vitality": 20,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -33701,7 +34818,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": 0,
         "cold": 30,
@@ -33711,6 +34828,9 @@
         "chaos": 0,
         "vitality": 50,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -33897,9 +35017,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 20,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -34025,7 +35148,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 15,
         "fire": 0,
         "cold": 0,
@@ -34035,6 +35158,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -34225,6 +35351,9 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 10
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -34304,9 +35433,12 @@
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -34389,6 +35521,9 @@
         "chaos": 50,
         "vitality": 0,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -34518,13 +35653,16 @@
         "physical": 0,
         "pierce": 10,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 30,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -34795,7 +35933,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 15,
         "pierce": 0,
         "fire": 0,
         "cold": 0,
@@ -34805,6 +35943,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -35269,9 +36410,12 @@
         "lightning": 0,
         "poison": 15,
         "aether": 0,
-        "chaos": 0,
+        "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -36996,7 +38140,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -37024,7 +38171,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -37051,7 +38201,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -37381,7 +38534,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 33
+      },
+      "passive_resistances": {
+        "bleeding": 33
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -37543,7 +38699,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 33
+      },
+      "passive_resistances": {
+        "bleeding": 33
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -37570,7 +38729,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
-        "bleeding": 0
+        "bleeding": 33
+      },
+      "passive_resistances": {
+        "bleeding": 33
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -37597,7 +38759,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 70,
-        "bleeding": 0
+        "bleeding": 33
+      },
+      "passive_resistances": {
+        "bleeding": 33
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -37732,12 +38897,16 @@
         "pierce": 0,
         "fire": 20,
         "cold": 0,
-        "lightning": 50,
+        "lightning": 51,
         "poison": 20,
-        "aether": 50,
+        "aether": 51,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "lightning": 1,
+        "aether": 1
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -37761,11 +38930,15 @@
         "fire": 0,
         "cold": 20,
         "lightning": 20,
-        "poison": 50,
-        "aether": 50,
+        "poison": 51,
+        "aether": 51,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 1,
+        "aether": 1
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -37787,13 +38960,17 @@
         "physical": 20,
         "pierce": 20,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 50,
+        "vitality": 51,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "vitality": 1
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -37815,13 +38992,17 @@
         "physical": 20,
         "pierce": 20,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 50,
+        "vitality": 51,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "vitality": 1
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -37845,13 +39026,17 @@
         "physical": 20,
         "pierce": 20,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 50,
+        "vitality": 51,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "vitality": 1
       },
       "variant_count": 8,
       "variants_disagree": false,
@@ -37877,15 +39062,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 20,
-        "pierce": 50,
+        "pierce": 51,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
-        "chaos": 50,
+        "chaos": 51,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 20
+      },
+      "passive_resistances": {
+        "pierce": 1,
+        "chaos": 1,
+        "bleeding": 20
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -37908,11 +39098,15 @@
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 50,
+        "poison": 51,
         "aether": 0,
-        "chaos": 50,
+        "chaos": 51,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 1,
+        "chaos": 1
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -37933,14 +39127,18 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 50,
+        "fire": 51,
         "cold": 0,
-        "lightning": 50,
+        "lightning": 51,
         "poison": 0,
         "aether": 20,
         "chaos": 0,
         "vitality": 20,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 1,
+        "lightning": 1
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -37966,9 +39164,13 @@
         "lightning": 20,
         "poison": 0,
         "aether": 0,
-        "chaos": 50,
+        "chaos": 51,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 51
+      },
+      "passive_resistances": {
+        "chaos": 1,
+        "bleeding": 51
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -37987,15 +39189,20 @@
       "is_summon": false,
       "resistances": {
         "physical": 45,
-        "pierce": 66,
-        "fire": 45,
+        "pierce": 67,
+        "fire": 46,
         "cold": 45,
         "lightning": 45,
         "poison": 45,
         "aether": 45,
         "chaos": 45,
         "vitality": 66,
-        "bleeding": 0
+        "bleeding": 45
+      },
+      "passive_resistances": {
+        "pierce": 1,
+        "fire": 1,
+        "bleeding": 45
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38015,14 +39222,19 @@
       "resistances": {
         "physical": 45,
         "pierce": 66,
-        "fire": 45,
+        "fire": 46,
         "cold": 45,
         "lightning": 45,
         "poison": 45,
         "aether": 45,
         "chaos": 45,
-        "vitality": 66,
-        "bleeding": 0
+        "vitality": 67,
+        "bleeding": 45
+      },
+      "passive_resistances": {
+        "fire": 1,
+        "vitality": 1,
+        "bleeding": 45
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -38046,11 +39258,15 @@
         "fire": 0,
         "cold": 20,
         "lightning": 20,
-        "poison": 50,
+        "poison": 51,
         "aether": 0,
-        "chaos": 50,
+        "chaos": 51,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 1,
+        "chaos": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38069,8 +39285,8 @@
       "is_summon": false,
       "resistances": {
         "physical": 20,
-        "pierce": 20,
-        "fire": 50,
+        "pierce": 21,
+        "fire": 51,
         "cold": 0,
         "lightning": 50,
         "poison": 0,
@@ -38078,6 +39294,14 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 1,
+        "fire": 1
+      },
+      "aura_resistances": {
+        "physical": 25,
+        "pierce": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -38101,11 +39325,15 @@
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 50,
+        "poison": 51,
         "aether": 20,
         "chaos": 20,
-        "vitality": 50,
+        "vitality": 51,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 1,
+        "vitality": 1
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -38133,7 +39361,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -38155,13 +39386,17 @@
         "physical": 0,
         "pierce": 0,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
-        "aether": 50,
+        "aether": 51,
         "chaos": 0,
         "vitality": 20,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "aether": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38180,15 +39415,19 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 33,
+        "pierce": 34,
         "fire": 50,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 20,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 1,
+        "cold": 1
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -38216,7 +39455,10 @@
         "aether": 20,
         "chaos": 20,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 51
+      },
+      "passive_resistances": {
+        "bleeding": 51
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38237,13 +39479,17 @@
         "physical": 0,
         "pierce": 0,
         "fire": 20,
-        "cold": 50,
-        "lightning": 50,
+        "cold": 51,
+        "lightning": 51,
         "poison": 0,
         "aether": 0,
         "chaos": 20,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "lightning": 1
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38264,13 +39510,17 @@
         "physical": 20,
         "pierce": 20,
         "fire": 0,
-        "cold": 50,
+        "cold": 51,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 50,
+        "vitality": 51,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 1,
+        "vitality": 1
       },
       "variant_count": 4,
       "variants_disagree": false,
@@ -38297,10 +39547,14 @@
         "cold": 0,
         "lightning": 0,
         "poison": 20,
-        "aether": 50,
-        "chaos": 50,
+        "aether": 51,
+        "chaos": 51,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "aether": 1,
+        "chaos": 1
       },
       "variant_count": 2,
       "variants_disagree": true,
@@ -38320,7 +39574,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 50,
+        "pierce": 51,
         "fire": 0,
         "cold": 20,
         "lightning": 0,
@@ -38328,7 +39582,11 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 51
+      },
+      "passive_resistances": {
+        "pierce": 1,
+        "bleeding": 51
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38355,7 +39613,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38382,7 +39643,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38409,7 +39673,10 @@
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -38432,11 +39699,15 @@
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 0,
+        "poison": 100,
         "aether": 0,
         "chaos": 25,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "poison": 100,
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -40332,7 +41603,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -40360,7 +41634,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -40388,7 +41665,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -40416,7 +41696,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -40444,7 +41727,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -40471,7 +41757,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -40499,7 +41788,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -40527,7 +41819,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -40555,7 +41850,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -41181,7 +42479,10 @@
         "aether": 85,
         "chaos": 85,
         "vitality": 85,
-        "bleeding": 0
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "bleeding": 85
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -41209,7 +42510,10 @@
         "aether": 100,
         "chaos": 100,
         "vitality": 100,
-        "bleeding": 0
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41293,7 +42597,10 @@
         "aether": 15,
         "chaos": 15,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 15
+      },
+      "passive_resistances": {
+        "bleeding": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41320,7 +42627,10 @@
         "aether": 15,
         "chaos": 15,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 15
+      },
+      "passive_resistances": {
+        "bleeding": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41347,7 +42657,10 @@
         "aether": 15,
         "chaos": 15,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 15
+      },
+      "passive_resistances": {
+        "bleeding": 15
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41374,7 +42687,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -41403,7 +42719,10 @@
         "aether": 40,
         "chaos": 40,
         "vitality": 40,
-        "bleeding": 0
+        "bleeding": 40
+      },
+      "passive_resistances": {
+        "bleeding": 40
       },
       "variant_count": 6,
       "variants_disagree": false,
@@ -41435,7 +42754,10 @@
         "aether": 40,
         "chaos": 40,
         "vitality": 40,
-        "bleeding": 0
+        "bleeding": 40
+      },
+      "passive_resistances": {
+        "bleeding": 40
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -41466,7 +42788,10 @@
         "aether": 45,
         "chaos": 45,
         "vitality": 45,
-        "bleeding": 0
+        "bleeding": 45
+      },
+      "passive_resistances": {
+        "bleeding": 45
       },
       "variant_count": 6,
       "variants_disagree": false,
@@ -41498,7 +42823,10 @@
         "aether": 45,
         "chaos": 45,
         "vitality": 45,
-        "bleeding": 0
+        "bleeding": 45
+      },
+      "passive_resistances": {
+        "bleeding": 45
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -41529,7 +42857,10 @@
         "aether": 50,
         "chaos": 50,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 6,
       "variants_disagree": false,
@@ -41561,7 +42892,10 @@
         "aether": 50,
         "chaos": 50,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 5,
       "variants_disagree": false,
@@ -41592,7 +42926,10 @@
         "aether": 50,
         "chaos": 50,
         "vitality": 50,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41619,7 +42956,10 @@
         "aether": 80,
         "chaos": 80,
         "vitality": 80,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41709,12 +43049,16 @@
         "pierce": 85,
         "fire": 85,
         "cold": 85,
-        "lightning": 85,
+        "lightning": 86,
         "poison": 85,
         "aether": 85,
         "chaos": 85,
         "vitality": 85,
-        "bleeding": 0
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "lightning": 1,
+        "bleeding": 85
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41740,8 +43084,12 @@
         "poison": 85,
         "aether": 85,
         "chaos": 85,
-        "vitality": 85,
-        "bleeding": 0
+        "vitality": 86,
+        "bleeding": 85
+      },
+      "passive_resistances": {
+        "vitality": 1,
+        "bleeding": 85
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -41759,16 +43107,21 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 15,
+        "physical": 18,
         "pierce": 15,
         "fire": 15,
         "cold": 15,
         "lightning": 15,
-        "poison": 15,
+        "poison": 21,
         "aether": 15,
         "chaos": 15,
         "vitality": 15,
-        "bleeding": 0
+        "bleeding": 15
+      },
+      "passive_resistances": {
+        "physical": 3,
+        "poison": 6,
+        "bleeding": 15
       },
       "variant_count": 15,
       "variants_disagree": false,
@@ -41921,7 +43274,10 @@
         "aether": 80,
         "chaos": 80,
         "vitality": 80,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -41949,7 +43305,10 @@
         "aether": 80,
         "chaos": 80,
         "vitality": 80,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -42004,7 +43363,10 @@
         "aether": 80,
         "chaos": 80,
         "vitality": 80,
-        "bleeding": 0
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -42575,7 +43937,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -42585,6 +43947,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -42603,7 +43968,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -42613,6 +43978,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -42640,7 +44008,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 8,
       "variants_disagree": false,
@@ -42674,7 +44045,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 8,
       "variants_disagree": false,
@@ -42708,7 +44082,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -42736,7 +44113,10 @@
         "aether": 0,
         "chaos": 0,
         "vitality": 33,
-        "bleeding": 0
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
       },
       "variant_count": 12,
       "variants_disagree": false,
@@ -42847,7 +44227,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -42857,6 +44237,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -42874,7 +44257,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -42884,6 +44267,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -42901,7 +44287,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -42911,6 +44297,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -42929,7 +44318,7 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
+        "physical": 25,
         "pierce": 25,
         "fire": 0,
         "cold": 35,
@@ -42939,6 +44328,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 25
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -43341,15 +44733,19 @@
       "is_summon": true,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 30,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
-        "vitality": 0,
+        "vitality": 500,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 30,
+        "vitality": 500
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -44475,7 +45871,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 10,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -44484,6 +45880,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -44503,7 +45902,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 5,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -44512,6 +45911,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 5
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -44530,7 +45932,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 10,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -44539,6 +45941,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -44557,7 +45962,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 5,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -44566,6 +45971,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 5
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -44585,7 +45993,7 @@
       "is_summon": false,
       "resistances": {
         "physical": 0,
-        "pierce": 0,
+        "pierce": 10,
         "fire": 0,
         "cold": 0,
         "lightning": 0,
@@ -44594,6 +46002,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "pierce": 10
       },
       "variant_count": 2,
       "variants_disagree": false,
@@ -44705,6 +46116,10 @@
         "vitality": 40,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "physical": 25,
+        "pierce": 25
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -44731,6 +46146,10 @@
         "chaos": 15,
         "vitality": 40,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 25,
+        "pierce": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -44923,6 +46342,10 @@
         "vitality": 40,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "physical": 25,
+        "pierce": 25
+      },
       "variant_count": 1,
       "variants_disagree": false,
       "record_paths": [
@@ -44949,6 +46372,10 @@
         "chaos": 0,
         "vitality": 40,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 25,
+        "pierce": 25
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -44999,11 +46426,14 @@
         "fire": 0,
         "cold": 0,
         "lightning": 0,
-        "poison": 0,
+        "poison": 20,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "poison": 20
       },
       "variant_count": 5,
       "variants_disagree": true,
@@ -45056,13 +46486,16 @@
         "physical": 10,
         "pierce": 10,
         "fire": 0,
-        "cold": 0,
+        "cold": 20,
         "lightning": 18,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 20
       },
       "variant_count": 3,
       "variants_disagree": true,
@@ -45111,7 +46544,7 @@
       "resistances": {
         "physical": 0,
         "pierce": 15,
-        "fire": 0,
+        "fire": 20,
         "cold": 0,
         "lightning": 0,
         "poison": 0,
@@ -45119,6 +46552,9 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 20
       },
       "variant_count": 5,
       "variants_disagree": true,
@@ -45204,7 +46640,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 0
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
       },
       "variant_count": 1,
       "variants_disagree": false,

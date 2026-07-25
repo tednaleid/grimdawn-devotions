@@ -235,19 +235,23 @@ def _representative_rank(entry):
     )
 
 
-def collapse_to_logical(groups: dict, tags: dict) -> list[dict]:
+def collapse_to_logical(groups: dict, tags: dict, resolved: dict) -> list[dict]:
     """{(name, classification): [(rel_path, rec)]} -> one dict per logical monster.
 
     Variant records (tier _[abc]NN, _summon, _pN phases) collapse onto the
-    highest-level representative. Groups whose members disagree on resistances are
-    flagged rather than silently resolved, so the page can mark them.
+    highest-level representative. `resolved` maps each member's path to its
+    combined resistances and provenance, computed before this collapse so the
+    representative's total already includes its skill-granted resistance.
+    Groups whose members disagree on the combined total are flagged rather than
+    silently resolved, so the page can mark them.
     """
     out = []
     for (_name, classification), members in groups.items():
         ordered = sorted(members, key=_representative_rank)
         rel_path, rec = ordered[0]
-        resistances = resistances_of(rec)
-        out.append({
+        res = resolved[rel_path]
+        resistances = res["resistances"]
+        entry = {
             "id": monster_id(rel_path),
             "name_tag": rec["description"],
             "classification": classification,
@@ -257,10 +261,19 @@ def collapse_to_logical(groups: dict, tags: dict) -> list[dict]:
             "max_level": int(as_float(rec.get("maxLevel")) or 0),
             "is_summon": rel_path.endswith("_summon.dbr"),
             "resistances": resistances,
+            "passive_resistances": res["passive"],
+            "aura_resistances": res["aura"],
             "variant_count": len(ordered),
-            "variants_disagree": any(resistances_of(r) != resistances for _, r in ordered[1:]),
+            "variants_disagree": any(resolved[p]["resistances"] != resistances for p, _ in ordered[1:]),
             "record_paths": [f"records/creatures/{p}" for p, _ in ordered],
-        })
+        }
+        # Sparse by contract: omit the provenance keys entirely when nothing was granted,
+        # so the ~80% of monsters with no skill grants gain no bulk.
+        if not entry["passive_resistances"]:
+            del entry["passive_resistances"]
+        if not entry["aura_resistances"]:
+            del entry["aura_resistances"]
+        out.append(entry)
     out.sort(key=lambda m: m["id"])
     return out
 
@@ -371,16 +384,22 @@ def iter_creature_records(db: DB):
 
 
 def collect_monsters(db: DB, tags: dict) -> list[dict]:
-    """Sweep creatures/, drop what is not surveyable, and collapse to the logical grain."""
+    """Sweep creatures/, drop what is not surveyable, and collapse to the logical grain.
+
+    Skill-granted resistance resolves per raw record here, before the collapse, so a
+    variant carrying a different skill loadout is compared on its true total.
+    """
     groups: dict = {}
+    resolved: dict = {}
     for rel_path, rec in iter_creature_records(db):
         reason = exclusion_reason(rel_path, rec, tags)
         if reason:
             EXCLUSIONS.append({"record_path": f"records/creatures/{rel_path}", "reason": reason})
             continue
+        resolved[rel_path] = resolved_resistances(rel_path, rec, db.get)
         key = (tags[rec["description"]], rec["monsterClassification"])
         groups.setdefault(key, []).append((rel_path, rec))
-    return collapse_to_logical(groups, tags)
+    return collapse_to_logical(groups, tags, resolved)
 
 
 def print_summary(monsters, exclusions, failed_offset_fields):
