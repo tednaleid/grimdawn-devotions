@@ -158,15 +158,20 @@ Exclude as a summoned entity's own stats, not the summoner's:
 
 - `Monster`, `Turret`, `SpiritHost`, `PetPlayerScaling`
 
-Exclude as not permanently resident:
+Record separately, as conditional rather than resident:
 
 - `Skill_BuffSelfDuration`, `Skill_BuffSelfToggled`, `Skill_BuffAttackRadiusToggled`
 
-Every excluded reference that carried a resistance is counted by reason and
-printed in the parser summary. In the measured data that is 555 references
-(`Skill_BuffAttackRadiusToggled` 217, `Skill_BuffSelfToggled` 173,
-`Skill_BuffSelfDuration` 165). They are reported rather than silently dropped,
-so the decision stays visible and reversible.
+These are the 555 references measured in the data (`Skill_BuffAttackRadiusToggled`
+217, `Skill_BuffSelfToggled` 173, `Skill_BuffSelfDuration` 165). Whether a
+monster's toggled aura is "really" always active is a judgment call, so rather
+than deciding it, the parser captures these into their own `aura_resistances`
+field. They stay out of the headline total, remain available to the page as an
+opt-in, and can be validated against community figures later. Capturing them as
+data replaces a guess with a measurement.
+
+Summoned-entity and unclassified references contribute nothing and are counted by
+reason in the parser summary, so they are reported rather than silently dropped.
 
 A `Class` that appears in neither list contributes nothing and is counted under
 an "unclassified skill class" reason, so a future patch introducing a new class
@@ -185,10 +190,14 @@ variants of one monster can carry different skill loadouts.
 inline plus passive total. This is the value every consumer should use, and it
 preserves the v1 contract that the explorer page was designed against.
 
-A new sparse `passive_resistances` object carries only the nonzero passive
-contributions, so a surprising number can be traced to its source without
-inflating the roughly 80 percent of monsters that have no passive grant at all.
-A monster with no contributions omits the key entirely.
+Two new sparse objects carry provenance, each holding only nonzero entries and
+omitted entirely when empty, so the roughly 80 percent of monsters with no grants
+gain no bulk:
+
+- `passive_resistances`: the resident contributions already folded into
+  `resistances`. Present so a surprising total can be traced to its source.
+- `aura_resistances`: the toggled and duration buff contributions, deliberately
+  **not** included in `resistances`.
 
 ```json
 {
@@ -207,6 +216,21 @@ A monster with no contributions omits the key entirely.
 The difficulty offset stays separate and page-applied, exactly as in v1:
 `effective = resistances + offset[difficulty][players]`.
 
+### Summoned creatures stay in the dataset
+
+Creatures that exist only as summons remain their own rows, unchanged from v1.
+They are the enemy's adds, not the player's minions: Loghorrean's Dreadguards, a
+nemesis's Ice Crystal, the Obsidian Cluster, and Mogdrogen's Briarthorn are all
+things a player has to kill, so a resistance survey should cover them.
+
+This was considered and rejected as an exclusion. A substring rule on "summon"
+also matches "summoner" and would have deleted `cultist_summoner_01`, which is
+Karroz, Sigil of Ch'thon, a real quest boss. A precise suffix rule avoids that
+trap but still removes 24 rows of genuine adds, which is the wrong outcome.
+
+`is_summon` remains a per-monster facet, so the page can offer summons as a
+filter toggle rather than the dataset making the choice for every consumer.
+
 ## Testing
 
 Extends `scripts/test_parse_monsters.py`, following its existing harness.
@@ -215,7 +239,10 @@ Pure unit tests:
 
 - Level selection picks the pinned entry, clamps past the end of the array, and
   defaults to level 1 when `skillLevel{n}` is missing or unparseable.
-- Each allowlisted class contributes; each excluded class does not.
+- Each allowlisted class contributes to `resistances`; each summoned-entity class
+  contributes nothing anywhere.
+- Each aura or duration class populates `aura_resistances` and leaves
+  `resistances` untouched.
 - Contributions from two passives add together, and add on top of a nonzero
   inline value.
 - An unknown `Class` contributes nothing and is counted.
@@ -229,7 +256,12 @@ Integration assertions against the real records:
 - Valdaran keeps his v1 values plus the small passive contribution his record
   actually grants (1 each to lightning and aether), guarding against a change
   that would silently inflate every monster.
-- No monster's `passive_resistances` contains a zero-valued key.
+- No monster's `passive_resistances` or `aura_resistances` contains a
+  zero-valued key, and neither key is present when empty.
+- At least one monster carries `aura_resistances`, and its `resistances` does not
+  include that contribution.
+- Summoned creatures still appear as rows: the row count stays at the v1 value
+  and Karroz (`tagBloodswornBoss02`) is present.
 
 The numbers are data-derived and move on a game patch, so counts are asserted as
 bands, matching how the v1 guards were written.
@@ -239,12 +271,11 @@ bands, matching how the v1 guards were written.
 - **Difficulty offsets are still page-applied**, so a value in the dataset is
   base plus passive and does not include the difficulty bonus. This is
   deliberate and unchanged from v1.
-- **Toggled and aura buffs are excluded.** A monster's toggled aura is plausibly
-  always active in practice, which would make this an understatement on the 555
-  affected references. The two validated monsters showed no shortfall, so the
-  exclusion is the better default, but it is a judgment call rather than a
-  certainty. The parser summary reports the count so the decision can be
-  revisited against evidence.
+- **Aura and duration buffs are recorded but not counted.** They populate
+  `aura_resistances` and stay out of `resistances`. A monster's toggled aura is
+  plausibly always active in practice, so a consumer that wants the pessimistic
+  view can add the two together. Neither validated monster showed a shortfall
+  from leaving them out, which is why the headline total excludes them.
 - **Skill grants are resolved one level deep.** A passive that itself references
   further skills is not followed. No evidence was found that monster resistance
   passives do this, but it is not proven absent.
