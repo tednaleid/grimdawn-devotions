@@ -3,7 +3,7 @@
 # /// script
 # requires-python = ">=3.10"
 # ///
-import importlib.util, json, subprocess, sys, tempfile
+import contextlib, importlib.util, io, json, subprocess, sys, tempfile
 from pathlib import Path
 
 here = Path(__file__).parent
@@ -479,16 +479,19 @@ check("summary reports skipped skill references", "skill grants not counted:" in
 # resolves to zero is now correctly not a skip, and no creature reaches a SUMMON_CLASSES
 # record through skillName{n} (summon definitions hang off spawn skills, one level deeper
 # than this resolver follows). So seed a skip and drive print_summary directly.
-import contextlib, io
-mon.SKILL_EXCLUSIONS.append({"record_path": "records/creatures/enemies/x.dbr",
-                             "skill": "records/skills/np/minion.dbr", "reason": "summoned entity"})
+# SKILL_EXCLUSIONS is a module global that the unit tests above have already appended to,
+# so replace its contents outright rather than appending: on top of that residue the
+# assertions below would pass whether or not the seed took effect.
+saved_skips = mon.SKILL_EXCLUSIONS[:]
+mon.SKILL_EXCLUSIONS[:] = [{"record_path": "records/creatures/enemies/x.dbr",
+                            "skill": "records/skills/np/minion.dbr", "reason": "summoned entity"}]
 buf = io.StringIO()
 with contextlib.redirect_stderr(buf):
     mon.print_summary(m3, [], [])
-mon.SKILL_EXCLUSIONS.pop()
+mon.SKILL_EXCLUSIONS[:] = saved_skips
 seeded = buf.getvalue()
-check("summary itemises skip reasons by reason", "- summoned entity: " in seeded)
-check("summary counts the seeded skip", "skill grants not counted: 0" not in seeded)
+check("summary counts exactly the seeded skip", "skill grants not counted: 1" in seeded)
+check("summary itemises skip reasons by reason", "- summoned entity: 1" in seeded)
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
