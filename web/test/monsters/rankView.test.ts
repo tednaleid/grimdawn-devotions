@@ -49,13 +49,19 @@ test("each row carries one bar per bucket", () => {
   expect([...rows[0]!.matchAll(/class="hbar/g)]).toHaveLength(13);
 });
 
-test("bar heights use the shared peak, not a per-row peak", () => {
-  // Nine types sit wholly in the "0" bucket (2 rows each); fire splits into two buckets of 1.
-  const html = rankMarkup(loc, [mon({ fire: 10 }), mon({ fire: 20 })], ZERO, false);
+test("bar heights scale to the shared peak, not per row and not to the row count", () => {
+  // Three rows, every type spread across two buckets (two at 10, one at 30), so each type's
+  // tallest bucket holds 2. The peak is therefore 2 while rows.length is 3, which separates
+  // three different implementations: scaling to the shared peak gives 100%/50%, scaling per
+  // row gives the same here but differs elsewhere, and scaling to rows.length gives 67%/33%.
+  // A fixture where peak and rows.length coincide cannot tell the last one apart.
+  const all = (v: number) => Object.fromEntries(DAMAGE_TYPES.map((t) => [t, v])) as Resistances;
+  const html = rankMarkup(loc, [mon(all(10)), mon(all(10)), mon(all(30))], ZERO, false);
   const fireRow = html.split('data-type="fire"')[1]!.split("</div>")[0]!;
   const heights = [...fireRow.matchAll(/height:([\d.]+)%/g)].map((m) => Number(m[1]));
-  // With a shared peak of 2, a bucket holding 1 row is 50% tall, never 100%.
-  expect(Math.max(...heights)).toBeCloseTo(50, 0);
+  const populated = heights.filter((h) => h > 0).sort((a, b) => b - a);
+  expect(populated[0]).toBeCloseTo(100, 0); // the bucket holding 2, at the shared peak
+  expect(populated[1]).toBeCloseTo(50, 0); // the bucket holding 1, half of it
 });
 
 test("mean and median are rendered per row", () => {
