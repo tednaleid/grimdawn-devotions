@@ -350,10 +350,16 @@ def members_disagree_on_summon(monster: dict) -> bool:
 
 
 DIFFICULTIES = ("normal", "elite", "ultimate")
+# Ascendant is not a fourth difficulty in the records: it is a toggle layered on
+# Ultimate (internally "ultimate challenge", the way Veteran layers on Normal).
+# It is a fourth key in our output because that is how the page offers it.
+ASCENDANT = "ascendant"
 PLAYER_BRACKETS = ("1", "2", "3", "4")
 
 GAMEENGINE_REF = "records/game/gameengine.dbr"
 SCALER_FALLBACK = "records/game/balancingadjustment_mp+difficulty_enemies01.dbr"
+ASCENDANT_RECORD_FALLBACK = "records/game/gameascendant.dbr"
+ULTRAMODE_FALLBACK = "records/game/balancingadjustment_ultramode_enemies01.dbr"
 
 
 def split_difficulty_array(value):
@@ -388,6 +394,49 @@ def scaler_ref(db: DB) -> str:
     return ref or SCALER_FALLBACK
 
 
+def ascendant_ref(db: DB) -> str:
+    """The enemy adjustment Ascendant Mode layers on top of Ultimate.
+
+    Two hops, both through fields the engine declares, so a patch that relocates
+    either record is followed rather than silently read from a stale path:
+    gameengine.dbr -> ascendantRecord -> gameascendant.dbr
+    -> ultimateChallangeAdjustment (the game's own spelling).
+    """
+    game_ref = (db.get(GAMEENGINE_REF).get("ascendantRecord") or "").strip()
+    ref = (db.get(game_ref or ASCENDANT_RECORD_FALLBACK).get("ultimateChallangeAdjustment") or "").strip()
+    return ref or ULTRAMODE_FALLBACK
+
+
+FAILED_ASCENDANT_FIELDS: list[str] = []
+
+
+def flat_adjustment(rec: dict) -> dict:
+    """The ten resistance values on a flat (non-tabular) adjustment record.
+
+    Deliberately not split_difficulty_array: that models a 3x4 difficulty/player
+    table, while this record is one adjustment applied on top of whichever
+    difficulty is active. Routing it through the 12-cell reader would be a
+    category error that happens to look correct while every value is zero.
+
+    An absent field contributes 0. A present field that is not a single number
+    is recorded in FAILED_ASCENDANT_FIELDS (mirroring FAILED_OFFSET_FIELDS) so
+    print_summary reports it instead of the value silently becoming 0.
+    """
+    out = {}
+    for key, field in RESISTANCE_FIELDS.items():
+        raw = rec.get(field)
+        if raw is None:
+            out[key] = 0
+            continue
+        v = as_float(raw)
+        if v is None:
+            FAILED_ASCENDANT_FIELDS.append(key)
+            out[key] = 0
+            continue
+        out[key] = int(v) if v == int(v) else round(v, 4)
+    return out
+
+
 FAILED_OFFSET_FIELDS: list[str] = []
 
 
@@ -414,6 +463,16 @@ def difficulty_offsets(db: DB) -> dict:
         for d in DIFFICULTIES:
             for p in PLAYER_BRACKETS:
                 out[d][p][key] = table.get(d, {}).get(p, 0)
+    # Ascendant = Ultimate plus a flat adjustment. The adjustment does not vary by
+    # player bracket, so Ultimate's bracket spread carries through unchanged.
+    # Additive rather than replacing: the field is named an "adjustment" and sits
+    # parallel to challengeAdjustment (Veteran), which stacks on Normal. Every
+    # value is 0 today, so no test on real data can distinguish the two readings.
+    adj = flat_adjustment(db.get(ascendant_ref(db)))
+    out[ASCENDANT] = {
+        p: {key: out["ultimate"][p][key] + adj[key] for key in RESISTANCE_FIELDS}
+        for p in PLAYER_BRACKETS
+    }
     return out
 
 
@@ -447,7 +506,7 @@ def collect_monsters(db: DB, tags: dict) -> list[dict]:
     return collapse_to_logical(groups, tags, resolved)
 
 
-def print_summary(monsters, exclusions, failed_offset_fields):
+def print_summary(monsters, exclusions, failed_offset_fields, failed_ascendant_fields):
     """Audit summary to stderr: population, facet spread, and every exclusion count."""
     from collections import Counter
     p = lambda *a: print(*a, file=sys.stderr)
@@ -482,6 +541,9 @@ def print_summary(monsters, exclusions, failed_offset_fields):
     if failed_offset_fields:
         p(f"  WARNING: difficulty offset fields failed to parse and defaulted to 0 "
           f"for every difficulty/player bracket: {sorted(set(failed_offset_fields))}")
+    if failed_ascendant_fields:
+        p(f"  WARNING: ascendant adjustment fields failed to parse and defaulted to 0: "
+          f"{sorted(set(failed_ascendant_fields))}")
 
 
 def main(argv=None) -> int:
@@ -512,7 +574,7 @@ def main(argv=None) -> int:
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Wrote {args.out}  ({len(monsters)} monsters)")
-    print_summary(monsters, EXCLUSIONS, FAILED_OFFSET_FIELDS)
+    print_summary(monsters, EXCLUSIONS, FAILED_OFFSET_FIELDS, FAILED_ASCENDANT_FIELDS)
     return 0
 
 

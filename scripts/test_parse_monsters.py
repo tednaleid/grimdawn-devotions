@@ -201,7 +201,8 @@ db = mon.DB((root / "extracted/records").resolve())
 check("scaler ref resolves through gameengine.dbr",
       mon.scaler_ref(db).endswith("balancingadjustment_mp+difficulty_enemies01.dbr"))
 offs = mon.difficulty_offsets(db)
-check("offsets cover the three difficulties", sorted(offs.keys()) == ["elite", "normal", "ultimate"])
+check("offsets cover the four difficulties",
+      sorted(offs.keys()) == ["ascendant", "elite", "normal", "ultimate"])
 check("offsets cover the four player brackets", sorted(offs["ultimate"].keys()) == ["1", "2", "3", "4"])
 check("every offset cell carries all ten resistance keys",
       all(list(offs[d][p].keys()) == TEN for d in offs for p in offs[d]))
@@ -234,6 +235,57 @@ check("a bad-arity field is recorded as failed", new_failures == ["fire"])
 check("a bad-arity field still defaults its offset to 0", fake_offs["ultimate"]["4"]["fire"] == 0)
 check("a good-arity field is not recorded as failed", "cold" not in new_failures)
 check("a good-arity field keeps its real parsed value", fake_offs["normal"]["1"]["cold"] == 1)
+
+# --- Ascendant: the adjustment record and the fourth offsets key ---
+check("ascendant ref resolves through gameengine.dbr and gameascendant.dbr",
+      mon.ascendant_ref(db).endswith("balancingadjustment_ultramode_enemies01.dbr"))
+check("ascendant ref falls back when the engine names no ascendant record",
+      mon.ascendant_ref(FakeDB({})).endswith("balancingadjustment_ultramode_enemies01.dbr"))
+
+check("flat_adjustment reads a scalar field",
+      mon.flat_adjustment({"defensiveFire": "7.000000"})["fire"] == 7)
+check("flat_adjustment keeps a negative adjustment",
+      mon.flat_adjustment({"defensiveFire": "-4.000000"})["fire"] == -4)
+check("flat_adjustment treats an absent field as no adjustment",
+      mon.flat_adjustment({})["fire"] == 0)
+check("flat_adjustment returns all ten keys",
+      list(mon.flat_adjustment({}).keys()) == TEN)
+before_asc = list(mon.FAILED_ASCENDANT_FIELDS)
+bad_adj = mon.flat_adjustment({"defensiveCold": "1.0;2.0"})
+check("flat_adjustment records a non-scalar field as failed",
+      mon.FAILED_ASCENDANT_FIELDS[len(before_asc):] == ["cold"])
+check("a failed ascendant field defaults to 0", bad_adj["cold"] == 0)
+
+# The real ultramode record is all zeros, so a fixture built from it cannot tell
+# "ultimate + adjustment" from "copy ultimate", "adjustment only", or "read the
+# wrong record". These values are nonzero and differ per type so it can.
+twelve_up = ";".join(str(float(n)) for n in [0, 0, 0, 0, 4, 6, 8, 11, 8, 10, 13, 16])
+asc_db = FakeDB({
+    mon.GAMEENGINE_REF: {"monsterAttributePak": mon.SCALER_FALLBACK,
+                         "ascendantRecord": mon.ASCENDANT_RECORD_FALLBACK},
+    mon.SCALER_FALLBACK: {f: twelve_up for f in mon.RESISTANCE_FIELDS.values()},
+    mon.ASCENDANT_RECORD_FALLBACK: {"ultimateChallangeAdjustment": mon.ULTRAMODE_FALLBACK},
+    mon.ULTRAMODE_FALLBACK: {"defensiveFire": "3.000000", "defensiveCold": "-2.000000"},
+})
+asc = mon.difficulty_offsets(asc_db)
+check("offsets cover four difficulties",
+      sorted(asc.keys()) == ["ascendant", "elite", "normal", "ultimate"])
+check("ascendant covers the four player brackets",
+      sorted(asc["ascendant"].keys()) == ["1", "2", "3", "4"])
+check("ascendant adds the adjustment to ultimate in every bracket",
+      [asc["ascendant"][p]["fire"] for p in "1234"] == [11, 13, 16, 19])
+check("ascendant carries a negative adjustment too",
+      [asc["ascendant"][p]["cold"] for p in "1234"] == [6, 8, 11, 14])
+check("a type absent from the adjustment record matches ultimate exactly",
+      [asc["ascendant"][p]["poison"] for p in "1234"] == [8, 10, 13, 16])
+check("building ascendant does not mutate ultimate",
+      [asc["ultimate"][p]["fire"] for p in "1234"] == [8, 10, 13, 16])
+check("ascendant is emitted after ultimate so the JSON reads weakest to hardest",
+      list(asc.keys()) == ["normal", "elite", "ultimate", "ascendant"])
+
+real = mon.difficulty_offsets(db)
+check("real ascendant offsets equal ultimate today (the ultramode record is all zeros)",
+      all(real["ascendant"][p][k] == real["ultimate"][p][k] for p in "1234" for k in TEN))
 
 # --- Task 4: run the real parser over the extracted tree ---
 out = Path(tempfile.mkdtemp()) / "monsters.json"
@@ -512,7 +564,7 @@ mon.SKILL_EXCLUSIONS[:] = [{"record_path": "records/creatures/enemies/x.dbr",
                             "skill": "records/skills/np/minion.dbr", "reason": "summoned entity"}]
 buf = io.StringIO()
 with contextlib.redirect_stderr(buf):
-    mon.print_summary(m3, [], [])
+    mon.print_summary(m3, [], [], [])
 mon.SKILL_EXCLUSIONS[:] = saved_skips
 seeded = buf.getvalue()
 check("summary counts exactly the seeded skip", "skill grants not counted: 1" in seeded)
