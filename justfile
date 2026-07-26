@@ -319,13 +319,11 @@ i18n-tables *LANGS:
 deposit:
     #!/usr/bin/env bash
     set -euo pipefail
-    # Best-effort: read the Steam build id from the app manifest for provenance.
-    manifest="{{gd_dir}}/../../appmanifest_219990.acf"
-    buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    read -r buildid version < <(just _game-version)
     uv run scripts/build_deposit.py build \
         --records-dir "{{records_dir}}" --text-root "{{justfile_directory()}}/extracted" \
         --out-dir "{{deposit_dir}}" --i18n-dir "{{justfile_directory()}}/data/i18n" \
-        --game-version "{{gd_version}}" ${buildid:+--steam-buildid "$buildid"}
+        --game-version "$version" --steam-buildid "$buildid"
 
 # Schema census over the deposit: per-category key stats, template usage, diagnostics
 [group("deposit")]
