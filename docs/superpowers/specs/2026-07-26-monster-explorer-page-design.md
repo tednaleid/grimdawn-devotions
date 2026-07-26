@@ -180,7 +180,7 @@ first-class answer the page can give.
 ### Provenance markers
 
 In the table, a filled dot marks a cell whose value includes a resident passive
-grant; a hollow ring marks a cell for which an aura grant exists. 404 rows carry
+grant; a hollow ring marks a cell for which an aura grant exists. 403 rows carry
 a passive grant, 140 an aura.
 
 The ring's meaning depends on the aura toggle: with it off, the ring means "an
@@ -233,10 +233,10 @@ Every control round-trips through the hash, per the project invariant. Keys:
 `diff`, `players`, `tier`, `role`, `q`, `minlv`, `summons`, `auras`, and
 `sort=key:dir`.
 
-Values at their default are omitted, so a shared link stays short. Tier and role
-follow RR's convention for a set with a non-empty default: the key is emitted
-even when empty, so "cleared to show all" stays distinguishable from "absent, use
-the default".
+Values at their default are omitted, so a shared link stays short. Unlike RR's
+`source` facet, tier and role both default to empty, so there is no "cleared to
+show all" state distinct from "absent": the key is simply omitted whenever the
+set is empty, and an absent key decodes to that same empty default.
 
 Decoding tolerates malformed input: unknown keys are ignored, undecodable tokens
 are dropped individually rather than discarding the whole list, and out-of-range
@@ -276,8 +276,8 @@ Six suites under `web/test/monsters/`, mirroring `web/test/rr/`:
   peak across types, and the empty-set case returning an explicit no-data result
   rather than `NaN`.
 - **filter**: each facet in isolation and in combination.
-- **urlState**: round-trip for every field, defaults omitted, the emitted-when-empty
-  convention for defaulted sets, and tolerance of stale or malformed hashes.
+- **urlState**: round-trip for every field, defaults omitted, and tolerance of
+  stale or malformed hashes.
 - **model**: offset application across all three difficulties and all four player
   brackets, and the aura toggle changing totals.
 - **rankView**: ordering by mean, histogram bucket counts, and the empty state.

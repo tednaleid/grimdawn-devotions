@@ -583,3 +583,33 @@ grain and `variants_disagree` are documented in
 `docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md`, the
 skill-grant resolution in
 `docs/superpowers/specs/2026-07-25-monster-passive-resistances-design.md`.
+
+## Monster explorer / RR: tier and role chip labels do not localize
+
+Tier and role chip labels are raw English/record-path tokens (`Common`,
+`boss&quest`, `waveevent`) with no catalogue keys, so they never localize. The
+same is true of the RR page's own facet chips. `web/test/i18nBoundary.test.ts`
+cannot catch this because it only greps `src/core`, `src/adapters`, `src/app`
+for two deleted singleton names and never scans `src/monsters/` or `src/rr/`.
+Worth widening that guard and adding catalogue keys for both pages' chip
+labels.
+
+Pointers: `chipsMarkup` in `web/src/monsters/app/main.ts` and the chip
+renderers in `web/src/rr/adapters/tableView.ts`; the grep list in
+`web/test/i18nBoundary.test.ts`.
+
+## Monster explorer: cosmetic test gaps confirmed by mutation
+
+Found during the final whole-branch review, not yet fixed:
+
+- Dropping the `hbar empty` class passes, so the styling its documented
+  `!important` exists to serve (see the comment on `.hbar.empty` in
+  `web/src/monsters/monsters.css`) is untested.
+- `rank-pos`'s `i + 1` (`web/src/monsters/adapters/rankView.ts`) mutating to
+  `i` passes.
+- `class="left"` on facet columns (`web/src/monsters/adapters/tableView.ts`)
+  is unpinned.
+- The provenance tooltip's `+${amount}` mutating to `+0` (the `marker` helper
+  in `web/src/monsters/adapters/tableView.ts`) passes.
+
+Pointers: `web/test/monsters/rankView.test.ts` and `web/test/monsters/tableView.test.ts`.
