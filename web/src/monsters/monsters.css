@@ -210,6 +210,13 @@
   text-transform: uppercase;
   color: var(--mon-mut);
 }
+/* Sits under the difficulty select, so it must not stretch the .ctl column wide enough to
+   push the neighbouring controls off the row. */
+.monsters-page .ctl-note {
+  max-width: 24rem;
+  font-size: 0.72rem;
+  color: var(--mon-mut);
+}
 .monsters-page select,
 .monsters-page input[type="search"] {
   background: var(--mon-panel);

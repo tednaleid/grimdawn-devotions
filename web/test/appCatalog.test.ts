@@ -270,6 +270,8 @@ const REQUIRED = [
   "monsters.diff.normal",
   "monsters.diff.elite",
   "monsters.diff.ultimate",
+  "monsters.diff.ascendant",
+  "monsters.note.ascendantSameAsUltimate",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

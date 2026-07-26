@@ -354,5 +354,7 @@
   "monsters.ctl.includeAuras": "include auras",
   "monsters.diff.normal": "Normal",
   "monsters.diff.elite": "Elite",
-  "monsters.diff.ultimate": "Ultimate"
+  "monsters.diff.ultimate": "Ultimate",
+  "monsters.diff.ascendant": "Ascendant",
+  "monsters.note.ascendantSameAsUltimate": "In this dataset Ascendant applies the same resistance offsets as Ultimate."
 }

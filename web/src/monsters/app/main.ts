@@ -1,6 +1,7 @@
 // ABOUTME: Entry point for the monster page: loads the dataset + localization, owns the render loop.
 // ABOUTME: All view state lives in the URL hash; render reads the decoded ViewState.
 import { loadMonsters } from "../adapters/dataSource";
+import { diffNoteMarkup } from "../adapters/controlsView";
 import { renderRank } from "../adapters/rankView";
 import { renderTable } from "../adapters/tableView";
 import { applyView } from "../core/filter";
@@ -89,6 +90,12 @@ async function boot() {
       `<div class="ctl-row">` +
       `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.difficulty"))}</span>` +
       selectMarkup("mon-diff", [...DIFFICULTIES], view.diff, (d) => t(`monsters.diff.${d}`)) +
+      diffNoteMarkup(
+        localization,
+        view.diff,
+        offsetFor(doc, "ascendant", view.players),
+        offsetFor(doc, "ultimate", view.players),
+      ) +
       `</div>` +
       `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.players"))}</span>` +
       selectMarkup("mon-players", PLAYER_COUNTS, view.players, (p) => p) +
