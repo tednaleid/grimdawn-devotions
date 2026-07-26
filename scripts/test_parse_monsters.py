@@ -429,8 +429,8 @@ doc3 = json.loads(out3.read_text(encoding="utf-8"))
 m3 = doc3["monsters"]
 by_id = {m["id"]: m for m in m3}
 
-check(f"row count unchanged (got {len(m3)})", len(m3) == 1637)
-check("raw record count unchanged", sum(m["variant_count"] for m in m3) == 2728)
+check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1635)
+check("raw record count unchanged", sum(m["variant_count"] for m in m3) == 2725)
 check("all ten resistance keys still present", all(list(m["resistances"].keys()) == TEN for m in m3))
 
 alkamos = by_id.get("enemies.boss-quest.ghost_stepsoftorment_01")
@@ -457,7 +457,7 @@ bleeders = [m for m in m3 if m["resistances"]["bleeding"]]
 # Band widened from the plan's stated 300-900, which was written against the wrong grain.
 # The design doc's "592 monsters" counted raw records across a 3,023-record superset that
 # includes the devotion role, hiddenFromCombat, and invincible records this pipeline
-# excludes. Here, 245 logical rows cover 533 raw records, so nothing is lost in
+# excludes. Here, 245 logical rows cover 533 raw records (of 1,635 rows after the trap exclusion), so nothing is lost in
 # resolution: the difference is the grain plus those exclusions. Every point of it comes
 # from passive_resistances -- bleeding is never set inline, and no aura skill grants it.
 check(f"bleeding is no longer uniformly zero (got {len(bleeders)})", 150 <= len(bleeders) <= 400)
@@ -513,6 +513,18 @@ mon.SKILL_EXCLUSIONS[:] = saved_skips
 seeded = buf.getvalue()
 check("summary counts exactly the seeded skip", "skill grants not counted: 1" in seeded)
 check("summary itemises skip reasons by reason", "- summoned entity: 1" in seeded)
+
+# --- Task 1 (explorer): traps are excluded, monsters merely named "trap" are not ---
+check("a trap_ prefixed record is excluded",
+      mon.exclusion_reason("enemies/trap_mineexplosive_a01.dbr", rec(), TAGS) == "trap")
+check("a trap_ prefixed record in a subdir is excluded",
+      mon.exclusion_reason("enemies/special/trap_foo_01.dbr", rec(), TAGS) == "trap")
+check("a monster merely named with trap inside is kept",
+      mon.exclusion_reason("enemies/boss&quest/ghost_ugdenbogtrap_01.dbr", rec(), TAGS) is None)
+check("a monster whose name starts with a trap-like word is kept",
+      mon.exclusion_reason("enemies/boss&quest/trapdoorspider_01.dbr", rec(), TAGS) is None)
+check("rule order: a non-monster record is still reported as such, not as a trap",
+      mon.exclusion_reason("enemies/trap_x.dbr", rec(Class="ProxyPool"), TAGS) == "not a monster record")
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

@@ -103,6 +103,12 @@ def exclusion_reason(rel_path: str, rec: dict, tags: dict) -> str | None:
         return "no resolvable name"
     if role_of(rel_path) == "devotion":
         return "devotion role"
+    if rel_path.rsplit("/", 1)[-1].startswith("trap_"):
+        # Traps are level furniture, not monsters: mine_explosive carries 500 in nine of ten
+        # types and would distort every aggregate. Matched on the filename prefix, never as a
+        # substring: "trap" appears inside five real monsters (three Ugdenbog ghosts,
+        # chthonianfiend_trappedandalone_01, chthonianservitor_mourndaletrap).
+        return "trap"
     if rec.get("monsterClassification") not in VALID_CLASSIFICATIONS:
         return "no classification"
     return None

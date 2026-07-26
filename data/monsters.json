@@ -1,8 +1,8 @@
 {
   "meta": {
-    "game_version": "1.3.0.0",
-    "steam_buildid": "24346246",
-    "generated_utc": "2026-07-26T00:05:50Z"
+    "game_version": "test",
+    "steam_buildid": "24393848",
+    "generated_utc": "2026-07-26T07:42:01Z"
   },
   "monsters": [
     {
@@ -45116,65 +45116,6 @@
       "variants_disagree": false,
       "record_paths": [
         "records/creatures/enemies/thornedhorrorfrost_c01.dbr"
-      ]
-    },
-    {
-      "id": "enemies.trap_chthonicshard_zap_a01_summon",
-      "name_tag": "tagEnemyTrapA03",
-      "classification": "Common",
-      "role": "base",
-      "race_tag": "tagRace004",
-      "min_level": 1,
-      "max_level": 250,
-      "is_summon": true,
-      "resistances": {
-        "physical": 0,
-        "pierce": 30,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 500,
-        "bleeding": 0
-      },
-      "passive_resistances": {
-        "pierce": 30,
-        "vitality": 500
-      },
-      "variant_count": 2,
-      "variants_disagree": false,
-      "record_paths": [
-        "records/creatures/enemies/trap_chthonicshard_zap_a01_summon.dbr",
-        "records/creatures/enemies/trap_chthonicshard_zap_b01_summon.dbr"
-      ]
-    },
-    {
-      "id": "enemies.trap_mineexplosive_a01",
-      "name_tag": "tagPetThermiteMineA01",
-      "classification": "Common",
-      "role": "base",
-      "race_tag": "tagRace010",
-      "min_level": 1,
-      "max_level": 250,
-      "is_summon": false,
-      "resistances": {
-        "physical": 500,
-        "pierce": 500,
-        "fire": 500,
-        "cold": 500,
-        "lightning": 500,
-        "poison": 500,
-        "aether": 500,
-        "chaos": 500,
-        "vitality": 500,
-        "bleeding": 0
-      },
-      "variant_count": 1,
-      "variants_disagree": false,
-      "record_paths": [
-        "records/creatures/enemies/trap_mineexplosive_a01.dbr"
       ]
     },
     {
