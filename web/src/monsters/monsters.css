@@ -63,6 +63,11 @@
   white-space: nowrap;
 }
 .monsters-page main {
+  /* web/src/styles.css declares an unscoped `main { display: grid; grid-template-columns:
+     280px 1fr 250px; }` for the planner's three-pane layout. This page loads that stylesheet
+     first (for the shared palette and header chrome), so without an override its three
+     sections (ranking, controls, table) become grid items in one row instead of stacking. */
+  display: block;
   max-width: 1500px;
   margin: 0 auto;
   padding: 16px 20px 60px;

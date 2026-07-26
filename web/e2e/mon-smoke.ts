@@ -154,6 +154,38 @@ try {
   const tableRows = await cdp.evaluate<number>("document.querySelectorAll('#mon-table tbody tr[data-id]').length");
   check(tableRows > 1000, `the table renders rows for the default view (${tableRows})`);
 
+  // Geometry, not just content: an unscoped `main { display: grid; grid-template-columns: ... }`
+  // rule in the shared styles.css once put ranking/controls/table side by side in one row
+  // (each squeezed into its own column) instead of stacked, and every content-only assertion
+  // above stayed green through that. Pin the actual layout: the three sections stack top to
+  // bottom, and the table is not clipped to a narrow grid track.
+  const geometry = await cdp.evaluate<{
+    rankBottom: number;
+    controlsTop: number;
+    controlsBottom: number;
+    tableTop: number;
+    scrollWidth: number;
+  }>(
+    `(() => {
+      const rank = document.getElementById('mon-rank').getBoundingClientRect();
+      const controls = document.getElementById('mon-controls').getBoundingClientRect();
+      const table = document.getElementById('mon-table-section').getBoundingClientRect();
+      const scroll = document.querySelector('.table-scroll').getBoundingClientRect();
+      return { rankBottom: rank.bottom, controlsTop: controls.top, controlsBottom: controls.bottom,
+        tableTop: table.top, scrollWidth: scroll.width };
+    })()`,
+  );
+  check(
+    geometry.controlsTop >= geometry.rankBottom && geometry.tableTop >= geometry.controlsBottom,
+    `ranking, controls and table stack vertically (rankBottom=${geometry.rankBottom.toFixed(0)}, ` +
+      `controlsTop=${geometry.controlsTop.toFixed(0)}, controlsBottom=${geometry.controlsBottom.toFixed(0)}, ` +
+      `tableTop=${geometry.tableTop.toFixed(0)})`,
+  );
+  check(
+    geometry.scrollWidth >= 800,
+    `the table's scroll container is not clipped (width=${geometry.scrollWidth.toFixed(0)}px)`,
+  );
+
   // Localization: monster names resolve through the game tag tables, not raw tags or catalogue keys.
   const firstName = await cdp.evaluate<string>(
     "document.querySelector('#mon-table tbody tr[data-id] td.m-name')?.textContent ?? ''",
