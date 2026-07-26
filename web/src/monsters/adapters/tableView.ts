@@ -13,11 +13,17 @@ const FACET_COLUMNS = [
   { key: "level", label: "monsters.table.colLevel", left: false },
 ];
 
+/** The alpha the strongest cell reaches. Short of 1 so the row rules stay visible through it. */
+const SHADE_CEILING = 0.85;
+
 /** A cell background tinted by how resistant the monster is, saturating at 100. */
 function shade(type: DamageType, value: number): string {
   const a = Math.max(0, Math.min(1, value / 100));
   if (a === 0) return "";
-  return ` style="background:color-mix(in srgb, var(--t-${type}-dim) ${(a * 100).toFixed(0)}%, transparent)"`;
+  // The full type hue, not its -dim partner: dim is a near-black tint that reads as a hint of
+  // colour at any value, so a 90 and a 20 looked nearly alike. Mixing the saturated hue toward
+  // transparent puts the whole 0-100 range on a visible ramp.
+  return ` style="background:color-mix(in srgb, var(--t-${type}) ${(a * SHADE_CEILING * 100).toFixed(0)}%, transparent)"`;
 }
 
 function header(loc: Localization, view: ViewState): string {

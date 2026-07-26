@@ -12,7 +12,8 @@
   --mon-warn: #ff6b6b;
 
   /* The ten damage-type hues, this page's own semantics, tuned against the #0d1117 ground.
-     Each has a -dim partner used as a cell background, the same idiom rr.css uses. */
+     One hue per type serves both the histogram bars (opaque) and the table's cell heat
+     shading (the same hue mixed toward transparent by the cell's value). */
   --t-physical: #b8bcc4;
   --t-pierce: #8fa3b8;
   --t-fire: #e8703a;
@@ -26,17 +27,6 @@
   --t-chaos: #a8453a;
   --t-vitality: #b06fd0;
   --t-bleeding: #ef5c6b;
-
-  --t-physical-dim: #24262a;
-  --t-pierce-dim: #1e2530;
-  --t-fire-dim: #33201a;
-  --t-cold-dim: #14283a;
-  --t-lightning-dim: #322c14;
-  --t-poison-dim: #1f2e14;
-  --t-aether-dim: #14302f;
-  --t-chaos-dim: #331e1e;
-  --t-vitality-dim: #291b33;
-  --t-bleeding-dim: #331a1e;
 
   --mon-mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
   margin: 0;
