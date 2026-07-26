@@ -235,6 +235,23 @@ const REQUIRED = [
   "monsters.type.chaos",
   "monsters.type.vitality",
   "monsters.type.bleeding",
+  "monsters.table.heading",
+  "monsters.table.count",
+  "monsters.table.empty",
+  "monsters.table.colName",
+  "monsters.table.colTier",
+  "monsters.table.colRole",
+  "monsters.table.colLevel",
+  "monsters.table.summonSuffix",
+  "monsters.table.disagreeTitle",
+  "monsters.table.passiveTitle",
+  "monsters.table.auraExcludedTitle",
+  "monsters.table.auraIncludedTitle",
+  "monsters.legend.passive",
+  "monsters.legend.auraExcluded",
+  "monsters.legend.auraIncluded",
+  "monsters.legend.disagree",
+  "monsters.legend.negative",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

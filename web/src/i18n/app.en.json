@@ -319,5 +319,22 @@
   "monsters.type.aether": "Aether",
   "monsters.type.chaos": "Chaos",
   "monsters.type.vitality": "Vitality",
-  "monsters.type.bleeding": "Bleeding"
+  "monsters.type.bleeding": "Bleeding",
+  "monsters.table.heading": "Monsters",
+  "monsters.table.count": "{count} shown",
+  "monsters.table.empty": "No monsters match these filters.",
+  "monsters.table.colName": "Monster",
+  "monsters.table.colTier": "Tier",
+  "monsters.table.colRole": "Role",
+  "monsters.table.colLevel": "Lv",
+  "monsters.table.summonSuffix": "(summon)",
+  "monsters.table.disagreeTitle": "Collapsed variant records disagree on resistance",
+  "monsters.table.passiveTitle": "from a passive skill",
+  "monsters.table.auraExcludedTitle": "from an aura, not counted in this total",
+  "monsters.table.auraIncludedTitle": "from an aura, included in this total",
+  "monsters.legend.passive": "from a passive skill",
+  "monsters.legend.auraExcluded": "has an aura grant, not counted",
+  "monsters.legend.auraIncluded": "has an aura grant, counted",
+  "monsters.legend.disagree": "collapsed variants disagree",
+  "monsters.legend.negative": "negative: takes extra damage"
 }
