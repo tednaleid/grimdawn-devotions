@@ -33,7 +33,11 @@ export function rankMarkup(loc: Localization, rows: Monster[], offsets: Resistan
           return (
             `<span class="hcol" title="${esc(title)}">` +
             `<span class="hcount">${n ? n : ""}</span>` +
-            `<span class="hbar${n ? "" : " empty"}" style="height:${height}%;background:var(--t-${s.type})"></span>` +
+            // .htrack is the space actually available to the bar (.hcol's height minus .hcount's
+            // fixed height); the bar's height:N% resolves against that, not against .hcol's full
+            // height as before, so buckets no longer compress once .hcount and .hbar compete for
+            // the same flex space.
+            `<span class="htrack"><span class="hbar${n ? "" : " empty"}" style="height:${height}%;background:var(--t-${s.type})"></span></span>` +
             `</span>`
           );
         })

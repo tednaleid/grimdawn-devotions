@@ -16,6 +16,7 @@ import {
 } from "../../adapters/localizationAdapter";
 import { mountAppMenu, type AppMenuContent } from "../../adapters/appMenu";
 import type { InfoPopoverText } from "../../adapters/infoPopover";
+import { esc } from "../adapters/markup";
 
 const MIN_LEVELS = ["0", "50", "75", "90", "100"];
 
@@ -67,7 +68,7 @@ async function boot() {
 
   function selectMarkup(id: string, options: string[], value: string, labelOf: (v: string) => string): string {
     const opts = options
-      .map((o) => `<option value="${o}"${o === value ? " selected" : ""}>${labelOf(o)}</option>`)
+      .map((o) => `<option value="${esc(o)}"${o === value ? " selected" : ""}>${esc(labelOf(o))}</option>`)
       .join("");
     return `<select id="${id}">${opts}</select>`;
   }
@@ -76,7 +77,7 @@ async function boot() {
     return values
       .map(
         (v) =>
-          `<button type="button" class="chip" data-facet="${facet}" data-val="${v}" aria-pressed="${selected.has(v)}">${v}</button>`,
+          `<button type="button" class="chip" data-facet="${facet}" data-val="${esc(v)}" aria-pressed="${selected.has(v)}">${esc(v)}</button>`,
       )
       .join("");
   }
@@ -86,26 +87,26 @@ async function boot() {
     const lv = (v: string) => (v === "0" ? t("monsters.ctl.anyLevel") : `${v}+`);
     return (
       `<div class="ctl-row">` +
-      `<div class="ctl"><span class="ctl-label">${t("monsters.ctl.difficulty")}</span>` +
+      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.difficulty"))}</span>` +
       selectMarkup("mon-diff", [...DIFFICULTIES], view.diff, (d) => t(`monsters.diff.${d}`)) +
       `</div>` +
-      `<div class="ctl"><span class="ctl-label">${t("monsters.ctl.players")}</span>` +
+      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.players"))}</span>` +
       selectMarkup("mon-players", PLAYER_COUNTS, view.players, (p) => p) +
       `</div>` +
-      `<div class="ctl"><span class="ctl-label">${t("monsters.ctl.minLevel")}</span>` +
+      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.minLevel"))}</span>` +
       selectMarkup("mon-minlv", MIN_LEVELS, String(view.minLevel), lv) +
       `</div>` +
-      `<div class="ctl"><span class="ctl-label">${t("monsters.ctl.search")}</span>` +
-      `<input type="search" id="mon-q" value="${view.q.replace(/"/g, "&quot;")}" placeholder="${t("monsters.ctl.searchPlaceholder")}"></div>` +
+      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.search"))}</span>` +
+      `<input type="search" id="mon-q" value="${esc(view.q)}" placeholder="${esc(t("monsters.ctl.searchPlaceholder"))}"></div>` +
       `</div>` +
       `<div class="ctl-row">` +
-      `<div class="ctl"><span class="ctl-label">${t("monsters.ctl.tier")}</span>` +
+      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.tier"))}</span>` +
       `<div class="chips">${chipsMarkup("tier", TIERS, view.tiers)}</div></div>` +
-      `<div class="ctl"><span class="ctl-label">${t("monsters.ctl.role")}</span>` +
+      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.role"))}</span>` +
       `<div class="chips">${chipsMarkup("role", [...knownRoles].sort(), view.roles)}</div></div>` +
-      `<div class="ctl"><span class="ctl-label">${t("monsters.ctl.toggles")}</span><div class="chips">` +
-      `<button type="button" class="chip" id="mon-summons" aria-pressed="${view.hideSummons}">${t("monsters.ctl.hideSummons")}</button>` +
-      `<button type="button" class="chip" id="mon-auras" aria-pressed="${view.includeAuras}">${t("monsters.ctl.includeAuras")}</button>` +
+      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.toggles"))}</span><div class="chips">` +
+      `<button type="button" class="chip" id="mon-summons" aria-pressed="${view.hideSummons}">${esc(t("monsters.ctl.hideSummons"))}</button>` +
+      `<button type="button" class="chip" id="mon-auras" aria-pressed="${view.includeAuras}">${esc(t("monsters.ctl.includeAuras"))}</button>` +
       `</div></div>` +
       `</div>`
     );
@@ -155,6 +156,10 @@ async function boot() {
 
     const rankHost = document.getElementById("mon-rank-body");
     if (rankHost) renderRank(rankHost, localization, rows, offsets, view.includeAuras);
+    const rankSub = document.getElementById("mon-rank-sub");
+    if (rankSub) {
+      rankSub.textContent = localization.translate("monsters.rank.caveat", { count: rows.length });
+    }
 
     const tableHost = document.getElementById("mon-table");
     if (tableHost) renderTable(tableHost, localization, rows, view, offsets, nameOf, onSort);

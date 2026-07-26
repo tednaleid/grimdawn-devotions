@@ -68,10 +68,29 @@ function mapMonster(r: RawMonster): Monster {
   };
 }
 
+/** Every row must carry all ten resistance keys as finite numbers, or `effective()` silently
+ *  computes `undefined + offset = NaN`, which renders as the literal string "NaN" in a cell and
+ *  poisons every mean/median that row feeds into.
+ */
+function validateResistances(id: unknown, resistances: unknown): void {
+  const rowId = typeof id === "string" ? id : "<unknown id>";
+  if (typeof resistances !== "object" || resistances === null) {
+    throw new Error(`monster ${rowId}: resistances must be an object`);
+  }
+  const r = resistances as Record<string, unknown>;
+  for (const type of DAMAGE_TYPES) {
+    const v = r[type];
+    if (typeof v !== "number" || !Number.isFinite(v)) {
+      throw new Error(`monster ${rowId}: resistances.${type} must be a finite number, got ${JSON.stringify(v)}`);
+    }
+  }
+}
+
 /** Parse the `{meta, monsters, difficulty_offsets}` doc.
  *
- *  Throws when the document is not an object or carries no monsters array. A dataset that
- *  parses but is structurally wrong should fail loudly at load rather than render blank cells.
+ *  Throws when the document is not an object, carries no monsters array, or a row is missing
+ *  one of the ten resistance keys. A dataset that parses but is structurally wrong should fail
+ *  loudly at load rather than render blank (NaN) cells.
  */
 export function parseMonsters(doc: unknown): MonsterDoc {
   if (typeof doc !== "object" || doc === null) {
@@ -85,6 +104,7 @@ export function parseMonsters(doc: unknown): MonsterDoc {
   if (!Array.isArray(d.monsters)) {
     throw new Error("monsters doc must carry a monsters array");
   }
+  for (const raw of d.monsters) validateResistances(raw?.id, raw?.resistances);
   return {
     meta: d.meta ?? {},
     monsters: d.monsters.map(mapMonster),

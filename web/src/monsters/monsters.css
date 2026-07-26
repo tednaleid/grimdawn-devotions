@@ -54,13 +54,11 @@
 .monsters-page a {
   color: var(--mon-ember);
 }
-.monsters-page .visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
+/* Shared .app-menu (web/src/styles.css) has no auto margin of its own; the planner relies on
+   #reset-points's margin-left: auto and RR adds its own scoped rule. This page has no other
+   header content to push the hamburger right, so it needs the same override. */
+.monsters-page header .app-menu {
+  margin-left: auto;
 }
 .monsters-page main {
   /* web/src/styles.css declares an unscoped `main { display: grid; grid-template-columns:
@@ -159,6 +157,12 @@
   justify-content: flex-end;
 }
 .monsters-page .hcount {
+  /* Fixed size, never shrunk: previously .hcount and .hbar were flex siblings each fighting
+     for .hcol's height (.hcount at a fixed 0.85rem, .hbar at height:N% of that SAME total
+     height), so flex-shrink compressed every bar above ~79% of the peak toward .hcol's
+     leftover space instead of the true N%. flex-shrink: 0 keeps .hcount's footprint constant
+     so .htrack below gets the rest of the column, unconditionally. */
+  flex-shrink: 0;
   font-size: 0.6rem;
   line-height: 1.1;
   height: 0.85rem;
@@ -167,8 +171,26 @@
   color: var(--mon-mut);
   font-variant-numeric: tabular-nums;
 }
+/* The space actually available to the bar: .hcol's height minus .hcount's fixed height,
+   with nothing else competing for it. .hbar's height:N% (set inline by rankView.ts) now
+   resolves against this, so all ten histograms genuinely share one linear scale. */
+.monsters-page .htrack {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
 .monsters-page .hbar {
-  min-height: 2px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* A tiny fraction of a pixel, not 2px: at 2px, every populated bucket under ~35 counts
+     (out of a ~54px track) rendered at the identical floored height, so a bucket of 86 was a
+     hairline indistinguishable from a bucket of 1. This still guarantees a sliver renders for
+     any nonzero count (the browser rounds it to a device pixel), without swamping the low end
+     of the shared scale. The empty state stays distinguishable by color alone (.hbar.empty's
+     dim background below), never by height, so it does not need its own floor. */
+  min-height: 0.5px;
   border-radius: 2px 2px 0 0;
 }
 .monsters-page .hbar.empty {

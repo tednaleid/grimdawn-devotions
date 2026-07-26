@@ -76,6 +76,24 @@ test("parseMonsters throws on a non-object, and on a doc with no monsters array"
   expect(() => parseMonsters({ meta: {} })).toThrow();
 });
 
+test("parseMonsters throws naming the row id and key when a resistance is missing", () => {
+  const { fire: _omit, ...missingFire } = DOC.monsters[0]!.resistances;
+  const doc = { ...DOC, monsters: [{ ...DOC.monsters[0], id: "enemies.badrow", resistances: missingFire }] };
+  expect(() => parseMonsters(doc)).toThrow(/enemies\.badrow/);
+  expect(() => parseMonsters(doc)).toThrow(/fire/);
+});
+
+test("parseMonsters throws when a resistance value is not a finite number", () => {
+  const bad = { ...DOC.monsters[0], id: "enemies.badval", resistances: { ...ZERO, fire: Number.NaN } };
+  expect(() => parseMonsters({ ...DOC, monsters: [bad] })).toThrow(/enemies\.badval/);
+  const stringy = { ...DOC.monsters[0], id: "enemies.badval2", resistances: { ...ZERO, fire: "30" } };
+  expect(() => parseMonsters({ ...DOC, monsters: [stringy] })).toThrow(/enemies\.badval2/);
+});
+
+test("a fully valid row parses without throwing", () => {
+  expect(() => parseMonsters(DOC)).not.toThrow();
+});
+
 test("offsetFor selects the difficulty and player bracket", () => {
   const doc = parseMonsters(DOC);
   expect(offsetFor(doc, "ultimate", "1").fire).toBe(8);
