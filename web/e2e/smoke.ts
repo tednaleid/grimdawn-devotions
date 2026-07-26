@@ -22,7 +22,10 @@ const server = Bun.serve({
   port: 0,
   async fetch(req) {
     let path = new URL(req.url).pathname;
-    if (path === "/") path = "/index.html";
+    // Any directory URL, not just the root: the sibling apps live at /resistance-reduction/ and
+    // /monster-resistances/, and the app-menu check below fetches them. (rr-smoke and mon-smoke
+    // already resolve paths this way.)
+    if (path.endsWith("/")) path += "index.html";
     const file = Bun.file(DIST + path);
     if (!(await file.exists())) return new Response("not found", { status: 404 });
     const ext = path.slice(path.lastIndexOf("."));
@@ -784,6 +787,24 @@ try {
     await cdp.evaluate<boolean>(`!!document.querySelector('#tooltip [data-vid="${tagVid}"].vsel')`),
     "the tapped filter row shows as selected in the re-shown popover",
   );
+
+  // --- App menu: the planner must offer both sibling apps ---
+  // `a.href` reports the browser-resolved absolute URL, so a wrong relative depth shows up here,
+  // and fetching each one proves the target serves rather than merely being well-formed.
+  await cdp.evaluate(`document.querySelector('.app-menu-btn').click()`);
+  const navHrefs = await cdp.evaluate<string[]>(
+    `Array.from(document.querySelectorAll('.app-menu-panel a.app-menu-nav')).map((a) => a.href)`,
+  );
+  const origin = new URL(BASE).origin;
+  check(navHrefs.length === 2, `the app menu links to both sibling apps (${navHrefs.length})`);
+  check(navHrefs.includes(`${origin}/resistance-reduction/`), `it links to the RR page (${navHrefs.join(", ")})`);
+  check(navHrefs.includes(`${origin}/monster-resistances/`), "it links to the monster-resistances page");
+  const navStatuses = await Promise.all(navHrefs.map(async (h) => (await fetch(h)).status));
+  check(
+    navStatuses.every((s) => s === 200),
+    `every app-menu link resolves to a served page (${navStatuses.join(", ")})`,
+  );
+  await cdp.evaluate(`document.querySelector('.app-menu-btn').click()`); // close it again
 
   check(cdp.consoleErrors.length === 0, `no console errors or page exceptions (got ${cdp.consoleErrors.length})`);
   if (cdp.consoleErrors.length) for (const e of cdp.consoleErrors) console.log(`    console: ${e}`);

@@ -181,12 +181,15 @@ async function boot() {
       github: localization.translate("ui.info.github"),
     };
   }
-  // Header app menu (hamburger, right of the header): cross-app link to the RR page, the language
+  // Header app menu (hamburger, right of the header): links to the two sibling apps, the language
   // list, and the About panel. Switching locale swaps catalogs, re-applies chrome, and re-renders;
   // locale is a viewer preference, never in the URL hash.
   function menuContent(): AppMenuContent {
     return {
-      nav: { href: "resistance-reduction/", label: localization.translate("rr.title") },
+      nav: [
+        { href: "resistance-reduction/", label: localization.translate("ui.nav.rr") },
+        { href: "monster-resistances/", label: localization.translate("ui.nav.monsters") },
+      ],
       languageHeading: localization.translate("ui.menu.language"),
       current: localization.locale,
       available: SUPPORTED_LOCALES,

@@ -224,11 +224,14 @@ async function boot() {
       github: localization.translate("ui.info.github"),
     };
   }
-  // Header app menu (hamburger): cross-app link back to the planner, the language list, and the
+  // Header app menu (hamburger): links to the two sibling apps, the language list, and the
   // About panel. Locale is a viewer preference (never in the hash); switching swaps catalogs and re-renders.
   function menuContent(): AppMenuContent {
     return {
-      nav: { href: "../", label: localization.translate("monsters.plannerLink") },
+      nav: [
+        { href: "../", label: localization.translate("ui.nav.planner") },
+        { href: "../resistance-reduction/", label: localization.translate("ui.nav.rr") },
+      ],
       languageHeading: localization.translate("ui.menu.language"),
       current: localization.locale,
       available: SUPPORTED_LOCALES,
