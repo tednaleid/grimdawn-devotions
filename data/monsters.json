@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.3.0.0",
     "steam_buildid": "24346246",
-    "generated_utc": "2026-07-26T07:54:30Z"
+    "generated_utc": "2026-07-26T16:43:41Z"
   },
   "monsters": [
     {
@@ -47190,6 +47190,56 @@
       }
     },
     "ultimate": {
+      "1": {
+        "physical": 2,
+        "pierce": 5,
+        "fire": 8,
+        "cold": 5,
+        "lightning": 10,
+        "poison": 10,
+        "aether": 5,
+        "chaos": 5,
+        "vitality": 12,
+        "bleeding": 9
+      },
+      "2": {
+        "physical": 7,
+        "pierce": 8,
+        "fire": 10,
+        "cold": 8,
+        "lightning": 12,
+        "poison": 12,
+        "aether": 8,
+        "chaos": 8,
+        "vitality": 14,
+        "bleeding": 11
+      },
+      "3": {
+        "physical": 10,
+        "pierce": 12,
+        "fire": 13,
+        "cold": 12,
+        "lightning": 15,
+        "poison": 15,
+        "aether": 12,
+        "chaos": 12,
+        "vitality": 17,
+        "bleeding": 14
+      },
+      "4": {
+        "physical": 13,
+        "pierce": 15,
+        "fire": 16,
+        "cold": 15,
+        "lightning": 18,
+        "poison": 18,
+        "aether": 15,
+        "chaos": 15,
+        "vitality": 19,
+        "bleeding": 17
+      }
+    },
+    "ascendant": {
       "1": {
         "physical": 2,
         "pierce": 5,

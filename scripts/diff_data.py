@@ -170,11 +170,12 @@ def _con_name(con: dict, gametext: dict) -> str:
 def diff_offsets(old: dict, new: dict) -> list[str]:
     """Changed-cell lines between two monsters.json 'difficulty_offsets' blocks.
 
-    Fixed shape (difficulty x player bracket x resistance key), so there is no
-    add/remove to report, only value changes: one line per changed cell in
-    'difficulty/bracket: key OLD -> NEW' form. This is the one part of the dataset
-    a balance patch can change globally, so it is diffed even though it carries no
-    per-monster id of its own.
+    Difficulty x player bracket x resistance key, one line per changed cell in
+    'difficulty/bracket: key OLD -> NEW' form. A new difficulty key (Ascendant
+    arrived this way) shows up as cells changing from absent to a value, so the
+    loops below union both sides rather than iterating one. This is the one part
+    of the dataset a balance patch can change globally, so it is diffed even
+    though it carries no per-monster id of its own.
     """
     o = old.get("difficulty_offsets") or {}
     n = new.get("difficulty_offsets") or {}
