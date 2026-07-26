@@ -112,6 +112,21 @@ def test_monster_diff_identical_documents_are_clean():
     assert dd.diff_monsters(doc, doc) == ([], [], []), dd.diff_monsters(doc, doc)
 
 
+def test_monster_diff_reports_provenance_moves_at_an_unchanged_total():
+    """A patch can move where resistance comes from without moving the total."""
+    old = {"monsters": [_mon("a")]}
+    new = {"monsters": [dict(_mon("a"), passive_resistances={"fire": 10})]}
+    _, _, changed = dd.diff_monsters(old, new)
+    assert len(changed) == 1 and "passive fire" in changed[0], changed
+
+
+def test_monster_diff_reports_a_gained_aura():
+    old = {"monsters": [_mon("a")]}
+    new = {"monsters": [dict(_mon("a"), aura_resistances={"cold": 33})]}
+    _, _, changed = dd.diff_monsters(old, new)
+    assert len(changed) == 1 and "aura cold" in changed[0], changed
+
+
 def _offsets_doc(offsets):
     return {"monsters": [], "difficulty_offsets": offsets}
 

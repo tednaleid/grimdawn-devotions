@@ -194,8 +194,10 @@ def diff_monsters(old: dict, new: dict):
     """(added, removed, changed) description lines between two monsters.json documents.
 
     Keyed on the stable id, so a renamed display string is not reported as a
-    remove-plus-add. Only resistance changes are reported as per-monster changes;
-    a facet-only change (classification, race_tag, level range, variant_count,
+    remove-plus-add. Compares the headline `resistances` and both provenance blocks,
+    since a patch can move where a monster's resistance comes from without moving the
+    total. Provenance deltas are prefixed `passive` or `aura` to keep them legible.
+    A facet-only change (classification, race_tag, level range, variant_count,
     variants_disagree) keeps the same id and is reported by neither this function
     nor an add/remove, so it is invisible here. `diff_offsets` above separately
     covers the difficulty_offsets block, the one global change a balance patch
@@ -209,10 +211,13 @@ def diff_monsters(old: dict, new: dict):
                for mid in sorted(old_by_id.keys() - new_by_id.keys())]
     changed = []
     for mid in sorted(old_by_id.keys() & new_by_id.keys()):
-        o = old_by_id[mid].get("resistances", {})
-        n = new_by_id[mid].get("resistances", {})
-        deltas = [f"{k} {_fmt(o.get(k))} -> {_fmt(n.get(k))}"
-                  for k in sorted(o.keys() | n.keys()) if o.get(k) != n.get(k)]
+        deltas = []
+        for block, label in (("resistances", ""), ("passive_resistances", "passive "),
+                             ("aura_resistances", "aura ")):
+            o = old_by_id[mid].get(block, {})
+            n = new_by_id[mid].get(block, {})
+            deltas += [f"{label}{k} {_fmt(o.get(k))} -> {_fmt(n.get(k))}"
+                       for k in sorted(o.keys() | n.keys()) if o.get(k) != n.get(k)]
         if deltas:
             changed.append(f"{mid}: " + ", ".join(deltas))
     return added, removed, changed
