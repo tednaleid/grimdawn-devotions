@@ -102,11 +102,32 @@ test("sorting by a damage type uses the effective value and respects direction",
   expect(asc.map((m) => m.id)).toEqual(["b", "a", "c"]);
 });
 
-test("sorting by a damage type accounts for the difficulty offset", () => {
+test("a flat difficulty offset shifts every row equally and cannot reorder them", () => {
   const off = { ...ZERO, fire: 100 } as Resistances;
   const rows = applyView(ROWS, view({ sortKey: "fire", sortDir: -1 }), off, nameOf);
-  // The offset is flat, so it shifts every row equally and the order is unchanged.
   expect(rows.map((m) => m.id)).toEqual(["c", "a", "b"]);
+});
+
+test("sorting by a damage type ranks on the effective value, not the base", () => {
+  // A flat offset cannot discriminate base-vs-effective sorting: it moves every row by the
+  // same amount, so the order is identical either way. Auras can, because they are per
+  // monster. Here `low` has the smaller base but the larger effective value, so an
+  // implementation sorting on `m.resistances` would return the opposite order.
+  const high = mon("high", { resistances: { ...ZERO, fire: 30 } });
+  const low = mon("low", { resistances: { ...ZERO, fire: 10 }, aura: { fire: 50 } });
+  const v = view({ sortKey: "fire", sortDir: -1, includeAuras: true });
+  expect(applyView([high, low], v, ZERO, nameOf).map((m) => m.id)).toEqual(["low", "high"]);
+  // With auras excluded the effective values are 30 and 10, so the order flips back.
+  const noAuras = view({ sortKey: "fire", sortDir: -1, includeAuras: false });
+  expect(applyView([high, low], noAuras, ZERO, nameOf).map((m) => m.id)).toEqual(["high", "low"]);
+});
+
+test("sorting by tier uses the weakest-to-strongest rank, not alphabetical order", () => {
+  // Boss sorts before Common alphabetically but after it by rank, so this discriminates.
+  const boss = mon("boss", { classification: "Boss" });
+  const common = mon("common", { classification: "Common" });
+  const asc = applyView([boss, common], view({ sortKey: "tier", sortDir: 1 }), ZERO, nameOf);
+  expect(asc.map((m) => m.classification)).toEqual(["Common", "Boss"]);
 });
 
 test("sorting by level and by tier works", () => {
