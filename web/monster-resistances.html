@@ -1,0 +1,52 @@
+<!-- ABOUTME: HTML shell for the Grim Dawn monster resistance explorer page. -->
+<!-- ABOUTME: Declares the layout (header, ranking, controls, table) and loads mon-main.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grim Dawn Monster Resistances</title>
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="./monsters.css" />
+  <script>
+    // Mirror the planner's boot-fail recovery: a cached shell can outlive the hashed entry it names.
+    function bootFailed() {
+      try {
+        if (!sessionStorage.getItem("monBootReloaded")) {
+          sessionStorage.setItem("monBootReloaded", "1");
+          location.reload();
+          return;
+        }
+      } catch (e) {}
+      var el = document.getElementById("boot-loading");
+      if (el)
+        el.innerHTML =
+          '<p>Couldn\'t load the page.</p><button type="button" onclick="location.reload()">Reload</button>';
+    }
+  </script>
+</head>
+<body class="monsters-page">
+  <header>
+    <h1 id="mon-title">Monster Resistances</h1>
+  </header>
+  <main id="mon-main">
+    <section id="mon-rank" aria-labelledby="mon-rank-heading">
+      <h2 id="mon-rank-heading"></h2>
+      <p id="mon-rank-sub" class="mon-sub"></p>
+      <div id="mon-rank-body">
+        <div id="boot-loading" role="status"><div class="boot-spinner" aria-hidden="true"></div><p>Loading…</p></div>
+      </div>
+    </section>
+    <!-- No heading here on purpose: each control carries its own visible label, and an
+         empty <h2> referenced by aria-labelledby would announce nothing to a screen reader. -->
+    <section id="mon-controls">
+      <div id="mon-controls-body"></div>
+    </section>
+    <section id="mon-table-section" aria-labelledby="mon-table-heading">
+      <h2 id="mon-table-heading"></h2>
+      <div id="mon-table"></div>
+    </section>
+  </main>
+  <script type="module" src="./mon-main.js" onerror="bootFailed()"></script>
+</body>
+</html>

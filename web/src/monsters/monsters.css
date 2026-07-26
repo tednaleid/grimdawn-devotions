@@ -1,0 +1,407 @@
+/* ABOUTME: Scoped styles for the monster resistance explorer page. */
+/* ABOUTME: Palette mirrors web/src/styles.css; the ten damage hues are this page's own semantics. */
+.monsters-page {
+  /* Shared with the planner and the RR page (web/src/styles.css): cool dark ground, gold accent. */
+  --mon-bg: #0d1117;
+  --mon-panel: #161b22;
+  --mon-panel2: #1c2330;
+  --mon-line: #30363d;
+  --mon-ink: #e6edf3;
+  --mon-mut: #9aa4b2;
+  --mon-ember: #f0c14b;
+  --mon-warn: #ff6b6b;
+
+  /* The ten damage-type hues, this page's own semantics, tuned against the #0d1117 ground.
+     One hue per type serves both the histogram bars (opaque) and the table's cell heat
+     shading (the same hue mixed toward transparent by the cell's value). */
+  --t-physical: #b8bcc4;
+  --t-pierce: #8fa3b8;
+  --t-fire: #e8703a;
+  --t-cold: #4db8e8;
+  --t-lightning: #e8c341;
+  --t-poison: #7fb03a;
+  --t-aether: #4ec9c9;
+  /* Chaos and bleeding are the two reds and sit adjacent in the legend, so they are separated
+     by lightness as well as hue: a dark brick against a bright rose. Two muted mid-reds were
+     hard to tell apart as filled bars. */
+  --t-chaos: #a8453a;
+  --t-vitality: #b06fd0;
+  --t-bleeding: #ef5c6b;
+
+  --mon-mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  margin: 0;
+  background: var(--mon-bg);
+  color: var(--mon-ink);
+  font:
+    14px / 1.45 system-ui,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+.monsters-page * {
+  box-sizing: border-box;
+}
+.monsters-page a {
+  color: var(--mon-ember);
+}
+/* Shared .app-menu (web/src/styles.css) has no auto margin of its own; the planner relies on
+   #reset-points's margin-left: auto and RR adds its own scoped rule. This page has no other
+   header content to push the hamburger right, so it needs the same override. */
+.monsters-page header .app-menu {
+  margin-left: auto;
+}
+.monsters-page main {
+  /* web/src/styles.css declares an unscoped `main { display: grid; grid-template-columns:
+     280px 1fr 250px; }` for the planner's three-pane layout. This page loads that stylesheet
+     first (for the shared palette and header chrome), so without an override its three
+     sections (ranking, controls, table) become grid items in one row instead of stacking. */
+  display: block;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 16px 20px 60px;
+}
+.monsters-page section {
+  margin-bottom: 28px;
+}
+.monsters-page h2 {
+  font-size: 1.05rem;
+  margin: 0 0 4px;
+}
+.monsters-page .mon-sub {
+  color: var(--mon-mut);
+  font-size: 0.85rem;
+  margin: 0 0 12px;
+  max-width: 70ch;
+}
+.monsters-page .mon-num {
+  font-family: var(--mon-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- ranking ---- */
+.monsters-page .rank-grid {
+  display: grid;
+  grid-template-columns: 1.6rem 6.5rem 1fr 4.4rem 4.4rem;
+  gap: 10px;
+  align-items: center;
+}
+.monsters-page .rank-head {
+  padding: 0 8px 6px;
+  border-bottom: 1px solid var(--mon-line);
+  color: var(--mon-mut);
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.monsters-page .rank-head .buckets {
+  display: flex;
+  gap: 2px;
+}
+.monsters-page .buckets span {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: 0.58rem;
+}
+.monsters-page .rank-row {
+  padding: 8px;
+  border-bottom: 1px solid var(--mon-line);
+}
+.monsters-page .rank-row:last-child {
+  border-bottom: none;
+}
+.monsters-page .rank-row:hover {
+  background: var(--mon-panel);
+}
+.monsters-page .rank-pos {
+  color: var(--mon-mut);
+  font-size: 0.78rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.monsters-page .rank-name {
+  font-weight: 600;
+}
+.monsters-page .rank-mean {
+  text-align: right;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.monsters-page .rank-median {
+  text-align: right;
+  color: var(--mon-mut);
+  font-variant-numeric: tabular-nums;
+}
+.monsters-page .rank-hist {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 4.1rem;
+}
+.monsters-page .hcol {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.monsters-page .hcount {
+  /* Fixed size, never shrunk: previously .hcount and .hbar were flex siblings each fighting
+     for .hcol's height (.hcount at a fixed 0.85rem, .hbar at height:N% of that SAME total
+     height), so flex-shrink compressed every bar above ~79% of the peak toward .hcol's
+     leftover space instead of the true N%. flex-shrink: 0 keeps .hcount's footprint constant
+     so .htrack below gets the rest of the column, unconditionally. */
+  flex-shrink: 0;
+  font-size: 0.6rem;
+  line-height: 1.1;
+  height: 0.85rem;
+  overflow: hidden;
+  text-align: center;
+  color: var(--mon-mut);
+  font-variant-numeric: tabular-nums;
+}
+/* The space actually available to the bar: .hcol's height minus .hcount's fixed height,
+   with nothing else competing for it. .hbar's height:N% (set inline by rankView.ts) now
+   resolves against this, so all ten histograms genuinely share one linear scale. */
+.monsters-page .htrack {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.monsters-page .hbar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* A tiny fraction of a pixel, not 2px: at 2px, every populated bucket under ~35 counts
+     (out of a ~54px track) rendered at the identical floored height, so a bucket of 86 was a
+     hairline indistinguishable from a bucket of 1. This still guarantees a sliver renders for
+     any nonzero count (the browser rounds it to a device pixel), without swamping the low end
+     of the shared scale. The empty state stays distinguishable by color alone (.hbar.empty's
+     dim background below), never by height, so it does not need its own floor. */
+  min-height: 0.5px;
+  border-radius: 2px 2px 0 0;
+}
+.monsters-page .hbar.empty {
+  /* biome-ignore lint/complexity/noImportantStyles: the ranking view sets an inline
+     background on every bar, empty ones included, so only !important can win against it.
+     Alternatives are worse: making the renderer omit the inline style for empty buckets
+     would move a styling decision into the view. */
+  background: var(--mon-panel2) !important;
+}
+
+/* ---- controls ---- */
+.monsters-page .ctl-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+.monsters-page .ctl {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.monsters-page .ctl-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--mon-mut);
+}
+/* Sits under the difficulty select, so it must not stretch the .ctl column wide enough to
+   push the neighbouring controls off the row. */
+.monsters-page .ctl-note {
+  max-width: 24rem;
+  font-size: 0.72rem;
+  color: var(--mon-mut);
+}
+.monsters-page select,
+.monsters-page input[type="search"] {
+  background: var(--mon-panel);
+  color: var(--mon-ink);
+  border: 1px solid var(--mon-line);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font: inherit;
+}
+.monsters-page input[type="search"] {
+  min-width: 14rem;
+  padding-right: 1.8rem;
+}
+/* Chrome and Safari draw their own cancel affordance, which is near-black and all but
+   invisible on this ground. Suppress it so there is exactly one X, ours, on every browser
+   (Firefox draws none at all). */
+.monsters-page input[type="search"]::-webkit-search-cancel-button {
+  display: none;
+}
+.monsters-page .search-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.monsters-page .search-clear {
+  position: absolute;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--mon-mut);
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.monsters-page .search-clear:hover {
+  color: var(--mon-ink);
+  background: var(--mon-panel2);
+}
+/* An empty field shows its placeholder, so this hides the button with no JS tracking the
+   input's content. It depends on .search-clear being the input's immediate next sibling. */
+.monsters-page input[type="search"]:placeholder-shown + .search-clear {
+  display: none;
+}
+.monsters-page .chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.monsters-page .chip {
+  background: var(--mon-panel);
+  color: var(--mon-mut);
+  border: 1px solid var(--mon-line);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.monsters-page .chip[aria-pressed="true"] {
+  background: var(--mon-ember);
+  border-color: var(--mon-ember);
+  color: #17140f;
+  font-weight: 600;
+}
+.monsters-page select:focus-visible,
+.monsters-page input:focus-visible,
+.monsters-page button:focus-visible {
+  outline: 2px solid var(--mon-ember);
+  outline-offset: 1px;
+}
+
+/* ---- table ---- */
+.monsters-page .table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--mon-line);
+  border-radius: 4px;
+  background: var(--mon-panel);
+}
+.monsters-page table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.84rem;
+}
+.monsters-page thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--mon-panel2);
+  color: var(--mon-mut);
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 8px;
+  text-align: right;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--mon-line);
+  cursor: pointer;
+  user-select: none;
+}
+.monsters-page thead th.left,
+.monsters-page tbody td.left {
+  text-align: left;
+}
+.monsters-page thead th[aria-sort="ascending"]::after {
+  content: " \25B2";
+  color: var(--mon-ember);
+}
+.monsters-page thead th[aria-sort="descending"]::after {
+  content: " \25BC";
+  color: var(--mon-ember);
+}
+.monsters-page tbody td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--mon-line);
+  text-align: right;
+  white-space: nowrap;
+}
+.monsters-page tbody tr:hover td {
+  background: var(--mon-panel2);
+}
+.monsters-page .m-name {
+  font-weight: 600;
+  max-width: 26ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.monsters-page .m-facet {
+  font-size: 0.7rem;
+  color: var(--mon-mut);
+}
+.monsters-page .cell {
+  font-family: var(--mon-mono);
+  font-variant-numeric: tabular-nums;
+  min-width: 3.2rem;
+}
+.monsters-page .cell.over {
+  font-weight: 700;
+}
+.monsters-page .cell.neg {
+  color: var(--mon-warn);
+  font-weight: 700;
+}
+.monsters-page .prov {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-left: 3px;
+  vertical-align: 2px;
+}
+.monsters-page .prov.passive {
+  background: var(--mon-ember);
+}
+.monsters-page .prov.aura {
+  border: 1px solid var(--mon-ember);
+}
+.monsters-page .disagree {
+  color: var(--mon-warn);
+  font-weight: 700;
+  cursor: help;
+}
+.monsters-page .mon-empty {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--mon-mut);
+}
+.monsters-page .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 10px;
+  font-size: 0.76rem;
+  color: var(--mon-mut);
+  align-items: center;
+}
+.monsters-page .legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}

@@ -102,4 +102,46 @@ if (!rrHtml.includes(rrJsName) || !rrHtml.includes(cssName) || !rrHtml.includes(
 }
 await Bun.write("dist/resistance-reduction/index.html", rrHtml);
 
-console.log(`bundled dist: ${jsName}, ${cssName}, ${rrJsName} (buildId ${buildId}, assetV ${assetVersion})`);
+// Third page: the monster resistance explorer, its own bundle under dist/monster-resistances/,
+// sharing the hashed styles.css from the parent dir. Named mon-main to avoid colliding.
+const mon = await Bun.build({
+  entrypoints: ["src/monsters/app/main.ts"],
+  outdir: "dist/monster-resistances",
+  target: "browser",
+  minify: true,
+  sourcemap: "linked",
+  naming: "mon-[name]-[hash].[ext]", // dist/monster-resistances/mon-main-<hash>.js
+  define: { __ASSET_V__: JSON.stringify(assetVersion) },
+});
+if (!mon.success) {
+  for (const log of mon.logs) console.error(log);
+  throw new Error("bundle: monsters Bun.build failed");
+}
+const monEntry = mon.outputs.find((o) => o.kind === "entry-point");
+if (!monEntry) throw new Error("bundle: no monsters entry-point output");
+const monJsName = monEntry.path.split(/[\\/]/).pop()!; // mon-main-<hash>.js
+
+const monCssBytes = await Bun.file("src/monsters/monsters.css").bytes();
+const monCssName = `mon-${createHash("sha256").update(monCssBytes).digest("hex").slice(0, 8)}.css`;
+await Bun.write(`dist/monster-resistances/${monCssName}`, monCssBytes);
+
+let monHtml = await Bun.file("monster-resistances.html").text();
+monHtml = monHtml
+  .replace('src="./mon-main.js"', `src="./${monJsName}"`)
+  .replace('href="../styles.css"', `href="../${cssName}"`)
+  .replace('href="./monsters.css"', `href="./${monCssName}"`);
+if (
+  monHtml.includes('"./mon-main.js"') ||
+  monHtml.includes('"../styles.css"') ||
+  monHtml.includes('"./monsters.css"')
+) {
+  throw new Error("bundle: monster-resistances.html still has un-hashed asset refs after rewrite");
+}
+if (!monHtml.includes(monJsName) || !monHtml.includes(cssName) || !monHtml.includes(monCssName)) {
+  throw new Error("bundle: hashed monster asset refs not present after rewrite");
+}
+await Bun.write("dist/monster-resistances/index.html", monHtml);
+
+console.log(
+  `bundled dist: ${jsName}, ${cssName}, ${rrJsName}, ${monJsName} (buildId ${buildId}, assetV ${assetVersion})`,
+);

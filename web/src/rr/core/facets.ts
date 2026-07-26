@@ -23,3 +23,7 @@ export const COARSE_CATEGORIES = ["devotion", "skill", "item"] as const;
 // sources most builds plan around; items (the large majority of rows) are opt-in. Unlike the damage
 // and RR facets, this facet defaults to a non-empty selection, so the hash codec always emits it.
 export const DEFAULT_COARSE_CATEGORIES = ["devotion", "skill"] as const;
+
+// Mirrors the `key`s in tableView.ts's COLS: every column the table can be sorted by.
+// urlState.ts validates an incoming `sort=` key against this before trusting it.
+export const SORT_KEYS = ["name", "cat", "rr", "typesLabel", "value", "trigger", "dur"] as const;

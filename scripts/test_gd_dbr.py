@@ -1,5 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # ABOUTME: Tests for gd_dbr shared helpers. Run: uv run scripts/test_gd_dbr.py
+# ABOUTME: Covers .dbr record parsing, translation loading, and level-array value selection.
 # /// script
 # requires-python = ">=3.10"
 # ///

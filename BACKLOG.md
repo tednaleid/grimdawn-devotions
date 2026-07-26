@@ -482,18 +482,24 @@ works fine under `file://`, but a copied `file://` link is not shareable across 
 
 ## Monster stats survey + explorer page (sub-project 3)
 
-**Specced 2026-07-24 (not yet implemented):** the investigation is done and the
-v1 pipeline is designed in
-[docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md](docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md).
-That spec supersedes the exploratory notes below for anything it covers: v1 is
-resistances-first (2,728 kept records collapsing to 1,637 logical monsters keyed
-on name x classification), difficulty is a global additive offset table extracted
-from `balancingadjustment_mp+difficulty_enemies01.dbr` (3 difficulties x 4 player
-brackets) and applied in the page, and HP/DA/OA plus attacks are defined
-follow-on phases. The difficulty tier above Ultimate scales only damage and
-health, not resistances, so the three-difficulty table is complete for v1. The
-explorer page is a separate sub-project to brainstorm once `data/monsters.json`
-exists; the spec pins the data contract it depends on.
+**v1 pipeline shipped; phase 2 (explorer page) unblocked.** The extraction
+pipeline designed in
+[docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md](docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md)
+is implemented: `scripts/parse_monsters.py` (run via `just parse-monsters`)
+produces the committed `data/monsters.json`, 2,725 kept records collapsed to
+1,635 logical monsters keyed on name x classification, with difficulty as a
+global additive offset table extracted from
+`balancingadjustment_mp+difficulty_enemies01.dbr` (3 difficulties x 4 player
+brackets) applied in the page. That spec supersedes the exploratory notes below
+for anything it covers; HP/DA/OA plus attacks remain defined follow-on phases.
+Superseded 2026-07-26: the tier above Ultimate is Ascendant, and it is now a
+fourth key in the offset table, derived from `gameascendant.dbr ->
+ultimateChallangeAdjustment` rather than assumed. It still adds no resistance
+offset, but the pipeline now reads the record instead of taking that on faith.
+See [docs/superpowers/specs/2026-07-26-ascendant-difficulty-design.md](docs/superpowers/specs/2026-07-26-ascendant-difficulty-design.md).
+Phase 2, the
+explorer page, can now be brainstormed and specced against the real dataset;
+the spec pins the data contract it depends on.
 
 A re-runnable survey that extracts **all monster stats** (not just resistances)
 from the game files into a queryable committed dataset, plus a dedicated explorer
@@ -563,3 +569,64 @@ Built after the RR page ships. Needs its own brainstorm/spec (the dedup grain, t
 `gameengine.dbr` difficulty scaling, and which stats beyond resistances to surface).
 Related: the RR pipeline spec (`docs/superpowers/specs/2026-07-21-resistance-reduction-pipeline-design.md`)
 and page spec (`docs/superpowers/specs/2026-07-21-resistance-reduction-page-design.md`).
+
+## Monster resistance dataset: known data quirks for the explorer page
+
+- Two dataset rows will skew any mean-based "which damage type do enemies resist
+  least" ranking: `enemies.trap_mineexplosive_a01` is classification `Common` with
+  500 in nine of ten types, and `enemies.trap_chthonicshard_zap_a01_summon` carries
+  a +500 vitality passive. Both are traps rather than monsters and both predate
+  this work. The explorer page should filter or annotate them.
+- Bleeding is representative-derived in a few collapsed groups: 544 kept raw
+  records individually carry nonzero bleeding while the 245 shipped rows cover
+  533, so a group whose representative lacks the passive shows 0. Already flagged
+  by `variants_disagree`.
+
+Pointers: `data/monsters.json` (`scripts/parse_monsters.py`); the dedup/collapse
+grain and `variants_disagree` are documented in
+`docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md`, the
+skill-grant resolution in
+`docs/superpowers/specs/2026-07-25-monster-passive-resistances-design.md`.
+
+## Monster explorer / RR: tier and role chip labels do not localize
+
+Tier and role chip labels are raw English/record-path tokens (`Common`,
+`boss&quest`, `waveevent`) with no catalogue keys, so they never localize. The
+same is true of the RR page's own facet chips. `web/test/i18nBoundary.test.ts`
+cannot catch this because it only greps `src/core`, `src/adapters`, `src/app`
+for two deleted singleton names and never scans `src/monsters/` or `src/rr/`.
+Worth widening that guard and adding catalogue keys for both pages' chip
+labels.
+
+Pointers: `chipsMarkup` in `web/src/monsters/app/main.ts` and the chip
+renderers in `web/src/rr/adapters/tableView.ts`; the grep list in
+`web/test/i18nBoundary.test.ts`.
+
+## Monster explorer: cosmetic test gaps confirmed by mutation
+
+Found during the final whole-branch review, not yet fixed:
+
+- Dropping the `hbar empty` class passes, so the styling its documented
+  `!important` exists to serve (see the comment on `.hbar.empty` in
+  `web/src/monsters/monsters.css`) is untested.
+- `rank-pos`'s `i + 1` (`web/src/monsters/adapters/rankView.ts`) mutating to
+  `i` passes.
+- `class="left"` on facet columns (`web/src/monsters/adapters/tableView.ts`)
+  is unpinned.
+- The provenance tooltip's `+${amount}` mutating to `+0` (the `marker` helper
+  in `web/src/monsters/adapters/tableView.ts`) passes.
+
+Pointers: `web/test/monsters/rankView.test.ts` and `web/test/monsters/tableView.test.ts`.
+
+## Veteran mode as a difficulty option
+
+Ascendant is now derived from `gameengine.dbr -> ascendantRecord ->
+gameascendant.dbr -> ultimateChallangeAdjustment`. Veteran is the same shape one
+hop shorter: `gameengine.dbr -> challengeAdjustment ->
+balancingadjustment_challengemode_enemies01.dbr`, layered on Normal the way
+Ascendant layers on Ultimate.
+
+Not built because its ten resistance fields are all zero today, so the control
+would gain an option numerically identical to Normal and nobody has asked for it.
+If it is ever wanted, `ascendant_ref`/`flat_adjustment` in
+`scripts/parse_monsters.py` generalise to it directly.

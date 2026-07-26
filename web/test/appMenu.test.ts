@@ -4,7 +4,10 @@ import { test, expect } from "bun:test";
 import { appMenuPanelHtml, type AppMenuContent } from "../src/adapters/appMenu";
 
 const content: AppMenuContent = {
-  nav: { href: "../", label: "Devotion Planner" },
+  nav: [
+    { href: "../", label: "Devotion Planner" },
+    { href: "../resistance-reduction/", label: "Resistance Reduction" },
+  ],
   languageHeading: "Language",
   current: "de",
   available: ["en", "de", "fr"],
@@ -19,11 +22,19 @@ const content: AppMenuContent = {
   githubUrl: "https://github.com/tednaleid/grimdawn-devotions",
 };
 
-test("composes the cross-app nav link", () => {
+test("composes one nav link per sibling app, in the order given", () => {
   const html = appMenuPanelHtml(content);
-  expect(html).toContain('class="app-menu-nav"');
+  expect([...html.matchAll(/class="app-menu-nav"/g)]).toHaveLength(2);
   expect(html).toContain('href="../"');
-  expect(html).toContain("Devotion Planner");
+  expect(html).toContain('href="../resistance-reduction/"');
+  expect(html.indexOf("Devotion Planner")).toBeLessThan(html.indexOf("Resistance Reduction"));
+});
+
+test("an empty nav list renders no links rather than an empty anchor", () => {
+  const html = appMenuPanelHtml({ ...content, nav: [] });
+  expect(html).not.toContain("app-menu-nav");
+  // The rest of the panel still composes, so a page with no siblings is not a broken menu.
+  expect(html).toContain("Language");
 });
 
 test("renders the language heading and one row per locale, current one checked", () => {
@@ -44,8 +55,14 @@ test("includes the About description, provenance, and GitHub link", () => {
   expect(html).toContain("View on GitHub");
 });
 
-test("escapes the nav label and href", () => {
-  const html = appMenuPanelHtml({ ...content, nav: { href: '"><x', label: 'a <b> & "c"' } });
+test("escapes every nav label and href, not just the first", () => {
+  const html = appMenuPanelHtml({
+    ...content,
+    nav: [
+      { href: "/ok", label: "Fine" },
+      { href: '"><x', label: 'a <b> & "c"' },
+    ],
+  });
   expect(html).toContain("a &lt;b&gt; &amp; &quot;c&quot;");
   expect(html).not.toContain("<b>");
 });

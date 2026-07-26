@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
-# ABOUTME: Builds data/i18n/game.<lang>.json: tag -> text for every game tag devotions.json and
-# ABOUTME: stat-tags.json reference. Language-independent; run once per language (see justfile `parse`).
+# ABOUTME: Builds data/i18n/game.<lang>.json: tag -> text for every game tag devotions.json,
+# ABOUTME: stat-tags.json, resistance-reduction.json, and monsters.json reference. One run per language.
 # /// script
 # requires-python = ">=3.10"
 # dependencies = []
@@ -34,13 +34,16 @@ def _add(tags: set[str], tag: str | None) -> None:
 
 
 def collect_referenced_tags(
-    devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None, rr: dict | None = None
+    devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None,
+    rr: dict | None = None, monsters: dict | None = None
 ) -> set[str]:
     """Every *_tag value referenced in devotions.json (constellation/power/pet/weapon),
     plus every game tag value in stat-tags.json and stat-format-tags.json, plus the
-    name/parent tags of every resistance-reduction source. RR sources whose name/parent
-    could not resolve to a real tag carry a synthesized x: placeholder (no game text
-    exists), so only tag-prefixed values are collected."""
+    name/parent tags of every resistance-reduction source, plus the name and race tags
+    of every monster in monsters.json. RR sources whose name/parent could not resolve to
+    a real tag carry a synthesized x: placeholder (no game text exists), so only
+    tag-prefixed values are collected. A monster with no resolvable race carries a null
+    race_tag, which _add skips."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
@@ -59,6 +62,9 @@ def collect_referenced_tags(
         for key in (s.get("name"), s.get("parent")):
             if key and key.startswith("tag"):
                 tags.add(key)
+    for m in (monsters or {}).get("monsters", []):
+        _add(tags, m.get("name_tag"))
+        _add(tags, m.get("race_tag"))
     tags.update(stat_tags.values())
     tags.update((stat_format_tags or {}).values())
     return tags
@@ -83,6 +89,8 @@ def main(argv=None) -> int:
                     help="Optional stat-format-tags.json (raw stat id -> value-embedded game tag)")
     ap.add_argument("--rr", type=Path,
                     help="Optional resistance-reduction.json (adds its source name/parent tags)")
+    ap.add_argument("--monsters", type=Path,
+                    help="Optional monsters.json (adds its monster name + race tags)")
     ap.add_argument("--text-dir", required=True, type=Path)
     ap.add_argument("--lang", required=True, help="Language code, e.g. en (used only for logging)")
     ap.add_argument("--out", required=True, type=Path)
@@ -92,7 +100,8 @@ def main(argv=None) -> int:
     stat_tags = json.loads(args.stat_tags.read_text(encoding="utf-8"))
     stat_format_tags = json.loads(args.stat_format_tags.read_text(encoding="utf-8")) if args.stat_format_tags else {}
     rr = json.loads(args.rr.read_text(encoding="utf-8")) if args.rr else {}
-    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr)
+    monsters = json.loads(args.monsters.read_text(encoding="utf-8")) if args.monsters else {}
+    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr, monsters)
 
     text_table = load_translations(args.text_dir)
     table = build_table(referenced, text_table)

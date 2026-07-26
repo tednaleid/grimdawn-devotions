@@ -12,7 +12,9 @@ export interface AppMenuNav {
 
 /** Everything the popover renders; rebuilt on a locale switch and handed to update(). */
 export interface AppMenuContent {
-  nav: AppMenuNav; // link to the other app (planner <-> RR)
+  /** Links to the sibling apps. Each page lists the other two, in the same planner/RR/monsters
+   *  order everywhere so a reader learns one arrangement rather than three. */
+  nav: readonly AppMenuNav[];
   languageHeading: string; // the "Language" section heading
   current: string; // active locale
   available: readonly string[];
@@ -23,7 +25,7 @@ export interface AppMenuContent {
 
 /** The popover's inner markup: cross-app link, language list, About panel. Pure; no DOM. */
 export function appMenuPanelHtml(c: AppMenuContent): string {
-  const nav = `<a class="app-menu-nav" href="${esc(c.nav.href)}">${esc(c.nav.label)}</a>`;
+  const nav = c.nav.map((n) => `<a class="app-menu-nav" href="${esc(n.href)}">${esc(n.label)}</a>`).join("");
   const language =
     `<div class="app-menu-section"><span class="app-menu-heading">${esc(c.languageHeading)}</span>` +
     `<ul class="app-menu-langlist" role="menu">${languageMenuHtml(languageOptions(c.current, c.available, c.names))}</ul></div>`;

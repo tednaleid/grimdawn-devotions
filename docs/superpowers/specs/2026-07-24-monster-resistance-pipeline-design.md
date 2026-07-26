@@ -1,6 +1,6 @@
 # Monster resistance survey pipeline: design
 
-Status: approved, not yet implemented
+Status: implemented
 Date: 2026-07-24
 Game version at investigation: 1.3.0.0 (Fangs of Asterkarn)
 
@@ -259,10 +259,13 @@ the parser summary, so if either turns out to matter the evidence is visible
 rather than lost.
 
 `_summon` records and `Quest` classification records are **kept**, not dropped,
-but each is tagged so the page can default them off. Silently dropping them
-would lose real opponents; tagging keeps the population honest and the choice in
-the user's hands. Every exclusion is counted and printed in the parser summary,
-following the RR parser's `EXCLUSIONS` pattern.
+and each is tagged so the page can filter on it. For `_summon` records that tag
+is representative-derived: most `_summon` records fold into a non-summon twin of
+the same creature at the logical grain, so `is_summon` on the output row survives
+only for monsters that exist solely as summons (see "Known limitations"). Silently
+dropping the records would lose real opponents; tagging keeps the population
+honest and the choice in the user's hands. Every exclusion is counted and printed
+in the parser summary, following the RR parser's `EXCLUSIONS` pattern.
 
 ### Grain
 
@@ -326,11 +329,14 @@ monster.
 
 ```json
 {
-  "game_version": "1.3.0.0",
-  "steam_buildid": "...",
+  "meta": {
+    "game_version": "1.3.0.0",
+    "steam_buildid": "12345678",
+    "generated_utc": "2026-07-24T00:00:00Z"
+  },
   "monsters": [
     {
-      "id": "nemesis_aetherial_01",
+      "id": "enemies.nemesis.nemesis_aetherial_01",
       "name_tag": "tagNemesis_Aetherial01",
       "classification": "Boss",
       "role": "nemesis",
@@ -343,9 +349,12 @@ monster.
         "lightning": 50, "poison": 20, "aether": 50, "chaos": 0,
         "vitality": 0, "bleeding": 0
       },
-      "variant_count": 1,
-      "variants_disagree": false,
-      "record_paths": ["records/creatures/enemies/nemesis/nemesis_aetherial_01.dbr"]
+      "variant_count": 2,
+      "variants_disagree": true,
+      "record_paths": [
+        "records/creatures/enemies/nemesis/nemesis_aetherial_01.dbr",
+        "records/creatures/enemies/special/fun/nemesis_aetherial_01.dbr"
+      ]
     }
   ],
   "difficulty_offsets": {
@@ -355,6 +364,12 @@ monster.
   }
 }
 ```
+
+Valdaran is a real worked example of the grain doing its job: a duplicate of the
+record lives under `enemies/special/fun/` with different resistances, so the pair
+collapses to one logical monster, the tie-break keeps the `nemesis/` record as
+representative, and `variants_disagree` marks the pair rather than hiding the
+conflict.
 
 Each player-count entry carries the full set of ten resistance keys; only `fire`
 is shown above to keep the example readable. The fire numbers are the real
@@ -426,16 +441,30 @@ language independent.
 
 Stated in the spec and surfaced in the page rather than left implicit:
 
-- **Passive resistance grants are not modelled.** A monster's own skills can add
-  resistance (hero and boss records commonly reference a shared passive such as
-  `nonplayerskills/passive/resists_heroboss.dbr`). Those grants are not stored
-  in a single consistent inline field, so v1 reports the inline base only.
-  Effective in-game resistance for heroes and bosses is therefore understated.
-  The page must say so where it could mislead, in the same spirit as the RR
-  page withholding an order it cannot prove legal.
+- **Passive resistance grants are modelled as of 2026-07-25.** A monster's own
+  skills contribute to its resistance, resolved at the rank the monster pins. See
+  [2026-07-25-monster-passive-resistances-design.md](2026-07-25-monster-passive-resistances-design.md).
+  Aura and duration buffs are recorded in `aura_resistances` but deliberately not
+  folded into the headline total.
 - **8% of collapsed groups have disagreeing variants.** Those carry
   `variants_disagree: true` and the page should mark them rather than present a
   single number as if it were uncontested.
+- **`role`, `is_summon`, and the level range describe the representative record,
+  not every collapsed member.** Measured: 253 rows collapse records spanning more
+  than one path role, 180 rows mix summon and non-summon records, 22 rows carry
+  `is_summon: true` against 246 raw `_summon` records, and the `waveevent` role
+  collapses from 144 raw records to a single row. This is mostly the grain
+  working as designed: wave-event spawns, summon variants, and multi-phase boss
+  records are duplicate placements of a creature that already exists elsewhere,
+  so they correctly fold into that creature's row instead of appearing as
+  separate monsters. The one real consequence: `is_summon` marks monsters that
+  exist *only* as summons, not every monster that can be summoned (224 of the
+  246 `_summon` records fold into a non-summon twin), so a page defaulting
+  summons off hides only summon-only creatures. Role-based filtering is
+  otherwise complete for the case that matters most: only one row outside the
+  `nemesis` role contains a `/nemesis/` record among its collapsed members
+  (`tagEnemySummonIceCrystal`, a summoned prop from a nemesis fight, not a
+  nemesis itself), so nemesis-tier filtering is effectively unaffected.
 - **Level-dependent stats are absent entirely in v1** (health, DA, OA), so the
   dataset describes defenses by type, not overall durability.
 - **242 records are excluded as not-worth-surveying** (191 devotion role, 51

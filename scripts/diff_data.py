@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
-# ABOUTME: Semantic diff of regenerated game data (devotions.json + resistance-reduction.json) vs the
-# ABOUTME: git-committed baseline. Asserts devotion structure is stable; reports tuning + RR changes.
+# ABOUTME: Semantic diff of regenerated game data (devotions.json + resistance-reduction.json +
+# ABOUTME: monsters.json) vs the git-committed baseline. Asserts devotion structure is stable; reports tuning + RR + monster changes.
 # /// script
 # requires-python = ">=3.10"
 # ///
@@ -167,10 +167,69 @@ def _con_name(con: dict, gametext: dict) -> str:
     return gametext.get(con.get("name_tag", ""), con.get("id", "?"))
 
 
+def diff_offsets(old: dict, new: dict) -> list[str]:
+    """Changed-cell lines between two monsters.json 'difficulty_offsets' blocks.
+
+    Difficulty x player bracket x resistance key, one line per changed cell in
+    'difficulty/bracket: key OLD -> NEW' form. A new difficulty key (Ascendant
+    arrived this way) shows up as cells changing from absent to a value, so the
+    loops below union both sides rather than iterating one. This is the one part
+    of the dataset a balance patch can change globally, so it is diffed even
+    though it carries no per-monster id of its own.
+    """
+    o = old.get("difficulty_offsets") or {}
+    n = new.get("difficulty_offsets") or {}
+    changed: list[str] = []
+    for diff in sorted(set(o) | set(n)):
+        ob, nb = o.get(diff) or {}, n.get(diff) or {}
+        for bracket in sorted(set(ob) | set(nb)):
+            oc, nc = ob.get(bracket) or {}, nb.get(bracket) or {}
+            for key in sorted(set(oc) | set(nc)):
+                ov, nv = oc.get(key), nc.get(key)
+                if ov != nv:
+                    changed.append(f"{diff}/{bracket}: {key} {_fmt(ov)} -> {_fmt(nv)}")
+    return changed
+
+
+def diff_monsters(old: dict, new: dict):
+    """(added, removed, changed) description lines between two monsters.json documents.
+
+    Keyed on the stable id, so a renamed display string is not reported as a
+    remove-plus-add. Compares the headline `resistances` and both provenance blocks,
+    since a patch can move where a monster's resistance comes from without moving the
+    total. Provenance deltas are prefixed `passive` or `aura` to keep them legible.
+    A facet-only change (classification, race_tag, level range, variant_count,
+    variants_disagree) keeps the same id and is reported by neither this function
+    nor an add/remove, so it is invisible here. `diff_offsets` above separately
+    covers the difficulty_offsets block, the one global change a balance patch
+    commonly makes.
+    """
+    old_by_id = {m["id"]: m for m in old.get("monsters", [])}
+    new_by_id = {m["id"]: m for m in new.get("monsters", [])}
+    added = [f"{mid} ({new_by_id[mid].get('classification')})"
+             for mid in sorted(new_by_id.keys() - old_by_id.keys())]
+    removed = [f"{mid} ({old_by_id[mid].get('classification')})"
+               for mid in sorted(old_by_id.keys() - new_by_id.keys())]
+    changed = []
+    for mid in sorted(old_by_id.keys() & new_by_id.keys()):
+        deltas = []
+        for block, label in (("resistances", ""), ("passive_resistances", "passive "),
+                             ("aura_resistances", "aura ")):
+            o = old_by_id[mid].get(block, {})
+            n = new_by_id[mid].get(block, {})
+            deltas += [f"{label}{k} {_fmt(o.get(k))} -> {_fmt(n.get(k))}"
+                       for k in sorted(o.keys() | n.keys()) if o.get(k) != n.get(k)]
+        if deltas:
+            changed.append(f"{mid}: " + ", ".join(deltas))
+    return added, removed, changed
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--devotions", default="data/devotions.json")
     ap.add_argument("--rr", default="data/resistance-reduction.json")
+    ap.add_argument("--monsters", type=Path,
+                    default=Path(__file__).resolve().parent.parent / "data/monsters.json")
     ap.add_argument("--game-text", default="data/i18n/game.en.json", help="tag->name map for readable names")
     args = ap.parse_args(argv)
     exit_code = 0
@@ -219,6 +278,27 @@ def main(argv=None) -> int:
             for r in removed:
                 print(f"    - {r}")
         for c in changed:
+            print(f"    ~ {c}")
+
+    print("=== monsters.json ===")
+    new_mon = _load_working(args.monsters)
+    old_mon = _load_baseline(args.monsters)
+    if old_mon is None:
+        print("  (no committed baseline; skipping monster diff)")
+    else:
+        added, removed, changed = diff_monsters(old_mon, new_mon)
+        print(f"  MONSTERS: +{len(added)} new, -{len(removed)} removed, {len(changed)} changed")
+        for a in added:
+            print(f"    + {a}")
+        if removed:
+            print("  REMOVED (review - regression or a legitimate removal):")
+            for r in removed:
+                print(f"    - {r}")
+        for c in changed:
+            print(f"    ~ {c}")
+        offset_changes = diff_offsets(old_mon, new_mon)
+        print(f"  DIFFICULTY OFFSETS: {len(offset_changes)} changed")
+        for c in offset_changes:
             print(f"    ~ {c}")
 
     return exit_code

@@ -88,7 +88,7 @@ async function boot() {
     }
   }
 
-  // Header app menu (hamburger): cross-app link back to the planner, the language list, and the About
+  // Header app menu (hamburger): links to the two sibling apps, the language list, and the About
   // panel. Locale is a viewer preference (never in the hash); switching swaps catalogs and re-renders.
   const GITHUB_URL = "https://github.com/tednaleid/grimdawn-devotions";
   const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/";
@@ -116,7 +116,10 @@ async function boot() {
   }
   function menuContent(): AppMenuContent {
     return {
-      nav: { href: "../", label: localization.translate("rr.plannerLink") },
+      nav: [
+        { href: "../", label: localization.translate("ui.nav.planner") },
+        { href: "../monster-resistances/", label: localization.translate("ui.nav.monsters") },
+      ],
       languageHeading: localization.translate("ui.menu.language"),
       current: localization.locale,
       available: SUPPORTED_LOCALES,

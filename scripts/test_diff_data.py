@@ -92,6 +92,66 @@ def test_rr_added_removed_changed():
     assert any("s1" in c for c in changed), changed
 
 
+def _mon(mid, fire=10, cls="Common"):
+    return {"id": mid, "name_tag": "tag" + mid, "classification": cls,
+            "resistances": {"fire": fire, "cold": 0}}
+
+
+def test_monster_diff_reports_added_removed_and_changed():
+    old = {"monsters": [_mon("a"), _mon("b"), _mon("c")]}
+    new = {"monsters": [_mon("a"), _mon("b", fire=40), _mon("d")]}
+    added, removed, changed = dd.diff_monsters(old, new)
+    assert added == ["d (Common)"], added
+    assert removed == ["c (Common)"], removed
+    assert len(changed) == 1 and changed[0].startswith("b:"), changed
+    assert "fire" in changed[0] and "10" in changed[0] and "40" in changed[0], changed
+
+
+def test_monster_diff_identical_documents_are_clean():
+    doc = {"monsters": [_mon("a"), _mon("b")]}
+    assert dd.diff_monsters(doc, doc) == ([], [], []), dd.diff_monsters(doc, doc)
+
+
+def test_monster_diff_reports_provenance_moves_at_an_unchanged_total():
+    """A patch can move where resistance comes from without moving the total."""
+    old = {"monsters": [_mon("a")]}
+    new = {"monsters": [dict(_mon("a"), passive_resistances={"fire": 10})]}
+    _, _, changed = dd.diff_monsters(old, new)
+    assert len(changed) == 1 and "passive fire" in changed[0], changed
+
+
+def test_monster_diff_reports_a_gained_aura():
+    old = {"monsters": [_mon("a")]}
+    new = {"monsters": [dict(_mon("a"), aura_resistances={"cold": 33})]}
+    _, _, changed = dd.diff_monsters(old, new)
+    assert len(changed) == 1 and "aura cold" in changed[0], changed
+
+
+def _offsets_doc(offsets):
+    return {"monsters": [], "difficulty_offsets": offsets}
+
+
+def test_offsets_diff_reports_changed_cells():
+    old = _offsets_doc({"normal": {"1": {"fire": 0}, "2": {"fire": 0}},
+                         "ultimate": {"1": {"fire": 8}}})
+    new = _offsets_doc({"normal": {"1": {"fire": 0}, "2": {"fire": 5}},
+                         "ultimate": {"1": {"fire": 8}}})
+    changed = dd.diff_offsets(old, new)
+    assert changed == ["normal/2: fire 0 -> 5"], changed
+
+
+def test_offsets_diff_identical_documents_are_clean():
+    doc = _offsets_doc({"normal": {"1": {"fire": 0}}, "ultimate": {"4": {"bleeding": 16}}})
+    assert dd.diff_offsets(doc, doc) == [], dd.diff_offsets(doc, doc)
+
+
+def test_offsets_diff_reports_multiple_changed_cells_sorted():
+    old = _offsets_doc({"elite": {"1": {"fire": 4}, "4": {"cold": 11}}})
+    new = _offsets_doc({"elite": {"1": {"fire": 6}, "4": {"cold": 13}}})
+    changed = dd.diff_offsets(old, new)
+    assert changed == ["elite/1: fire 4 -> 6", "elite/4: cold 11 -> 13"], changed
+
+
 def run():
     fns = [v for k, v in globals().items() if k.startswith("test_")]
     for fn in fns:

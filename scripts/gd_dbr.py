@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # ABOUTME: Shared stdlib helpers for reading Grim Dawn .dbr records and translations.
-# ABOUTME: Imported by parse_devotions.py and parse_rr.py; no game-domain logic lives here.
+# ABOUTME: Imported by parse_devotions.py, parse_rr.py, and parse_monsters.py; no game-domain logic lives here.
 from __future__ import annotations
 
 import re

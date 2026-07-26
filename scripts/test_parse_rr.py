@@ -1,5 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # ABOUTME: Tests for parse_rr RR extraction. Run: uv run scripts/test_parse_rr.py
+# ABOUTME: Covers resistance-reduction skill classification, source dedup, and the committed data-shape checks.
 # /// script
 # requires-python = ">=3.10"
 # ///

@@ -11,6 +11,7 @@ records_dir := justfile_directory() / "extracted/records"
 text_dir    := justfile_directory() / "extracted/text_en"
 out         := justfile_directory() / "data/devotions.json"
 out_rr      := justfile_directory() / "data/resistance-reduction.json"
+out_mon     := justfile_directory() / "data/monsters.json"
 
 # Default: show available recipes
 default:
@@ -34,8 +35,9 @@ doctor:
       *)            check winget "package manager — ships with Windows 10/11" ;;
     esac
     echo "Web data (committed; needed for build/serve):"
-    for f in data/devotions.json; do
-      if [ -f "{{justfile_directory()}}/$f" ]; then echo "  ok   $f"; ok=$((ok+1)); else echo "  MISS $f — run 'just parse'"; fail=$((fail+1)); fi
+    for f in data/devotions.json:parse data/resistance-reduction.json:parse-rr data/monsters.json:parse-monsters; do
+      path="${f%%:*}"; recipe="${f##*:}"
+      if [ -f "{{justfile_directory()}}/$path" ]; then echo "  ok   $path"; ok=$((ok+1)); else echo "  MISS $path — run 'just $recipe'"; fail=$((fail+1)); fi
     done
     if [ -d "{{justfile_directory()}}/assets/devotions" ]; then echo "  ok   assets/devotions"; ok=$((ok+1)); else echo "  warn assets/devotions missing — run 'just assets' (artwork is optional)"; fi
     echo "Extraction prereqs (optional; Windows-only, only needed to re-extract game data):"
@@ -189,8 +191,19 @@ parse-rr *ARGS:
         --devotions "{{out}}" \
         --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
 
+# Parse extracted records into monsters.json (re-run after a patch / re-extract).
+parse-monsters *ARGS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    read -r buildid version < <(just _game-version)
+    mkdir -p "$(dirname "{{out_mon}}")"
+    uv run scripts/parse_monsters.py \
+        --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out_mon}}" \
+        --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
+
 # Diff the regenerated data/*.json against the committed baseline: assert devotion structure is stable,
-# report tuning + RR changes. Run after regenerating, before committing. Exits non-zero on a structural break.
+# report tuning + RR + monster changes. Run after regenerating, before committing. Exits non-zero on a
+# structural break.
 diff-data:
     uv run scripts/diff_data.py --devotions "{{out}}" --rr "{{out_rr}}"
 
@@ -198,13 +211,13 @@ diff-data:
 # review the diff and deploy yourself. Requires the game installed + closed (Windows-only extraction).
 # `diff-data` exits non-zero on a devotion structural break, halting the chain. New buildids must be added
 # to data/steam-build-versions.json first (or pass GD_VERSION=...).
-migrate: extract parse parse-rr i18n-tables assets build diff-data check
+migrate: extract parse parse-rr parse-monsters i18n-tables assets build diff-data check
     @echo ""
     @echo "Migration regenerated + verified. Review the diff-data report above (before the check output)."
     @echo "Then: just e2e   (recommended), then   git add -A && git commit && git push   to deploy."
 
 # Full pipeline: extract then parse
-all: extract parse parse-rr i18n-tables
+all: extract parse parse-rr parse-monsters i18n-tables
 
 # KEEPS the committed dataset (data/devotions.json, data/stat_labels.json) — those only
 # regenerate via `just parse` on Windows, so clean must never delete them.
@@ -266,7 +279,7 @@ i18n-tables *LANGS:
         fi
       fi
       uv run scripts/build_game_tables.py --devotions "{{out}}" --stat-tags data/stat-tags.json \
-        --stat-format-tags data/stat-format-tags.json --rr "{{out_rr}}" \
+        --stat-format-tags data/stat-format-tags.json --rr "{{out_rr}}" --monsters "{{out_mon}}" \
         --text-dir "$tdir" --lang "$L" --out "data/i18n/game.$L.json"
       built="$built $L"
     done
@@ -324,6 +337,17 @@ test *ARGS:
 # so the default suite (and the pre-commit hook) stay fast. Run before big engine changes.
 test-slow:
     cd "{{justfile_directory()}}/web" && REACH_SLOW=1 bun test test/reachability-monotonicity.test.ts
+
+# Run the Python script test suites (parsers + data tools). The web suite is `just test`.
+# Run `just extract` first: four of the six suites hard-require extracted/records and
+# extracted/text_en, and fail with no explanation on a clean clone without it.
+test-scripts:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for t in "{{justfile_directory()}}"/scripts/test_*.py; do
+        echo "--- $(basename "$t")"
+        uv run "$t"
+    done
 
 # Per-click engine perf harness. Times selectionView (the validity-floor search + dimming sweep) = the
 # EXACT work one UI click costs; this is the pure core engine to optimize so the UI is fast (no DOM). Two
@@ -448,6 +472,7 @@ build: cover-table
     bun scripts/bundle.ts
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
     cp "{{justfile_directory()}}/data/resistance-reduction.json" dist/data/resistance-reduction.json
+    cp "{{justfile_directory()}}/data/monsters.json" dist/data/monsters.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
     mkdir -p dist/data/i18n && cp "{{justfile_directory()}}/data/i18n/"*.json dist/data/i18n/
     # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that
@@ -474,12 +499,22 @@ build: cover-table
 serve: build
     @echo "  Planner:              http://localhost:5173/"
     @echo "  Resistance reduction: http://localhost:5173/resistance-reduction/"
+    @echo "  Monster resistances:  http://localhost:5173/monster-resistances/"
     bunx serve "{{justfile_directory()}}/web/dist" -l 5173
 
 # Open the resistance-reduction page in the default browser (run in another shell while `serve` is up)
 open-rr:
     #!/usr/bin/env bash
     url="http://localhost:5173/resistance-reduction/"
+    if command -v powershell.exe >/dev/null 2>&1; then powershell.exe -NoProfile -Command "Start-Process '$url'"
+    elif command -v open >/dev/null 2>&1; then open "$url"
+    elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$url"
+    else echo "open manually: $url"; fi
+
+# Open the monster resistances page in the default browser (run in another shell while `serve` is up)
+open-monsters:
+    #!/usr/bin/env bash
+    url="http://localhost:5173/monster-resistances/"
     if command -v powershell.exe >/dev/null 2>&1; then powershell.exe -NoProfile -Command "Start-Process '$url'"
     elif command -v open >/dev/null 2>&1; then open "$url"
     elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$url"
@@ -511,3 +546,4 @@ install-e2e:
 e2e: build
     cd "{{justfile_directory()}}/web" && bun e2e/smoke.ts
     cd "{{justfile_directory()}}/web" && bun e2e/rr-smoke.ts
+    cd "{{justfile_directory()}}/web" && bun e2e/mon-smoke.ts
