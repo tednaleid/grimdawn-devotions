@@ -65,6 +65,16 @@ test("a negative cell is marked so it reads as taking extra damage", () => {
   expect(html).toContain('class="cell neg" data-cell="fire"');
 });
 
+test("the negative marker starts below zero, not at it", () => {
+  // Pins the boundary the way the 100 case does. Zero is neutral, not a weakness, so a
+  // `<= 0` slip would mislabel every unresisted type on every monster in the table.
+  const atZero = tableMarkup(loc, [mon({ resistances: { ...ZERO, fire: 0 } })], view(), ZERO, nameOf);
+  expect(atZero).toContain('class="cell" data-cell="fire"');
+  expect(atZero).not.toContain('class="cell neg" data-cell="fire"');
+  const justBelow = tableMarkup(loc, [mon({ resistances: { ...ZERO, fire: -1 } })], view(), ZERO, nameOf);
+  expect(justBelow).toContain('class="cell neg" data-cell="fire"');
+});
+
 test("a value at or above 100 is marked as a wall", () => {
   const html = tableMarkup(loc, [mon({ resistances: { ...ZERO, fire: 100 } })], view(), ZERO, nameOf);
   expect(html).toContain('class="cell over" data-cell="fire"');
