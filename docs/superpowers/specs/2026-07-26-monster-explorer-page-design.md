@@ -1,6 +1,6 @@
 # Monster resistance explorer page: design
 
-Status: approved, not yet implemented
+Status: implemented 2026-07-26
 Date: 2026-07-26
 Game version at design: 1.3.0.0 (Fangs of Asterkarn)
 

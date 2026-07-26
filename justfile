@@ -546,3 +546,4 @@ install-e2e:
 e2e: build
     cd "{{justfile_directory()}}/web" && bun e2e/smoke.ts
     cd "{{justfile_directory()}}/web" && bun e2e/rr-smoke.ts
+    cd "{{justfile_directory()}}/web" && bun e2e/mon-smoke.ts

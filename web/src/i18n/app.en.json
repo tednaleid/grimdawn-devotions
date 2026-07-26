@@ -336,5 +336,22 @@
   "monsters.legend.auraExcluded": "has an aura grant, not counted",
   "monsters.legend.auraIncluded": "has an aura grant, counted",
   "monsters.legend.disagree": "collapsed variants disagree",
-  "monsters.legend.negative": "negative: takes extra damage"
+  "monsters.legend.negative": "negative: takes extra damage",
+  "monsters.title": "Monster Resistances",
+  "monsters.plannerLink": "Devotion Planner",
+  "monsters.info.description": "A fan-made reference for Grim Dawn's monster resistances: which damage types enemies resist least, and which enemies break the pattern.",
+  "monsters.ctl.difficulty": "Difficulty",
+  "monsters.ctl.players": "Players",
+  "monsters.ctl.tier": "Tier",
+  "monsters.ctl.role": "Role",
+  "monsters.ctl.search": "Search",
+  "monsters.ctl.searchPlaceholder": "name contains...",
+  "monsters.ctl.minLevel": "Min level",
+  "monsters.ctl.anyLevel": "any",
+  "monsters.ctl.toggles": "Options",
+  "monsters.ctl.hideSummons": "hide summons",
+  "monsters.ctl.includeAuras": "include auras",
+  "monsters.diff.normal": "Normal",
+  "monsters.diff.elite": "Elite",
+  "monsters.diff.ultimate": "Ultimate"
 }

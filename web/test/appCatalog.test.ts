@@ -252,6 +252,23 @@ const REQUIRED = [
   "monsters.legend.auraIncluded",
   "monsters.legend.disagree",
   "monsters.legend.negative",
+  "monsters.title",
+  "monsters.plannerLink",
+  "monsters.info.description",
+  "monsters.ctl.difficulty",
+  "monsters.ctl.players",
+  "monsters.ctl.tier",
+  "monsters.ctl.role",
+  "monsters.ctl.search",
+  "monsters.ctl.searchPlaceholder",
+  "monsters.ctl.minLevel",
+  "monsters.ctl.anyLevel",
+  "monsters.ctl.toggles",
+  "monsters.ctl.hideSummons",
+  "monsters.ctl.includeAuras",
+  "monsters.diff.normal",
+  "monsters.diff.elite",
+  "monsters.diff.ultimate",
 ];
 
 test("every required chrome key exists in app.en.json", () => {
