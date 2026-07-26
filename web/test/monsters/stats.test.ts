@@ -90,11 +90,31 @@ test("every type's counts sum to the row count", () => {
 });
 
 test("peak is the tallest bucket across all ten types, not per type", () => {
-  // Nine types sit entirely in the "0" bucket (3 rows); fire spreads across three buckets.
-  const rows = [mon({ fire: 10 }), mon({ fire: 20 }), mon({ fire: 30 })];
+  // Every type must be spread across at least two buckets for this to discriminate. An
+  // all-zero type puts all N rows in the "0" bucket, which is the largest count possible,
+  // so peak would equal N however it was computed and the test would pass against a
+  // per-type-peak bug. Here fire alone reaches 3 while every other type maxes at 2.
+  const all = (v: number) => Object.fromEntries(DAMAGE_TYPES.map((t) => [t, v])) as Resistances;
+  const rows = [mon(all(10)), mon(all(10)), mon({ ...all(30), fire: 10 }), mon({ ...all(30), fire: 50 })];
   const r = rankTypes(rows, ZERO, false)!;
-  expect(r.peak).toBe(3);
+
+  const maxOf = (type: string) => Math.max(...r.stats.find((s) => s.type === type)!.counts);
+  expect(maxOf("fire")).toBe(3); // 10,10,10 in "10-19", then 50 alone
+  expect(maxOf("cold")).toBe(2); // 10,10 then 30,30: two buckets of two
+  expect(r.peak).toBe(3); // the global maximum, contributed by fire only
+
+  // Nothing else ties fire, so a peak taken from any single other type would read 2.
+  for (const s of r.stats) {
+    if (s.type !== "fire") expect(Math.max(...s.counts)).toBeLessThan(3);
+  }
 });
+
+// The explicit `DAMAGE_TYPES.indexOf` tie-break in rankTypes is deliberately not tested.
+// stats are built in canonical order and Array.prototype.sort has been stable since ES2019,
+// so a tie group already arrives in canonical order and resolves correctly with or without
+// the tie-break. No test driving rankTypes can distinguish the two, and a test asserting
+// something that holds either way would assert nothing. The clause stays as documentation of
+// intent and as insurance against a future non-stable sort.
 
 test("the difficulty offset shifts values into different buckets", () => {
   const rows = [mon({ fire: 0 })];
