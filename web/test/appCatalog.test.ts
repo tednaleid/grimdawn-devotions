@@ -220,6 +220,21 @@ const REQUIRED = [
   "rr.primer.reducedNote",
   "rr.primer.elementalNote",
   "rr.primer.formula",
+  "monsters.rank.heading",
+  "monsters.rank.type",
+  "monsters.rank.mean",
+  "monsters.rank.median",
+  "monsters.rank.empty",
+  "monsters.type.physical",
+  "monsters.type.pierce",
+  "monsters.type.fire",
+  "monsters.type.cold",
+  "monsters.type.lightning",
+  "monsters.type.poison",
+  "monsters.type.aether",
+  "monsters.type.chaos",
+  "monsters.type.vitality",
+  "monsters.type.bleeding",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

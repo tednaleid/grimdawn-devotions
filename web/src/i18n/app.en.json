@@ -304,5 +304,20 @@
   "rr.primer.flatBody": "Flat, no % sign. Only the single highest source applies. Applied last. Can push below zero.",
   "rr.primer.reducedNote": "In-game, both the mult and flat types share the keyword \"Reduced target's Resistances\"; the % sign tells them apart. They are separate categories that both apply to the same target and do not conflict with each other. Conflicts exist only within a type: e.g. two flat sources, the highest one wins per resistance.",
   "rr.primer.elementalNote": "Elemental is not its own resistance: any Elemental source applies its full value to Fire, Cold, and Lightning simultaneously. \"All\" sources apply to every resistance. Poison and Acid damage share one resistance.",
-  "rr.primer.formula": "Final = (R₀ − Σ stacking) × (1 − sgn(R₀ − Σ stacking) · maxMult⁄100) − maxFlat"
+  "rr.primer.formula": "Final = (R₀ − Σ stacking) × (1 − sgn(R₀ − Σ stacking) · maxMult⁄100) − maxFlat",
+  "monsters.rank.heading": "Damage types ranked by mean resistance",
+  "monsters.rank.type": "Type",
+  "monsters.rank.mean": "Mean",
+  "monsters.rank.median": "Median",
+  "monsters.rank.empty": "No monsters match these filters, so there is nothing to average.",
+  "monsters.type.physical": "Physical",
+  "monsters.type.pierce": "Pierce",
+  "monsters.type.fire": "Fire",
+  "monsters.type.cold": "Cold",
+  "monsters.type.lightning": "Lightning",
+  "monsters.type.poison": "Poison & Acid",
+  "monsters.type.aether": "Aether",
+  "monsters.type.chaos": "Chaos",
+  "monsters.type.vitality": "Vitality",
+  "monsters.type.bleeding": "Bleeding"
 }
