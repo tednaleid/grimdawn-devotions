@@ -10,7 +10,6 @@ export interface ViewState {
   tiers: Set<string>;
   roles: Set<string>;
   q: string;
-  minLevel: number;
   hideSummons: boolean;
   includeAuras: boolean;
   sortKey: string;
@@ -25,7 +24,6 @@ export const DEFAULT_VIEW: ViewState = {
   tiers: new Set(),
   roles: new Set(),
   q: "",
-  minLevel: 0,
   hideSummons: false,
   includeAuras: false,
   sortKey: "name",
@@ -35,7 +33,7 @@ export const DEFAULT_VIEW: ViewState = {
 const TIER_VALUES = new Set(TIERS);
 const DIFF_VALUES = new Set<string>(DIFFICULTIES);
 const PLAYER_VALUES = new Set(PLAYER_COUNTS);
-const SORT_VALUES = new Set<string>(["name", "tier", "role", "level", ...DAMAGE_TYPES]);
+const SORT_VALUES = new Set<string>(["name", "tier", "role", ...DAMAGE_TYPES]);
 
 /** Encode the view into a `key=value&...` hash body (no leading '#'). Defaults are omitted,
  *  so a link to the default view is just the bare page URL. */
@@ -46,7 +44,6 @@ export function encodeHash(view: ViewState): string {
   putSet(parts, "tier", view.tiers);
   putSet(parts, "role", view.roles);
   if (view.q) parts.push(`q=${encodeURIComponent(view.q)}`);
-  if (view.minLevel) parts.push(`minlv=${view.minLevel}`);
   if (view.hideSummons) parts.push("summons=1");
   if (view.includeAuras) parts.push("auras=1");
   if (view.sortKey !== DEFAULT_VIEW.sortKey || view.sortDir !== DEFAULT_VIEW.sortDir) {
@@ -94,11 +91,9 @@ export function decodeHash(hash: string, knownRoles: Set<string>): ViewState {
       case "q":
         v.q = val;
         break;
-      case "minlv": {
-        const n = Number(val);
-        if (Number.isFinite(n) && n > 0) v.minLevel = Math.floor(n);
-        break;
-      }
+      // `minlv` is deliberately unhandled: a Min level control shipped briefly and could not
+      // filter anything (max_level is 250 on 1,630 of 1,635 rows), so it was removed. An old
+      // link carrying it falls through to `default` and is ignored, like any stale key.
       case "summons":
         v.hideSummons = val === "1";
         break;

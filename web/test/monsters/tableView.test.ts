@@ -38,9 +38,9 @@ function cellFor(html: string, type: string): string {
   return html.split(`data-cell="${type}"`)[1]!.split("</td>")[0]!;
 }
 
-test("renders four facet columns plus one per damage type", () => {
+test("renders three facet columns plus one per damage type", () => {
   const html = tableMarkup(loc, [mon()], view(), ZERO, nameOf);
-  expect([...html.matchAll(/<th /g)]).toHaveLength(4 + 10);
+  expect([...html.matchAll(/<th /g)]).toHaveLength(3 + 10);
 });
 
 test("renders one row per monster with the resolved name", () => {
@@ -100,10 +100,13 @@ test("the heat tint saturates at 100 rather than overflowing past it", () => {
   expect(cellFor(html, "fire")).toContain('style="background:color-mix(in srgb, var(--t-fire) 85%, transparent)"');
 });
 
-test("the Lv column renders maxLevel, not minLevel", () => {
+test("no level column is rendered", () => {
+  // max_level is 250 on 1,630 of the 1,635 real rows, so the column carried no information.
+  // The fields stay on the model; this pins that the table stopped printing them.
   const html = tableMarkup(loc, [mon({ minLevel: 3, maxLevel: 77 })], view(), ZERO, nameOf);
-  expect(html).toContain('<td class="mon-num">77</td>');
-  expect(html).not.toContain('<td class="mon-num">3</td>');
+  expect(html).not.toContain("monsters.table.colLevel");
+  expect(html).not.toContain("mon-num");
+  expect(html).not.toContain(">77<");
 });
 
 test("a passive marker appears only on the types a passive contributed to", () => {

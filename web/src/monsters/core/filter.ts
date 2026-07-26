@@ -12,7 +12,6 @@ function matches(m: Monster, view: ViewState, nameOf: NameOf): boolean {
   if (view.tiers.size && !view.tiers.has(m.classification)) return false;
   if (view.roles.size && !view.roles.has(m.role)) return false;
   if (view.hideSummons && m.isSummon) return false;
-  if (view.minLevel && m.maxLevel < view.minLevel) return false;
   // Search the resolved display name only: the raw tag is never shown, so matching it
   // would surface rows the user cannot see a reason for.
   if (view.q && !nameOf(m).toLowerCase().includes(view.q.toLowerCase())) return false;
@@ -27,8 +26,6 @@ function sortValue(m: Monster, key: string, eff: Resistances, nameOf: NameOf): s
       return TIER_RANK[m.classification] ?? TIERS.length;
     case "role":
       return m.role;
-    case "level":
-      return m.maxLevel;
     default:
       return eff[key as DamageType] ?? 0;
   }

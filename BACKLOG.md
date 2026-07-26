@@ -486,8 +486,8 @@ works fine under `file://`, but a copied `file://` link is not shareable across 
 pipeline designed in
 [docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md](docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md)
 is implemented: `scripts/parse_monsters.py` (run via `just parse-monsters`)
-produces the committed `data/monsters.json`, 2,728 kept records collapsed to
-1,637 logical monsters keyed on name x classification, with difficulty as a
+produces the committed `data/monsters.json`, 2,725 kept records collapsed to
+1,635 logical monsters keyed on name x classification, with difficulty as a
 global additive offset table extracted from
 `balancingadjustment_mp+difficulty_enemies01.dbr` (3 difficulties x 4 player
 brackets) applied in the page. That spec supersedes the exploratory notes below

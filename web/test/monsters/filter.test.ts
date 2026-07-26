@@ -31,10 +31,9 @@ const NAMES: Record<string, string> = { a: "Alkamos", b: "Kaisan", c: "Fabius" }
 const nameOf = (m: Monster) => NAMES[m.id] ?? m.id;
 
 const ROWS = [
-  // minLevel is deliberately NOT in maxLevel order (5, 60, 95 vs maxLevel 100, 90, 20): a
-  // level-sort test that ties minLevel to 1 across every fixture cannot tell maxLevel-sort
-  // from a minLevel-sort-that-degenerates-to-the-id-tiebreak, because both happen to land on
-  // the same alphabetical order for this fixture. Distinct, non-parallel values close that gap.
+  // The level fields stay populated and non-parallel even though nothing sorts or filters on
+  // them any more: they are part of the Monster contract, so a fixture that zeroed them would
+  // stop representing real rows.
   mon("a", {
     classification: "Quest",
     role: "boss&quest",
@@ -81,14 +80,6 @@ test("search matches the resolved name case-insensitively, not the id or tag", (
   expect(applyView(ROWS, view({ q: "tag_a" }), ZERO, nameOf)).toHaveLength(0);
 });
 
-test("minLevel filters on maxLevel", () => {
-  expect(
-    applyView(ROWS, view({ minLevel: 90 }), ZERO, nameOf)
-      .map((m) => m.id)
-      .sort(),
-  ).toEqual(["a", "b"]);
-});
-
 test("hideSummons drops summoned rows", () => {
   expect(
     applyView(ROWS, view({ hideSummons: true }), ZERO, nameOf)
@@ -98,8 +89,14 @@ test("hideSummons drops summoned rows", () => {
 });
 
 test("filters combine conjunctively", () => {
-  const v = view({ tiers: new Set(["Hero", "Quest"]), minLevel: 95 });
+  // Tier alone keeps a and b; adding the summon toggle must narrow it to a, not union.
+  const v = view({ tiers: new Set(["Hero", "Quest"]), hideSummons: true });
   expect(applyView(ROWS, v, ZERO, nameOf).map((m) => m.id)).toEqual(["a"]);
+  expect(
+    applyView(ROWS, view({ tiers: new Set(["Hero", "Quest"]) }), ZERO, nameOf)
+      .map((m) => m.id)
+      .sort(),
+  ).toEqual(["a", "b"]);
 });
 
 test("default sort is by resolved name ascending", () => {
@@ -141,13 +138,19 @@ test("sorting by tier uses the weakest-to-strongest rank, not alphabetical order
   expect(asc.map((m) => m.classification)).toEqual(["Common", "Boss"]);
 });
 
-test("sorting by level and by tier works", () => {
-  expect(applyView(ROWS, view({ sortKey: "level", sortDir: -1 }), ZERO, nameOf).map((m) => m.id)).toEqual([
-    "a",
-    "b",
-    "c",
+test("sorting by role uses the role text", () => {
+  expect(applyView(ROWS, view({ sortKey: "role", sortDir: 1 }), ZERO, nameOf).map((m) => m.role)).toEqual([
+    "base",
+    "boss&quest",
+    "nemesis",
   ]);
-  expect(applyView(ROWS, view({ sortKey: "tier", sortDir: 1 }), ZERO, nameOf)[0]!.classification).toBe("Common");
+});
+
+test("an unknown sort key falls through to a resistance lookup and cannot throw", () => {
+  // "level" was a real key until the Lv column was dropped; a stale link can still carry it.
+  // decodeHash rejects it, but applyView must stay total for any string that reaches it.
+  const rows = applyView(ROWS, view({ sortKey: "level" }), ZERO, nameOf);
+  expect(rows).toHaveLength(3);
 });
 
 test("ties break on id so the order is deterministic", () => {

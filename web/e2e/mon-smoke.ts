@@ -228,6 +228,24 @@ try {
   const notes = await cdp.evaluate<number>("document.querySelectorAll('.ctl-note').length");
   check(notes === 1, `the derived difficulty note renders on ascendant (${notes})`);
 
+  // The search clear button. Its visibility is pure CSS (`input:placeholder-shown + .search-clear`),
+  // which no markup test can see, so the rendered geometry is asserted here instead.
+  await cdp.evaluate(`(() => {
+    const q = document.querySelector('#mon-q');
+    q.value = 'kaisan';
+    q.dispatchEvent(new Event('input'));
+  })()`);
+  const clearShown = await cdp.evaluate<number>("document.querySelector('#mon-q-clear').getBoundingClientRect().width");
+  check(clearShown > 0, `the search clear button is visible once text is typed (${clearShown}px)`);
+  await cdp.evaluate("document.querySelector('#mon-q-clear').click()");
+  const afterClear = await cdp.evaluate<string>("document.querySelector('#mon-q').value");
+  const clearHidden = await cdp.evaluate<number>(
+    "document.querySelector('#mon-q-clear').getBoundingClientRect().width",
+  );
+  check(afterClear === "", `clicking it empties the search box ("${afterClear}")`);
+  check(clearHidden === 0, `and the button hides itself again on an empty box (${clearHidden}px)`);
+  check(!(await cdp.evaluate<string>("location.hash")).includes("q="), "clearing the search drops q from the hash");
+
   check(cdp.consoleErrors.length === 0, `no console errors (${cdp.consoleErrors.slice(0, 2).join("; ")})`);
 
   failed = results.some((r) => !r.ok);

@@ -6,11 +6,12 @@ import type { ViewState } from "../core/urlState";
 import type { Localization } from "../../ports/Localization";
 import { esc } from "./markup";
 
+// No level column: max_level is 250 on 1,630 of the 1,635 rows, so it printed the same
+// number nearly everywhere. Monster.maxLevel stays in the model as part of the data contract.
 const FACET_COLUMNS = [
   { key: "name", label: "monsters.table.colName", left: true },
   { key: "tier", label: "monsters.table.colTier", left: true },
   { key: "role", label: "monsters.table.colRole", left: true },
-  { key: "level", label: "monsters.table.colLevel", left: false },
 ];
 
 /** The alpha the strongest cell reaches. Short of 1 so the row rules stay visible through it. */
@@ -82,7 +83,6 @@ function row(
     `<td class="left m-name">${esc(nameOf(m))}${warn}</td>` +
     `<td class="left m-facet">${esc(m.classification)}</td>` +
     `<td class="left m-facet">${esc(roleText)}</td>` +
-    `<td class="mon-num">${m.maxLevel}</td>` +
     cells +
     `</tr>`
   );

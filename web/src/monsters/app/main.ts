@@ -19,8 +19,6 @@ import { mountAppMenu, type AppMenuContent } from "../../adapters/appMenu";
 import type { InfoPopoverText } from "../../adapters/infoPopover";
 import { esc } from "../adapters/markup";
 
-const MIN_LEVELS = ["0", "50", "75", "90", "100"];
-
 const GITHUB_URL = "https://github.com/tednaleid/grimdawn-devotions";
 const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/";
 
@@ -85,7 +83,6 @@ async function boot() {
 
   function controlsMarkup(): string {
     const t = (k: string) => localization.translate(k);
-    const lv = (v: string) => (v === "0" ? t("monsters.ctl.anyLevel") : `${v}+`);
     return (
       `<div class="ctl-row">` +
       `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.difficulty"))}</span>` +
@@ -100,11 +97,14 @@ async function boot() {
       `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.players"))}</span>` +
       selectMarkup("mon-players", PLAYER_COUNTS, view.players, (p) => p) +
       `</div>` +
-      `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.minLevel"))}</span>` +
-      selectMarkup("mon-minlv", MIN_LEVELS, String(view.minLevel), lv) +
-      `</div>` +
       `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.search"))}</span>` +
-      `<input type="search" id="mon-q" value="${esc(view.q)}" placeholder="${esc(t("monsters.ctl.searchPlaceholder"))}"></div>` +
+      // The clear button must be the input's immediate next sibling: monsters.css hides it via
+      // `input:placeholder-shown + .search-clear`, so an empty field shows no stray affordance
+      // without any JS tracking the input's content.
+      `<span class="search-wrap">` +
+      `<input type="search" id="mon-q" value="${esc(view.q)}" placeholder="${esc(t("monsters.ctl.searchPlaceholder"))}">` +
+      `<button type="button" class="search-clear" id="mon-q-clear" aria-label="${esc(t("monsters.ctl.clearSearch"))}">&times;</button>` +
+      `</span></div>` +
       `</div>` +
       `<div class="ctl-row">` +
       `<div class="ctl"><span class="ctl-label">${esc(t("monsters.ctl.tier"))}</span>` +
@@ -126,9 +126,6 @@ async function boot() {
     host
       .querySelector("#mon-players")
       ?.addEventListener("change", (e) => set({ players: (e.target as HTMLSelectElement).value }));
-    host
-      .querySelector("#mon-minlv")
-      ?.addEventListener("change", (e) => set({ minLevel: Number((e.target as HTMLSelectElement).value) }));
     host.querySelector("#mon-summons")?.addEventListener("click", () => set({ hideSummons: !view.hideSummons }));
     host.querySelector("#mon-auras")?.addEventListener("click", () => set({ includeAuras: !view.includeAuras }));
 
@@ -138,6 +135,16 @@ async function boot() {
       view = { ...view, q: search.value };
       pushHash(true);
       renderResults();
+    });
+    // Clearing takes the same path as typing rather than going through set(): a controls
+    // re-render would rebuild the input, and returning focus to it is the point of the button.
+    host.querySelector("#mon-q-clear")?.addEventListener("click", () => {
+      if (!search) return;
+      search.value = "";
+      view = { ...view, q: "" };
+      pushHash(true);
+      renderResults();
+      search.focus();
     });
 
     host.querySelectorAll<HTMLElement>(".chip[data-facet]").forEach((chip) => {

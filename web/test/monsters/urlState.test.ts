@@ -13,7 +13,6 @@ test("encode then decode is identity over a fully populated view", () => {
     tiers: new Set(["Hero", "Boss"]),
     roles: new Set(["nemesis"]),
     q: "kaisan",
-    minLevel: 75,
     hideSummons: true,
     includeAuras: true,
     sortKey: "fire",
@@ -61,10 +60,11 @@ test("an out-of-range difficulty or player count falls back to the default", () 
   expect(decodeHash("players=9", ROLES).players).toBe(DEFAULT_VIEW.players);
 });
 
-test("a non-numeric or negative minlv falls back to the default", () => {
-  expect(decodeHash("minlv=abc", ROLES).minLevel).toBe(0);
-  expect(decodeHash("minlv=-5", ROLES).minLevel).toBe(0);
-  expect(decodeHash("minlv=90", ROLES).minLevel).toBe(90);
+test("a link carrying the retired minlv key is ignored, not rejected", () => {
+  // The Min level control shipped briefly and was removed; old links still carry minlv.
+  // It must decode to the plain default view rather than throwing or poisoning the state.
+  expect(decodeHash("minlv=90", ROLES)).toEqual(DEFAULT_VIEW);
+  expect(decodeHash("minlv=abc", ROLES)).toEqual(DEFAULT_VIEW);
 });
 
 test("the boolean toggles read as present-means-on", () => {
@@ -88,10 +88,9 @@ test("an unknown sort key discards the direction with it, leaving no hybrid stat
 
 test("one bad value does not discard the other fields in the same hash", () => {
   // Each key is handled independently, so a stale enum must not wipe out a user's filters.
-  const back = decodeHash("diff=nightmare&q=alkamos&minlv=90&summons=1", ROLES);
+  const back = decodeHash("diff=nightmare&q=alkamos&summons=1", ROLES);
   expect(back.diff).toBe(DEFAULT_VIEW.diff);
   expect(back.q).toBe("alkamos");
-  expect(back.minLevel).toBe(90);
   expect(back.hideSummons).toBe(true);
 });
 
