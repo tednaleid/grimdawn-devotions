@@ -50,18 +50,34 @@ test("each row carries one bar per bucket", () => {
 });
 
 test("bar heights scale to the shared peak, not per row and not to the row count", () => {
-  // Three rows, every type spread across two buckets (two at 10, one at 30), so each type's
-  // tallest bucket holds 2. The peak is therefore 2 while rows.length is 3, which separates
-  // three different implementations: scaling to the shared peak gives 100%/50%, scaling per
-  // row gives the same here but differs elsewhere, and scaling to rows.length gives 67%/33%.
-  // A fixture where peak and rows.length coincide cannot tell the last one apart.
+  // Three divisors must be told apart, so three numbers must differ: the shared peak, the
+  // row's own tallest bucket, and rows.length. Four rows where fire is spread one-per-bucket
+  // while every other type doubles up gives fire's own max 1, a shared peak of 2, and
+  // rows.length 4. Fire's populated bars are then 50% under the correct implementation,
+  // 100% if scaled to fire's own peak, and 25% if scaled to the row count.
   const all = (v: number) => Object.fromEntries(DAMAGE_TYPES.map((t) => [t, v])) as Resistances;
-  const html = rankMarkup(loc, [mon(all(10)), mon(all(10)), mon(all(30))], ZERO, false);
-  const fireRow = html.split('data-type="fire"')[1]!.split("</div>")[0]!;
-  const heights = [...fireRow.matchAll(/height:([\d.]+)%/g)].map((m) => Number(m[1]));
-  const populated = heights.filter((h) => h > 0).sort((a, b) => b - a);
-  expect(populated[0]).toBeCloseTo(100, 0); // the bucket holding 2, at the shared peak
-  expect(populated[1]).toBeCloseTo(50, 0); // the bucket holding 1, half of it
+  const rows = [
+    mon({ ...all(10), fire: 10 }),
+    mon({ ...all(10), fire: 30 }),
+    mon({ ...all(30), fire: 50 }),
+    mon({ ...all(30), fire: 70 }),
+  ];
+  const html = rankMarkup(loc, rows, ZERO, false);
+
+  const barsOf = (type: string) =>
+    [
+      ...html
+        .split(`data-type="${type}"`)[1]!
+        .split("</div>")[0]!
+        .matchAll(/height:([\d.]+)%/g),
+    ]
+      .map((m) => Number(m[1]))
+      .filter((h) => h > 0);
+
+  // Fire holds one row in each of four buckets; half the shared peak of 2.
+  expect(barsOf("fire")).toEqual([50, 50, 50, 50]);
+  // Cold holds two rows in each of two buckets, which is the shared peak itself.
+  expect(barsOf("cold")).toEqual([100, 100]);
 });
 
 test("mean and median are rendered per row", () => {
