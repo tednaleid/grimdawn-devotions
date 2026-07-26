@@ -499,12 +499,22 @@ build: cover-table
 serve: build
     @echo "  Planner:              http://localhost:5173/"
     @echo "  Resistance reduction: http://localhost:5173/resistance-reduction/"
+    @echo "  Monster resistances:  http://localhost:5173/monster-resistances/"
     bunx serve "{{justfile_directory()}}/web/dist" -l 5173
 
 # Open the resistance-reduction page in the default browser (run in another shell while `serve` is up)
 open-rr:
     #!/usr/bin/env bash
     url="http://localhost:5173/resistance-reduction/"
+    if command -v powershell.exe >/dev/null 2>&1; then powershell.exe -NoProfile -Command "Start-Process '$url'"
+    elif command -v open >/dev/null 2>&1; then open "$url"
+    elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$url"
+    else echo "open manually: $url"; fi
+
+# Open the monster resistances page in the default browser (run in another shell while `serve` is up)
+open-monsters:
+    #!/usr/bin/env bash
+    url="http://localhost:5173/monster-resistances/"
     if command -v powershell.exe >/dev/null 2>&1; then powershell.exe -NoProfile -Command "Start-Process '$url'"
     elif command -v open >/dev/null 2>&1; then open "$url"
     elif command -v xdg-open >/dev/null 2>&1; then xdg-open "$url"
