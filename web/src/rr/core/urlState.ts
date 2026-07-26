@@ -1,6 +1,7 @@
 // ABOUTME: The RR page ViewState (every view-changing control) and its default; hash codec added in Task 6.
 // ABOUTME: ViewState is the single source of view state; main.ts round-trips it through the URL hash.
 import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES, DEFAULT_COARSE_CATEGORIES } from "./facets";
+import { putSet, readSet } from "../../core/hashCodec";
 
 export interface ViewState {
   q: string;
@@ -27,24 +28,6 @@ export const DEFAULT_VIEW: ViewState = {
 const RR_VALUES = new Set(RR_TYPES);
 const CAT_VALUES = new Set(COARSE_CATEGORIES);
 const DMG_VALUES = new Set(DAMAGE_TYPES);
-
-function putSet(parts: string[], key: string, set: Set<string>): void {
-  if (set.size) parts.push(`${key}=${[...set].map(encodeURIComponent).join(",")}`);
-}
-
-function readSet(val: string, allowed: Set<string>): Set<string> {
-  const out = new Set<string>();
-  for (const raw of val.split(",")) {
-    let t: string;
-    try {
-      t = decodeURIComponent(raw);
-    } catch {
-      continue;
-    }
-    if (allowed.has(t)) out.add(t);
-  }
-  return out;
-}
 
 /** Encode the full view into a `key=value&...` hash body (no leading '#'); empties are omitted. */
 export function encodeHash(view: ViewState): string {
