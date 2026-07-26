@@ -79,3 +79,18 @@ test("sort decodes key and direction, and tolerates a missing direction", () => 
   expect(decodeHash("sort=fire:-1", ROLES).sortDir).toBe(-1);
   expect(decodeHash("sort=fire", ROLES).sortDir).toBe(1);
 });
+
+test("an unknown sort key discards the direction with it, leaving no hybrid state", () => {
+  // Applying the direction while falling back on the key would produce a view that is
+  // neither what the link asked for nor the default.
+  expect(decodeHash("sort=bogus:-1", ROLES)).toEqual(DEFAULT_VIEW);
+});
+
+test("one bad value does not discard the other fields in the same hash", () => {
+  // Each key is handled independently, so a stale enum must not wipe out a user's filters.
+  const back = decodeHash("diff=nightmare&q=alkamos&minlv=90&summons=1", ROLES);
+  expect(back.diff).toBe(DEFAULT_VIEW.diff);
+  expect(back.q).toBe("alkamos");
+  expect(back.minLevel).toBe(90);
+  expect(back.hideSummons).toBe(true);
+});

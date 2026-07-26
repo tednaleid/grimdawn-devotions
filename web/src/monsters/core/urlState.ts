@@ -107,8 +107,13 @@ export function decodeHash(hash: string, knownRoles: Set<string>): ViewState {
         break;
       case "sort": {
         const [k, d] = val.split(":");
-        if (k && SORT_VALUES.has(k)) v.sortKey = k;
-        v.sortDir = d === "-1" ? -1 : 1;
+        // Key and direction are one unit. An unrecognised key means the whole token is stale,
+        // so the direction is discarded with it: applying the direction alone would leave a
+        // state that is neither what the link asked for nor the default.
+        if (k && SORT_VALUES.has(k)) {
+          v.sortKey = k;
+          v.sortDir = d === "-1" ? -1 : 1;
+        }
         break;
       }
       default:
