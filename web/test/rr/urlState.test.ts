@@ -71,6 +71,18 @@ test("unknown tokens and the legacy cat/par/trig/group keys are dropped without 
   expect(back).not.toHaveProperty("group");
 });
 
+test("sort decodes key and direction, and tolerates a missing direction", () => {
+  expect(decodeHash("#sort=value:-1", new Set()).sortKey).toBe("value");
+  expect(decodeHash("#sort=value:-1", new Set()).sortDir).toBe(-1);
+  expect(decodeHash("#sort=value", new Set()).sortDir).toBe(1);
+});
+
+test("an unknown sort key discards the direction with it, leaving no hybrid state", () => {
+  // Applying the direction while falling back on the key would produce a view that is
+  // neither what the link asked for nor the default (mirrors the fix for the monsters page).
+  expect(decodeHash("#sort=bogus:-1", new Set())).toEqual(DEFAULT_VIEW);
+});
+
 test("DEFAULT_VIEW: empty damage/rr facets, source defaults to devotion+skill, no group field", () => {
   expect(DEFAULT_VIEW.fType).toEqual(new Set());
   expect(DEFAULT_VIEW.fRR).toEqual(new Set());

@@ -31,15 +31,26 @@ const NAMES: Record<string, string> = { a: "Alkamos", b: "Kaisan", c: "Fabius" }
 const nameOf = (m: Monster) => NAMES[m.id] ?? m.id;
 
 const ROWS = [
-  mon("a", { classification: "Quest", role: "boss&quest", maxLevel: 100, resistances: { ...ZERO, fire: 30 } }),
+  // minLevel is deliberately NOT in maxLevel order (5, 60, 95 vs maxLevel 100, 90, 20): a
+  // level-sort test that ties minLevel to 1 across every fixture cannot tell maxLevel-sort
+  // from a minLevel-sort-that-degenerates-to-the-id-tiebreak, because both happen to land on
+  // the same alphabetical order for this fixture. Distinct, non-parallel values close that gap.
+  mon("a", {
+    classification: "Quest",
+    role: "boss&quest",
+    minLevel: 5,
+    maxLevel: 100,
+    resistances: { ...ZERO, fire: 30 },
+  }),
   mon("b", {
     classification: "Hero",
     role: "nemesis",
+    minLevel: 60,
     maxLevel: 90,
     isSummon: true,
     resistances: { ...ZERO, fire: 10 },
   }),
-  mon("c", { classification: "Common", role: "base", maxLevel: 20, resistances: { ...ZERO, fire: 50 } }),
+  mon("c", { classification: "Common", role: "base", minLevel: 15, maxLevel: 20, resistances: { ...ZERO, fire: 50 } }),
 ];
 
 function view(over: Partial<ViewState> = {}): ViewState {

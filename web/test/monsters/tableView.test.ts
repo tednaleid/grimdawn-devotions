@@ -80,6 +80,29 @@ test("a value at or above 100 is marked as a wall", () => {
   expect(html).toContain('class="cell over" data-cell="fire"');
 });
 
+test("a nonzero cell is heat-shaded by its type's dim color, scaled by value/100", () => {
+  // 40, not some multiple of 10 that a /10-vs-/100 divisor mutant could still satisfy at a
+  // round number, pins the exact divisor shade() uses.
+  const html = tableMarkup(loc, [mon({ resistances: { ...ZERO, fire: 40 } })], view(), ZERO, nameOf);
+  expect(cellFor(html, "fire")).toContain('style="background:color-mix(in srgb, var(--t-fire-dim) 40%, transparent)"');
+});
+
+test("a zero-value cell carries no background shading", () => {
+  const html = tableMarkup(loc, [mon({ resistances: { ...ZERO, fire: 0 } })], view(), ZERO, nameOf);
+  expect(cellFor(html, "fire")).not.toContain("background");
+});
+
+test("the heat tint saturates at 100 rather than overflowing past it", () => {
+  const html = tableMarkup(loc, [mon({ resistances: { ...ZERO, fire: 250 } })], view(), ZERO, nameOf);
+  expect(cellFor(html, "fire")).toContain('style="background:color-mix(in srgb, var(--t-fire-dim) 100%, transparent)"');
+});
+
+test("the Lv column renders maxLevel, not minLevel", () => {
+  const html = tableMarkup(loc, [mon({ minLevel: 3, maxLevel: 77 })], view(), ZERO, nameOf);
+  expect(html).toContain('<td class="mon-num">77</td>');
+  expect(html).not.toContain('<td class="mon-num">3</td>');
+});
+
 test("a passive marker appears only on the types a passive contributed to", () => {
   const html = tableMarkup(loc, [mon({ passive: { bleeding: 80 } })], view(), ZERO, nameOf);
   // Scoped to <tbody>: the legend also carries a class="prov passive" key swatch (by design,

@@ -1,6 +1,6 @@
 // ABOUTME: The RR page ViewState (every view-changing control) and its default; hash codec added in Task 6.
 // ABOUTME: ViewState is the single source of view state; main.ts round-trips it through the URL hash.
-import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES, DEFAULT_COARSE_CATEGORIES } from "./facets";
+import { DAMAGE_TYPES, RR_TYPES, COARSE_CATEGORIES, DEFAULT_COARSE_CATEGORIES, SORT_KEYS } from "./facets";
 import { putSet, readSet } from "../../core/hashCodec";
 
 export interface ViewState {
@@ -28,6 +28,7 @@ export const DEFAULT_VIEW: ViewState = {
 const RR_VALUES = new Set(RR_TYPES);
 const CAT_VALUES = new Set(COARSE_CATEGORIES);
 const DMG_VALUES = new Set(DAMAGE_TYPES);
+const SORT_VALUES = new Set<string>(SORT_KEYS);
 
 /** Encode the full view into a `key=value&...` hash body (no leading '#'); empties are omitted. */
 export function encodeHash(view: ViewState): string {
@@ -90,8 +91,14 @@ export function decodeHash(hash: string, knownIds: Set<string>): ViewState {
         break;
       case "sort": {
         const [k, d] = val.split(":");
-        if (k) v.sortKey = k;
-        v.sortDir = d === "-1" ? -1 : 1;
+        // Key and direction are one unit, matching the fix commit 481e1b5 made for the monsters
+        // page: an unrecognised key means the whole token is stale, so the direction is
+        // discarded with it rather than applied on top of the (unchanged) default key, which
+        // would leave a state that is neither what the link asked for nor the default.
+        if (k && SORT_VALUES.has(k)) {
+          v.sortKey = k;
+          v.sortDir = d === "-1" ? -1 : 1;
+        }
         break;
       }
       case "r0": {
