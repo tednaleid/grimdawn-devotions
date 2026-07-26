@@ -20,9 +20,12 @@
   --t-lightning: #e8c341;
   --t-poison: #7fb03a;
   --t-aether: #4ec9c9;
-  --t-chaos: #c0504d;
+  /* Chaos and bleeding are the two reds and sit adjacent in the legend, so they are separated
+     by lightness as well as hue: a dark brick against a bright rose. Two muted mid-reds were
+     hard to tell apart as filled bars. */
+  --t-chaos: #a8453a;
   --t-vitality: #b06fd0;
-  --t-bleeding: #e05561;
+  --t-bleeding: #ef5c6b;
 
   --t-physical-dim: #24262a;
   --t-pierce-dim: #1e2530;
@@ -164,9 +167,10 @@
   border-radius: 2px 2px 0 0;
 }
 .monsters-page .hbar.empty {
-  /* biome-ignore lint/complexity/noImportantStyles: intentional — overrides the per-bucket inline
-     background color the renderer sets for populated bars; without this, an empty bucket keeps
-     whatever color it last held instead of reading as empty. */
+  /* biome-ignore lint/complexity/noImportantStyles: the ranking view sets an inline
+     background on every bar, empty ones included, so only !important can win against it.
+     Alternatives are worse: making the renderer omit the inline style for empty buckets
+     would move a styling decision into the view. */
   background: var(--mon-panel2) !important;
 }
 
