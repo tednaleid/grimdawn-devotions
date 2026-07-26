@@ -172,6 +172,24 @@ def _skill_grant(srec: dict, level: int) -> dict:
     return out
 
 
+def _buff_hop_grant(srec: dict, level: int, get_skill) -> dict:
+    """The grant a buff-hosting skill delivers through its `buffSkillName` child.
+
+    A toggled or radius buff carries no `defensive<Type>` field itself; the grant lives on
+    the child record it applies. Only a `SkillBuff_Passive` child counts, because that
+    buffs the bearer. The `SkillBuff_Debuf` family is excluded on purpose: its values are
+    negative because they are resistance reduction applied to the player, which belongs to
+    the resistance-reduction pipeline rather than to a monster's own resistance.
+    """
+    ref = srec.get("buffSkillName")
+    if not ref:
+        return {}
+    child = get_skill(ref)
+    if not child or (child.get("Class") or "").strip() not in SELF_PASSIVE_CLASSES:
+        return {}
+    return _skill_grant(child, level)
+
+
 def skill_contributions(rel_path: str, rec: dict, get_skill) -> tuple[dict, dict]:
     """(resident, aura) sparse resistance contributions from a monster's own skills.
 
@@ -189,16 +207,24 @@ def skill_contributions(rel_path: str, rec: dict, get_skill) -> tuple[dict, dict
         if not srec:
             continue
         cls = (srec.get("Class") or "").strip()
-        grant = _skill_grant(srec, _skill_level(rec, m.group(1)))
+        level = _skill_level(rec, m.group(1))
+        own = _skill_grant(srec, level)
+        hop = _buff_hop_grant(srec, level, get_skill) if not own else {}
+        grant = own or hop
         if cls in SELF_PASSIVE_CLASSES:
             bucket = resident
         elif cls in AURA_CLASSES:
             bucket = aura
+        elif hop:
+            # A toggled or radius buff hosts its grant on a child record rather than
+            # carrying it inline. Reaching a grant through such a host makes it
+            # conditional, so it is recorded as an aura however the child is classed.
+            bucket = aura
         else:
-            # Only report a skip that actually forfeits resistance. 2,177 references on
-            # current data carry a zeroed defensive field and grant nothing; counting
-            # those would make the summary read as loss where none occurred.
-            if grant:
+            # Only report a skip that actually forfeits resistance. Most references carry
+            # a zeroed defensive field and grant nothing; counting those would make the
+            # summary read as loss where none occurred.
+            if own:
                 reason = ("summoned entity" if cls in SUMMON_CLASSES
                           else f"unclassified skill class {cls or '(none)'}")
                 SKILL_EXCLUSIONS.append(

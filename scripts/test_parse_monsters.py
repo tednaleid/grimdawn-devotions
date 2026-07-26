@@ -1,5 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # ABOUTME: Tests for parse_monsters extraction. Run: uv run scripts/test_parse_monsters.py
+# ABOUTME: Covers role/exclusion rules, id and race-tag derivation, difficulty offsets, and skill-granted resistance bucketing.
 # /// script
 # requires-python = ">=3.10"
 # ///
@@ -310,6 +311,11 @@ SKILLS = {
     "records/skills/np/weird.dbr": {"Class": "AttributePak", "defensiveVitalityBogus": "1", "defensiveLife": "40.000000"},
     "records/skills/np/levelled.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "10.000000;20.000000;30.000000"},
     "records/skills/np/nores.dbr": {"Class": "Skill_Passive", "characterLife": "500.000000"},
+    "records/skills/np/toggledhost.dbr": {"Class": "Skill_BuffRadiusToggled", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
+    "records/skills/np/shieldbuff.dbr": {"Class": "SkillBuff_Passive", "defensiveFire": "33.000000", "defensiveCold": "33.000000"},
+    "records/skills/np/debufhost.dbr": {"Class": "Skill_AttackBuffRadius", "buffSkillName": "records/skills/np/curse.dbr"},
+    "records/skills/np/curse.dbr": {"Class": "SkillBuff_Debuf", "defensivePoison": "-15.000000", "defensiveChaos": "-15.000000"},
+    "records/skills/np/granterwithchild.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "40.000000", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
 }
 get_skill = lambda ref: SKILLS.get(ref.strip(), {})
 
@@ -340,6 +346,12 @@ p, a = contrib([("records/skills/np/turret.dbr", 1)])
 check("turret contributes nothing", p == {} and a == {})
 p, a = contrib([("records/skills/np/weird.dbr", 1)])
 check("unclassified class contributes nothing", p == {} and a == {})
+p, a = contrib([("records/skills/np/toggledhost.dbr", 1)])
+check("a toggled host's child grant lands in the aura bucket", a == {"fire": 33, "cold": 33} and p == {})
+p, a = contrib([("records/skills/np/debufhost.dbr", 1)])
+check("a debuff child is never credited to the monster", p == {} and a == {})
+p, a = contrib([("records/skills/np/granterwithchild.dbr", 1)])
+check("a skill granting inline is not also credited with its child", p == {"bleeding": 40} and a == {})
 check("skipped skills carrying a resistance are recorded",
       len(mon.SKILL_EXCLUSIONS) - before == 3)
 check("skip reasons name summoned entity and unclassified",
@@ -432,6 +444,15 @@ check("kaisan pierce resolves to 67", kaisan and kaisan["resistances"]["pierce"]
 check("kaisan fire resolves to 46", kaisan and kaisan["resistances"]["fire"] == 46)
 
 check("karroz is still present", "enemies.boss-quest.cultist_summoner_01" in by_id)
+
+eldritch = by_id.get("enemies.eldritcharmor_c01")
+check("a toggled self-shield is recorded as an aura",
+      eldritch and eldritch.get("aura_resistances", {}).get("fire") == 33
+      and eldritch["aura_resistances"].get("cold") == 33)
+check("an aura is still kept out of the headline total",
+      eldritch and eldritch["resistances"]["fire"] == 0)
+auras = [m for m in m3 if m.get("aura_resistances")]
+check(f"aura provenance now covers the toggled hosts (got {len(auras)})", 100 <= len(auras) <= 200)
 bleeders = [m for m in m3 if m["resistances"]["bleeding"]]
 # Band widened from the plan's stated 300-900, which was written against the wrong grain.
 # The design doc's "592 monsters" counted raw records across a 3,023-record superset that

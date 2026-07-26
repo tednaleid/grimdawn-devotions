@@ -565,3 +565,21 @@ Built after the RR page ships. Needs its own brainstorm/spec (the dedup grain, t
 `gameengine.dbr` difficulty scaling, and which stats beyond resistances to surface).
 Related: the RR pipeline spec (`docs/superpowers/specs/2026-07-21-resistance-reduction-pipeline-design.md`)
 and page spec (`docs/superpowers/specs/2026-07-21-resistance-reduction-page-design.md`).
+
+## Monster resistance dataset: known data quirks for the explorer page
+
+- Two dataset rows will skew any mean-based "which damage type do enemies resist
+  least" ranking: `enemies.trap_mineexplosive_a01` is classification `Common` with
+  500 in nine of ten types, and `enemies.trap_chthonicshard_zap_a01_summon` carries
+  a +500 vitality passive. Both are traps rather than monsters and both predate
+  this work. The explorer page should filter or annotate them.
+- Bleeding is representative-derived in a few collapsed groups: 544 kept raw
+  records individually carry nonzero bleeding while the 245 shipped rows cover
+  533, so a group whose representative lacks the passive shows 0. Already flagged
+  by `variants_disagree`.
+
+Pointers: `data/monsters.json` (`scripts/parse_monsters.py`); the dedup/collapse
+grain and `variants_disagree` are documented in
+`docs/superpowers/specs/2026-07-24-monster-resistance-pipeline-design.md`, the
+skill-grant resolution in
+`docs/superpowers/specs/2026-07-25-monster-passive-resistances-design.md`.
