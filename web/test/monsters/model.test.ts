@@ -108,5 +108,12 @@ test("including auras stacks with the difficulty offset", () => {
 });
 
 test("effective always returns all ten keys in the canonical order", () => {
-  expect(Object.keys(effective(mon(), ZERO as Resistances, false))).toEqual([...DAMAGE_TYPES]);
+  // Feed a monster whose own resistance keys are in a deliberately scrambled order. If
+  // `effective` derived its output order from the input object instead of enumerating
+  // DAMAGE_TYPES, this would come back scrambled too. A fixture built from DAMAGE_TYPES
+  // cannot catch that, because its order already coincides with the canonical one.
+  const scrambled = Object.fromEntries([...DAMAGE_TYPES].reverse().map((t) => [t, 0])) as Resistances;
+  expect(Object.keys(scrambled)).not.toEqual([...DAMAGE_TYPES]);
+  const out = effective(mon({ resistances: scrambled }), ZERO as Resistances, false);
+  expect(Object.keys(out)).toEqual([...DAMAGE_TYPES]);
 });
