@@ -1,7 +1,7 @@
 # Ascendant Difficulty Design
 
 **Date:** 2026-07-26
-**Status:** proposed
+**Status:** implemented 2026-07-26
 **Branch:** monster-resistance-pipeline
 
 ## Goal

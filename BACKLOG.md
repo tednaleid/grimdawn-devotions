@@ -492,8 +492,12 @@ global additive offset table extracted from
 `balancingadjustment_mp+difficulty_enemies01.dbr` (3 difficulties x 4 player
 brackets) applied in the page. That spec supersedes the exploratory notes below
 for anything it covers; HP/DA/OA plus attacks remain defined follow-on phases.
-The difficulty tier above Ultimate scales only damage and health, not
-resistances, so the three-difficulty table is complete for v1. Phase 2, the
+Superseded 2026-07-26: the tier above Ultimate is Ascendant, and it is now a
+fourth key in the offset table, derived from `gameascendant.dbr ->
+ultimateChallangeAdjustment` rather than assumed. It still adds no resistance
+offset, but the pipeline now reads the record instead of taking that on faith.
+See [docs/superpowers/specs/2026-07-26-ascendant-difficulty-design.md](docs/superpowers/specs/2026-07-26-ascendant-difficulty-design.md).
+Phase 2, the
 explorer page, can now be brainstormed and specced against the real dataset;
 the spec pins the data contract it depends on.
 
