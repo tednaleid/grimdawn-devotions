@@ -94,3 +94,17 @@ test("one bad value does not discard the other fields in the same hash", () => {
   expect(back.minLevel).toBe(90);
   expect(back.hideSummons).toBe(true);
 });
+
+test("ascendant round-trips through the hash", () => {
+  const v: ViewState = { ...DEFAULT_VIEW, diff: "ascendant" };
+  expect(encodeHash(v)).toContain("diff=ascendant");
+  expect(decodeHash("diff=ascendant", ROLES).diff).toBe("ascendant");
+});
+
+test("a difficulty outside the list is still rejected", () => {
+  // Pins that adding ascendant widened the allowed set by exactly one value rather
+  // than dropping the check. "ascendent" is the plausible misspelling a hand-edited
+  // link carries, so it is the useful negative case.
+  expect(decodeHash("diff=ascendent", ROLES).diff).toBe(DEFAULT_VIEW.diff);
+  expect(decodeHash("diff=nightmare", ROLES).diff).toBe(DEFAULT_VIEW.diff);
+});

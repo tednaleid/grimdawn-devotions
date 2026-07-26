@@ -1,7 +1,14 @@
 // ABOUTME: Tests for the monster model: parsing, difficulty offsets, and aura inclusion.
 // ABOUTME: These pin the effective-resistance formula the whole page depends on.
 import { test, expect } from "bun:test";
-import { parseMonsters, offsetFor, effective, type Monster, type Resistances } from "../../src/monsters/core/model";
+import {
+  parseMonsters,
+  offsetFor,
+  effective,
+  sameOffsets,
+  type Monster,
+  type Resistances,
+} from "../../src/monsters/core/model";
 import { DAMAGE_TYPES } from "../../src/monsters/core/facets";
 
 const ZERO = Object.fromEntries(DAMAGE_TYPES.map((t) => [t, 0]));
@@ -134,4 +141,23 @@ test("effective always returns all ten keys in the canonical order", () => {
   expect(Object.keys(scrambled)).not.toEqual([...DAMAGE_TYPES]);
   const out = effective(mon({ resistances: scrambled }), ZERO as Resistances, false);
   expect(Object.keys(out)).toEqual([...DAMAGE_TYPES]);
+});
+
+test("offsetFor reads the ascendant block", () => {
+  const doc = parseMonsters({
+    monsters: [],
+    difficulty_offsets: { ascendant: { "1": { fire: 12, cold: 3 } } },
+  });
+  expect(offsetFor(doc, "ascendant", "1").fire).toBe(12);
+  expect(offsetFor(doc, "ascendant", "1").cold).toBe(3);
+});
+
+test("sameOffsets is true only when every type matches", () => {
+  const base = Object.fromEntries(DAMAGE_TYPES.map((t) => [t, 5])) as Resistances;
+  expect(sameOffsets(base, { ...base })).toBe(true);
+  // The differing type is the last in the list, so an implementation comparing
+  // only the first few still fails here.
+  expect(sameOffsets(base, { ...base, bleeding: 6 })).toBe(false);
+  // Equal totals, different rows: a sum-based comparison would wrongly pass.
+  expect(sameOffsets(base, { ...base, fire: 4, cold: 6 })).toBe(false);
 });

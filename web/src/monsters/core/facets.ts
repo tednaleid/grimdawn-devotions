@@ -24,7 +24,10 @@ export type DamageType = (typeof DAMAGE_TYPES)[number];
 /** The six monster classifications, ordered weakest to strongest rather than alphabetically. */
 export const TIERS = ["Common", "Champion", "Hero", "Boss", "SuperBoss", "Quest"];
 
-export const DIFFICULTIES = ["normal", "elite", "ultimate"] as const;
+/** Ordered weakest to hardest, which is the dropdown order. Ascendant is a toggle layered on
+ *  Ultimate in-game rather than a difficulty of its own; it is a fourth entry here because that
+ *  is how the page offers it and how scripts/parse_monsters.py keys the offsets. */
+export const DIFFICULTIES = ["normal", "elite", "ultimate", "ascendant"] as const;
 
 export type Difficulty = (typeof DIFFICULTIES)[number];
 

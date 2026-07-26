@@ -125,6 +125,16 @@ export function offsetFor(doc: MonsterDoc, difficulty: Difficulty, players: stri
   return Object.fromEntries(DAMAGE_TYPES.map((t) => [t, raw[t] ?? 0])) as Resistances;
 }
 
+/** Whether two offset rows impose identical values across all ten types.
+ *
+ *  Lets the page state that two difficulties are equivalent only while the data says so.
+ *  Nothing asserts that equivalence in app code: if a patch makes the rows diverge this
+ *  returns false and the claim stops being rendered.
+ */
+export function sameOffsets(a: Resistances, b: Resistances): boolean {
+  return DAMAGE_TYPES.every((t) => a[t] === b[t]);
+}
+
 /** What a player actually faces: base plus offset, plus aura grants when included.
  *
  *  Always returns all ten keys in canonical order so callers can index without checking.
