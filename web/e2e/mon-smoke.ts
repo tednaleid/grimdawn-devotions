@@ -214,6 +214,20 @@ try {
     `a filtered hash restores diff/tier/search on load (diff=${restoredDiff}, boss=${restoredTier}, q="${restoredQ}", rows=${restoredRows})`,
   );
 
+  // Selecting Ascendant keeps the table populated and records itself in the hash.
+  await cdp.evaluate(`(() => {
+    const s = document.querySelector('#mon-diff');
+    s.value = 'ascendant';
+    s.dispatchEvent(new Event('change'));
+  })()`);
+  await waitFor<string>(cdp, "location.hash", (h) => h.includes("diff=ascendant"));
+  const ascRows = await cdp.evaluate<number>("document.querySelectorAll('#mon-table tbody tr[data-id]').length");
+  check(ascRows > 0, `ascendant keeps the table populated (${ascRows})`);
+  check((await cdp.evaluate<string>("location.hash")).includes("diff=ascendant"), "ascendant is recorded in the hash");
+  // The note is data-derived, so it must actually render while the two rows match.
+  const notes = await cdp.evaluate<number>("document.querySelectorAll('.ctl-note').length");
+  check(notes === 1, `the derived difficulty note renders on ascendant (${notes})`);
+
   check(cdp.consoleErrors.length === 0, `no console errors (${cdp.consoleErrors.slice(0, 2).join("; ")})`);
 
   failed = results.some((r) => !r.ok);
