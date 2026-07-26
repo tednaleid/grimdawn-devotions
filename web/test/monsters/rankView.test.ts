@@ -80,10 +80,12 @@ test("bar heights scale to the shared peak, not per row and not to the row count
   expect(barsOf("cold")).toEqual([100, 100]);
 });
 
-test("mean and median are rendered per row", () => {
-  const html = rankMarkup(loc, [mon({ fire: 10 }), mon({ fire: 30 })], ZERO, false);
-  const fireRow = html.split('data-type="fire"')[1]!;
-  expect(fireRow).toContain('class="rank-mean">20.0<');
+test("mean and median render in their own columns and are not interchangeable", () => {
+  // The two must differ numerically or a swap is undetectable. A two-value fixture always has
+  // mean equal to median, so this uses three skewed values: mean 40, median 20.
+  const rows = [mon({ fire: 10 }), mon({ fire: 20 }), mon({ fire: 90 })];
+  const fireRow = rankMarkup(loc, rows, ZERO, false).split('data-type="fire"')[1]!;
+  expect(fireRow).toContain('class="rank-mean">40.0<');
   expect(fireRow).toContain('class="rank-median">20<');
 });
 
