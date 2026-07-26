@@ -613,3 +613,16 @@ Found during the final whole-branch review, not yet fixed:
   in `web/src/monsters/adapters/tableView.ts`) passes.
 
 Pointers: `web/test/monsters/rankView.test.ts` and `web/test/monsters/tableView.test.ts`.
+
+## Veteran mode as a difficulty option
+
+Ascendant is now derived from `gameengine.dbr -> ascendantRecord ->
+gameascendant.dbr -> ultimateChallangeAdjustment`. Veteran is the same shape one
+hop shorter: `gameengine.dbr -> challengeAdjustment ->
+balancingadjustment_challengemode_enemies01.dbr`, layered on Normal the way
+Ascendant layers on Ultimate.
+
+Not built because its ten resistance fields are all zero today, so the control
+would gain an option numerically identical to Normal and nobody has asked for it.
+If it is ever wanted, `ascendant_ref`/`flat_adjustment` in
+`scripts/parse_monsters.py` generalise to it directly.
