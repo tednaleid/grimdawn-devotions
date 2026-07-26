@@ -430,7 +430,11 @@ m3 = doc3["monsters"]
 by_id = {m["id"]: m for m in m3}
 
 check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1635)
-check("raw record count unchanged", sum(m["variant_count"] for m in m3) == 2725)
+# 2,728 before the trap exclusion. This counts KEPT records (the variant_counts of surviving
+# rows), not records read, so excluding 3 trap records necessarily drops it by 3. Those 3
+# collapse into only 2 logical rows, which is why the row count fell by 2 and this by 3.
+check(f"kept raw record count (got {sum(m['variant_count'] for m in m3)})",
+      sum(m["variant_count"] for m in m3) == 2725)
 check("all ten resistance keys still present", all(list(m["resistances"].keys()) == TEN for m in m3))
 
 alkamos = by_id.get("enemies.boss-quest.ghost_stepsoftorment_01")
