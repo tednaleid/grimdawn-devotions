@@ -41,29 +41,67 @@ its sibling (`derived_dir.parent / "deposit"`), mirroring the repo's own justfil
 convention that the two directories are always siblings under data/. An explicit
 `deposit_dir` argument overrides that default.
 
-Mastery/skill vocabulary. `vocabulary()['masteries']` and `['skills']` are a mapping from
-display name to record, not a plain list, so a caller can turn a human name straight into
-the record path `Criteria` actually uses. The name comes from `facts` (a deposit table, not
-a derived one - reached the same way as `labels`, via `deposit_dir`):
-`facts.record = <mastery or skill record> AND facts.key = 'skillDisplayName'` gives a tag,
-`labels.tag = that tag AND labels.locale = 'en'` gives the text. All 9 masteries resolve.
-Of the 245 distinct skill records named in `boosts` (`kind = 'skill'`), 199 resolve and 46
-do not - not every skill record carries a `skillDisplayName` fact. An unresolved record is
+Mastery/skill vocabulary. `vocabulary()['masteries']`, `['skills']`, and `['granted_skills']`
+are each a mapping from display name to record, not a plain list, so a caller can turn a
+human name straight into the record path `Criteria` actually uses. The name comes from
+`facts` (a deposit table, not a derived one - reached the same way as `labels`, via
+`deposit_dir`): `facts.record = <record> AND facts.key = 'skillDisplayName'` gives a tag,
+`labels.tag = that tag AND labels.locale = 'en'` gives the text. An unresolved record is
 never dropped or given an invented name: it is keyed by its own record path instead, so it
-stays addressable. `vocabulary()['skills']` is scoped to `boosts.target` (the skills a
-`--boosts-skill`/`--mastery` search can name), not `relations`' `grants_skill` edges, which
-are a different (larger) set of skill records serving `--grants-skill`.
+stays addressable; see `_name_map` for how a name shared by more than one record (real for
+`granted_skills`) is handled without dropping any of them either.
+
+`skills` is scoped to `boosts.target` where `kind = 'skill'` (245 records, what
+`--boosts-skill`/`--mastery` can name; 199 resolve to a display name). `granted_skills` is a
+separate key scoped to `relations.dst` where `kind = 'grants_skill'` (724 records, what
+`--grants-skill` can name; 616 resolve). These are almost entirely disjoint sets at the
+record level - exactly one record (a Flashbang item skill) appears in both `boosts.target`
+and as a `grants_skill` edge, measured 2026-08-01 - so a single shared `skills` key would
+have resolved essentially none of `--grants-skill`'s vocabulary. `masteries` (9 records, all
+resolve) never shares a key with either of the other two, checked directly.
+
+But `skills` and `granted_skills` DO share 9 display names, checked directly against the
+real, already-disambiguated dicts: Canister Bomb, Overguard, Panetti's Replicating Missile,
+Phantasmal Blades, Rebuke, Storm Surge, Stun Jacks, Wind Devil (each names a genuinely
+different record depending which key you look it up in - a class skill in `skills`, a
+separate item-skill record with the same display text in `granted_skills`), plus Flashbang
+(the one record shared by both keys, so both point to the same record there). A caller that
+resolves a bare name against these three maps without knowing which one the flag calls for
+can land on the wrong record for those 9 names. This module does not disambiguate across
+keys - only within one - so a caller (Task 7's flag parsing) must look a name up in the
+vocabulary key that matches the flag it came from (`--boosts-skill`/`--mastery` -> `skills`,
+`--grants-skill` -> `granted_skills`), not search all three and take whichever hits first.
 """
 from __future__ import annotations
 
 import sys
+from collections import Counter
 from pathlib import Path
+from typing import TypedDict
 
 sys.path.insert(0, str(Path(__file__).parent))
 from build_deposit import sql_str  # shared path-quoting helper
 from gditems_core import Candidate, Criteria
 
 import duckdb
+
+
+class Vocabulary(TypedDict):
+    """`vocabulary()`'s result. Enum-like scope tokens (gear_types, slots, stat_families,
+    domains, rarities, expansions) stay plain lists of the raw tokens `Criteria` consumes
+    directly. `masteries`, `skills`, and `granted_skills` need per-name lookup, so each is a
+    display-name -> record map instead (see `_name_map`); a flat `dict[str, list[str] |
+    dict[str, str]]` would type every value as the union at every key, which is looser than
+    what the method actually returns and defeats the point of asking for one key by name."""
+    masteries: dict[str, str]
+    gear_types: list[str]
+    slots: list[str]
+    stat_families: list[str]
+    domains: list[str]
+    rarities: list[str]
+    expansions: list[str]
+    skills: dict[str, str]
+    granted_skills: dict[str, str]
 
 DERIVED_TABLES = ("entities", "stats", "relations", "families", "sources", "boosts",
                    "conversions")
@@ -121,7 +159,7 @@ class DuckDbRepository:
             return self._select("e.record = ?", [name_or_record])
         return self._select("l.text = ?", [name_or_record])
 
-    def vocabulary(self) -> dict[str, list[str] | dict[str, str]]:
+    def vocabulary(self) -> Vocabulary:
         def col(table: str, column: str) -> list[str]:
             rows = self._con.execute(
                 f"SELECT DISTINCT {column} FROM {table} WHERE {column} IS NOT NULL "
@@ -133,6 +171,9 @@ class DuckDbRepository:
         masteries = col("boosts", "mastery_record")
         skills = self._con.execute(
             "SELECT DISTINCT target FROM boosts WHERE kind = 'skill' ORDER BY target").fetchall()
+        granted_skills = self._con.execute(
+            "SELECT DISTINCT dst FROM relations WHERE kind = 'grants_skill' "
+            "ORDER BY dst").fetchall()
 
         return {
             "masteries": self._name_map(masteries),
@@ -143,14 +184,21 @@ class DuckDbRepository:
             "rarities": col("entities", "rarity"),
             "expansions": col("entities", "expansion"),
             "skills": self._name_map([r[0] for r in skills]),
+            "granted_skills": self._name_map([r[0] for r in granted_skills]),
         }
 
     def _name_map(self, records: list[str]) -> dict[str, str]:
         """Display name -> record for every record with a resolvable skillDisplayName fact,
         record -> record for the rest, so an unnamed record stays addressable rather than
-        silently dropped. No two records in the measured data share a display name, so this
-        stays a flat, collision-free dict; a future collision would silently keep only the
-        last record under that name and is not guarded against here."""
+        silently dropped. `masteries` and the `boosts`-scoped `skills` never collide on a
+        name in the measured data, but `granted_skills` does: distinct item-skill records
+        (e.g. a base version and a legendary/rune version of the same skill) commonly share
+        one skillDisplayName - 47 names across 62 of the 724 granted-skill records, measured
+        2026-08-01. A plain `{name: record}` dict would silently keep only the last such
+        record and drop the rest, exactly the failure mode this function exists to avoid, so
+        a name shared by more than one record in this call is disambiguated to `"name
+        (record)"` for every record that shares it, keeping the real name and the real
+        record - nothing invented - rather than dropping any of them."""
         if not records:
             return {}
         named = dict(self._con.execute("""
@@ -159,7 +207,12 @@ class DuckDbRepository:
             JOIN labels l ON l.tag = f.value AND l.locale = 'en'
             WHERE f.record = ANY(?) AND f.key = 'skillDisplayName'
         """, [records]).fetchall())
-        return {named.get(record, record): record for record in records}
+        labels = {record: named.get(record, record) for record in records}
+        counts = Counter(labels.values())
+        return {
+            (label if counts[label] == 1 else f"{label} ({record})"): record
+            for record, label in labels.items()
+        }
 
     # ------------------------------------------------------------------
     # shared query + assembly
@@ -329,8 +382,10 @@ def _selftest() -> None:
     assert len(results) > 0, "expected a non-zero row count"
 
     vocab = repo.vocabulary()
-    for key, values in vocab.items():
-        print(f"vocabulary[{key}]: {len(values)} token(s)")
+    for key in ("gear_types", "slots", "stat_families", "domains", "rarities", "expansions"):
+        print(f"vocabulary[{key}]: {len(vocab[key])} token(s)")
+    for key in ("masteries", "skills", "granted_skills"):
+        print(f"vocabulary[{key}]: {len(vocab[key])} token(s)")
 
     masteries = vocab["masteries"]
     assert "Nightblade" in masteries, "expected the Nightblade mastery to resolve by name"
@@ -342,6 +397,15 @@ def _selftest() -> None:
     print(f"skills: {len(named_skills)} resolved to a display name, "
           f"{len(unnamed_skills)} addressable only by record path")
     assert "Amarasta's Blade Burst" in skills
+
+    granted_skills = vocab["granted_skills"]
+    named_granted = [name for name, record in granted_skills.items() if name != record]
+    unnamed_granted = [name for name, record in granted_skills.items() if name == record]
+    print(f"granted_skills: {len(named_granted)} resolved to a display name, "
+          f"{len(unnamed_granted)} addressable only by record path")
+    assert len(granted_skills) == 724, f"expected 724 granted-skill records, got {len(granted_skills)}"
+    assert len(named_granted) == 616, (
+        f"expected 616 resolved (named or disambiguated) entries, got {len(named_granted)}")
 
 
 if __name__ == "__main__":
