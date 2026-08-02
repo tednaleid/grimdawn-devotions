@@ -41,14 +41,18 @@ its sibling (`derived_dir.parent / "deposit"`), mirroring the repo's own justfil
 convention that the two directories are always siblings under data/. An explicit
 `deposit_dir` argument overrides that default.
 
-Mastery/skill vocabulary. `vocabulary()['masteries']` and `['skills']` return record paths
-(e.g. `records/skills/playerclass04/_classtraining_class04.dbr`), not human display names.
-None of the tables this adapter reads (entities/stats/relations/families/sources/boosts/
-conversions/labels) carry a name tag for a skill or mastery record - `entities` is items
-only, and `labels` has no row keyed to those tags in this dataset. Record paths are also
-exactly what Criteria.masteries/boosts_skills/boosts_masteries and Candidate.skill_boosts/
-mastery_boosts already use, so nothing downstream needs translation. A human-name
-resolution layer, if wanted, needs a different data source than this module has.
+Mastery/skill vocabulary. `vocabulary()['masteries']` and `['skills']` are a mapping from
+display name to record, not a plain list, so a caller can turn a human name straight into
+the record path `Criteria` actually uses. The name comes from `facts` (a deposit table, not
+a derived one - reached the same way as `labels`, via `deposit_dir`):
+`facts.record = <mastery or skill record> AND facts.key = 'skillDisplayName'` gives a tag,
+`labels.tag = that tag AND labels.locale = 'en'` gives the text. All 9 masteries resolve.
+Of the 245 distinct skill records named in `boosts` (`kind = 'skill'`), 199 resolve and 46
+do not - not every skill record carries a `skillDisplayName` fact. An unresolved record is
+never dropped or given an invented name: it is keyed by its own record path instead, so it
+stays addressable. `vocabulary()['skills']` is scoped to `boosts.target` (the skills a
+`--boosts-skill`/`--mastery` search can name), not `relations`' `grants_skill` edges, which
+are a different (larger) set of skill records serving `--grants-skill`.
 """
 from __future__ import annotations
 
@@ -99,9 +103,10 @@ class DuckDbRepository:
             self._con.execute(
                 f"CREATE VIEW {name} AS SELECT * FROM read_parquet({sql_str(path.as_posix())})")
         deposit_dir = deposit_dir or derived_dir.parent / "deposit"
-        labels_path = deposit_dir / "labels.parquet"
-        self._con.execute(
-            f"CREATE VIEW labels AS SELECT * FROM read_parquet({sql_str(labels_path.as_posix())})")
+        for name in ("labels", "facts"):
+            path = deposit_dir / f"{name}.parquet"
+            self._con.execute(
+                f"CREATE VIEW {name} AS SELECT * FROM read_parquet({sql_str(path.as_posix())})")
 
     # ------------------------------------------------------------------
     # public port
@@ -116,7 +121,7 @@ class DuckDbRepository:
             return self._select("e.record = ?", [name_or_record])
         return self._select("l.text = ?", [name_or_record])
 
-    def vocabulary(self) -> dict[str, list[str]]:
+    def vocabulary(self) -> dict[str, list[str] | dict[str, str]]:
         def col(table: str, column: str) -> list[str]:
             rows = self._con.execute(
                 f"SELECT DISTINCT {column} FROM {table} WHERE {column} IS NOT NULL "
@@ -125,23 +130,36 @@ class DuckDbRepository:
 
         slots = self._con.execute(
             "SELECT DISTINCT unnest(slots) AS slot FROM entities ORDER BY slot").fetchall()
-        skills = self._con.execute("""
-            SELECT DISTINCT target FROM boosts WHERE kind = 'skill'
-            UNION
-            SELECT DISTINCT dst FROM relations WHERE kind = 'grants_skill'
-            ORDER BY 1
-        """).fetchall()
+        masteries = col("boosts", "mastery_record")
+        skills = self._con.execute(
+            "SELECT DISTINCT target FROM boosts WHERE kind = 'skill' ORDER BY target").fetchall()
 
         return {
-            "masteries": col("boosts", "mastery_record"),
+            "masteries": self._name_map(masteries),
             "gear_types": col("entities", "gear_type"),
             "slots": [r[0] for r in slots],
             "stat_families": col("families", "family"),
             "domains": col("entities", "domain"),
             "rarities": col("entities", "rarity"),
             "expansions": col("entities", "expansion"),
-            "skills": [r[0] for r in skills],
+            "skills": self._name_map([r[0] for r in skills]),
         }
+
+    def _name_map(self, records: list[str]) -> dict[str, str]:
+        """Display name -> record for every record with a resolvable skillDisplayName fact,
+        record -> record for the rest, so an unnamed record stays addressable rather than
+        silently dropped. No two records in the measured data share a display name, so this
+        stays a flat, collision-free dict; a future collision would silently keep only the
+        last record under that name and is not guarded against here."""
+        if not records:
+            return {}
+        named = dict(self._con.execute("""
+            SELECT f.record, l.text
+            FROM facts f
+            JOIN labels l ON l.tag = f.value AND l.locale = 'en'
+            WHERE f.record = ANY(?) AND f.key = 'skillDisplayName'
+        """, [records]).fetchall())
+        return {named.get(record, record): record for record in records}
 
     # ------------------------------------------------------------------
     # shared query + assembly
@@ -313,6 +331,17 @@ def _selftest() -> None:
     vocab = repo.vocabulary()
     for key, values in vocab.items():
         print(f"vocabulary[{key}]: {len(values)} token(s)")
+
+    masteries = vocab["masteries"]
+    assert "Nightblade" in masteries, "expected the Nightblade mastery to resolve by name"
+    print(f"masteries['Nightblade'] = {masteries['Nightblade']}")
+
+    skills = vocab["skills"]
+    named_skills = [name for name, record in skills.items() if name != record]
+    unnamed_skills = [name for name, record in skills.items() if name == record]
+    print(f"skills: {len(named_skills)} resolved to a display name, "
+          f"{len(unnamed_skills)} addressable only by record path")
+    assert "Amarasta's Blade Burst" in skills
 
 
 if __name__ == "__main__":
