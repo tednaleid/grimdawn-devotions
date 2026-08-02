@@ -192,6 +192,8 @@ WIDE_KEYS = [
     "characterBaseAttackSpeed", "itemSkillName", "itemSkillLevelEq", "itemSkillLevel",
     "itemSkillAutoController", "petBonusName", "itemSetName", "attributeScalePercent",
     "lootRandomizerName", "lootRandomizerJitter", "lootRandomizerCost",
+    "augmentSkillName1", "augmentSkillName2", "augmentSkillLevel1", "augmentSkillLevel2",
+    "augmentMasteryName1", "augmentMasteryName2", "augmentMasteryLevel1", "augmentMasteryLevel2",
 ]
 
 # Value-bearing stat vocabulary shared by the self-stat and skill-rollup stages;
@@ -501,6 +503,53 @@ def build_relations(con: duckdb.DuckDBPyConnection, diag: dict) -> int:
 
 
 # ---------------------------------------------------------------------------
+# boosts
+# ---------------------------------------------------------------------------
+
+def build_boosts(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
+    """Per-skill and per-mastery level bonuses, each resolved to its mastery record.
+
+    An item boosts either one named skill (augmentSkillName<N>) or a whole mastery
+    (augmentMasteryName<N>); the trailing number pairs a name key with its level key.
+    The playerclassNN segment of the target path is what ties a skill to its mastery,
+    whose own record is always _classtraining_class<NN> in the same directory.
+    """
+    con.execute("CREATE TEMP TABLE boosts (record VARCHAR, kind VARCHAR, target VARCHAR, "
+                "mastery_record VARCHAR, level INTEGER)")
+    for kind, name_key, level_key in (("skill", "augmentSkillName", "augmentSkillLevel"),
+                                      ("mastery", "augmentMasteryName", "augmentMasteryLevel")):
+        con.execute(f"""
+            INSERT INTO boosts
+            WITH paired AS (
+                SELECT s.record AS rec,
+                       lower(trim(n.value)) AS target,
+                       CAST(lv.value_num AS INTEGER) AS lvl
+                FROM scoped s
+                JOIN facts n ON n.record = s.record
+                            AND n.key LIKE '{name_key}%' AND trim(n.value) != ''
+                JOIN facts lv ON lv.record = s.record
+                             AND lv.key = '{level_key}'
+                                          || regexp_extract(n.key, '{name_key}(\\d+)', 1)
+                             AND lv.value_num > 0
+            ),
+            classed AS (
+                SELECT rec, target, lvl,
+                       regexp_extract(target, 'playerclass(\\d+)', 1) AS cls
+                FROM paired
+            )
+            SELECT rec, '{kind}', target,
+                   'records/skills/playerclass' || cls
+                   || '/_classtraining_class' || cls || '.dbr',
+                   lvl
+            FROM classed
+            WHERE cls != ''""")
+    out = out_dir / "boosts.parquet"
+    con.execute(f"COPY (SELECT * FROM boosts ORDER BY record, kind, target) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM boosts").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 # sources
 # ---------------------------------------------------------------------------
 
@@ -770,6 +819,7 @@ def cmd_build(args) -> int:
     n_entities = build_entities(con, cur, out_dir, diag)
     n_stats = build_stats(con, cur, out_dir, diag)
     n_sources = build_sources(con, cur, out_dir)
+    n_boosts = build_boosts(con, out_dir)
 
     rel_out = out_dir / "relations.parquet"
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
@@ -808,11 +858,15 @@ def cmd_build(args) -> int:
         "SELECT kind, count(*) FROM sources GROUP BY 1 ORDER BY 1").fetchall()
     print(f"  sources: {n_sources}   " +
           "  ".join(f"{k}({n})" for k, n in src_kind_counts))
+    boost_kind_counts = con.execute(
+        "SELECT kind, count(*) FROM boosts GROUP BY 1 ORDER BY 1").fetchall()
+    print(f"  boosts: {n_boosts}   " +
+          "  ".join(f"{k}({n})" for k, n in boost_kind_counts))
     print(f"  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                          if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities", "stats", "relations", "families", "sources"):
+    for name in ("entities", "stats", "relations", "families", "sources", "boosts"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")

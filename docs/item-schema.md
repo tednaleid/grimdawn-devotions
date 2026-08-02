@@ -18,13 +18,14 @@ install needed.
 | `relations.parquet` | `(src, kind, dst)` | `applies_to` (augment/component -> gear-type token), `crafts` and `reagent` (blueprint edges), `set_member` (item -> set record), `grants_skill` (item -> skill record), `spawns_pet` (item -> pet creature via the granted summon skill) |
 | `families.parquet` | `(family, stat_id)` | the filter taxonomy from `stat-families.json`, ids unified to the stats vocabulary - "Cold" as one joinable family instead of 15 raw keys |
 | `sources.parquet` | `(item, kind, vendor_record, vendor_tag, faction_tag, tier, provenance)` | item acquisition sources, tier 1. `kind` = `faction_vendor` (derived from the merchant chain: merchant `marketFileName` -> merchant-table tier keys -> tier table `marketStaticItems`; `tier` is friendly/respected/honored/revered from the referencing key, `vendor_tag` the merchant's `description` name tag, `faction_tag` the curated `tagFaction*` tag) or `crafted` (materialized from the `crafts` edges; the blueprint's record and name tag ride in the vendor columns, `faction_tag` and `tier` are NULL). `provenance` = `flat-fact` for derived rows, `curated-oracle` reserved for hand-fixed ones. Items with no rows are unsourced (displayed silently; "world drop" waits for the loot walk). Localized reputation-tier display names exist as `tagFactionState*` label tags when a consumer needs them |
+| `boosts.parquet` | `(record, kind, target, mastery_record, level)` | per-skill and per-mastery level bonuses (`augmentSkillName<N>`/`augmentSkillLevel<N>` and `augmentMasteryName<N>`/`augmentMasteryLevel<N>`, the trailing number pairing a name key to its level key). A skill boost and a mastery boost differ structurally, not by heuristic: `kind = 'skill'` has `target` naming a skill record with `mastery_record` resolved from the `playerclassNN` segment of that path; `kind = 'mastery'` has `target` equal to `mastery_record`, both naming the mastery's own `_classtraining_class<NN>` record directly |
 
 The filter contract maps onto these directly: facet groups are predicates on
 `entities` columns (domain, type, slot, rarity, level range, expansion),
 semi-joins on `stats`+`families` (stat families, OR within a family) and
 `relations` (applies-to, crafts, sets), and text search joins `labels` (active
 locale with per-tag English fallback) over `name_tag`, `text_tag`, and the
-granted skill's name/description tags. `scripts/derived_queries/` holds nine
+granted skill's name/description tags. `scripts/derived_queries/` holds ten
 acceptance queries proving the whole contract; filters evaluate per entity row
 (variant), and a card UI collapses rows by `group_key`.
 
@@ -99,8 +100,8 @@ counted in the `expansion_defaulted` diagnostic.
 - `just derive` - rebuild `data/derived/` from the deposit + curation (runs
   the drift guards, prints per-domain counts, diagnostics, artifact sizes)
 - `just q "SQL"` - ad-hoc SQL; the derived views (`entities`, `stats`,
-  `relations`, `families`, `sources`) register alongside `facts`/`labels`/`meta`
-- `just q-ae-all` - the nine acceptance recipes (AE1-AE9). Each gates its
+  `relations`, `families`, `sources`, `boosts`) register alongside `facts`/`labels`/`meta`
+- `just q-ae-all` - the ten acceptance recipes (AE1-AE10). Each gates its
   output on pinned oracle checks, so zero rows AND oracle drift both fail;
   after a game patch, expect count pins (97 ring/amulet augments, 14 legendary
   2h axes, 284 vendor-sourced augments) to fail until re-checked against

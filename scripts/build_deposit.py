@@ -480,7 +480,7 @@ def print_table(cols: list[str], rows: list[tuple], max_rows: int) -> None:
 
 def register_derived(con: duckdb.DuckDBPyConnection, derived_dir: Path,
                      required: bool) -> bool:
-    """Views every parquet under the derived dir (entities, stats, relations, ...).
+    """Views every parquet under the derived dir (entities, stats, relations, boosts, ...).
 
     Missing dir is fatal only for recipes that need the derived schema
     (--require-derived); plain deposit queries keep working without it.
@@ -556,7 +556,7 @@ def main(argv=None) -> int:
     q.add_argument("--fail-on-empty", action="store_true",
                    help="Exit non-zero when the query returns 0 rows (acceptance recipes)")
     q.add_argument("--derived-dir", type=Path, default=None,
-                   help="Also view data/derived/*.parquet (entities, stats, relations, ...)")
+                   help="Also view data/derived/*.parquet (entities, stats, relations, boosts, ...)")
     q.add_argument("--require-derived", action="store_true",
                    help="Fail (pointing at `just derive`) when the derived schema is missing")
     q.set_defaults(fn=cmd_query)

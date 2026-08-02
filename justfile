@@ -408,9 +408,13 @@ q-ae8-faction-sources: (_q-derived "ae8_faction_sources.sql")
 [group("deposit")]
 q-ae9-applies-to: (_q-derived "ae9_applies_to.sql")
 
-# All nine derived acceptance queries (the AE gate from docs/item-schema.md)
+# AE10: skill and mastery boosts, every boost resolving to its mastery
 [group("deposit")]
-q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de q-ae8-faction-sources q-ae9-applies-to
+q-ae10-skill-mastery-boosts: (_q-derived "ae10_skill_mastery_boosts.sql")
+
+# All ten derived acceptance queries (the AE gate from docs/item-schema.md)
+[group("deposit")]
+q-ae-all: q-ae1-cold-daggers q-ae2-augments-ring-amulet q-ae3-blueprint-links q-ae4-requirement-oracles q-ae5-legendary-2h-axes q-ae6-expansion-badges q-ae7-search-de q-ae8-faction-sources q-ae9-applies-to q-ae10-skill-mastery-boosts
 
 # Delete the deposit artifacts. Deliberately NOT part of `clean`: regenerating
 # them needs Windows + the game install, so `clean` must never touch them.
