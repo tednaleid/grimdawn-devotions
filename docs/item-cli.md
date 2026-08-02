@@ -36,11 +36,12 @@ data/derived not found. Run: just fetch-deposit
 ## `vocab`
 
 Prints every valid token for every flag: domains, gear types, slots,
-rarities, expansions, stat families, masteries, skills, and granted skills, as
-spelled in the data. Call this before composing `search` flags - a mistyped
-token otherwise either fails (for validated flags) or, for anything not
-caught, produces a result indistinguishable from a genuine absence of
-matches.
+rarities, expansions, stat families, conversion types, masteries, skills, and
+granted skills, as spelled in the data. Call this before composing `search`
+flags - a mistyped token otherwise either fails (for validated flags) or, for
+anything not caught, produces a result indistinguishable from a genuine
+absence of matches. Conversion types are capitalized in the data (`Pierce`,
+`Fire`, `Aether`, ...), not lowercase.
 
 `--json` prints the same categories as structured data. Skill and mastery
 names that resolve to no display name are left out of `vocab`'s lists (they
@@ -71,8 +72,8 @@ Flags fall into three groups.
 | --- | --- |
 | `--stat FAMILY[:MIN]` | Repeatable. A stat family, optionally with a minimum, e.g. `damage.pierce:20` |
 | `--resist TYPE` | Comma-separated resist types, sugar for the `resist.<type>` stat family, e.g. `pierce` |
-| `--converts-to TYPE` | Damage-type conversion target |
-| `--min-convert N` | Minimum conversion percentage, paired with `--converts-to` |
+| `--converts-to TYPE` | Damage-type conversion target, e.g. `Pierce` (see `vocab`'s `conversion_types` for the exact spellings; they are capitalized) |
+| `--min-convert N` | Minimum conversion percentage; requires `--converts-to` |
 | `--grants-skill` | Comma-separated skill names or record paths (outright grants) |
 | `--boosts-skill` | Comma-separated skill names or record paths (skill bonus) |
 | `--boosts-mastery` | Comma-separated mastery names or record paths |
@@ -91,7 +92,7 @@ and `--converts-to` with `--min-convert` filter the candidate set.
 | `--limit N` | Result count (default 20) |
 | `--json` | Structured JSON instead of a table |
 | `--explain` | Print the per-criterion score arithmetic |
-| `--weights` | Comma-separated `name=weight` pairs; names match the criterion labels `--explain` prints, e.g. `stat:resist.pierce=2.0` |
+| `--weights` | Comma-separated `name=weight` pairs; names must match a criterion label the query actually scores (the same labels `--explain` prints and `unmatched_criteria` names), e.g. `stat:resist.pierce=2.0`. An unrecognised name exits non-zero with a near-match suggestion rather than being silently ignored. `--json` echoes the effective map under `"weights"` so a caller can confirm what was applied. |
 | `--open N` | Open the Nth result's grimtools page in a browser |
 
 `--json` and the table render the identical query - both are built from the
@@ -121,6 +122,14 @@ listing every tier's item level ascending, with "(showing N)" marking which
 one the row above is scored against.
 
 Every result carries a grimtools deep link (see "grimtools links" below).
+
+**`search` never returns a record with no display name.** 944 entities in the
+derived data (742 affix, 192 gear, 5 augment, 5 blueprint) resolve to an
+empty name - internal templates, not real items - and a grimtools link built
+from an empty name matches every item at that item level instead of
+isolating one. `search` excludes them outright; `show` still resolves one
+directly by its own record path, since inspecting one on purpose is
+legitimate even though recommending one never is.
 
 ## Name resolution for skill and mastery flags
 
@@ -226,21 +235,32 @@ a confident wrong answer.
 
 ## grimtools links
 
-Every result and `show` output carries a grimtools deep link, built from the
-item's name plus its exact item level. grimtools item ids are internal to
-that site and cannot be derived from game data, so the link pins an item by
-name and level instead: verified live, a name-only advanced-search query for
-Sellecor's March returns all three tiers, while name plus item level 30
-returns only the base tier, name plus item level 84 only the Mythical tier.
+Every `search` result carries a grimtools deep link, built from the item's
+name plus its exact item level. `show` carries one too, except for a
+nameless record (see "Result model" above) - there is no name to link by, so
+`show` reports no link rather than a degenerate one that matches everything.
+
+grimtools item ids are internal to that site and cannot be derived from game
+data, so the link pins an item by name and level instead: verified live, a
+name-only advanced-search query for Sellecor's March returns all three
+tiers, while name plus item level 30 returns only the base tier, name plus
+item level 84 only the Mythical tier. This usually isolates one record but
+not always: a name-and-level collision across unrelated families (Ulgrim's
+Keepsake, two quest-item families both at item level 1) or a duplicated
+level within one family (Obsidian War Cleaver's ladder is 30 / 30 / 40 / 55
+/ 70 / 84 / 94) both resolve more than one record on grimtools.
 
 ## Errors
 
 An unrecognised token for any vocabulary-backed flag (`--domain`, `--slot`,
 `--gear-type`, `--rarity`, `--expansion`, `--source`, `--fits`, `--stat`,
-`--resist`, and the skill/mastery flags) exits non-zero and names near
-matches from that flag's own vocabulary. A missing `data/derived` prints the
-one fixed line above and nothing else. `--open N` past the number of results
-actually returned fails with the range rather than opening nothing:
+`--resist`, `--converts-to`, and the skill/mastery flags) exits non-zero and
+names near matches from that flag's own vocabulary. `--min-convert` without
+`--converts-to` also exits non-zero, since alone it is a silent no-op rather
+than a criterion. `--weights` names an unrecognised criterion the same way,
+against the criteria the query actually scores. A missing `data/derived`
+prints the one fixed line above and nothing else. `--open N` past the number of results actually returned
+fails with the range rather than opening nothing:
 
 ```
 ERROR: --open 5 is out of range: 2 result(s)
@@ -253,7 +273,7 @@ All error paths exit non-zero so a calling script or agent notices.
 A skill/damage-conversion build question:
 
 ```
-scripts/gditems.py search --mastery Nightblade,Inquisitor --converts-to pierce \
+scripts/gditems.py search --mastery Nightblade,Inquisitor --converts-to Pierce \
   --boosts-skill "Amarasta's Blade Burst" --level 70 --json
 ```
 

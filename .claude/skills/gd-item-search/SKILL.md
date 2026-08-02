@@ -34,10 +34,11 @@ Run `just fetch-deposit` and retry rather than treating that as a dead end.
    (equivalently: `uv run scripts/gditems.py vocab --json`)
 
    This lists every real domain, gear type, slot, rarity, expansion, stat
-   family, mastery, skill, and granted-skill name. Compose `search` flags
-   from these tokens, not from guesses or grimtools terminology - a
-   plausible-looking token that happens to be wrong for this data set
-   otherwise fails or silently matches nothing.
+   family, conversion type, mastery, skill, and granted-skill name. Compose
+   `search` flags from these tokens, not from guesses or grimtools
+   terminology - a plausible-looking token that happens to be wrong for this
+   data set otherwise fails or silently matches nothing. Conversion types are
+   capitalized (`Pierce`, not `pierce`).
 
    Skill and mastery flags read different vocabulary keys: `--boosts-skill`
    and `--mastery` resolve against `skills` (bonuses a mastery/item confers),
@@ -51,7 +52,7 @@ Run `just fetch-deposit` and retry rather than treating that as a dead end.
 
    ```
    uv run scripts/gditems.py search --domain gear,relic --mastery Nightblade \
-     --converts-to pierce --level 70 --json
+     --converts-to Pierce --level 70 --json
    ```
 
    `--json` gives the same query as the table, structured for reasoning:

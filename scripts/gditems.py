@@ -233,6 +233,20 @@ def _parse_weights(value: str | None) -> dict[str, float] | None:
     return weights
 
 
+def _validate_weights(criteria: Criteria, weights: dict[str, float] | None) -> None:
+    """Fail loudly on a `--weights` name that names no scored criterion the caller
+    actually passed. Weights are read with `dict.get(name, 1.0)` at scoring time
+    (`gditems_core.score`), so an unrecognised name is otherwise a silent no-op that
+    still exits 0 with an unweighted ranking - see the module docstring's rationale for
+    `--weights` at all."""
+    if not weights:
+        return
+    valid_names = criteria_criterion_names(criteria)
+    for name in weights:
+        if name not in valid_names:
+            _fail_unknown("--weights", name, valid_names)
+
+
 def _resolve_name(vocab_map: dict[str, str], flag: str, raw: str) -> str:
     """Resolve one caller-supplied token for `flag` against the vocabulary map that
     belongs to it (never any other key - see the module docstring).
@@ -281,6 +295,10 @@ def _build_criteria(vocab: dict, args: argparse.Namespace) -> Criteria:
     _validate_tokens("--source", sources, SOURCE_TOKENS)
     if args.fits is not None:
         _validate_tokens("--fits", (args.fits,), vocab["gear_types"])
+    if args.converts_to is not None:
+        _validate_tokens("--converts-to", (args.converts_to,), vocab["conversion_types"])
+    if args.min_convert is not None and args.converts_to is None:
+        _fail("--min-convert requires --converts-to")
 
     stats = _stat_criteria(vocab, args.stat)
     stats.extend(_resist_stats(vocab, args.resist))
@@ -329,6 +347,7 @@ def run_search(repo, args: argparse.Namespace) -> dict:
     vocab = repo.vocabulary()
     criteria = _build_criteria(vocab, args)
     weights = _parse_weights(args.weights)
+    _validate_weights(criteria, weights)
 
     candidates = repo.fetch(criteria)
     groups = collapse_tiers(candidates, criteria.level)
@@ -352,10 +371,11 @@ def run_search(repo, args: argparse.Namespace) -> dict:
         for rank, item in enumerate(scored, start=1)
     ]
     return {"results": results, "disclaimer": HONESTY_LINE, "criteria": criteria,
+            "weights": weights or {},
             "unmatched_criteria": _unmatched_criteria(criteria, scored_pool)}
 
 
-def _ladder(tiers: list, headline_level: int) -> str:
+def _tier_levels(tiers: list) -> str:
     """Render a family's tier ladder as the item levels the data actually carries.
 
     Grim Dawn's own game data gives every tier of a family the same display name -
@@ -366,11 +386,24 @@ def _ladder(tiers: list, headline_level: int) -> str:
     and 583 more-than-three-tier families among Rare gear alone), so applying those
     words by rank position would assert a specific in-game upgrade tier that may not
     exist. Item level is real and already the ladder's own sort key, so it is the only
-    thing shown; "(showing N)" marks which tier the row above is scored against.
+    thing shown.
     """
     ascending = sorted(tiers, key=lambda c: c.item_level)
-    levels = " / ".join(str(c.item_level) for c in ascending)
-    return f"{levels} (showing {headline_level})"
+    return " / ".join(str(c.item_level) for c in ascending)
+
+
+def _ladder(tiers: list, headline_level: int) -> str:
+    """A search result's tier ladder: `_tier_levels` plus which tier the row above is
+    scored against, since search always headlines one tier per family."""
+    return f"{_tier_levels(tiers)} (showing {headline_level})"
+
+
+def _grimtools_url_or_none(name: str, item_level: int) -> str | None:
+    """`grimtools_url`, but None for an empty name instead of raising: `show` can
+    resolve a nameless record by its own record path (a legitimate use, see
+    `gditems_duckdb.DuckDbRepository.find`'s docstring), and such a record has no link
+    grimtools could ever isolate it by."""
+    return grimtools_url(name, item_level) if name else None
 
 
 def _fmt_num(value: float) -> str:
@@ -452,10 +485,13 @@ def _json_result(result: dict) -> dict:
 def render_json(payload: dict) -> str:
     """Same query, same result set as `render_table` - see `run_search`'s docstring.
     `criteria` echoes what was actually parsed (post name-resolution) so a caller can
-    confirm intent; `disclaimer` repeats the honesty line so a caller reading only the
-    JSON still sees it."""
+    confirm intent; `weights` echoes the effective `--weights` map (empty if none were
+    passed) since weights are not part of `Criteria` and would otherwise be invisible in
+    this echo even though they change the ranking; `disclaimer` repeats the honesty line
+    so a caller reading only the JSON still sees it."""
     data = {
         "criteria": dataclasses.asdict(payload["criteria"]),
+        "weights": payload["weights"],
         "results": [_json_result(r) for r in payload["results"]],
         "unmatched_criteria": payload["unmatched_criteria"],
         "disclaimer": payload["disclaimer"],
@@ -509,6 +545,7 @@ def _reverse_map(vocab_map: dict[str, str]) -> dict[str, str]:
 def render_show(payload: dict) -> str:
     cand = payload["candidate"]
     vocab = payload["vocab"]
+    tiers = payload["tiers"]
     skill_names = _reverse_map(vocab["skills"])
     mastery_names = _reverse_map(vocab["masteries"])
     granted_names = _reverse_map(vocab["granted_skills"])
@@ -520,6 +557,11 @@ def render_show(payload: dict) -> str:
         lines.append(f"  slots: {', '.join(cand.slots)}")
     if payload["set_name"]:
         lines.append(f"  set: {payload['set_name']}")
+    if len(tiers) > 1:
+        lines.append(f"  tiers: {_tier_levels(tiers)}")
+    url = _grimtools_url_or_none(cand.name, cand.item_level)
+    lines.append(f"  grimtools: {url}" if url else
+                  "  grimtools: no link (item has no display name)")
 
     lines.append("")
     lines.append("Stats:")
@@ -589,15 +631,16 @@ def _json_show(payload: dict) -> dict:
         "conversions": [{"from": from_type, "to": to_type, "percent": percent}
                          for from_type, to_type, percent in cand.conversions],
         "tiers": [c.item_level for c in ascending_tiers],
-        "url": grimtools_url(cand.name, cand.item_level),
+        "url": _grimtools_url_or_none(cand.name, cand.item_level),
     }
 
 
 def render_show_json(payload: dict) -> str:
     """Same information `render_show` prints, as structured data instead of prose: stats,
     skill and mastery boosts, conversions, source, set membership, the tier ladder, and
-    the grimtools URL - so an agent asking for one item's detail does not have to parse
-    prose (see the module docstring)."""
+    the grimtools URL (null for a nameless record - see `_grimtools_url_or_none`) - so
+    an agent asking for one item's detail does not have to parse prose (see the module
+    docstring)."""
     return json.dumps(_json_show(payload), indent=2)
 
 
@@ -620,6 +663,7 @@ def run_vocab(repo) -> dict:
         "rarities": vocab["rarities"],
         "expansions": vocab["expansions"],
         "stat_families": vocab["stat_families"],
+        "conversion_types": vocab["conversion_types"],
         "masteries": names("masteries"),
         "skills": names("skills"),
         "granted_skills": names("granted_skills"),
