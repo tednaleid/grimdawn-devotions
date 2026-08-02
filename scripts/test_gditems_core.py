@@ -123,6 +123,53 @@ check("mastery boost counts toward a skill criterion", gen_skill.raw > 0, True)
 check("mastery boost is discounted against a direct hit",
       gen_skill.normalised < by_rec["r/strong"].parts[1].normalised, True)
 check("mastery fallback explains itself", "mastery" in gen_skill.note.lower(), True)
+# Pin the exact discount, not just its direction: generalist's mastery boost is 3, so a
+# 0.5 fallback weight must yield 1.5. Changing MASTERY_FALLBACK_WEIGHT would break this.
+check("mastery fallback raw value is pinned to the 0.5 weighting", gen_skill.raw, 1.5)
+
+# _raw_value: the four branches score() alone never exercises distinctly enough to catch
+# a mutated field or a swapped max/min. Called directly so each test bites the one branch.
+conv_one_target = cand("r/conv1", "fc1", "ConvOne", 1, 1,
+                        conversions=(("Physical", "Fire", 50.0), ("Physical", "Cold", 30.0)))
+conv_two_target = cand("r/conv2", "fc2", "ConvTwo", 1, 1,
+                        conversions=(("Physical", "Fire", 20.0), ("Aether", "Fire", 10.0)))
+check("converts_to sums only conversions whose destination matches the requested type",
+      core._raw_value(conv_one_target, "converts_to:Fire")[0], 50.0)
+check("converts_to sums every conversion targeting the requested type, not just the first",
+      core._raw_value(conv_two_target, "converts_to:Fire")[0], 30.0)
+
+granter = cand("r/grant", "fg1", "Granter", 1, 1, granted_skills=("records/skills/x.dbr",))
+non_granter = cand("r/nogrant", "fg2", "NoGranter", 1, 1)
+check("grants_skill returns 1.0 when the skill is granted",
+      core._raw_value(granter, "grants_skill:records/skills/x.dbr")[0], 1.0)
+check("grants_skill returns 0.0 when the skill is not granted",
+      core._raw_value(non_granter, "grants_skill:records/skills/x.dbr")[0], 0.0)
+
+mastery_boost = cand("r/mast", "fm1", "MasteryBoost", 1, 1,
+                      mastery_boosts={"records/skills/playerclass04/_classtraining_class04.dbr": 4})
+check("boosts_mastery returns the level for the named mastery",
+      core._raw_value(mastery_boost,
+                       "boosts_mastery:records/skills/playerclass04/_classtraining_class04.dbr")[0],
+      4.0)
+check("boosts_mastery returns 0.0 for a mastery the candidate does not boost",
+      core._raw_value(mastery_boost,
+                       "boosts_mastery:records/skills/playerclass05/_classtraining_class05.dbr")[0],
+      0.0)
+
+mastery_direct_wins = cand("r/mdw", "fu1", "MasteryDirectWins", 1, 1,
+                            mastery_boosts={"records/skills/playerclass04/_classtraining_class04.dbr": 5},
+                            skill_boosts={"records/skills/playerclass04/shadowstrike.dbr": 2})
+mastery_skill_wins = cand("r/msw", "fu2", "MasterySkillWins", 1, 1,
+                           mastery_boosts={"records/skills/playerclass04/_classtraining_class04.dbr": 1},
+                           skill_boosts={"records/skills/playerclass04/shadowstrike.dbr": 6})
+check("mastery union takes the direct boost when it is larger than any skill boost",
+      core._raw_value(mastery_direct_wins,
+                       "mastery:records/skills/playerclass04/_classtraining_class04.dbr")[0],
+      5.0)
+check("mastery union takes the skill boost when it is larger than the direct boost",
+      core._raw_value(mastery_skill_wins,
+                       "mastery:records/skills/playerclass04/_classtraining_class04.dbr")[0],
+      6.0)
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

@@ -123,7 +123,7 @@ def _mastery_dir(record: str) -> str:
     return head
 
 
-def _raw_value(candidate: Candidate, criteria: Criteria, criterion_name: str) -> tuple[float, str]:
+def _raw_value(candidate: Candidate, criterion_name: str) -> tuple[float, str]:
     """Read the raw (unnormalised) value a candidate contributes to one criterion.
 
     Most criteria read a single field on the candidate directly. The exception is
@@ -176,7 +176,7 @@ def score(candidates, c, weights=None):
     notes: dict[str, dict[str, str]] = {n: {} for n in names}
     for cand_ in candidates:
         for name in names:
-            value, note = _raw_value(cand_, c, name)
+            value, note = _raw_value(cand_, name)
             raw[name][cand_.record] = value
             notes[name][cand_.record] = note
     best = {n: max(v.values(), default=0.0) for n, v in raw.items()}
