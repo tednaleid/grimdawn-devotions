@@ -197,14 +197,15 @@ a confident wrong answer.
 - **The score reflects only the criteria you passed.** It ranks candidates
   and does not judge builds. Every table and JSON result repeats this line
   verbatim.
-- **Source is thin, and `unknown` is not a world drop.** `source` renders as
-  `vendor`, `crafted`, or `unknown`. `unknown` means unattributed in the
-  current data, nothing more - it is never rendered or described as a world
-  drop. Measured against build 19149150: only 7.2% of gear records carry any
-  source row, alongside 79.0% of augments, 78.5% of components, and 96.5% of
-  relics. Whether an item is actually farmable, and from where, is one of the
-  most useful things a player wants to know, and this data cannot answer it
-  for most gear. Farmability and monster-infrequent affix applicability both
+- **Source is thin for gear specifically, and `unknown` is not a world
+  drop.** `source` renders as `vendor`, `crafted`, or `unknown`. `unknown`
+  means unattributed in the current data, nothing more - it is never
+  rendered or described as a world drop. Measured against build 19149150,
+  augments (97.6%), components (78.5%), and relics (97.6%) are well
+  attributed. Gear is not: only 7.2% of gear records carry any source row,
+  and affixes carry none at all (0%). Gear is exactly the domain a player
+  most wants to know how to farm, and this data cannot answer that for 93%
+  of it. Farmability and monster-infrequent affix applicability both
   wait on the reverse loot-table graph, out of scope here and tracked as its
   own initiative (see [BACKLOG.md](../BACKLOG.md)); `source` is designed so
   that work resolves more items automatically, without changing this CLI's

@@ -7,17 +7,31 @@ description: Answer Grim Dawn item and build questions (gear, augments, componen
 
 Answer Grim Dawn build questions with `scripts/gditems.py`, a standalone CLI
 over the derived item database (see [docs/item-cli.md](../../../docs/item-cli.md)
-for the full flag reference). Never guess at item names, skill names, or stat
-tokens - the vocabulary is real data, and every flag rejects an unknown token
-loudly rather than returning a misleadingly empty result.
+for the full flag reference). Run it through the justfile passthrough
+(`just items ...`), which this repo prefers, or directly with `uv run
+scripts/gditems.py ...` - both are equivalent. Never guess at item names,
+skill names, or stat tokens - the vocabulary is real data, and every flag
+rejects an unknown token loudly rather than returning a misleadingly empty
+result.
+
+If the derived data has not been fetched yet, every subcommand fails fast
+with one fixed line on stderr and exit code 2:
+
+```
+data/derived not found. Run: just fetch-deposit
+```
+
+Run `just fetch-deposit` and retry rather than treating that as a dead end.
 
 ## Workflow
 
 1. **Call `vocab` before composing flags.**
 
    ```
-   uv run scripts/gditems.py vocab --json
+   just items vocab --json
    ```
+
+   (equivalently: `uv run scripts/gditems.py vocab --json`)
 
    This lists every real domain, gear type, slot, rarity, expansion, stat
    family, mastery, skill, and granted-skill name. Compose `search` flags
@@ -66,13 +80,14 @@ loudly rather than returning a misleadingly empty result.
 
    `source` renders as `vendor`, `crafted`, or `unknown`. `unknown` means
    *unattributed in this data* - it is not evidence the item drops from
-   monsters, and it must never be written up that way. Source coverage is
-   thin outside augments/components/relics (7.2% of gear, 79.0% of
-   augments, 78.5% of components, 96.5% of relics carry any source row at
-   all, build 19149150), so most gear recommendations will legitimately
-   have no acquisition story to tell. Say so plainly rather than inventing
-   one. Farmability data waits on a separate, not-yet-built loot-table
-   graph (see BACKLOG.md).
+   monsters, and it must never be written up that way. Augments (97.6%),
+   components (78.5%), and relics (97.6%) are well attributed (build
+   19149150). Gear is not: only 7.2% of gear records carry any source row,
+   and affixes carry none at all (0%). Gear is exactly the domain a player
+   most wants a farming answer for, so most gear recommendations will
+   legitimately have no acquisition story to tell. Say so plainly rather
+   than inventing one. Farmability data waits on a separate, not-yet-built
+   loot-table graph (see BACKLOG.md).
 
 5. **Use `show` for per-item detail, then publish the recommendations as an
    artifact.**
