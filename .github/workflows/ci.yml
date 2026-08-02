@@ -21,6 +21,10 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: just
+      # scripts/ are standalone `uv run --script` programs, and `just lint-py` shells
+      # out to `uvx ruff`. Without uv on the runner that recipe exits 127, not 0.
+      # Pinned to an exact release: setup-uv stopped publishing moving major tags after v7.
+      - uses: astral-sh/setup-uv@v9.0.0
       - name: Install web dependencies
         run: just web-install
       - name: Run checks (tests, lint, type-check)
