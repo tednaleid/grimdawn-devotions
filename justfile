@@ -432,6 +432,12 @@ clean-deposit:
 clean-derived:
     rm -rf "{{derived_dir}}"
 
+# Query the derived item database. Standalone: scripts/gditems.py
+[group("deposit")]
+[doc("Query the item database: just items search --domain augment --fits chest --resist pierce")]
+items *ARGS:
+    uv run "{{justfile_directory()}}/scripts/gditems.py" {{ARGS}}
+
 # --- Dataset releases ---------------------------------------------------------
 # Generated parquet never enters git: publish uploads deposit + derived as an
 # immutable GitHub Release (deposit-<buildid>.<rev>) and writes deposit.lock;
