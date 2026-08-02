@@ -4,6 +4,21 @@ How to read a character out of a shared `grimtools.com/calc/<id>` link and audit
 it against this project's own data. The goal is a report where every claim is
 traceable to data rather than recollection.
 
+Two scripts do the mechanical work; everything below explains why they are shaped
+the way they are, and what still needs a human eye:
+
+```
+bun scripts/gt_scrape.ts https://www.grimtools.com/calc/<id> build.json
+uv run scripts/gt_audit.py build.json
+```
+
+`gt_scrape.ts` loads the page and writes one JSON blob: gear, skills, devotions,
+the buff catalogue, and the full character sheet in three named buff states with
+resistance overcap for each. `gt_audit.py` turns that into findings - the RR
+ledger, the monster cross-check, circuit breakers, and a planner link. Its
+parsing rules are pure and pinned by `scripts/test_gt_audit.py`, because every
+one of them exists to fix a mistake a hand-written regex made first.
+
 ## Getting the build out of grimtools
 
 The build is **not** server-rendered and there is **no API call to intercept**:
@@ -55,10 +70,18 @@ Resistance.
 The panel therefore read **Poison 36%** and **Physical 18%**, which look like
 glaring holes and are not: with the buff on they are **83%** and **37%**.
 
-Read the buff panel before believing any defensive number:
+Read the buff panel before believing any defensive number. Three things about it
+are easy to get wrong, and each fails silently:
+
+- **`.buff-row` does not exist until the panel is opened.** Querying first returns
+  an empty list that looks exactly like "there is nothing to toggle".
+- **Toggling a buff replaces the row element.** A held reference goes stale, so
+  clicking it again does nothing. Re-query by name for every toggle.
+- **The row's class does not update in place either.** Confirm a toggle actually
+  landed by reading `.buff-popup-header`, which counts them: `Buffs (2/16)`.
 
 ```js
-document.querySelector(".buff-toggle.text-image-button").click();
+document.querySelector(".buff-toggle.text-image-button").click();  // rows appear only now
 [...document.querySelectorAll(".buff-row")].map((r) => ({
   name: r.querySelector(".buff-name")?.textContent.trim(),
   source: r.querySelector(".buff-source")?.textContent.trim(),
@@ -67,9 +90,12 @@ document.querySelector(".buff-toggle.text-image-button").click();
 }));
 ```
 
-Then click the rows worth enabling and re-read the stats. Report numbers in named
-states ("as shared", "with Blood of Dreeg", "with cooldowns") rather than one
-ambiguous column.
+The panel groups buffs as **Permanent**, **Toggled**, **Activated** and
+**Triggered**, which is a better spine for a report than on/off: an Activated
+mastery buff is one the player keeps up, a Triggered proc is conditional, and a
+potion is neither. Report numbers in named states ("as shared", "sustained",
+"all procs") rather than one ambiguous column, and say which group each state
+turned on.
 
 ### The resistance panel hides overcap
 
@@ -77,14 +103,34 @@ The panel shows the **capped** value, so every resistance reading exactly `80%`
 may be sitting on a huge cushion or none at all and they look identical. The
 tooltip carries the truth:
 
+The hover is a jQuery event and the text lands in `.tooltip-v2`, appended near the
+end of `<body>`. Take the last one: earlier matches are pre-existing hidden popups.
+
 ```js
 $(document.querySelector('[stat="resFire"]')).trigger("mouseenter");
+[...document.querySelectorAll(".tooltip-v2")].map((n) => n.textContent.trim()).pop();
 // -> "Fire 80% (+78% Over Maximum) Resistance to incendiary attacks..."
 ```
 
 On one build this turned "seven resistances at exactly 80, no cushion" into
 "+106, +88, +78, +78, +44, +22, +22, and one at **+5**". The advice reversed
 completely, because the thin resistance was aether and the panel gave no hint.
+
+### A tooltip states the same bonus more than once
+
+Three overlaps, all of which inflate any total computed by grepping a whole
+tooltip. On one audited build they turned a real -90% cold into -115%.
+
+1. **Every skill tooltip prints `Current Level` and `Next Level`**, each with a
+   full stat block. Cut at `Next Level` and read only what precedes it.
+2. **A devotion celestial power is printed inside the tooltip of the skill it is
+   bound to**, and again by `dumpDevotion()`. Count it once. Cutting at
+   `Next Level` drops the skill-side copy, since the power block follows it.
+3. **`-X% Elemental Resistance` is one line that reduces three resistances.**
+   Expand it into Fire, Cold and Lightning rather than reporting "Elemental" as a
+   damage type of its own, or it silently vanishes from every per-type total.
+
+`gt_audit.current_block` and `collect_rr` implement all three.
 
 ## Cross-checking against our own data
 
@@ -99,8 +145,14 @@ baseline.
 
 Completed constellations are unambiguous (take every star). Partial ones need
 each star matched against our structured bonuses, which works by comparing the
-multiset of magnitudes in the tooltip text. Celestial-power stars are named after
-the power rather than the constellation, so resolve those first.
+multiset of magnitudes in the tooltip text.
+
+Celestial-power stars are named after the power rather than the constellation, so
+resolve those first - but **split them off with `dumpDevotion()`'s `isSkill` flag,
+never by name**. A constellation and a power can share a name: Tsunami is both, so
+a name-based split treats all five Tsunami entries as the one power star and
+silently loses four stars. That failure looks like a clean run, because the
+leftover stars are simply never assigned.
 
 **Verify the result by decoding it with the app's own `decodeHash` and
 `buildModel`** instead of trusting the encoder. A positional bitset that is
@@ -135,11 +187,24 @@ final = (base > 0 ? base * (1 - maxMult / 100) : base) - maxFlat
 ```
 
 The consequence is worth internalising: **once stacking drives a resistance to
-zero, multiplicative RR does nothing.** One audited build had -104% chaos
-stacking, and checking every non-summon boss and hero in `data/monsters.json`
-(710 of them) found **none above 104%**, so every multiplicative RR item was
-worthless to that character. That "do not buy this" finding only exists because
-we hold the monster table.
+zero, multiplicative RR does nothing.** That "do not buy this" finding only exists
+because we hold the monster table.
+
+Answering it correctly needs one more step. **`data/monsters.json` stores base
+resistances; the per-difficulty bonuses live in a separate `difficulty_offsets`
+table and must be added.** Skipping them makes every Elite and Ultimate answer too
+optimistic - Ultimate tier 4 adds +15 cold and +15 chaos. Scope the pool to
+non-summon `Boss`, `Hero`, `Quest`, `Champion` and `SuperBoss` (1,400 records);
+omitting Champion and SuperBoss drops it to 710 and hides exactly the enemies that
+resist hardest.
+
+Worked both ways on real builds: a character with **-104% chaos** stacking has 15
+of those 1,400 still positive on Ultimate, and one with **-90% cold** has 19. In
+both cases the answer is the same in practice - multiplicative RR is dead weight
+against roughly 99% of the game - but it is *not* zero, and the exceptions are
+the superbosses (Callagadra, Avatar of Mogdrogen, the Ravagers, The Dread,
+N'erfatal), which is precisely the content someone might buy that item for.
+`gt_audit.monster_check` does this with the offsets applied.
 
 To deep-link the RR page, ids come from `aggregate(parseCatalogue(doc).sources)`
 and the hash is `#source=devotion,skill,item&sel=<ids>&r0=<n>`. **`source=` must
@@ -167,6 +232,16 @@ mastery name with a blank skill column.
   failures.
 - Our tokens are not always the game's words: Poison & Acid is `acid`, and
   conversion types are capitalised (`Chaos`).
+- **The in-game "Awakened " prefix is not part of the item's name.** An Ascension
+  craft shares its base item's name tag and item level, differing only in rarity,
+  so `show "Awakened Bloodmane's Mark"` finds nothing. Strip the prefix and pick
+  the candidate whose record lives under `records/items/awakened/`; `show` lists
+  both with their record paths rather than guessing.
+- A criterion coming back unmatched is worth one sanity check before it goes in a
+  report. `resist.physical` returning nothing for augments, components and medals
+  is a real answer (the stat is well represented on shoulders, chest, head, legs
+  and feet, so the query works). The same empty result from a token that matches
+  nothing anywhere would be a data gap wearing the same clothes.
 
 **Check the deposit's game version against the build's.** `data/deposit/meta.parquet`
 carries `game_version`. Auditing a 1.3.0.0 build against a 1.2.1.x index is fine
