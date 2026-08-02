@@ -548,6 +548,42 @@ def build_boosts(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
 
 
 # ---------------------------------------------------------------------------
+# conversions
+# ---------------------------------------------------------------------------
+
+def build_conversions(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
+    """Damage conversion as from/to/percent triples.
+
+    A record can carry several conversions, numbered by a trailing digit on the key
+    (the unnumbered key is index 1), so these are joined from facts rather than pivoted
+    wide, which would collapse them to one per record.
+    """
+    con.execute("CREATE TEMP TABLE conversions (record VARCHAR, from_type VARCHAR, "
+                "to_type VARCHAR, percent DOUBLE)")
+    con.execute("""
+        WITH idx AS (
+            SELECT record, key, value, value_num,
+                   COALESCE(NULLIF(regexp_extract(key, '(\\d+)$', 1), ''), '1') AS n,
+                   regexp_replace(key, '\\d+$', '') AS base
+            FROM facts
+            WHERE regexp_replace(key, '\\d+$', '') IN
+                  ('conversionInType', 'conversionOutType', 'conversionPercentage')
+        )
+        INSERT INTO conversions
+        SELECT s.record, trim(i.value), trim(o.value), p.value_num
+        FROM scoped s
+        JOIN idx i ON i.record = s.record AND i.base = 'conversionInType'  AND trim(i.value) != ''
+        JOIN idx o ON o.record = s.record AND o.base = 'conversionOutType' AND o.n = i.n
+                                          AND trim(o.value) != ''
+        JOIN idx p ON p.record = s.record AND p.base = 'conversionPercentage' AND p.n = i.n
+                                          AND p.value_num > 0""")
+    out = out_dir / "conversions.parquet"
+    con.execute(f"COPY (SELECT * FROM conversions ORDER BY record, from_type, to_type) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM conversions").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 # sources
 # ---------------------------------------------------------------------------
 
@@ -818,6 +854,7 @@ def cmd_build(args) -> int:
     n_stats = build_stats(con, cur, out_dir, diag)
     n_sources = build_sources(con, cur, out_dir)
     n_boosts = build_boosts(con, out_dir)
+    n_conversions = build_conversions(con, out_dir)
 
     rel_out = out_dir / "relations.parquet"
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
@@ -860,11 +897,12 @@ def cmd_build(args) -> int:
         "SELECT kind, count(*) FROM boosts GROUP BY 1 ORDER BY 1").fetchall()
     print(f"  boosts: {n_boosts}   " +
           "  ".join(f"{k}({n})" for k, n in boost_kind_counts))
+    print(f"  conversions: {n_conversions}")
     print(f"  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                          if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities", "stats", "relations", "families", "sources", "boosts"):
+    for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
