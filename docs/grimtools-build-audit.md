@@ -97,6 +97,32 @@ potion is neither. Report numbers in named states ("as shared", "sustained",
 "all procs") rather than one ambiguous column, and say which group each state
 turned on.
 
+### Difficulty is a viewer setting, and it moves every resistance
+
+Grimtools has a difficulty selector, and the shared link carries whatever the
+author left it on. Elite subtracts 25 from every player resistance and Ultimate
+subtracts 50, applied before the cap, so **the same character reads +79 poison
+cushion on Normal and +29 on Ultimate**. Measured on one build by flipping the
+selector:
+
+| | Normal | Elite | Ultimate |
+| --- | --- | --- | --- |
+| Poison | +79 | +54 | +29 |
+| Pierce | +71 | +46 | +21 |
+| Fire | +125 | +100 | +75 |
+
+Judge cushions at Ultimate, because that is where the character is played.
+`gt_scrape.ts` forces the selector to Ultimate before reading anything and warns
+if it could not. Read the current setting from `.difficulty-selector`, whose text
+begins with the active label.
+
+**A cushion of about +30 is the useful target** - enough to absorb the resistance
+reduction enemies apply, past which it stops paying for itself. That number turns
+a wall of raw overcap figures into an actual verdict: +126 elemental is budget to
+reclaim, +21 pierce is not. Getting this wrong in the generous direction produces
+the worst kind of advice, telling someone to strip a resistance that was already
+at its limit.
+
 ### The resistance panel hides overcap
 
 The panel shows the **capped** value, so every resistance reading exactly `80%`
@@ -246,6 +272,34 @@ mastery name with a blank skill column.
 **Check the deposit's game version against the build's.** `data/deposit/meta.parquet`
 carries `game_version`. Auditing a 1.3.0.0 build against a 1.2.1.x index is fine
 for finding candidates, but stats may have moved and the report has to say so.
+
+### Armour and armour absorption
+
+Armour is easy to fold into "damage reduction" and get wrong, because it is much
+narrower than it looks. All of this is checkable in the extracted files.
+
+- **Armour reduces physical damage only.** The game's own stat description
+  (`tagCharStatsArmorTotalDescription`) reads "the less damage you will take from
+  physical attacks". Nothing else: not cold, fire, lightning, aether, chaos,
+  vitality, poison or pierce, and not damage-over-time.
+- **Absorption is 70% by default**, from `armorDefensiveAbsorption` in
+  `records/game/gameengine.dbr`. The other records carrying that key are dev
+  sandbox archives and the in-game UI copy - do not read a different default off
+  one of those.
+- **It absorbs 70% of the damage falling within the armour value, and none of the
+  excess**: `absorbed = min(hit, armour) x absorption`. At 3,047 armour a 3,000
+  hit lands for 900, while a 6,000 hit lands for 3,867, because the absorbed
+  amount is capped by the armour value rather than the hit. Armour is strong
+  against many medium physical hits and weak against one large one.
+- **"Increases Armour Absorption by X%" multiplies the 70, it does not add to
+  it**: +20% gives 70 x 1.2 = 84%. Only two devotion stars grant it at all -
+  Obelisk of Menhir's fifth (+18%) and Anvil's second (+3%).
+- **Armour Piercing routes around it.** 299 records convert a share of physical
+  damage into pierce, which is checked against pierce resistance instead.
+
+What this audit has *not* verified from data is the order in which armour and
+physical resistance apply to the same hit, so report them as separate mitigation
+steps rather than multiplying them into one number.
 
 ## Arithmetic worth double-checking
 

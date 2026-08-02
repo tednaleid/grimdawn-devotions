@@ -135,7 +135,9 @@ const PROBE = String.raw`(() => {
     return s;
   };
   const RES = ["resFire","resCold","resLightning","resPoison","resPierce","resBleeding",
-               "resLife","resAether","resChaos","resPhysical"];
+               "resLife","resAether","resChaos","resPhysical",
+               "resStun","resFreeze","resPetrify","resTotalSpeedResistance","resTrap",
+               "resSlowLifeLeach","resDisruption"];
   // The panel shows the CAPPED value, so 80% may sit on a huge cushion or none and they
   // look identical. Only the hover tooltip carries "(+N% Over Maximum)".
   const overcap = () => {
@@ -147,7 +149,10 @@ const PROBE = String.raw`(() => {
       const tip = [...document.querySelectorAll(".tooltip-v2")]
         .map((n) => (n.textContent || "").replace(/\s+/g, " ").trim()).filter(Boolean).pop() || "";
       const m = tip.match(/\(\s*([+-]?\d+)%\s*Over Maximum\s*\)/i);
-      out[r] = { shown: el.textContent.trim(), over: m ? Number(m[1]) : 0 };
+      // Stats in hidden tabs carry their label in the same node ("Stun Resist80%"),
+      // so drop everything before the first digit or sign.
+      const shown = el.textContent.trim().replace(/^[^0-9+-]*/, "");
+      out[r] = { shown, over: m ? Number(m[1]) : 0 };
       try { $(el).trigger("mouseleave"); } catch (e) {}
     }
     return out;
@@ -178,8 +183,23 @@ const PROBE = String.raw`(() => {
     return hit;
   };
 
+  // Difficulty is a viewer control, and it moves every resistance: Elite subtracts 25 and
+  // Ultimate 50 from the player's totals, so the same character reads +79 poison overcap on
+  // Normal and +29 on Ultimate. Force Ultimate before reading anything, because that is the
+  // difficulty the numbers have to be judged at.
+  const difficultyLabel = () =>
+    ([...document.querySelectorAll(".difficulty-selector-popup a")]
+      .map((a) => a.textContent.trim())
+      .find((n) => (document.querySelector(".difficulty-selector")?.textContent || "").startsWith(n))) || "unknown";
+  const difficultyAsShared = difficultyLabel();
+  const ult = [...document.querySelectorAll(".difficulty-selector-popup a")]
+    .find((a) => a.textContent.trim() === "Ultimate");
+  if (ult) ult.click();
+
   const out = {
     url: location.href,
+    difficultyAsShared,
+    difficulty: difficultyLabel(),
     className: getCombinedClassName(),
     gameVersion: buildInfo.created_for_build,
     masteries: buildInfo.masteries,
@@ -237,9 +257,15 @@ try {
   const data = JSON.parse(raw);
   writeFileSync(OUT, JSON.stringify(data, null, 1), "utf8");
   const n = (s: string) => data.states[s]?.header ?? "?";
+  if (data.difficulty !== "Ultimate")
+    console.error(
+      `WARNING: could not switch to Ultimate (reads "${data.difficulty}"). Resistance overcap ` +
+        `is 25 points high on Elite and 50 on Normal; do not judge cushions from this scrape.`,
+    );
   console.error(
     `wrote ${OUT}: ${data.className} level ${data.bio?.level}, ${data.items.length} items, ` +
-      `${data.devotions.length} devotion stars | buffs ${n("asShared")} -> ${n("sustained")} -> ${n("everything")}`,
+      `${data.devotions.length} devotion stars | difficulty ${data.difficultyAsShared} -> ` +
+      `${data.difficulty} | buffs ${n("asShared")} -> ${n("sustained")} -> ${n("everything")}`,
   );
 } finally {
   cleanup();
