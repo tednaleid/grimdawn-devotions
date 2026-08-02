@@ -95,6 +95,8 @@ Pages, auto-deployed from `main`).
 - `docs/dbr-format.md` -- reverse-engineered game data model
 - `docs/deposit.md` -- raw game-data deposit: schema, recipes, refresh flow
 - `docs/item-schema.md` -- derived typed item schema: tables, curated inputs, known gaps
+- `docs/item-cli.md` -- the item query CLI: flags, name resolution, tier semantics
+- `docs/grimtools-build-audit.md` -- reading a shared grimtools build and auditing it against our data
 - `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings
 - `docs/reachability-engine.md` -- shipped vs costed engine comparison + the current-state decision

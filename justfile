@@ -169,11 +169,21 @@ extract: _require-game-closed
 # human-readable version via data/steam-build-versions.json. GD_VERSION overrides the map (and bootstraps
 # a brand-new build). Fails on an unknown buildid so a new release cannot silently ship the previous
 # version label. Prints one line: "<buildid> <version>".
+#
+# GD_BUILDID overrides the manifest read. The buildid describes the records being parsed, but the
+# manifest describes what Steam has installed *now*, and those diverge whenever a rebuild runs against
+# an existing `extracted/` tree after the game has since patched. Stamping the installed buildid onto
+# older records would misattribute the data, so a rebuild off a known extraction passes the buildid it
+# actually came from.
 _game-version:
     #!/usr/bin/env bash
     set -euo pipefail
     manifest="{{gd_dir}}/../../appmanifest_219990.acf"
-    buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    if [ -n "${GD_BUILDID:-}" ]; then
+      buildid="${GD_BUILDID}"
+    else
+      buildid=$(grep -oE '"buildid"[[:space:]]+"[0-9]+"' "$manifest" 2>/dev/null | grep -oE '[0-9]+' || true)
+    fi
     if [ -z "$buildid" ]; then echo "could not read Steam buildid from $manifest" >&2; exit 1; fi
     if [ -n "${GD_VERSION:-}" ]; then echo "$buildid $GD_VERSION"; exit 0; fi
     map="{{justfile_directory()}}/data/steam-build-versions.json"
