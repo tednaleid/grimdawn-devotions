@@ -48,17 +48,19 @@ These are measured, not assumed. Implementation must not contradict them.
 
 ### Source attribution is thin for gear and absent for affixes
 
-Coverage of `sources.parquet` by domain, measured 2026-08-01 against the committed
-deposit (build 19149150):
+Coverage of `sources.parquet` by domain, measured against the committed deposit
+(build 19149150). Count records with `count(DISTINCT record)`, not `count(*)` across a
+join to `sources`, since an item with several source rows would otherwise be counted
+several times and deflate its coverage:
 
 | domain | records | with a source row | coverage |
 | --- | --- | --- | --- |
 | gear | 6,109 | 439 | 7.2% |
 | affix | 6,657 | 0 | 0% |
 | blueprint | 765 | 0 | 0% |
-| augment | 420 | 332 | 79.0% |
+| augment | 340 | 332 | 97.6% |
 | component | 107 | 84 | 78.5% |
-| relic | 85 | 82 | 96.5% |
+| relic | 84 | 82 | 97.6% |
 | quest | 68 | 1 | 1.5% |
 
 An item with no source row is unattributed, which is not the same as a world drop. The
