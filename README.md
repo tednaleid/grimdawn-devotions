@@ -39,8 +39,8 @@ reads the game's extracted `.dbr` records into one
 [`data/devotions.json`](data/devotions.json): every constellation, its affinity
 unlock cost and the affinity it grants, and each star's stat bonuses, celestial
 power, weapon requirement, map position, and intra-constellation pick order.
-Current output: **109 constellations, 559 stars** (game build `19149150`,
-v1.2.1.x). It is committed to the repo and re-runnable after every patch, so the
+Current output: **109 constellations, 559 stars** (game build `24346246`,
+v1.3.0.0). It is committed to the repo and re-runnable after every patch, so the
 planner builds anywhere without touching the game.
 
 Everything is reproducible from your own game install; see Quick start below.
@@ -157,8 +157,8 @@ in `extracted/text_en/text_en/*.txt`. The `extracted/` tree is **git-ignored**
 ```jsonc
 {
   "meta": {
-    "game_version": "1.2.1.x",
-    "steam_buildid": "19149150",
+    "game_version": "1.3.0.0",
+    "steam_buildid": "24346246",
     "extracted_from": "records/ui/skills/devotion/",
     "generated_utc": "2026-06-21T19:06:05Z",
     "affinities": ["ascendant","chaos","eldritch","order","primordial"]

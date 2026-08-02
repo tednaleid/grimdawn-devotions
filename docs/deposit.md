@@ -65,15 +65,32 @@ display labels is deferred stat-label work.
 
 Windows box, game fully closed:
 
-1. `just extract` - records + English text (destructive re-extract)
-2. `just i18n-tables` - every other installed language's text
-3. `just deposit` - rebuild the deposit (captures the new Steam build id)
-4. `just publish-deposit` - release the new build's parquet and commit the
+1. add the new Steam build id to `data/steam-build-versions.json`
+2. `just extract` - records + English text (destructive re-extract)
+3. `just i18n-tables` - every other installed language's text
+4. `just deposit` - rebuild the deposit (captures the new Steam build id)
+5. `just derive` - **expect curation drift here on a content patch.** New
+   categories, `Class` values, and factions fail the build by design; classify
+   each one in `data/item-curation/` from the records themselves before
+   re-running (see docs/item-schema.md)
+6. `just q-ae-all` - the count pins move whenever content is added. Repin only
+   after confirming the structural checks and transcribed oracles still pass:
+   a moved count is a patch, a failed oracle is a bug
+7. `just publish-deposit` - release the new build's parquet and commit the
    updated `deposit.lock`
 
-Skipping step 2 leaves the non-English label tables stale; `just deposit`
+Skipping step 3 leaves the non-English label tables stale; `just deposit`
 warns when any `extracted/text_*` directory is older than the extracted
 records, and warns about repo-known locales with no extracted text at all.
+
+Steps 5 and 6 are the reviewed part and the reason this is not one command.
+`just publish-deposit` runs both as gates, so a patch cannot ship without
+them, but doing them first keeps the review separate from the upload.
+
+The game-data track (`data/devotions.json`, `monsters.json`,
+`resistance-reduction.json`, `data/i18n/`) is committed to git and refreshes
+independently with `just migrate`, which chains extract through `just check`
+and stops before the commit so the diff gets reviewed.
 
 Every other machine picks up the new build with `git pull` and
 `just fetch-deposit` - no game install, no derive step.
