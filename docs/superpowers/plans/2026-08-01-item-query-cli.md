@@ -73,8 +73,8 @@ sample AS (
 ),
 checks AS (
     SELECT
-        (SELECT n FROM k WHERE kind = 'skill') > 7000 AS skill_rows_present,
-        (SELECT n FROM k WHERE kind = 'mastery') > 900 AS mastery_rows_present,
+        (SELECT n FROM k WHERE kind = 'skill') = 13896 AS skill_rows_present,
+        (SELECT n FROM k WHERE kind = 'mastery') = 1146 AS mastery_rows_present,
         (SELECT count(*) FROM boosts WHERE mastery_record IS NULL) = 0 AS every_boost_has_mastery,
         (SELECT count(*) FROM boosts WHERE level <= 0) = 0 AS levels_positive,
         (SELECT count(*) FROM boosts WHERE kind = 'mastery' AND target != mastery_record) = 0 AS mastery_target_is_self
