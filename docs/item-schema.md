@@ -50,11 +50,11 @@ acceptance queries proving the whole contract; filters evaluate per entity row
   (weapon damage lines, block, chances, durations, skill/mastery bonuses,
   light radius, experience, energy regen, and all augment/component/relic
   stats). Calibration evidence and the one known gap live in the file itself.
-- `factions.json` - the `factionSource`-value-to-`tagFaction*` tag map (13
-  rows at build 19149150, following the game's own `tagFaction<value>` tag
+- `factions.json` - the `factionSource`-value-to-`tagFaction*` tag map (14
+  rows at build 24346246, following the game's own `tagFaction<value>` tag
   convention, kept explicit so new factions are reviewed) plus
   `unsold_augments`, the pinned list of faction-sourced augments no vendor
-  sells (8 dev template blanks).
+  sells (8 dev template blanks and 2 dev sandbox runes).
 
 Drift guards run at the top of `just derive` and fail the build loudly:
 unknown `records/items/*` category, unknown `Class` in a scoped category,
@@ -68,8 +68,8 @@ deliberately and re-run.
 
 Precedence per record: positive literal keys win (`levelRequirement`;
 `strengthRequirement`/`dexterityRequirement`/`intelligenceRequirement` map to
-physique/cunning/spirit - no positive attribute literals exist at build
-19149150, so in practice the formulas decide); otherwise the record's
+physique/cunning/spirit - at build 24346246 no in-scope record carries a
+positive attribute literal, so in practice the formulas decide); otherwise the record's
 `itemCostName` formula record (default `records/game/itemcostformulas.dbr`)
 supplies per-gear-kind equations (`daggerIntelligenceEquation`, ...)
 evaluated over `itemLevel` and `totalAttCount` with an AST-whitelisted

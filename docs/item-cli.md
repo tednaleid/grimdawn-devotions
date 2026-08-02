@@ -232,11 +232,11 @@ a confident wrong answer.
 - **Source is thin for gear specifically, and `unknown` is not a world
   drop.** `source` renders as `vendor`, `crafted`, or `unknown`. `unknown`
   means unattributed in the current data, nothing more - it is never
-  rendered or described as a world drop. Measured against build 19149150,
-  augments (97.6%), components (78.5%), and relics (97.6%) are well
-  attributed. Gear is not: only 7.2% of gear records carry any source row,
+  rendered or described as a world drop. Measured against build 24346246,
+  augments (97.9%), relics (96.7%), and components (78.5%) are well
+  attributed. Gear is not: only 7.8% of gear records carry any source row,
   and affixes carry none at all (0%). Gear is exactly the domain a player
-  most wants to know how to farm, and this data cannot answer that for 93%
+  most wants to know how to farm, and this data cannot answer that for 92%
   of it. Farmability and monster-infrequent affix applicability both
   wait on the reverse loot-table graph, out of scope here and tracked as its
   own initiative (see [BACKLOG.md](../BACKLOG.md)); `source` is designed so

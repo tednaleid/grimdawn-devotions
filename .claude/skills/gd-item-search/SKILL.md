@@ -87,9 +87,9 @@ Run `just fetch-deposit` and retry rather than treating that as a dead end.
 
    `source` renders as `vendor`, `crafted`, or `unknown`. `unknown` means
    *unattributed in this data* - it is not evidence the item drops from
-   monsters, and it must never be written up that way. Augments (97.6%),
-   components (78.5%), and relics (97.6%) are well attributed (build
-   19149150). Gear is not: only 7.2% of gear records carry any source row,
+   monsters, and it must never be written up that way. Augments (97.9%),
+   relics (96.7%), and components (78.5%) are well attributed (build
+   24346246). Gear is not: only 7.8% of gear records carry any source row,
    and affixes carry none at all (0%). Gear is exactly the domain a player
    most wants a farming answer for, so most gear recommendations will
    legitimately have no acquisition story to tell. Say so plainly rather

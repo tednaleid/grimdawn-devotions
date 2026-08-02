@@ -6,10 +6,12 @@
     "kept explicit so a new faction in a patch is reviewed, not silently joined. Drift guards",
     "(scripts/build_derived.py): a factionSource value missing from faction_tags fails the build;",
     "the set of faction-sourced augments with NO vendor row must equal unsold_augments exactly",
-    "(all 8 are dev template blanks, present in the deposit but sold by no vendor), so a real",
+    "(8 dev template blanks under records/items/enchants and 2 nameless dev sandbox runes",
+    "under records/sandbox/ben, all present in the deposit but sold by no vendor), so a real",
     "augment losing vendor coverage, or a blank gaining it, fails loudly.",
-    "Verified at build 19149150: 13 factionSource values, 292 faction-sourced augments,",
-    "284 covered by faction vendor tier tables."
+    "Verified at build 24346246: 14 factionSource values, 338 faction-sourced augments,",
+    "328 covered by faction vendor tier tables. Many more tagFactionUser* labels exist (hostile",
+    "factions, unnamed placeholders); only the 14 that appear as a factionSource value belong here."
   ],
   "faction_tags": {
     "Survivors": "tagFactionSurvivors",
@@ -24,7 +26,8 @@
     "User11": "tagFactionUser11",
     "User13": "tagFactionUser13",
     "User14": "tagFactionUser14",
-    "User15": "tagFactionUser15"
+    "User15": "tagFactionUser15",
+    "User17": "tagFactionUser17"
   },
   "unsold_augments": [
     "records/items/enchants/a00_blank.dbr",
@@ -34,6 +37,8 @@
     "records/items/enchants/b000a_enchant.dbr",
     "records/items/enchants/b0000a_enchant.dbr",
     "records/items/enchants/b00000a_enchant.dbr",
-    "records/items/enchants/c000a_enchant.dbr"
+    "records/items/enchants/c000a_enchant.dbr",
+    "records/sandbox/ben/test_d303_rune.dbr",
+    "records/sandbox/ben/test_d303_rune2.dbr"
   ]
 }

@@ -209,9 +209,12 @@ def grimtools_url(name, item_level):
     derived from game data. This narrows a family's several tiers to the one intended
     record in the common case, but not always: measured exceptions are a cross-family
     name-and-level collision (Ulgrim's Keepsake, two unrelated quest-item families both
-    at item level 1) and duplicate levels within one family (Obsidian War Cleaver's
-    ladder is 30 / 30 / 40 / 55 / 70 / 84 / 94), either of which resolves more than one
-    record on grimtools.
+    at item level 1), duplicate levels within one family (Obsidian War Cleaver's
+    ladder is 30 / 30 / 40 / 55 / 70 / 84 / 94), and every Ascension craft under
+    records/items/awakened, which shares its base item's name and item level and differs
+    only in rarity (97 such pairs at build 24346246). Any of these resolves more than one
+    record on grimtools. Use the `record` field, which is always unambiguous, whenever the
+    caller needs to name one specific tier.
 
     Refuses to build a link for an empty name: a name-less query (`{"name": ""}`)
     matches every item at that level on grimtools rather than isolating anything, which

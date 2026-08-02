@@ -386,7 +386,7 @@ _q-derived FILE:
 [group("deposit")]
 q-ae1-cold-daggers: (_q-derived "ae1_cold_daggers.sql")
 
-# AE2: augments applicable to rings or amulets (pinned: 97 at build 19149150)
+# AE2: augments applicable to rings or amulets (pinned: 113 at build 24346246)
 [group("deposit")]
 q-ae2-augments-ring-amulet: (_q-derived "ae2_augments_ring_amulet.sql")
 
@@ -398,7 +398,7 @@ q-ae3-blueprint-links: (_q-derived "ae3_blueprint_links.sql")
 [group("deposit")]
 q-ae4-requirement-oracles: (_q-derived "ae4_requirement_oracles.sql")
 
-# AE5: legendary two-handed axes reconcile with grimtools' 14; The Guillotine card fields
+# AE5: legendary two-handed axes (pinned: 17 records / 10 groups); The Guillotine card fields
 [group("deposit")]
 q-ae5-legendary-2h-axes: (_q-derived "ae5_legendary_2h_axes.sql")
 
@@ -410,7 +410,7 @@ q-ae6-expansion-badges: (_q-derived "ae6_expansion_badges.sql")
 [group("deposit")]
 q-ae7-search-de: (_q-derived "ae7_search_de.sql")
 
-# AE8: faction vendor sources match the pinned coverage (284/292) + transcribed card oracles
+# AE8: faction vendor sources match the pinned coverage (328/338) + transcribed card oracles
 [group("deposit")]
 q-ae8-faction-sources: (_q-derived "ae8_faction_sources.sql")
 

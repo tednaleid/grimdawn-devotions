@@ -598,7 +598,7 @@ def build_sources(con: duckdb.DuckDBPyConnection, cur: dict, out_dir: Path) -> i
     # The merchant chain is followed from every marketFileName in the deposit
     # (not path-scoped): today only faction vendors reference tier tables whose
     # marketStaticItems carry faction-sourced items, and the acceptance pins
-    # (284 at build 19149150) make any future widening a loud, reviewed event.
+    # (328 at build 24346246) make any future widening a loud, reviewed event.
     con.execute("""
         CREATE TEMP TABLE sources (
           item VARCHAR, kind VARCHAR, vendor_record VARCHAR, vendor_tag VARCHAR,

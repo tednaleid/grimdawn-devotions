@@ -1,7 +1,7 @@
 -- ABOUTME: AE8 acceptance: faction vendor source edges match the pinned coverage at build
--- ABOUTME: 19149150 (284 of 292 augments, tier distribution) and five transcribed card oracles.
--- Empty result = failure. Pins: 284 distinct vendor-sourced augments (the other 8 are the
--- curated template blanks), tier item counts friendly 6 / honored 112 / revered 166 with no
+-- ABOUTME: 24346246 (328 of 338 augments, tier distribution) and five transcribed card oracles.
+-- Empty result = failure. Pins: 328 distinct vendor-sourced augments (the other 10 are the
+-- curated blanks), tier item counts friendly 9 / honored 130 / revered 189 with no
 -- other tier value, five oracle rows (augment, vendor, faction, tier) transcribed from
 -- grimtools/wiki (Coven Black Ash externally corroborated; all five spot-checked by Ted),
 -- and the exact set of distinct sources.kind values across the WHOLE table (crafted,
@@ -37,11 +37,11 @@ oracle(augment, vendor, faction, tier) AS (
 ),
 checks AS (
     SELECT
-      (SELECT count(DISTINCT item) FROM v) = 284
+      (SELECT count(DISTINCT item) FROM v) = 328
       AND (SELECT count(*) FROM tiers) = 3
-      AND (SELECT items FROM tiers WHERE tier = 'friendly') = 6
-      AND (SELECT items FROM tiers WHERE tier = 'honored') = 112
-      AND (SELECT items FROM tiers WHERE tier = 'revered') = 166
+      AND (SELECT items FROM tiers WHERE tier = 'friendly') = 9
+      AND (SELECT items FROM tiers WHERE tier = 'honored') = 130
+      AND (SELECT items FROM tiers WHERE tier = 'revered') = 189
       AND (SELECT count(*) FROM kinds) = 2
       AND NOT EXISTS (SELECT 1 FROM kinds WHERE kind NOT IN ('crafted', 'faction_vendor'))
       AND NOT EXISTS (SELECT 1 FROM oracle o
