@@ -155,6 +155,41 @@ def circuit_breakers(build: dict) -> list[dict]:
     return out
 
 
+# Roughly the cushion worth holding: enough to absorb the resistance reduction enemies
+# apply, past which more overcap stops paying for itself. Judged at Ultimate, which has
+# already subtracted 50 from every resistance before the cap.
+USEFUL_CUSHION = 30
+
+
+def resistance_report(build: dict, state: str = "sustained") -> list[dict]:
+    """Each resistance with its cushion in every captured buff state, and a verdict.
+
+    The panel only shows the capped value, so this is the table that decides where gear
+    budget is being wasted and where it is load-bearing - which is invisible without it.
+    """
+    states = build.get("states") or {}
+    order = [s for s in ("asShared", "sustained", "everything") if s in states]
+    base = states.get(state) or states.get("asShared") or {}
+    rows = []
+    for res, cell in (base.get("overcap") or {}).items():
+        if cell is None:
+            continue
+        over = {s: (states[s]["overcap"].get(res) or {}).get("over", 0) for s in order}
+        judged = over.get(state, 0)
+        shown = cell.get("shown", "")
+        capped = "%" in shown and not shown.startswith("0")
+        if not capped or judged <= 0:
+            verdict = "UNDER CAP" if judged <= 0 else "thin"
+        elif judged < USEFUL_CUSHION:
+            verdict = "on the line"
+        elif judged < USEFUL_CUSHION * 3:
+            verdict = "comfortable"
+        else:
+            verdict = "reclaimable"
+        rows.append({"resistance": res, "shown": shown, "over": over, "verdict": verdict})
+    return rows
+
+
 def encode_bitset(selected: set[str], order: list[str]) -> str:
     """Trailing-trimmed LSB-first bitset, base64url unpadded (web/src/core/urlState.ts)."""
     last = max((i for i, k in enumerate(order) if k in selected), default=-1)
@@ -301,7 +336,10 @@ def main() -> int:
         "level": (build.get("bio") or {}).get("level"),
         "gameVersion": build.get("gameVersion"),
         "dataVersion": devotions.get("meta", {}).get("game_version"),
+        "difficulty": build.get("difficulty"),
+        "difficultyAsShared": build.get("difficultyAsShared"),
         "buffStates": {k: v.get("header") for k, v in (build.get("states") or {}).items()},
+        "resistances": resistance_report(build),
         "rrSources": rows,
         "rrStacking": {k: sum(v for _, v in e) for k, e in totals.items()},
         "rrMaxPercent": max_pct,
@@ -324,6 +362,17 @@ def main() -> int:
     print(f"{f['class']} level {f['level']} - {f['url']}")
     print(f"  build made in game {f['gameVersion']}; repo data is {f['dataVersion']}")
     print(f"  buff states: {' -> '.join(str(v) for v in f['buffStates'].values())}")
+    if f["difficulty"] and f["difficulty"] != "Ultimate":
+        print(f"  WARNING: read at {f['difficulty']}, not Ultimate - cushions below are too high")
+    print()
+    cols = [s for s in ("asShared", "sustained", "everything")
+            if any(s in r["over"] for r in f["resistances"])]
+    print(f"RESISTANCE CUSHIONS at {f['difficulty'] or '?'}"
+          f" (verdict judged on 'sustained' against a useful target of +{USEFUL_CUSHION})")
+    print(f"  {'resistance':25}{'shown':>7}" + "".join(f"{c:>12}" for c in cols) + "   verdict")
+    for r in f["resistances"]:
+        cells = "".join(f"{r['over'].get(c, 0):>+12}" for c in cols)
+        print(f"  {r['resistance']:25}{r['shown']:>7}{cells}   {r['verdict']}")
     print()
     print("RESISTANCE REDUCTION (stacking pass sums; the other two take the highest only)")
     for typ, entries in sorted(totals.items(), key=lambda kv: -sum(v for _, v in kv[1])):

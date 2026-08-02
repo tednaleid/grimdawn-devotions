@@ -448,6 +448,21 @@ clean-derived:
 items *ARGS:
     uv run "{{justfile_directory()}}/scripts/gditems.py" {{ARGS}}
 
+# Scrape a shared grimtools build into JSON (needs the headless browser: just install-e2e).
+# Forces the difficulty selector to Ultimate before reading, since Elite and Normal
+# overstate every resistance cushion by 25 and 50. See docs/grimtools-build-audit.md.
+[group("deposit")]
+[doc("Scrape a grimtools build to JSON: just gt-scrape https://www.grimtools.com/calc/ID out.json")]
+gt-scrape URL OUT:
+    bun "{{justfile_directory()}}/scripts/gt_scrape.ts" "{{URL}}" "{{OUT}}"
+
+# Audit a scraped build against our own data: RR ledger, monster cross-check,
+# circuit breakers, resistance cushions, and a devotion planner link.
+[group("deposit")]
+[doc("Audit a scraped grimtools build: just gt-audit out.json [--json]")]
+gt-audit FILE *ARGS:
+    uv run "{{justfile_directory()}}/scripts/gt_audit.py" "{{FILE}}" {{ARGS}}
+
 # --- Dataset releases ---------------------------------------------------------
 # Generated parquet never enters git: publish uploads deposit + derived as an
 # immutable GitHub Release (deposit-<buildid>.<rev>) and writes deposit.lock;

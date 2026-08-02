@@ -142,5 +142,36 @@ check("an on-hit devotion proc is reported alongside it",
       names.get("Giant's Blood"), "15% when hit")
 check("an on-attack proc is not a circuit breaker", "Tsunami" in names, False)
 
+
+# Cushions decide where gear budget is wasted and where it is load-bearing, so the verdict
+# has to key off the sustained state rather than the as-shared one, and a resistance that is
+# not at its cap at all must never read as merely thin.
+def state(over_by_res):
+    return {s: {"header": s, "stats": {},
+                "overcap": {r: {"shown": v[1], "over": v[0][i]}
+                            for r, v in over_by_res.items()}}
+            for i, s in enumerate(("asShared", "sustained", "everything"))}
+
+rep = {r["resistance"]: r for r in gt.resistance_report({"states": state({
+    "resFire":     ((75, 126, 161), "80%"),
+    "resPoison":   ((29, 29, 64), "80%"),
+    "resAether":   ((50, 85, 120), "80%"),
+    "resPhysical": ((0, 0, 0), "12%"),
+})})}
+check("a cushion far past the useful target is reclaimable budget",
+      rep["resFire"]["verdict"], "reclaimable")
+check("a cushion under the useful target is on the line",
+      rep["resPoison"]["verdict"], "on the line")
+check("a healthy cushion is neither", rep["resAether"]["verdict"], "comfortable")
+check("a resistance below its cap is called out, not treated as a thin cushion",
+      rep["resPhysical"]["verdict"], "UNDER CAP")
+check("the verdict follows the sustained state, not the as-shared one",
+      gt.resistance_report({"states": state({"r": ((5, 90, 90), "80%")})})[0]["verdict"],
+      "reclaimable")
+check("every captured state is carried through for display",
+      sorted(rep["resFire"]["over"]), ["asShared", "everything", "sustained"])
+check("a missing overcap cell is skipped rather than scored as zero",
+      gt.resistance_report({"states": {"sustained": {"overcap": {"resFire": None}}}}), [])
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
