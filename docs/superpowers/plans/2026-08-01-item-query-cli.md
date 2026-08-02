@@ -749,7 +749,15 @@ git commit -m "feat(cli): duckdb repository adapter translating criteria to sql"
 
 Create `scripts/gditems.py` with a uv shebang, the two ABOUTME lines, and `dependencies = ["duckdb", "lzstring"]`.
 
-Directory resolution, in this order: `--derived-dir` flag, then `GDITEMS_DERIVED_DIR`, then `<repo root>/data/derived` computed from the script's own location. Never read justfile variables.
+Directory resolution covers TWO directories, because item display names live in
+`labels.parquet` under `data/deposit/` while everything else is under `data/derived/`. For
+each, the order is: explicit flag (`--derived-dir`, `--deposit-dir`), then environment
+variable (`GDITEMS_DERIVED_DIR`, `GDITEMS_DEPOSIT_DIR`), then a repo-relative default
+computed from the script's own location (`<repo root>/data/derived`, `<repo root>/data/deposit`).
+Never read justfile variables. `DuckDbRepository` already takes `deposit_dir` as an optional
+second argument defaulting to `derived_dir.parent / "deposit"`; pass both explicitly from the
+CLI rather than relying on that fallback, so a caller who moves one directory is not silently
+given the wrong other one.
 
 `search` flags, exactly as the spec lists them. Scope: `--domain`, `--slot`, `--gear-type`, `--rarity`, `--expansion`, `--all-tiers`, `--source`, `--fits`, `--level`. Criteria: `--stat` (repeatable, accepting `family` or `family:min`), `--resist`, `--converts-to`, `--min-convert`, `--grants-skill`, `--boosts-skill`, `--boosts-mastery`, `--mastery`. Output: `--limit` (default 20), `--json`, `--explain`, `--weights`, `--open`.
 
