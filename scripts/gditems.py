@@ -36,6 +36,7 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import NoReturn
 
 sys.path.insert(0, str(Path(__file__).parent))
 from gditems_core import Criteria, StatCriterion, collapse_tiers, grimtools_url, score
@@ -45,16 +46,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 HONESTY_LINE = ("Score reflects only the criteria you passed. "
                  "It ranks candidates and does not judge builds.")
-
-# Positional labels for a tier ladder, lowest item level first. Grim Dawn's own game data
-# gives every tier of a family the same display name (checked directly against Sellecor's
-# March: all three tiers are named "Sellecor's March" in labels.parquet, is_empowered is
-# False on all three) so these words are NOT read from the data - they are the same
-# base/Empowered/Mythical convention the design spec itself uses for "the ladder", applied
-# by rank position. A family deeper than three tiers (not seen among real tiered gear;
-# large group_key collisions in the data are unrelated same-named common drops, not a real
-# ladder) falls back to a plain ordinal rather than inventing a fourth tier name.
-_TIER_LABELS = ("base", "Empowered", "Mythical")
 
 
 # ---------------------------------------------------------------------------
@@ -127,7 +118,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def _fail(message: str) -> None:
+def _fail(message: str) -> NoReturn:
     print(f"ERROR: {message}", file=sys.stderr)
     raise SystemExit(1)
 
@@ -268,20 +259,22 @@ def run_search(repo, args: argparse.Namespace) -> dict:
     return {"results": results, "disclaimer": HONESTY_LINE}
 
 
-def _tier_index(record: str, tiers: list) -> int:
+def _ladder(tiers: list, headline_level: int) -> str:
+    """Render a family's tier ladder as the item levels the data actually carries.
+
+    Grim Dawn's own game data gives every tier of a family the same display name -
+    checked directly against Sellecor's March: all three tiers are named "Sellecor's
+    March" in labels.parquet, is_empowered is False on all three - and the words
+    base/Empowered/Mythical are grimtools' own display convention, not present in this
+    data at all. A two-tier family can be an ordinary Rare item (measured: 208 two-tier
+    and 583 more-than-three-tier families among Rare gear alone), so applying those
+    words by rank position would assert a specific in-game upgrade tier that may not
+    exist. Item level is real and already the ladder's own sort key, so it is the only
+    thing shown; "(showing N)" marks which tier the row above is scored against.
+    """
     ascending = sorted(tiers, key=lambda c: c.item_level)
-    return next(i for i, c in enumerate(ascending) if c.record == record)
-
-
-def _tier_label(index: int) -> str:
-    if index < len(_TIER_LABELS):
-        return _TIER_LABELS[index]
-    return f"tier {index + 1}"
-
-
-def _ladder(tiers: list) -> str:
-    ascending = sorted(tiers, key=lambda c: c.item_level)
-    return " / ".join(f"{_tier_label(i)} {c.item_level}" for i, c in enumerate(ascending))
+    levels = " / ".join(str(c.item_level) for c in ascending)
+    return f"{levels} (showing {headline_level})"
 
 
 def _fmt_num(value: float) -> str:
@@ -318,15 +311,14 @@ def render_table(payload: dict, explain: bool = False) -> str:
         scored = result["scored"]
         cand = scored.candidate
         tiers = result["tiers"]
-        index = _tier_index(cand.record, tiers)
         lines.append(f"{result['rank']}. {cand.name}  score {scored.total:.2f}")
         lines.append(f"   matched: {_matched_summary(scored)}")
         if explain:
             lines.extend(_explain_lines(scored))
-        lines.append(f"   {_tier_label(index)} tier, item level {cand.item_level}, "
-                      f"req level {cand.req_level}, source: {cand.source}")
+        lines.append(f"   item level {cand.item_level}, req level {cand.req_level}, "
+                      f"source: {cand.source}")
         if len(tiers) > 1:
-            lines.append(f"   tiers: {_ladder(tiers)}")
+            lines.append(f"   tiers: {_ladder(tiers, cand.item_level)}")
         lines.append(f"   {result['url']}")
     lines.append("")
     lines.append(HONESTY_LINE)
