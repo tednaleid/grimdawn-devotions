@@ -73,15 +73,15 @@ sample AS (
 ),
 checks AS (
     SELECT
-        (SELECT n FROM k WHERE kind = 'skill') = 13896 AS skill_rows_present,
-        (SELECT n FROM k WHERE kind = 'mastery') = 1146 AS mastery_rows_present,
+        (SELECT n FROM k WHERE kind = 'skill') = 13896 AS skill_rows_exact,
+        (SELECT n FROM k WHERE kind = 'mastery') = 1146 AS mastery_rows_exact,
         (SELECT count(*) FROM boosts WHERE mastery_record IS NULL) = 0 AS every_boost_has_mastery,
         (SELECT count(*) FROM boosts WHERE level <= 0) = 0 AS levels_positive,
         (SELECT count(*) FROM boosts WHERE kind = 'mastery' AND target != mastery_record) = 0 AS mastery_target_is_self
 )
 SELECT s.record, s.kind, s.target, s.mastery_record, s.level
 FROM sample s CROSS JOIN checks c
-WHERE c.skill_rows_present AND c.mastery_rows_present AND c.every_boost_has_mastery
+WHERE c.skill_rows_exact AND c.mastery_rows_exact AND c.every_boost_has_mastery
   AND c.levels_positive AND c.mastery_target_is_self
 ORDER BY s.record
 LIMIT 20;
