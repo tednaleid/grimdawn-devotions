@@ -664,6 +664,11 @@ typecheck:
 [group("check")]
 lint:
     cd "{{justfile_directory()}}/web" && bunx biome lint --error-on-warnings
+    # scripts/ is a separate Biome project (root biome.json; web/biome.json extends it).
+    # The path argument is what scopes this: without it Biome also walks web/scripts.
+    # Use web's pinned binary - at the repo root `bunx biome` resolves an unrelated
+    # npm package called "biome" that exits 0 without checking anything.
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome lint --error-on-warnings scripts
 
 # Auto-fix the safe lint findings Biome can resolve on its own
 [group("check")]
@@ -674,15 +679,22 @@ lint-fix:
 [group("check")]
 fmt:
     cd "{{justfile_directory()}}/web" && bunx biome format --write
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format --write scripts
 
 # Verify formatting without writing (fails if anything is unformatted); used by check + CI
 [group("check")]
 fmt-check:
     cd "{{justfile_directory()}}/web" && bunx biome format
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format scripts
+
+# Lint the standalone Python scripts (bug catchers only; see ruff.toml for why it is narrow)
+[group("check")]
+lint-py:
+    cd "{{justfile_directory()}}" && uvx ruff check scripts/
 
 # Full verification gate: formatting, tests, lint, and type-check
 [group("check")]
-check: fmt-check test lint typecheck
+check: fmt-check test lint lint-py typecheck
 
 # Opt-in (hooks are not tracked): run this once after cloning.
 # Install a git pre-commit hook that runs `just check` before each commit.

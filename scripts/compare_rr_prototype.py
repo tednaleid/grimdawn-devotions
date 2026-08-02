@@ -15,7 +15,6 @@ Run: uv run scripts/compare_rr_prototype.py
 import importlib.util
 import json
 import re
-import sys
 from pathlib import Path
 
 here = Path(__file__).parent

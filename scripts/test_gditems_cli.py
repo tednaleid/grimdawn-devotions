@@ -17,7 +17,6 @@ DuckDbRepository, proving the scoring/rendering wiring without touching a parque
 import importlib.util
 import json
 import subprocess
-import sys
 from pathlib import Path
 
 HERE = Path(__file__).parent

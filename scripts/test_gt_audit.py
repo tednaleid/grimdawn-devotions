@@ -173,5 +173,58 @@ check("every captured state is carried through for display",
 check("a missing overcap cell is skipped rather than scored as zero",
       gt.resistance_report({"states": {"sustained": {"overcap": {"resFire": None}}}}), [])
 
+
+# --- end to end: the real matcher over real devotion data --------------------------------
+# The unit checks above cannot catch a mismatch between the matcher and the shape of
+# data/devotions.json, which is what actually broke: name-based power resolution looked
+# perfectly healthy and silently dropped four stars.
+import base64  # noqa: E402
+import json  # noqa: E402
+
+repo = here.parent
+devotions = json.loads((repo / "data/devotions.json").read_text(encoding="utf-8"))
+game = json.loads((repo / "data/i18n/game.en.json").read_text(encoding="utf-8"))
+text = game.get("tags", game)
+fixture = json.loads((here / "fixtures/gt-devotions-infiltrator.json").read_text(encoding="utf-8"))
+build = {"devotions": fixture["devotions"]}
+
+selected, unmatched, canonical = gt.map_devotions(build, devotions, text)
+check("every scraped star maps to one of ours", len(selected), len(fixture["devotions"]))
+check("nothing is left unmatched", unmatched, [])
+check("no star id is claimed twice", len(selected), len(set(selected)))
+check("canonical order covers the whole model, not just the taken stars",
+      len(canonical) > len(selected), True)
+check("every selected id exists in the canonical order",
+      sorted(set(selected) - set(canonical)), [])
+
+by_constellation = {}
+for sid in selected:
+    by_constellation[sid.split(":")[0]] = by_constellation.get(sid.split(":")[0], 0) + 1
+# Independently confirmed by decoding the generated hash with the app's own decodeHash
+# and buildModel, rather than by re-running this matcher.
+check("per-constellation counts match the app's own decode of the hash",
+      dict(sorted(by_constellation.items())),
+      {"amatok_the_spirit_of_winter": 7, "behemoth": 6, "chariot_of_the_dead": 6,
+       "hammer": 3, "hydra": 6, "murmur_mistress_of_rumors": 6, "rhowan_s_crown": 5,
+       "solemn_watcher": 5, "tsunami": 5, "ulo_the_keeper_of_the_waters": 5,
+       "ultos_shepherd_of_storms": 1})
+
+# The regression that motivated isSkill: Tsunami names both a constellation and a celestial
+# power, and resolving powers by name collapsed all five of its stars onto the power star.
+check("a constellation sharing its name with a power keeps all of its stars",
+      by_constellation["tsunami"], 5)
+# Partial constellations are the ones the magnitude matcher actually has to decide.
+check("a partially taken constellation takes only what was taken",
+      (by_constellation["chariot_of_the_dead"], by_constellation["ultos_shepherd_of_storms"]),
+      (6, 1))
+
+bits = gt.encode_bitset(selected, canonical)
+def decode_bitset(blob, order):
+    raw = base64.urlsafe_b64decode(blob + "=" * (-len(blob) % 4))
+    return {k for i, k in enumerate(order) if i // 8 < len(raw) and raw[i // 8] >> (i % 8) & 1}
+check("the hash round-trips back to exactly the same stars", decode_bitset(bits, canonical), selected)
+check("the encoded hash is byte-for-byte the one verified against the planner", bits,
+      "AAAAAAAAAAAAOAAAAAAAAAAAAAAAHwAAAIA_AAD8AADuAAAAPwAAAPAD4AMAAD4AAAAfAAAAAAAAAAAAAAAAAACA")
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

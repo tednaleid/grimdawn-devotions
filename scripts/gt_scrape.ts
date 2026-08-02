@@ -74,6 +74,12 @@ async function pageWsUrl(): Promise<string> {
   throw new Error("chrome debug endpoint never exposed a page target");
 }
 
+/** The slice of a CDP Runtime.evaluate reply this script reads. */
+type CdpResult = {
+  result?: { value?: unknown };
+  exceptionDetails?: { text?: string; exception?: { description?: string } };
+};
+
 class CDP {
   private id = 0;
   private pending = new Map<number, { resolve: (v: unknown) => void; reject: (e: Error) => void }>();
@@ -101,22 +107,23 @@ class CDP {
       };
     });
   }
-  send(method: string, params: Record<string, unknown> = {}): Promise<any> {
+  send(method: string, params: Record<string, unknown> = {}): Promise<CdpResult> {
     const id = ++this.id;
     return new Promise((resolve, reject) => {
-      this.pending.set(id, { resolve, reject });
+      this.pending.set(id, { resolve: (v) => resolve(v as CdpResult), reject });
       this.ws.send(JSON.stringify({ id, method, params }));
     });
   }
-  async evaluate(expression: string): Promise<any> {
+  /** Evaluate in the page. The caller names the type it expects the expression to return. */
+  async evaluate<T>(expression: string): Promise<T> {
     const r = await this.send("Runtime.evaluate", {
       expression,
       returnByValue: true,
       awaitPromise: true,
     });
     if (r.exceptionDetails)
-      throw new Error(r.exceptionDetails.exception?.description ?? r.exceptionDetails.text);
-    return r.result.value;
+      throw new Error(r.exceptionDetails.exception?.description ?? r.exceptionDetails.text ?? "evaluate failed");
+    return r.result?.value as T;
   }
 }
 
@@ -245,7 +252,7 @@ try {
   let ready = false;
   for (let i = 0; i < 80; i++) {
     await Bun.sleep(500);
-    ready = await cdp.evaluate(
+    ready = await cdp.evaluate<boolean>(
       `typeof player === "object" && player !== null && !!document.body.innerText.match(/Level \\d+/)`,
     );
     if (ready === true) break;
@@ -253,7 +260,7 @@ try {
   if (!ready) throw new Error(`the calculator never decoded a build at ${URL_TO_LOAD}`);
   await Bun.sleep(3000);
 
-  const raw = await cdp.evaluate(PROBE);
+  const raw = await cdp.evaluate<string>(PROBE);
   const data = JSON.parse(raw);
   writeFileSync(OUT, JSON.stringify(data, null, 1), "utf8");
   const n = (s: string) => data.states[s]?.header ?? "?";

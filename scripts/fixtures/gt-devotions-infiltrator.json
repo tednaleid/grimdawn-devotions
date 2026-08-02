@@ -1,0 +1,288 @@
+{
+ "_aboutme": [
+  "ABOUTME: Real dumpDevotion() output from grimtools.com/calc/VWPyL95Z (game 1.3.0.0),",
+  "ABOUTME: reduced to the fields scripts/gt_audit.py's map_devotions reads.",
+  "Kept because it carries the cases synthetic data would not think to include: a",
+  "constellation and a celestial power sharing the name Tsunami, two partially taken",
+  "constellations resolved by bonus magnitudes, and nine complete ones."
+ ],
+ "source": "https://www.grimtools.com/calc/VWPyL95Z",
+ "gameVersion": "1.3.0.0",
+ "devotions": [
+  {
+   "name": "Hammer",
+   "isSkill": false,
+   "details": "Hammer\n+15% Physical Damage\n+20 Armor"
+  },
+  {
+   "name": "Hammer",
+   "isSkill": false,
+   "details": "Hammer\n+30% Internal Trauma Damage with +30% Increased Duration\n+15 Defensive Ability"
+  },
+  {
+   "name": "Hammer",
+   "isSkill": false,
+   "details": "Hammer\n+24% Physical Damage\n+60% Internal Trauma Damage\nIncreases Armor by 8%"
+  },
+  {
+   "name": "Tsunami",
+   "isSkill": false,
+   "details": "Tsunami\n+15% Cold Damage\n+15% Lightning Damage"
+  },
+  {
+   "name": "Tsunami",
+   "isSkill": false,
+   "details": "Tsunami\n+15 Spirit\n+20 Defensive Ability"
+  },
+  {
+   "name": "Tsunami",
+   "isSkill": false,
+   "details": "Tsunami\n+50% Frostburn Damage\n+50% Electrocute Damage\n+15 Physique"
+  },
+  {
+   "name": "Tsunami",
+   "isSkill": false,
+   "details": "Tsunami\n+24% Cold Damage\n+24% Lightning Damage"
+  },
+  {
+   "name": "Tsunami",
+   "isSkill": true,
+   "details": "Tsunami (35% Chance on Attack)\nA torrent of water crashes down upon any foes unfortunate enough to be standing in front of you.\n\nBound To:\nChilling Rounds\n\nCurrent Level : 25\n0.7 Second Skill Recharge\n12 Meter Range\n45% Weapon Damage\n180-215 Cold Damage\n82-130 Lightning Damage\n450 Frostburn Damage over 2 Seconds\n14% Chance for target to Fumble attacks for 2 Seconds\n14% Chance of Impaired Aim to target for 2 Seconds"
+  },
+  {
+   "name": "Rhowan's Crown",
+   "isSkill": false,
+   "details": "Rhowan's Crown\n6-9 Elemental Damage\n+30% Elemental Damage"
+  },
+  {
+   "name": "Rhowan's Crown",
+   "isSkill": false,
+   "details": "Rhowan's Crown\n+20 Spirit\n+20 Defensive Ability\n\nBonus to All Pets\n+60% Elemental Damage"
+  },
+  {
+   "name": "Elemental Storm",
+   "isSkill": true,
+   "details": "Elemental Storm (25% Chance on Attack)\nA crackling whirlwind of flame and ice manifests itself at your command.\n\nBound To:\nBeronath's Fury\n\nCurrent Level : 20\n1.5 Second Skill Recharge\n5 Second Duration\n3.5 Meter Radius\n132 Elemental Damage\n196 Burn Damage over 2 Seconds\n196 Frostburn Damage over 2 Seconds\n196 Electrocute Damage over 2 Seconds\n32 Reduced target's Elemental Resistances for 2 Seconds"
+  },
+  {
+   "name": "Rhowan's Crown",
+   "isSkill": false,
+   "details": "Rhowan's Crown\n+20 Offensive Ability\n18% Elemental Resistance\n\nBonus to All Pets\n18% Elemental Resistance"
+  },
+  {
+   "name": "Rhowan's Crown",
+   "isSkill": false,
+   "details": "Rhowan's Crown\n+40% Elemental Damage\n+60% Burn Damage\n+60% Frostburn Damage\n+60% Electrocute Damage\n8% Chaos Resistance"
+  },
+  {
+   "name": "Amatok the Spirit of Winter",
+   "isSkill": false,
+   "details": "Amatok the Spirit of Winter\n+40% Cold Damage"
+  },
+  {
+   "name": "Amatok the Spirit of Winter",
+   "isSkill": false,
+   "details": "Amatok the Spirit of Winter\n+6% Health\n+15 Defensive Ability"
+  },
+  {
+   "name": "Amatok the Spirit of Winter",
+   "isSkill": false,
+   "details": "Amatok the Spirit of Winter\n+30 Defensive Ability\n+80 Armor"
+  },
+  {
+   "name": "Amatok the Spirit of Winter",
+   "isSkill": false,
+   "details": "Amatok the Spirit of Winter\n+50% Cold Damage\n+50% Frostburn Damage\n+60 Armor"
+  },
+  {
+   "name": "Amatok the Spirit of Winter",
+   "isSkill": false,
+   "details": "Amatok the Spirit of Winter\n36 Frostburn Damage over 3 Seconds\n+50% Cold Damage\n+100% Frostburn Damage"
+  },
+  {
+   "name": "Amatok the Spirit of Winter",
+   "isSkill": false,
+   "details": "Amatok the Spirit of Winter\n+50% Frostburn Damage with +50% Increased Duration\n+25 Offensive Ability"
+  },
+  {
+   "name": "Blizzard",
+   "isSkill": true,
+   "details": "Blizzard (100% Chance on Critical Attack)\nShards of razor-sharp ice rain down from the sky upon your foes.\n\nBound To:\nBlade Spirit\n\nCurrent Level : 20\n3.2 Second Skill Recharge\n6.5 Meter Target Area\n2 Meter Radius\n16% Weapon Damage\n315-392 Cold Damage\n490 Frostburn Damage over 2 Seconds\n50% Chance to Freeze target for 1 Second\n70% Slower target Movement for 3 Seconds\n\nNext Level : 21\n3.2 Second Skill Recharge\n6.5 Meter Target Area\n2 Meter Radius\n16% Weapon Damage\n315-392 Cold Damage\n490 Frostburn Damage over 2 Seconds\n50% Chance to Freeze target for 1 Second\n70% Slower target Movement for 3 Seconds"
+  },
+  {
+   "name": "Solemn Watcher",
+   "isSkill": false,
+   "details": "Solemn Watcher\n+25 Physique"
+  },
+  {
+   "name": "Solemn Watcher",
+   "isSkill": false,
+   "details": "Solemn Watcher\n+40 Armor\n18% Chaos Resistance"
+  },
+  {
+   "name": "Solemn Watcher",
+   "isSkill": false,
+   "details": "Solemn Watcher\n+40 Armor\n18% Pierce Resistance"
+  },
+  {
+   "name": "Solemn Watcher",
+   "isSkill": false,
+   "details": "Solemn Watcher\n+3% Physique\n+30 Defensive Ability"
+  },
+  {
+   "name": "Solemn Watcher",
+   "isSkill": false,
+   "details": "Solemn Watcher\n+5% Defensive Ability\n20% Reflected Damage Reduction"
+  },
+  {
+   "name": "Hydra",
+   "isSkill": false,
+   "details": "Hydra\nRequires a ranged weapon.\n+25 Offensive Ability"
+  },
+  {
+   "name": "Hydra",
+   "isSkill": false,
+   "details": "Hydra\nRequires a ranged weapon.\n+35 Offensive Ability\n+10% Movement Speed"
+  },
+  {
+   "name": "Hydra",
+   "isSkill": false,
+   "details": "Hydra\nRequires a ranged weapon.\n5% of Attack Damage converted to Health\n+5% Attack Speed\n+5% Casting Speed\n+5% Max Movement Speed"
+  },
+  {
+   "name": "Hydra",
+   "isSkill": false,
+   "details": "Hydra\nRequires a ranged weapon.\n6 Physical Damage\n+25 Offensive Ability"
+  },
+  {
+   "name": "Hydra",
+   "isSkill": false,
+   "details": "Hydra\nRequires a ranged weapon.\n12 Physical Damage\n+4% Offensive Ability\n20% Slow Resistance"
+  },
+  {
+   "name": "Hydra",
+   "isSkill": false,
+   "details": "Hydra\nRequires a ranged weapon.\n+50% to All Damage\n+5% Attack Speed\n+5% Casting Speed\n+5% Max Movement Speed"
+  },
+  {
+   "name": "Behemoth",
+   "isSkill": false,
+   "details": "Behemoth\n+30 Health Regenerated per second"
+  },
+  {
+   "name": "Behemoth",
+   "isSkill": false,
+   "details": "Behemoth\n+300 Health\n\nBonus to All Pets\n+12% Health"
+  },
+  {
+   "name": "Behemoth",
+   "isSkill": false,
+   "details": "Behemoth\n+70 Health Regenerated per second\nHealing Effects Increased by 6%"
+  },
+  {
+   "name": "Behemoth",
+   "isSkill": false,
+   "details": "Behemoth\n+8% Health\n+80 Armor\n\nBonus to All Pets\n+100 Armor"
+  },
+  {
+   "name": "Behemoth",
+   "isSkill": false,
+   "details": "Behemoth\nIncreases Health Regeneration by 80%\n\nBonus to All Pets\nIncreases Health Regeneration by 100%"
+  },
+  {
+   "name": "Giant's Blood",
+   "isSkill": true,
+   "details": "Giant's Blood (15% Chance when Hit)\nGiant's blood flows through your veins, incurring improved regeneration and healing.\n\nBound To:\nVeil of Shadow\n\nCurrent Level : 20\n25 Second Skill Recharge\n12 Second Duration\n20% + 1200 Health Restored\n+590 Health Regenerated per second"
+  },
+  {
+   "name": "Chariot of the Dead",
+   "isSkill": false,
+   "details": "Chariot of the Dead\n+20 Physique\n+20 Cunning"
+  },
+  {
+   "name": "Chariot of the Dead",
+   "isSkill": false,
+   "details": "Chariot of the Dead\n+15 Offensive Ability\n10% Slow Resistance"
+  },
+  {
+   "name": "Chariot of the Dead",
+   "isSkill": false,
+   "details": "Chariot of the Dead\n+25 Cunning\n+60 Armor"
+  },
+  {
+   "name": "Chariot of the Dead",
+   "isSkill": false,
+   "details": "Chariot of the Dead\n+25 Offensive Ability\n15% Slow Resistance"
+  },
+  {
+   "name": "Chariot of the Dead",
+   "isSkill": false,
+   "details": "Chariot of the Dead\n+15 Offensive Ability\n+4% Offensive Ability"
+  },
+  {
+   "name": "Wayward Soul",
+   "isSkill": true,
+   "details": "Wayward Soul (20% Chance when Hit)\nSacrifice a wayward soul to ward yourself against the specter of death.\n\nBound To:\nAura of Censure\n\nCurrent Level : 20\n8 Second Skill Recharge\n5 Second Duration\n12% Health Restored\nRestores 5% Health Per Second\n+130 Defensive Ability\n+460 Armor"
+  },
+  {
+   "name": "Ulo the Keeper of the Waters",
+   "isSkill": false,
+   "details": "Ulo the Keeper of the Waters\n15% Elemental Resistance\n\nBonus to All Pets\n15% Elemental Resistance"
+  },
+  {
+   "name": "Ulo the Keeper of the Waters",
+   "isSkill": false,
+   "details": "Ulo the Keeper of the Waters\n+300 Health\n+300 Energy\n30% Life Leech Resistance\n30% Energy Leech Resistance"
+  },
+  {
+   "name": "Ulo the Keeper of the Waters",
+   "isSkill": false,
+   "details": "Ulo the Keeper of the Waters\n15% Stun Resistance\n15% Freeze Resistance\n15% Petrify Resistance\n15% Entrapment Resistance\n\nBonus to All Pets\n15% Stun Resistance\n15% Freeze Resistance\n15% Petrify Resistance\n15% Entrapment Resistance"
+  },
+  {
+   "name": "Ulo the Keeper of the Waters",
+   "isSkill": false,
+   "details": "Ulo the Keeper of the Waters\n20% Poison & Acid Resistance\n20% Chaos Resistance\n\nBonus to All Pets\n20% Poison & Acid Resistance\n20% Chaos Resistance"
+  },
+  {
+   "name": "Cleansing Waters",
+   "isSkill": true,
+   "details": "Cleansing Waters (100% Chance on Attack)\nUlo's cleansing waters purge all foul magic from the area, removing beneficial auras and spells from foes while allies are cleansed of negative ailments, including damage over time effects.\n\nBound To:\nStorm Spread\n\nCurrent Level : 20\n10 Second Skill Recharge\n1 Second Duration\n3.5 Meter Radius\n50% Slow target for 8 Seconds"
+  },
+  {
+   "name": "Murmur, Mistress of Rumors",
+   "isSkill": false,
+   "details": "Murmur, Mistress of Rumors\n+40% Cold Damage\n+40% Acid Damage"
+  },
+  {
+   "name": "Murmur, Mistress of Rumors",
+   "isSkill": false,
+   "details": "Murmur, Mistress of Rumors\n3% Chance to Avoid Melee Attacks\n3% Chance to Avoid Projectiles"
+  },
+  {
+   "name": "Murmur, Mistress of Rumors",
+   "isSkill": false,
+   "details": "Murmur, Mistress of Rumors\n+200 Health\n+20 Defensive Ability"
+  },
+  {
+   "name": "Rumor",
+   "isSkill": true,
+   "details": "Rumor (15% Chance on Attack)\nThe chilling truths of Murmur's words spread amongst your foes, like a rumor that refuses to die, and shatter their minds.\n\nBound To:\nBursting Round\n\nCurrent Level : 20\n1 Second Skill Recharge\n4 Second Duration\n97 Cold Damage\n97 Acid Damage\n-96 Offensive Ability\n-23% Cold Resistance\n-30% Poison & Acid Resistance"
+  },
+  {
+   "name": "Murmur, Mistress of Rumors",
+   "isSkill": false,
+   "details": "Murmur, Mistress of Rumors\n+20 Defensive Ability\n15% Vitality Resistance"
+  },
+  {
+   "name": "Murmur, Mistress of Rumors",
+   "isSkill": false,
+   "details": "Murmur, Mistress of Rumors\n+50% Cold Damage\n+50% Acid Damage\n+80% Frostburn Damage"
+  },
+  {
+   "name": "Ultos, Shepherd of Storms",
+   "isSkill": false,
+   "details": "Ultos, Shepherd of Storms\n+80% Cold Damage\n+25 Offensive Ability"
+  }
+ ]
+}

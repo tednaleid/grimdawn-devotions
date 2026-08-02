@@ -898,8 +898,8 @@ def cmd_build(args) -> int:
     print(f"  boosts: {n_boosts}   " +
           "  ".join(f"{k}({n})" for k, n in boost_kind_counts))
     print(f"  conversions: {n_conversions}")
-    print(f"  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
-                                         if not k.endswith("_sample")))
+    print("  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
+                                        if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
     for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions"):

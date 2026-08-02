@@ -1,0 +1,17 @@
+# ABOUTME: Ruff config for the standalone Python scripts in scripts/ (run: just lint-py).
+# ABOUTME: Deliberately narrow - bug catchers only, no style opinions on 12 existing files.
+#
+# `F` is pyflakes: undefined names, unused imports and variables, f-string mistakes,
+# redefinitions. These are the errors that otherwise surface at runtime deep inside a
+# code path nobody exercised, which is exactly the failure mode of a directory full of
+# standalone `uv run` scripts with no import-time coverage. `E9` is syntax and IO errors.
+#
+# Everything else ruff offers here is style: import sorting (8 findings), explicit
+# subprocess check= (13), blind except (3), and assorted simplifications - 43 in total.
+# Widening `select` is a one-line change if we ever want that churn; it is not worth
+# rewriting a dozen working scripts to get it today.
+include = ["scripts/**/*.py"]
+line-length = 100
+
+[lint]
+select = ["F", "E9"]
