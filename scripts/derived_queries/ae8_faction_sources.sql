@@ -2,10 +2,20 @@
 -- ABOUTME: 19149150 (284 of 292 augments, tier distribution) and five transcribed card oracles.
 -- Empty result = failure. Pins: 284 distinct vendor-sourced augments (the other 8 are the
 -- curated template blanks), tier item counts friendly 6 / honored 112 / revered 166 with no
--- other tier value, and five oracle rows (augment, vendor, faction, tier) transcribed from
--- grimtools/wiki (Coven Black Ash externally corroborated; all five spot-checked by Ted).
+-- other tier value, five oracle rows (augment, vendor, faction, tier) transcribed from
+-- grimtools/wiki (Coven Black Ash externally corroborated; all five spot-checked by Ted),
+-- and the exact set of distinct sources.kind values across the WHOLE table (crafted,
+-- faction_vendor - not just the faction_vendor rows `v` below scopes to). gditems_duckdb.py's
+-- _SOURCE_CASE_SQL maps any kind outside that set to the 'unknown' display token, which
+-- --source unknown also uses to mean "no source row at all" - a real third kind would display
+-- as unknown while being excluded from --source unknown queries, splitting the two meanings of
+-- that one word. Pinning the kind set here makes a future kind fail loudly at derive time
+-- instead of silently drifting into that split.
 -- A game patch that shifts any of these should fail this recipe so the pins are re-checked.
-WITH v AS (
+WITH kinds AS (
+    SELECT DISTINCT kind FROM sources
+),
+v AS (
     SELECT s.item, l.text AS augment, lv.text AS vendor, lf.text AS faction, s.tier
     FROM sources s
     JOIN entities e ON e.record = s.item
@@ -32,6 +42,8 @@ checks AS (
       AND (SELECT items FROM tiers WHERE tier = 'friendly') = 6
       AND (SELECT items FROM tiers WHERE tier = 'honored') = 112
       AND (SELECT items FROM tiers WHERE tier = 'revered') = 166
+      AND (SELECT count(*) FROM kinds) = 2
+      AND NOT EXISTS (SELECT 1 FROM kinds WHERE kind NOT IN ('crafted', 'faction_vendor'))
       AND NOT EXISTS (SELECT 1 FROM oracle o
                       WHERE NOT EXISTS (SELECT 1 FROM v
                                         WHERE v.augment = o.augment AND v.vendor = o.vendor

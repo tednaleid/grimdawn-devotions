@@ -151,6 +151,101 @@ check("missing derived dir exits non-zero", code != 0, True)
 check("missing derived dir message is exact",
       err.strip(), "data/derived not found. Run: just fetch-deposit")
 
+# ---------------------------------------------------------------------------
+# F1: search must never surface a nameless internal-template record
+# ---------------------------------------------------------------------------
+
+# Reproduced by the reviewer: this exact query used to return a blank-named row at rank
+# 2 whose grimtools link, built from an empty name, matched every level-90 item instead
+# of isolating one.
+out = run_cli("search", "--domain", "gear", "--gear-type", "axe2h", "--rarity", "Rare",
+              "--stat", "damage.physical", "--json")
+data = json.loads(out)
+check("search never returns a nameless candidate", any(r["name"] == "" for r in data["results"]), False)
+check("search still returns real candidates for this query", len(data["results"]) > 0, True)
+
+# `show` is a deliberate exception: inspecting a nameless record directly (by its own
+# record path) is legitimate even though `search` must never rank it as a recommendation.
+out = run_cli("show", "records/items/enemygear/gear_humanpossessed_apprenticetorso01.dbr", "--json")
+show_data = json.loads(out)
+check("show still resolves a nameless record by record path", show_data["name"], "")
+check("show gives no grimtools link for a nameless record (no name to link by)",
+      show_data["url"], None)
+text = run_cli("show", "records/items/enemygear/gear_humanpossessed_apprenticetorso01.dbr")
+check("show text explains the missing grimtools link for a nameless record",
+      "no link (item has no display name)" in text, True)
+
+# ---------------------------------------------------------------------------
+# F2: --converts-to vocabulary, casing, and the --min-convert pairing rule
+# ---------------------------------------------------------------------------
+
+vocab_data = json.loads(run_cli("vocab", "--json"))
+check("vocab lists conversion types", "Pierce" in vocab_data["conversion_types"], True)
+check("conversion types are capitalized, not lowercase",
+      "pierce" in vocab_data["conversion_types"], False)
+
+# The documented flagship example used lowercase, which matched nothing silently.
+# --converts-to must now be validated the same way every other vocabulary flag is.
+code, err = run_cli_expect_failure("search", "--converts-to", "pierce")
+check("lowercase converts-to token exits non-zero", code != 0, True)
+check("lowercase converts-to token suggests the real casing", "Pierce" in err, True)
+
+# --min-convert alone was a silent no-op; it must require --converts-to.
+code, err = run_cli_expect_failure("search", "--min-convert", "10")
+check("--min-convert without --converts-to exits non-zero", code != 0, True)
+check("--min-convert without --converts-to names the pairing rule", "--converts-to" in err, True)
+
+out = run_cli("search", "--domain", "gear", "--converts-to", "Pierce", "--min-convert", "5",
+              "--limit", "3", "--json")
+data = json.loads(out)
+check("correctly-cased --converts-to returns structured results", "results" in data, True)
+
+# ---------------------------------------------------------------------------
+# F3: --weights names are validated and echoed in --json
+# ---------------------------------------------------------------------------
+
+code, err = run_cli_expect_failure("search", "--domain", "gear", "--resist", "pierce",
+                                    "--weights", "stat:resist.peirce=5.0")
+check("unrecognised weight name exits non-zero", code != 0, True)
+check("unrecognised weight name suggests the real one", "resist.pierce" in err, True)
+
+out = run_cli("search", "--domain", "gear", "--resist", "pierce",
+              "--weights", "stat:resist.pierce=3.5", "--json")
+data = json.loads(out)
+check("json echoes the effective weights", data["weights"], {"stat:resist.pierce": 3.5})
+
+out = run_cli("search", "--domain", "gear", "--resist", "pierce", "--json")
+data = json.loads(out)
+check("json echoes an empty weights map when none were passed", data["weights"], {})
+
+# ---------------------------------------------------------------------------
+# F4: show's text and JSON renderers must agree
+# ---------------------------------------------------------------------------
+
+# The Massacre axe has three tiers, so its text-mode `show` must now carry the ladder
+# and a grimtools link - both previously JSON-only (Task 9's tier-ladder fix was
+# invisible to a text-mode caller).
+text = run_cli("show", "records/items/gearweapons/melee2h/c002_axe2h.dbr")
+check("show text carries the tier ladder", "14 / 58 / 84" in text, True)
+check("show text carries a grimtools link",
+      "https://www.grimtools.com/db/advsearch?query=" in text, True)
+
+# ---------------------------------------------------------------------------
+# F5: --source is a filter that must exclude sourced items from `unknown`, not the reverse
+# ---------------------------------------------------------------------------
+
+out = run_cli("search", "--domain", "augment", "--source", "unknown", "--limit", "50", "--json")
+data = json.loads(out)
+check("--source unknown returns at least one item", len(data["results"]) > 0, True)
+check("--source unknown returns only items with no source",
+      {r["source"] for r in data["results"]}, {"unknown"})
+
+out = run_cli("search", "--domain", "augment", "--source", "vendor", "--limit", "50", "--json")
+data = json.loads(out)
+check("--source vendor returns at least one item", len(data["results"]) > 0, True)
+check("--source vendor returns only vendor-sourced items",
+      {r["source"] for r in data["results"]}, {"vendor"})
+
 
 # ---------------------------------------------------------------------------
 # fake-repo leg: run_search driven directly, no database
@@ -177,7 +272,7 @@ class FakeRepo:
         return {"masteries": {}, "skills": {}, "granted_skills": {},
                 "gear_types": ["boots"], "slots": ["feet"],
                 "stat_families": ["damage.pierce"], "domains": ["gear"],
-                "rarities": ["Epic"], "expansions": ["fg"]}
+                "rarities": ["Epic"], "expansions": ["fg"], "conversion_types": ["Pierce"]}
 
     def find(self, name_or_record):
         return [c for c in self._candidates if c.name == name_or_record]
@@ -200,6 +295,34 @@ payload = cli.run_search(repo, cli.parse_args([
 rendered = json.loads(cli.render_json(payload))
 check("fake repo needs no database", rendered["results"][0]["name"], "Thing")
 check("level filtering applies through the CLI path", len(rendered["results"]), 1)
+
+# F5: --open N must open the Nth (1-indexed) result's URL, not the (N+1)th. Three
+# distinct records so a ranking-vs-index mixup would be visible.
+open_repo = FakeRepo([
+    core.Candidate(record="r/a", group_key="fa", name="Item A", item_level=10, req_level=10,
+                   rarity="Epic", slots=("feet",), source="unknown",
+                   stat_values={"damage.pierce": 30.0}, skill_boosts={}, mastery_boosts={},
+                   granted_skills=(), conversions=()),
+    core.Candidate(record="r/b", group_key="fb", name="Item B", item_level=10, req_level=10,
+                   rarity="Epic", slots=("feet",), source="unknown",
+                   stat_values={"damage.pierce": 20.0}, skill_boosts={}, mastery_boosts={},
+                   granted_skills=(), conversions=()),
+    core.Candidate(record="r/c", group_key="fc", name="Item C", item_level=10, req_level=10,
+                   rarity="Epic", slots=("feet",), source="unknown",
+                   stat_values={"damage.pierce": 10.0}, skill_boosts={}, mastery_boosts={},
+                   granted_skills=(), conversions=()),
+])
+open_payload = cli.run_search(open_repo, cli.parse_args(
+    ["search", "--domain", "gear", "--stat", "damage.pierce", "--json"]))
+open_results = open_payload["results"]
+check("three results ranked by pierce descending",
+      [r["scored"].candidate.name for r in open_results], ["Item A", "Item B", "Item C"])
+
+opened: list[str] = []
+cli.open_url = opened.append
+cli._handle_open(open_results, 2)
+check("--open 2 opens the second result's url, not the third's",
+      opened, [open_results[1]["url"]])
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

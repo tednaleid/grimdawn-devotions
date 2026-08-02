@@ -127,6 +127,23 @@ check("mastery fallback explains itself", "mastery" in gen_skill.note.lower(), T
 # 0.5 fallback weight must yield 1.5. Changing MASTERY_FALLBACK_WEIGHT would break this.
 check("mastery fallback raw value is pinned to the 0.5 weighting", gen_skill.raw, 1.5)
 
+# A caller-supplied weight must actually multiply a criterion's contribution, not be
+# silently ignored (a hardcoded weight=1.0 would pass every check above unchanged).
+weighted = core.score([weak, strong, generalist, nostat], crit,
+                       {"stat:damage.pierce": 5.0})
+by_rec_w = {r.candidate.record: r for r in weighted}
+pierce_part_w = by_rec_w["r/strong"].parts[0]
+check("a custom weight is echoed on the part it applies to", pierce_part_w.weight, 5.0)
+# strong is the best candidate on both criteria (pierce and the boosted skill), so both
+# normalise to 1.0; total = 1.0*5.0 (weighted pierce) + 1.0*1.0 (unweighted skill) = 6.0.
+# A hardcoded weight=1.0 would instead total 2.0, same as the unweighted run below.
+check("the weighted total reflects the applied weight, not a hardcoded 1.0",
+      by_rec_w["r/strong"].total, 6.0)
+unweighted = core.score([weak, strong, generalist, nostat], crit, None)
+by_rec_u = {r.candidate.record: r for r in unweighted}
+check("an unweighted run stays at the pre-weight total",
+      by_rec_u["r/strong"].total, 2.0)
+
 # _raw_value: the four branches score() alone never exercises distinctly enough to catch
 # a mutated field or a swapped max/min. Called directly so each test bites the one branch.
 conv_one_target = cand("r/conv1", "fc1", "ConvOne", 1, 1,
@@ -184,6 +201,14 @@ blob = core.grimtools_url("Sellecor's March", 30).split("query=", 1)[1]
 decoded = json.loads(lzstring.LZString().decompressFromEncodedURIComponent(blob))
 check("query pins the exact item level", decoded["raw"]["itemLevel"], {"min": 30, "max": 30})
 check("query carries the item name", decoded["name"], "Sellecor's March")
+
+# An empty name would produce a match-everything-at-this-level query on grimtools
+# (`{"name": ""}`), not a link that isolates anything, so grimtools_url refuses outright.
+try:
+    core.grimtools_url("", 30)
+    check("grimtools_url raises on an empty name", "no exception raised", "ValueError")
+except ValueError:
+    check("grimtools_url raises on an empty name", True, True)
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
