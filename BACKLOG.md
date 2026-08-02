@@ -688,6 +688,14 @@ artifact policy, item source, grimtools boundary).
    research pass first: the "XP-only" evidence was refuted (keys belonged to
    devotion shrines), and `perPartyMemberDropItemName` under
    `storyelements/questitems/` shows item rewards exist in the records tree.
+   Farmability (whether an item is farmable, and from where) and
+   monster-infrequent affix applicability both wait on this walk; neither
+   is answerable today. `scripts/gditems.py`'s `--source` field (shipped in
+   the item query CLI, see [docs/item-cli.md](docs/item-cli.md)) is thin for
+   exactly this reason - 7.2% of gear and 0% of affixes carry any source row
+   at build 19149150 - and is designed so that this walk resolves more of
+   those `unknown` items automatically once it lands, with no change to the
+   CLI's interface.
 4. **Ship `/items/` on the existing Pages deploy** (after 1). Publish the
    prototype plus derived parquet at a subpath, with the tier-1 source facet.
    Not "one workflow edit": CI cannot regenerate parquet (Windows-only

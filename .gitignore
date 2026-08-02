@@ -25,7 +25,9 @@ Thumbs.db
 .superpowers/
 
 # Local editor / agent settings (machine-specific, not shared)
-.claude/
+.claude/*
+# ...except shared workflow skills, which are project content, not machine settings
+!.claude/skills/
 
 # Scratch space for temporary/LLM-generated files (mockups, notes) - not committed
 .llm/
