@@ -611,7 +611,9 @@ git commit -m "feat(cli): relative scoring with mastery fallback for skill crite
 **Interfaces:**
 - Produces: `def grimtools_url(name: str, item_level: int) -> str`.
 
-Background: grimtools item ids are internal and cannot be derived, and are not needed. A search query of exact name plus an exact `itemLevel` isolates one item. The query is JSON, compressed with lz-string's `compressToEncodedURIComponent`, appended to `https://www.grimtools.com/db/advsearch?query=`. The Python `lzstring` package produces byte-identical output to the JavaScript implementation, verified 2026-08-01. The JSON must carry BOTH the flat `raw/itemLevel` key and the nested `raw` object, because grimtools' parser reads the nested form; the flat key alone is ignored.
+Background: grimtools item ids are internal and cannot be derived, and are not needed. A search query of exact name plus an exact `itemLevel` isolates one item. The query is JSON, compressed with lz-string's `compressToEncodedURIComponent`, appended to `https://www.grimtools.com/db/advsearch?query=`. The Python `lzstring` package produces byte-identical output to the JavaScript implementation, verified 2026-08-01.
+
+The query carries the NESTED `raw` object only. Verified live against grimtools on 2026-08-01: the name alone returns all three Sellecor's March tiers, and the nested-only form returns exactly one, identically to a query that also carries a flat `raw/itemLevel` key. The flat key is what grimtools' own UI happens to emit alongside the nested one, but its parser reads the nested form, so adding it here buys nothing. Note this differs from SKILL filters, where a flat `skill/sk####` key is not merely redundant but actively ignored, which is the defect that shipped in this repository's item-search page and returned 144 items where 3 were correct.
 
 - [ ] **Step 1: Write the failing test**
 
