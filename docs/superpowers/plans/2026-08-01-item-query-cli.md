@@ -763,7 +763,13 @@ given the wrong other one.
 
 `--resist pierce` is sugar expanding to the corresponding defensive stat family, resolved through the vocabulary rather than hardcoded.
 
-Skill and mastery flags accept human names and resolve to record paths through the vocabulary, so a caller writes `--boosts-skill "Shadow Strike"` rather than a path.
+Skill and mastery flags accept human names and resolve to record paths through the vocabulary, so a caller writes `--boosts-skill "Shadow Strike"` rather than a path. Three rules govern that resolution, each forced by something measured in the data:
+
+Resolve a name against the vocabulary key belonging to the flag it came from, never against all keys with the first hit winning. `skills` and `granted_skills` share nine display names (Canister Bomb, Flashbang, Overguard, Panetti's Replicating Missile, Phantasmal Blades, Rebuke, Storm Surge, Stun Jacks, Wind Devil), and eight of those point at genuinely different records depending on the key. So `--boosts-skill` reads `skills`, `--grants-skill` reads `granted_skills`, and `--mastery` and `--boosts-mastery` read `masteries`.
+
+Handle names that collide inside a single key. 47 display names within `granted_skills` are each shared by several distinct records, covering 109 of its 724 entries, because a base skill and its legendary or component variant can carry the same name. The repository keeps every one of them by keying collided entries as `"name (record)"`. A caller cannot realistically type that. So when an exact lookup fails, gather every key of the form `<name> (<anything>)`: if exactly one matches, use it; if several match, exit non-zero listing each candidate with its record so the caller can pick. Never silently choose one.
+
+A record path is always accepted directly, for any of these flags. That is the escape hatch for the 46 skills and 108 granted skills that carry no display name at all, and it must keep working, since telling a caller a skill does not exist when it merely lacks a label would be a lie.
 
 - [ ] **Step 2: Implement `vocab`**
 
