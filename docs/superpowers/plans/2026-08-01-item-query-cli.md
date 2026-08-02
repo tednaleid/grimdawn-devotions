@@ -657,7 +657,7 @@ def grimtools_url(name, item_level):
     so the link pins the item by name plus an exact itemLevel instead, which resolves the
     base, Empowered and Mythical tiers of a name to the single intended record.
     """
-    query = {"name": name, "raw/itemLevel": {"min": item_level, "max": item_level},
+    query = {"name": name,
              "raw": {"itemLevel": {"min": item_level, "max": item_level}}}
     blob = lzstring.LZString().compressToEncodedURIComponent(
         json.dumps(query, separators=(",", ":")))
