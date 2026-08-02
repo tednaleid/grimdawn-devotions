@@ -171,5 +171,19 @@ check("mastery union takes the skill boost when it is larger than the direct boo
                        "mastery:records/skills/playerclass04/_classtraining_class04.dbr")[0],
       6.0)
 
+# grimtools_url: name plus itemLevel pins one record among a family's tiers.
+# Byte-for-byte fixture: this blob was produced by the JavaScript lz-string implementation
+# and verified against grimtools, returning exactly one item (the base Sellecor's March).
+EXPECTED = ("https://www.grimtools.com/db/advsearch?query="
+            "N4IgdghgtgpiBcIDKMA2qYGMD2AnA5AM4AEAshLpgBYgA0IuEA7gqAJYAuMUAMjAG5pWIKGzAIAzAAZ6UCAA9JUgL6qgA")
+check("grimtools url matches the verified fixture",
+      core.grimtools_url("Sellecor's March", 30), EXPECTED)
+
+import json, lzstring
+blob = core.grimtools_url("Sellecor's March", 30).split("query=", 1)[1]
+decoded = json.loads(lzstring.LZString().decompressFromEncodedURIComponent(blob))
+check("query pins the exact item level", decoded["raw"]["itemLevel"], {"min": 30, "max": 30})
+check("query carries the item name", decoded["name"], "Sellecor's March")
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

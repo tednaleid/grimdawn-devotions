@@ -1,6 +1,9 @@
 # ABOUTME: Pure query model, scoring, tier collapse, and grimtools link building for the item CLI.
 # ABOUTME: Imports no database driver and performs no I/O, so every rule here is unit testable.
+import json
 from dataclasses import dataclass
+
+import lzstring
 
 
 @dataclass(frozen=True)
@@ -194,3 +197,19 @@ def score(candidates, c, weights=None):
         out.append(ScoredItem(candidate=cand_, total=total, parts=tuple(parts)))
     out.sort(key=lambda s: s.total, reverse=True)
     return out
+
+
+GRIMTOOLS_SEARCH = "https://www.grimtools.com/db/advsearch?query="
+
+
+def grimtools_url(name, item_level):
+    """Deep link that isolates one item on grimtools.
+
+    grimtools item ids are internal to their site and cannot be derived from game data,
+    so the link pins the item by name plus an exact itemLevel instead, which resolves the
+    base, Empowered and Mythical tiers of a name to the single intended record.
+    """
+    query = {"name": name, "raw": {"itemLevel": {"min": item_level, "max": item_level}}}
+    blob = lzstring.LZString().compressToEncodedURIComponent(
+        json.dumps(query, separators=(",", ":")))
+    return GRIMTOOLS_SEARCH + blob
