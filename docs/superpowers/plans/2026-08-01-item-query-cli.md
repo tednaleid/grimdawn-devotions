@@ -130,15 +130,28 @@ def build_boosts(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
                                       ("mastery", "augmentMasteryName", "augmentMasteryLevel")):
         con.execute(f"""
             INSERT INTO boosts
-            SELECT s.record, '{kind}', lower(trim(n.value)),
-                   'records/skills/playerclass' || cls || '/_classtraining_class' || cls || '.dbr',
-                   CAST(lv.value_num AS INTEGER)
-            FROM scoped s
-            JOIN facts n ON n.record = s.record AND n.key LIKE '{name_key}%' AND trim(n.value) != ''
-            JOIN facts lv ON lv.record = s.record
-                         AND lv.key = '{level_key}' || regexp_extract(n.key, '{name_key}(\\d+)', 1)
-                         AND lv.value_num > 0
-            CROSS JOIN (SELECT regexp_extract(lower(trim(n.value)), 'playerclass(\\d+)', 1)) AS t(cls)
+            WITH paired AS (
+                SELECT s.record AS rec,
+                       lower(trim(n.value)) AS target,
+                       CAST(lv.value_num AS INTEGER) AS lvl
+                FROM scoped s
+                JOIN facts n ON n.record = s.record
+                            AND n.key LIKE '{name_key}%' AND trim(n.value) != ''
+                JOIN facts lv ON lv.record = s.record
+                             AND lv.key = '{level_key}'
+                                          || regexp_extract(n.key, '{name_key}(\\d+)', 1)
+                             AND lv.value_num > 0
+            ),
+            classed AS (
+                SELECT rec, target, lvl,
+                       regexp_extract(target, 'playerclass(\\d+)', 1) AS cls
+                FROM paired
+            )
+            SELECT rec, '{kind}', target,
+                   'records/skills/playerclass' || cls
+                   || '/_classtraining_class' || cls || '.dbr',
+                   lvl
+            FROM classed
             WHERE cls != ''""")
     out = out_dir / "boosts.parquet"
     con.execute(f"COPY (SELECT * FROM boosts ORDER BY record, kind, target) "
@@ -299,7 +312,7 @@ git commit -m "feat(derive): conversions table for damage conversion triples"
   - `@dataclass(frozen=True) class StatCriterion: family: str; minimum: float | None`
   - `@dataclass(frozen=True) class Criteria` with fields `domains: tuple[str, ...]`, `slots: tuple[str, ...]`, `gear_types: tuple[str, ...]`, `rarities: tuple[str, ...]`, `expansions: tuple[str, ...]`, `sources: tuple[str, ...]`, `fits: str | None`, `level: int | None`, `all_tiers: bool`, `stats: tuple[StatCriterion, ...]`, `converts_to: str | None`, `min_convert: float | None`, `grants_skills: tuple[str, ...]`, `boosts_skills: tuple[str, ...]`, `boosts_masteries: tuple[str, ...]`, `masteries: tuple[str, ...]`, `limit: int`
   - `@dataclass(frozen=True) class Candidate` with fields `record: str`, `group_key: str`, `name: str`, `item_level: int`, `req_level: int`, `rarity: str`, `slots: tuple[str, ...]`, `source: str`, `stat_values: dict[str, float]`, `skill_boosts: dict[str, int]`, `mastery_boosts: dict[str, int]`, `granted_skills: tuple[str, ...]`, `conversions: tuple[tuple[str, str, float], ...]`
-  - `def collapse_tiers(candidates: list[Candidate], level: int | None, all_tiers: bool) -> list[list[Candidate]]` returning one inner list per family, ordered strongest-usable first.
+  - `def collapse_tiers(candidates: list[Candidate], level: int | None) -> list[list[Candidate]]` returning one inner list per family, each ordered strongest-usable first. It takes no `all_tiers` flag: rendering one tier or all of them is the caller's decision in Task 7, and both modes read the same structure.
   - `def criteria_criterion_names(c: Criteria) -> list[str]` returning a stable label per criterion the caller passed, used by scoring and by the per-criterion empty-match report.
 
 - [ ] **Step 1: Write the failing test**
@@ -346,18 +359,18 @@ emp = cand("r/emp", "fam1", "Empowered Sellecor's March", 65, 60)
 myth = cand("r/myth", "fam1", "Mythical Sellecor's March", 84, 80)
 fam = [base, emp, myth]
 
-groups = core.collapse_tiers(fam, level=None, all_tiers=False)
+groups = core.collapse_tiers(fam, level=None)
 check("collapse yields one family", len(groups), 1)
-check("no level shows strongest tier first", groups[0][0].record, "r/myth")
+check("family carries every tier, strongest first",
+      [c.record for c in groups[0]], ["r/myth", "r/emp", "r/base"])
 
-groups = core.collapse_tiers(fam, level=70, all_tiers=False)
-check("level 70 picks the empowered tier", groups[0][0].record, "r/emp")
+groups = core.collapse_tiers(fam, level=70)
+check("level 70 makes the empowered tier the headline", groups[0][0].record, "r/emp")
+check("level 70 drops the tier the character cannot equip",
+      "r/myth" in [c.record for c in groups[0]], False)
 
-groups = core.collapse_tiers(fam, level=20, all_tiers=False)
-check("level 20 below every requirement drops the family", groups, [])
-
-groups = core.collapse_tiers(fam, level=None, all_tiers=True)
-check("all_tiers keeps every record", len(groups[0]), 3)
+groups = core.collapse_tiers(fam, level=20)
+check("level below every requirement drops the family entirely", groups, [])
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
@@ -380,8 +393,8 @@ Create `scripts/gditems_core.py` starting with:
 Define the dataclasses exactly as listed in the Interfaces block, then:
 
 ```python
-def collapse_tiers(candidates, level, all_tiers):
-    """Group records into item families, newest usable tier first.
+def collapse_tiers(candidates, level):
+    """Group records into item families, strongest usable tier first.
 
     A family is one item that exists at several levels (base, Empowered, Mythical),
     sharing a group_key. When a level is given, tiers requiring a higher level are
@@ -400,11 +413,9 @@ def collapse_tiers(candidates, level, all_tiers):
     return out
 ```
 
-The returned inner list is always ordered strongest first, and `all_tiers` is deliberately
-not consulted here: it controls what the caller renders, not what collapse returns. Callers
-take `group[0]` for the headline tier and the rest for the ladder, so both modes read the
-same structure. Keep the parameter in the signature, because the caller's intent belongs in
-the call and Task 7 renders from it.
+The returned inner list is always ordered strongest first. Callers take `group[0]` for the
+headline tier and the rest for the ladder, which is why this function needs no `all_tiers`
+flag: Task 7 renders one tier or all of them from the same structure.
 
 - [ ] **Step 4: Run the test to verify it passes**
 
