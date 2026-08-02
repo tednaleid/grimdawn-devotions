@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # ABOUTME: Command-line entry point for the item query CLI: flag parsing, vocabulary-backed
-# ABOUTME: name resolution, the `search` and `vocab` subcommands, and the human-readable table.
+# ABOUTME: name resolution, the `search`/`show`/`vocab` subcommands, table/JSON output, and --open.
 # /// script
 # requires-python = ">=3.10"
 # dependencies = ["duckdb", "lzstring"]
@@ -8,9 +8,10 @@
 """Query the derived Grim Dawn item database.
 
 Composition root: `main` resolves the two data directories, builds one
-`DuckDbRepository`, and hands it to `run_search`/`run_vocab` rather than letting those
-functions reach for a database themselves. That is what lets a later task drive
-`run_search(repo, args)` with a fake repository in tests, with no parquet involved.
+`DuckDbRepository`, and hands it to `run_search`/`run_show`/`run_vocab` rather than
+letting those functions reach for a database themselves. That is what lets a later
+task drive `run_search(repo, args)` with a fake repository in tests, with no parquet
+involved.
 
 Directory resolution (independently for `--derived-dir`/`--deposit-dir`): explicit flag,
 then `GDITEMS_DERIVED_DIR`/`GDITEMS_DEPOSIT_DIR`, then a repo-relative default computed
@@ -24,28 +25,50 @@ nine display names that point at different records - see `_resolve_name`. A raw
 `records/...` path is always accepted too, since some skills carry no display name at
 all.
 
-Table output only; `--json`, `show`, and `--open` are later tasks. `--json`/`--open` are
-still parsed here (so the flag surface matches the spec) but fail loudly rather than
-silently falling back to the table, since a caller who asked for JSON and got a table
-would be a confident wrong answer, not an honest error.
+`search` renders as a table by default; `--json` renders the identical query as
+structured JSON instead, both built from the same scored list (see `run_search`) so
+they can never describe a query differently. `--open N` opens the Nth result's
+grimtools URL through the module-level `open_url`, which defaults to
+`webbrowser.open` and is replaced in tests so nothing actually launches. `show`
+prints full detail for one item, resolved the same way ambiguous vocabulary names
+are resolved elsewhere in this file: on more than one match it lists the candidates
+and exits non-zero rather than guessing which one the caller meant.
 """
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import os
 import sys
+import webbrowser
 from pathlib import Path
 from typing import NoReturn
 
 sys.path.insert(0, str(Path(__file__).parent))
-from gditems_core import Criteria, StatCriterion, collapse_tiers, grimtools_url, score
+from gditems_core import (
+    Criteria,
+    StatCriterion,
+    collapse_tiers,
+    criteria_criterion_names,
+    grimtools_url,
+    score,
+)
 from gditems_duckdb import DuckDbRepository
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 HONESTY_LINE = ("Score reflects only the criteria you passed. "
                  "It ranks candidates and does not judge builds.")
+
+
+# ---------------------------------------------------------------------------
+# browser port
+# ---------------------------------------------------------------------------
+
+def open_url(url: str) -> None:
+    """Module-level so tests can replace it and assert the URL without a browser."""
+    webbrowser.open(url)
 
 
 # ---------------------------------------------------------------------------
@@ -103,14 +126,19 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     out = search.add_argument_group("output")
     out.add_argument("--limit", type=int, default=20)
     out.add_argument("--json", action="store_true",
-                      help="Not yet implemented (a later task)")
+                      help="Print results as structured JSON instead of a table")
     out.add_argument("--explain", action="store_true",
                       help="Print the per-criterion score arithmetic")
     out.add_argument("--weights", default=None,
                       help="Comma-separated name=weight pairs; names match the criterion "
                            "labels --explain prints, e.g. stat:resist.pierce=2.0")
-    out.add_argument("--open", type=int, default=None,
-                      help="Not yet implemented (a later task)")
+    out.add_argument("--open", type=int, default=None, metavar="N",
+                      help="Open the Nth result's grimtools page in a browser")
+
+    show = subparsers.add_parser(
+        "show", help="Print full detail for one item")
+    show.add_argument("name_or_record",
+                       help="Exact item name, or an entities.record path")
 
     vocab = subparsers.add_parser("vocab", help="List valid tokens for every flag")
     vocab.add_argument("--json", action="store_true")
@@ -228,10 +256,22 @@ def _build_criteria(vocab: dict, args: argparse.Namespace) -> Criteria:
 # search
 # ---------------------------------------------------------------------------
 
+def _unmatched_criteria(criteria: Criteria, scored_pool: list) -> list[str]:
+    """Name every scored criterion nobody in the pool satisfies at all (raw value zero
+    for every candidate), computed against the full pool before --limit truncates it, so
+    a criterion that only the 21st-best candidate happens to hit is not misreported as
+    matched by nobody. See `gditems_core.criteria_criterion_names` for the label format
+    and `gditems_core.score` for why a non-matching candidate stays in the list scored
+    at zero instead of being dropped, which is what this reads."""
+    matched = {p.name for item in scored_pool for p in item.parts if p.raw > 0}
+    return [name for name in criteria_criterion_names(criteria) if name not in matched]
+
+
 def run_search(repo, args: argparse.Namespace) -> dict:
     """Fetch, collapse to tiers, and score. Callable with any object structurally
     matching the repository port (fetch/vocabulary/find), so a fake repo can drive this
-    with no database."""
+    with no database. Both the table and the JSON renderer are built from this single
+    result, so they cannot describe the same query differently."""
     vocab = repo.vocabulary()
     criteria = _build_criteria(vocab, args)
     weights = _parse_weights(args.weights)
@@ -249,14 +289,16 @@ def run_search(repo, args: argparse.Namespace) -> dict:
     else:
         pool = [group[0] for group in groups]
 
-    scored = score(pool, criteria, weights)[:criteria.limit]
+    scored_pool = score(pool, criteria, weights)
+    scored = scored_pool[:criteria.limit]
 
     results = [
         {"rank": rank, "scored": item, "tiers": family_of[item.candidate.record],
          "url": grimtools_url(item.candidate.name, item.candidate.item_level)}
         for rank, item in enumerate(scored, start=1)
     ]
-    return {"results": results, "disclaimer": HONESTY_LINE}
+    return {"results": results, "disclaimer": HONESTY_LINE, "criteria": criteria,
+            "unmatched_criteria": _unmatched_criteria(criteria, scored_pool)}
 
 
 def _ladder(tiers: list, headline_level: int) -> str:
@@ -325,6 +367,130 @@ def render_table(payload: dict, explain: bool = False) -> str:
     return "\n".join(lines)
 
 
+def _json_result(result: dict) -> dict:
+    scored = result["scored"]
+    cand = scored.candidate
+    ascending_tiers = sorted(result["tiers"], key=lambda c: c.item_level)
+    return {
+        "rank": result["rank"],
+        "name": cand.name,
+        "record": cand.record,
+        "item_level": cand.item_level,
+        "req_level": cand.req_level,
+        "rarity": cand.rarity,
+        "slots": list(cand.slots),
+        "source": cand.source,
+        "score": scored.total,
+        "parts": [
+            {"name": p.name, "raw": p.raw, "normalised": p.normalised,
+             "weight": p.weight, "note": p.note}
+            for p in scored.parts
+        ],
+        "tiers": [c.item_level for c in ascending_tiers],
+        "url": result["url"],
+    }
+
+
+def render_json(payload: dict) -> str:
+    """Same query, same result set as `render_table` - see `run_search`'s docstring.
+    `criteria` echoes what was actually parsed (post name-resolution) so a caller can
+    confirm intent; `disclaimer` repeats the honesty line so a caller reading only the
+    JSON still sees it."""
+    data = {
+        "criteria": dataclasses.asdict(payload["criteria"]),
+        "results": [_json_result(r) for r in payload["results"]],
+        "unmatched_criteria": payload["unmatched_criteria"],
+        "disclaimer": payload["disclaimer"],
+    }
+    return json.dumps(data, indent=2)
+
+
+# ---------------------------------------------------------------------------
+# show
+# ---------------------------------------------------------------------------
+
+def run_show(repo, name_or_record: str) -> dict:
+    """Resolve `name_or_record` through the same repository port `search` uses
+    (repo.find), to exactly one candidate, and gather everything known about it. A name
+    that resolves to more than one record (a family's several tiers, or two families
+    sharing a display name - both real in this data, see the module docstring's
+    Sellecor's March example) lists every candidate and exits non-zero rather than
+    guessing which one the caller meant."""
+    matches = repo.find(name_or_record)
+    if not matches:
+        _fail(f"no item found for '{name_or_record}'")
+    if len(matches) > 1:
+        print(f"ERROR: '{name_or_record}' matches more than one item:", file=sys.stderr)
+        for cand in sorted(matches, key=lambda c: (c.item_level, c.record)):
+            print(f"  {cand.record}  (item level {cand.item_level})", file=sys.stderr)
+        raise SystemExit(1)
+    candidate = matches[0]
+    return {"candidate": candidate, "set_name": repo.set_name(candidate.record),
+            "vocab": repo.vocabulary()}
+
+
+def _reverse_map(vocab_map: dict[str, str]) -> dict[str, str]:
+    return {record: name for name, record in vocab_map.items()}
+
+
+def render_show(payload: dict) -> str:
+    cand = payload["candidate"]
+    vocab = payload["vocab"]
+    skill_names = _reverse_map(vocab["skills"])
+    mastery_names = _reverse_map(vocab["masteries"])
+    granted_names = _reverse_map(vocab["granted_skills"])
+
+    lines = [cand.name, f"  record: {cand.record}"]
+    lines.append(f"  item level {cand.item_level}, req level {cand.req_level}, "
+                  f"rarity {cand.rarity}, source: {cand.source}")
+    if cand.slots:
+        lines.append(f"  slots: {', '.join(cand.slots)}")
+    if payload["set_name"]:
+        lines.append(f"  set: {payload['set_name']}")
+
+    lines.append("")
+    lines.append("Stats:")
+    if cand.stat_values:
+        for family in sorted(cand.stat_values):
+            lines.append(f"  {family}: {_fmt_num(cand.stat_values[family])}")
+    else:
+        lines.append("  none")
+
+    lines.append("")
+    lines.append("Skill boosts:")
+    if cand.skill_boosts:
+        for target in sorted(cand.skill_boosts):
+            lines.append(f"  {skill_names.get(target, target)}: +{cand.skill_boosts[target]}")
+    else:
+        lines.append("  none")
+
+    lines.append("")
+    lines.append("Mastery boosts:")
+    if cand.mastery_boosts:
+        for target in sorted(cand.mastery_boosts):
+            lines.append(f"  {mastery_names.get(target, target)}: +{cand.mastery_boosts[target]}")
+    else:
+        lines.append("  none")
+
+    lines.append("")
+    lines.append("Granted skills:")
+    if cand.granted_skills:
+        for target in sorted(cand.granted_skills):
+            lines.append(f"  {granted_names.get(target, target)}")
+    else:
+        lines.append("  none")
+
+    lines.append("")
+    lines.append("Conversions:")
+    if cand.conversions:
+        for from_type, to_type, percent in cand.conversions:
+            lines.append(f"  {from_type} -> {to_type}: {_fmt_num(percent)}%")
+    else:
+        lines.append("  none")
+
+    return "\n".join(lines)
+
+
 # ---------------------------------------------------------------------------
 # vocab
 # ---------------------------------------------------------------------------
@@ -372,6 +538,16 @@ def _resolve_dir(explicit: str | None, env_var: str, default_subdir: str) -> Pat
     return REPO_ROOT / "data" / default_subdir
 
 
+def _handle_open(results: list[dict], n: int) -> None:
+    """Open the Nth result (1-indexed, matching the rank the table prints) through
+    `open_url`. Validated against the actual result count rather than trusting the
+    caller's N, since a caller reading a table that stopped at --limit could otherwise
+    ask for a rank that was never fetched."""
+    if not (1 <= n <= len(results)):
+        _fail(f"--open {n} is out of range: {len(results)} result(s)")
+    open_url(results[n - 1]["url"])
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
 
@@ -388,12 +564,18 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "search":
-        if args.json:
-            _fail("--json for search is not implemented yet")
-        if args.open is not None:
-            _fail("--open is not implemented yet")
         payload = run_search(repo, args)
-        print(render_table(payload, explain=args.explain))
+        if args.open is not None:
+            _handle_open(payload["results"], args.open)
+        if args.json:
+            print(render_json(payload))
+        else:
+            print(render_table(payload, explain=args.explain))
+        return 0
+
+    if args.command == "show":
+        payload = run_show(repo, args.name_or_record)
+        print(render_show(payload))
         return 0
 
     return 2

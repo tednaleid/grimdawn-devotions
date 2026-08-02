@@ -159,6 +159,20 @@ class DuckDbRepository:
             return self._select("e.record = ?", [name_or_record])
         return self._select("l.text = ?", [name_or_record])
 
+    def set_name(self, record: str) -> str | None:
+        """Display name of the item set `record` belongs to, resolved
+        entities.set_record -> facts.key='setName' -> labels, the same
+        facts-then-labels join `_name_map` uses for skill/mastery names. None if the
+        item is not part of a set or the set's name does not resolve."""
+        row = self._con.execute("""
+            SELECT l.text
+            FROM entities e
+            JOIN facts f ON f.record = e.set_record AND f.key = 'setName'
+            JOIN labels l ON l.tag = f.value AND l.locale = 'en'
+            WHERE e.record = ?
+        """, [record]).fetchone()
+        return row[0] if row else None
+
     def vocabulary(self) -> Vocabulary:
         def col(table: str, column: str) -> list[str]:
             rows = self._con.execute(
