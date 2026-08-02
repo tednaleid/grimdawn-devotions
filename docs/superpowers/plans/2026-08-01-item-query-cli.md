@@ -14,7 +14,7 @@
 - Every code file starts with two `# ABOUTME: ` lines.
 - NO emdashes, NO emojis, no hyperbole in code comments, docs, or commit messages.
 - Tests are standalone uv-shebang scripts named `scripts/test_*.py`, using the repo's hand-rolled `check(name, got, want)` helper and ending with `print("FAILURES:", failures)` then `raise SystemExit(1 if failures else 0)`. Do NOT introduce pytest. `just test-scripts` globs `scripts/test_*.py`.
-- Acceptance SQL lives in `scripts/derived_queries/*.sql`, gates its output on a `checks` CTE so an empty result means failure, and carries pinned counts with a comment saying a game patch should fail the recipe deliberately.
+- Acceptance SQL lives in `scripts/derived_queries/*.sql`, gates its output on a `checks` CTE so an empty result means failure, and carries pinned counts with a comment saying a game patch should fail the recipe deliberately. Pins are EXACT equalities, matching the sibling queries (`count(*) = 97` in AE2, `= 284` in AE8, `446 of 447` in AE9). Never pin an inequality such as `> 7000`: a threshold with headroom passes a build that silently lost a chunk of its rows, which is the one thing these recipes exist to catch.
 - `scripts/gditems_core.py` imports no database driver and no I/O. Purity is enforced by Task 3's test.
 - The CLI resolves data directories from an explicit flag, then `GDITEMS_DERIVED_DIR` / `GDITEMS_DEPOSIT_DIR`, then repo-relative defaults. It never reads justfile variables.
 - Source values render only as `vendor`, `crafted`, or `unknown`. Never "world drop".
@@ -212,10 +212,10 @@ WITH multi AS (
 ),
 checks AS (
     SELECT
-        (SELECT count(*) FROM conversions) > 2000 AS rows_present,
+        (SELECT count(*) FROM conversions) = :TOTAL_ROWS AS rows_present,
         (SELECT count(*) FROM conversions WHERE from_type IS NULL OR to_type IS NULL) = 0 AS types_present,
         (SELECT count(*) FROM conversions WHERE percent <= 0) = 0 AS percent_positive,
-        (SELECT count(*) FROM multi) > 0 AS multi_conversion_preserved
+        (SELECT count(*) FROM multi) = :MULTI_RECORDS AS multi_conversion_preserved
 )
 SELECT c.record, c.from_type, c.to_type, c.percent
 FROM conversions c CROSS JOIN checks k
@@ -223,6 +223,13 @@ WHERE k.rows_present AND k.types_present AND k.percent_positive AND k.multi_conv
 ORDER BY c.record, c.from_type, c.to_type
 LIMIT 20;
 ```
+
+`:TOTAL_ROWS` and `:MULTI_RECORDS` are the two numbers you cannot know until the table exists.
+Write the file with those literal placeholders, and replace them with the exact counts your
+first successful `just derive` reports, in Step 5. Do NOT substitute an inequality such as
+`> 2000`: Task 1's review proved a threshold with headroom passes a build that silently lost
+16 percent of its rows, which defeats the purpose of the recipe. If you cannot obtain a real
+count, STOP and report rather than loosening the check.
 
 - [ ] **Step 2: Wire the recipe and run it to verify it fails**
 
@@ -282,10 +289,26 @@ Call it from the build entry point and report its row count in diagnostics.
 
 In `scripts/build_deposit.py`, add `conversions` to the derived view registration list alongside `boosts`.
 
-- [ ] **Step 5: Rebuild and verify**
+- [ ] **Step 5: Rebuild, pin the exact counts, and verify**
 
-Run: `just derive` then `just q-ae11-damage-conversion`
+Run: `just derive`. Note the conversions row count it reports.
+
+Obtain the two exact numbers:
+
+```bash
+just q "SELECT count(*) AS total_rows FROM conversions"
+just q "SELECT count(*) AS multi_records FROM (SELECT record FROM conversions GROUP BY record HAVING count(*) > 1)"
+```
+
+Replace `:TOTAL_ROWS` and `:MULTI_RECORDS` in `ae11_damage_conversion.sql` with those exact
+integers, and state in the file's comment that both are pinned to build 19149150.
+
+Run: `just q-ae11-damage-conversion`
 Expected: PASS.
+
+Then deliberately prove the pin bites: temporarily change `:TOTAL_ROWS` to one less than the
+real count, re-run the recipe, and confirm it returns zero rows and fails. Restore the correct
+value afterwards. A pin nobody has seen fail is not known to be a pin.
 
 Run: `just q-ae-all`
 Expected: all pass.
