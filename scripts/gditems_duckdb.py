@@ -110,6 +110,13 @@ DERIVED_TABLES = ("entities", "stats", "relations", "families", "sources", "boos
 _SOURCE_KIND_TO_TOKEN = {"faction_vendor": "vendor", "crafted": "crafted"}
 _TOKEN_TO_SOURCE_KIND = {token: kind for kind, token in _SOURCE_KIND_TO_TOKEN.items()}
 
+# Every token Candidate.source (and therefore --source) can take: every
+# _SOURCE_KIND_TO_TOKEN value, plus 'unknown' for the no-source-row case
+# _SOURCE_CASE_SQL falls back to below. The single source of truth for this list -
+# gditems.py imports it rather than re-typing it, so the CLI's --source vocabulary
+# can never drift from what the adapter actually produces.
+SOURCE_TOKENS = tuple(_SOURCE_KIND_TO_TOKEN.values()) + ("unknown",)
+
 # The CASE that maps sources.kind to the Candidate.source vocabulary (vendor/crafted/unknown).
 _SOURCE_CASE_SQL = (
     "CASE (SELECT so.kind FROM sources so WHERE so.item = e.record LIMIT 1) "
@@ -158,6 +165,17 @@ class DuckDbRepository:
         if name_or_record.startswith("records/"):
             return self._select("e.record = ?", [name_or_record])
         return self._select("l.text = ?", [name_or_record])
+
+    def tiers(self, group_key: str) -> list[Candidate]:
+        """Every record in the item family `group_key` identifies - the tier ladder
+        `show` reports. Scoped by group_key, never by display name: display names
+        collide ACROSS families, not just within one (measured 2026-08-01: Gazer Eye,
+        Exalted Effigy, Hysteria, and Massacre each name two unrelated families across
+        gear/augment/component/relic alone, 20+ once affixes are included). A relic
+        named "Massacre" and an unrelated two-handed axe also named "Massacre" both
+        matched `find("Massacre")`, so a caller that used `find` for this would silently
+        report the axe's levels as part of the relic's ladder."""
+        return self._select("e.group_key = ?", [group_key])
 
     def set_name(self, record: str) -> str | None:
         """Display name of the item set `record` belongs to, resolved

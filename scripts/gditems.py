@@ -64,7 +64,7 @@ from gditems_core import (
     grimtools_url,
     score,
 )
-from gditems_duckdb import DuckDbRepository
+from gditems_duckdb import SOURCE_TOKENS, DuckDbRepository
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -161,12 +161,6 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def _fail(message: str) -> NoReturn:
     print(f"ERROR: {message}", file=sys.stderr)
     raise SystemExit(1)
-
-
-# `--source` tokens are a fixed CLI-level enum, not part of `repo.vocabulary()` (there is
-# no "sources" key - see the Vocabulary TypedDict in gditems_duckdb.py), so unlike every
-# other scope flag this list cannot be drawn from the vocabulary and is named here instead.
-SOURCE_TOKENS = ("vendor", "crafted", "unknown")
 
 
 def _fail_unknown(flag: str, raw: str, valid) -> NoReturn:
@@ -486,10 +480,13 @@ def run_show(repo, name_or_record: str) -> dict:
     data (see the module docstring's Sellecor's March example). The caller must pick
     one, typically by record path, rather than the CLI guessing which one was meant.
 
-    On success, `tiers` is every record sharing the resolved candidate's display name:
-    the same fact that makes a name ambiguous doubles as the family's tier ladder,
-    since every tier of a family shares one display name in this data (see
-    `_ladder`)."""
+    On success, `tiers` is every record in the resolved candidate's own family
+    (`repo.tiers(candidate.group_key)`), NOT every record sharing its display name.
+    Display names collide across unrelated families (measured 2026-08-01: "Massacre"
+    names both a relic and an unrelated two-handed axe), so a name-based lookup here
+    would silently blend another family's item levels into this one's ladder - a
+    confirmed bug this docstring used to describe as intentional. group_key is the
+    real family identity and is already on the resolved Candidate."""
     matches = repo.find(name_or_record)
     if not matches:
         return {"error": f"no item found for '{name_or_record}'", "candidates": []}
@@ -500,7 +497,7 @@ def run_show(repo, name_or_record: str) -> dict:
             "candidates": [{"record": c.record, "item_level": c.item_level} for c in ordered],
         }
     candidate = matches[0]
-    tiers = repo.find(candidate.name) if candidate.name else [candidate]
+    tiers = repo.tiers(candidate.group_key)
     return {"candidate": candidate, "set_name": repo.set_name(candidate.record),
             "vocab": repo.vocabulary(), "tiers": tiers}
 

@@ -126,6 +126,24 @@ check("show --json carries a grimtools url",
       show_data["url"].startswith("https://www.grimtools.com/db/advsearch?query="), True)
 check("show --json carries the tier ladder", show_data["tiers"], [75])
 
+# The tier ladder must come from the resolved item's own family (group_key), never
+# from every record that merely shares its display name: "Massacre" names both a
+# single-tier relic (item level 90) and an unrelated three-tier two-handed axe
+# (levels 14/58/84). Asking for the relic's own record must report ONLY its own
+# level, not the axe's, even though both share the display name "Massacre".
+out = run_cli("show", "records/items/gearrelic/d110_relic.dbr", "--json")
+massacre_relic = json.loads(out)
+check("massacre relic name", massacre_relic["name"], "Massacre")
+check("massacre relic tier ladder holds only its own level, not the unrelated axe's",
+      massacre_relic["tiers"], [90])
+
+# and the reverse: the axe's own ladder must not pick up the relic's level either.
+out = run_cli("show", "records/items/gearweapons/melee2h/c002_axe2h.dbr", "--json")
+massacre_axe = json.loads(out)
+check("massacre axe name", massacre_axe["name"], "Massacre")
+check("massacre axe tier ladder holds only its own family's levels, not the relic's",
+      massacre_axe["tiers"], [14, 58, 84])
+
 # A missing derived directory fails with the exact fixed line, nothing else.
 code, err = run_cli_expect_failure(
     "--derived-dir", str(HERE / "does-not-exist-derived"), "search", "--domain", "gear")
