@@ -192,8 +192,6 @@ WIDE_KEYS = [
     "characterBaseAttackSpeed", "itemSkillName", "itemSkillLevelEq", "itemSkillLevel",
     "itemSkillAutoController", "petBonusName", "itemSetName", "attributeScalePercent",
     "lootRandomizerName", "lootRandomizerJitter", "lootRandomizerCost",
-    "augmentSkillName1", "augmentSkillName2", "augmentSkillLevel1", "augmentSkillLevel2",
-    "augmentMasteryName1", "augmentMasteryName2", "augmentMasteryLevel1", "augmentMasteryLevel2",
 ]
 
 # Value-bearing stat vocabulary shared by the self-stat and skill-rollup stages;
