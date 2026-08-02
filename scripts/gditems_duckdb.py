@@ -129,7 +129,8 @@ _SOURCE_CASE_SQL = (
 
 _BASE_SELECT = f"""
     SELECT e.record, e.group_key, COALESCE(l.text, ''), COALESCE(e.item_level, 0),
-           e.req_level, COALESCE(e.rarity, ''), e.slots, {_SOURCE_CASE_SQL}
+           e.req_level, COALESCE(e.rarity, ''), COALESCE(e.domain, ''), e.slots,
+           {_SOURCE_CASE_SQL}
     FROM entities e
     LEFT JOIN labels l ON l.tag = e.name_tag AND l.locale = 'en'
 """
@@ -282,13 +283,15 @@ class DuckDbRepository:
         return [
             Candidate(
                 record=record, group_key=group_key, name=name, item_level=item_level,
-                req_level=req_level, rarity=rarity, slots=tuple(slots), source=source,
+                req_level=req_level, rarity=rarity, domain=domain, slots=tuple(slots),
+                source=source,
                 stat_values=stat_values.get(record, {}),
                 skill_boosts=skill_boosts.get(record, {}),
                 mastery_boosts=mastery_boosts.get(record, {}),
                 granted_skills=granted_skills.get(record, ()),
                 conversions=conversions.get(record, ()))
-            for record, group_key, name, item_level, req_level, rarity, slots, source in rows
+            for record, group_key, name, item_level, req_level, rarity, domain, slots, source
+            in rows
         ]
 
     def _stat_values(self, records: list[str]) -> dict[str, dict[str, float]]:

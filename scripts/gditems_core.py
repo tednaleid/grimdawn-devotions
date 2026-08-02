@@ -41,6 +41,7 @@ class Candidate:
     item_level: int
     req_level: int
     rarity: str
+    domain: str
     slots: tuple[str, ...]
     source: str
     stat_values: dict[str, float]

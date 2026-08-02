@@ -26,6 +26,7 @@ def cand(record, group_key, name, item_level, req_level, **kw):
     return core.Candidate(
         record=record, group_key=group_key, name=name, item_level=item_level,
         req_level=req_level, rarity=kw.get("rarity", "Epic"),
+        domain=kw.get("domain", "gear"),
         slots=kw.get("slots", ("feet",)), source=kw.get("source", "unknown"),
         stat_values=kw.get("stat_values", {}), skill_boosts=kw.get("skill_boosts", {}),
         mastery_boosts=kw.get("mastery_boosts", {}),

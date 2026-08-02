@@ -92,11 +92,34 @@ and `--converts-to` with `--min-convert` filter the candidate set.
 | `--limit N` | Result count (default 20) |
 | `--json` | Structured JSON instead of a table |
 | `--explain` | Print the per-criterion score arithmetic |
-| `--weights` | Comma-separated `name=weight` pairs; names must match a criterion label the query actually scores (the same labels `--explain` prints and `unmatched_criteria` names), e.g. `stat:resist.pierce=2.0`. An unrecognised name exits non-zero with a near-match suggestion rather than being silently ignored. `--json` echoes the effective map under `"weights"` so a caller can confirm what was applied. |
+| `--weights` | Comma-separated `name=weight` pairs; names must match a criterion the query actually scores, e.g. `stat:resist.pierce=2.0`. A skill or mastery may be named either the way `--explain` prints it (`boosts_skill:Chilling Rounds`) or by its record path; both resolve to the same criterion. An unrecognised name exits non-zero with a near-match suggestion rather than being silently ignored. `--json` echoes the effective map under `"weights"` so a caller can confirm what was applied. |
 | `--open N` | Open the Nth result's grimtools page in a browser |
 
 `--json` and the table render the identical query - both are built from the
 same scored list, so they can never describe a query differently.
+
+Every result carries its `domain` (`gear`, `augment`, `component`, `relic`,
+...) in both modes. A search spanning several domains needs it: an augment
+and a component are acquired and slotted differently, and nothing else in the
+row separates them.
+
+### Criterion labels
+
+A criterion is labelled `<kind>:<target>`. Skill and mastery criteria match
+on a record path internally, but both the table and `--explain` print the
+display name instead, so asking for `--boosts-skill "Chilling Rounds"` reads
+back as `boosts skill Chilling Rounds` rather than
+`boosts skill records/skills/playerclass07/wpattack02.dbr`.
+
+A record with no display name in the game data keeps its record path. 46 of
+the 245 boost targets are genuinely nameless (hidden buff-carrier records
+carrying no `skillDisplayName` fact at all, for example
+`records/skills/playerclass01/cadence3.dbr`); a name derived from the file
+stem would assert one the game does not have.
+
+In `--json` each scored part carries both forms: `name` is the record-keyed
+label (the `--weights` key, and what `unmatched_criteria` names), and
+`display` is the readable form beside it.
 
 ## Result model
 

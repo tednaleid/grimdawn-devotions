@@ -141,7 +141,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
                       help="Print the per-criterion score arithmetic")
     out.add_argument("--weights", default=None,
                       help="Comma-separated name=weight pairs; names match the criterion "
-                           "labels --explain prints, e.g. stat:resist.pierce=2.0")
+                           "labels --explain prints (a skill or mastery may also be "
+                           "weighted by its record path), e.g. "
+                           "stat:resist.pierce=2.0")
     out.add_argument("--open", type=int, default=None, metavar="N",
                       help="Open the Nth result's grimtools page in a browser")
 
@@ -231,6 +233,24 @@ def _parse_weights(value: str | None) -> dict[str, float] | None:
         except ValueError:
             _fail(f"--weights entry '{pair}' has a non-numeric weight")
     return weights
+
+
+def _normalise_weight_keys(weights: dict[str, float] | None,
+                            labels: dict[str, str]) -> dict[str, float] | None:
+    """Accept a `--weights` key in either form the CLI shows.
+
+    Scoring keys on the internal criterion label, which for a skill or mastery carries a
+    `records/...` path, so requiring that form would mean pasting a record path to weight
+    a skill a caller named by display name. The display form the table and `--explain`
+    print is translated back here. A key matching neither form passes through untouched
+    so `_validate_weights` rejects it by name. Two criteria cannot share a display form:
+    `_name_map` disambiguates duplicate names within a vocabulary key, and the criterion
+    kind prefix separates the keys from each other.
+    """
+    if not weights:
+        return weights
+    by_display = {display: label for label, display in labels.items()}
+    return {by_display.get(name, name): weight for name, weight in weights.items()}
 
 
 def _validate_weights(criteria: Criteria, weights: dict[str, float] | None) -> None:
@@ -346,7 +366,8 @@ def run_search(repo, args: argparse.Namespace) -> dict:
     result, so they cannot describe the same query differently."""
     vocab = repo.vocabulary()
     criteria = _build_criteria(vocab, args)
-    weights = _parse_weights(args.weights)
+    labels = _criterion_labels(vocab, criteria)
+    weights = _normalise_weight_keys(_parse_weights(args.weights), labels)
     _validate_weights(criteria, weights)
 
     candidates = repo.fetch(criteria)
@@ -371,7 +392,7 @@ def run_search(repo, args: argparse.Namespace) -> dict:
         for rank, item in enumerate(scored, start=1)
     ]
     return {"results": results, "disclaimer": HONESTY_LINE, "criteria": criteria,
-            "weights": weights or {},
+            "weights": weights or {}, "labels": labels,
             "unmatched_criteria": _unmatched_criteria(criteria, scored_pool)}
 
 
@@ -410,8 +431,45 @@ def _fmt_num(value: float) -> str:
     return f"{value:g}"
 
 
-def _pretty_name(name: str) -> str:
-    kind, sep, target = name.partition(":")
+def _reverse_map(vocab_map: dict[str, str]) -> dict[str, str]:
+    return {record: name for name, record in vocab_map.items()}
+
+
+# Criterion kind -> the one vocabulary key whose flag produces it. Skill and mastery
+# criteria carry a `records/...` path in their label because that is what `Criteria`
+# matches on, so rendering one verbatim would echo an internal path back at a reader who
+# typed a display name. Each kind is translated through the same key `_resolve_name` used
+# to resolve it (never any other - see the gditems_duckdb module docstring on the nine
+# display names shared between `skills` and `granted_skills`).
+_CRITERION_VOCAB_KEY = {
+    "grants_skill": "granted_skills",
+    "boosts_skill": "skills",
+    "boosts_mastery": "masteries",
+    "mastery": "masteries",
+}
+
+
+def _criterion_labels(vocab: dict, criteria: Criteria) -> dict[str, str]:
+    """Map each scored criterion's internal label to its display form.
+
+    `stat` and `converts_to` targets are already display tokens and pass through. A skill
+    or mastery record with no display name in the data keeps its record path, which is the
+    honest rendering for the 46 of 245 boost targets that genuinely carry no name (for
+    example `records/skills/playerclass01/cadence3.dbr`, a hidden buff-carrier record with
+    no skillDisplayName fact at all). Guessing a name from the file stem would invent one.
+    """
+    reversed_by_kind = {kind: _reverse_map(vocab[key])
+                        for kind, key in _CRITERION_VOCAB_KEY.items()}
+    labels = {}
+    for label in criteria_criterion_names(criteria):
+        kind, _, target = label.partition(":")
+        display = reversed_by_kind.get(kind, {}).get(target, target)
+        labels[label] = f"{kind}:{display}"
+    return labels
+
+
+def _pretty_name(name: str, labels: dict[str, str] | None = None) -> str:
+    kind, sep, target = (labels or {}).get(name, name).partition(":")
     if not sep:
         return name
     if kind == "stat":
@@ -419,16 +477,17 @@ def _pretty_name(name: str) -> str:
     return f"{kind.replace('_', ' ')} {target}"
 
 
-def _matched_summary(scored) -> str:
-    matched = [f"{_pretty_name(p.name)}={_fmt_num(p.raw)}" for p in scored.parts if p.raw > 0]
+def _matched_summary(scored, labels: dict[str, str] | None = None) -> str:
+    matched = [f"{_pretty_name(p.name, labels)}={_fmt_num(p.raw)}"
+               for p in scored.parts if p.raw > 0]
     return ", ".join(matched) if matched else "none matched"
 
 
-def _explain_lines(scored) -> list[str]:
+def _explain_lines(scored, labels: dict[str, str] | None = None) -> list[str]:
     lines = []
     for p in scored.parts:
         note = f" ({p.note})" if p.note else ""
-        lines.append(f"     {_pretty_name(p.name)}: raw={_fmt_num(p.raw)} "
+        lines.append(f"     {_pretty_name(p.name, labels)}: raw={_fmt_num(p.raw)} "
                       f"normalised={p.normalised:.2f} weight={_fmt_num(p.weight)} "
                       f"contributes={p.normalised * p.weight:.2f}{note}")
     return lines
@@ -436,21 +495,23 @@ def _explain_lines(scored) -> list[str]:
 
 def render_table(payload: dict, explain: bool = False) -> str:
     lines: list[str] = []
+    labels = payload["labels"]
     for result in payload["results"]:
         scored = result["scored"]
         cand = scored.candidate
         tiers = result["tiers"]
         lines.append(f"{result['rank']}. {cand.name}  score {scored.total:.2f}")
-        lines.append(f"   matched: {_matched_summary(scored)}")
+        lines.append(f"   matched: {_matched_summary(scored, labels)}")
         if explain:
-            lines.extend(_explain_lines(scored))
+            lines.extend(_explain_lines(scored, labels))
         lines.append(f"   item level {cand.item_level}, req level {cand.req_level}, "
-                      f"source: {cand.source}")
+                      f"{cand.domain}, source: {cand.source}")
         if len(tiers) > 1:
             lines.append(f"   tiers: {_ladder(tiers, cand.item_level)}")
         lines.append(f"   {result['url']}")
     if payload["unmatched_criteria"]:
-        pretty = ", ".join(_pretty_name(name) for name in payload["unmatched_criteria"])
+        pretty = ", ".join(_pretty_name(name, labels)
+                            for name in payload["unmatched_criteria"])
         lines.append("")
         lines.append(f"Unmatched criteria (matched nothing in the pool): {pretty}")
     lines.append("")
@@ -458,7 +519,7 @@ def render_table(payload: dict, explain: bool = False) -> str:
     return "\n".join(lines)
 
 
-def _json_result(result: dict) -> dict:
+def _json_result(result: dict, labels: dict[str, str]) -> dict:
     scored = result["scored"]
     cand = scored.candidate
     ascending_tiers = sorted(result["tiers"], key=lambda c: c.item_level)
@@ -469,12 +530,16 @@ def _json_result(result: dict) -> dict:
         "item_level": cand.item_level,
         "req_level": cand.req_level,
         "rarity": cand.rarity,
+        "domain": cand.domain,
         "slots": list(cand.slots),
         "source": cand.source,
         "score": scored.total,
+        # `name` stays the internal label (it is the --weights key and the value echoed in
+        # `unmatched_criteria`); `display` is the same criterion with skill and mastery
+        # records resolved back to the name the caller typed.
         "parts": [
-            {"name": p.name, "raw": p.raw, "normalised": p.normalised,
-             "weight": p.weight, "note": p.note}
+            {"name": p.name, "display": labels.get(p.name, p.name), "raw": p.raw,
+             "normalised": p.normalised, "weight": p.weight, "note": p.note}
             for p in scored.parts
         ],
         "tiers": [c.item_level for c in ascending_tiers],
@@ -492,7 +557,7 @@ def render_json(payload: dict) -> str:
     data = {
         "criteria": dataclasses.asdict(payload["criteria"]),
         "weights": payload["weights"],
-        "results": [_json_result(r) for r in payload["results"]],
+        "results": [_json_result(r, payload["labels"]) for r in payload["results"]],
         "unmatched_criteria": payload["unmatched_criteria"],
         "disclaimer": payload["disclaimer"],
     }
@@ -538,10 +603,6 @@ def run_show(repo, name_or_record: str) -> dict:
             "vocab": repo.vocabulary(), "tiers": tiers}
 
 
-def _reverse_map(vocab_map: dict[str, str]) -> dict[str, str]:
-    return {record: name for name, record in vocab_map.items()}
-
-
 def render_show(payload: dict) -> str:
     cand = payload["candidate"]
     vocab = payload["vocab"]
@@ -552,7 +613,7 @@ def render_show(payload: dict) -> str:
 
     lines = [cand.name, f"  record: {cand.record}"]
     lines.append(f"  item level {cand.item_level}, req level {cand.req_level}, "
-                  f"rarity {cand.rarity}, source: {cand.source}")
+                  f"rarity {cand.rarity}, {cand.domain}, source: {cand.source}")
     if cand.slots:
         lines.append(f"  slots: {', '.join(cand.slots)}")
     if payload["set_name"]:
@@ -619,6 +680,7 @@ def _json_show(payload: dict) -> dict:
         "item_level": cand.item_level,
         "req_level": cand.req_level,
         "rarity": cand.rarity,
+        "domain": cand.domain,
         "slots": list(cand.slots),
         "source": cand.source,
         "set": payload["set_name"],

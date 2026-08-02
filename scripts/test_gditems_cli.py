@@ -219,6 +219,62 @@ data = json.loads(out)
 check("json echoes an empty weights map when none were passed", data["weights"], {})
 
 # ---------------------------------------------------------------------------
+# Results carry their domain
+# ---------------------------------------------------------------------------
+
+# A multi-domain search is the case that needs this: without `domain` on the row there is
+# nothing in the output separating an augment from a component, and the two are acquired
+# and slotted differently. Pinned loosely (both present) rather than to exact counts,
+# since the point is that the field discriminates, not what today's totals are.
+out = run_cli("search", "--domain", "augment,component", "--fits", "amulet",
+              "--resist", "cold", "--limit", "40", "--json")
+data = json.loads(out)
+domains = {r["domain"] for r in data["results"]}
+check("search json carries each result's domain", domains, {"augment", "component"})
+
+out = run_cli("show", "Skyshard Powder", "--json")
+check("show json carries the domain", json.loads(out)["domain"], "augment")
+
+out = run_cli("show", "Skyshard Powder")
+check("show text carries the domain", "augment" in out, True)
+
+# ---------------------------------------------------------------------------
+# Criterion labels echo the name the caller typed, not the record behind it
+# ---------------------------------------------------------------------------
+
+CHILLING_ROUNDS = "records/skills/playerclass07/wpattack02.dbr"
+
+out = run_cli("search", "--slot", "amulet", "--boosts-skill", "Chilling Rounds",
+              "--stat", "damage.cold", "--limit", "1", "--explain")
+check("table names the skill, not its record", "boosts skill Chilling Rounds" in out, True)
+check("table does not leak the record path", CHILLING_ROUNDS in out, False)
+
+out = run_cli("search", "--slot", "amulet", "--boosts-skill", "Chilling Rounds",
+              "--stat", "damage.cold", "--limit", "1", "--json")
+data = json.loads(out)
+part = next(p for p in data["results"][0]["parts"] if p["name"].startswith("boosts_skill:"))
+# `name` stays record-keyed: it is the --weights key and the unmatched_criteria value, so
+# it must not become a display string. `display` is the readable form beside it.
+check("json part keeps the record-keyed label", part["name"], f"boosts_skill:{CHILLING_ROUNDS}")
+check("json part carries the display form", part["display"], "boosts_skill:Chilling Rounds")
+
+# Both spellings of the same weight key must produce the same ranking, so a caller can
+# weight a skill by the name they typed instead of pasting a record path.
+by_name = run_cli("search", "--slot", "amulet", "--boosts-skill", "Chilling Rounds",
+                  "--stat", "damage.cold", "--limit", "3",
+                  "--weights", "boosts_skill:Chilling Rounds=5", "--json")
+by_record = run_cli("search", "--slot", "amulet", "--boosts-skill", "Chilling Rounds",
+                    "--stat", "damage.cold", "--limit", "3",
+                    "--weights", f"boosts_skill:{CHILLING_ROUNDS}=5", "--json")
+check("--weights accepts the display name", json.loads(by_name)["results"],
+      json.loads(by_record)["results"])
+
+code, err = run_cli_expect_failure("search", "--slot", "amulet",
+                                    "--boosts-skill", "Chilling Rounds",
+                                    "--weights", "boosts_skill:Nonsense=5")
+check("a weight name matching neither form still exits non-zero", code != 0, True)
+
+# ---------------------------------------------------------------------------
 # F4: show's text and JSON renderers must agree
 # ---------------------------------------------------------------------------
 
@@ -280,11 +336,11 @@ class FakeRepo:
 
 repo = FakeRepo([
     core.Candidate(record="r/myth", group_key="f1", name="Mythical Thing", item_level=84,
-                   req_level=80, rarity="Epic", slots=("feet",), source="unknown",
+                   req_level=80, rarity="Epic", domain="gear", slots=("feet",), source="unknown",
                    stat_values={"damage.pierce": 40.0}, skill_boosts={}, mastery_boosts={},
                    granted_skills=(), conversions=()),
     core.Candidate(record="r/base", group_key="f1", name="Thing", item_level=30,
-                   req_level=25, rarity="Epic", slots=("feet",), source="unknown",
+                   req_level=25, rarity="Epic", domain="gear", slots=("feet",), source="unknown",
                    stat_values={"damage.pierce": 10.0}, skill_boosts={}, mastery_boosts={},
                    granted_skills=(), conversions=()),
 ])
@@ -300,15 +356,15 @@ check("level filtering applies through the CLI path", len(rendered["results"]), 
 # distinct records so a ranking-vs-index mixup would be visible.
 open_repo = FakeRepo([
     core.Candidate(record="r/a", group_key="fa", name="Item A", item_level=10, req_level=10,
-                   rarity="Epic", slots=("feet",), source="unknown",
+                   rarity="Epic", domain="gear", slots=("feet",), source="unknown",
                    stat_values={"damage.pierce": 30.0}, skill_boosts={}, mastery_boosts={},
                    granted_skills=(), conversions=()),
     core.Candidate(record="r/b", group_key="fb", name="Item B", item_level=10, req_level=10,
-                   rarity="Epic", slots=("feet",), source="unknown",
+                   rarity="Epic", domain="gear", slots=("feet",), source="unknown",
                    stat_values={"damage.pierce": 20.0}, skill_boosts={}, mastery_boosts={},
                    granted_skills=(), conversions=()),
     core.Candidate(record="r/c", group_key="fc", name="Item C", item_level=10, req_level=10,
-                   rarity="Epic", slots=("feet",), source="unknown",
+                   rarity="Epic", domain="gear", slots=("feet",), source="unknown",
                    stat_values={"damage.pierce": 10.0}, skill_boosts={}, mastery_boosts={},
                    granted_skills=(), conversions=()),
 ])
@@ -323,6 +379,36 @@ cli.open_url = opened.append
 cli._handle_open(open_results, 2)
 check("--open 2 opens the second result's url, not the third's",
       opened, [open_results[1]["url"]])
+
+# A skill record with no display name in the data keeps its record path as its label.
+# 46 of the 245 boost targets are genuinely nameless (hidden buff-carrier records with no
+# skillDisplayName fact), and inventing a name from the file stem would assert one the
+# game does not have. Driven through the fake repo so the case is pinned regardless of
+# which records happen to be nameless in a future deposit.
+NAMED = "records/skills/playerclass07/named.dbr"
+NAMELESS = "records/skills/playerclass07/nameless.dbr"
+
+
+class SkillVocabRepo(FakeRepo):
+    def vocabulary(self):
+        vocab = super().vocabulary()
+        vocab["skills"] = {"Named Skill": NAMED}
+        return vocab
+
+
+label_repo = SkillVocabRepo([
+    core.Candidate(record="r/x", group_key="fx", name="Item X", item_level=10, req_level=10,
+                   rarity="Epic", domain="gear", slots=("feet",), source="unknown",
+                   stat_values={}, skill_boosts={NAMED: 3, NAMELESS: 2}, mastery_boosts={},
+                   granted_skills=(), conversions=()),
+])
+label_payload = cli.run_search(label_repo, cli.parse_args(
+    ["search", "--domain", "gear", "--boosts-skill", f"Named Skill,{NAMELESS}"]))
+labels = label_payload["labels"]
+check("a named skill record resolves to its display name",
+      labels[f"boosts_skill:{NAMED}"], "boosts_skill:Named Skill")
+check("a nameless skill record keeps its record path",
+      labels[f"boosts_skill:{NAMELESS}"], f"boosts_skill:{NAMELESS}")
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

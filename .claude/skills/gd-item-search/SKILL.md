@@ -56,9 +56,15 @@ Run `just fetch-deposit` and retry rather than treating that as a dead end.
    ```
 
    `--json` gives the same query as the table, structured for reasoning:
-   each result carries its score breakdown (`parts`), source, tier ladder,
-   and grimtools URL. Use `--explain` (table mode) if you need the
+   each result carries its score breakdown (`parts`), `domain`, source, tier
+   ladder, and grimtools URL. Use `--explain` (table mode) if you need the
    per-criterion arithmetic spelled out for a human.
+
+   Read `domain` whenever a search spans more than one: an augment and a
+   component are acquired and slotted differently, and nothing else in the
+   row tells them apart. In `parts`, `name` is the record-keyed criterion
+   label and `display` is the readable form (`boosts_skill:Chilling Rounds`);
+   quote `display` in a report, not `name`.
 
 3. **Read `unmatched_criteria` before concluding nothing matches.**
 
