@@ -25,6 +25,12 @@ nine display names that point at different records - see `_resolve_name`. A raw
 `records/...` path is always accepted too, since some skills carry no display name at
 all.
 
+An unrecognised token for any vocabulary-backed flag exits non-zero and names the near
+matches from that flag's own vocabulary (`difflib.get_close_matches` - see
+`_fail_unknown`), never another flag's, so a typo cannot be mistaken for an honest
+zero-result query. A missing `data/derived` prints one fixed line naming the fix
+(`just fetch-deposit`) and nothing else.
+
 `search` renders as a table by default; `--json` renders the identical query as
 structured JSON instead, both built from the same scored list (see `run_search`) so
 they can never describe a query differently. `--open N` opens the Nth result's
@@ -32,12 +38,16 @@ grimtools URL through the module-level `open_url`, which defaults to
 `webbrowser.open` and is replaced in tests so nothing actually launches. `show`
 prints full detail for one item, resolved the same way ambiguous vocabulary names
 are resolved elsewhere in this file: on more than one match it lists the candidates
-and exits non-zero rather than guessing which one the caller meant.
+and exits non-zero rather than guessing which one the caller meant. `--json` on
+`show` emits the identical information as structured data instead of prose,
+including the ambiguous-match candidate list, since the CLI's primary consumer is an
+agent that should not have to parse prose to write a report.
 """
 from __future__ import annotations
 
 import argparse
 import dataclasses
+import difflib
 import json
 import os
 import sys
@@ -139,6 +149,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "show", help="Print full detail for one item")
     show.add_argument("name_or_record",
                        help="Exact item name, or an entities.record path")
+    show.add_argument("--json", action="store_true",
+                       help="Print item detail as structured JSON instead of prose")
 
     vocab = subparsers.add_parser("vocab", help="List valid tokens for every flag")
     vocab.add_argument("--json", action="store_true")
@@ -149,6 +161,29 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def _fail(message: str) -> NoReturn:
     print(f"ERROR: {message}", file=sys.stderr)
     raise SystemExit(1)
+
+
+# `--source` tokens are a fixed CLI-level enum, not part of `repo.vocabulary()` (there is
+# no "sources" key - see the Vocabulary TypedDict in gditems_duckdb.py), so unlike every
+# other scope flag this list cannot be drawn from the vocabulary and is named here instead.
+SOURCE_TOKENS = ("vendor", "crafted", "unknown")
+
+
+def _fail_unknown(flag: str, raw: str, valid) -> NoReturn:
+    """Fail loudly on an unrecognised token for `flag`, naming near matches computed with
+    `difflib.get_close_matches` against `valid` - that flag's own vocabulary, never
+    another flag's (see the module docstring). Silence is the failure mode this guards
+    against: an unknown token that filters to zero rows is otherwise indistinguishable
+    from an honest "no items match"."""
+    suggestions = difflib.get_close_matches(raw, list(valid), n=3, cutoff=0.6)
+    hint = f" Did you mean: {', '.join(suggestions)}?" if suggestions else ""
+    _fail(f"'{raw}' is not a known token for {flag}.{hint}")
+
+
+def _validate_tokens(flag: str, tokens: tuple[str, ...], valid) -> None:
+    for token in tokens:
+        if token not in valid:
+            _fail_unknown(flag, token, valid)
 
 
 def _split_csv(value: str | None) -> tuple[str, ...]:
@@ -163,16 +198,25 @@ def _parse_stat(raw: str) -> StatCriterion:
     return StatCriterion(family=family, minimum=minimum)
 
 
+def _stat_criteria(vocab: dict, raw_list: list[str]) -> list[StatCriterion]:
+    stats = [_parse_stat(raw) for raw in raw_list]
+    for stat in stats:
+        if stat.family not in vocab["stat_families"]:
+            _fail_unknown("--stat", stat.family, vocab["stat_families"])
+    return stats
+
+
 def _resist_stats(vocab: dict, value: str | None) -> list[StatCriterion]:
     """`--resist pierce` sugar, expanded through the vocabulary rather than a hardcoded
     resist-type list, so a family the curation drops or renames fails loudly instead of
     silently matching nothing."""
+    resist_types = [family[len("resist."):] for family in vocab["stat_families"]
+                     if family.startswith("resist.")]
     stats = []
     for resist_type in _split_csv(value):
         family = f"resist.{resist_type}"
         if family not in vocab["stat_families"]:
-            _fail(f"'{resist_type}' is not a known resist type "
-                  f"(looked for stat family '{family}' in the vocabulary)")
+            _fail_unknown("--resist", resist_type, resist_types)
         stats.append(StatCriterion(family=family, minimum=None))
     return stats
 
@@ -221,7 +265,7 @@ def _resolve_name(vocab_map: dict[str, str], flag: str, raw: str) -> str:
         for name in candidates:
             print(f"  {name}", file=sys.stderr)
         raise SystemExit(1)
-    _fail(f"'{raw}' is not a known token for {flag}")
+    _fail_unknown(flag, raw, vocab_map.keys())
 
 
 def _resolve_names(vocab_map: dict[str, str], flag: str, value: str | None) -> tuple[str, ...]:
@@ -229,15 +273,31 @@ def _resolve_names(vocab_map: dict[str, str], flag: str, value: str | None) -> t
 
 
 def _build_criteria(vocab: dict, args: argparse.Namespace) -> Criteria:
-    stats = [_parse_stat(s) for s in args.stat]
+    domains = _split_csv(args.domain)
+    _validate_tokens("--domain", domains, vocab["domains"])
+    slots = _split_csv(args.slot)
+    _validate_tokens("--slot", slots, vocab["slots"])
+    gear_types = _split_csv(args.gear_type)
+    _validate_tokens("--gear-type", gear_types, vocab["gear_types"])
+    rarities = _split_csv(args.rarity)
+    _validate_tokens("--rarity", rarities, vocab["rarities"])
+    expansions = _split_csv(args.expansion)
+    _validate_tokens("--expansion", expansions, vocab["expansions"])
+    sources = _split_csv(args.source)
+    _validate_tokens("--source", sources, SOURCE_TOKENS)
+    if args.fits is not None:
+        _validate_tokens("--fits", (args.fits,), vocab["gear_types"])
+
+    stats = _stat_criteria(vocab, args.stat)
     stats.extend(_resist_stats(vocab, args.resist))
+
     return Criteria(
-        domains=_split_csv(args.domain),
-        slots=_split_csv(args.slot),
-        gear_types=_split_csv(args.gear_type),
-        rarities=_split_csv(args.rarity),
-        expansions=_split_csv(args.expansion),
-        sources=_split_csv(args.source),
+        domains=domains,
+        slots=slots,
+        gear_types=gear_types,
+        rarities=rarities,
+        expansions=expansions,
+        sources=sources,
         fits=args.fits,
         level=args.level,
         all_tiers=args.all_tiers,
@@ -362,6 +422,10 @@ def render_table(payload: dict, explain: bool = False) -> str:
         if len(tiers) > 1:
             lines.append(f"   tiers: {_ladder(tiers, cand.item_level)}")
         lines.append(f"   {result['url']}")
+    if payload["unmatched_criteria"]:
+        pretty = ", ".join(_pretty_name(name) for name in payload["unmatched_criteria"])
+        lines.append("")
+        lines.append(f"Unmatched criteria (matched nothing in the pool): {pretty}")
     lines.append("")
     lines.append(HONESTY_LINE)
     return "\n".join(lines)
@@ -411,22 +475,34 @@ def render_json(payload: dict) -> str:
 
 def run_show(repo, name_or_record: str) -> dict:
     """Resolve `name_or_record` through the same repository port `search` uses
-    (repo.find), to exactly one candidate, and gather everything known about it. A name
-    that resolves to more than one record (a family's several tiers, or two families
-    sharing a display name - both real in this data, see the module docstring's
-    Sellecor's March example) lists every candidate and exits non-zero rather than
-    guessing which one the caller meant."""
+    (repo.find), to exactly one candidate, and gather everything known about it.
+
+    Never exits and never prints: an absent or ambiguous name comes back as an
+    `"error"` payload (with a `"candidates"` list, empty for the absent case) so the
+    caller can report it in whichever format `--json` asked for - text on stderr, or
+    the same information as structured JSON - rather than only ever as prose (see the
+    module docstring). Ambiguity is a name resolving to more than one record: a
+    family's several tiers, or two families sharing a display name, both real in this
+    data (see the module docstring's Sellecor's March example). The caller must pick
+    one, typically by record path, rather than the CLI guessing which one was meant.
+
+    On success, `tiers` is every record sharing the resolved candidate's display name:
+    the same fact that makes a name ambiguous doubles as the family's tier ladder,
+    since every tier of a family shares one display name in this data (see
+    `_ladder`)."""
     matches = repo.find(name_or_record)
     if not matches:
-        _fail(f"no item found for '{name_or_record}'")
+        return {"error": f"no item found for '{name_or_record}'", "candidates": []}
     if len(matches) > 1:
-        print(f"ERROR: '{name_or_record}' matches more than one item:", file=sys.stderr)
-        for cand in sorted(matches, key=lambda c: (c.item_level, c.record)):
-            print(f"  {cand.record}  (item level {cand.item_level})", file=sys.stderr)
-        raise SystemExit(1)
+        ordered = sorted(matches, key=lambda c: (c.item_level, c.record))
+        return {
+            "error": f"'{name_or_record}' matches more than one item",
+            "candidates": [{"record": c.record, "item_level": c.item_level} for c in ordered],
+        }
     candidate = matches[0]
+    tiers = repo.find(candidate.name) if candidate.name else [candidate]
     return {"candidate": candidate, "set_name": repo.set_name(candidate.record),
-            "vocab": repo.vocabulary()}
+            "vocab": repo.vocabulary(), "tiers": tiers}
 
 
 def _reverse_map(vocab_map: dict[str, str]) -> dict[str, str]:
@@ -489,6 +565,43 @@ def render_show(payload: dict) -> str:
         lines.append("  none")
 
     return "\n".join(lines)
+
+
+def _json_show(payload: dict) -> dict:
+    cand = payload["candidate"]
+    vocab = payload["vocab"]
+    skill_names = _reverse_map(vocab["skills"])
+    mastery_names = _reverse_map(vocab["masteries"])
+    granted_names = _reverse_map(vocab["granted_skills"])
+    ascending_tiers = sorted(payload["tiers"], key=lambda c: c.item_level)
+    return {
+        "name": cand.name,
+        "record": cand.record,
+        "item_level": cand.item_level,
+        "req_level": cand.req_level,
+        "rarity": cand.rarity,
+        "slots": list(cand.slots),
+        "source": cand.source,
+        "set": payload["set_name"],
+        "stats": dict(cand.stat_values),
+        "skill_boosts": {skill_names.get(target, target): level
+                          for target, level in cand.skill_boosts.items()},
+        "mastery_boosts": {mastery_names.get(target, target): level
+                            for target, level in cand.mastery_boosts.items()},
+        "granted_skills": [granted_names.get(target, target) for target in cand.granted_skills],
+        "conversions": [{"from": from_type, "to": to_type, "percent": percent}
+                         for from_type, to_type, percent in cand.conversions],
+        "tiers": [c.item_level for c in ascending_tiers],
+        "url": grimtools_url(cand.name, cand.item_level),
+    }
+
+
+def render_show_json(payload: dict) -> str:
+    """Same information `render_show` prints, as structured data instead of prose: stats,
+    skill and mastery boosts, conversions, source, set membership, the tier ladder, and
+    the grimtools URL - so an agent asking for one item's detail does not have to parse
+    prose (see the module docstring)."""
+    return json.dumps(_json_show(payload), indent=2)
 
 
 # ---------------------------------------------------------------------------
@@ -554,7 +667,10 @@ def main(argv: list[str] | None = None) -> int:
     derived_dir = _resolve_dir(args.derived_dir, "GDITEMS_DERIVED_DIR", "derived")
     deposit_dir = _resolve_dir(args.deposit_dir, "GDITEMS_DEPOSIT_DIR", "deposit")
     if not derived_dir.is_dir():
-        print(f"ERROR: {derived_dir} not found. Run: just fetch-deposit", file=sys.stderr)
+        # Exact, fixed text regardless of where derived_dir actually resolved from -
+        # nothing else - so this is reliably grep-able and never buries the fix under
+        # an absolute-path echo.
+        print("data/derived not found. Run: just fetch-deposit", file=sys.stderr)
         return 2
     repo = DuckDbRepository(derived_dir, deposit_dir)
 
@@ -575,7 +691,17 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "show":
         payload = run_show(repo, args.name_or_record)
-        print(render_show(payload))
+        if "error" in payload:
+            if args.json:
+                print(json.dumps({"error": payload["error"], "candidates": payload["candidates"]},
+                                  indent=2), file=sys.stderr)
+            else:
+                suffix = ":" if payload["candidates"] else ""
+                print(f"ERROR: {payload['error']}{suffix}", file=sys.stderr)
+                for c in payload["candidates"]:
+                    print(f"  {c['record']}  (item level {c['item_level']})", file=sys.stderr)
+            return 1
+        print(render_show_json(payload) if args.json else render_show(payload))
         return 0
 
     return 2
