@@ -203,12 +203,22 @@ GRIMTOOLS_SEARCH = "https://www.grimtools.com/db/advsearch?query="
 
 
 def grimtools_url(name, item_level):
-    """Deep link that isolates one item on grimtools.
+    """Deep link that usually isolates one item on grimtools, built from name plus an
+    exact itemLevel since grimtools item ids are internal to their site and cannot be
+    derived from game data. This narrows a family's several tiers to the one intended
+    record in the common case, but not always: measured exceptions are a cross-family
+    name-and-level collision (Ulgrim's Keepsake, two unrelated quest-item families both
+    at item level 1) and duplicate levels within one family (Obsidian War Cleaver's
+    ladder is 30 / 30 / 40 / 55 / 70 / 84 / 94), either of which resolves more than one
+    record on grimtools.
 
-    grimtools item ids are internal to their site and cannot be derived from game data,
-    so the link pins the item by name plus an exact itemLevel instead, which resolves the
-    base, Empowered and Mythical tiers of a name to the single intended record.
+    Refuses to build a link for an empty name: a name-less query (`{"name": ""}`)
+    matches every item at that level on grimtools rather than isolating anything, which
+    is worse than no link at all - see `gditems_duckdb.DuckDbRepository.fetch`'s
+    docstring for the 944 entities this guards against.
     """
+    if not name:
+        raise ValueError("grimtools_url requires a non-empty item name")
     query = {"name": name, "raw": {"itemLevel": {"min": item_level, "max": item_level}}}
     blob = lzstring.LZString().compressToEncodedURIComponent(
         json.dumps(query, separators=(",", ":")))

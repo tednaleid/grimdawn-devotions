@@ -87,9 +87,10 @@ import duckdb
 
 
 class Vocabulary(TypedDict):
-    """`vocabulary()`'s result. Enum-like scope tokens (gear_types, slots, stat_families,
-    domains, rarities, expansions) stay plain lists of the raw tokens `Criteria` consumes
-    directly. `masteries`, `skills`, and `granted_skills` need per-name lookup, so each is a
+    """`vocabulary()`'s result. Enum-like scope/criteria tokens (gear_types, slots,
+    stat_families, domains, rarities, expansions, conversion_types) stay plain lists of
+    the raw tokens `Criteria` consumes directly. `masteries`, `skills`, and
+    `granted_skills` need per-name lookup, so each is a
     display-name -> record map instead (see `_name_map`); a flat `dict[str, list[str] |
     dict[str, str]]` would type every value as the union at every key, which is looser than
     what the method actually returns and defeats the point of asking for one key by name."""
@@ -100,6 +101,7 @@ class Vocabulary(TypedDict):
     domains: list[str]
     rarities: list[str]
     expansions: list[str]
+    conversion_types: list[str]
     skills: dict[str, str]
     granted_skills: dict[str, str]
 
@@ -158,10 +160,23 @@ class DuckDbRepository:
     # ------------------------------------------------------------------
 
     def fetch(self, c: Criteria) -> list[Candidate]:
+        """Candidates for `search`, scoped by `c` and always excluding empty-name
+        records. 944 entities (measured 2026-08-01: 742 affix, 192 gear under
+        records/items/enemygear/ and elsewhere, 5 augment, 5 blueprint) resolve to no
+        display name at all - internal templates, not real items a build recommendation
+        should ever surface. `find`/`tiers` do not apply this filter: a nameless record
+        is still a legitimate `show` target by its own record path (see `find`'s
+        docstring)."""
         where_sql, params = _where_clause(c)
+        name_clause = "COALESCE(l.text, '') <> ''"
+        where_sql = f"({where_sql}) AND {name_clause}" if where_sql else name_clause
         return self._select(where_sql, params)
 
     def find(self, name_or_record: str) -> list[Candidate]:
+        """Resolve `name_or_record` for `show`, unfiltered by name: a nameless record
+        (see `fetch`'s docstring) is still addressable by its own record path, since
+        inspecting one directly is a legitimate use even though `search` must never
+        rank it as a recommendation."""
         if name_or_record.startswith("records/"):
             return self._select("e.record = ?", [name_or_record])
         return self._select("l.text = ?", [name_or_record])
@@ -215,6 +230,7 @@ class DuckDbRepository:
             "domains": col("entities", "domain"),
             "rarities": col("entities", "rarity"),
             "expansions": col("entities", "expansion"),
+            "conversion_types": col("conversions", "to_type"),
             "skills": self._name_map([r[0] for r in skills]),
             "granted_skills": self._name_map([r[0] for r in granted_skills]),
         }
