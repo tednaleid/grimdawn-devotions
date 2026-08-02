@@ -91,3 +91,106 @@ def criteria_criterion_names(c: Criteria) -> list[str]:
     for mastery in c.masteries:
         names.append(f"mastery:{mastery}")
     return names
+
+
+MASTERY_FALLBACK_WEIGHT = 0.5
+
+
+@dataclass(frozen=True)
+class CriterionScore:
+    name: str
+    raw: float
+    normalised: float
+    weight: float
+    note: str
+
+
+@dataclass(frozen=True)
+class ScoredItem:
+    candidate: Candidate
+    total: float
+    parts: tuple[CriterionScore, ...]
+
+
+def _mastery_dir(record: str) -> str:
+    """The playerclass directory a skill or mastery record lives under.
+
+    Both a skill and the mastery it belongs to share this prefix (for example
+    records/skills/playerclass04/), which is how a mastery boost is matched to the
+    skills it lifts without a separate skill-to-mastery table.
+    """
+    head, _, _ = record.rpartition("/")
+    return head
+
+
+def _raw_value(candidate: Candidate, criteria: Criteria, criterion_name: str) -> tuple[float, str]:
+    """Read the raw (unnormalised) value a candidate contributes to one criterion.
+
+    Most criteria read a single field on the candidate directly. The exception is
+    boosts_skill: a mastery-wide boost lifts every skill in that mastery too, so a
+    candidate with only the mastery bonus still contributes, at MASTERY_FALLBACK_WEIGHT
+    of a direct hit, with a note explaining the discount came via the mastery.
+    """
+    kind, _, target = criterion_name.partition(":")
+    if kind == "stat":
+        return candidate.stat_values.get(target, 0.0), ""
+    if kind == "converts_to":
+        total = sum(pct for _from, to, pct in candidate.conversions if to == target)
+        return total, ""
+    if kind == "grants_skill":
+        return (1.0 if target in candidate.granted_skills else 0.0), ""
+    if kind == "boosts_skill":
+        direct = candidate.skill_boosts.get(target)
+        if direct is not None:
+            return float(direct), ""
+        skill_dir = _mastery_dir(target)
+        for mastery_record, level in candidate.mastery_boosts.items():
+            if _mastery_dir(mastery_record) == skill_dir:
+                return (level * MASTERY_FALLBACK_WEIGHT,
+                        f"via +{level} to the mastery, not the skill directly")
+        return 0.0, ""
+    if kind == "boosts_mastery":
+        return float(candidate.mastery_boosts.get(target, 0)), ""
+    if kind == "mastery":
+        mastery_dir = _mastery_dir(target)
+        direct = candidate.mastery_boosts.get(target, 0)
+        via_skill = max(
+            (level for record, level in candidate.skill_boosts.items()
+             if _mastery_dir(record) == mastery_dir),
+            default=0)
+        return float(max(direct, via_skill)), ""
+    return 0.0, ""
+
+
+def score(candidates, c, weights=None):
+    """Rank candidates by how well they satisfy the criteria the caller passed.
+
+    Each criterion normalises against the best value present among the candidates, so a
+    total answers "how good is this relative to what exists" rather than against an
+    invented absolute scale. An item that misses a criterion scores zero for it and stays
+    in the list, which is what lets a strong partial match outrank a weak complete one.
+    """
+    weights = weights or {}
+    names = criteria_criterion_names(c)
+    raw: dict[str, dict[str, float]] = {n: {} for n in names}
+    notes: dict[str, dict[str, str]] = {n: {} for n in names}
+    for cand_ in candidates:
+        for name in names:
+            value, note = _raw_value(cand_, c, name)
+            raw[name][cand_.record] = value
+            notes[name][cand_.record] = note
+    best = {n: max(v.values(), default=0.0) for n, v in raw.items()}
+    out = []
+    for cand_ in candidates:
+        parts = []
+        for name in names:
+            value = raw[name][cand_.record]
+            top = best[name]
+            normalised = (value / top) if top > 0 else 0.0
+            weight = weights.get(name, 1.0)
+            parts.append(CriterionScore(name=name, raw=value, normalised=normalised,
+                                        weight=weight, note=notes[name][cand_.record]))
+        total = sum(p.normalised * p.weight for p in parts)
+        out.append(ScoredItem(candidate=cand_, total=total, parts=tuple(parts)))
+    out.sort(key=lambda s: s.total, reverse=True)
+    return out

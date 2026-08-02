@@ -87,5 +87,42 @@ check("scope flags never produce a label",
           fits="chest", level=70, all_tiers=True, limit=5)),
       [])
 
+# score: relative normalisation, mastery fallback, and "kept, not dropped" for misses.
+crit = core.Criteria(
+    domains=("gear",), slots=(), gear_types=(), rarities=(), expansions=(), sources=(),
+    fits=None, level=None, all_tiers=False,
+    stats=(core.StatCriterion(family="damage.pierce", minimum=None),),
+    converts_to=None, min_convert=None, grants_skills=(),
+    boosts_skills=("records/skills/playerclass04/shadowstrike.dbr",),
+    boosts_masteries=(), masteries=(), limit=10)
+
+strong = cand("r/strong", "f1", "Strong", 84, 80,
+              stat_values={"damage.pierce": 40.0},
+              skill_boosts={"records/skills/playerclass04/shadowstrike.dbr": 3})
+weak = cand("r/weak", "f2", "Weak", 84, 80,
+            stat_values={"damage.pierce": 20.0},
+            skill_boosts={"records/skills/playerclass04/shadowstrike.dbr": 1})
+generalist = cand("r/gen", "f3", "Generalist", 84, 80,
+                  stat_values={"damage.pierce": 20.0},
+                  mastery_boosts={"records/skills/playerclass04/_classtraining_class04.dbr": 3})
+nostat = cand("r/none", "f4", "Nothing", 84, 80)
+
+ranked = core.score([weak, strong, generalist, nostat], crit, None)
+check("best item ranks first", ranked[0].candidate.record, "r/strong")
+check("item matching nothing is kept, not dropped", "r/none" in [r.candidate.record for r in ranked], True)
+check("item matching nothing scores zero", ranked[-1].total, 0.0)
+
+by_rec = {r.candidate.record: r for r in ranked}
+check("normalisation is relative to the best candidate",
+      by_rec["r/strong"].parts[0].normalised, 1.0)
+check("half the best value normalises to half",
+      by_rec["r/weak"].parts[0].normalised, 0.5)
+
+gen_skill = [p for p in by_rec["r/gen"].parts if p.name.startswith("boosts_skill")][0]
+check("mastery boost counts toward a skill criterion", gen_skill.raw > 0, True)
+check("mastery boost is discounted against a direct hit",
+      gen_skill.normalised < by_rec["r/strong"].parts[1].normalised, True)
+check("mastery fallback explains itself", "mastery" in gen_skill.note.lower(), True)
+
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
