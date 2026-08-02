@@ -80,16 +80,16 @@ Every other machine picks up the new build with `git pull` and
 
 ## Home: GitHub Releases, never git
 
-Measured at build 19149150 (game 1.2.1.x, 2026-07-03): `facts.parquet`
-12.1 MB (18,971,672 rows covering all 61,530 records), `labels.parquet`
-5.7 MB (229,584 tags across 13 locales), `meta.parquet` 1 KB - about 18 MB
-total. The 818 MB raw tree compresses roughly 45:1; parquet dictionary
+Measured at build 24346246 (game 1.3.0.0, 2026-08-02): `facts.parquet`
+16.4 MB (24,501,161 rows covering all 82,131 records), `labels.parquet`
+7.1 MB (263,808 tags across 13 locales), `meta.parquet` 1 KB - about 24 MB
+total. The raw tree compresses roughly 45:1; parquet dictionary
 encoding thrives on DBR key/value repetition.
 
 Generated parquet never enters git at any stability level: parquet does not
 delta-diff, so every format iteration would bake a full ~18 MB blob into
 history. Instead, `just publish-deposit` uploads the three deposit files plus
-the five derived files (`docs/item-schema.md`) as assets of an immutable
+the seven derived files (`docs/item-schema.md`) as assets of an immutable
 GitHub Release tagged `deposit-<steam buildid>.<rev>` - a format change
 between game patches re-publishes the same buildid under the next `<rev>`,
 and existing releases are never modified or deleted. Git commits only
