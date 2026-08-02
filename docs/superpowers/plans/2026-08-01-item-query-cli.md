@@ -517,7 +517,7 @@ check("normalisation is relative to the best candidate",
 check("half the best value normalises to half",
       by_rec["r/weak"].parts[0].normalised, 0.5)
 
-gen_skill = [p for p in by_rec["r/gen"].parts if p.name.startswith("boosts-skill")][0]
+gen_skill = [p for p in by_rec["r/gen"].parts if p.name.startswith("boosts_skill")][0]
 check("mastery boost counts toward a skill criterion", gen_skill.raw > 0, True)
 check("mastery boost is discounted against a direct hit",
       gen_skill.normalised < by_rec["r/strong"].parts[1].normalised, True)
@@ -571,7 +571,23 @@ def score(candidates, c, weights=None):
     return out
 ```
 
-Implement `_raw_value(candidate, criteria, criterion_name)` returning `(value, note)`. For a `boosts-skill:<record>` criterion, return the direct boost level with an empty note when present; otherwise, if the candidate carries a mastery boost whose `mastery_record` matches that skill's mastery, return `level * MASTERY_FALLBACK_WEIGHT` with the note `"via +N to the mastery, not the skill directly"`. For `stat:<family>` return the stat value. For `converts-to:<type>` return the summed percent converting to that type. For `grants-skill:<record>` return 1.0 when granted.
+Implement `_raw_value(candidate, criteria, criterion_name)` returning `(value, note)`.
+
+The criterion label strings are already fixed by `criteria_criterion_names` in
+`gditems_core.py`, which Task 3 shipped. They use UNDERSCORES, not hyphens. Read that
+function and match it exactly rather than inventing labels: the real prefixes are
+`stat:`, `converts_to:`, `grants_skill:`, `boosts_skill:`, `boosts_mastery:`, and
+`mastery:`. A label mismatch produces a silent zero for every candidate on that
+criterion, which looks exactly like "nothing matched" rather than like a bug.
+
+For a `boosts_skill:<record>` criterion, return the direct boost level with an empty note
+when present; otherwise, if the candidate carries a mastery boost whose `mastery_record`
+matches that skill's mastery, return `level * MASTERY_FALLBACK_WEIGHT` with the note
+`"via +N to the mastery, not the skill directly"`. For `stat:<family>` return the stat
+value. For `converts_to:<type>` return the summed percent converting to that type. For
+`grants_skill:<record>` return 1.0 when granted. For `boosts_mastery:<record>` return the
+mastery boost level. For `mastery:<record>` return the larger of a direct mastery boost
+and any skill boost belonging to that mastery, since the flag is the union of both.
 
 - [ ] **Step 4: Run to verify it passes**
 
