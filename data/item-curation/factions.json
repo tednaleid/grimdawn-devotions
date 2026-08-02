@@ -1,0 +1,39 @@
+{
+  "_aboutme": [
+    "ABOUTME: Curated faction map + vendor-coverage exclusions for the derived sources table",
+    "ABOUTME: (factionSource value -> tagFaction label tag; see docs/item-schema.md).",
+    "faction_tags follows the game's own convention (tag = 'tagFaction' + factionSource value),",
+    "kept explicit so a new faction in a patch is reviewed, not silently joined. Drift guards",
+    "(scripts/build_derived.py): a factionSource value missing from faction_tags fails the build;",
+    "the set of faction-sourced augments with NO vendor row must equal unsold_augments exactly",
+    "(all 8 are dev template blanks, present in the deposit but sold by no vendor), so a real",
+    "augment losing vendor coverage, or a blank gaining it, fails loudly.",
+    "Verified at build 19149150: 13 factionSource values, 292 faction-sourced augments,",
+    "284 covered by faction vendor tier tables."
+  ],
+  "faction_tags": {
+    "Survivors": "tagFactionSurvivors",
+    "User0": "tagFactionUser0",
+    "User2": "tagFactionUser2",
+    "User4": "tagFactionUser4",
+    "User5": "tagFactionUser5",
+    "User7": "tagFactionUser7",
+    "User8": "tagFactionUser8",
+    "User9": "tagFactionUser9",
+    "User10": "tagFactionUser10",
+    "User11": "tagFactionUser11",
+    "User13": "tagFactionUser13",
+    "User14": "tagFactionUser14",
+    "User15": "tagFactionUser15"
+  },
+  "unsold_augments": [
+    "records/items/enchants/a00_blank.dbr",
+    "records/items/enchants/a000a_enchant.dbr",
+    "records/items/enchants/a0000a_enchant.dbr",
+    "records/items/enchants/a00000a_enchant.dbr",
+    "records/items/enchants/b000a_enchant.dbr",
+    "records/items/enchants/b0000a_enchant.dbr",
+    "records/items/enchants/b00000a_enchant.dbr",
+    "records/items/enchants/c000a_enchant.dbr"
+  ]
+}

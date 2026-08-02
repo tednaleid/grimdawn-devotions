@@ -4,6 +4,15 @@
 # Optional long-format dump (~32 MB) - regenerate with `just parse --duckdb`
 /data/devotion_records.csv
 
+# Raw game-data deposit (parquet). Never committed: lives in GitHub Releases
+# pinned by deposit.lock - `just fetch-deposit` anywhere, or regenerate with
+# `just deposit` on Windows. See docs/deposit.md.
+/data/deposit/
+
+# Derived typed item schema (parquet). Same home: GitHub Releases, never git -
+# `just fetch-deposit`, or regenerate anywhere with `just derive`.
+/data/derived/
+
 # Python / uv
 __pycache__/
 *.pyc
@@ -16,7 +25,9 @@ Thumbs.db
 .superpowers/
 
 # Local editor / agent settings (machine-specific, not shared)
-.claude/
+.claude/*
+# ...except shared workflow skills, which are project content, not machine settings
+!.claude/skills/
 
 # Scratch space for temporary/LLM-generated files (mockups, notes) - not committed
 .llm/

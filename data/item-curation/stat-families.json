@@ -1,0 +1,591 @@
+{
+  "_aboutme": [
+    "ABOUTME: Curated filter-family taxonomy: family -> raw stat ids (devotions-parity",
+    "ABOUTME: families over the deposit's key vocabulary; the pet family is source-based).",
+    "Membership rules mirror web/src/core/statFormat.ts (Life=Vitality, Poison=Acid,",
+    "offensiveSlow* DoTs fold into their damage family). Extending a family or adding one",
+    "is a data change here, never a schema change. Drift guard: every id listed must exist",
+    "in the deposit's key census; scripts/build_derived.py fails loudly otherwise.",
+    "The pet family has no id list: membership is stats.source = 'pet_bonus'."
+  ],
+  "families": {
+    "attr.cunning": {
+      "ids": [
+        "characterDexterity",
+        "characterDexterityModifier"
+      ]
+    },
+    "attr.da": {
+      "ids": [
+        "characterDefensiveAbility",
+        "characterDefensiveAbilityModifier"
+      ]
+    },
+    "attr.energy": {
+      "ids": [
+        "characterMana",
+        "characterManaModifier"
+      ]
+    },
+    "attr.energy_regen": {
+      "ids": [
+        "characterManaRegen",
+        "characterManaRegenModifier"
+      ]
+    },
+    "attr.health": {
+      "ids": [
+        "characterLife",
+        "characterLifeModifier"
+      ]
+    },
+    "attr.health_regen": {
+      "ids": [
+        "characterLifeRegen",
+        "characterLifeRegenModifier"
+      ]
+    },
+    "attr.oa": {
+      "ids": [
+        "characterOffensiveAbility",
+        "characterOffensiveAbilityModifier"
+      ]
+    },
+    "attr.physique": {
+      "ids": [
+        "characterStrength",
+        "characterStrengthModifier"
+      ]
+    },
+    "attr.spirit": {
+      "ids": [
+        "characterIntelligence",
+        "characterIntelligenceModifier"
+      ]
+    },
+    "damage.acid": {
+      "ids": [
+        "offensiveBasePoisonMax",
+        "offensiveBasePoisonMin",
+        "offensivePoisonChance",
+        "offensivePoisonMax",
+        "offensivePoisonMin",
+        "offensivePoisonModifier",
+        "offensivePoisonModifierChance",
+        "offensiveSlowPoisonChance",
+        "offensiveSlowPoisonDurationMax",
+        "offensiveSlowPoisonDurationMin",
+        "offensiveSlowPoisonDurationModifier",
+        "offensiveSlowPoisonMax",
+        "offensiveSlowPoisonMin",
+        "offensiveSlowPoisonModifier",
+        "offensiveSlowPoisonModifierChance"
+      ]
+    },
+    "damage.aether": {
+      "ids": [
+        "offensiveAetherChance",
+        "offensiveAetherMax",
+        "offensiveAetherMin",
+        "offensiveAetherModifier",
+        "offensiveAetherModifierChance",
+        "offensiveBaseAetherMax",
+        "offensiveBaseAetherMin"
+      ]
+    },
+    "damage.all": {
+      "ids": [
+        "offensiveTotalDamageModifier",
+        "offensiveTotalDamageModifierChance"
+      ]
+    },
+    "damage.bleeding": {
+      "ids": [
+        "offensiveSlowBleedingChance",
+        "offensiveSlowBleedingDurationMax",
+        "offensiveSlowBleedingDurationMin",
+        "offensiveSlowBleedingDurationModifier",
+        "offensiveSlowBleedingMax",
+        "offensiveSlowBleedingMin",
+        "offensiveSlowBleedingModifier",
+        "offensiveSlowBleedingModifierChance"
+      ]
+    },
+    "damage.chaos": {
+      "ids": [
+        "offensiveBaseChaosMax",
+        "offensiveBaseChaosMin",
+        "offensiveChaosChance",
+        "offensiveChaosMax",
+        "offensiveChaosMin",
+        "offensiveChaosModifier",
+        "offensiveChaosModifierChance"
+      ]
+    },
+    "damage.cold": {
+      "ids": [
+        "offensiveBaseColdMax",
+        "offensiveBaseColdMin",
+        "offensiveColdChance",
+        "offensiveColdMax",
+        "offensiveColdMin",
+        "offensiveColdModifier",
+        "offensiveColdModifierChance",
+        "offensiveSlowColdChance",
+        "offensiveSlowColdDurationMax",
+        "offensiveSlowColdDurationMin",
+        "offensiveSlowColdDurationModifier",
+        "offensiveSlowColdMax",
+        "offensiveSlowColdMin",
+        "offensiveSlowColdModifier",
+        "offensiveSlowColdModifierChance"
+      ]
+    },
+    "damage.elemental": {
+      "ids": [
+        "offensiveElementalChance",
+        "offensiveElementalMax",
+        "offensiveElementalMin",
+        "offensiveElementalModifier",
+        "offensiveElementalModifierChance"
+      ]
+    },
+    "damage.fire": {
+      "ids": [
+        "offensiveBaseFireMax",
+        "offensiveBaseFireMin",
+        "offensiveFireChance",
+        "offensiveFireMax",
+        "offensiveFireMin",
+        "offensiveFireModifier",
+        "offensiveFireModifierChance",
+        "offensiveSlowFireChance",
+        "offensiveSlowFireDurationMax",
+        "offensiveSlowFireDurationMin",
+        "offensiveSlowFireDurationModifier",
+        "offensiveSlowFireMax",
+        "offensiveSlowFireMin",
+        "offensiveSlowFireModifier",
+        "offensiveSlowFireModifierChance"
+      ]
+    },
+    "damage.lightning": {
+      "ids": [
+        "offensiveBaseLightningMax",
+        "offensiveBaseLightningMin",
+        "offensiveLightningChance",
+        "offensiveLightningMax",
+        "offensiveLightningMin",
+        "offensiveLightningModifier",
+        "offensiveLightningModifierChance",
+        "offensiveSlowLightningChance",
+        "offensiveSlowLightningDurationMax",
+        "offensiveSlowLightningDurationMin",
+        "offensiveSlowLightningDurationModifier",
+        "offensiveSlowLightningMax",
+        "offensiveSlowLightningMin",
+        "offensiveSlowLightningModifier",
+        "offensiveSlowLightningModifierChance"
+      ]
+    },
+    "damage.physical": {
+      "ids": [
+        "offensivePhysicalChance",
+        "offensivePhysicalMax",
+        "offensivePhysicalMin",
+        "offensivePhysicalModifier",
+        "offensivePhysicalModifierChance",
+        "offensiveSlowPhysicalChance",
+        "offensiveSlowPhysicalDurationMax",
+        "offensiveSlowPhysicalDurationMin",
+        "offensiveSlowPhysicalDurationModifier",
+        "offensiveSlowPhysicalMax",
+        "offensiveSlowPhysicalMin",
+        "offensiveSlowPhysicalModifier",
+        "offensiveSlowPhysicalModifierChance"
+      ]
+    },
+    "damage.pierce": {
+      "ids": [
+        "offensivePierceChance",
+        "offensivePierceMax",
+        "offensivePierceMin",
+        "offensivePierceModifier",
+        "offensivePierceModifierChance"
+      ]
+    },
+    "damage.vitality": {
+      "ids": [
+        "offensiveBaseLifeMax",
+        "offensiveBaseLifeMin",
+        "offensiveLifeChance",
+        "offensiveLifeMax",
+        "offensiveLifeMin",
+        "offensiveLifeModifier",
+        "offensiveLifeModifierChance",
+        "offensiveSlowLifeChance",
+        "offensiveSlowLifeDurationMax",
+        "offensiveSlowLifeDurationMin",
+        "offensiveSlowLifeDurationModifier",
+        "offensiveSlowLifeMax",
+        "offensiveSlowLifeMin",
+        "offensiveSlowLifeModifier",
+        "offensiveSlowLifeModifierChance"
+      ]
+    },
+    "resist.acid": {
+      "ids": [
+        "defensivePoison",
+        "defensivePoisonDuration",
+        "defensivePoisonDurationModifier",
+        "defensivePoisonMaxResist",
+        "defensivePoisonModifier"
+      ]
+    },
+    "resist.aether": {
+      "ids": [
+        "defensiveAether",
+        "defensiveAetherDuration",
+        "defensiveAetherDurationModifier",
+        "defensiveAetherMaxResist",
+        "defensiveAetherModifier"
+      ]
+    },
+    "resist.bleeding": {
+      "ids": [
+        "defensiveBleeding",
+        "defensiveBleedingDuration",
+        "defensiveBleedingDurationModifier",
+        "defensiveBleedingMaxResist"
+      ]
+    },
+    "resist.chaos": {
+      "ids": [
+        "defensiveChaos",
+        "defensiveChaosDuration",
+        "defensiveChaosDurationModifier",
+        "defensiveChaosMaxResist",
+        "defensiveChaosModifier"
+      ]
+    },
+    "resist.cold": {
+      "ids": [
+        "defensiveCold",
+        "defensiveColdDuration",
+        "defensiveColdDurationModifier",
+        "defensiveColdMaxResist",
+        "defensiveColdModifier"
+      ]
+    },
+    "resist.elemental": {
+      "ids": [
+        "defensiveElementalModifier",
+        "defensiveElementalResistance"
+      ]
+    },
+    "resist.fire": {
+      "ids": [
+        "defensiveFire",
+        "defensiveFireDuration",
+        "defensiveFireDurationModifier",
+        "defensiveFireMaxResist",
+        "defensiveFireModifier"
+      ]
+    },
+    "resist.lightning": {
+      "ids": [
+        "defensiveLightning",
+        "defensiveLightningDuration",
+        "defensiveLightningDurationModifier",
+        "defensiveLightningMaxResist",
+        "defensiveLightningModifier"
+      ]
+    },
+    "resist.physical": {
+      "ids": [
+        "defensivePhysical",
+        "defensivePhysicalDuration",
+        "defensivePhysicalDurationModifier",
+        "defensivePhysicalMaxResist",
+        "defensivePhysicalModifier"
+      ]
+    },
+    "resist.pierce": {
+      "ids": [
+        "defensivePierce",
+        "defensivePierceDuration",
+        "defensivePierceDurationModifier",
+        "defensivePierceMaxResist",
+        "defensivePierceModifier"
+      ]
+    },
+    "resist.vitality": {
+      "ids": [
+        "defensiveLife",
+        "defensiveLifeDuration",
+        "defensiveLifeDurationModifier",
+        "defensiveLifeMaxResist",
+        "defensiveLifeModifier"
+      ]
+    },
+    "retaliation": {
+      "ids": [
+        "retaliationAetherChance",
+        "retaliationAetherMax",
+        "retaliationAetherMin",
+        "retaliationAetherModifier",
+        "retaliationAetherModifierChance",
+        "retaliationChaosChance",
+        "retaliationChaosMax",
+        "retaliationChaosMin",
+        "retaliationChaosModifier",
+        "retaliationChaosModifierChance",
+        "retaliationColdChance",
+        "retaliationColdMax",
+        "retaliationColdMin",
+        "retaliationColdModifier",
+        "retaliationColdModifierChance",
+        "retaliationConfusionChance",
+        "retaliationConfusionMax",
+        "retaliationConfusionMin",
+        "retaliationConvertChance",
+        "retaliationConvertMax",
+        "retaliationConvertMin",
+        "retaliationDamageMultModifier",
+        "retaliationDamagePct",
+        "retaliationElementalChance",
+        "retaliationElementalMax",
+        "retaliationElementalMin",
+        "retaliationElementalModifier",
+        "retaliationElementalModifierChance",
+        "retaliationFearChance",
+        "retaliationFearMax",
+        "retaliationFearMin",
+        "retaliationFireChance",
+        "retaliationFireMax",
+        "retaliationFireMin",
+        "retaliationFireModifier",
+        "retaliationFireModifierChance",
+        "retaliationFreezeChance",
+        "retaliationFreezeMax",
+        "retaliationFreezeMin",
+        "retaliationLifeChance",
+        "retaliationLifeMax",
+        "retaliationLifeMin",
+        "retaliationLifeModifier",
+        "retaliationLifeModifierChance",
+        "retaliationLightningChance",
+        "retaliationLightningMax",
+        "retaliationLightningMin",
+        "retaliationLightningModifier",
+        "retaliationLightningModifierChance",
+        "retaliationPercentCurrentLifeChance",
+        "retaliationPercentCurrentLifeMax",
+        "retaliationPercentCurrentLifeMin",
+        "retaliationPetrifyChance",
+        "retaliationPetrifyMax",
+        "retaliationPetrifyMin",
+        "retaliationPhysicalChance",
+        "retaliationPhysicalMax",
+        "retaliationPhysicalMin",
+        "retaliationPhysicalModifier",
+        "retaliationPhysicalModifierChance",
+        "retaliationPierceChance",
+        "retaliationPierceMax",
+        "retaliationPierceMin",
+        "retaliationPierceModifier",
+        "retaliationPierceModifierChance",
+        "retaliationPierceRatioChance",
+        "retaliationPierceRatioMax",
+        "retaliationPierceRatioMin",
+        "retaliationPierceRatioModifier",
+        "retaliationPierceRatioModifierChance",
+        "retaliationPoisonChance",
+        "retaliationPoisonMax",
+        "retaliationPoisonMin",
+        "retaliationPoisonModifier",
+        "retaliationPoisonModifierChance",
+        "retaliationSleepChance",
+        "retaliationSleepMax",
+        "retaliationSleepMin",
+        "retaliationSleepModifier",
+        "retaliationSleepModifierChance",
+        "retaliationSlowAttackSpeedChance",
+        "retaliationSlowAttackSpeedDurationMax",
+        "retaliationSlowAttackSpeedDurationMin",
+        "retaliationSlowAttackSpeedDurationModifier",
+        "retaliationSlowAttackSpeedDurationModifierChance",
+        "retaliationSlowAttackSpeedMax",
+        "retaliationSlowAttackSpeedMin",
+        "retaliationSlowAttackSpeedModifier",
+        "retaliationSlowAttackSpeedModifierChance",
+        "retaliationSlowBleedingChance",
+        "retaliationSlowBleedingDurationMax",
+        "retaliationSlowBleedingDurationMin",
+        "retaliationSlowBleedingDurationModifier",
+        "retaliationSlowBleedingDurationModifierChance",
+        "retaliationSlowBleedingMax",
+        "retaliationSlowBleedingMin",
+        "retaliationSlowBleedingModifier",
+        "retaliationSlowBleedingModifierChance",
+        "retaliationSlowColdChance",
+        "retaliationSlowColdDurationMax",
+        "retaliationSlowColdDurationMin",
+        "retaliationSlowColdDurationModifier",
+        "retaliationSlowColdDurationModifierChance",
+        "retaliationSlowColdMax",
+        "retaliationSlowColdMin",
+        "retaliationSlowColdModifier",
+        "retaliationSlowColdModifierChance",
+        "retaliationSlowDefensiveAbilityChance",
+        "retaliationSlowDefensiveAbilityDurationMax",
+        "retaliationSlowDefensiveAbilityDurationMin",
+        "retaliationSlowDefensiveAbilityDurationModifier",
+        "retaliationSlowDefensiveAbilityDurationModifierChance",
+        "retaliationSlowDefensiveAbilityMax",
+        "retaliationSlowDefensiveAbilityMin",
+        "retaliationSlowDefensiveAbilityModifier",
+        "retaliationSlowDefensiveAbilityModifierChance",
+        "retaliationSlowFireChance",
+        "retaliationSlowFireDurationMax",
+        "retaliationSlowFireDurationMin",
+        "retaliationSlowFireDurationModifier",
+        "retaliationSlowFireDurationModifierChance",
+        "retaliationSlowFireMax",
+        "retaliationSlowFireMin",
+        "retaliationSlowFireModifier",
+        "retaliationSlowFireModifierChance",
+        "retaliationSlowLifeChance",
+        "retaliationSlowLifeDurationMax",
+        "retaliationSlowLifeDurationMin",
+        "retaliationSlowLifeDurationModifier",
+        "retaliationSlowLifeDurationModifierChance",
+        "retaliationSlowLifeLeachChance",
+        "retaliationSlowLifeLeachDurationMax",
+        "retaliationSlowLifeLeachDurationMin",
+        "retaliationSlowLifeLeachDurationModifier",
+        "retaliationSlowLifeLeachDurationModifierChance",
+        "retaliationSlowLifeLeachMax",
+        "retaliationSlowLifeLeachMin",
+        "retaliationSlowLifeLeachModifier",
+        "retaliationSlowLifeLeachModifierChance",
+        "retaliationSlowLifeMax",
+        "retaliationSlowLifeMin",
+        "retaliationSlowLifeModifier",
+        "retaliationSlowLifeModifierChance",
+        "retaliationSlowLightningChance",
+        "retaliationSlowLightningDurationMax",
+        "retaliationSlowLightningDurationMin",
+        "retaliationSlowLightningDurationModifier",
+        "retaliationSlowLightningDurationModifierChance",
+        "retaliationSlowLightningMax",
+        "retaliationSlowLightningMin",
+        "retaliationSlowLightningModifier",
+        "retaliationSlowLightningModifierChance",
+        "retaliationSlowManaLeachChance",
+        "retaliationSlowManaLeachDurationMax",
+        "retaliationSlowManaLeachDurationMin",
+        "retaliationSlowManaLeachDurationModifier",
+        "retaliationSlowManaLeachDurationModifierChance",
+        "retaliationSlowManaLeachMax",
+        "retaliationSlowManaLeachMin",
+        "retaliationSlowManaLeachModifier",
+        "retaliationSlowManaLeachModifierChance",
+        "retaliationSlowOffensiveAbilityChance",
+        "retaliationSlowOffensiveAbilityDurationMax",
+        "retaliationSlowOffensiveAbilityDurationMin",
+        "retaliationSlowOffensiveAbilityDurationModifier",
+        "retaliationSlowOffensiveAbilityDurationModifierChance",
+        "retaliationSlowOffensiveAbilityMax",
+        "retaliationSlowOffensiveAbilityMin",
+        "retaliationSlowOffensiveAbilityModifier",
+        "retaliationSlowOffensiveAbilityModifierChance",
+        "retaliationSlowOffensiveReductionChance",
+        "retaliationSlowOffensiveReductionDurationMax",
+        "retaliationSlowOffensiveReductionDurationMin",
+        "retaliationSlowOffensiveReductionDurationModifier",
+        "retaliationSlowOffensiveReductionDurationModifierChance",
+        "retaliationSlowOffensiveReductionMax",
+        "retaliationSlowOffensiveReductionMin",
+        "retaliationSlowOffensiveReductionModifier",
+        "retaliationSlowOffensiveReductionModifierChance",
+        "retaliationSlowPhysicalChance",
+        "retaliationSlowPhysicalDurationMax",
+        "retaliationSlowPhysicalDurationMin",
+        "retaliationSlowPhysicalDurationModifier",
+        "retaliationSlowPhysicalDurationModifierChance",
+        "retaliationSlowPhysicalMax",
+        "retaliationSlowPhysicalMin",
+        "retaliationSlowPhysicalModifier",
+        "retaliationSlowPhysicalModifierChance",
+        "retaliationSlowPoisonChance",
+        "retaliationSlowPoisonDurationMax",
+        "retaliationSlowPoisonDurationMin",
+        "retaliationSlowPoisonDurationModifier",
+        "retaliationSlowPoisonDurationModifierChance",
+        "retaliationSlowPoisonMax",
+        "retaliationSlowPoisonMin",
+        "retaliationSlowPoisonModifier",
+        "retaliationSlowPoisonModifierChance",
+        "retaliationSlowRunSpeedChance",
+        "retaliationSlowRunSpeedDurationMax",
+        "retaliationSlowRunSpeedDurationMin",
+        "retaliationSlowRunSpeedDurationModifier",
+        "retaliationSlowRunSpeedDurationModifierChance",
+        "retaliationSlowRunSpeedMax",
+        "retaliationSlowRunSpeedMin",
+        "retaliationSlowRunSpeedModifier",
+        "retaliationSlowRunSpeedModifierChance",
+        "retaliationStunChance",
+        "retaliationStunMax",
+        "retaliationStunMin",
+        "retaliationStunModifier",
+        "retaliationStunModifierChance",
+        "retaliationTotalDamageModifier",
+        "retaliationTotalDamageModifierChance",
+        "retaliationTrapChance",
+        "retaliationTrapMax",
+        "retaliationTrapMin"
+      ]
+    },
+    "skills.bonus": {
+      "ids": [
+        "augmentAllLevel",
+        "augmentSkillLevel1",
+        "augmentSkillLevel2"
+      ]
+    },
+    "skills.mastery": {
+      "ids": [
+        "augmentMasteryLevel1",
+        "augmentMasteryLevel2"
+      ]
+    },
+    "speed.attack": {
+      "ids": [
+        "characterAttackSpeed",
+        "characterAttackSpeedModifier"
+      ]
+    },
+    "speed.cast": {
+      "ids": [
+        "characterSpellCastSpeed",
+        "characterSpellCastSpeedModifier"
+      ]
+    },
+    "speed.run": {
+      "ids": [
+        "characterRunSpeed",
+        "characterRunSpeedModifier"
+      ]
+    },
+    "speed.total": {
+      "ids": [
+        "characterTotalSpeedModifier"
+      ]
+    },
+    "pet": {
+      "source": "pet_bonus"
+    }
+  }
+}

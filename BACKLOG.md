@@ -630,3 +630,101 @@ Not built because its ten resistance fields are all zero today, so the control
 would gain an option numerically identical to Normal and nobody has asked for it.
 If it is ever wanted, `ascendant_ref`/`flat_adjustment` in
 `scripts/parse_monsters.py` generalise to it directly.
+
+## Item-database follow-ups (downstream of the derived schema)
+
+The raw deposit (`just deposit`, `docs/deposit.md`) is phase 1 and the derived
+typed schema (`just derive`, `docs/item-schema.md`) is phase 2 of the
+item-database initiative. Ideation records:
+`docs/ideation/2026-07-03-item-data-extraction-ideation.html` (extraction) and
+`docs/ideation/2026-07-11-item-db-direction-ideation.html` (repo topology,
+artifact policy, item source, grimtools boundary).
+
+### Direction decisions (ratified 2026-07-11)
+
+- **Single repo, split on tripwires.** The item work stays in this repo until
+  a tripwire fires: first external consumer of the parquet, first
+  independently-deployed item app, or item work breaking devotions CI. The
+  split stays cheap by design (`deposit_dir` one-line relocation, no
+  cross-imports, deploy ships only `web/dist`); the future combined
+  gear+devotion planner weights staying. The released deposit is the
+  interchange boundary if a split ever happens (raw text for 13 locales is in
+  `labels.parquet`; display formatting stays code).
+- **Link-out rule: own everything a query can answer.** Anything answerable
+  by DuckDB over the deposit (stats, requirements, sources, crafts, factions)
+  is modeled natively; only world geometry and lore link out. Outbound links
+  are name-intent links (grimtools name-search URLs, `/map/areas/<id>`, wiki
+  name slugs) - never grimtools item ids, which are internal sequential
+  values on per-patch snapshot hosts. Never link out for item source.
+
+### Sequenced roadmap
+
+1. **Dataset releases + lockfile** (shipped 2026-07-11; see
+   `docs/plans/2026-07-11-001-feat-dataset-releases-plan.md` and
+   `docs/deposit.md`). `just publish-deposit` / `just fetch-deposit` with a
+   committed `deposit.lock`. Still open as a follow-on: the machine-generated
+   balance diff vs the previous build (small text, delta-diffable, doubles as
+   a pipeline drift smoke test, community-valuable) - the release archive
+   this shipped is its input.
+2. **Item source tier 1: faction vendor and crafted sources** (shipped
+   2026-07-11; see `docs/plans/2026-07-11-002-feat-item-source-tier1-plan.md`
+   and `docs/item-schema.md`). `sources.parquet` derives full vendor lines
+   ("Sold by Falonestra (Coven of Ugdenbog), Revered") from the merchant
+   chain, materializes crafted rows, and feeds the prototype's source facet;
+   `q-ae8-faction-sources` pins 284/292 coverage. Unsourced items stay silent
+   (revised from the earlier "world drop" fallback: that label waits for
+   step 3, which can actually distinguish it). Follow-up: whether the 8
+   template-blank augments should leave the entities table entirely.
+3. **Acquisition edges via one transposed loot-graph walker** (big rock;
+   supersedes the old affix-applicability item). One reverse-reachability
+   walk over creature `chanceToEquip*` -> `LootRandomizerTable` weights ->
+   items emits `(item, source, path_kind, effective_weight)` and delivers
+   three products at once: `drops_from`/monster-MI source edges, affix-to-gear
+   applicability (activates the affix domain's gear-type buttons), and
+   resolution of the `blueprints_without_crafts` diagnostic (58 at build
+   19149150). Every edge carries a provenance qualifier (flat-fact |
+   loot-walk | curated-oracle | interpolated) - decide the qualifier
+   vocabulary before the first edge ships. Quest-reward tier needs a fresh
+   research pass first: the "XP-only" evidence was refuted (keys belonged to
+   devotion shrines), and `perPartyMemberDropItemName` under
+   `storyelements/questitems/` shows item rewards exist in the records tree.
+   Farmability (whether an item is farmable, and from where) and
+   monster-infrequent affix applicability both wait on this walk; neither
+   is answerable today. `scripts/gditems.py`'s `--source` field (shipped in
+   the item query CLI, see [docs/item-cli.md](docs/item-cli.md)) is thin for
+   exactly this reason - 7.2% of gear and 0% of affixes carry any source row
+   at build 19149150 - and is designed so that this walk resolves more of
+   those `unknown` items automatically once it lands, with no change to the
+   CLI's interface.
+4. **Ship `/items/` on the existing Pages deploy** (after 1). Publish the
+   prototype plus derived parquet at a subpath, with the tier-1 source facet.
+   Not "one workflow edit": CI cannot regenerate parquet (Windows-only
+   extraction), so it depends on step 1's fetchable release; also resolve the
+   prototype's CDN-loaded DuckDB against the self-contained deploy ethos.
+
+### Unsequenced follow-ups
+
+- **Engine bake-off: facet bitmaps vs DuckDB-WASM.** Decide the browser query
+  engine with measured sizes, not assumptions. Precedent constraints: the
+  2026-06-21 reachability spec's DuckDB rejection (its exception clause
+  arguably fits this case) and the 2026-06-28 first-load byte-budget work.
+  If bitmaps win, derived parquet stays a build intermediate forever.
+- **Engine-independent query IR in the URL hash.** Compact filter IR (facet
+  terms, ranges, text, combinators) encoded with `urlState.ts` tolerance
+  discipline, host-independent, so shared links never encode engine or origin
+  specifics. Published URLs are the initiative's only irreversible artifact;
+  must be settled before the first shareable item-query link ships.
+- **Roll-range gap: scaled offensive bonus lines.** Offensive damage-bonus
+  stats on items carrying `attributeScalePercent` show a level-linked upscale
+  on grimtools that plain jitter does not reproduce; datapoints recorded in
+  `data/item-curation/variance.json` under `calibration.known_gap`.
+- **Attack-speed tier pinning.** Fast/Average/Moderate/Slow APS bases in
+  `data/item-curation/attack-speed.json` are interpolated; one grimtools card
+  per tier (a Fast 1h axe, a scepter, a Slow 2h mace) pins them.
+- **AND toggle within stat families.** OR is the only launch semantics
+  (R16); the stats table already supports AND via `GROUP BY/HAVING`.
+- **Pet-skill stat rollup.** Pet chains are relations only (`spawns_pet`);
+  rolling pet-skill stats into the filterable stats table is deferred.
+- **Exception-only stat-label generator.** Decompose stat-id naming into
+  candidate game tags, verify against `Text_EN`, hand-curate only the misses;
+  scales item stat labels to 13 locales without hand-authoring 700+ ids.

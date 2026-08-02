@@ -1,0 +1,300 @@
+<!-- ABOUTME: Throwaway prototype browser for the derived item schema (data/derived/*.parquet). -->
+<!-- ABOUTME: Single page, DuckDB-WASM from CDN, filter button groups + item cards. Serve repo root: just item-browser. -->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Grim Dawn item DB (prototype)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #14120f; --panel: #1e1b17; --border: #3a352c; --text: #d8d2c4; --dim: #8a8374;
+    --common: #dcdcdc; --magical: #f7e419; --rare: #64ff64; --epic: #5b9ee8;
+    --legendary: #b464ff; --quest: #d0a45f; --broken: #9c9c9c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.4 system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: var(--panel); border-bottom: 1px solid var(--border); padding: 10px 16px; }
+  h1 { font-size: 16px; margin: 0 0 8px; }
+  h1 small { color: var(--dim); font-weight: normal; margin-left: 8px; }
+  .group { display: flex; flex-wrap: wrap; gap: 4px; align-items: baseline; margin: 4px 0; }
+  .group .label { color: var(--dim); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; width: 78px; flex-shrink: 0; }
+  button.f { background: #2a2620; color: var(--text); border: 1px solid var(--border); border-radius: 4px; padding: 2px 9px; cursor: pointer; font-size: 12px; }
+  button.f.on { background: #4a6a2a; border-color: #6f9a44; color: #fff; }
+  button.f .n { color: var(--dim); font-size: 10px; margin-left: 4px; }
+  button.f.on .n { color: #cfe6b0; }
+  button.f.zero { opacity: .35; }
+  input[type=search] { background: #2a2620; color: var(--text); border: 1px solid var(--border); border-radius: 4px; padding: 3px 8px; width: 260px; }
+  #count { color: var(--dim); font-size: 12px; margin-left: 12px; }
+  #status { padding: 40px; text-align: center; color: var(--dim); }
+  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; padding: 12px 16px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .card .name { font-weight: 600; }
+  .card .meta { color: var(--dim); font-size: 12px; margin: 2px 0 6px; }
+  .card .req { color: var(--dim); font-size: 12px; margin-bottom: 6px; }
+  .card .srcline { color: #8fb98f; font-size: 12px; margin-bottom: 2px; }
+  .card .apline { color: #8fa8c8; font-size: 12px; margin: -4px 0 6px; }
+  .card ul { margin: 0; padding: 0 0 0 2px; list-style: none; font-size: 12px; color: #b7e0a0; }
+  .card ul li.src { color: var(--dim); margin-top: 5px; font-style: italic; }
+  .badge { font-size: 10px; border-radius: 3px; padding: 1px 5px; margin-left: 6px; vertical-align: 1px; }
+  .badge.aom { background: #6a3a12; color: #f0b070; }
+  .badge.fg { background: #123f4a; color: #6fd0e0; }
+  .badge.emp { background: #45103f; color: #e080d0; }
+</style>
+</head>
+<body>
+<header id="header" style="display:none">
+  <h1>Grim Dawn item DB <small id="timing"></small></h1>
+  <div class="group"><span class="label">search</span>
+    <input id="search" type="search" placeholder="name contains...">
+    <span id="count"></span>
+  </div>
+  <div id="groups"></div>
+</header>
+<div id="status">loading DuckDB-WASM from CDN...</div>
+<div id="grid"></div>
+
+<script type="module">
+import * as duckdb from "https://cdn.jsdelivr.net/npm/@duckdb/duckdb-wasm@1.29.0/+esm";
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const status = (m) => { $("status").textContent = m; };
+
+const RARITY_ORDER = ["Common", "Magical", "Rare", "Epic", "Legendary", "Quest", "Broken"];
+const EXPANSION_LABEL = { base: "base game", aom: "Ashes of Malmouth", fg: "Forgotten Gods" };
+const RENDER_CAP = 250;
+
+const t0 = performance.now();
+const bundle = await duckdb.selectBundle(duckdb.getJsDelivrBundles());
+const worker = await duckdb.createWorker(bundle.mainWorker);
+const db = new duckdb.AsyncDuckDB(new duckdb.ConsoleLogger(duckdb.LogLevel.WARNING), worker);
+await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
+const tInit = performance.now();
+
+status("fetching parquet files...");
+async function reg(name, url) {
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`${url}: HTTP ${resp.status} - run \`just derive\` and serve the repo root`);
+  await db.registerFileBuffer(name, new Uint8Array(await resp.arrayBuffer()));
+}
+await Promise.all([
+  reg("entities.parquet", "data/derived/entities.parquet"),
+  reg("stats.parquet", "data/derived/stats.parquet"),
+  reg("sources.parquet", "data/derived/sources.parquet"),
+  reg("relations.parquet", "data/derived/relations.parquet"),
+  reg("labels.parquet", "data/deposit/labels.parquet"),
+]);
+const tFetch = performance.now();
+
+status("querying...");
+const conn = await db.connect();
+const rows = (res) => res.toArray().map((r) => r.toJSON());
+
+const items = rows(await conn.query(`
+  SELECT e.record, e.domain, e.gear_type, e.rarity, e.item_level, e.req_level,
+         e.req_physique, e.req_cunning, e.req_spirit, e.expansion,
+         e.attacks_per_sec, e.is_empowered, l.text AS name
+  FROM 'entities.parquet' e
+  JOIN (SELECT tag, text FROM 'labels.parquet' WHERE locale = 'en') l ON l.tag = e.name_tag
+  ORDER BY name, e.item_level, e.record`));
+
+const statsByRecord = new Map();
+for (const s of rows(await conn.query(`
+    SELECT record, source, stat_id, value_min, value_max, display_low, display_high
+    FROM 'stats.parquet'`))) {
+  let list = statsByRecord.get(s.record);
+  if (!list) statsByRecord.set(s.record, (list = []));
+  list.push(s);
+}
+
+// Acquisition sources: vendor rows carry vendor+faction+tier; crafted rows carry the
+// blueprint's name in vendor_name (faction/tier null). Items without rows are unsourced.
+const sourcesByRecord = new Map();
+for (const s of rows(await conn.query(`
+    SELECT s.item, s.kind, s.tier, lv.text AS vendor_name, lf.text AS faction_name
+    FROM 'sources.parquet' s
+    LEFT JOIN (SELECT tag, text FROM 'labels.parquet' WHERE locale = 'en') lv ON lv.tag = s.vendor_tag
+    LEFT JOIN (SELECT tag, text FROM 'labels.parquet' WHERE locale = 'en') lf ON lf.tag = s.faction_tag
+    ORDER BY s.item, s.kind, s.tier, vendor_name`))) {
+  let list = sourcesByRecord.get(s.item);
+  if (!list) sourcesByRecord.set(s.item, (list = []));
+  list.push(s);
+}
+for (const it of items) {
+  const src = sourcesByRecord.get(it.record) ?? [];
+  it.source = [...new Set(src.map((s) => (s.kind === "crafted" ? "crafted" : "faction vendor")))];
+  if (!it.source.length) it.source = ["unsourced"];
+}
+
+// Applies-to: augments/components go ON other gear; their gear_type facet value set
+// becomes those target types (same vocabulary as gear's own gear_type), so clicking
+// "legs" matches legs armor AND everything applicable to legs.
+const appliesByRecord = new Map();
+for (const r of rows(await conn.query(`
+    SELECT src, dst FROM 'relations.parquet' WHERE kind = 'applies_to' ORDER BY src, dst`))) {
+  let list = appliesByRecord.get(r.src);
+  if (!list) appliesByRecord.set(r.src, (list = []));
+  list.push(r.dst);
+}
+for (const it of items) {
+  if (it.domain === "augment" || it.domain === "component") {
+    it.applies_to = appliesByRecord.get(it.record) ?? [];
+    it.gear_type = it.applies_to;
+  }
+}
+const tQuery = performance.now();
+$("timing").textContent =
+  `${items.length} items · wasm ${Math.round(tInit - t0)}ms · fetch ${Math.round(tFetch - tInit)}ms · query ${Math.round(tQuery - tFetch)}ms`;
+
+// --- filter state: OR within a group, AND across groups -----------------------
+// `source` and `gear_type` are set-valued (an item can be both vendor-sold and crafted;
+// an augment/component's gear types are the slots it applies to). Scalar fields wrap
+// into one-element sets. A set-valued field matches when ANY of its values is selected,
+// and counts count items (once per value they hold), not source rows.
+const FIELDS = ["domain", "gear_type", "rarity", "expansion", "source"];
+const active = { domain: new Set(), gear_type: new Set(), rarity: new Set(), expansion: new Set(), source: new Set() };
+const buttons = [];
+
+const values = (it, field) => (Array.isArray(it[field]) ? it[field] : [it[field]]);
+
+// Faceted-count rule: a button's count honors every OTHER group's filters (and the
+// search text) but ignores its own group, since picking a sibling would OR-expand.
+function matchesExcept(it, except, q) {
+  for (const f of FIELDS) {
+    if (f !== except && active[f].size && !values(it, f).some((v) => active[f].has(v))) return false;
+  }
+  return !q || it.name.toLowerCase().includes(q);
+}
+
+function vocab(field, order) {
+  const counts = new Map();
+  for (const it of items) {
+    for (const v of values(it, field)) {
+      if (v) counts.set(v, (counts.get(v) ?? 0) + 1);
+    }
+  }
+  const keys = [...counts.keys()];
+  keys.sort(order ? (a, b) => order.indexOf(a) - order.indexOf(b) : (a, b) => counts.get(b) - counts.get(a));
+  return keys.map((k) => [k, counts.get(k)]);
+}
+
+const GROUPS = [
+  ["domain", "domain", null],
+  ["gear_type", "gear type", null],
+  ["rarity", "rarity", RARITY_ORDER],
+  ["expansion", "expansion", ["base", "aom", "fg"]],
+  ["source", "source", ["faction vendor", "crafted", "unsourced"]],
+];
+for (const [field, label, order] of GROUPS) {
+  const div = document.createElement("div");
+  div.className = "group";
+  div.innerHTML = `<span class="label">${label}</span>`;
+  for (const [value, n] of vocab(field, order)) {
+    const b = document.createElement("button");
+    b.className = "f";
+    b.innerHTML = `${esc(field === "expansion" ? EXPANSION_LABEL[value] ?? value : value)}<span class="n">${n}</span>`;
+    b.onclick = () => {
+      active[field].has(value) ? active[field].delete(value) : active[field].add(value);
+      b.classList.toggle("on");
+      render();
+    };
+    buttons.push({ field, value, btn: b, span: b.querySelector(".n") });
+    div.appendChild(b);
+  }
+  $("groups").appendChild(div);
+}
+$("search").oninput = render;
+
+// --- rendering -----------------------------------------------------------------
+function statLine(s) {
+  const range = s.display_low != null
+    ? (s.display_low === s.display_high ? `${s.display_low}` : `${s.display_low}–${s.display_high}`)
+    : (s.value_min === s.value_max ? `${fmtNum(s.value_min)}` : `${fmtNum(s.value_min)}–${fmtNum(s.value_max)}`);
+  return `${range} ${s.stat_id}`;
+}
+function fmtNum(v) { return Number.isInteger(v) ? v : Math.round(v * 100) / 100; }
+
+const TIER_LABEL = { friendly: "Friendly", respected: "Respected", honored: "Honored", revered: "Revered" };
+function sourceLine(s) {
+  return s.kind === "crafted"
+    ? `Crafted via ${s.vendor_name ?? "blueprint (unnamed)"}`
+    : `Sold by ${s.vendor_name ?? "?"} (${s.faction_name ?? "?"}), ${TIER_LABEL[s.tier] ?? s.tier}`;
+}
+
+// Applies-to display: collapse exact slot groups to an in-game style phrase, largest
+// group first; leftovers list raw (the same tokens as the facet buttons).
+const APPLY_GROUPS = [
+  ["all weapons", ["axe1h", "axe2h", "dagger", "mace1h", "mace2h", "ranged1h", "ranged2h", "scepter", "spear2h", "sword1h", "sword2h"]],
+  ["all armor", ["chest", "feet", "hands", "head", "legs", "shoulders", "waist"]],
+  ["1h melee", ["axe1h", "dagger", "mace1h", "scepter", "sword1h"]],
+  ["2h weapons", ["axe2h", "mace2h", "ranged2h", "spear2h", "sword2h"]],
+  ["all jewelry", ["amulet", "medal", "ring"]],
+];
+function appliesLine(slots) {
+  if (!slots || !slots.length) return null;
+  const rest = new Set(slots);
+  const parts = [];
+  for (const [phrase, members] of APPLY_GROUPS) {
+    if (members.every((m) => rest.has(m))) {
+      parts.push(phrase);
+      for (const m of members) rest.delete(m);
+    }
+  }
+  parts.push(...[...rest].sort());
+  return `Applies to ${parts.join(", ")}`;
+}
+
+function card(it) {
+  const stats = statsByRecord.get(it.record) ?? [];
+  const self = stats.filter((s) => s.source === "self");
+  const granted = stats.filter((s) => s.source !== "self");
+  const srcLines = (sourcesByRecord.get(it.record) ?? []).map(sourceLine);
+  const reqs = [];
+  if (it.req_level) reqs.push(`level ${it.req_level}`);
+  if (it.req_physique) reqs.push(`${it.req_physique} physique`);
+  if (it.req_cunning) reqs.push(`${it.req_cunning} cunning`);
+  if (it.req_spirit) reqs.push(`${it.req_spirit} spirit`);
+  const badges =
+    (it.expansion !== "base" ? `<span class="badge ${it.expansion}">${it.expansion}</span>` : "") +
+    (it.is_empowered ? `<span class="badge emp">empowered</span>` : "");
+  const apline = appliesLine(it.applies_to);
+  return `<div class="card">
+    <div class="name" style="color: var(--${(it.rarity || "common").toLowerCase()})">${esc(it.name)}${badges}</div>
+    <div class="meta">${esc(Array.isArray(it.gear_type) ? it.domain : (it.gear_type || it.domain))} · ilvl ${it.item_level ?? "?"}${it.attacks_per_sec ? ` · ${it.attacks_per_sec.toFixed(2)}/s` : ""}</div>
+    ${apline ? `<div class="apline">${esc(apline)}</div>` : ""}
+    ${reqs.length ? `<div class="req">requires ${reqs.join(", ")}</div>` : ""}
+    ${srcLines.map((t) => `<div class="srcline">${esc(t)}</div>`).join("")}
+    <ul>${self.map((s) => `<li>${esc(statLine(s))}</li>`).join("")}
+    ${granted.length ? `<li class="src">granted skill</li>` + granted.map((s) => `<li>${esc(statLine(s))}</li>`).join("") : ""}</ul>
+  </div>`;
+}
+
+function render() {
+  const q = $("search").value.trim().toLowerCase();
+  const match = items.filter((it) => matchesExcept(it, null, q));
+
+  const counts = { domain: new Map(), gear_type: new Map(), rarity: new Map(), expansion: new Map(), source: new Map() };
+  for (const it of items) {
+    for (const field of FIELDS) {
+      if (matchesExcept(it, field, q)) {
+        for (const v of values(it, field)) counts[field].set(v, (counts[field].get(v) ?? 0) + 1);
+      }
+    }
+  }
+  for (const { field, value, btn, span } of buttons) {
+    const n = counts[field].get(value) ?? 0;
+    span.textContent = n;
+    btn.classList.toggle("zero", n === 0);
+  }
+
+  $("count").textContent = `${match.length} match${match.length > RENDER_CAP ? ` · showing first ${RENDER_CAP}` : ""}`;
+  $("grid").innerHTML = match.slice(0, RENDER_CAP).map(card).join("");
+}
+
+$("status").remove();
+$("header").style.display = "";
+render();
+</script>
+</body>
+</html>
