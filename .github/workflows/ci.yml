@@ -29,3 +29,10 @@ jobs:
         run: just web-install
       - name: Run checks (tests, lint, type-check)
         run: just check
+      # The script suites are not part of `just check` because one of them, test_gditems_cli,
+      # drives the real CLI against data/derived, which is never in git. Fetching it is what
+      # buys that end-to-end leg; the pin in deposit.lock makes the download reproducible.
+      - name: Fetch the pinned item dataset
+        run: just fetch-deposit
+      - name: Run the script test suites
+        run: just test-scripts

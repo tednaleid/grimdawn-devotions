@@ -687,10 +687,12 @@ fmt-check:
     cd "{{justfile_directory()}}/web" && bunx biome format
     cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format scripts
 
-# Lint the standalone Python scripts (bug catchers only; see ruff.toml for why it is narrow)
+# Lint the standalone Python scripts (bug catchers only; see ruff.toml for why it is narrow).
+# The version is pinned so a ruff release cannot fail an unrelated change: unpinned, `uvx ruff`
+# tracks latest, and a new check landing in the F rules would break CI on someone else's commit.
 [group("check")]
 lint-py:
-    cd "{{justfile_directory()}}" && uvx ruff check scripts/
+    cd "{{justfile_directory()}}" && uvx ruff@0.16.1 check scripts/
 
 # Full verification gate: formatting, tests, lint, and type-check
 [group("check")]
