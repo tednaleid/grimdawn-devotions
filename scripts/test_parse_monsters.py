@@ -196,6 +196,13 @@ check("an empty value is rejected", mon.split_difficulty_array("") is None)
 check("a None value is rejected", mon.split_difficulty_array(None) is None)
 check("a non-numeric entry is rejected", mon.split_difficulty_array(";".join(["x"] * 12)) is None)
 
+# Everything from here on reads the extracted game tree, which comes from a local install
+# via `just extract` and is never in git. The pure checks above still gate everywhere.
+if not (root / "extracted/records").is_dir():
+    print("  SKIP the real-records legs (extracted/ not present)")
+    print("FAILURES:", failures)
+    raise SystemExit(1 if failures else 0)
+
 # --- Task 3: offsets read from the real records ---
 db = mon.DB((root / "extracted/records").resolve())
 check("scaler ref resolves through gameengine.dbr",

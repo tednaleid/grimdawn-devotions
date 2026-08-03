@@ -27,6 +27,12 @@ def check(name, cond):
         failures += 1
         print(f"  FAIL {name}")
 
+# Every check below drives the real parser over the extracted tree, which comes from a local
+# game install via `just extract` and is never in git. Without it there is nothing to run.
+if not (root / "extracted/records").is_dir():
+    print("  SKIP whole suite (extracted/ not present; needs a machine with the game installed)")
+    raise SystemExit(0)
+
 # Run the real parser over the extracted tree into a temp file.
 out = Path(tempfile.mkdtemp()) / "rr.json"
 rc = subprocess.run([sys.executable, str(here / "parse_rr.py"),

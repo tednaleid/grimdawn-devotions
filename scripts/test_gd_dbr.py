@@ -27,11 +27,15 @@ check("as_number int", gd.as_number("45.000000"), 45)
 check("as_number rejects array", gd.as_number("1;2;3"), None)
 check("clean_text strips codes", gd.clean_text("{^n}Night^o's"), "Night's")
 
-# read_dbr over a real record: Viper carries the mult field.
+# read_dbr over a real record: Viper carries the mult field. extracted/ comes from a local
+# game install via `just extract` and is never in git, so this leg cannot run everywhere.
 db_root = here.parent / "extracted/records"
-viper = gd.read_dbr(db_root / "records/skills/devotion/tier1_13d.dbr")
-check("read_dbr picks up mult field",
-      viper.get("offensiveElementalResistanceReductionPercentMin"), "20.000000")
+if not db_root.is_dir():
+    print("  SKIP read_dbr over a real record (extracted/ not present)")
+else:
+    viper = gd.read_dbr(db_root / "records/skills/devotion/tier1_13d.dbr")
+    check("read_dbr picks up mult field",
+          viper.get("offensiveElementalResistanceReductionPercentMin"), "20.000000")
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)

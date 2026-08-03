@@ -26,6 +26,9 @@ GitHub Pages; no backend, no accounts.
 - Format: `just fmt`
 - Run: `just serve` (builds, serves http://localhost:5173)
 - Check (gate, run before commit; also CI): `just check`
+- Python script suites (also CI, after `just fetch-deposit`): `just test-scripts`. The legs that
+  read `extracted/` skip loudly anywhere the game is not installed, so run this on a machine with
+  the game before changing a parser.
 - Reachability WASM core (optional fast path): `just wasm`
 - Per-click engine perf: `just perf` (times `selectionView`, the exact cost one UI click pays = the core
   to optimize; deployed WASM path) or `just perf --ts` (the pure TS core algorithm you iterate on)
