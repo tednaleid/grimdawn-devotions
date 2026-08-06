@@ -1392,9 +1392,13 @@ Add element lookups beside the existing ones (~line 139):
 
 ```ts
   const affinityPanelEl = document.getElementById("affinity-panel") as HTMLElement;
-  const searchPanelEl = document.getElementById("search-panel") as HTMLElement;
   const availPanelEl = document.getElementById("avail-panel") as HTMLElement;
 ```
+
+Do **not** add a `searchPanelEl` lookup here. Nothing consumes it until Task 13, and
+Biome's `correctness/noUnusedVariables` is a warning, which `biome lint
+--error-on-warnings` turns into a failure — this task's own `just check` in Step 6
+would fail. Task 13 adds that lookup at the point of use.
 
 In `refresh()`, pass `affinityPanelEl` to `renderAffinities` instead of `affinityEl`, and replace the three `affinityEl.insertAdjacentHTML("beforeend", ...)` blocks (lines 721-736) with a single assignment that builds the same HTML into `availPanelEl`:
 
@@ -1664,7 +1668,13 @@ After `refresh()`:
 
 - [ ] **Step 5: Mount the panel with a debounce**
 
-After the element lookups and before the first `refresh()`:
+Add the container lookup here (Task 12 deliberately left it out, so that task's lint gate would pass), beside the other element lookups:
+
+```ts
+  const searchPanelEl = document.getElementById("search-panel") as HTMLElement;
+```
+
+Then, after the element lookups and before the first `refresh()`:
 
 ```ts
   // replaceState (in repaint) is what keeps history clean; this debounce only avoids
