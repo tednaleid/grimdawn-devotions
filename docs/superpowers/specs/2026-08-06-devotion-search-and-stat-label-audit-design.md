@@ -112,11 +112,19 @@ community expects. Findings:
   regex scrape yielded seventy pairs, only five overlapping our overrides, with
   both apparent mismatches being artifacts of the scrape rather than real
   errors.
-- `window.dumpDevotion()` on the calculator returns every devotion star with
-  its name and rendered stat lines. This is the useful primitive: rendered
-  output, comparable to ours, with no bundle archaeology. It returns an empty
-  array until the devotion panel initializes, so it needs the real click path
-  through the character sheet.
+- `window.dumpDevotion()` returns rendered stat lines per devotion star. This is
+  the useful primitive: rendered output, comparable to ours, with no bundle
+  archaeology. Two limits matter. It returns an empty array until the devotion
+  panel initializes, and it reports only the stars a build has actually taken —
+  55 at most, against our 559. It therefore cannot audit the full noun set from
+  any number of practical captures, and is a spot check rather than a sweep.
+
+This repository already carries the tooling: `scripts/gt_scrape.ts:217` calls
+`dumpDevotion()`, `scripts/gt_audit.py` parses its output,
+`docs/grimtools-build-audit.md` documents the debug helpers, and
+`scripts/fixtures/gt-devotions-infiltrator.json` is a committed 55-star capture.
+That fixture already contains `+50% to All Damage` and zero occurrences of
+"Total Damage", which is in-repo evidence of the reported bug.
 
 ### The audit, in three steps
 
@@ -125,12 +133,15 @@ community expects. Findings:
    and, for each of the sixty-four nouns, prints the current label alongside
    every game tag whose stripped text shares its head noun. Report to stdout;
    no committed artifact.
-2. **A one-time GrimTools cross-check.** Drive the calculator's devotion panel
-   once, capture `window.dumpDevotion()` to a scratch file, and diff its
-   per-star phrasing against ours. Nothing is committed and nothing becomes a
-   build dependency. `extracted/` wins any disagreement: since GrimTools renders
-   the game's strings, a conflict means our tag guess was wrong, not that
-   GrimTools knows better.
+2. **A GrimTools spot check against the committed fixture.** No scraping and no
+   browser: diff our rendering of the 55 stars in
+   `scripts/fixtures/gt-devotions-infiltrator.json` against that fixture's
+   `details` text. This is an end-to-end confirmation that our labels match what
+   the community reads, and it runs in CI like any other test. It covers only
+   the stats that build takes, so step 1 remains the source of coverage; this
+   step is a cheap check, not a sweep. `extracted/` wins any disagreement: since
+   GrimTools renders the game's strings, a conflict means our tag guess was
+   wrong, not that GrimTools knows better.
 3. **Apply the findings.** Each confirmed mismatch resolves one of two ways,
    and the first is strongly preferred:
    - If a clean bare-noun game tag exists, move the key into
@@ -393,4 +404,9 @@ feedback, "Constellations: 0 · Stars: 0" reads like a bug.
   `navController`; the match count is the feedback mechanism instead.
 - Fuzzy or typo-tolerant matching. It needs a scoring threshold that cannot be
   tuned honestly across thirteen languages and four non-Latin scripts.
-- Committing any GrimTools-derived corpus or mapping as project data.
+- Committing any GrimTools-derived corpus or mapping as project data. The
+  existing `scripts/fixtures/gt-devotions-infiltrator.json` is already committed
+  and is reused as-is; no new GrimTools-derived data is added.
+- Scraping additional GrimTools builds to widen audit coverage. Each build caps
+  at 55 stars and is manual work, and GrimTools carries no information the
+  game's own text does not.
