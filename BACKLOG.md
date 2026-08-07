@@ -307,6 +307,22 @@ full design. Remaining work:
   ones) or re-author them to the game's wording. Distinct from the open-ended
   translation-quality stream: this is a small, enumerable English-correctness
   pass.
+- **Block-recovery label: record why it stays app-authored.**
+  `characterDefensiveBlockRecoveryReduction` keeps an app-authored
+  `stat.override.*` label even though a game format tag exists
+  (`tagCharDefensiveBlockRecoveryReductionR`), because that tag's range form
+  `-({%.0f0}-{%.0f1})%` is not reducible by `stripValueTokens` to a clean
+  prefix label. `statFormat.ts` carries a comment explaining why its sibling
+  `retaliationDamagePct` DID move to `STAT_FORMAT_TAGS` but says nothing about
+  why this one did not, so the next reader has to rediscover it. Write the
+  reasoning down beside the `OVERRIDES` entry. Related quirk found while
+  auditing the Polish catalog: the game ships two variants of this tag, the
+  single-value `tagCharDefensiveBlockRecoveryReduction` (which is what a
+  devotion star renders, since every devotion value is a scalar) and the
+  ranged `...ReductionR`; all 13 catalogs are sourced from the single-value
+  one. Pointer: `OVERRIDES` +
+  `stat.override.characterDefensiveBlockRecoveryReduction` in
+  `web/src/core/statFormat.ts`.
 - **Heal label full-template upgrade.** `characterHealIncreasePercent` is
   app-authored as the bare label "Increased Healing" because its game format
   string is value-suffix ("Healing Effects Increased by {v}%") and cannot
@@ -770,3 +786,48 @@ via `ArchiveTool`. When the local install has patched past the version
 up that newer patch's text (renamed/added/removed item and enemy tags) while
 `en` does not, which is why cs/de/es/ja/ru/zh saw extra changes beyond
 `tagGDX3ItemAwakenedSetC202Name` and the two orphans.
+
+## Devotion search: follow-ups from the branch review
+
+The text search over the devotion map shipped (search box, corpus, per-locale
+index, map emphasis, `q=` in the hash). Four items the final review raised and
+the fix wave deliberately did not take:
+
+- **No e2e leg for the search wiring.** `web/src/app/main.ts`'s search wiring
+  (debounce, `replace`-mode hash writes, the `hashchange` re-sync of the box)
+  is the branch's only surface with no automated coverage: the core matcher,
+  the index, and the panel adapter are all unit tested, but nothing drives the
+  three together. `web/e2e/smoke.ts` is where that belongs - it already runs a
+  real browser and asserts across `history.back()`. Note `just e2e` is not in
+  CI, so this buys a repeatable local check rather than an enforced gate.
+- **One channel carries four names.** A search or benefit match travels as
+  `RenderOpts.highlight` / `conHighlight` -> `DisplaySettings.benefitMatch` /
+  `conMatch` -> `StarDisplay.benefitMatch` / `ConstellationDisplay.emphasis`.
+  Now that this is genuinely one channel at two granularities (star and
+  constellation), the names should converge on one word per granularity.
+  Pointers: `web/src/adapters/svgRenderer.ts`, `web/src/core/displayState.ts`,
+  and the call sites in `web/src/app/main.ts`.
+- **Search does not index the dimension word.** The corpus indexes
+  `condensedRows` subjects, so a star tooltip that renders "Duration" or
+  "Chance" as its dimension exposes a word the user can read but cannot search
+  for. Deciding whether to index dimensions means deciding whether "duration"
+  should match every duration-bearing star, which is a relevance question, not
+  a wiring one. Pointer: `searchCorpus` in `web/src/core/search.ts`.
+- **Shadowed `manifest` in the renderer test.** `web/test/svgRenderer.test.ts`
+  declares a module-level `manifest` and then five function-local
+  `const manifest` bindings with different dimensions, so a reader cannot tell
+  which one a given assertion uses without checking the scope. Rename the
+  shared one.
+
+## Data guard: the committed devotions.json actually carries descriptions
+
+`scripts/test_parse_devotions.py`'s `description_tag` assertions sit behind an
+`if records_dir.is_dir()` guard, and `just check` does not run the Python
+suites at all (`test-scripts` is a separate recipe; CI runs it at `ci.yml:38`).
+CI has no `extracted/`, so those assertions have never executed there. Nothing
+that always runs checks that the committed `data/devotions.json` carries
+constellation descriptions, which is what the app actually reads. Add a cheap
+assertion to the bun suite, which always runs: load the committed JSON and
+assert every constellation has a non-null `description_tag`. Pointer: the
+model/data tests under `web/test/`; the Python-side check is "every
+constellation has a description_tag" in `scripts/test_parse_devotions.py`.
