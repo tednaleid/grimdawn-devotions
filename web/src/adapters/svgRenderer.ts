@@ -344,14 +344,16 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   return `<svg id="map" viewBox="${vb}" preserveAspectRatio="xMidYMid meet"><defs>${defs.join("")}</defs>${parts.join("")}</svg>`;
 }
 
+/** Per-render inputs for a mounted map, mirroring RenderOpts minus the boot-time manifest. */
+export interface UpdateOpts {
+  highlight?: Set<StarId>;
+  reach?: ReachView;
+  diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
+  affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
+}
+
 export interface SvgHandle {
-  update(
-    state: SelectionState,
-    highlight?: Set<StarId>,
-    reach?: ReachView,
-    diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
-    affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> },
-  ): void;
+  update(state: SelectionState, opts?: UpdateOpts): void;
   svg: SVGSVGElement;
   // Draw (or clear, with null) a box around a constellation's stars, on top of every layer. Used for
   // build-order row hover-sync; an outline on the constellation's own art is buried under later-painted
@@ -371,20 +373,8 @@ export interface SvgDeps {
 
 export function mountSvg(container: HTMLElement, model: DevotionModel, deps: SvgDeps): SvgHandle {
   const regions = buildConRegions(model, deps.manifest);
-  function render(
-    state: SelectionState,
-    highlight?: Set<StarId>,
-    reach?: ReachView,
-    diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
-    affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> },
-  ) {
-    container.innerHTML = renderSvgMarkup(model, state, {
-      manifest: deps.manifest,
-      highlight,
-      reach,
-      diff,
-      affinityFilter,
-    });
+  function render(state: SelectionState, opts: UpdateOpts = {}) {
+    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest, ...opts });
   }
   render({ selected: new Set(), pointCap: 55 });
   const svg = container.querySelector("svg") as SVGSVGElement;
@@ -485,10 +475,10 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 
   return {
     svg,
-    update(state, highlight, reach, diff, affinityFilter) {
+    update(state, opts) {
       const live = container.querySelector("svg") as SVGSVGElement | null;
       const vb = live?.getAttribute("viewBox");
-      render(state, highlight, reach, diff, affinityFilter);
+      render(state, opts);
       const next = container.querySelector("svg") as SVGSVGElement | null;
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },

@@ -705,7 +705,12 @@ async function boot() {
           removed: new Set([...baseline.selected].filter((s) => !state.selected.has(s))),
         }
       : null;
-    handle.update(state, taggedStars(), reach, diff, affinityFilterSets());
+    handle.update(state, {
+      highlight: taggedStars(),
+      reach,
+      diff,
+      affinityFilter: affinityFilterSets(),
+    });
     renderBenefitsPanel();
     prevAffinity = renderAffinities(
       localization,
