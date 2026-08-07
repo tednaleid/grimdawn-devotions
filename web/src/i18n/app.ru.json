@@ -186,7 +186,7 @@
   "ui.search.count": "Созвездия: {cons} · Звёзды: {stars}",
   "ui.search.label": "Поиск",
   "ui.search.none": "Нет совпадений",
-  "ui.search.placeholder": "Имя, характеристика или сила",
+  "ui.search.placeholder": "Имя, характеристика или небесная сила",
   "ui.title": "Планировщик набожности Grim Dawn",
   "ui.tooltip.cannotComplete": "Невозможно завершить в пределах {cap} очков",
   "ui.tooltip.currentLevel": "Текущий уровень: {level}",

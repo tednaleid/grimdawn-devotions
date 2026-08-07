@@ -186,7 +186,7 @@
   "ui.search.count": "Konstelacje: {cons} · Gwiazdy: {stars}",
   "ui.search.label": "Szukaj",
   "ui.search.none": "Brak wyników",
-  "ui.search.placeholder": "Nazwa, statystyka lub moc",
+  "ui.search.placeholder": "Nazwa, atrybut lub moc niebiańska",
   "ui.title": "Planer Oddania Grim Dawn",
   "ui.tooltip.cannotComplete": "Nie da się ukończyć w limicie {cap} punktów",
   "ui.tooltip.currentLevel": "Aktualny poziom: {level}",

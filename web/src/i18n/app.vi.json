@@ -186,7 +186,7 @@
   "ui.search.count": "Chòm Sao: {cons} · Sao: {stars}",
   "ui.search.label": "Tìm Kiếm",
   "ui.search.none": "Không có kết quả",
-  "ui.search.placeholder": "Tên, chỉ số hoặc sức mạnh",
+  "ui.search.placeholder": "Tên, thuộc tính hoặc sức mạnh thiên giới",
   "ui.title": "Trình lập kế hoạch Devotion - Grim Dawn",
   "ui.tooltip.cannotComplete": "Không thể hoàn thành trong giới hạn {cap} điểm",
   "ui.tooltip.currentLevel": "Cấp Hiện Tại: {level}",

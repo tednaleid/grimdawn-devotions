@@ -186,7 +186,7 @@
   "ui.search.count": "Souhvězdí: {cons} · Hvězdy: {stars}",
   "ui.search.label": "Hledat",
   "ui.search.none": "Žádné výsledky",
-  "ui.search.placeholder": "Název, statistika nebo síla",
+  "ui.search.placeholder": "Název, atribut nebo nebeská síla",
   "ui.title": "Plánovač oddanosti Grim Dawn",
   "ui.tooltip.cannotComplete": "Nelze dokončit v rámci {cap} bodů",
   "ui.tooltip.currentLevel": "Aktuální úroveň: {level}",

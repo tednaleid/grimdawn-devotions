@@ -186,7 +186,7 @@
   "ui.search.count": "Costellazioni: {cons} · Stelle: {stars}",
   "ui.search.label": "Cerca",
   "ui.search.none": "Nessun risultato",
-  "ui.search.placeholder": "Nome, statistica o potere",
+  "ui.search.placeholder": "Nome, attributo o potere celestiale",
   "ui.title": "Pianificatore delle Devozioni di Grim Dawn",
   "ui.tooltip.cannotComplete": "Non può essere completato entro {cap} punti",
   "ui.tooltip.currentLevel": "Livello attuale: {level}",

@@ -186,7 +186,7 @@
   "ui.search.count": "星座: {cons} · 星: {stars}",
   "ui.search.label": "搜索",
   "ui.search.none": "无匹配结果",
-  "ui.search.placeholder": "名称、属性或力",
+  "ui.search.placeholder": "名称、属性或天体之力",
   "ui.title": "Grim Dawn 虔诚规划器",
   "ui.tooltip.cannotComplete": "无法在{cap}点以内完成",
   "ui.tooltip.currentLevel": "当前等级: {level}",
