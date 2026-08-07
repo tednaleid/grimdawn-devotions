@@ -7,7 +7,6 @@ export interface SearchPanelHandle {
   /** null clears the line (empty query); a match renders counts or the empty state. */
   setCount(m: SearchMatch | null): void;
   relocalize(loc: Localization): void;
-  value(): string;
   setValue(q: string): void;
 }
 
@@ -56,7 +55,14 @@ export function mountSearchPanel(
   applyChrome();
   input.addEventListener("input", () => opts.onInput(input.value));
   input.addEventListener("keydown", (e) => {
-    if ((e as KeyboardEvent).key !== "Escape") return;
+    const ev = e as KeyboardEvent;
+    if (ev.key !== "Escape") return;
+    // On an empty box Escape belongs to whatever is behind us: let it bubble to main.ts's
+    // document handler and close the drawer, which is what a user expects. Only when there is
+    // a query to clear do we consume it, so clearing a search on a narrow layout does not also
+    // hide the search box along with the drawer it lives in.
+    if (!input.value) return;
+    ev.stopPropagation();
     input.value = "";
     opts.onInput("");
   });
@@ -76,7 +82,6 @@ export function mountSearchPanel(
       applyChrome();
       paintCount();
     },
-    value: () => input.value,
     setValue(q) {
       if (input.value !== q) input.value = q;
     },

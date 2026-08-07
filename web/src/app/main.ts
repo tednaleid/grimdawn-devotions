@@ -42,6 +42,7 @@ import {
   canonicalPowerStatIds,
   decodeHash,
   encodeHash,
+  normalizeQuery,
 } from "../core/urlState";
 import { parseTag } from "../core/benefitTag";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
@@ -725,7 +726,7 @@ async function boot() {
   }
   // The match count line; null (an empty box) clears it rather than showing "no matches".
   function paintSearchCount() {
-    searchPanel.setCount(query.trim() ? searchMatch : null);
+    searchPanel.setCount(query ? searchMatch : null); // `query` is already normalized (trimmed)
   }
   // The hash, written by both render paths. Search uses "replace" so typing never floods history.
   function writeHash(urlMode: "push" | "replace") {
@@ -825,7 +826,7 @@ async function boot() {
   const searchPanel = mountSearchPanel(searchPanelEl, localization, {
     initial: query,
     onInput(q) {
-      query = q;
+      query = normalizeQuery(q); // the same normal form the hash stores, so a shared link restores what is on screen
       clearTimeout(searchTimer);
       searchTimer = setTimeout(repaint, 120);
     },
@@ -963,6 +964,9 @@ async function boot() {
       popoverTarget = null;
       tip.hide();
     }
+    // Drop any debounced repaint still in flight: it captured the pre-navigation query and
+    // would land after this render, writing a stale hash over the one Back just restored.
+    clearTimeout(searchTimer);
     applyHash(location.hash);
     searchPanel.setValue(query); // the box must agree with the restored hash
     refresh("replace");

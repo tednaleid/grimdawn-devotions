@@ -98,12 +98,32 @@ test("the clear button empties the query, notifies onInput(''), and refocuses th
   expect(kids["#search-input"].focused).toBe(true);
 });
 
-test("Escape empties the query and notifies onInput('')", () => {
+// The Escape event double: main.ts closes the drawer on a document-level keydown, so whether
+// the panel consumes the event decides if clearing a search also hides the box on narrow layouts.
+function escapeEvent() {
+  const e = { key: "Escape", stopped: false, stopPropagation() {} };
+  e.stopPropagation = () => {
+    e.stopped = true;
+  };
+  return e;
+}
+
+test("Escape empties the query, notifies onInput(''), and does not reach the drawer handler", () => {
   const { kids, onInputCalls } = mount("abc");
   kids["#search-input"].value = "abc";
-  kids["#search-input"].fire("keydown", { key: "Escape" });
+  const e = escapeEvent();
+  kids["#search-input"].fire("keydown", e);
   expect(kids["#search-input"].value).toBe("");
   expect(onInputCalls).toEqual([""]);
+  expect(e.stopped).toBe(true);
+});
+
+test("Escape on an already-empty box bubbles, so it can still close the drawer", () => {
+  const { kids, onInputCalls } = mount("");
+  const e = escapeEvent();
+  kids["#search-input"].fire("keydown", e);
+  expect(e.stopped).toBe(false);
+  expect(onInputCalls).toEqual([]);
 });
 
 test("a non-Escape key does not clear the query", () => {
@@ -114,10 +134,9 @@ test("a non-Escape key does not clear the query", () => {
   expect(onInputCalls).toEqual([]);
 });
 
-test("value()/setValue() reflect the input", () => {
+test("the initial query seeds the input and setValue() replaces it", () => {
   const { handle, kids } = mount("seed");
-  expect(handle.value()).toBe("seed");
+  expect(kids["#search-input"].value).toBe("seed");
   handle.setValue("next");
   expect(kids["#search-input"].value).toBe("next");
-  expect(handle.value()).toBe("next");
 });
