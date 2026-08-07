@@ -200,7 +200,11 @@ Scope is the 64 app-authored stat *nouns*: the 50 `stat.override.*` keys and the
 
 - [ ] **Step 1: Write the failing test**
 
-Create `scripts/test_audit_stat_labels.py`. The project's Python tests are plain `uv run` scripts using `assert`, discovered by `just test-scripts` as `scripts/test_*.py`. Match that style — read `scripts/test_parse_devotions.py` first if unsure.
+Create `scripts/test_audit_stat_labels.py`, discovered by `just test-scripts` as `scripts/test_*.py`.
+
+**Read `scripts/test_parse_devotions.py` and one other sibling suite in full before writing, and follow what they actually do.** All four existing suites share one shape, and the new test must match it: load the module under test via `importlib.util.spec_from_file_location` + `module_from_spec` + `exec_module` (never a plain top-level import — that only resolves because `uv run` happens to put the script's directory on `sys.path[0]`, and it trips static analysers), accumulate a `failures` counter through a `check(...)` helper that prints per-check results, and end with an explicit `"ALL PASSED"` / `"FAILURES: N"` summary plus `raise SystemExit(1 if failures else 0)`.
+
+The assertions below are what the test must cover; express them through that harness rather than as bare `assert` statements in `def test_*()` functions.
 
 ```python
 #!/usr/bin/env -S uv run --script
