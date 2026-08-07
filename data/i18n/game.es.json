@@ -5,6 +5,7 @@
   "Intelligence": "Espíritu",
   "Life": "Vida",
   "Mana": "Energía",
+  "SkillRetaliationDamageFormat": "{%.0f0%} de daño de contrataque añadido al ataque",
   "Strength": "Constitución",
   "tagAetherCrystalA01": "Cristal de Éter",
   "tagAetherCrystalA02": "Clúster de Cristal de Éter",

@@ -5,6 +5,7 @@
   "Intelligence": "精神",
   "Life": "生命",
   "Mana": "能量",
+  "SkillRetaliationDamageFormat": "{%.0f0%} 的反击伤害附加至攻击",
   "Strength": "体格",
   "tagAetherCrystalA01": "虚化水晶",
   "tagAetherCrystalA02": "虚化水晶集簇",

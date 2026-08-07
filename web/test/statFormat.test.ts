@@ -56,6 +56,25 @@ describe("statRow format-string stats (game-sourced term, value stripped)", () =
       value: "+20%",
     });
   });
+  // The authored label used to carry its own leading "%", which the value column already
+  // renders: "+18%" + "% Retaliation added to Attack" showed the sign twice.
+  test("retaliationDamagePct is the game's added-to-attack phrase, with no doubled percent", () => {
+    expect(resRow(statRow("retaliationDamagePct", 18))).toEqual({
+      label: "of Retaliation Damage added to Attack",
+      value: "+18%",
+    });
+  });
+});
+
+describe("statRow reduction stats keep the reduced quantity in the noun", () => {
+  // The value renders negative, so the noun has to name the thing being reduced ("Time"),
+  // or "-5% Shield Recovery" reads as losing recovery rather than shortening it.
+  test("block recovery reduction is Shield Recovery Time, negative percent", () => {
+    expect(resRow(statRow("characterDefensiveBlockRecoveryReduction", 5))).toEqual({
+      label: "Shield Recovery Time",
+      value: "-5%",
+    });
+  });
 });
 
 describe("statRow offensive damage (percent vs flat)", () => {

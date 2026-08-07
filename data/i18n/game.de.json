@@ -5,6 +5,7 @@
   "Intelligence": "Geist",
   "Life": "Leben",
   "Mana": "Energie",
+  "SkillRetaliationDamageFormat": "{%.0f0%} des Vergeltungsschadens wird zum Angriff hinzugefügt",
   "Strength": "Konstitution",
   "tagAetherCrystalA01": "Ätherkristall",
   "tagAetherCrystalA02": "Ätherkristallansammlung",

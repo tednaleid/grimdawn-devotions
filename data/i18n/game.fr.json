@@ -5,6 +5,7 @@
   "Intelligence": "Esprit",
   "Life": "Santé",
   "Mana": "Énergie",
+  "SkillRetaliationDamageFormat": "{%.0f0%} de Dégâts de Représailles ajoutés à l'Attaque",
   "Strength": "Physique",
   "tagAetherCrystalA01": "Cristal Éthéré",
   "tagAetherCrystalA02": "Amas de Cristaux Éthérés",

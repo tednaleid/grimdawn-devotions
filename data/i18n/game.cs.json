@@ -5,6 +5,7 @@
   "Intelligence": "Duchovno",
   "Life": "Zdraví",
   "Mana": "Magická energie",
+  "SkillRetaliationDamageFormat": "{%.0f0%} opláceného zranění přidáno k útoku",
   "Strength": "Fyzická kondice",
   "tagAetherCrystalA01": "Aetherický krystal",
   "tagAetherCrystalA02": "Shluk aetherických krystalů",

@@ -5,6 +5,7 @@
   "Intelligence": "Spirit",
   "Life": "Health",
   "Mana": "Energy",
+  "SkillRetaliationDamageFormat": "{%.0f0%} of Retaliation Damage added to Attack",
   "Strength": "Physique",
   "tagAetherCrystalA01": "Aether Crystal",
   "tagAetherCrystalA02": "Aether Crystal Cluster",

@@ -5,6 +5,7 @@
   "Intelligence": "Spirito",
   "Life": "Salute",
   "Mana": "Energia",
+  "SkillRetaliationDamageFormat": "{%.0f0%} del Danno di Ritorsione aggiunto all'Attacco",
   "Strength": "Fisico",
   "tagAetherCrystalA01": "Cristallo Etereo",
   "tagAetherCrystalA02": "Cristallo Etereo ~ Ammasso",

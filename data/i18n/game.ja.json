@@ -5,6 +5,7 @@
   "Intelligence": "精神力",
   "Life": "ヘルス",
   "Mana": "エナジー",
+  "SkillRetaliationDamageFormat": "{%.0f0%} の報復ダメージを攻撃に追加",
   "Strength": "体格",
   "tagAetherCrystalA01": "イーサー クリスタル",
   "tagAetherCrystalA02": "イーサー クリスタル の塊",

@@ -1,4 +1,5 @@
 {
   "defensiveConvert": "DefenseConvert",
-  "defensivePercentCurrentLife": "DefensePercentCurrentLife"
+  "defensivePercentCurrentLife": "DefensePercentCurrentLife",
+  "retaliationDamagePct": "SkillRetaliationDamageFormat"
 }

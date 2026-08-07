@@ -5,6 +5,7 @@
   "Intelligence": "Duchowości",
   "Life": "Zdrowia",
   "Mana": "Energii",
+  "SkillRetaliationDamageFormat": "{%.0f0%} obrażeń od odbicia dodanych do wartości ataku",
   "Strength": "Budowy ciała",
   "tagAetherCrystalA01": "Kryształ Aetheru",
   "tagAetherCrystalA02": "Skupisko Kryształów Aetheru",

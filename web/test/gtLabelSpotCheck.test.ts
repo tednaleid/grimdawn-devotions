@@ -14,7 +14,7 @@ const GT_CONFIRMED: Record<string, string> = {
 
 // Wordings we deliberately retired. Present here as evidence, so a future edit that
 // reintroduces one has to argue with a failing test rather than slip through review.
-const RETIRED = ["Total Damage"];
+const RETIRED = ["Total Damage", "% Retaliation added to Attack", "Shield Recovery"];
 
 test("our English noun matches what GrimTools renders", () => {
   const catalog = en as Record<string, string>;

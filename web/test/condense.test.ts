@@ -96,7 +96,7 @@ test("retaliation stats group under Retaliation and collapse by concept", () => 
   expect(ret).toBeTruthy();
   const subjects = ret!.subjects.map((s) => res(s.subject)).sort();
   expect(subjects).toContain("Fire Retaliation");
-  expect(subjects).toContain("% Retaliation added to Attack");
+  expect(subjects).toContain("of Retaliation Damage added to Attack");
   expect(subjects).toContain("Fear");
   // Fire flat + Fire % collapse onto one subject; Fear min + chance onto one.
   const fire = ret!.subjects.find((s) => res(s.subject) === "Fire Retaliation")!;

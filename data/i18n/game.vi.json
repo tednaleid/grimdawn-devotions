@@ -5,6 +5,7 @@
   "Intelligence": "Tinh Thần",
   "Life": "Máu",
   "Mana": "Năng Lượng",
+  "SkillRetaliationDamageFormat": "{%.0f0%} Sát Thương Phản Kích thêm vào Đòn Tấn Công",
   "Strength": "Thể Chất",
   "tagAetherCrystalA01": "Tinh Thể Aether",
   "tagAetherCrystalA02": "Cụm Tinh Thể Aether",

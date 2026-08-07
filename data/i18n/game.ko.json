@@ -5,6 +5,7 @@
   "Intelligence": "정신",
   "Life": "체력",
   "Mana": "에너지",
+  "SkillRetaliationDamageFormat": "{%.0f0%} 의 보복 데미지가 공격에 추가",
   "Strength": "힘",
   "tagAetherCrystalA01": "에테르 크리스탈",
   "tagAetherCrystalA02": "에테르 크리스탈 덩어리",

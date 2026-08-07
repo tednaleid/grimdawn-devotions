@@ -5,6 +5,7 @@
   "Intelligence": "Дух",
   "Life": "Здоровье",
   "Mana": "Энергия",
+  "SkillRetaliationDamageFormat": "{%.0f0%} ответного урона добавляется к атаке",
   "Strength": "Телосложение",
   "tagAetherCrystalA01": "Груда эфирных кристаллов",
   "tagAetherCrystalA02": "Эфирная друза",

@@ -728,3 +728,16 @@ artifact policy, item source, grimtools boundary).
 - **Exception-only stat-label generator.** Decompose stat-id naming into
   candidate game tags, verify against `Text_EN`, hand-curate only the misses;
   scales item stat labels to 13 locales without hand-authoring 700+ ids.
+
+## Game text tables drift from the installed game
+
+`just i18n-tables` regenerated against the current Grim Dawn install drops
+`tagEnemyTrapA03` and `tagPetThermiteMineA01` from every `data/i18n/game.*.json`
+and adds `tagGDX3ItemAwakenedSetC202Name` to some locales. Those tags are still
+referenced by `data/monsters.json` / `data/devotions.json`, so the committed
+tables were built against an older game build than the one installed now. The
+2026-08-06 stat-label audit hand-inserted its single new tag rather than ship
+that unrelated churn. Decide whether the tables should be regenerated wholesale
+(and `data/monsters.json` re-parsed so the dropped tags stop being referenced),
+or whether the omissions are benign; `scripts/build_game_tables.py` already
+reports `omitted: N` per language.
