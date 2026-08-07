@@ -725,8 +725,11 @@ async function boot() {
     });
   }
   // The match count line; null (an empty box) clears it rather than showing "no matches".
+  // Also hands the tooltip the query, so hovering a match marks up the text that matched -
+  // otherwise a hit on flavour text ("owl" inside "acknowledged") looks like a bug.
   function paintSearchCount() {
     searchPanel.setCount(query ? searchMatch : null); // `query` is already normalized (trimmed)
+    tip.setHighlight(query);
   }
   // The hash, written by both render paths. Search uses "replace" so typing never floods history.
   function writeHash(urlMode: "push" | "replace") {

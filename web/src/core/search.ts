@@ -83,3 +83,63 @@ export function matchQuery(index: SearchIndex, query: string): SearchMatch {
   for (const [id, text] of index.stars) if (hit(text)) stars.add(id);
   return { constellations, stars };
 }
+
+/**
+ * Fold like `normalize`, but keep a map from each folded character back to the offset of the
+ * original character it came from, plus a trailing sentinel at `text.length`.
+ *
+ * Folding is not length-preserving: NFD splits an accented character in two before the mark is
+ * dropped, and some characters lowercase to several. So an index into the folded string is not an
+ * index into the text we render, and highlighting needs the round trip.
+ *
+ * The per-character loop must produce exactly what `normalize` produces for the whole string, or a
+ * highlight lands on the wrong characters; `search.test.ts` pins that agreement.
+ */
+function foldWithMap(text: string): { folded: string; map: number[] } {
+  let folded = "";
+  const map: number[] = [];
+  let at = 0;
+  // Iterate code points, not UTF-16 units, so a surrogate pair is folded as one character.
+  for (const ch of text) {
+    const f = ch.toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
+    for (let k = 0; k < f.length; k++) {
+      folded += f[k];
+      map.push(at);
+    }
+    at += ch.length;
+  }
+  map.push(text.length); // so a match ending at the last character can address its end
+  return { folded, map };
+}
+
+/**
+ * Where each query term occurs in `text`, as `[start, end)` ranges into the ORIGINAL string,
+ * sorted and with overlaps merged. Terms are the same whitespace-split, folded terms `matchQuery`
+ * uses, so anything that made a star or constellation match can be shown to the reader.
+ *
+ * Pure: returns ranges, never markup. Escaping and tag choice belong to the adapter that renders.
+ */
+export function matchRanges(text: string, query: string): [number, number][] {
+  const terms = normalize(query).split(/\s+/).filter(Boolean);
+  if (terms.length === 0) return [];
+  const { folded, map } = foldWithMap(text);
+  const found: [number, number][] = [];
+  for (const term of terms) {
+    for (let from = 0; ; ) {
+      const i = folded.indexOf(term, from);
+      if (i < 0) break;
+      const start = map[i];
+      const end = map[i + term.length];
+      if (start !== undefined && end !== undefined && end > start) found.push([start, end]);
+      from = i + term.length;
+    }
+  }
+  found.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const merged: [number, number][] = [];
+  for (const r of found) {
+    const last = merged[merged.length - 1];
+    if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]);
+    else merged.push([r[0], r[1]]);
+  }
+  return merged;
+}

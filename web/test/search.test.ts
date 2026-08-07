@@ -3,7 +3,7 @@
 import { test, expect } from "bun:test";
 import devotions from "../../data/devotions.json";
 import { buildModel, type DevotionsDoc } from "../src/core/model";
-import { searchCorpus, matchQuery, normalize, type SearchIndex } from "../src/core/search";
+import { searchCorpus, matchQuery, matchRanges, normalize, type SearchIndex } from "../src/core/search";
 import { makeLocalization, resolveText } from "../src/core/localization";
 import { condensedRows } from "../src/core/statFormat";
 import { resolveIndex } from "../src/adapters/searchIndex";
@@ -173,4 +173,67 @@ test("different locales resolve the same corpus to different index text", () => 
   expect(enIndex.constellations.get("crane")).toContain("crane");
   expect(deIndex.constellations.get("crane")).toContain("kranich");
   expect(enIndex.constellations.get("crane")).not.toEqual(deIndex.constellations.get("crane"));
+});
+
+// --- matchRanges: where a query hit lands in the ORIGINAL text, for highlighting ---
+
+const slice = (s: string, rs: [number, number][]) => rs.map(([a, b]) => s.slice(a, b));
+
+test("matchRanges finds a term inside a longer word", () => {
+  const s = "their valor and deeds never acknowledged";
+  expect(slice(s, matchRanges(s, "owl"))).toEqual(["owl"]);
+  expect(matchRanges(s, "owl")[0]![0]).toBe(s.indexOf("owl"));
+});
+
+test("matchRanges is case-insensitive but reports original-case ranges", () => {
+  const s = "Howl of Mogdrogen";
+  expect(slice(s, matchRanges(s, "OWL"))).toEqual(["owl"]);
+});
+
+test("matchRanges maps back through diacritic folding", () => {
+  // The fold changes length (NFD splits, then marks are dropped), so a naive index into the
+  // folded string would land on the wrong characters here.
+  const s = "Dégâts de Feu";
+  expect(slice(s, matchRanges(s, "degats"))).toEqual(["Dégâts"]);
+  expect(slice(s, matchRanges(s, "feu"))).toEqual(["Feu"]);
+});
+
+test("matchRanges reports every occurrence, and merges overlaps", () => {
+  const s = "fire and firefly";
+  expect(slice(s, matchRanges(s, "fire"))).toEqual(["fire", "fire"]);
+  // "fire" and "ref" overlap inside "firefly"; the merged range covers both.
+  expect(slice("firefly", matchRanges("firefly", "fire ref"))).toEqual(["firef"]);
+});
+
+test("matchRanges returns nothing for an empty query or an absent term", () => {
+  expect(matchRanges("Owl", "")).toEqual([]);
+  expect(matchRanges("Owl", "   ")).toEqual([]);
+  expect(matchRanges("Owl", "crane")).toEqual([]);
+});
+
+test("matchRanges ranges are sorted, non-overlapping, and in bounds", () => {
+  const s = "Fire Damage and Fire Resistance with fiery flair";
+  const rs = matchRanges(s, "fire re");
+  for (const [a, b] of rs) {
+    expect(a).toBeGreaterThanOrEqual(0);
+    expect(b).toBeLessThanOrEqual(s.length);
+    expect(a).toBeLessThan(b);
+  }
+  for (let i = 1; i < rs.length; i++) expect(rs[i]![0]).toBeGreaterThan(rs[i - 1]![1] - 1);
+});
+
+test("the highlight fold agrees with normalize across the real game text", () => {
+  // If these ever disagree, a match found by matchQuery would highlight the wrong characters.
+  // Checked against real strings in a diacritic-heavy locale, not just ASCII.
+  // Single tokens on purpose: a multi-word string used as a query splits into several terms and
+  // so cannot yield one range. What is under test here is the fold round trip, not term splitting.
+  const samples = ["Dégâts", "Résistance", "Thương", "所有类型伤害", "Straße", "İstanbul", "Owl", "Frostburn"];
+  for (const s of samples) {
+    // A term equal to the whole normalized string must select the whole original string.
+    const whole = normalize(s);
+    if (!whole.trim()) continue;
+    const rs = matchRanges(s, whole);
+    expect(rs.length).toBe(1);
+    expect(rs[0]).toEqual([0, s.length]);
+  }
 });
