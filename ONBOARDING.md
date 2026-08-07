@@ -74,6 +74,7 @@ dimming. Every page's full view state lives in its own URL hash
   -- committed datasets, each page's source of truth
 - `web/src/app/main.ts` -- planner entry point and wiring
 - `web/src/core/` -- pure planner logic: model, rules, reachability, aggregate, affinity
+- `web/src/core/search.ts` -- pure text-search corpus and matcher over the devotion map
 - `web/src/core/urlState.ts` -- encode/decode the planner's shareable URL-hash state
 - `web/src/adapters/` -- SVG render, sidebar, tooltip, HTTP, WASM resolver, and the
   shared localization/app-menu adapters every page uses
