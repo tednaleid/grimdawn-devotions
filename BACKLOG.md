@@ -729,15 +729,21 @@ artifact policy, item source, grimtools boundary).
   candidate game tags, verify against `Text_EN`, hand-curate only the misses;
   scales item stat labels to 13 locales without hand-authoring 700+ ids.
 
-## Game text tables drift from the installed game
+## Game text tables are stale against the current inputs
 
-`just i18n-tables` regenerated against the current Grim Dawn install drops
-`tagEnemyTrapA03` and `tagPetThermiteMineA01` from every `data/i18n/game.*.json`
-and adds `tagGDX3ItemAwakenedSetC202Name` to some locales. Those tags are still
-referenced by `data/monsters.json` / `data/devotions.json`, so the committed
-tables were built against an older game build than the one installed now. The
-2026-08-06 stat-label audit hand-inserted its single new tag rather than ship
-that unrelated churn. Decide whether the tables should be regenerated wholesale
-(and `data/monsters.json` re-parsed so the dropped tags stop being referenced),
-or whether the omissions are benign; `scripts/build_game_tables.py` already
-reports `omitted: N` per language.
+`data/i18n/game.*.json` has not been regenerated since `devotions.json` /
+`resistance-reduction.json` last changed, and one gap is user visible today:
+`tagGDX3ItemAwakenedSetC202Name` is referenced by `data/resistance-reduction.json`
+but exists only in `game.en.json`, so 12 locales fall back to English for that RR
+source name. A `just i18n-tables` run fixes it.
+
+The same run also drops `tagEnemyTrapA03` and `tagPetThermiteMineA01` from every
+locale. That is not game-version drift: both still exist in the installed game
+(`extracted/text_en`), and `grep -rl` finds them in no input file, only inside
+the generated tables themselves. They are orphans left over from an earlier
+input set, and a regen correctly stops emitting them.
+
+The 2026-08-06 stat-label audit hand-inserted its own single new tag rather than
+ship that unrelated churn inside a label commit. A deliberate wholesale
+regeneration pass is still worth doing; `scripts/build_game_tables.py` already
+reports `omitted: N` per language, which is the signal to check afterwards.
