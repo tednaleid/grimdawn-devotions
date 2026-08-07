@@ -747,3 +747,26 @@ The 2026-08-06 stat-label audit hand-inserted its own single new tag rather than
 ship that unrelated churn inside a label commit. A deliberate wholesale
 regeneration pass is still worth doing; `scripts/build_game_tables.py` already
 reports `omitted: N` per language, which is the signal to check afterwards.
+
+The 2026-08-06 constellation-description change hit the same problem at larger
+scale: adding `description_tag` made `collect_referenced_tags` newly pull in 105
+`tagDevotion_*Desc` keys, but a plain `just i18n-tables` run also carried the
+usual unrelated churn described above, plus more of it than in the label-audit
+case, since non-English locales differed from each other too, not just from
+`en`. Rather than ship that, the new keys were added to all 13 committed tables
+by hand-merging (`original` union `{new tagDevotion_*Desc keys}`), not by
+committing a literal `just i18n-tables` output. That means the committed tables
+are currently not byte-reproducible from `just i18n-tables` alone: re-running it
+will surface the same churn again, and that is expected, not a new regression.
+It is one more reason the wholesale regeneration pass above is worth doing: it
+would restore reproducibility.
+
+The non-English churn is larger than the English case because of an asymmetry
+in how each is sourced: `en` reads from the already-extracted, version-pinned
+`extracted/text_en`, while every other locale is re-extracted fresh from
+whatever `resources/Text_<LANG>.arc` the locally installed game currently ships,
+via `ArchiveTool`. When the local install has patched past the version
+`extracted/` and the committed data were built from, the non-English tables pick
+up that newer patch's text (renamed/added/removed item and enemy tags) while
+`en` does not, which is why cs/de/es/ja/ru/zh saw extra changes beyond
+`tagGDX3ItemAwakenedSetC202Name` and the two orphans.
