@@ -390,6 +390,10 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
     if name_tag and name_tag not in tags:
         warnings.append(f"{con_path.name}: unresolved name tag {name_tag}")
 
+    desc_tag = rec.get("constellationInfoTag", "").strip()
+    if desc_tag and desc_tag not in tags:
+        warnings.append(f"{con_path.name}: unresolved description tag {desc_tag}")
+
     # Tier from the star path prefix, e.g. tier1_01a -> 1
     tier = None
     m = re.search(r"tier(\d)_", button_refs[0])
@@ -451,6 +455,7 @@ def parse_constellation(db: DB, tags: dict[str, str], con_path: Path, warnings: 
     return {
         "id": con_id,
         "name_tag": resolved_name_tag,
+        "description_tag": register(desc_tag, clean_text(tags.get(desc_tag, "")), game_en) if desc_tag else None,
         "tier": tier,
         "dbr": str(con_path.relative_to(db.root)).replace("\\", "/"),
         "affinity_required": affinity_required,
@@ -520,6 +525,8 @@ def validate(constellations: list[dict], game_en: dict[str, str], warnings: list
     cons_no_bg = 0
     for c in constellations:
         referenced_tags.append((f"constellation {c['id']}", c["name_tag"]))
+        if c["description_tag"]:
+            referenced_tags.append((f"constellation {c['id']} desc", c["description_tag"]))
         if not c.get("background"):
             cons_no_bg += 1
         n = len(c["stars"])

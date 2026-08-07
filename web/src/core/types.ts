@@ -43,6 +43,7 @@ export interface Star {
 export interface Constellation {
   id: string;
   nameTag: string;
+  descriptionTag: string | null;
   tier: number | null;
   affinityRequired: AffinityMap;
   affinityBonus: AffinityMap;

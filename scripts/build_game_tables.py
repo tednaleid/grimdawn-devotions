@@ -47,6 +47,7 @@ def collect_referenced_tags(
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
+        _add(tags, c.get("description_tag"))
         for s in c.get("stars", []):
             cp = s.get("celestial_power")
             if cp:

@@ -3,7 +3,7 @@
     "game_version": "1.3.0.0",
     "steam_buildid": "24346246",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-07-23T21:24:45Z",
+    "generated_utc": "2026-08-07T00:52:34Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -16,6 +16,7 @@
     {
       "id": "akeron_s_scorpion",
       "name_tag": "tagDevotion_A02",
+      "description_tag": "tagDevotion_A02Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation02.dbr",
       "affinity_required": {
@@ -139,6 +140,7 @@
     {
       "id": "anvil",
       "name_tag": "tagDevotion_A05",
+      "description_tag": "tagDevotion_A05Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation05.dbr",
       "affinity_required": {
@@ -264,6 +266,7 @@
     {
       "id": "assassin_s_blade",
       "name_tag": "tagDevotion_A08",
+      "description_tag": "tagDevotion_A08Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation08.dbr",
       "affinity_required": {
@@ -380,6 +383,7 @@
     {
       "id": "bat",
       "name_tag": "tagDevotion_A01",
+      "description_tag": "tagDevotion_A01Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation01.dbr",
       "affinity_required": {
@@ -504,6 +508,7 @@
     {
       "id": "bull",
       "name_tag": "tagDevotion_A21",
+      "description_tag": "tagDevotion_A21Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation21.dbr",
       "affinity_required": {
@@ -630,6 +635,7 @@
     {
       "id": "crane",
       "name_tag": "tagDevotion_A31",
+      "description_tag": "tagDevotion_A31Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation31.dbr",
       "affinity_required": {
@@ -741,6 +747,7 @@
     {
       "id": "crossroads_primordial",
       "name_tag": "tagDevotion_A15",
+      "description_tag": "tagDevotion_A15Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation15.dbr",
       "affinity_required": {},
@@ -774,6 +781,7 @@
     {
       "id": "crossroads_chaos",
       "name_tag": "tagDevotion_A15",
+      "description_tag": "tagDevotion_A15Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation80.dbr",
       "affinity_required": {},
@@ -807,6 +815,7 @@
     {
       "id": "crossroads_order",
       "name_tag": "tagDevotion_A15",
+      "description_tag": "tagDevotion_A15Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation81.dbr",
       "affinity_required": {},
@@ -840,6 +849,7 @@
     {
       "id": "crossroads_eldritch",
       "name_tag": "tagDevotion_A15",
+      "description_tag": "tagDevotion_A15Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation82.dbr",
       "affinity_required": {},
@@ -873,6 +883,7 @@
     {
       "id": "crossroads_ascendant",
       "name_tag": "tagDevotion_A15",
+      "description_tag": "tagDevotion_A15Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation83.dbr",
       "affinity_required": {},
@@ -906,6 +917,7 @@
     {
       "id": "dryad",
       "name_tag": "tagDevotion_A26",
+      "description_tag": "tagDevotion_A26Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation26.dbr",
       "affinity_required": {
@@ -1030,6 +1042,7 @@
     {
       "id": "eel",
       "name_tag": "tagDevotion_A11",
+      "description_tag": "tagDevotion_A11Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation11.dbr",
       "affinity_required": {
@@ -1101,6 +1114,7 @@
     {
       "id": "empty_throne",
       "name_tag": "tagDevotion_A16",
+      "description_tag": "tagDevotion_A16Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation16.dbr",
       "affinity_required": {
@@ -1202,6 +1216,7 @@
     {
       "id": "eye_of_the_guardian",
       "name_tag": "tagDevotion_A09",
+      "description_tag": "tagDevotion_A09Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation09.dbr",
       "affinity_required": {
@@ -1327,6 +1342,7 @@
     {
       "id": "falcon",
       "name_tag": "tagDevotion_A10",
+      "description_tag": "tagDevotion_A10Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation10.dbr",
       "affinity_required": {
@@ -1449,6 +1465,7 @@
     {
       "id": "fiend",
       "name_tag": "tagDevotion_A20",
+      "description_tag": "tagDevotion_A20Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation20.dbr",
       "affinity_required": {
@@ -1578,6 +1595,7 @@
     {
       "id": "fox",
       "name_tag": "tagDevotion_A24",
+      "description_tag": "tagDevotion_A24Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation24.dbr",
       "affinity_required": {
@@ -1669,6 +1687,7 @@
     {
       "id": "gallows",
       "name_tag": "tagDevotion_A14",
+      "description_tag": "tagDevotion_A14Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation14.dbr",
       "affinity_required": {
@@ -1762,6 +1781,7 @@
     {
       "id": "ghoul",
       "name_tag": "tagDevotion_A25",
+      "description_tag": "tagDevotion_A25Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation25.dbr",
       "affinity_required": {
@@ -1884,6 +1904,7 @@
     {
       "id": "hammer",
       "name_tag": "tagDevotion_A04",
+      "description_tag": "tagDevotion_A04Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation04.dbr",
       "affinity_required": {
@@ -1956,6 +1977,7 @@
     {
       "id": "harpy",
       "name_tag": "tagDevotion_A23",
+      "description_tag": "tagDevotion_A23Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation23.dbr",
       "affinity_required": {
@@ -2046,6 +2068,7 @@
     {
       "id": "hawk",
       "name_tag": "tagDevotion_A27",
+      "description_tag": "tagDevotion_A27Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation27.dbr",
       "affinity_required": {
@@ -2122,6 +2145,7 @@
     {
       "id": "hound",
       "name_tag": "tagDevotion_A33",
+      "description_tag": "tagDevotion_A33Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation33.dbr",
       "affinity_required": {
@@ -2201,6 +2225,7 @@
     {
       "id": "imp",
       "name_tag": "tagDevotion_A19",
+      "description_tag": "tagDevotion_A19Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation19.dbr",
       "affinity_required": {
@@ -2322,6 +2347,7 @@
     {
       "id": "jackal",
       "name_tag": "tagDevotion_A38",
+      "description_tag": "tagDevotion_A38Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation86.dbr",
       "affinity_required": {
@@ -2399,6 +2425,7 @@
     {
       "id": "lion",
       "name_tag": "tagDevotion_A37",
+      "description_tag": "tagDevotion_A37Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation85.dbr",
       "affinity_required": {
@@ -2478,6 +2505,7 @@
     {
       "id": "lizard",
       "name_tag": "tagDevotion_A35",
+      "description_tag": "tagDevotion_A35Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation35.dbr",
       "affinity_required": {
@@ -2550,6 +2578,7 @@
     {
       "id": "lotus",
       "name_tag": "tagGDX2Devotion_A204",
+      "description_tag": "tagGDX2Devotion_A204Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation105.dbr",
       "affinity_required": {
@@ -2640,6 +2669,7 @@
     {
       "id": "mantis",
       "name_tag": "tagGDX2Devotion_A202",
+      "description_tag": "tagGDX2Devotion_A202Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation103.dbr",
       "affinity_required": {
@@ -2729,6 +2759,7 @@
     {
       "id": "nighttalon",
       "name_tag": "tagGDX2Devotion_A201",
+      "description_tag": "tagGDX2Devotion_A201Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation102.dbr",
       "affinity_required": {
@@ -2833,6 +2864,7 @@
     {
       "id": "owl",
       "name_tag": "tagDevotion_A12",
+      "description_tag": "tagDevotion_A12Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation12.dbr",
       "affinity_required": {
@@ -2933,6 +2965,7 @@
     {
       "id": "panther",
       "name_tag": "tagDevotion_A30",
+      "description_tag": "tagDevotion_A30Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation30.dbr",
       "affinity_required": {
@@ -3037,6 +3070,7 @@
     {
       "id": "quill",
       "name_tag": "tagGDX1Devotion_A103",
+      "description_tag": "tagGDX1Devotion_A103Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation90.dbr",
       "affinity_required": {
@@ -3124,6 +3158,7 @@
     {
       "id": "rat",
       "name_tag": "tagDevotion_A17",
+      "description_tag": "tagDevotion_A17Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation17.dbr",
       "affinity_required": {
@@ -3219,6 +3254,7 @@
     {
       "id": "raven",
       "name_tag": "tagDevotion_A03",
+      "description_tag": "tagDevotion_A03Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation03.dbr",
       "affinity_required": {
@@ -3316,6 +3352,7 @@
     {
       "id": "sailor_s_guide",
       "name_tag": "tagDevotion_A07",
+      "description_tag": "tagDevotion_A07Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation07.dbr",
       "affinity_required": {
@@ -3403,6 +3440,7 @@
     {
       "id": "scarab",
       "name_tag": "tagGDX2Devotion_A203",
+      "description_tag": "tagGDX2Devotion_A203Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation104.dbr",
       "affinity_required": {
@@ -3493,6 +3531,7 @@
     {
       "id": "scholar_s_light",
       "name_tag": "tagDevotion_A36",
+      "description_tag": "tagDevotion_A36Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation84.dbr",
       "affinity_required": {
@@ -3564,6 +3603,7 @@
     {
       "id": "shepherd_s_crook",
       "name_tag": "tagDevotion_A06",
+      "description_tag": "tagDevotion_A06Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation06.dbr",
       "affinity_required": {
@@ -3691,6 +3731,7 @@
     {
       "id": "spider",
       "name_tag": "tagDevotion_A34",
+      "description_tag": "tagDevotion_A34Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation34.dbr",
       "affinity_required": {
@@ -3795,6 +3836,7 @@
     {
       "id": "stag",
       "name_tag": "tagGDX1Devotion_A101",
+      "description_tag": "tagGDX1Devotion_A101Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation88.dbr",
       "affinity_required": {
@@ -3904,6 +3946,7 @@
     {
       "id": "toad",
       "name_tag": "tagGDX1Devotion_A104",
+      "description_tag": "tagGDX1Devotion_A104Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation91.dbr",
       "affinity_required": {
@@ -4009,6 +4052,7 @@
     {
       "id": "tortoise",
       "name_tag": "tagDevotion_A29",
+      "description_tag": "tagDevotion_A29Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation29.dbr",
       "affinity_required": {
@@ -4128,6 +4172,7 @@
     {
       "id": "tsunami",
       "name_tag": "tagDevotion_A18",
+      "description_tag": "tagDevotion_A18Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation18.dbr",
       "affinity_required": {
@@ -4255,6 +4300,7 @@
     {
       "id": "viper",
       "name_tag": "tagDevotion_A13",
+      "description_tag": "tagDevotion_A13Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation13.dbr",
       "affinity_required": {
@@ -4345,6 +4391,7 @@
     {
       "id": "vulture",
       "name_tag": "tagDevotion_A32",
+      "description_tag": "tagDevotion_A32Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation32.dbr",
       "affinity_required": {
@@ -4453,6 +4500,7 @@
     {
       "id": "wolverine",
       "name_tag": "tagDevotion_A28",
+      "description_tag": "tagDevotion_A28Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation28.dbr",
       "affinity_required": {
@@ -4577,6 +4625,7 @@
     {
       "id": "wraith",
       "name_tag": "tagDevotion_A22",
+      "description_tag": "tagDevotion_A22Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation22.dbr",
       "affinity_required": {
@@ -4673,6 +4722,7 @@
     {
       "id": "wretch",
       "name_tag": "tagGDX1Devotion_A102",
+      "description_tag": "tagGDX1Devotion_A102Desc",
       "tier": 1,
       "dbr": "records/ui/skills/devotion/constellations/constellation89.dbr",
       "affinity_required": {
@@ -4766,6 +4816,7 @@
     {
       "id": "affliction",
       "name_tag": "tagDevotion_B16",
+      "description_tag": "tagDevotion_B16Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation51.dbr",
       "affinity_required": {
@@ -4940,6 +4991,7 @@
     {
       "id": "alladrah_s_phoenix",
       "name_tag": "tagGDX1Devotion_B103",
+      "description_tag": "tagGDX1Devotion_B103Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation94.dbr",
       "affinity_required": {
@@ -5072,6 +5124,7 @@
     {
       "id": "amatok_the_spirit_of_winter",
       "name_tag": "tagDevotion_B15",
+      "description_tag": "tagDevotion_B15Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation50.dbr",
       "affinity_required": {
@@ -5237,6 +5290,7 @@
     {
       "id": "assassin",
       "name_tag": "tagDevotion_B06",
+      "description_tag": "tagDevotion_B06Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation41.dbr",
       "affinity_required": {
@@ -5398,6 +5452,7 @@
     {
       "id": "autumn_boar",
       "name_tag": "tagDevotion_B08",
+      "description_tag": "tagDevotion_B08Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation43.dbr",
       "affinity_required": {
@@ -5563,6 +5618,7 @@
     {
       "id": "bard_s_harp",
       "name_tag": "tagGDX1Devotion_B105",
+      "description_tag": "tagGDX1Devotion_B105Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation96.dbr",
       "affinity_required": {
@@ -5713,6 +5769,7 @@
     {
       "id": "behemoth",
       "name_tag": "tagDevotion_B28",
+      "description_tag": "tagDevotion_B28Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation63.dbr",
       "affinity_required": {
@@ -5861,6 +5918,7 @@
     {
       "id": "berserker",
       "name_tag": "tagDevotion_B25",
+      "description_tag": "tagDevotion_B25Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation60.dbr",
       "affinity_required": {
@@ -6032,6 +6090,7 @@
     {
       "id": "blades_of_nadaan",
       "name_tag": "tagDevotion_B23",
+      "description_tag": "tagDevotion_B23Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation58.dbr",
       "affinity_required": {
@@ -6188,6 +6247,7 @@
     {
       "id": "bysmiel_s_bonds",
       "name_tag": "tagDevotion_B12",
+      "description_tag": "tagDevotion_B12Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation47.dbr",
       "affinity_required": {
@@ -6333,6 +6393,7 @@
     {
       "id": "chariot_of_the_dead",
       "name_tag": "tagDevotion_B29",
+      "description_tag": "tagDevotion_B29Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation64.dbr",
       "affinity_required": {
@@ -6488,6 +6549,7 @@
     {
       "id": "crab",
       "name_tag": "tagDevotion_B17",
+      "description_tag": "tagDevotion_B17Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation52.dbr",
       "affinity_required": {
@@ -6611,6 +6673,7 @@
     {
       "id": "dire_bear",
       "name_tag": "tagDevotion_B05",
+      "description_tag": "tagDevotion_B05Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation40.dbr",
       "affinity_required": {
@@ -6750,6 +6813,7 @@
     {
       "id": "harvestman_s_scythe",
       "name_tag": "tagDevotion_B31",
+      "description_tag": "tagDevotion_B31Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation79.dbr",
       "affinity_required": {
@@ -6878,6 +6942,7 @@
     {
       "id": "huntress",
       "name_tag": "tagDevotion_B04",
+      "description_tag": "tagDevotion_B04Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation39.dbr",
       "affinity_required": {
@@ -7055,6 +7120,7 @@
     {
       "id": "hydra",
       "name_tag": "tagDevotion_B22",
+      "description_tag": "tagDevotion_B22Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation57.dbr",
       "affinity_required": {
@@ -7219,6 +7285,7 @@
     {
       "id": "hyrian_guardian_of_the_celestial_gates",
       "name_tag": "tagGDX2Devotion_B202",
+      "description_tag": "tagGDX2Devotion_B202Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation107.dbr",
       "affinity_required": {
@@ -7371,6 +7438,7 @@
     {
       "id": "kraken",
       "name_tag": "tagDevotion_B21",
+      "description_tag": "tagDevotion_B21Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation56.dbr",
       "affinity_required": {
@@ -7525,6 +7593,7 @@
     {
       "id": "magi",
       "name_tag": "tagDevotion_B07",
+      "description_tag": "tagDevotion_B07Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation42.dbr",
       "affinity_required": {
@@ -7688,6 +7757,7 @@
     {
       "id": "manticore",
       "name_tag": "tagDevotion_B18",
+      "description_tag": "tagDevotion_B18Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation53.dbr",
       "affinity_required": {
@@ -7849,6 +7919,7 @@
     {
       "id": "messenger_of_war",
       "name_tag": "tagDevotion_B20",
+      "description_tag": "tagDevotion_B20Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation55.dbr",
       "affinity_required": {
@@ -7990,6 +8061,7 @@
     {
       "id": "murmur_mistress_of_rumors",
       "name_tag": "tagGDX1Devotion_B101",
+      "description_tag": "tagGDX1Devotion_B101Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation92.dbr",
       "affinity_required": {
@@ -8132,6 +8204,7 @@
     {
       "id": "oklaine_s_lantern",
       "name_tag": "tagDevotion_B26",
+      "description_tag": "tagDevotion_B26Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation61.dbr",
       "affinity_required": {
@@ -8272,6 +8345,7 @@
     {
       "id": "revenant",
       "name_tag": "tagDevotion_B10",
+      "description_tag": "tagDevotion_B10Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation45.dbr",
       "affinity_required": {
@@ -8424,6 +8498,7 @@
     {
       "id": "rhowan_s_crown",
       "name_tag": "tagDevotion_B01",
+      "description_tag": "tagDevotion_B01Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation36.dbr",
       "affinity_required": {
@@ -8564,6 +8639,7 @@
     {
       "id": "rhowan_s_scepter",
       "name_tag": "tagDevotion_B24",
+      "description_tag": "tagDevotion_B24Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation59.dbr",
       "affinity_required": {
@@ -8728,6 +8804,7 @@
     {
       "id": "scales_of_ulcama",
       "name_tag": "tagDevotion_B02",
+      "description_tag": "tagDevotion_B02Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation37.dbr",
       "affinity_required": {
@@ -8868,6 +8945,7 @@
     {
       "id": "shieldmaiden",
       "name_tag": "tagDevotion_B27",
+      "description_tag": "tagDevotion_B27Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation62.dbr",
       "affinity_required": {
@@ -9024,6 +9102,7 @@
     {
       "id": "solael_s_witchblade",
       "name_tag": "tagDevotion_B11",
+      "description_tag": "tagDevotion_B11Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation46.dbr",
       "affinity_required": {
@@ -9149,6 +9228,7 @@
     {
       "id": "solemn_watcher",
       "name_tag": "tagDevotion_B19",
+      "description_tag": "tagDevotion_B19Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation54.dbr",
       "affinity_required": {
@@ -9253,6 +9333,7 @@
     {
       "id": "staff_of_rattosh",
       "name_tag": "tagGDX1Devotion_B102",
+      "description_tag": "tagGDX1Devotion_B102Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation93.dbr",
       "affinity_required": {
@@ -9399,6 +9480,7 @@
     {
       "id": "targo_the_builder",
       "name_tag": "tagDevotion_B14",
+      "description_tag": "tagDevotion_B14Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation49.dbr",
       "affinity_required": {
@@ -9554,6 +9636,7 @@
     {
       "id": "tempest",
       "name_tag": "tagDevotion_B13",
+      "description_tag": "tagDevotion_B13Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation48.dbr",
       "affinity_required": {
@@ -9717,6 +9800,7 @@
     {
       "id": "typhos_the_jailor_of_souls",
       "name_tag": "tagGDX1Devotion_B104",
+      "description_tag": "tagGDX1Devotion_B104Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation95.dbr",
       "affinity_required": {
@@ -9866,6 +9950,7 @@
     {
       "id": "ulo_the_keeper_of_the_waters",
       "name_tag": "tagDevotion_B30",
+      "description_tag": "tagDevotion_B30Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation65.dbr",
       "affinity_required": {
@@ -10006,6 +10091,7 @@
     {
       "id": "ulzaad_herald_of_korvaak",
       "name_tag": "tagGDX2Devotion_B201",
+      "description_tag": "tagGDX2Devotion_B201Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation106.dbr",
       "affinity_required": {
@@ -10152,6 +10238,7 @@
     {
       "id": "wendigo",
       "name_tag": "tagDevotion_B03",
+      "description_tag": "tagDevotion_B03Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation38.dbr",
       "affinity_required": {
@@ -10293,6 +10380,7 @@
     {
       "id": "widow",
       "name_tag": "tagDevotion_B09",
+      "description_tag": "tagDevotion_B09Desc",
       "tier": 2,
       "dbr": "records/ui/skills/devotion/constellations/constellation44.dbr",
       "affinity_required": {
@@ -10434,6 +10522,7 @@
     {
       "id": "abomination",
       "name_tag": "tagDevotion_C02",
+      "description_tag": "tagDevotion_C02Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation67.dbr",
       "affinity_required": {
@@ -10630,6 +10719,7 @@
     {
       "id": "aeon_s_hourglass",
       "name_tag": "tagDevotion_C01",
+      "description_tag": "tagDevotion_C01Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation66.dbr",
       "affinity_required": {
@@ -10771,6 +10861,7 @@
     {
       "id": "attak_seru_the_mirage",
       "name_tag": "tagGDX1Devotion_C104",
+      "description_tag": "tagGDX1Devotion_C104Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation100.dbr",
       "affinity_required": {
@@ -10914,6 +11005,7 @@
     {
       "id": "azrakaa_the_eternal_sands",
       "name_tag": "tagGDX2Devotion_C202",
+      "description_tag": "tagGDX2Devotion_C202Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation109.dbr",
       "affinity_required": {
@@ -11061,6 +11153,7 @@
     {
       "id": "blind_sage",
       "name_tag": "tagDevotion_C11",
+      "description_tag": "tagDevotion_C11Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation76.dbr",
       "affinity_required": {
@@ -11224,6 +11317,7 @@
     {
       "id": "dying_god",
       "name_tag": "tagDevotion_C08",
+      "description_tag": "tagDevotion_C08Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation73.dbr",
       "affinity_required": {
@@ -11395,6 +11489,7 @@
     {
       "id": "ishtak_the_spring_maiden",
       "name_tag": "tagGDX1Devotion_C102",
+      "description_tag": "tagGDX1Devotion_C102Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation98.dbr",
       "affinity_required": {
@@ -11549,6 +11644,7 @@
     {
       "id": "korvaak_the_eldritch_sun",
       "name_tag": "tagGDX2Devotion_C201",
+      "description_tag": "tagGDX2Devotion_C201Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation108.dbr",
       "affinity_required": {
@@ -11711,6 +11807,7 @@
     {
       "id": "leviathan",
       "name_tag": "tagDevotion_C12",
+      "description_tag": "tagDevotion_C12Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation77.dbr",
       "affinity_required": {
@@ -11870,6 +11967,7 @@
     {
       "id": "light_of_empyrion",
       "name_tag": "tagDevotion_C03",
+      "description_tag": "tagDevotion_C03Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation68.dbr",
       "affinity_required": {
@@ -12037,6 +12135,7 @@
     {
       "id": "mogdrogen_the_wolf",
       "name_tag": "tagDevotion_C10",
+      "description_tag": "tagDevotion_C10Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation75.dbr",
       "affinity_required": {
@@ -12203,6 +12302,7 @@
     {
       "id": "obelisk_of_menhir",
       "name_tag": "tagDevotion_C05",
+      "description_tag": "tagDevotion_C05Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation70.dbr",
       "affinity_required": {
@@ -12358,6 +12458,7 @@
     {
       "id": "oleron",
       "name_tag": "tagDevotion_C04",
+      "description_tag": "tagDevotion_C04Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation69.dbr",
       "affinity_required": {
@@ -12523,6 +12624,7 @@
     {
       "id": "rattosh_the_veilwarden",
       "name_tag": "tagGDX1Devotion_C105",
+      "description_tag": "tagGDX1Devotion_C105Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation101.dbr",
       "affinity_required": {
@@ -12665,6 +12767,7 @@
     {
       "id": "spear_of_the_heavens",
       "name_tag": "tagDevotion_C06",
+      "description_tag": "tagDevotion_C06Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation71.dbr",
       "affinity_required": {
@@ -12807,6 +12910,7 @@
     {
       "id": "tree_of_life",
       "name_tag": "tagDevotion_C09",
+      "description_tag": "tagDevotion_C09Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation74.dbr",
       "affinity_required": {
@@ -12964,6 +13068,7 @@
     {
       "id": "ultos_shepherd_of_storms",
       "name_tag": "tagGDX1Devotion_C101",
+      "description_tag": "tagGDX1Devotion_C101Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation97.dbr",
       "affinity_required": {
@@ -13108,6 +13213,7 @@
     {
       "id": "ulzuin_s_torch",
       "name_tag": "tagDevotion_C07",
+      "description_tag": "tagDevotion_C07Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation72.dbr",
       "affinity_required": {
@@ -13271,6 +13377,7 @@
     {
       "id": "unknown_soldier",
       "name_tag": "tagDevotion_C13",
+      "description_tag": "tagDevotion_C13Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation78.dbr",
       "affinity_required": {
@@ -13436,6 +13543,7 @@
     {
       "id": "vire_the_stone_matron",
       "name_tag": "tagGDX1Devotion_C103",
+      "description_tag": "tagGDX1Devotion_C103Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation99.dbr",
       "affinity_required": {
@@ -13583,6 +13691,7 @@
     {
       "id": "yugol_the_insatiable_night",
       "name_tag": "tagGDX2Devotion_C203",
+      "description_tag": "tagGDX2Devotion_C203Desc",
       "tier": 3,
       "dbr": "records/ui/skills/devotion/constellations/constellation110.dbr",
       "affinity_required": {
