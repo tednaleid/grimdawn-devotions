@@ -8,6 +8,14 @@ const MIN_CAP = 1;
 const MAX_CAP = 55;
 const MAX_QUERY = 100; // a shared link carries a search box's worth of text, not a document
 
+/**
+ * The one normal form for a search query: trimmed and capped. Both hash directions apply it, and
+ * so must any live in-memory copy, or what the user sees and what a copied link restores diverge.
+ */
+export function normalizeQuery(q: string): string {
+  return q.trim().slice(0, MAX_QUERY);
+}
+
 /** Stable ordering of every star id: constellation insertion order, then star index. */
 export function canonicalStarIds(model: DevotionModel): StarId[] {
   const out: StarId[] = [];
@@ -125,7 +133,7 @@ export function encodeHash(
     out += `&cs=${encodeBitset(baseline.selected, canonical)}&cp=${bcap}`;
   }
   // Only when a search is active, same as b=; an empty box leaves the hash as it was.
-  const q = query.trim().slice(0, MAX_QUERY);
+  const q = normalizeQuery(query);
   if (q) out += `&q=${encodeURIComponent(q)}`;
   return out;
 }
@@ -175,14 +183,11 @@ export function decodeHash(
     baseline = { selected: baseSel, pointCap: bcap };
   }
 
-  // URLSearchParams throws on a malformed escape; a bad q means "no search", like every
-  // other param's tolerance, never a broken page.
-  let query = "";
-  try {
-    query = (params.get("q") ?? "").trim().slice(0, MAX_QUERY);
-  } catch {
-    query = "";
-  }
+  // No try/catch here on purpose: URLSearchParams.get() does not throw on a malformed escape,
+  // it substitutes U+FFFD (decodeURIComponent is the one that throws, and it is not called).
+  // Tolerance comes from the normal form instead: a missing q is "", and an oversized or
+  // padded one is trimmed and capped rather than rejected.
+  const query = normalizeQuery(params.get("q") ?? "");
 
   return { selected, pointCap, benefits, baseline, query };
 }

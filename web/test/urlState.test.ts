@@ -181,8 +181,13 @@ test("an overlong query is truncated, not rejected", () => {
   expect(decoded.query.length).toBe(100);
 });
 
-test("a malformed percent-escape decodes to an empty query rather than throwing", () => {
+test("a malformed percent-escape decodes to a harmless query rather than throwing", () => {
   expect(() => decodeHash("p=55&s=&q=%E0%A4%A", canonical, statCanonical)).not.toThrow();
+  // URLSearchParams substitutes U+FFFD for the bad escape instead of throwing, so the query
+  // survives as unmatchable text; the rest of the hash still decodes.
+  const decoded = decodeHash("p=55&s=&q=%E0%A4%A", canonical, statCanonical)!;
+  expect(decoded.query).toBe("�%A");
+  expect(decoded.pointCap).toBe(55);
 });
 
 test("a query containing & and = round-trips intact", () => {
