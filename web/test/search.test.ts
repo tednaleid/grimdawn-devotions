@@ -5,6 +5,7 @@ import devotions from "../../data/devotions.json";
 import { buildModel, type DevotionsDoc } from "../src/core/model";
 import { searchCorpus, matchQuery, normalize, type SearchIndex } from "../src/core/search";
 import { makeLocalization, resolveText } from "../src/core/localization";
+import { condensedRows } from "../src/core/statFormat";
 import appEn from "../src/i18n/app.en.json";
 
 const model = buildModel(devotions as unknown as DevotionsDoc);
@@ -41,6 +42,40 @@ test('a star with pet bonuses carries the pet section label so "pet" matches', (
   expect(text).toContain("pet");
 });
 
+test("a star with a celestial power carries its power description", () => {
+  const corpus = searchCorpus(model);
+  const star = [...model.stars.values()].find((s) => s.celestialPower?.descriptionTag)!;
+  const tags = corpus.stars
+    .get(star.id)!
+    .filter((p) => p.k === "game")
+    .map((p) => (p as { tag: string }).tag);
+  expect(tags).toContain(star.celestialPower!.descriptionTag!);
+});
+
+test("a star with a weapon requirement carries its weapon requirement text", () => {
+  const corpus = searchCorpus(model);
+  const star = [...model.stars.values()].find((s) => s.weaponRequirement?.descriptionTag)!;
+  const tags = corpus.stars
+    .get(star.id)!
+    .filter((p) => p.k === "game")
+    .map((p) => (p as { tag: string }).tag);
+  expect(tags).toContain(star.weaponRequirement!.descriptionTag!);
+});
+
+test("a plain star's corpus entry is exactly its condensed bonus subjects - no values, nothing extra", () => {
+  const corpus = searchCorpus(model);
+  const star = [...model.stars.values()].find(
+    (s) =>
+      Object.keys(s.bonuses).length > 0 &&
+      s.petBonuses === undefined &&
+      s.celestialPower === null &&
+      !s.weaponRequirement?.descriptionTag,
+  )!;
+  const opts = star.racialTarget ? { racialTarget: star.racialTarget } : {};
+  const expected = condensedRows(star.bonuses, opts).flatMap((g) => g.subjects.map((sub) => sub.subject));
+  expect(corpus.stars.get(star.id)).toEqual(expected);
+});
+
 function idx(stars: Record<string, string>, cons: Record<string, string> = {}): SearchIndex {
   return {
     constellations: new Map(Object.entries(cons).map(([k, v]) => [k, normalize(v)])),
@@ -67,7 +102,11 @@ test("an empty or whitespace query matches nothing", () => {
 
 test("constellation and star matches are reported separately", () => {
   const i = idx({ a: "Fire Damage" }, { owl: "Owl" });
-  const m = matchQuery(i, "owl");
-  expect([...m.constellations]).toEqual(["owl"]);
-  expect(m.stars.size).toBe(0);
+  const constellationHit = matchQuery(i, "owl");
+  expect([...constellationHit.constellations]).toEqual(["owl"]);
+  expect(constellationHit.stars.size).toBe(0);
+
+  const starHit = matchQuery(i, "fire");
+  expect([...starHit.stars]).toEqual(["a"]);
+  expect(starHit.constellations.size).toBe(0);
 });
