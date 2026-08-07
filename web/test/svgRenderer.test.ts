@@ -312,8 +312,27 @@ test("a matched constellation with art gets a search-glow halo", () => {
     { manifest, conHighlight: new Set([withArt.id]) },
   );
   expect(markup).toContain('filter id="search-glow"');
-  expect(markup).toContain(`class="search-glow"`);
-  expect(markup).toContain(`mask="url(#mask-${withArt.id})"`);
+  // The mask must sit on the rect and the filter on a wrapping <g>. Both on one element makes SVG
+  // clip the blur back to the art silhouette (filter runs before masking), so no aura escapes the
+  // shape and the halo is invisible. This assertion is what keeps that regression out.
+  expect(markup).toMatch(
+    new RegExp(
+      `<g filter="url\\(#search-glow\\)"><rect class="search-glow"[^>]*mask="url\\(#mask-${withArt.id}\\)"[^>]*/></g>`,
+    ),
+  );
+  expect(markup).not.toMatch(/<rect class="search-glow"[^>]*filter="url\(#search-glow\)"/);
+});
+
+test("the search halo paints under the art, not over it", () => {
+  // A surrounding glow drawn on top of thin line art washes it out; the affinity halo wants the
+  // opposite (it flushes after the art so its colour reads through), so the two orderings differ.
+  const withArt = [...model.constellations.values()].find((c) => c.background?.image)!;
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest, conHighlight: new Set([withArt.id]) },
+  );
+  expect(markup.indexOf('class="search-glow"')).toBeLessThan(markup.indexOf('class="art'));
 });
 
 test("an unmatched constellation gets no halo", () => {
@@ -346,6 +365,8 @@ test("a matched constellation muted by an affinity filter still gets its halo, w
     },
   );
   expect(markup).toMatch(
-    new RegExp(`<g filter="url\\(#mute-wide\\)"><rect class="search-glow"[^>]*mask="url\\(#mask-${offCon.id}\\)"`),
+    new RegExp(
+      `<g filter="url\\(#mute-wide\\)"><g filter="url\\(#search-glow\\)"><rect class="search-glow"[^>]*mask="url\\(#mask-${offCon.id}\\)"`,
+    ),
   );
 });

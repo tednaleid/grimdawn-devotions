@@ -217,17 +217,21 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     );
   }
 
-  // Search-match halo filter def: same construction as #aff-glow (wide blur, stacked merge for alpha
-  // density) but flooded with #match-glow's neutral blue/white, so a search match reads identically
-  // whether it lands on a star or a whole constellation, and never reads as an affinity colour. Only
-  // emitted when a search is actually active (mirrors #aff-glow/#mute being gated on affFilter above).
+  // Search-match halo filter def: flooded with #match-glow's neutral blue so a search match reads
+  // identically whether it lands on a star or a whole constellation, and never as an affinity colour.
+  // Only emitted when a search is active (mirrors #aff-glow/#mute being gated on affFilter above).
+  //
+  // Blue only, no tight white core: constellation art is thin line work, so a small-radius blur bleeds
+  // inward across the strokes and floods the silhouette white instead of rimming it. stdDeviation is in
+  // user units against art roughly 250x380, so ~22 hugs the shape; the 45 this started at read as
+  // background fog rather than a highlight.
   const conMatched = opts.conHighlight;
   if (conMatched && conMatched.size > 0) {
     defs.push(
       `<filter id="search-glow" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">` +
-        `<feGaussianBlur in="SourceAlpha" stdDeviation="45" result="b"/>` +
+        `<feGaussianBlur in="SourceAlpha" stdDeviation="22" result="b"/>` +
         `<feFlood flood-color="#6cb6ff" result="c"/><feComposite in="c" in2="b" operator="in" result="g"/>` +
-        `<feMerge><feMergeNode in="g"/><feMergeNode in="g"/><feMergeNode in="g"/></feMerge>` +
+        `<feMerge><feMergeNode in="g"/><feMergeNode in="g"/><feMergeNode in="g"/><feMergeNode in="g"/></feMerge>` +
         `</filter>`,
     );
   }
@@ -280,8 +284,10 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     }
   }
 
-  // Search-match halo: a second layer pushed into the SAME haloParts array as the affinity halo above,
-  // so both flush on top of the art together (see the haloParts note below the art layer).
+  // Search-match halo: an aura AROUND the constellation, flushed UNDER the art (unlike the affinity
+  // halo, which paints on top so its colour reads through the line work). A surrounding glow painted
+  // over thin line art washes it out; painted under, the aura surrounds and the art stays crisp.
+  const searchHaloParts: string[] = [];
   if (opts.manifest && conMatched && conMatched.size > 0) {
     for (const c of model.constellations.values()) {
       const cd0 = constellationDisplay(c, settings);
@@ -294,14 +300,23 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       // Feels the brightness channel like the affinity halo: a matched constellation you cannot
       // reach still glows, but dimmer, so reachability keeps reading under a search.
       const op = cd0.brightness === "unattainable" ? HALO_UNREACHABLE_OPACITY : 1;
+      // The mask goes on the rect and the filter on a wrapping <g>, and that split is the whole
+      // trick. SVG applies filter BEFORE masking, so with both on one element the blur spreads and
+      // is then clipped straight back to the art silhouette - no aura can escape the shape, which
+      // is why this first shipped as an invisible inner tint. Masking the child and filtering the
+      // parent blurs the already-masked paint, letting it bleed outward.
       const glow =
+        `<g filter="url(#search-glow)">` +
         `<rect class="search-glow" opacity="${op}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" ` +
-        `fill="#6cb6ff" mask="url(#mask-${c.id})" filter="url(#search-glow)"/>`;
+        `fill="#6cb6ff" mask="url(#mask-${c.id})"/>` +
+        `</g>`;
       // Off-filter constellations desaturate like an off-filter star's benefit glow does, so the
       // halo reads as "matched, off-filter" instead of vanishing.
-      haloParts.push(cd0.color.kind === "mute" ? `<g filter="url(#mute-wide)">${glow}</g>` : glow);
+      searchHaloParts.push(cd0.color.kind === "mute" ? `<g filter="url(#mute-wide)">${glow}</g>` : glow);
     }
   }
+  // Under the art, per the note above. The affinity halo's own flush stays after it.
+  parts.push(...searchHaloParts);
 
   // Layer 1: optional art, tinted by the constellation's identity (granted) colors.
   // The tint rect is only drawn for constellations that have an affinity requirement
