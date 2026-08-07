@@ -221,17 +221,25 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   // identically whether it lands on a star or a whole constellation, and never as an affinity colour.
   // Only emitted when a search is active (mirrors #aff-glow/#mute being gated on affFilter above).
   //
-  // Blue only, no tight white core: constellation art is thin line work, so a small-radius blur bleeds
-  // inward across the strokes and floods the silhouette white instead of rimming it. stdDeviation is in
-  // user units against art roughly 250x380, so ~22 hugs the shape; the 45 this started at read as
-  // background fog rather than a highlight.
+  // Two blue bands: a near one (16) for brightness against the silhouette, a far one (38) for reach.
+  // Both flooded #6cb6ff, no white core - white washes even under the art, and on thin line work a
+  // small-radius blur bleeds inward across the strokes and floods the shape rather than rimming it.
+  // stdDeviation is in user units against art roughly 250x380. The merge stacking is what carries
+  // brightness: a wide blur thins alpha, so reach and intensity have to be bought separately. Pushing
+  // this hard is only safe because the halo paints UNDER the art (see the searchHaloParts flush).
+  // The filter region is widened past the usual 300% or the far band clips at the edges.
   const conMatched = opts.conHighlight;
   if (conMatched && conMatched.size > 0) {
     defs.push(
-      `<filter id="search-glow" x="-100%" y="-100%" width="300%" height="300%" color-interpolation-filters="sRGB">` +
-        `<feGaussianBlur in="SourceAlpha" stdDeviation="22" result="b"/>` +
-        `<feFlood flood-color="#6cb6ff" result="c"/><feComposite in="c" in2="b" operator="in" result="g"/>` +
-        `<feMerge><feMergeNode in="g"/><feMergeNode in="g"/><feMergeNode in="g"/><feMergeNode in="g"/></feMerge>` +
+      `<filter id="search-glow" x="-150%" y="-150%" width="400%" height="400%" color-interpolation-filters="sRGB">` +
+        `<feGaussianBlur in="SourceAlpha" stdDeviation="16" result="b1"/>` +
+        `<feFlood flood-color="#6cb6ff" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
+        `<feGaussianBlur in="SourceAlpha" stdDeviation="38" result="b2"/>` +
+        `<feFlood flood-color="#6cb6ff" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
+        `<feMerge>` +
+        `<feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g2"/>` +
+        `<feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="g1"/>` +
+        `</feMerge>` +
         `</filter>`,
     );
   }

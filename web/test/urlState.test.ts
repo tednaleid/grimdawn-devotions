@@ -217,3 +217,44 @@ test("adding a query does not disturb the other params", () => {
   expect([...decoded.benefits].sort()).toEqual([...benefits].sort());
   expect(decoded.query).toBe("acid");
 });
+
+// A hash is a shareable link people hand-edit and truncate. Every param is optional and each
+// one defaults on its own, so a partial hash restores a sensible planner rather than nothing.
+test("a query-only hash decodes, with the full point budget", () => {
+  const decoded = decodeHash("#q=owl", canonical, statCanonical)!;
+  expect(decoded).not.toBeNull();
+  expect(decoded.query).toBe("owl");
+  expect(decoded.pointCap).toBe(55);
+  expect(decoded.selected.size).toBe(0);
+  expect(decoded.benefits.size).toBe(0);
+});
+
+test("a missing p= defaults to the full 55 points, not the floor", () => {
+  // Number(null) is 0, which IS finite, so an absent p= used to slip past the isFinite guard
+  // and clamp to the 1-point minimum. A link without p= means "no cap was shared", not "one point".
+  expect(decodeHash("#s=", canonical)!.pointCap).toBe(55);
+  expect(decodeHash("#b=", canonical, statCanonical)!.pointCap).toBe(55);
+});
+
+test("an empty or unparseable p= defaults to 55", () => {
+  expect(decodeHash("#p=&s=", canonical)!.pointCap).toBe(55);
+  expect(decodeHash("#p=abc&s=", canonical)!.pointCap).toBe(55);
+});
+
+test("a missing cp= defaults the baseline to 55 too", () => {
+  const canon = canonicalStarIds(model);
+  const cur = new Set<StarId>([canon[0]!, canon[5]!]);
+  const base = new Set<StarId>([canon[0]!, canon[9]!]);
+  const full = encodeHash(cur, 55, canon, new Set(), [], { selected: base, pointCap: 40 });
+  const withoutCp = full.replace("&cp=40", "");
+  expect(decodeHash(withoutCp, canon)!.baseline!.pointCap).toBe(55);
+});
+
+test("p=0 is still the uncapped sentinel, not a missing value", () => {
+  expect(decodeHash("#p=0&s=", canonical)!.pointCap).toBe(Number.POSITIVE_INFINITY);
+});
+
+test("a hash with no recognized param still decodes to null", () => {
+  expect(decodeHash("#garbage", canonical)).toBeNull();
+  expect(decodeHash("#zzz=1", canonical)).toBeNull();
+});
