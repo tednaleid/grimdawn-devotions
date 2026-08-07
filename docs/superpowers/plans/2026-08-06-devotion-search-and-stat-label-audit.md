@@ -1384,7 +1384,7 @@ plural rules would mangle a bare count."
 
 **Interfaces:**
 - Consumes: catalog keys (Task 11), `SearchMatch` (Task 5)
-- Produces: `mountSearchPanel(el: HTMLElement, loc: Localization, opts: { initial: string; onInput(q: string): void }): SearchPanelHandle` where `SearchPanelHandle = { setCount(m: SearchMatch | null): void; setLocalization(loc: Localization): void; value(): string; setValue(q: string): void }`. Task 13 drives all four methods.
+- Produces: `mountSearchPanel(el: HTMLElement, loc: Localization, opts: { initial: string; onInput(q: string): void }): SearchPanelHandle` where `SearchPanelHandle = { setCount(m: SearchMatch | null): void; relocalize(loc: Localization): void; value(): string; setValue(q: string): void }`. Task 13 drives all four methods.
 
 - [ ] **Step 1: Split the aside in index.html**
 
@@ -1447,7 +1447,7 @@ import type { Localization } from "../ports/Localization";
 export interface SearchPanelHandle {
   /** null clears the line (empty query); a match renders counts or the empty state. */
   setCount(m: SearchMatch | null): void;
-  setLocalization(loc: Localization): void;
+  relocalize(loc: Localization): void;
   value(): string;
   setValue(q: string): void;
 }
@@ -1512,7 +1512,7 @@ export function mountSearchPanel(
       last = m;
       paintCount();
     },
-    setLocalization(next) {
+    relocalize(next) {
       localization = next;
       applyChrome();
       paintCount();
@@ -1710,7 +1710,7 @@ In the language picker's `onSelect` (~line 204) and the app menu's `onSelect`, a
 
 ```ts
       searchIndex = resolveIndex(localization, corpus);
-      searchPanel.setLocalization(localization);
+      searchPanel.relocalize(localization);
 ```
 
 In the `hashchange` handler (~line 901), after `applyHash(location.hash)`:
