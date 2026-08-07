@@ -71,6 +71,7 @@ function modelFromCons(
     constellations.set(spec.id, {
       id: spec.id,
       nameTag: spec.id,
+      descriptionTag: null,
       tier: null,
       affinityRequired,
       affinityBonus,

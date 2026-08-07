@@ -9,6 +9,15 @@ import { AFFINITIES } from "../src/core/types";
 import { glowColor, presentAffinities } from "../src/adapters/affinityColors";
 
 const model = buildModel(doc as any);
+// Shared manifest covering every constellation's art, for the search-halo tests below (they need
+// more than one constellation's art present at once to tell a matched one from an unmatched one).
+const manifest = {
+  images: Object.fromEntries(
+    [...model.constellations.values()]
+      .filter((c) => c.background?.image)
+      .map((c) => [c.background!.image!.split("/").pop()!, { url: "art.webp", w: 64, h: 64 }]),
+  ),
+};
 
 test("marks selected and selectable stars with classes and ids", () => {
   const markup = renderSvgMarkup(
@@ -288,4 +297,76 @@ test("a matching constellation emits a colored glow with its matched-color gradi
 test("no glow without an affinity filter", () => {
   const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest: null });
   expect(markup).not.toContain("aff-glow");
+});
+
+test("no search-glow layer when no query is active", () => {
+  const markup = renderSvgMarkup(model, { selected: new Set(), pointCap: 55 }, { manifest });
+  expect(markup).not.toContain("search-glow");
+});
+
+test("a matched constellation with art gets a search-glow halo", () => {
+  const withArt = [...model.constellations.values()].find((c) => c.background?.image)!;
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest, conHighlight: new Set([withArt.id]) },
+  );
+  expect(markup).toContain('filter id="search-glow"');
+  // The mask must sit on the rect and the filter on a wrapping <g>. Both on one element makes SVG
+  // clip the blur back to the art silhouette (filter runs before masking), so no aura escapes the
+  // shape and the halo is invisible. This assertion is what keeps that regression out.
+  expect(markup).toMatch(
+    new RegExp(
+      `<g filter="url\\(#search-glow\\)"><rect class="search-glow"[^>]*mask="url\\(#mask-${withArt.id}\\)"[^>]*/></g>`,
+    ),
+  );
+  expect(markup).not.toMatch(/<rect class="search-glow"[^>]*filter="url\(#search-glow\)"/);
+});
+
+test("the search halo paints under the art, not over it", () => {
+  // A surrounding glow drawn on top of thin line art washes it out; the affinity halo wants the
+  // opposite (it flushes after the art so its colour reads through), so the two orderings differ.
+  const withArt = [...model.constellations.values()].find((c) => c.background?.image)!;
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest, conHighlight: new Set([withArt.id]) },
+  );
+  expect(markup.indexOf('class="search-glow"')).toBeLessThan(markup.indexOf('class="art'));
+});
+
+test("an unmatched constellation gets no halo", () => {
+  const cons = [...model.constellations.values()].filter((c) => c.background?.image);
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest, conHighlight: new Set([cons[0]!.id]) },
+  );
+  // cons[1] (like almost every non-crossroads constellation) has an affinity requirement, so its
+  // mask is legitimately referenced by the unrelated art-tint rect (Layer 1) even when unmatched -
+  // a bare "mask=...(#mask-<id>)" substring check would false-fail on that. Assert specifically
+  // that no search-glow rect references it (this is what an over-broad emphasis loop would add).
+  expect(markup).not.toMatch(new RegExp(`<rect class="search-glow"[^>]*mask="url\\(#mask-${cons[1]!.id}\\)"`));
+});
+
+test("a matched constellation muted by an affinity filter still gets its halo, wrapped in mute-wide", () => {
+  // A constellation that does NOT grant the filtered affinity, so it fails the filter (mutes),
+  // but it is still a search match: the search halo must still draw, desaturated via #mute-wide.
+  const offCon = [...model.constellations.values()].find(
+    (c) => c.background?.image && (c.affinityBonus.chaos ?? 0) === 0,
+  )!;
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest,
+      affinityFilter: { grants: new Set(["chaos"]), requires: new Set() },
+      conHighlight: new Set([offCon.id]),
+    },
+  );
+  expect(markup).toMatch(
+    new RegExp(
+      `<g filter="url\\(#mute-wide\\)"><g filter="url\\(#search-glow\\)"><rect class="search-glow"[^>]*mask="url\\(#mask-${offCon.id}\\)"`,
+    ),
+  );
 });

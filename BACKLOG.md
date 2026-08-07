@@ -307,6 +307,22 @@ full design. Remaining work:
   ones) or re-author them to the game's wording. Distinct from the open-ended
   translation-quality stream: this is a small, enumerable English-correctness
   pass.
+- **Block-recovery label: record why it stays app-authored.**
+  `characterDefensiveBlockRecoveryReduction` keeps an app-authored
+  `stat.override.*` label even though a game format tag exists
+  (`tagCharDefensiveBlockRecoveryReductionR`), because that tag's range form
+  `-({%.0f0}-{%.0f1})%` is not reducible by `stripValueTokens` to a clean
+  prefix label. `statFormat.ts` carries a comment explaining why its sibling
+  `retaliationDamagePct` DID move to `STAT_FORMAT_TAGS` but says nothing about
+  why this one did not, so the next reader has to rediscover it. Write the
+  reasoning down beside the `OVERRIDES` entry. Related quirk found while
+  auditing the Polish catalog: the game ships two variants of this tag, the
+  single-value `tagCharDefensiveBlockRecoveryReduction` (which is what a
+  devotion star renders, since every devotion value is a scalar) and the
+  ranged `...ReductionR`; all 13 catalogs are sourced from the single-value
+  one. Pointer: `OVERRIDES` +
+  `stat.override.characterDefensiveBlockRecoveryReduction` in
+  `web/src/core/statFormat.ts`.
 - **Heal label full-template upgrade.** `characterHealIncreasePercent` is
   app-authored as the bare label "Increased Healing" because its game format
   string is value-suffix ("Healing Effects Increased by {v}%") and cannot
@@ -728,3 +744,90 @@ artifact policy, item source, grimtools boundary).
 - **Exception-only stat-label generator.** Decompose stat-id naming into
   candidate game tags, verify against `Text_EN`, hand-curate only the misses;
   scales item stat labels to 13 locales without hand-authoring 700+ ids.
+
+## Game text tables are stale against the current inputs
+
+`data/i18n/game.*.json` has not been regenerated since `devotions.json` /
+`resistance-reduction.json` last changed, and one gap is user visible today:
+`tagGDX3ItemAwakenedSetC202Name` is referenced by `data/resistance-reduction.json`
+but exists only in `game.en.json`, so 12 locales fall back to English for that RR
+source name. A `just i18n-tables` run fixes it.
+
+The same run also drops `tagEnemyTrapA03` and `tagPetThermiteMineA01` from every
+locale. That is not game-version drift: both still exist in the installed game
+(`extracted/text_en`), and `grep -rl` finds them in no input file, only inside
+the generated tables themselves. They are orphans left over from an earlier
+input set, and a regen correctly stops emitting them.
+
+The 2026-08-06 stat-label audit hand-inserted its own single new tag rather than
+ship that unrelated churn inside a label commit. A deliberate wholesale
+regeneration pass is still worth doing; `scripts/build_game_tables.py` already
+reports `omitted: N` per language, which is the signal to check afterwards.
+
+The 2026-08-06 constellation-description change hit the same problem at larger
+scale: adding `description_tag` made `collect_referenced_tags` newly pull in 105
+`tagDevotion_*Desc` keys, but a plain `just i18n-tables` run also carried the
+usual unrelated churn described above, plus more of it than in the label-audit
+case, since non-English locales differed from each other too, not just from
+`en`. Rather than ship that, the new keys were added to all 13 committed tables
+by hand-merging (`original` union `{new tagDevotion_*Desc keys}`), not by
+committing a literal `just i18n-tables` output. That means the committed tables
+are currently not byte-reproducible from `just i18n-tables` alone: re-running it
+will surface the same churn again, and that is expected, not a new regression.
+It is one more reason the wholesale regeneration pass above is worth doing: it
+would restore reproducibility.
+
+The non-English churn is larger than the English case because of an asymmetry
+in how each is sourced: `en` reads from the already-extracted, version-pinned
+`extracted/text_en`, while every other locale is re-extracted fresh from
+whatever `resources/Text_<LANG>.arc` the locally installed game currently ships,
+via `ArchiveTool`. When the local install has patched past the version
+`extracted/` and the committed data were built from, the non-English tables pick
+up that newer patch's text (renamed/added/removed item and enemy tags) while
+`en` does not, which is why cs/de/es/ja/ru/zh saw extra changes beyond
+`tagGDX3ItemAwakenedSetC202Name` and the two orphans.
+
+## Devotion search: follow-ups from the branch review
+
+The text search over the devotion map shipped (search box, corpus, per-locale
+index, map emphasis, `q=` in the hash). Four items the final review raised and
+the fix wave deliberately did not take:
+
+- **No e2e leg for the search wiring.** `web/src/app/main.ts`'s search wiring
+  (debounce, `replace`-mode hash writes, the `hashchange` re-sync of the box)
+  is the branch's only surface with no automated coverage: the core matcher,
+  the index, and the panel adapter are all unit tested, but nothing drives the
+  three together. `web/e2e/smoke.ts` is where that belongs - it already runs a
+  real browser and asserts across `history.back()`. Note `just e2e` is not in
+  CI, so this buys a repeatable local check rather than an enforced gate.
+- **One channel carries four names.** A search or benefit match travels as
+  `RenderOpts.highlight` / `conHighlight` -> `DisplaySettings.benefitMatch` /
+  `conMatch` -> `StarDisplay.benefitMatch` / `ConstellationDisplay.emphasis`.
+  Now that this is genuinely one channel at two granularities (star and
+  constellation), the names should converge on one word per granularity.
+  Pointers: `web/src/adapters/svgRenderer.ts`, `web/src/core/displayState.ts`,
+  and the call sites in `web/src/app/main.ts`.
+- **Search does not index the dimension word.** The corpus indexes
+  `condensedRows` subjects, so a star tooltip that renders "Duration" or
+  "Chance" as its dimension exposes a word the user can read but cannot search
+  for. Deciding whether to index dimensions means deciding whether "duration"
+  should match every duration-bearing star, which is a relevance question, not
+  a wiring one. Pointer: `searchCorpus` in `web/src/core/search.ts`.
+- **Shadowed `manifest` in the renderer test.** `web/test/svgRenderer.test.ts`
+  declares a module-level `manifest` and then five function-local
+  `const manifest` bindings with different dimensions, so a reader cannot tell
+  which one a given assertion uses without checking the scope. Rename the
+  shared one.
+
+## Data guard: the committed devotions.json actually carries descriptions
+
+`scripts/test_parse_devotions.py`'s `description_tag` assertions sit behind an
+`if records_dir.is_dir()` guard, and `just check` does not run the Python
+suites at all (`test-scripts` is a separate recipe; CI runs it at `ci.yml:38`).
+CI has no `extracted/`, so those assertions have never executed there. Nothing
+that always runs checks that the committed `data/devotions.json` carries
+constellation descriptions, which is what the app actually reads. Add a cheap
+assertion to the bun suite, which always runs: load the committed JSON and
+assert every constellation has a non-null `description_tag`. Pointer: the
+model/data tests under `web/test/`; the Python-side check is "every
+constellation has a description_tag" in `scripts/test_parse_devotions.py`.

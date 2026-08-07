@@ -54,7 +54,7 @@ exports[`characterization: en surfaces are stable 1`] = `
             "ids": [
               "offensiveTotalDamageModifier",
             ],
-            "key": "Offense:Total Damage",
+            "key": "Offense:All Damage",
             "rows": [
               {
                 "base": "—",
@@ -66,7 +66,7 @@ exports[`characterization: en surfaces are stable 1`] = `
                 "verdict": "up",
               },
             ],
-            "subject": "Total Damage",
+            "subject": "All Damage",
             "verdict": "up",
           },
         ],
@@ -298,6 +298,25 @@ exports[`characterization: en surfaces are stable 1`] = `
           },
           {
             "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:All Damage",
+            "rows": [
+              {
+                "base": "+15%",
+                "delta": "+30",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+45%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "up",
+              },
+            ],
+            "subject": "All Damage",
+            "verdict": "up",
+          },
+          {
+            "ids": [
               "offensiveSlowBleedingMin",
               "offensiveSlowBleedingModifier",
               "offensiveSlowBleedingDurationMin",
@@ -448,25 +467,6 @@ exports[`characterization: en surfaces are stable 1`] = `
               },
             ],
             "subject": "Poison",
-            "verdict": "up",
-          },
-          {
-            "ids": [
-              "offensiveTotalDamageModifier",
-            ],
-            "key": "Offense:Total Damage",
-            "rows": [
-              {
-                "base": "+15%",
-                "delta": "+30",
-                "id": "offensiveTotalDamageModifier",
-                "now": "+45%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "up",
-              },
-            ],
-            "subject": "Total Damage",
             "verdict": "up",
           },
           {
@@ -745,7 +745,7 @@ exports[`characterization: en surfaces are stable 1`] = `
             "ids": [
               "offensiveTotalDamageModifier",
             ],
-            "key": "Offense:Total Damage",
+            "key": "Offense:All Damage",
             "rows": [
               {
                 "base": "",
@@ -757,7 +757,7 @@ exports[`characterization: en surfaces are stable 1`] = `
                 "verdict": "",
               },
             ],
-            "subject": "Total Damage",
+            "subject": "All Damage",
             "verdict": "",
           },
         ],
@@ -1032,6 +1032,25 @@ exports[`characterization: en surfaces are stable 1`] = `
           },
           {
             "ids": [
+              "offensiveTotalDamageModifier",
+            ],
+            "key": "Offense:All Damage",
+            "rows": [
+              {
+                "base": "",
+                "delta": "",
+                "id": "offensiveTotalDamageModifier",
+                "now": "+45%",
+                "role": "subject",
+                "subLabel": "",
+                "verdict": "",
+              },
+            ],
+            "subject": "All Damage",
+            "verdict": "",
+          },
+          {
+            "ids": [
               "offensiveSlowBleedingMin",
               "offensiveSlowBleedingModifier",
               "offensiveSlowBleedingDurationMin",
@@ -1182,25 +1201,6 @@ exports[`characterization: en surfaces are stable 1`] = `
               },
             ],
             "subject": "Poison",
-            "verdict": "",
-          },
-          {
-            "ids": [
-              "offensiveTotalDamageModifier",
-            ],
-            "key": "Offense:Total Damage",
-            "rows": [
-              {
-                "base": "",
-                "delta": "",
-                "id": "offensiveTotalDamageModifier",
-                "now": "+45%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "",
-              },
-            ],
-            "subject": "Total Damage",
             "verdict": "",
           },
           {
@@ -1601,6 +1601,17 @@ exports[`characterization: en surfaces are stable 1`] = `
           "subject": "Acid",
         },
         {
+          "key": "Offense:All Damage",
+          "parts": [
+            {
+              "dim": "pct",
+              "id": "offensiveTotalDamageModifier",
+              "value": "+45%",
+            },
+          ],
+          "subject": "All Damage",
+        },
+        {
           "key": "Offense:Bleeding",
           "parts": [
             {
@@ -1685,17 +1696,6 @@ exports[`characterization: en surfaces are stable 1`] = `
             },
           ],
           "subject": "Poison",
-        },
-        {
-          "key": "Offense:Total Damage",
-          "parts": [
-            {
-              "dim": "pct",
-              "id": "offensiveTotalDamageModifier",
-              "value": "+45%",
-            },
-          ],
-          "subject": "Total Damage",
         },
         {
           "key": "Offense:Vitality",
@@ -1862,7 +1862,7 @@ exports[`characterization: en surfaces are stable 1`] = `
       "group": "Offense",
       "subjects": [
         {
-          "key": "Offense:Total Damage",
+          "key": "Offense:All Damage",
           "parts": [
             {
               "dim": "pct",
@@ -1870,7 +1870,7 @@ exports[`characterization: en surfaces are stable 1`] = `
               "value": "+130%",
             },
           ],
-          "subject": "Total Damage",
+          "subject": "All Damage",
         },
       ],
     },
@@ -2334,14 +2334,14 @@ exports[`characterization: en surfaces are stable 1`] = `
     "bysmiel_s_bonds:3": {
       "bonuses": [
         {
+          "id": "offensiveTotalDamageModifier",
+          "label": "All Damage",
+          "value": "+30%",
+        },
+        {
           "id": "defensiveTrap",
           "label": "Reduced Entrapment Duration",
           "value": "+20%",
-        },
-        {
-          "id": "offensiveTotalDamageModifier",
-          "label": "Total Damage",
-          "value": "+30%",
         },
       ],
     },
@@ -2401,14 +2401,14 @@ exports[`characterization: en surfaces are stable 1`] = `
     "crane:2": {
       "bonuses": [
         {
+          "id": "offensiveTotalDamageModifier",
+          "label": "All Damage",
+          "value": "+15%",
+        },
+        {
           "id": "characterWeaponIntelligenceReqReduction",
           "label": "Spirit Requirement for all Weapons",
           "value": "-10%",
-        },
-        {
-          "id": "offensiveTotalDamageModifier",
-          "label": "Total Damage",
-          "value": "+15%",
         },
       ],
     },
@@ -2564,7 +2564,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
             "ids": [
               "offensiveTotalDamageModifier",
             ],
-            "key": "Offense:总伤害",
+            "key": "Offense:所有类型伤害",
             "rows": [
               {
                 "base": "—",
@@ -2576,7 +2576,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
                 "verdict": "up",
               },
             ],
-            "subject": "总伤害",
+            "subject": "所有类型伤害",
             "verdict": "up",
           },
         ],
@@ -2800,7 +2800,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
             "ids": [
               "offensiveTotalDamageModifier",
             ],
-            "key": "Offense:总伤害",
+            "key": "Offense:所有类型伤害",
             "rows": [
               {
                 "base": "+15%",
@@ -2812,7 +2812,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
                 "verdict": "up",
               },
             ],
-            "subject": "总伤害",
+            "subject": "所有类型伤害",
             "verdict": "up",
           },
           {
@@ -3255,7 +3255,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
             "ids": [
               "offensiveTotalDamageModifier",
             ],
-            "key": "Offense:总伤害",
+            "key": "Offense:所有类型伤害",
             "rows": [
               {
                 "base": "",
@@ -3267,7 +3267,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
                 "verdict": "",
               },
             ],
-            "subject": "总伤害",
+            "subject": "所有类型伤害",
             "verdict": "",
           },
         ],
@@ -3534,7 +3534,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
             "ids": [
               "offensiveTotalDamageModifier",
             ],
-            "key": "Offense:总伤害",
+            "key": "Offense:所有类型伤害",
             "rows": [
               {
                 "base": "",
@@ -3546,7 +3546,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
                 "verdict": "",
               },
             ],
-            "subject": "总伤害",
+            "subject": "所有类型伤害",
             "verdict": "",
           },
           {
@@ -4106,7 +4106,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
           "subject": "对特定种族的伤害",
         },
         {
-          "key": "Offense:总伤害",
+          "key": "Offense:所有类型伤害",
           "parts": [
             {
               "dim": "pct",
@@ -4114,7 +4114,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
               "value": "+45%",
             },
           ],
-          "subject": "总伤害",
+          "subject": "所有类型伤害",
         },
         {
           "key": "Offense:暴击伤害",
@@ -4372,7 +4372,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
       "group": "Offense",
       "subjects": [
         {
-          "key": "Offense:总伤害",
+          "key": "Offense:所有类型伤害",
           "parts": [
             {
               "dim": "pct",
@@ -4380,7 +4380,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
               "value": "+130%",
             },
           ],
-          "subject": "总伤害",
+          "subject": "所有类型伤害",
         },
       ],
     },
@@ -4845,7 +4845,7 @@ exports[`characterization: zh surfaces are stable 1`] = `
       "bonuses": [
         {
           "id": "offensiveTotalDamageModifier",
-          "label": "总伤害",
+          "label": "所有类型伤害",
           "value": "+30%",
         },
         {
@@ -4911,14 +4911,14 @@ exports[`characterization: zh surfaces are stable 1`] = `
     "crane:2": {
       "bonuses": [
         {
-          "id": "offensiveTotalDamageModifier",
-          "label": "总伤害",
-          "value": "+15%",
-        },
-        {
           "id": "characterWeaponIntelligenceReqReduction",
           "label": "所有武器的智力需求",
           "value": "-10%",
+        },
+        {
+          "id": "offensiveTotalDamageModifier",
+          "label": "所有类型伤害",
+          "value": "+15%",
         },
       ],
     },

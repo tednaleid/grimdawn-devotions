@@ -20,7 +20,7 @@ Each element resolves three independent dimensions:
 
 2. **Color** (saturation) <- affinity-filter relevance: "Does this match the active affinity filter?" Also a tri-state outcome: mute (off-filter, desaturate), match (provides a filtered color, glow in matched colors), or identity (no filter active). Color and saturation are their own channel, separate from brightness.
 
-3. **Emphasis** (a union of additive effects) <- independent cues that genuinely stack. Active elements glow, selected elements get special styling, taken edges glow gold, benefit-match stars enlarge and glow, compare-diff shows outlines. These are not competing for a single property; they are additive layers that coexist.
+3. **Emphasis** (a union of additive effects) <- independent cues that genuinely stack. Active elements glow, selected elements get special styling, taken edges glow gold, benefit-match stars enlarge and glow, a text search glows its matching stars and constellations, compare-diff shows outlines. These are not competing for a single property; they are additive layers that coexist.
 
 Because brightness, color, and emphasis own different channels, they combine freely. An active constellation that fails an affinity filter stays fully opaque (brightness) and self-glows (emphasis) *while* desaturating (color). You can see it is both active and off-filter. Neither signal overrides the other.
 
@@ -81,7 +81,8 @@ Independent signals that stack. Never opacity:
 
 - **Active self-glow**: an active (fully selected) constellation or edge glows in its own color, lifting the visual weight so it stands out as "I have this."
 - **Selection styling**: a selected star renders with a white fill and gradient stroke, the immediate visual feedback of a click.
-- **Benefit-match enlarge and glow**: a star that grants a filtered benefit (one you want) enlarges and glows. Rendered as its own full-opacity layer so the glow reads even on an unattainable (dim) star. When the star's constellation fails the affinity filter, the glow is wrapped in a desaturate filter so the whole effect reads as "benefit match, off-filter" without the star's opacity bleeding through.
+- **Benefit-match enlarge and glow**: a star that grants a filtered benefit (one you want) enlarges and glows. This is a star-level "matches what you asked for" signal fed by two sources unioned into one set: the Benefits panel's selected tags, and a star-level hit from the text search. Rendered as its own full-opacity layer so the glow reads even on an unattainable (dim) star. When the star's constellation fails the affinity filter, the glow is wrapped in a desaturate filter so the whole effect reads as "benefit match, off-filter" without the star's opacity bleeding through.
+- **Search-match halo**: a constellation whose name or description matches the active text search glows via a `#search-glow` halo, built the same way as the affinity halo (`#aff-glow`: wide blur, stacked merge for alpha density) but flooded with the neutral blue `#match-glow` uses for star-level matches, so a hit reads the same whether it lands on a star or a whole constellation and never reads as an affinity color. Like the affinity halo, its opacity respects the brightness channel (dimmer on an unattainable constellation) and it desaturates via `#mute-wide` when the constellation is muted by an affinity filter, so a search hit stays visible on an off-filter constellation instead of vanishing.
 - **Compare-diff outlines**: a star added or removed in a comparison shows an outline, marking the change.
 - **Taken gold**: an edge whose both endpoints are selected renders gold (the traditional grimtools style), distinct from the normal edge color.
 

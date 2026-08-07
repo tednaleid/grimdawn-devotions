@@ -28,6 +28,7 @@ devotions = {
     "constellations": [
         {
             "name_tag": "tagConA",
+            "description_tag": "tagConDesc",
             "stars": [
                 {
                     "celestial_power": {
@@ -48,13 +49,14 @@ stat_format_tags = {"defensiveConvert": "DefenseConvert"}
 
 referenced = bgt.collect_referenced_tags(devotions, stat_tags, stat_format_tags)
 check("collects constellation name_tag", "tagConA" in referenced, True)
+check("collects constellation description_tag", "tagConDesc" in referenced, True)
 check("collects power name_tag", "tagPowerName" in referenced, True)
 check("collects power description_tag", "tagPowerDesc" in referenced, True)
 check("collects pet name_tag", "tagPetName" in referenced, True)
 check("collects weapon description_tag", "tagWeaponDesc" in referenced, True)
 check("collects stat-tags values", {"tagCharStatsDA", "Life"} <= referenced, True)
 check("collects stat-format-tags values", "DefenseConvert" in referenced, True)
-check("referenced tag count", len(referenced), 8)
+check("referenced tag count", len(referenced), 9)
 check("collect works without stat-format-tags", "tagConA" in bgt.collect_referenced_tags(devotions, stat_tags), True)
 
 # --- rr sources: tag-prefixed name/parent collected; synthesized x: keys skipped ---
@@ -70,6 +72,7 @@ check("skips synthesized rr keys", any(t.startswith("x:") for t in ref_rr), Fals
 # --- build_table: resolves against a text table, cleans control codes, omits unresolved tags
 text_table = {
     "tagConA": "^oConstellation A^n",
+    "tagConDesc": "Constellation A flavour text.",
     "tagPowerName": "Power Name",
     "tagPowerDesc": "{^y}Power Desc",
     "tagPetName": "Pet Name",
@@ -79,10 +82,11 @@ text_table = {
 }
 table = bgt.build_table(referenced, text_table)
 check("resolves + cleans control codes", table.get("tagConA"), "Constellation A")
+check("resolves constellation description_tag", table.get("tagConDesc"), "Constellation A flavour text.")
 check("resolves plain tag", table.get("tagPowerName"), "Power Name")
 check("strips brace control code", table.get("tagPowerDesc"), "Power Desc")
 check("unresolved referenced tag omitted", "Life" in table, False)
-check("table size = resolved only", len(table), 6)
+check("table size = resolved only", len(table), 7)
 
 # --- end-to-end via main(): fake devotions.json / stat-tags.json / text-dir on disk
 with tempfile.TemporaryDirectory() as tmp:

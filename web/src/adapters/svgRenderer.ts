@@ -66,6 +66,9 @@ export interface RenderOpts {
   // filter affinities (matchedAffinities); matching constellations glow (see the aff-glow layer) and
   // the rest desaturate (the mute color outcome) - the filter never changes brightness.
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
+  // When present, a text search is active; these constellations matched on name or description
+  // and glow via the search-glow halo. Star-level matches arrive folded into `highlight`.
+  conHighlight?: Set<string>;
 }
 
 // A constellation's hover/click footprint in SVG world coords: its art bounds
@@ -145,6 +148,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     reach,
     affinityFilter: opts.affinityFilter,
     benefitMatch: opts.highlight,
+    conMatch: opts.conHighlight,
     diff,
   };
   const defs: string[] = [];
@@ -202,10 +206,41 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     // mute: drain color toward grey (the affinity-filter de-emphasis). SVG-native feColorMatrix
     // because CSS filter: saturate() renders nothing on WebKit, like our other glows. `mute-wide` is the
     // same desaturation with an expanded region, used to wrap a benefit-match glow layer (whose halo
-    // spreads well past the marker) so the whole glow desaturates without the halo being clipped.
+    // spreads well past the marker) so the whole glow desaturates without the halo being clipped. The
+    // search halo below reuses this same def (a muted constellation can still be a search match) - it
+    // relies on this def existing only while an affinity filter is active, which holds because
+    // `cd0.color.kind` can only be "mute" when one is (see constellationColor). Don't move this def
+    // out from under that `if (affFilter)` without checking that reasoning still holds.
     defs.push(
       `<filter id="mute" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/></filter>`,
       `<filter id="mute-wide" x="-400%" y="-400%" width="900%" height="900%" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/></filter>`,
+    );
+  }
+
+  // Search-match halo filter def: flooded with #match-glow's neutral blue so a search match reads
+  // identically whether it lands on a star or a whole constellation, and never as an affinity colour.
+  // Only emitted when a search is active (mirrors #aff-glow/#mute being gated on affFilter above).
+  //
+  // Two blue bands: a near one (16) for brightness against the silhouette, a far one (38) for reach.
+  // Both flooded #6cb6ff, no white core - white washes even under the art, and on thin line work a
+  // small-radius blur bleeds inward across the strokes and floods the shape rather than rimming it.
+  // stdDeviation is in user units against art roughly 250x380. The merge stacking is what carries
+  // brightness: a wide blur thins alpha, so reach and intensity have to be bought separately. Pushing
+  // this hard is only safe because the halo paints UNDER the art (see the searchHaloParts flush).
+  // The filter region is widened past the usual 300% or the far band clips at the edges.
+  const conMatched = opts.conHighlight;
+  if (conMatched && conMatched.size > 0) {
+    defs.push(
+      `<filter id="search-glow" x="-150%" y="-150%" width="400%" height="400%" color-interpolation-filters="sRGB">` +
+        `<feGaussianBlur in="SourceAlpha" stdDeviation="16" result="b1"/>` +
+        `<feFlood flood-color="#6cb6ff" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
+        `<feGaussianBlur in="SourceAlpha" stdDeviation="38" result="b2"/>` +
+        `<feFlood flood-color="#6cb6ff" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
+        `<feMerge>` +
+        `<feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g2"/>` +
+        `<feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="g1"/>` +
+        `</feMerge>` +
+        `</filter>`,
     );
   }
 
@@ -256,6 +291,40 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       if (cd0.selfGlow) haloParts.push(glow);
     }
   }
+
+  // Search-match halo: an aura AROUND the constellation, flushed UNDER the art (unlike the affinity
+  // halo, which paints on top so its colour reads through the line work). A surrounding glow painted
+  // over thin line art washes it out; painted under, the aura surrounds and the art stays crisp.
+  const searchHaloParts: string[] = [];
+  if (opts.manifest && conMatched && conMatched.size > 0) {
+    for (const c of model.constellations.values()) {
+      const cd0 = constellationDisplay(c, settings);
+      if (!cd0.emphasis) continue;
+      const name = c.background?.image?.split("/").pop() ?? "";
+      const art = opts.manifest.images[name];
+      if (!(art && c.background && c.background.x != null && c.background.y != null)) continue;
+      const { x, y } = c.background;
+      ensureMask(c.id, art.url, x, y, art.w, art.h);
+      // Feels the brightness channel like the affinity halo: a matched constellation you cannot
+      // reach still glows, but dimmer, so reachability keeps reading under a search.
+      const op = cd0.brightness === "unattainable" ? HALO_UNREACHABLE_OPACITY : 1;
+      // The mask goes on the rect and the filter on a wrapping <g>, and that split is the whole
+      // trick. SVG applies filter BEFORE masking, so with both on one element the blur spreads and
+      // is then clipped straight back to the art silhouette - no aura can escape the shape, which
+      // is why this first shipped as an invisible inner tint. Masking the child and filtering the
+      // parent blurs the already-masked paint, letting it bleed outward.
+      const glow =
+        `<g filter="url(#search-glow)">` +
+        `<rect class="search-glow" opacity="${op}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" ` +
+        `fill="#6cb6ff" mask="url(#mask-${c.id})"/>` +
+        `</g>`;
+      // Off-filter constellations desaturate like an off-filter star's benefit glow does, so the
+      // halo reads as "matched, off-filter" instead of vanishing.
+      searchHaloParts.push(cd0.color.kind === "mute" ? `<g filter="url(#mute-wide)">${glow}</g>` : glow);
+    }
+  }
+  // Under the art, per the note above. The affinity halo's own flush stays after it.
+  parts.push(...searchHaloParts);
 
   // Layer 1: optional art, tinted by the constellation's identity (granted) colors.
   // The tint rect is only drawn for constellations that have an affinity requirement
@@ -344,14 +413,17 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
   return `<svg id="map" viewBox="${vb}" preserveAspectRatio="xMidYMid meet"><defs>${defs.join("")}</defs>${parts.join("")}</svg>`;
 }
 
+/** Per-render inputs for a mounted map, mirroring RenderOpts minus the boot-time manifest. */
+export interface UpdateOpts {
+  highlight?: Set<StarId>;
+  reach?: ReachView;
+  diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
+  affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
+  conHighlight?: Set<string>;
+}
+
 export interface SvgHandle {
-  update(
-    state: SelectionState,
-    highlight?: Set<StarId>,
-    reach?: ReachView,
-    diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
-    affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> },
-  ): void;
+  update(state: SelectionState, opts?: UpdateOpts): void;
   svg: SVGSVGElement;
   // Draw (or clear, with null) a box around a constellation's stars, on top of every layer. Used for
   // build-order row hover-sync; an outline on the constellation's own art is buried under later-painted
@@ -371,20 +443,8 @@ export interface SvgDeps {
 
 export function mountSvg(container: HTMLElement, model: DevotionModel, deps: SvgDeps): SvgHandle {
   const regions = buildConRegions(model, deps.manifest);
-  function render(
-    state: SelectionState,
-    highlight?: Set<StarId>,
-    reach?: ReachView,
-    diff?: { added: Set<StarId>; removed: Set<StarId> } | null,
-    affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> },
-  ) {
-    container.innerHTML = renderSvgMarkup(model, state, {
-      manifest: deps.manifest,
-      highlight,
-      reach,
-      diff,
-      affinityFilter,
-    });
+  function render(state: SelectionState, opts: UpdateOpts = {}) {
+    container.innerHTML = renderSvgMarkup(model, state, { manifest: deps.manifest, ...opts });
   }
   render({ selected: new Set(), pointCap: 55 });
   const svg = container.querySelector("svg") as SVGSVGElement;
@@ -485,10 +545,10 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
 
   return {
     svg,
-    update(state, highlight, reach, diff, affinityFilter) {
+    update(state, opts) {
       const live = container.querySelector("svg") as SVGSVGElement | null;
       const vb = live?.getAttribute("viewBox");
-      render(state, highlight, reach, diff, affinityFilter);
+      render(state, opts);
       const next = container.querySelector("svg") as SVGSVGElement | null;
       if (vb && next) next.setAttribute("viewBox", vb); // preserve pan/zoom across re-render
     },

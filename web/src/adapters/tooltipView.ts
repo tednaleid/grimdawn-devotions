@@ -14,6 +14,7 @@ import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequireme
 import { affinityOrb, presentAffinities } from "./affinityColors";
 import { affinityTagId, petTagId } from "../core/benefitTag";
 import { resolveText, sortByResolved, type Text } from "../core/localization";
+import { matchRanges } from "../core/search";
 import type { Localization } from "../ports/Localization";
 
 type AffinityTotals = Record<Affinity, number>;
@@ -61,7 +62,7 @@ function bonusRowsHtml(
     .map((r) => {
       const vid = keyOf(r.id);
       const sel = selectedBenefits.has(vid) ? " vsel" : "";
-      return `<div class="tip-bonus${sel}" data-vid="${vid}"><span class="val">${r.value}</span> ${r.label}</div>`;
+      return `<div class="tip-bonus${sel}" data-vid="${vid}"><span class="val">${r.value}</span> ${hl(r.label)}</div>`;
     })
     .join("");
 }
@@ -69,7 +70,7 @@ function bonusRowsHtml(
 // A star's conditional qualifier (e.g. Kraken's two-handed weapon requirement), shown verbatim
 // under its bonuses. Empty when the star has no requirement or no description text.
 function weaponReqHtml(description: string | null | undefined): string {
-  return description ? `<div class="tip-weapon-req">${description}</div>` : "";
+  return description ? `<div class="tip-weapon-req">${hl(description)}</div>` : "";
 }
 
 // "Bonus to All Pets": the same stat lines as a player bonus, under a header, tagged with pet: ids.
@@ -92,7 +93,7 @@ function powerRowsHtml(loc: Localization, power: PowerRows): string {
   return power.rows
     .map(resolve)
     .concat(sortByResolved(loc, power.fallthrough, (r) => r.label).map(resolve))
-    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${r.label}</div>`)
+    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${hl(r.label)}</div>`)
     .join("");
 }
 
@@ -102,13 +103,15 @@ function powerHtml(loc: Localization, power: CelestialPower): string {
   const proc = power.proc
     ? ` <span class="tip-proc">${loc.translate("ui.tooltip.procQualifier", { chance: power.proc.chance, trigger: loc.translate(`trigger.${power.proc.triggerKey}`) })}</span>`
     : "";
-  const desc = power.descriptionTag ? `<div class="tip-power-desc">${loc.gameText(power.descriptionTag)}</div>` : "";
+  const desc = power.descriptionTag
+    ? `<div class="tip-power-desc">${hl(loc.gameText(power.descriptionTag))}</div>`
+    : "";
   const level = power.level
     ? `<div class="tip-power-level">${loc.translate("ui.tooltip.currentLevel", { level: power.level })}</div>`
     : "";
   const stats = powerRowsHtml(loc, formatPowerStats(power.stats));
   const pet = power.pet ? petHtml(loc, power.pet) : "";
-  return `<div class="tip-power">${loc.gameText(power.nameTag)}${proc}</div>${desc}${level}${stats}${pet}`;
+  return `<div class="tip-power">${hl(loc.gameText(power.nameTag))}${proc}</div>${desc}${level}${stats}${pet}`;
 }
 
 // A summon proc's pet: the "Summons N <Pet>..." line, then the pet's base attack
@@ -136,6 +139,33 @@ function affinitySections(
 function commitHtml(loc: Localization, commit?: { label: Text; enabled: boolean }): string {
   if (!commit) return "";
   return `<button class="tip-commit" type="button"${commit.enabled ? "" : " disabled"}>${resolveText(loc, commit.label)}</button>`;
+}
+
+const ESCAPES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
+const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ESCAPES[c]!);
+
+// The live search query, so the tooltip can show WHICH text matched. Module scope because the
+// module-level row builders below need it too, and there is one tooltip per page; the handle's
+// setHighlight is the only writer. Threading it through show()/showConstellation() instead would
+// mean another argument on two functions that already take nine.
+let highlightQuery = "";
+
+/**
+ * Escape `text` for innerHTML and wrap the runs matching the current query. Every piece of game
+ * text the search corpus indexes goes through here, so a match is always visible on hover. With
+ * no query this is plain escaping, which the raw interpolation it replaces was not doing.
+ */
+function hl(text: string): string {
+  const ranges = highlightQuery ? matchRanges(text, highlightQuery) : [];
+  if (ranges.length === 0) return escapeHtml(text);
+  let out = "";
+  let at = 0;
+  for (const [start, end] of ranges) {
+    out += escapeHtml(text.slice(at, start));
+    out += `<b class="tip-hit">${escapeHtml(text.slice(start, end))}</b>`;
+    at = end;
+  }
+  return out + escapeHtml(text.slice(at));
 }
 
 export function tooltipView(el: HTMLElement) {
@@ -181,7 +211,7 @@ export function tooltipView(el: HTMLElement) {
         pathCost !== undefined
           ? `<div class="tip-path-cost">${loc.translate("ui.tooltip.pointsToReach", { count: pathCost })}</div>`
           : "";
-      el.innerHTML = `<strong>${loc.gameText(con.nameTag)}</strong>${costLine}${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, (id) => id, star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${commitHtml(loc, commit)}`;
+      el.innerHTML = `<strong>${hl(loc.gameText(con.nameTag))}</strong>${costLine}${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, (id) => id, star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${commitHtml(loc, commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
@@ -200,9 +230,15 @@ export function tooltipView(el: HTMLElement) {
       if (!con) return;
       const stars = new Set(con.starIds);
       const powers = powersGained(model, stars)
-        .map((p) => `<div class="tip-power">${loc.gameText(p.power.nameTag)}</div>`)
+        .map((p) => `<div class="tip-power">${hl(loc.gameText(p.power.nameTag))}</div>`)
         .join("");
-      const head = `<strong>${loc.gameText(con.nameTag)}</strong> <span class="tip-cost">${loc.translate("ui.tooltip.pts", { count: con.starIds.length })}</span>`;
+      const head = `<strong>${hl(loc.gameText(con.nameTag))}</strong> <span class="tip-cost">${loc.translate("ui.tooltip.pts", { count: con.starIds.length })}</span>`;
+      // The game's flavour text. Search indexes it, so it has to be visible somewhere or a match on
+      // it is unexplainable - "owl" hitting Unknown Soldier makes sense only once you can read
+      // "their valor and deeds never acknowledged" here.
+      const flavour = con.descriptionTag
+        ? `<div class="tip-flavour">${hl(loc.gameText(con.descriptionTag))}</div>`
+        : "";
       // `dim` with a `needs` count: how many points would complete it. `dim` without one: the engine
       // found no completion within the cap (do not leak the INF sentinel as a giant point count).
       const dimLine = dim
@@ -226,9 +262,13 @@ export function tooltipView(el: HTMLElement) {
               return `<div class="tip-weapon-req">${loc.translate("ui.tooltip.partialGate", { req })}</div>`;
             })
             .join("");
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(loc, sumBonuses(model, stars), selectedBenefits, (id) => id, racialTargets(model, stars))}${weaponReq}${petBonusHtml(loc, sumPetBonuses(model, stars), selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${dimLine}${commitHtml(loc, commit)}`;
+      el.innerHTML = `${head}${flavour}${powers}${bonusRowsHtml(loc, sumBonuses(model, stars), selectedBenefits, (id) => id, racialTargets(model, stars))}${weaponReq}${petBonusHtml(loc, sumPetBonuses(model, stars), selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${dimLine}${commitHtml(loc, commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
+    },
+    /** The query whose matches the next render should mark up. "" turns highlighting off. */
+    setHighlight(query: string) {
+      highlightQuery = query;
     },
     hide() {
       el.style.display = "none";

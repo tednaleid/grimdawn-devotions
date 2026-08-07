@@ -76,6 +76,16 @@ else:
         # --- Phase 1b Task 5: the English display fields are gone; only tags remain.
         check("constellation has no baked english name", "name" in con, False)
 
+        # --- Task 4: constellationInfoTag flavour text, resolved to description_tag.
+        check("constellation has description_tag", "description_tag" in con, True)
+        cons_with_desc = [c for c in constellations if c["description_tag"]]
+        cons_without_desc = [c for c in constellations if not c["description_tag"]]
+        check("every constellation has a description_tag", len(cons_without_desc) == 0, True)
+        check("every constellation description_tag resolves in game_en",
+              all(resolves(c["description_tag"]) for c in cons_with_desc), True)
+        check("constellations without a description_tag emit None, not KeyError",
+              all(c["description_tag"] is None for c in cons_without_desc), True)
+
         power = None
         proc_power = None
         weapon_req = None
@@ -128,6 +138,8 @@ else:
         for c in constellations:
             if not resolves(c.get("name_tag")):
                 missing.append(("con", c["id"], c.get("name_tag")))
+            if c.get("description_tag") and not resolves(c["description_tag"]):
+                missing.append(("con-desc", c["id"], c.get("description_tag")))
             for s in c["stars"]:
                 cp = s.get("celestial_power")
                 if cp:

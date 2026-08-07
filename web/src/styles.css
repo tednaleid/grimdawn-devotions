@@ -591,6 +591,61 @@ main {
   border-top: 1px solid #30363d;
   margin: 1.3rem -0.75rem 0.7rem;
 }
+/* Search panel. The controls follow the in-sidebar convention set by .cmp-controls
+   (#161d27 on #283446, 4px radius) rather than the chunkier header-button one, and the
+   count line uses the same muted grey as the sidebar's h3 labels. */
+.search-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+#search-input {
+  flex: 1;
+  min-width: 0;
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 0.3rem 0.4rem;
+  color: #e6edf3;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+#search-input::placeholder {
+  color: #6b7688;
+}
+#search-input:focus {
+  outline: none;
+  border-color: #6cb6ff;
+}
+/* Chrome renders a second clear affordance inside type="search"; we ship our own button. */
+#search-input::-webkit-search-cancel-button {
+  display: none;
+}
+#search-clear {
+  flex: none;
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+#search-clear:hover {
+  background: #1d2530;
+  border-color: #3d4a5c;
+  color: #e6edf3;
+}
+#search-count {
+  margin-top: 0.35rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+}
 .power,
 .tip-power {
   color: #f0c14b;
@@ -602,6 +657,23 @@ main {
   color: #c9b88a;
   font-size: 0.92em;
   margin: 0.1rem 0 0.25rem;
+}
+/* Constellation flavour text. Prose rather than a stat line, so it is italic and muted to sit
+   behind the numbers, and it needs line-height a paragraph can breathe in. */
+/* A run of text matching the live search query. Bold plus a faint wash, like find-in-page:
+   it marks WHICH words matched without changing the characters, so it works in every script. */
+.tip-hit {
+  color: #cfe6ff;
+  background: rgba(108, 182, 255, 0.18);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+.tip-flavour {
+  color: #98a3b3;
+  font-style: italic;
+  font-size: 0.92em;
+  line-height: 1.35;
+  margin: 0.2rem 0 0.35rem;
 }
 .tip-proc {
   color: #8fb4d6;
@@ -734,6 +806,11 @@ main {
 /* The affinity match halo (see #aff-glow in the renderer). Non-interactive so it never intercepts a
    click meant for the art/stars beneath or around it. */
 .aff-glow {
+  pointer-events: none;
+}
+/* Search-match halo on constellation art. The colour and blur live in the SVG filter
+   (#search-glow); this only controls how the masked source rect participates. */
+.search-glow {
   pointer-events: none;
 }
 .orb {

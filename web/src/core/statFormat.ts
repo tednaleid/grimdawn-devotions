@@ -110,7 +110,8 @@ const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
   offensiveElementalResistanceReductionPercentDurationMin: { percent: false, sign: 1 },
   offensiveLightningModifierChance: { percent: true, sign: 1 },
   retaliationTotalDamageModifier: { percent: true, sign: 1 },
-  retaliationDamagePct: { percent: true, sign: 1 },
+  // retaliationDamagePct is not here: its noun is a value-PREFIX game format
+  // (SkillRetaliationDamageFormat), so it resolves via STAT_FORMAT_TAGS instead.
   retaliationFearMin: { percent: false, sign: 1 },
   retaliationFearChance: { percent: true, sign: 1 },
 

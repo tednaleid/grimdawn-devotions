@@ -6,6 +6,34 @@ import { isFilterableStat } from "./statFormat";
 
 const MIN_CAP = 1;
 const MAX_CAP = 55;
+const MAX_QUERY = 100; // a shared link carries a search box's worth of text, not a document
+
+/** Every param decodeHash understands. Presence of any one makes a hash ours to decode. */
+const KNOWN_PARAMS = ["p", "s", "b", "q", "cs", "cp"] as const;
+
+/**
+ * A point-cap param (`p=` live, `cp=` baseline). Absent, empty, or unparseable all mean the full
+ * budget, since a link that does not carry a cap is not a link that asked for a small one; `"0"`
+ * is the uncapped sentinel; anything else clamps into range.
+ *
+ * The absent case must be checked BEFORE parsing: `Number(null)` is `0`, which is finite, so it
+ * slips past an isFinite guard and clamps to the 1-point minimum.
+ */
+function decodeCap(raw: string | null): number {
+  if (raw === "0") return Infinity;
+  if (raw === null || raw.trim() === "") return MAX_CAP;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return MAX_CAP;
+  return Math.max(MIN_CAP, Math.min(MAX_CAP, Math.round(n)));
+}
+
+/**
+ * The one normal form for a search query: trimmed and capped. Both hash directions apply it, and
+ * so must any live in-memory copy, or what the user sees and what a copied link restores diverge.
+ */
+export function normalizeQuery(q: string): string {
+  return q.trim().slice(0, MAX_QUERY);
+}
 
 /** Stable ordering of every star id: constellation insertion order, then star index. */
 export function canonicalStarIds(model: DevotionModel): StarId[] {
@@ -111,6 +139,7 @@ export function encodeHash(
   benefits: Set<string> = new Set(),
   statCanonical: string[] = [],
   baseline: { selected: Set<StarId>; pointCap: number } | null = null,
+  query: string = "",
 ): string {
   // p=0 is the uncapped sentinel (0 is otherwise an invalid cap; the real min is 1).
   const cap = Number.isFinite(pointCap) ? pointCap : 0;
@@ -122,6 +151,9 @@ export function encodeHash(
     const bcap = Number.isFinite(baseline.pointCap) ? baseline.pointCap : 0;
     out += `&cs=${encodeBitset(baseline.selected, canonical)}&cp=${bcap}`;
   }
+  // Only when a search is active, same as b=; an empty box leaves the hash as it was.
+  const q = normalizeQuery(query);
+  if (q) out += `&q=${encodeURIComponent(q)}`;
   return out;
 }
 
@@ -135,21 +167,17 @@ export function decodeHash(
   pointCap: number;
   benefits: Set<string>;
   baseline: { selected: Set<StarId>; pointCap: number } | null;
+  query: string;
 } | null {
   const raw = hash.replace(/^#/, "").trim();
   if (!raw) return null;
   const params = new URLSearchParams(raw);
-  if (!params.has("p") && !params.has("s") && !params.has("b")) return null;
+  // Any recognized param is enough to decode; each one below defaults independently, so a
+  // hand-edited or truncated link restores a sensible planner instead of nothing. A hash
+  // carrying none of them (a stray fragment, another app's anchor) is still not ours.
+  if (!KNOWN_PARAMS.some((k) => params.has(k))) return null;
 
-  // p=0 restores the uncapped state; any other value clamps to the finite range.
-  let pointCap: number;
-  if (params.get("p") === "0") {
-    pointCap = Infinity;
-  } else {
-    pointCap = Number(params.get("p"));
-    if (!Number.isFinite(pointCap)) pointCap = MAX_CAP;
-    pointCap = Math.max(MIN_CAP, Math.min(MAX_CAP, Math.round(pointCap)));
-  }
+  const pointCap = decodeCap(params.get("p"));
 
   const selected = decodeBitset(params.get("s") ?? "", canonical);
   const benefits = decodeBitset(params.get("b") ?? "", statCanonical);
@@ -158,16 +186,13 @@ export function decodeHash(
   // cs= simply means "no comparison", matching the tolerance of the other params).
   let baseline: { selected: Set<StarId>; pointCap: number } | null = null;
   const baseSel = decodeBitset(params.get("cs") ?? "", canonical);
-  if (baseSel.size > 0) {
-    let bcap: number;
-    if (params.get("cp") === "0") bcap = Infinity;
-    else {
-      bcap = Number(params.get("cp"));
-      if (!Number.isFinite(bcap)) bcap = MAX_CAP;
-      bcap = Math.max(MIN_CAP, Math.min(MAX_CAP, Math.round(bcap)));
-    }
-    baseline = { selected: baseSel, pointCap: bcap };
-  }
+  if (baseSel.size > 0) baseline = { selected: baseSel, pointCap: decodeCap(params.get("cp")) };
 
-  return { selected, pointCap, benefits, baseline };
+  // No try/catch here on purpose: URLSearchParams.get() does not throw on a malformed escape,
+  // it substitutes U+FFFD (decodeURIComponent is the one that throws, and it is not called).
+  // Tolerance comes from the normal form instead: a missing q is "", and an oversized or
+  // padded one is trimmed and capped rather than rejected.
+  const query = normalizeQuery(params.get("q") ?? "");
+
+  return { selected, pointCap, benefits, baseline, query };
 }

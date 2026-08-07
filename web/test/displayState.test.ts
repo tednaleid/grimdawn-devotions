@@ -159,3 +159,31 @@ test("edge color: muted when its constellation fails the affinity filter", () =>
   const onOrder = settings({ affinityFilter: { grants: new Set<Affinity>(["order"]), requires: new Set() } });
   expect(edgeDisplay(c, "c:0", "c:1", onOrder).color).toEqual({ kind: "mute" });
 });
+
+test("a constellation in conMatch is emphasized", () => {
+  const c = con("owl", ["owl:0", "owl:1"]);
+  const on = constellationDisplay(c, settings({ conMatch: new Set(["owl"]) }));
+  expect(on.emphasis).toBe(true);
+  const off = constellationDisplay(c, settings({ conMatch: new Set(["crane"]) }));
+  expect(off.emphasis).toBe(false);
+});
+
+test("emphasis defaults to false with no conMatch", () => {
+  const c = con("owl", ["owl:0"]);
+  expect(constellationDisplay(c, settings()).emphasis).toBe(false);
+});
+
+test("emphasis is independent of brightness and colour", () => {
+  const c = con("owl", ["owl:0"], { chaos: 1 });
+  const d = constellationDisplay(
+    c,
+    settings({
+      conMatch: new Set(["owl"]),
+      reach: reach({ completable: new Set() }),
+      affinityFilter: { grants: new Set(["order" as Affinity]), requires: new Set() },
+    }),
+  );
+  expect(d.emphasis).toBe(true);
+  expect(d.brightness).toBe("unattainable");
+  expect(d.color.kind).toBe("mute");
+});

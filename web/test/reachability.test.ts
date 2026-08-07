@@ -43,6 +43,7 @@ function modelFromCons(conSpecs: Array<{ id: string; size: number; req: Vec; gra
     constellations.set(spec.id, {
       id: spec.id,
       nameTag: spec.id,
+      descriptionTag: null,
       tier: null,
       affinityRequired: {},
       affinityBonus: {},

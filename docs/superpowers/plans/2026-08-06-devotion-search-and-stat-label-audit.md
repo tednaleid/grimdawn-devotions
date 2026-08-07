@@ -200,7 +200,11 @@ Scope is the 64 app-authored stat *nouns*: the 50 `stat.override.*` keys and the
 
 - [ ] **Step 1: Write the failing test**
 
-Create `scripts/test_audit_stat_labels.py`. The project's Python tests are plain `uv run` scripts using `assert`, discovered by `just test-scripts` as `scripts/test_*.py`. Match that style — read `scripts/test_parse_devotions.py` first if unsure.
+Create `scripts/test_audit_stat_labels.py`, discovered by `just test-scripts` as `scripts/test_*.py`.
+
+**Read `scripts/test_parse_devotions.py` and one other sibling suite in full before writing, and follow what they actually do.** All four existing suites share one shape, and the new test must match it: load the module under test via `importlib.util.spec_from_file_location` + `module_from_spec` + `exec_module` (never a plain top-level import — that only resolves because `uv run` happens to put the script's directory on `sys.path[0]`, and it trips static analysers), accumulate a `failures` counter through a `check(...)` helper that prints per-check results, and end with an explicit `"ALL PASSED"` / `"FAILURES: N"` summary plus `raise SystemExit(1 if failures else 0)`.
+
+The assertions below are what the test must cover; express them through that harness rather than as bare `assert` statements in `def test_*()` functions.
 
 ```python
 #!/usr/bin/env -S uv run --script
@@ -1092,9 +1096,17 @@ test("an unmatched constellation gets no halo", () => {
     { selected: new Set(), pointCap: 55 },
     { manifest, conHighlight: new Set([cons[0]!.id]) },
   );
-  expect(markup).not.toContain(`mask="url(#mask-${cons[1]!.id})"`);
+  // Scope the assertion to the search-glow rect. A bare
+  // `not.toContain('mask="url(#mask-<id>)"')` false-fails on a CORRECT implementation,
+  // because the art-tint layer independently emits the same mask reference for every
+  // constellation that has an affinity requirement.
+  expect(markup).not.toMatch(new RegExp(`<rect class="search-glow"[^>]*mask="url\\(#mask-${cons[1]!.id}\\)"`));
 });
 ```
+
+Add a fourth test the halo's trickiest case needs: a matched constellation that an active affinity filter has muted still gets its halo, wrapped in `#mute-wide`. Nothing else pins that interaction.
+
+These tests need a manifest covering every constellation's art, not just one, so the "unmatched gets no halo" case can genuinely catch an over-broad loop. Add a shared module-level `manifest` fixture if the file does not already have one.
 
 - [ ] **Step 2: Run the test to verify it fails**
 
@@ -1372,7 +1384,7 @@ plural rules would mangle a bare count."
 
 **Interfaces:**
 - Consumes: catalog keys (Task 11), `SearchMatch` (Task 5)
-- Produces: `mountSearchPanel(el: HTMLElement, loc: Localization, opts: { initial: string; onInput(q: string): void }): SearchPanelHandle` where `SearchPanelHandle = { setCount(m: SearchMatch | null): void; setLocalization(loc: Localization): void; value(): string; setValue(q: string): void }`. Task 13 drives all four methods.
+- Produces: `mountSearchPanel(el: HTMLElement, loc: Localization, opts: { initial: string; onInput(q: string): void }): SearchPanelHandle` where `SearchPanelHandle = { setCount(m: SearchMatch | null): void; relocalize(loc: Localization): void; value(): string; setValue(q: string): void }`. Task 13 drives all four methods.
 
 - [ ] **Step 1: Split the aside in index.html**
 
@@ -1392,9 +1404,13 @@ Add element lookups beside the existing ones (~line 139):
 
 ```ts
   const affinityPanelEl = document.getElementById("affinity-panel") as HTMLElement;
-  const searchPanelEl = document.getElementById("search-panel") as HTMLElement;
   const availPanelEl = document.getElementById("avail-panel") as HTMLElement;
 ```
+
+Do **not** add a `searchPanelEl` lookup here. Nothing consumes it until Task 13, and
+Biome's `correctness/noUnusedVariables` is a warning, which `biome lint
+--error-on-warnings` turns into a failure — this task's own `just check` in Step 6
+would fail. Task 13 adds that lookup at the point of use.
 
 In `refresh()`, pass `affinityPanelEl` to `renderAffinities` instead of `affinityEl`, and replace the three `affinityEl.insertAdjacentHTML("beforeend", ...)` blocks (lines 721-736) with a single assignment that builds the same HTML into `availPanelEl`:
 
@@ -1431,7 +1447,7 @@ import type { Localization } from "../ports/Localization";
 export interface SearchPanelHandle {
   /** null clears the line (empty query); a match renders counts or the empty state. */
   setCount(m: SearchMatch | null): void;
-  setLocalization(loc: Localization): void;
+  relocalize(loc: Localization): void;
   value(): string;
   setValue(q: string): void;
 }
@@ -1496,7 +1512,7 @@ export function mountSearchPanel(
       last = m;
       paintCount();
     },
-    setLocalization(next) {
+    relocalize(next) {
       localization = next;
       applyChrome();
       paintCount();
@@ -1664,7 +1680,13 @@ After `refresh()`:
 
 - [ ] **Step 5: Mount the panel with a debounce**
 
-After the element lookups and before the first `refresh()`:
+Add the container lookup here (Task 12 deliberately left it out, so that task's lint gate would pass), beside the other element lookups:
+
+```ts
+  const searchPanelEl = document.getElementById("search-panel") as HTMLElement;
+```
+
+Then, after the element lookups and before the first `refresh()`:
 
 ```ts
   // replaceState (in repaint) is what keeps history clean; this debounce only avoids
@@ -1688,7 +1710,7 @@ In the language picker's `onSelect` (~line 204) and the app menu's `onSelect`, a
 
 ```ts
       searchIndex = resolveIndex(localization, corpus);
-      searchPanel.setLocalization(localization);
+      searchPanel.relocalize(localization);
 ```
 
 In the `hashchange` handler (~line 901), after `applyHash(location.hash)`:

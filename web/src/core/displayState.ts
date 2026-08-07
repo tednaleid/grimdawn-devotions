@@ -1,5 +1,5 @@
 // ABOUTME: Pure resolver mapping each constellation/star/edge to a display record.
-// ABOUTME: Three orthogonal channels - brightness (attainability), color (affinity filter), emphasis.
+// ABOUTME: Three orthogonal channels - brightness (attainability), color (affinity filter), emphasis (benefitMatch/conMatch).
 import type { Affinity, Constellation, Star, StarId } from "./types";
 import type { ReachView } from "./reachability";
 import { matchedAffinities } from "./affinity";
@@ -12,6 +12,8 @@ export interface DisplaySettings {
   reach?: ReachView;
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
   benefitMatch?: Set<StarId>;
+  /** Constellations emphasized by the text search; the constellation-level half of the emphasis channel. */
+  conMatch?: Set<string>;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
 }
 
@@ -19,6 +21,7 @@ export interface ConstellationDisplay {
   brightness: Brightness;
   color: ColorOutcome;
   selfGlow: boolean;
+  emphasis: boolean;
 }
 
 // A constellation is active when fully selected, attainable when started or completable
@@ -41,7 +44,12 @@ function constellationColor(con: Constellation, s: DisplaySettings): ColorOutcom
 
 export function constellationDisplay(con: Constellation, s: DisplaySettings): ConstellationDisplay {
   const brightness = constellationBrightness(con, s);
-  return { brightness, color: constellationColor(con, s), selfGlow: brightness === "active" };
+  return {
+    brightness,
+    color: constellationColor(con, s),
+    selfGlow: brightness === "active",
+    emphasis: s.conMatch?.has(con.id) ?? false,
+  };
 }
 
 export interface StarDisplay {

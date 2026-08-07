@@ -42,8 +42,12 @@ import {
   canonicalPowerStatIds,
   decodeHash,
   encodeHash,
+  normalizeQuery,
 } from "../core/urlState";
 import { parseTag } from "../core/benefitTag";
+import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
+import { resolveIndex } from "../adapters/searchIndex";
+import { mountSearchPanel } from "../adapters/searchPanel";
 import { affinityTotals } from "../core/affinity";
 import {
   starsGranting,
@@ -102,6 +106,9 @@ async function boot() {
   // Benefit "tags": the raw stat ids selected in the Benefits panel; they highlight the
   // matching map nodes and are persisted in the URL so a shared link restores them.
   const selectedBenefits = new Set<string>();
+  // The live search query. Emphasizes matching map nodes and rides in the URL so a shared
+  // link restores it, like the benefit tags.
+  let query = "";
   // Decode and repair a hash into planner state. Runs at boot and on every hashchange
   // (Back/Forward, bookmark clicks, hand-edited URLs); an undecodable hash is the empty build.
   function applyHash(hash: string): void {
@@ -119,6 +126,7 @@ async function boot() {
     if (Number.isFinite(state.pointCap)) lastFiniteCap = state.pointCap;
     selectedBenefits.clear();
     for (const b of restored?.benefits ?? []) selectedBenefits.add(b);
+    query = restored?.query ?? "";
   }
   applyHash(location.hash);
   // The full benefit catalog (every subject + its stat ids), so the panel can list benefits the
@@ -133,10 +141,22 @@ async function boot() {
   for (const id of canonicalPetStatIds(model)) allPetBonuses[id] = 1;
   const benefitCatalog = condensedRows(allBonuses);
   const petCatalog = condensedRows(allPetBonuses);
+  // The search corpus is locale-independent and built once; the index is per-locale and
+  // rebuilt on a language switch (see the app menu's onSelect).
+  const corpus = searchCorpus(model);
+  let searchIndex = resolveIndex(localization, corpus);
+  let searchMatch: SearchMatch = { constellations: new Set(), stars: new Set() };
+  function recomputeSearch() {
+    searchMatch = matchQuery(searchIndex, query);
+  }
+  recomputeSearch();
 
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
   const affinityEl = document.getElementById("affinity") as HTMLElement;
+  const affinityPanelEl = document.getElementById("affinity-panel") as HTMLElement;
+  const availPanelEl = document.getElementById("avail-panel") as HTMLElement;
+  const searchPanelEl = document.getElementById("search-panel") as HTMLElement;
   const tooltipEl = document.getElementById("tooltip") as HTMLElement;
   const barEl = document.getElementById("point-bar") as HTMLElement;
   const totalWord = document.getElementById("total-word") as HTMLElement;
@@ -206,6 +226,9 @@ async function boot() {
       localization = await loadLocalization({ base: ".", available: SUPPORTED_LOCALES, preferred: [locale] });
       applyChrome();
       menu.update(menuContent(), localization.translate("ui.menu.label"));
+      // The index is per-locale (the corpus is not), and the panel owns its own chrome.
+      searchIndex = resolveIndex(localization, corpus);
+      searchPanel.relocalize(localization);
       refresh();
     },
   });
@@ -239,6 +262,13 @@ async function boot() {
     }
     const out = starsGranting(model, playerTags);
     for (const id of starsGrantingPet(model, petTags)) out.add(id);
+    return out;
+  }
+
+  // Benefit tags and search share one glow: both mean "this node matches what you asked for".
+  function emphasizedStars(): Set<StarId> {
+    const out = taggedStars();
+    for (const id of searchMatch.stars) out.add(id);
     return out;
   }
 
@@ -676,8 +706,43 @@ async function boot() {
     availHtml = r.availHtml;
     petAvailHtml = r.petAvailHtml;
   }
+  // The map's per-render inputs. Shared by refresh() and repaint() so the two paths cannot drift:
+  // benefit tags and search matches are unioned into one highlight set, while constellation-level
+  // search matches go to conHighlight (a constellation hit glows the art, not its stars).
+  function paintMap() {
+    const diff = baseline
+      ? {
+          added: new Set([...state.selected].filter((s) => !baseline!.selected.has(s))),
+          removed: new Set([...baseline.selected].filter((s) => !state.selected.has(s))),
+        }
+      : null;
+    handle.update(state, {
+      highlight: emphasizedStars(),
+      reach,
+      diff,
+      affinityFilter: affinityFilterSets(),
+      conHighlight: searchMatch.constellations,
+    });
+  }
+  // The match count line; null (an empty box) clears it rather than showing "no matches".
+  // Also hands the tooltip the query, so hovering a match marks up the text that matched -
+  // otherwise a hit on flavour text ("owl" inside "acknowledged") looks like a bug.
+  function paintSearchCount() {
+    searchPanel.setCount(query ? searchMatch : null); // `query` is already normalized (trimmed)
+    tip.setHighlight(query);
+  }
+  // The hash, written by both render paths. Search uses "replace" so typing never floods history.
+  function writeHash(urlMode: "push" | "replace") {
+    const next = `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline, query)}`;
+    // Only touch history when the hash actually changed: no-op refreshes (language switch,
+    // popover re-renders) must create no entry and leave the current one alone.
+    if (next === location.hash) return;
+    if (urlMode === "push") history.pushState(null, "", next);
+    else history.replaceState(null, "", next);
+  }
   function refresh(urlMode: "push" | "replace" = "push") {
     completionCache.clear();
+    recomputeSearch();
     // The full per-click engine cost (validity floor + dimming sweep) is the core selectionView port;
     // this controller is a thin caller, so optimize selectionView, not refresh. The degraded path
     // (uncapped or no table) stays permissive and cheap.
@@ -699,17 +764,12 @@ async function boot() {
     }
     document.body.classList.toggle("comparing", baseline !== null);
     updateNarrow();
-    const diff = baseline
-      ? {
-          added: new Set([...state.selected].filter((s) => !baseline!.selected.has(s))),
-          removed: new Set([...baseline.selected].filter((s) => !state.selected.has(s))),
-        }
-      : null;
-    handle.update(state, taggedStars(), reach, diff, affinityFilterSets());
+    paintMap();
+    paintSearchCount();
     renderBenefitsPanel();
     prevAffinity = renderAffinities(
       localization,
-      affinityEl,
+      affinityPanelEl,
       model,
       reach.have,
       reach.need,
@@ -718,22 +778,15 @@ async function boot() {
       selectedBenefits,
     );
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
+    let availParts = "";
     if (availHtml)
-      affinityEl.insertAdjacentHTML(
-        "beforeend",
-        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.availableToGet")}</h2>${availHtml}`,
-      );
+      availParts += `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.availableToGet")}</h2>${availHtml}`;
     if (petAvailHtml)
-      affinityEl.insertAdjacentHTML(
-        "beforeend",
-        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.petBonus")}</h2>${petAvailHtml}`,
-      );
+      availParts += `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.petBonus")}</h2>${petAvailHtml}`;
     const availPowers = availablePowers(model, reach.reachableStars);
     if (availPowers.length)
-      affinityEl.insertAdjacentHTML(
-        "beforeend",
-        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.celestialPowers")}</h2>${powersListHtml(localization, availPowers)}`,
-      );
+      availParts += `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.celestialPowers")}</h2>${powersListHtml(localization, availPowers)}`;
+    availPanelEl.innerHTML = availParts;
     // Empty-state copy. The build order shows whenever the selection is self-covering: the cap is auto-raised
     // to the validity floor (above), so a self-covering selection that still has no order is genuinely
     // unbuildable within 55, not merely under-budgeted. Otherwise show a prompt (nothing to order yet) or the
@@ -757,14 +810,30 @@ async function boot() {
       : localization.translate("ui.points.capRemoveTitle");
     totalWord.style.display = uncapped ? "none" : "";
     renderPointBar();
-    const next = `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline)}`;
-    // Only touch history when the hash actually changed: no-op refreshes (language switch,
-    // popover re-renders) must create no entry and leave the current one alone.
-    if (next !== location.hash) {
-      if (urlMode === "push") history.pushState(null, "", next);
-      else history.replaceState(null, "", next);
-    }
+    writeHash(urlMode);
   }
+
+  // The search-only render path. refresh() re-runs selectionView (the full per-click engine
+  // cost); a keystroke must not pay that, so this reuses the cached `reach` and only redraws
+  // what a query can change: map emphasis, the count line, and the hash.
+  function repaint() {
+    recomputeSearch();
+    paintMap();
+    paintSearchCount();
+    writeHash("replace"); // replace, so typing never floods the back button
+  }
+
+  // replaceState (in repaint) is what keeps history clean; this debounce only avoids
+  // re-rendering the map on every keystroke.
+  let searchTimer: ReturnType<typeof setTimeout> | undefined;
+  const searchPanel = mountSearchPanel(searchPanelEl, localization, {
+    initial: query,
+    onInput(q) {
+      query = normalizeQuery(q); // the same normal form the hash stores, so a shared link restores what is on screen
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(repaint, 120);
+    },
+  });
 
   // Expose the header height to CSS so the corner toggles sit just below the top bar.
   function setHeaderH() {
@@ -898,7 +967,11 @@ async function boot() {
       popoverTarget = null;
       tip.hide();
     }
+    // Drop any debounced repaint still in flight: it captured the pre-navigation query and
+    // would land after this render, writing a stale hash over the one Back just restored.
+    clearTimeout(searchTimer);
     applyHash(location.hash);
+    searchPanel.setValue(query); // the box must agree with the restored hash
     refresh("replace");
   });
 

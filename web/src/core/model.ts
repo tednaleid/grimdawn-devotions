@@ -27,6 +27,7 @@ interface RawStar {
 interface RawConstellation {
   id: string;
   name_tag: string;
+  description_tag?: string | null;
   tier: number | null;
   affinity_required: Record<string, number>;
   affinity_bonus: Record<string, number>;
@@ -82,6 +83,7 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
     constellations.set(c.id, {
       id: c.id,
       nameTag: c.name_tag,
+      descriptionTag: c.description_tag ?? null,
       tier: c.tier,
       affinityRequired: c.affinity_required,
       affinityBonus: c.affinity_bonus,
