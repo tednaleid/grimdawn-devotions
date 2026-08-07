@@ -1096,9 +1096,17 @@ test("an unmatched constellation gets no halo", () => {
     { selected: new Set(), pointCap: 55 },
     { manifest, conHighlight: new Set([cons[0]!.id]) },
   );
-  expect(markup).not.toContain(`mask="url(#mask-${cons[1]!.id})"`);
+  // Scope the assertion to the search-glow rect. A bare
+  // `not.toContain('mask="url(#mask-<id>)"')` false-fails on a CORRECT implementation,
+  // because the art-tint layer independently emits the same mask reference for every
+  // constellation that has an affinity requirement.
+  expect(markup).not.toMatch(new RegExp(`<rect class="search-glow"[^>]*mask="url\\(#mask-${cons[1]!.id}\\)"`));
 });
 ```
+
+Add a fourth test the halo's trickiest case needs: a matched constellation that an active affinity filter has muted still gets its halo, wrapped in `#mute-wide`. Nothing else pins that interaction.
+
+These tests need a manifest covering every constellation's art, not just one, so the "unmatched gets no halo" case can genuinely catch an over-broad loop. Add a shared module-level `manifest` fixture if the file does not already have one.
 
 - [ ] **Step 2: Run the test to verify it fails**
 
