@@ -6,6 +6,7 @@ import { isFilterableStat } from "./statFormat";
 
 const MIN_CAP = 1;
 const MAX_CAP = 55;
+const MAX_QUERY = 100; // a shared link carries a search box's worth of text, not a document
 
 /** Stable ordering of every star id: constellation insertion order, then star index. */
 export function canonicalStarIds(model: DevotionModel): StarId[] {
@@ -111,6 +112,7 @@ export function encodeHash(
   benefits: Set<string> = new Set(),
   statCanonical: string[] = [],
   baseline: { selected: Set<StarId>; pointCap: number } | null = null,
+  query: string = "",
 ): string {
   // p=0 is the uncapped sentinel (0 is otherwise an invalid cap; the real min is 1).
   const cap = Number.isFinite(pointCap) ? pointCap : 0;
@@ -122,6 +124,9 @@ export function encodeHash(
     const bcap = Number.isFinite(baseline.pointCap) ? baseline.pointCap : 0;
     out += `&cs=${encodeBitset(baseline.selected, canonical)}&cp=${bcap}`;
   }
+  // Only when a search is active, same as b=; an empty box leaves the hash as it was.
+  const q = query.trim().slice(0, MAX_QUERY);
+  if (q) out += `&q=${encodeURIComponent(q)}`;
   return out;
 }
 
@@ -135,6 +140,7 @@ export function decodeHash(
   pointCap: number;
   benefits: Set<string>;
   baseline: { selected: Set<StarId>; pointCap: number } | null;
+  query: string;
 } | null {
   const raw = hash.replace(/^#/, "").trim();
   if (!raw) return null;
@@ -169,5 +175,14 @@ export function decodeHash(
     baseline = { selected: baseSel, pointCap: bcap };
   }
 
-  return { selected, pointCap, benefits, baseline };
+  // URLSearchParams throws on a malformed escape; a bad q means "no search", like every
+  // other param's tolerance, never a broken page.
+  let query = "";
+  try {
+    query = (params.get("q") ?? "").trim().slice(0, MAX_QUERY);
+  } catch {
+    query = "";
+  }
+
+  return { selected, pointCap, benefits, baseline, query };
 }

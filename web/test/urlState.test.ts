@@ -160,3 +160,55 @@ test("a power-only benefit tag round-trips through the URL without disturbing ol
   const decoded = decodeHash(`#${hash}`, canonical, benefitCanonical);
   expect(decoded!.benefits.has(tag)).toBe(true);
 });
+
+test("a query round-trips through the hash", () => {
+  const h = encodeHash(new Set(), 55, canonical, new Set(), statCanonical, null, "fire res");
+  expect(h).toContain("q=fire%20res");
+  expect(decodeHash(h, canonical, statCanonical)!.query).toBe("fire res");
+});
+
+test("an empty query emits no q param", () => {
+  expect(encodeHash(new Set(), 55, canonical, new Set(), statCanonical, null, "")).not.toContain("q=");
+});
+
+test("a missing q decodes to an empty query", () => {
+  expect(decodeHash("p=55&s=", canonical, statCanonical)!.query).toBe("");
+});
+
+test("an overlong query is truncated, not rejected", () => {
+  const long = "x".repeat(500);
+  const decoded = decodeHash(`p=55&s=&q=${long}`, canonical, statCanonical)!;
+  expect(decoded.query.length).toBe(100);
+});
+
+test("a malformed percent-escape decodes to an empty query rather than throwing", () => {
+  expect(() => decodeHash("p=55&s=&q=%E0%A4%A", canonical, statCanonical)).not.toThrow();
+});
+
+test("a query containing & and = round-trips intact", () => {
+  const raw = "a&b=c";
+  const h = encodeHash(new Set(), 55, canonical, new Set(), statCanonical, null, raw);
+  expect(h).toContain(`q=${encodeURIComponent(raw)}`);
+  const decoded = decodeHash(h, canonical, statCanonical)!;
+  expect(decoded.query).toBe(raw);
+  // encodeURIComponent means the & and = inside the query never introduce extra params
+  const params = new URLSearchParams(h);
+  expect([...params.keys()].sort()).toEqual(["p", "q", "s"]);
+});
+
+test("a whitespace-only query emits no q param", () => {
+  expect(encodeHash(new Set(), 55, canonical, new Set(), statCanonical, null, "   ")).not.toContain("q=");
+});
+
+test("adding a query does not disturb the other params", () => {
+  const canon = canonicalStarIds(model);
+  const stat = canonicalBenefitIds(model);
+  const selected = new Set<StarId>([canon[0]!, canon[5]!]);
+  const benefits = new Set([stat[0]!, stat[3]!]);
+  const hash = encodeHash(selected, 42, canon, benefits, stat, null, "acid");
+  const decoded = decodeHash(hash, canon, stat)!;
+  expect([...decoded.selected].sort()).toEqual([...selected].sort());
+  expect(decoded.pointCap).toBe(42);
+  expect([...decoded.benefits].sort()).toEqual([...benefits].sort());
+  expect(decoded.query).toBe("acid");
+});
