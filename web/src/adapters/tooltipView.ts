@@ -203,6 +203,10 @@ export function tooltipView(el: HTMLElement) {
         .map((p) => `<div class="tip-power">${loc.gameText(p.power.nameTag)}</div>`)
         .join("");
       const head = `<strong>${loc.gameText(con.nameTag)}</strong> <span class="tip-cost">${loc.translate("ui.tooltip.pts", { count: con.starIds.length })}</span>`;
+      // The game's flavour text. Search indexes it, so it has to be visible somewhere or a match on
+      // it is unexplainable - "owl" hitting Unknown Soldier makes sense only once you can read
+      // "their valor and deeds never acknowledged" here.
+      const flavour = con.descriptionTag ? `<div class="tip-flavour">${loc.gameText(con.descriptionTag)}</div>` : "";
       // `dim` with a `needs` count: how many points would complete it. `dim` without one: the engine
       // found no completion within the cap (do not leak the INF sentinel as a giant point count).
       const dimLine = dim
@@ -226,7 +230,7 @@ export function tooltipView(el: HTMLElement) {
               return `<div class="tip-weapon-req">${loc.translate("ui.tooltip.partialGate", { req })}</div>`;
             })
             .join("");
-      el.innerHTML = `${head}${powers}${bonusRowsHtml(loc, sumBonuses(model, stars), selectedBenefits, (id) => id, racialTargets(model, stars))}${weaponReq}${petBonusHtml(loc, sumPetBonuses(model, stars), selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${dimLine}${commitHtml(loc, commit)}`;
+      el.innerHTML = `${head}${flavour}${powers}${bonusRowsHtml(loc, sumBonuses(model, stars), selectedBenefits, (id) => id, racialTargets(model, stars))}${weaponReq}${petBonusHtml(loc, sumPetBonuses(model, stars), selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${dimLine}${commitHtml(loc, commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
