@@ -80,7 +80,7 @@ else:
         check("constellation has description_tag", "description_tag" in con, True)
         cons_with_desc = [c for c in constellations if c["description_tag"]]
         cons_without_desc = [c for c in constellations if not c["description_tag"]]
-        check("most constellations have a description_tag", len(cons_with_desc) > 0, True)
+        check("every constellation has a description_tag", len(cons_without_desc) == 0, True)
         check("every constellation description_tag resolves in game_en",
               all(resolves(c["description_tag"]) for c in cons_with_desc), True)
         check("constellations without a description_tag emit None, not KeyError",
