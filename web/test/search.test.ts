@@ -6,7 +6,11 @@ import { buildModel, type DevotionsDoc } from "../src/core/model";
 import { searchCorpus, matchQuery, normalize, type SearchIndex } from "../src/core/search";
 import { makeLocalization, resolveText } from "../src/core/localization";
 import { condensedRows } from "../src/core/statFormat";
+import { resolveIndex } from "../src/adapters/searchIndex";
 import appEn from "../src/i18n/app.en.json";
+import appDe from "../src/i18n/app.de.json";
+import gameEn from "../../data/i18n/game.en.json";
+import gameDe from "../../data/i18n/game.de.json";
 
 const model = buildModel(devotions as unknown as DevotionsDoc);
 const loc = makeLocalization(appEn as Record<string, string>, {}, "en");
@@ -109,4 +113,64 @@ test("constellation and star matches are reported separately", () => {
   const starHit = matchQuery(i, "fire");
   expect([...starHit.stars]).toEqual(["a"]);
   expect(starHit.constellations.size).toBe(0);
+});
+
+test("resolveIndex produces normalized text findable by matchQuery", () => {
+  const corpus = searchCorpus(model);
+  const index = resolveIndex(loc, corpus);
+  expect(index.stars.size).toBe(model.stars.size);
+  // The Owl constellation carries offensiveTotalDamageModifier, relabelled "All Damage".
+  const m = matchQuery(index, "all damage");
+  expect(m.stars.size).toBeGreaterThan(0);
+});
+
+test("resolveIndex actually resolves game text, not raw tag ids", () => {
+  const enLoc = makeLocalization(
+    appEn as Record<string, string>,
+    appEn as Record<string, string>,
+    "en",
+    gameEn,
+    gameEn,
+  );
+  const corpus = searchCorpus(model);
+  const index = resolveIndex(enLoc, corpus);
+  // crane's nameTag is tagDevotion_A31, English text "Crane".
+  const crane = index.constellations.get("crane")!;
+  expect(crane).toContain("crane");
+  expect(crane).not.toContain("tagdevotion_a31");
+});
+
+test("resolveIndex normalizes: lowercase, no diacritics", () => {
+  const corpus = searchCorpus(model);
+  const index = resolveIndex(loc, corpus);
+  for (const text of index.constellations.values()) {
+    expect(text).toBe(normalize(text));
+  }
+  for (const text of index.stars.values()) {
+    expect(text).toBe(normalize(text));
+  }
+});
+
+test("different locales resolve the same corpus to different index text", () => {
+  const enLoc = makeLocalization(
+    appEn as Record<string, string>,
+    appEn as Record<string, string>,
+    "en",
+    gameEn,
+    gameEn,
+  );
+  const deLoc = makeLocalization(
+    appDe as Record<string, string>,
+    appEn as Record<string, string>,
+    "de",
+    gameDe as Record<string, string>,
+    gameEn,
+  );
+  const corpus = searchCorpus(model);
+  const enIndex = resolveIndex(enLoc, corpus);
+  const deIndex = resolveIndex(deLoc, corpus);
+  // crane resolves to "Crane" in English and "Kranich" in German - a genuine translation.
+  expect(enIndex.constellations.get("crane")).toContain("crane");
+  expect(deIndex.constellations.get("crane")).toContain("kranich");
+  expect(enIndex.constellations.get("crane")).not.toEqual(deIndex.constellations.get("crane"));
 });
