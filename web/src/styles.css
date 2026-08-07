@@ -736,6 +736,11 @@ main {
 .aff-glow {
   pointer-events: none;
 }
+/* Search-match halo on constellation art. The colour and blur live in the SVG filter
+   (#search-glow); this only controls how the masked source rect participates. */
+.search-glow {
+  pointer-events: none;
+}
 .orb {
   display: inline-block;
   width: 0.7em;
