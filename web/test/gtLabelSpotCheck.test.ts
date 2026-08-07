@@ -24,10 +24,16 @@ test("our English noun matches what GrimTools renders", () => {
   }
 });
 
-test("retired wordings appear neither in our catalog nor in GrimTools text", () => {
+// Catalog values only, by exact equality. Do NOT add a `expect(gtText).not.toContain(stale)`
+// half here: a retired wording can be a strict PREFIX of the corrected one, so a substring
+// probe fires on correct data. "Shield Recovery" is a prefix of "Shield Recovery Time", the
+// term we replaced it with, so the moment the fixture is recaptured from a build that takes a
+// star carrying characterDefensiveBlockRecoveryReduction the assertion fails on text that is
+// right. The fixture is third-party prose we neither own nor control; the assertion that
+// actually matters is that OUR catalog never ships a retired wording again.
+test("retired wordings never reappear as a catalog value", () => {
   const catalog = en as Record<string, string>;
   for (const stale of RETIRED) {
-    expect(gtText).not.toContain(stale);
     expect(Object.values(catalog)).not.toContain(stale);
   }
 });
