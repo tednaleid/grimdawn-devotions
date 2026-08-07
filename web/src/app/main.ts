@@ -137,6 +137,8 @@ async function boot() {
   const mapContainer = document.getElementById("map-container") as HTMLElement;
   const benefitsEl = document.getElementById("benefits") as HTMLElement;
   const affinityEl = document.getElementById("affinity") as HTMLElement;
+  const affinityPanelEl = document.getElementById("affinity-panel") as HTMLElement;
+  const availPanelEl = document.getElementById("avail-panel") as HTMLElement;
   const tooltipEl = document.getElementById("tooltip") as HTMLElement;
   const barEl = document.getElementById("point-bar") as HTMLElement;
   const totalWord = document.getElementById("total-word") as HTMLElement;
@@ -714,7 +716,7 @@ async function boot() {
     renderBenefitsPanel();
     prevAffinity = renderAffinities(
       localization,
-      affinityEl,
+      affinityPanelEl,
       model,
       reach.have,
       reach.need,
@@ -723,22 +725,15 @@ async function boot() {
       selectedBenefits,
     );
     // "Available to get" goes under the Affinity panel, separated from the affinity rows.
+    let availParts = "";
     if (availHtml)
-      affinityEl.insertAdjacentHTML(
-        "beforeend",
-        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.availableToGet")}</h2>${availHtml}`,
-      );
+      availParts += `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.availableToGet")}</h2>${availHtml}`;
     if (petAvailHtml)
-      affinityEl.insertAdjacentHTML(
-        "beforeend",
-        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.petBonus")}</h2>${petAvailHtml}`,
-      );
+      availParts += `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.petBonus")}</h2>${petAvailHtml}`;
     const availPowers = availablePowers(model, reach.reachableStars);
     if (availPowers.length)
-      affinityEl.insertAdjacentHTML(
-        "beforeend",
-        `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.celestialPowers")}</h2>${powersListHtml(localization, availPowers)}`,
-      );
+      availParts += `<hr class="panel-sep"/><h2>${localization.translate("ui.panel.celestialPowers")}</h2>${powersListHtml(localization, availPowers)}`;
+    availPanelEl.innerHTML = availParts;
     // Empty-state copy. The build order shows whenever the selection is self-covering: the cap is auto-raised
     // to the validity floor (above), so a self-covering selection that still has no order is genuinely
     // unbuildable within 55, not merely under-budgeted. Otherwise show a prompt (nothing to order yet) or the

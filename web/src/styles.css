@@ -591,6 +591,20 @@ main {
   border-top: 1px solid #30363d;
   margin: 1.3rem -0.75rem 0.7rem;
 }
+.search-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+#search-input {
+  flex: 1;
+  min-width: 0;
+}
+#search-count {
+  margin-top: 4px;
+  opacity: 0.75;
+  font-size: 0.9em;
+}
 .power,
 .tip-power {
   color: #f0c14b;
