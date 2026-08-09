@@ -132,8 +132,10 @@ up short is a data change we need to look at, not a table to ship.
 
 ## Part 2: the worker
 
-Lives in `worker/` in this repo, deployed by `just deploy-worker`, so it is versioned
-next to what it serves.
+Lives in `worker/` in this repo, so it is versioned next to what it serves. Normal
+deployment is from CI on push to `main`. A `just deploy-worker` recipe wraps the same
+`wrangler deploy` for the first deploy and as an escape hatch, but it is not the usual
+path.
 
 Contract: `GET /?slug=<slug>` returns
 `{slug, stars: ["sk688", ...], gameVersion, dataVersion}`.
@@ -173,16 +175,37 @@ by string-aware brace matching rather than by a line ending.
    feature will use.
 2. On first Workers use, choose a `*.workers.dev` subdomain. It is part of the public
    URL.
-3. `npm i -D wrangler` in this repo. Project-local and version-pinned, not global.
-4. Authenticate with `wrangler login`, which does a browser OAuth flow and stores a
-   local token. **Create no API token.** The worker changes rarely enough that manual
-   deploys from a developer machine are appropriate, which means no secret in GitHub,
-   nothing to rotate, and nothing to leak.
-5. A CI deploy is out of scope. If it is ever wanted, use the "Edit Cloudflare
-   Workers" token template scoped to the single account, stored as
-   `CLOUDFLARE_API_TOKEN` in repo secrets.
+3. `npm i -D wrangler` in this repo. Wrangler is Cloudflare's CLI. Keep it
+   project-local and version-pinned so CI and a developer machine run the same
+   version.
+4. For local work, authenticate with `wrangler login`. That runs a browser OAuth flow
+   and stores the issued token in a local config file, so there is no key to copy by
+   hand.
+5. Deployment is from CI, not from a developer machine, so that it is reproducible,
+   logged, and does not depend on one person's laptop. That requires an API token,
+   because there is no browser to redirect to. See below.
 6. `wrangler tail` gives live logs; the dashboard gives request and error counts. A
    rate-limiting rule on the route is optional hardening.
+
+### The deploy token
+
+Created by hand in the dashboard under My Profile, API Tokens, from the "Edit
+Cloudflare Workers" template, then narrowed: account resources scoped to the single
+account, and the zone and Workers Routes permissions removed, since deployment targets
+`*.workers.dev` rather than a custom domain. The result needs only
+`Account -> Workers Scripts: Edit`.
+
+Leave IP filtering off, because runner addresses are dynamic. Leave expiry off as
+well: a token that lapses silently would break deploys on a worker nobody has touched
+in months, and the token is revocable in one click if it ever leaks.
+
+The token is stored as the `CLOUDFLARE_API_TOKEN` repository secret. The account id is
+an identifier rather than a credential, so it lives in the committed `wrangler.toml`.
+
+Repository secrets are reachable by any workflow that can run in the repository, so
+the deploy workflow triggers only on `push` to `main`, filtered to `worker/**`. It
+never triggers on `pull_request`, which keeps the token out of reach of runs started
+by a pull request and stops unrelated commits from redeploying.
 
 ## Part 3: the planner
 
@@ -270,7 +293,6 @@ item CLI's `unmatched_criteria`.
 ## Out of scope
 
 - Importing anything other than devotions (gear, mastery skills, attributes).
-- A CI deploy of the worker.
 - An e2e leg for the import wiring. Noted in `BACKLOG.md`, matching how the search
   box shipped.
 - Automatic divergence marking between the imported set and the current build.
