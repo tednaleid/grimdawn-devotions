@@ -304,8 +304,15 @@ when they disagree. Separately, a scheduled canary imports a known slug and asse
 exact star set, so a shape or numbering change reaches us from CI rather than from a
 confused user.
 
-Unmapped ids are always reported, never dropped, following the same discipline as the
-item CLI's `unmatched_criteria`.
+An earlier draft of this spec called for reporting unmapped ids, following the item
+CLI's `unmatched_criteria` discipline. Planning showed that is not implementable and
+not needed. `buildInfo.data.skills` mixes mastery skills and devotion stars with no
+marker separating them, so membership in the table is the only thing that tells them
+apart, and an id absent from the table cannot be distinguished from a mastery skill.
+The case that motivated the requirement, a star the table does not know because
+grimtools added stars after it was generated, is caught by the data-version check
+above. What does get reported is pruning by `repairSelection`, which is a real and
+detectable loss.
 
 ## Testing
 
