@@ -5,6 +5,11 @@
 //
 // Every count below is asserted before anything is written: a short count means grimtools' data
 // moved, which is a thing to look at rather than a table to ship.
+//
+// The bonus cross-check gate (see below) only exercises the 47 stars of the one hardcoded
+// CALC_URL build - about 8% of the 559 total - so it verifies within-constellation star
+// ORDER for those stars' constellations only. It is not proof the other 512 stars joined in
+// the right order; broader confidence there comes from checking additional builds by hand.
 import { readdirSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
@@ -141,6 +146,12 @@ const norm = (o: Record<string, number> | undefined) =>
     .map(([k, v]) => `${k}:${v}`)
     .join(",");
 
+const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** True if `n` appears in `text` as a standalone number, not as digits inside a longer number
+ * (so candidate 12 does not match inside 120, 512, or 1.25). */
+const matchesBoundary = (text: string, n: number) =>
+  new RegExp(`(?<![\\d.])${escapeRegex(String(n))}(?![\\d.])`).test(text);
+
 type F6Con = { displayTag: string; requires: Record<string, number>; grants: Record<string, number>; skIds: string[] };
 type GtCon = {
   displayTag: string;
@@ -244,6 +255,11 @@ if (covered.size !== 559) fail(`expected 559 distinct star ids, got ${covered.si
 // tooltip for each star the loaded build has selected, so cross-checking our recorded bonus
 // values against that text (independent of the sk-index join above) catches that failure mode.
 // isSkill:true entries are bound proc skills (e.g. "Targo's Hammer"), not stars, and are skipped.
+// Both counts below are hardcoded expectations for CALC_URL, exactly like the counts above are
+// for f6I/devotion.json: if this build's own content ever moves, the gate must say so rather
+// than silently check fewer stars (or none) while still writing the table.
+if (devotionDump.length !== 55)
+  fail(`expected dumpDevotion() to return 55 entries for CALC_URL, got ${devotionDump.length}`);
 const dumpStars = devotionDump.filter((d) => !d.isSkill);
 let bonusChecked = 0;
 for (const d of dumpStars) {
@@ -263,7 +279,7 @@ for (const d of dumpStars) {
       Math.round(v),
       ...durations.flatMap((dur) => [v * dur, Math.round(v * dur)]),
     ]);
-    const found = [...candidates].some((c) => d.details.includes(String(c)));
+    const found = [...candidates].some((c) => matchesBoundary(d.details, c));
     if (!found)
       fail(
         `bonus mismatch: ${d.id} (${dbr}) ${key}=${v} (tried ${[...candidates].join(", ")}) not found in tooltip: ${d.details.split("\n").slice(0, 2).join(" / ")}`,
@@ -271,6 +287,7 @@ for (const d of dumpStars) {
   }
   bonusChecked++;
 }
+if (bonusChecked !== 47) fail(`expected the bonus cross-check to check 47 stars, checked ${bonusChecked}`);
 console.error(`bonus cross-check: ${bonusChecked} of ${dumpStars.length} checked, out of ${devotionDump.length} stars`);
 
 writeFileSync(
