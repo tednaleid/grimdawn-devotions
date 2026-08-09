@@ -448,13 +448,39 @@ clean-derived:
 items *ARGS:
     uv run "{{justfile_directory()}}/scripts/gditems.py" {{ARGS}}
 
-# Scrape a shared grimtools build into JSON (needs the headless browser: just install-e2e).
-# Forces the difficulty selector to Ultimate before reading, since Elite and Normal
-# overstate every resistance cushion by 25 and 50. See docs/grimtools-build-audit.md.
+# List the Grim Dawn characters saved on this machine (name, level, class, save path).
+# Reads player.gdc directly; nothing leaves the machine. Set GD_SAVE_DIR if your saves
+# are somewhere unusual. See docs/grimtools-build-audit.md.
 [group("deposit")]
-[doc("Scrape a grimtools build to JSON: just gt-scrape https://www.grimtools.com/calc/ID out.json")]
-gt-scrape URL OUT:
-    bun "{{justfile_directory()}}/scripts/gt_scrape.ts" "{{URL}}" "{{OUT}}"
+[doc("List local Grim Dawn characters: just gd-characters [--json]")]
+gd-characters *ARGS:
+    uv run "{{justfile_directory()}}/scripts/gd_save.py" list {{ARGS}}
+
+# Print the save-file path for one local character, for piping into gt-scrape.
+[group("deposit")]
+[doc("Path to a character's save: just gd-save-path Ted4")]
+gd-save-path NAME:
+    @uv run "{{justfile_directory()}}/scripts/gd_save.py" path "{{NAME}}"
+
+# Scrape a grimtools build into JSON (needs the headless browser: just install-e2e).
+# SOURCE is either a shared calc URL or a local player.gdc path - a save is fed to the
+# calculator's Import control, which uploads it to grimtools. Forces the difficulty
+# selector to Ultimate before reading, since Elite and Normal overstate every resistance
+# cushion by 25 and 50. See docs/grimtools-build-audit.md.
+[group("deposit")]
+[doc("Scrape a build to JSON: just gt-scrape <calc-url|player.gdc> out.json")]
+gt-scrape SOURCE OUT:
+    bun "{{justfile_directory()}}/scripts/gt_scrape.ts" "{{SOURCE}}" "{{OUT}}"
+
+# Scrape a local character by name and audit it in one step (uploads the save to grimtools).
+[group("deposit")]
+[doc("Audit a local character end to end: just gd-audit Ted4 [out.json]")]
+gd-audit NAME OUT="build.json":
+    #!/usr/bin/env bash
+    set -euo pipefail
+    save="$(uv run "{{justfile_directory()}}/scripts/gd_save.py" path "{{NAME}}")"
+    bun "{{justfile_directory()}}/scripts/gt_scrape.ts" "$save" "{{OUT}}"
+    uv run "{{justfile_directory()}}/scripts/gt_audit.py" "{{OUT}}"
 
 # Audit a scraped build against our own data: RR ledger, monster cross-check,
 # circuit breakers, resistance cushions, and a devotion planner link.

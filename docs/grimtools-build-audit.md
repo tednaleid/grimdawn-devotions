@@ -1,23 +1,33 @@
 # Auditing a grimtools build
 
-How to read a character out of a shared `grimtools.com/calc/<id>` link and audit
-it against this project's own data. The goal is a report where every claim is
-traceable to data rather than recollection.
+How to read a character - either from a shared `grimtools.com/calc/<id>` link or
+from a local `player.gdc` save - and audit it against this project's own data.
+The goal is a report where every claim is traceable to data rather than
+recollection.
 
-Two scripts do the mechanical work; everything below explains why they are shaped
-the way they are, and what still needs a human eye:
+Three scripts do the mechanical work; everything below explains why they are
+shaped the way they are, and what still needs a human eye:
 
 ```
-bun scripts/gt_scrape.ts https://www.grimtools.com/calc/<id> build.json
-uv run scripts/gt_audit.py build.json
+just gd-characters                                # what is saved on this machine
+just gt-scrape <calc-url|path/to/player.gdc> build.json
+just gt-audit build.json
 ```
 
-`gt_scrape.ts` loads the page and writes one JSON blob: gear, skills, devotions,
-the buff catalogue, and the full character sheet in three named buff states with
-resistance overcap for each. `gt_audit.py` turns that into findings - the RR
-ledger, the monster cross-check, circuit breakers, and a planner link. Its
-parsing rules are pure and pinned by `scripts/test_gt_audit.py`, because every
-one of them exists to fix a mistake a hand-written regex made first.
+For a local character those collapse into one step:
+
+```
+just gd-audit Ted4
+```
+
+`gd_save.py` reads save files locally and never talks to the network.
+`gt_scrape.ts` loads the calculator and writes one JSON blob: gear, skills,
+devotions, the buff catalogue, and the full character sheet in three named buff
+states with resistance overcap for each. `gt_audit.py` turns that into findings -
+the RR ledger, the monster cross-check, circuit breakers, and a planner link.
+Their parsing rules are pure and pinned by `scripts/test_gt_audit.py` and
+`scripts/test_gd_save.py`, because every one of them exists to fix a mistake a
+hand-written regex or a hand-read byte offset made first.
 
 ## Getting the build out of grimtools
 
@@ -56,6 +66,74 @@ tabs. Hidden nodes have no `innerText`, so read **`textContent`** and the whole
 sheet arrives in one pass: damage modifiers, crit, speeds, block, dodge,
 retaliation, and every control resistance.
 
+## Starting from a local save
+
+`just gd-characters` lists every character on the machine with name, level, class
+and save path. It reads the files directly, so it works with the game closed and
+nothing leaves the machine.
+
+Saves live in one of two places. With Steam Cloud on (the default) they are under
+`Steam/userdata/<id>/219990/remote/save/main/_<name>/player.gdc`; with it off they
+are under `Documents/My Games/Grim Dawn/save/main/`. `gd_save.py` looks in both,
+and `GD_SAVE_DIR` overrides the search.
+
+### The file is obfuscated, but not encrypted
+
+A `.gdc` is xored against a keystream seeded from its own first four bytes:
+`key = seed ^ 0x55555555`, then a 256-entry table built by rotating right one bit
+and multiplying by 39916801. Nothing is readable until the stream is walked in
+order from the start.
+
+Two things make this easy to get subtly wrong:
+
+- **Reads must happen at the right width.** A 32-bit read xors all four bytes
+  against one key; four byte reads advance the key between each. Reading the
+  wrong width does not fail, it desynchronises everything after it.
+- **The character name is UTF-16 and the class tag is ASCII**, both
+  length-prefixed with a count of characters rather than bytes.
+
+The check that the schedule is right is that the first decoded word is the ASCII
+magic `GDCX`. `scripts/test_gd_save.py` round-trips a synthetic save through an
+encoder that borrows the reader's own table, so the test cannot pass by
+duplicating a bug in the table generation.
+
+`gd_save.py` parses **only the header**. Everything after it is a chain of
+length-prefixed blocks it deliberately does not walk, because gear, skills and
+devotions come from the calculator, which also computes the character sheet.
+
+### The class name needs the expansion text, and the base game lies about it
+
+The class is one tag whose digits are the two mastery numbers:
+`tagSkillClassName0306` is Occultist + Shaman, Conjurer. Resolving it needs
+`extracted/text_en`, and there is a trap in the merge. The base game ships
+placeholders for the expansion masteries (`tagSkillClassName07=?` and
+`tagSkillClassName0407=` empty) and the expansion files carry the real names, but
+**NTFS returns `tagsgdx1_skills.txt` before `tags_skills.txt`**, so a
+last-writer-wins merge resolves Infiltrator back to "Nightblade + ?".
+`gd_save.load_tags` never lets a placeholder overwrite a real name. Note that
+`gd_dbr.load_translations` has no such rule, so any other consumer of that table
+inherits the ordering bug.
+
+### Importing a save uploads it
+
+The calculator's Import control is **server-side**: `calc.js` posts the file to
+`upload_save.php` through a `FormData`, and there is no `FileReader` anywhere in
+it. The save is transmitted to grimtools. That is fine for your own character and
+worth asking about before pointing the scraper at someone else's.
+
+Mechanically the file input is `#file-save`, hidden behind an overlay, so
+`gt_scrape.ts` sets it directly with CDP's `DOM.setFileInputFiles` rather than
+clicking through a native file dialog. Setting files fires `input` and `change`,
+which is what `calc.js` listens for.
+
+**`buildInfo` is `null` after an import.** That global is populated by decoding a
+calc URL slug, and an imported character has no slug, so `buildInfo.data.bio`
+throws and `getCombinedClassName()` still works. Every field the probe took from
+`buildInfo` falls back to the DOM: the level from `Level \d+` in the body text
+and the game version from the header. A save import also produces no shareable
+link, which is a feature rather than a gap - the audit needs the loaded page, not
+a published build.
+
 ## Two traps that produce confidently wrong advice
 
 Neither is discoverable by reasoning. Both require checking the page.
@@ -66,6 +144,12 @@ Neither is discoverable by reasoning. Both require checking the page.
 buffs off. A build showing `Buffs (5/15)` had **Blood of Dreeg** among the ten
 that were off, and that buff carried +120% Poison & Acid and +19% Physical
 Resistance.
+
+An imported save behaves the same way, so this is not a shared-link problem: a
+level 69 Conjurer arrived at `Buffs (4/12)` and only reached 8 once the probe
+turned the non-potion buffs on, which moved its bleeding resistance from 35% to
+55%. Whichever source the build came from, read the named states rather than one
+column.
 
 The panel therefore read **Poison 36%** and **Physical 18%**, which look like
 glaring holes and are not: with the buff on they are **83%** and **37%**.

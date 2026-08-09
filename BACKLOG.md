@@ -831,3 +831,22 @@ assertion to the bun suite, which always runs: load the committed JSON and
 assert every constellation has a non-null `description_tag`. Pointer: the
 model/data tests under `web/test/`; the Python-side check is "every
 constellation has a description_tag" in `scripts/test_parse_devotions.py`.
+
+## Base-game placeholders clobber expansion text in `load_translations`
+
+`gd_dbr.load_translations` globs `*.txt` and merges last-writer-wins. The base
+game ships placeholders for the expansion masteries (`tagSkillClassName07=?`,
+`tagSkillClassName0407=` empty) and the expansion files carry the real names,
+but NTFS returns `tagsgdx1_skills.txt` **before** `tags_skills.txt`, so the
+placeholder wins and Infiltrator resolves to "Nightblade + ?". Found while
+building `scripts/gd_save.py`, which works around it locally by never letting an
+empty or `?` value overwrite a real one.
+
+Two things to settle before changing the shared loader: whether the same
+ordering bug is why `data/i18n/game.*.json` had to be hand-merged (see the
+game-table staleness item), and whether any committed data currently depends on
+the base-game value winning. Fixing it will change generated output, so it wants
+a diff against the committed tables rather than a blind regeneration. Pointers:
+`load_translations` in `scripts/gd_dbr.py`, consumers in
+`scripts/build_game_tables.py` and `scripts/parse_devotions.py`, and the
+placeholder-aware version in `gd_save.load_tags`.
