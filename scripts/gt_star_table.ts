@@ -142,15 +142,23 @@ const norm = (o: Record<string, number> | undefined) =>
     .join(",");
 
 type F6Con = { displayTag: string; requires: Record<string, number>; grants: Record<string, number>; skIds: string[] };
-type GtCon = { displayTag: string; affinitiesGiven: Record<string, number>; stars: { skill: string }[] };
+type GtCon = {
+  displayTag: string;
+  affinitiesGiven: Record<string, number>;
+  affinitiesRequired: Record<string, number>;
+  stars: { skill: string }[];
+};
 type OurStar = { index: number; dbr: string; bonuses: Record<string, number> };
 type OurCon = { id: string; stars: OurStar[] };
+/** One entry per star (or per bound proc skill) in the build's selection, from dumpDevotion(). */
+type DumpEntry = { id: string; name: string; details: string; isSkill: boolean };
 
 const devotionRes = await fetch(DEVOTION_JSON, { headers: { "User-Agent": UA } });
 if (!devotionRes.ok) fail(`devotion.json fetch returned ${devotionRes.status}`);
 const devotion = (await devotionRes.json()) as { version: string; constellations: Record<string, GtCon> };
 
 let f6i: F6Con[];
+let devotionDump: DumpEntry[];
 try {
   const cdp = await CDP.connect(await pageWsUrl());
   await cdp.send("Page.enable");
@@ -165,6 +173,11 @@ try {
   if (!ready) fail("the calculator never exposed f6I");
   await Bun.sleep(3000);
   f6i = JSON.parse(await cdp.evaluate<string>(PROBE));
+  // CALC_URL is a real build with its own devotion selection, so dumpDevotion() (the same
+  // function gt_scrape.ts uses) gives rendered tooltip text for those stars while the page
+  // is still loaded. That text is the only thing in this script that reflects WITHIN-
+  // constellation star order, so it is what catches a scrambled-but-same-length join.
+  devotionDump = JSON.parse(await cdp.evaluate<string>(`JSON.stringify(dumpDevotion())`));
 } finally {
   cleanup();
 }
@@ -189,6 +202,12 @@ const skToDbr = new Map<string, string>();
 for (const a of f6i) {
   const b = byKey.get(`${a.displayTag}|${norm(a.grants)}`);
   if (!b) fail(`no devotion.json match for ${a.displayTag} granting ${norm(a.grants)}`);
+  // f6I's `Va` (requires) should equal devotion.json's affinitiesRequired for the same
+  // constellation. This is a free correctness check on top of the join key: it would have
+  // caught trap #2 (Va/cb inverted) outright, since an inverted `requires` would be compared
+  // against the GRANT instead and mismatch almost everywhere.
+  if (norm(a.requires) !== norm(b.affinitiesRequired))
+    fail(`${a.displayTag}: f6I requires ${norm(a.requires)}, devotion.json requires ${norm(b.affinitiesRequired)}`);
   if (a.skIds.length !== b.stars.length)
     fail(`${a.displayTag}: f6I has ${a.skIds.length} stars, devotion.json has ${b.stars.length}`);
   a.skIds.forEach((sk, j) => {
@@ -218,6 +237,41 @@ for (const [sk, dbr] of skToDbr) {
 }
 const covered = new Set(Object.values(stars));
 if (covered.size !== 559) fail(`expected 559 distinct star ids, got ${covered.size}`);
+
+// The counts above prove every constellation joined with the right star COUNT, but not that
+// the stars within a constellation joined in the right ORDER: a scrambled-but-same-length
+// pairing would pass every assertion so far. dumpDevotion() gives the calc's own rendered
+// tooltip for each star the loaded build has selected, so cross-checking our recorded bonus
+// values against that text (independent of the sk-index join above) catches that failure mode.
+// isSkill:true entries are bound proc skills (e.g. "Targo's Hammer"), not stars, and are skipped.
+const dumpStars = devotionDump.filter((d) => !d.isSkill);
+let bonusChecked = 0;
+for (const d of dumpStars) {
+  const dbr = skToDbr.get(d.id);
+  if (!dbr) fail(`dumpDevotion() star ${d.id} (${d.name}) has no skToDbr entry`);
+  if (!dbrToStarId.has(dbr)) fail(`dumpDevotion() star ${d.id} maps to ${dbr}, absent from data/devotions.json`);
+  const bonuses = dbrToBonuses.get(dbr) ?? {};
+  const numeric = Object.entries(bonuses).filter(([, v]) => typeof v === "number");
+  if (numeric.length === 0) continue; // trap #4 exemption: nothing numeric to check on this star
+
+  // Trap #4: DoT bonuses are stored as a per-second rate but rendered as a total, so a rate
+  // paired with a duration on the same star must also be tried as rate * duration.
+  const durations = numeric.filter(([k]) => /Duration/i.test(k)).map(([, v]) => v);
+  for (const [key, v] of numeric) {
+    const candidates = new Set<number>([
+      v,
+      Math.round(v),
+      ...durations.flatMap((dur) => [v * dur, Math.round(v * dur)]),
+    ]);
+    const found = [...candidates].some((c) => d.details.includes(String(c)));
+    if (!found)
+      fail(
+        `bonus mismatch: ${d.id} (${dbr}) ${key}=${v} (tried ${[...candidates].join(", ")}) not found in tooltip: ${d.details.split("\n").slice(0, 2).join(" / ")}`,
+      );
+  }
+  bonusChecked++;
+}
+console.error(`bonus cross-check: ${bonusChecked} of ${dumpStars.length} checked, out of ${devotionDump.length} stars`);
 
 writeFileSync(
   "data/grimtools-stars.json",
