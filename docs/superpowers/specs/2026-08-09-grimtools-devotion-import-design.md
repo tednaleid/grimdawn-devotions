@@ -276,5 +276,11 @@ item CLI's `unmatched_criteria`.
 - Automatic divergence marking between the imported set and the current build.
 - Any change to `scripts/gt_scrape.ts`. Its headless path still serves the audit
   workflow, which needs the rendered character sheet rather than just the build
-  record. The stale claim in `docs/grimtools-build-audit.md` about where the build
-  data lives should be corrected in place as part of this work.
+  record.
+
+## Included, though it sits outside the feature
+
+`docs/grimtools-build-audit.md` states that the build is decoded from the URL slug
+client side and that there is no request carrying build data. That is wrong, and it is
+the reason the audit workflow reaches for headless Chrome where a plain GET would do.
+Correct it in place, per the living-docs rule, as part of this work.
