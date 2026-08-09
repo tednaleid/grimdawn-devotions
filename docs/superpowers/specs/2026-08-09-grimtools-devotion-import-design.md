@@ -207,6 +207,35 @@ the deploy workflow triggers only on `push` to `main`, filtered to `worker/**`. 
 never triggers on `pull_request`, which keeps the token out of reach of runs started
 by a pull request and stops unrelated commits from redeploying.
 
+### Automating everything except the minting
+
+Creating the token itself cannot be automated. Cloudflare's `POST
+/client/v4/user/tokens` requires a credential that already holds
+`User API Tokens: Edit`, which means either another hand-made token or the Global API
+Key. Bootstrapping through the Global Key would mean hand-copying a credential that
+can do everything on the account in order to avoid hand-copying one that can only edit
+Workers scripts, which is a worse trade. Cloudflare also has no GitHub OIDC federation
+for API access, so the long-lived secret cannot be avoided entirely, and the OAuth
+token from `wrangler login` does not carry the token-management scope. Two minutes in
+the dashboard, once, is the floor.
+
+Everything after the copy is scripted, as `just setup-worker-auth`. It reads the token
+**on stdin**, never as an argument, so the value never reaches shell history or the
+process table. It then:
+
+1. runs `npx wrangler whoami` to read the account id and writes it into
+   `wrangler.toml`;
+2. verifies the token against `GET /client/v4/user/tokens/verify` and fails if it is
+   not active;
+3. confirms the token actually carries deploy permission with a dry run, rather than
+   letting that surface on the first real deploy;
+4. stores it with `gh secret set CLOUDFLARE_API_TOKEN` for this repository;
+5. reports each step, and never echoes the token.
+
+`gh` must be installed and authenticated with `repo` scope, which it already is on the
+development machine. The recipe checks for that up front and says so plainly rather
+than failing partway through. Rotation later is the same recipe with a fresh value.
+
 ## Part 3: the planner
 
 ### The control
