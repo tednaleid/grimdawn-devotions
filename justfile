@@ -456,6 +456,11 @@ items *ARGS:
 gt-scrape URL OUT:
     bun "{{justfile_directory()}}/scripts/gt_scrape.ts" "{{URL}}" "{{OUT}}"
 
+# Regenerate the grimtools sk-id -> star-id mapping table (needs headless Chrome: just install-e2e)
+[group("deposit")]
+gt-star-table:
+    bun "{{justfile_directory()}}/scripts/gt_star_table.ts"
+
 # Audit a scraped build against our own data: RR ledger, monster cross-check,
 # circuit breakers, resistance cushions, and a devotion planner link.
 [group("deposit")]
