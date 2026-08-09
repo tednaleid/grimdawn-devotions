@@ -304,7 +304,7 @@ git commit -m "feat(grimtools): parse calc slugs and extract inline buildInfo"
 
 - [ ] **Step 1: Write the generator**
 
-Create `scripts/gt_star_table.ts`. Copy **lines 27 through 134 of `scripts/gt_scrape.ts` verbatim** (the `isWin` constant, `chromeShellPath()`, the Chrome spawn, `cleanup()`, `pageWsUrl()`, the `CdpResult` type and the `CDP` class), changing only the debug port from 9412 to 9417. That block is duplicated rather than imported because the repo's `scripts/` are standalone programs; raw CDP is used because Playwright's transports do not connect under Bun on Windows.
+Create `scripts/gt_star_table.ts`. Copy **lines 21 through 128 of `scripts/gt_scrape.ts` verbatim** (the `isWin` constant, `chromeShellPath()`, the Chrome spawn, `cleanup()`, `pageWsUrl()`, the `CdpResult` type and the `CDP` class, ending at the class's closing brace immediately before the `PROBE` comment), changing only the debug port from 9412 to 9417. Verify the range still starts at `const isWin` and ends at that brace before copying; if it does not, find the same block by name rather than by line number. That block is duplicated rather than imported because the repo's `scripts/` are standalone programs; raw CDP is used because Playwright's transports do not connect under Bun on Windows.
 
 ```ts
 // ABOUTME: Regenerates data/grimtools-stars.json, mapping grimtools sk ids to our star ids.
