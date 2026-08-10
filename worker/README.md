@@ -31,6 +31,23 @@ Cloudflare account, no login, no network dependency beyond the outbound fetch to
 grimtools the worker itself makes. Tasks that build the import UI against this worker
 need no Cloudflare setup at all.
 
+### Testing the planner against it (`just serve`)
+
+`wrangler.toml`'s `ALLOWED_ORIGIN` is the production origin
+(`https://tednaleid.github.io`), so a planner served locally by `just serve`
+(`http://localhost:5173`) is a different origin and the worker's CORS header refuses
+it. Override the local origin by creating `worker/.dev.vars` (gitignored, wrangler's
+own convention for local-only var overrides - never committed, even though nothing in
+it is secret today) with:
+
+```
+ALLOWED_ORIGIN=http://localhost:5173
+```
+
+`wrangler dev` picks this up automatically and it layers over (does not require
+editing) `wrangler.toml`'s `[vars]`. Delete the file, or just don't create it, to test
+CORS refusal itself.
+
 ## Deployment
 
 Normal deployment is from CI on push to `main`, filtered to `worker/**`. A

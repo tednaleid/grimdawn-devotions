@@ -60,6 +60,24 @@ test("passes an unknown slug through as a 404", async () => {
   expect(res.status).toBe(404);
 });
 
+test("reports grimtools' null-build page as 404 not_found, not 502", async () => {
+  // The real shape grimtools serves for an unknown-but-plausible slug: HTTP 200 with
+  // `buildInfo = null`, never an actual 404. This must resolve the same as a genuine 404 so the
+  // app's notFound message fires instead of the generic network-failure one.
+  const missing = (async () => new Response(`<script>window['buildInfo'] = null;</script>`, { status: 200 })) as never;
+  const res = await handleRequest(new Request("https://w/?slug=zzzzzzzz"), env(missing));
+  expect(res.status).toBe(404);
+  expect((await res.json()).error).toBe("not_found");
+});
+
+test("reports a genuinely malformed page as 502 unparseable, distinct from a missing build", async () => {
+  const malformed = (async () =>
+    new Response("<html><body>no buildInfo marker at all</body></html>", { status: 200 })) as never;
+  const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV"), env(malformed));
+  expect(res.status).toBe(502);
+  expect((await res.json()).error).toBe("unparseable");
+});
+
 test("degrades to a null dataVersion when devotion.json is unavailable", async () => {
   const partial = (async (u: string) =>
     String(u).includes("devotion.json")

@@ -1,7 +1,7 @@
 // ABOUTME: Cloudflare Worker that returns a grimtools build's devotion star ids for one slug.
 // ABOUTME: Takes a slug and never a URL, so there is no code path that fetches a caller-named host.
 /// <reference path="./worker-env.d.ts" />
-import { extractBuildInfo } from "../../web/src/core/grimtools";
+import { extractBuildInfo, buildIsMissing } from "../../web/src/core/grimtools";
 
 const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
 const CALC = "https://www.grimtools.com/calc/";
@@ -50,16 +50,25 @@ async function boundedText(res: Response): Promise<string> {
   return text;
 }
 
+/** The three ways reading a calc page can resolve: a real build, an explicit `null` (no such
+ * slug - grimtools returns HTTP 200 for these, never a 404), or a page that is malformed in some
+ * other way. Kept distinct so the caller can tell "no such build" from "could not understand the
+ * response", which are different failures worth reporting differently to the user. */
+type BuildInfoResult =
+  | { kind: "found"; info: NonNullable<ReturnType<typeof extractBuildInfo>> }
+  | { kind: "missing" }
+  | { kind: "unparseable" };
+
 /**
- * Read a response body incrementally, stopping the moment a complete `buildInfo` object is found,
- * so a hostile or oversized upstream cannot force a full-body brace-matching scan on the whole
- * MAX_BYTES cap. MAX_BYTES is the backstop for the case where `buildInfo` never appears. Uses
- * `{ stream: true }` so a multi-byte character split across a chunk boundary decodes correctly
- * rather than as a replacement character.
+ * Read a response body incrementally, stopping the moment a complete `buildInfo` object is found
+ * or the page marks itself as not a build, so a hostile or oversized upstream cannot force a
+ * full-body brace-matching scan on the whole MAX_BYTES cap. MAX_BYTES is the backstop for the case
+ * where `buildInfo` never resolves either way. Uses `{ stream: true }` so a multi-byte character
+ * split across a chunk boundary decodes correctly rather than as a replacement character.
  */
-async function readBuildInfo(res: Response): Promise<ReturnType<typeof extractBuildInfo>> {
+async function readBuildInfo(res: Response): Promise<BuildInfoResult> {
   const reader = res.body?.getReader();
-  if (!reader) return null;
+  if (!reader) return { kind: "unparseable" };
   const decoder = new TextDecoder();
   let text = "";
   let total = 0;
@@ -75,10 +84,14 @@ async function readBuildInfo(res: Response): Promise<ReturnType<typeof extractBu
     const info = extractBuildInfo(text);
     if (info) {
       await reader.cancel();
-      return info;
+      return { kind: "found", info };
+    }
+    if (buildIsMissing(text)) {
+      await reader.cancel();
+      return { kind: "missing" };
     }
   }
-  return null;
+  return { kind: "unparseable" };
 }
 
 export async function handleRequest(request: Request, env: Env): Promise<Response> {
@@ -102,19 +115,24 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   // non-ok branch below as any other upstream failure.
   const fetchOpts = { headers: { "User-Agent": UA }, signal, redirect: "manual" as const };
 
-  let info: ReturnType<typeof extractBuildInfo>;
+  let result: BuildInfoResult;
   try {
     const page = await doFetch(`${CALC}${slug}`, fetchOpts);
+    // grimtools serves a real 404 only for a request shape it does not recognize at all (kept
+    // here as a belt-and-suspenders case); an unknown-but-plausible slug is HTTP 200 with
+    // `buildInfo = null`, caught below via result.kind === "missing" instead.
     if (page.status === 404) return json({ error: "not_found" }, 404, origin);
     if (!page.ok) return json({ error: "upstream", status: page.status }, 502, origin);
-    info = await readBuildInfo(page);
+    result = await readBuildInfo(page);
   } catch {
     // Covers a network failure and the shared timeout firing mid-fetch or mid-read, so every
     // failure path still returns our structured JSON (with CORS headers) rather than an
     // uncaught exception reaching the caller with no Access-Control-Allow-Origin at all.
     return json({ error: "upstream" }, 502, origin);
   }
-  if (!info) return json({ error: "unparseable" }, 502, origin);
+  if (result.kind === "missing") return json({ error: "not_found" }, 404, origin);
+  if (result.kind === "unparseable") return json({ error: "unparseable" }, 502, origin);
+  const info = result.info;
 
   // Re-validate rather than trusting upstream: the response must be incapable of carrying
   // anything but ids of our own shape.

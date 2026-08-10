@@ -60,6 +60,15 @@ function objectEnd(s: string, start: number): number {
   return -1;
 }
 
+/** Locates `window['buildInfo'] = `; shared by extractBuildInfo and buildIsMissing below. */
+const BUILD_INFO_MARKER = /buildInfo['"]\]\s*=\s*/;
+
+/** Index of the first character of buildInfo's value (right after ` = `), or -1 if absent. */
+function buildInfoValueStart(html: string): number {
+  const m = BUILD_INFO_MARKER.exec(html);
+  return m ? m.index + m[0].length : -1;
+}
+
 /**
  * Pull the skill ids and game version out of a calculator page.
  *
@@ -70,10 +79,12 @@ function objectEnd(s: string, start: number): number {
  * Returns null rather than throwing on any unexpected shape, so callers report a clean failure.
  */
 export function extractBuildInfo(html: string): { skillIds: string[]; gameVersion: string } | null {
-  const marker = html.search(/buildInfo['"]\]\s*=\s*/);
-  if (marker < 0) return null;
-  const start = html.indexOf("{", marker);
-  if (start < 0) return null;
+  const start = buildInfoValueStart(html);
+  // The value must begin with the object itself, right where the assignment ends. Anything else
+  // (grimtools writes a bare `null` for a slug that is not a build - see buildIsMissing) means
+  // there is nothing to extract here; scanning forward for some LATER `{` in the page would risk
+  // brace-matching an unrelated inline <script> or <style> block that happens to parse as JSON.
+  if (start < 0 || html[start] !== "{") return null;
   const end = objectEnd(html, start);
   if (end < 0) return null;
   let parsed: unknown;
@@ -87,6 +98,18 @@ export function extractBuildInfo(html: string): { skillIds: string[]; gameVersio
   if (!Array.isArray(skills)) return null;
   const skillIds = skills.map((s) => s?.name).filter((n): n is string => typeof n === "string");
   return { skillIds, gameVersion: typeof doc.created_for_build === "string" ? doc.created_for_build : "" };
+}
+
+/**
+ * True when the page explicitly marks the slug as not a build: grimtools serves
+ * `window['buildInfo'] = null;` with HTTP 200 for any syntactically-plausible but nonexistent
+ * slug, never a real 404. Distinguishes "no such build" (this) from a page that is malformed in
+ * some other way (extractBuildInfo returns null for that case too, but it is a different failure
+ * and the worker reports the two differently).
+ */
+export function buildIsMissing(html: string): boolean {
+  const start = buildInfoValueStart(html);
+  return start >= 0 && /^null\b/.test(html.slice(start, start + 8));
 }
 
 /** The committed `sk<id>` to star-id table (`data/grimtools-stars.json`, `stars` field). */

@@ -1,7 +1,7 @@
 // ABOUTME: Tests slug parsing and buildInfo extraction against a committed real calculator page.
 // ABOUTME: No network: the fixture is what pins the extraction contract.
 import { test, expect } from "bun:test";
-import { parseSlug, extractBuildInfo, mapStars } from "../src/core/grimtools";
+import { parseSlug, extractBuildInfo, buildIsMissing, mapStars } from "../src/core/grimtools";
 import realTable from "../../data/grimtools-stars.json";
 
 test("parseSlug accepts a bare slug", () => {
@@ -44,6 +44,28 @@ test("extractBuildInfo pulls skill ids and game version from a real page", async
 test("extractBuildInfo returns null rather than throwing on pages without the global", () => {
   expect(extractBuildInfo("<html><body>nothing here</body></html>")).toBeNull();
   expect(extractBuildInfo("")).toBeNull();
+});
+
+test("extractBuildInfo does not brace-match later markup when buildInfo is explicitly null", () => {
+  // grimtools serves `window['buildInfo'] = null;` (HTTP 200) for a syntactically-plausible but
+  // nonexistent slug. Before the fix this scanned forward for the next `{` anywhere in the
+  // document; a later inline <script> that happens to brace-balance and JSON.parse (here: shaped
+  // just enough to carry a data.skills array) must NOT be returned as if it were the build.
+  const html =
+    `<script>window['buildInfo'] = null;</script>` +
+    `<style>.x { color: red; }</style>` +
+    `<script>var trap = {"data":{"skills":[{"name":"sk999"}]}};</script>`;
+  expect(extractBuildInfo(html)).toBeNull();
+});
+
+test("buildIsMissing detects grimtools' null-build marker", () => {
+  expect(buildIsMissing("<script>window['buildInfo'] = null;</script>")).toBe(true);
+});
+
+test("buildIsMissing is false for a real build or an absent marker", () => {
+  expect(buildIsMissing("<html><body>nothing here</body></html>")).toBe(false);
+  const html = `<script>window['buildInfo'] = {"data":{"skills":[]},"created_for_build":"1.2.1.6"};</script>`;
+  expect(buildIsMissing(html)).toBe(false);
 });
 
 test("extractBuildInfo does not run past the end of the object", () => {
