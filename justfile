@@ -504,6 +504,16 @@ web-install:
 worker-dev:
     cd "{{justfile_directory()}}/worker" && ../web/node_modules/.bin/wrangler dev --local --port 8787
 
+# Verify a Cloudflare API token and store it as a GitHub Actions secret (token is read on stdin)
+[group("web")]
+setup-worker-auth:
+    bash "{{justfile_directory()}}/scripts/setup_worker_auth.sh"
+
+# Deploy the import worker by hand. Normal deploys are from CI; this is the escape hatch.
+[group("web")]
+deploy-worker:
+    cd "{{justfile_directory()}}/worker" && ../web/node_modules/.bin/wrangler deploy
+
 # Generate the precomputed cover table from data/devotions.json (only if stale)
 [group("web")]
 cover-table:
