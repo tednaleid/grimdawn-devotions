@@ -82,7 +82,11 @@ which is a worse trade than a five-minute dashboard visit. In order:
 2. **Run `just setup-worker-auth`** and paste the token when prompted. It verifies
    the token, reads the account id, confirms the token can actually deploy (a
    `wrangler deploy --dry-run`), and stores it as the `CLOUDFLARE_API_TOKEN`
-   repository secret via `gh secret set`. Safe to re-run for rotation.
+   repository secret via `gh secret set`. Safe to re-run for rotation. That dry-run
+   deploy happens before step 3 below fills in `account_id`, so if the token's
+   Cloudflare login can see more than one account, wrangler may prompt interactively
+   to pick one - the script's stdin is still your terminal at that point, so just
+   answer the prompt. It is a rough edge, not a hang.
 3. **Fill in `worker/wrangler.toml`'s `account_id`** with the id the script printed,
    and commit it. It is an identifier, not a credential, so it belongs in the repo
    rather than in a secret.

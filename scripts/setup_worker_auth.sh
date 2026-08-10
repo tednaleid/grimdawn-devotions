@@ -18,8 +18,11 @@ printf '\n'
 [ -n "$TOKEN" ] || { echo "no token given"; exit 1; }
 
 echo "Verifying the token..."
-STATUS=$(curl -sS -H "Authorization: Bearer $TOKEN" \
-  "https://api.cloudflare.com/client/v4/user/tokens/verify" | jq -r '.result.status // "invalid"')
+# The header goes through curl's stdin (-H @-), not -H "Authorization: Bearer $TOKEN": an
+# interpolated argument sits in this process's argv for its whole lifetime, readable via
+# ps/procfs. printf is a shell builtin, so it forks nothing and exposes no argv either.
+STATUS=$(printf 'Authorization: Bearer %s' "$TOKEN" \
+  | curl -sS -H @- "https://api.cloudflare.com/client/v4/user/tokens/verify" | jq -r '.result.status // "invalid"')
 [ "$STATUS" = "active" ] || { echo "token is not active (status: $STATUS)"; exit 1; }
 
 echo "Reading the account id..."
