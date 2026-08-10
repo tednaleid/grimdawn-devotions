@@ -856,14 +856,22 @@ async function boot() {
   let tableDataVersion = "";
   async function loadStarTable(): Promise<StarTable | null> {
     if (starTable) return starTable;
+    // The user-facing message for a failure here is the same "import service" one the worker
+    // gets, which is imprecise: this file is ours and same-origin. Warn so the real cause (a
+    // deploy that dropped data/grimtools-stars.json) is diagnosable from the console rather
+    // than only from a misleading toast, matching httpDataSource's degrade-and-warn habit.
     try {
       const res = await fetch(`./data/grimtools-stars.json?v=${buildId}`);
-      if (!res.ok) return null;
+      if (!res.ok) {
+        console.warn(`grimtools-stars.json fetch ${res.status}; import unavailable`);
+        return null;
+      }
       const doc = (await res.json()) as { dataVersion: string; stars: StarTable };
       tableDataVersion = doc.dataVersion;
       starTable = doc.stars;
       return starTable;
-    } catch {
+    } catch (e) {
+      console.warn("grimtools-stars.json load failed; import unavailable", e);
       return null;
     }
   }
