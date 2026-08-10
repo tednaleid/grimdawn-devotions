@@ -28,9 +28,21 @@ jobs:
       # `just wasm` builds the fast resolver; `just build` runs cover-table, bundles, and
       # copies html/css/data/assets (it copies reach.wasm only if present, hence wasm first).
       - name: Build static site (just wasm + just build)
+        env:
+          # The deployed import worker's URL, set once (as a repository variable, not a secret -
+          # it is public) after `just deploy-worker`'s first run - see worker/README.md. Bakes into
+          # __IMPORT_API__ (web/scripts/bundle.ts) as the production import endpoint. Unset here,
+          # IMPORT_API falls back below to bundle.ts's own http://localhost:8787 default, which
+          # visibly fails in a browser rather than silently returning a wrong result, but still
+          # leaves the import feature dead in production - hence the loud warning.
+          IMPORT_API: ${{ vars.IMPORT_API_URL }}
         run: |
           just web-install
           just wasm
+          if [ -z "$IMPORT_API" ]; then
+            echo "::warning::IMPORT_API_URL repository variable is not set; the deployed site's import feature will point at http://localhost:8787 and fail for visitors. Set it after the worker's first deploy (see worker/README.md)."
+            unset IMPORT_API
+          fi
           just build
       - uses: actions/upload-pages-artifact@v5
         with:

@@ -48,6 +48,8 @@ import { parseTag } from "../core/benefitTag";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
+import { mapStars, IMPORT_CONTRACT_VERSION, type StarTable } from "../core/grimtools";
+import { mountImportPanel } from "../adapters/importPanel";
 import { affinityTotals } from "../core/affinity";
 import {
   starsGranting,
@@ -61,6 +63,13 @@ import type { Affinity, SelectionState, StarId } from "../core/types";
 
 const GITHUB_URL = "https://github.com/tednaleid/grimdawn-devotions";
 const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/"; // per-build page: <base><buildid>/
+
+// The import service. Local development points at `just worker-dev`; the deployed value is
+// substituted at build time. Both globals come from bundle.ts's define map.
+declare const __IMPORT_API__: string;
+declare const __BUILD_ID__: string;
+const importApi = typeof __IMPORT_API__ === "string" ? __IMPORT_API__ : "http://localhost:8787";
+const buildId = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 
 async function boot() {
   // A prior failed load may have set this guard (see bootFailed() in index.html). The module has now
@@ -109,6 +118,10 @@ async function boot() {
   // The live search query. Emphasizes matching map nodes and rides in the URL so a shared
   // link restores it, like the benefit tags.
   let query = "";
+  // The grimtools slug the current build was imported from, or "" when there is none. Provenance
+  // only (see urlState's gt=): rides in the hash so a shared link keeps the source link without
+  // ever re-fetching grimtools on load.
+  let source = "";
   // Decode and repair a hash into planner state. Runs at boot and on every hashchange
   // (Back/Forward, bookmark clicks, hand-edited URLs); an undecodable hash is the empty build.
   function applyHash(hash: string): void {
@@ -127,6 +140,7 @@ async function boot() {
     selectedBenefits.clear();
     for (const b of restored?.benefits ?? []) selectedBenefits.add(b);
     query = restored?.query ?? "";
+    source = restored?.source ?? "";
   }
   applyHash(location.hash);
   // The full benefit catalog (every subject + its stat ids), so the panel can list benefits the
@@ -229,6 +243,7 @@ async function boot() {
       // The index is per-locale (the corpus is not), and the panel owns its own chrome.
       searchIndex = resolveIndex(localization, corpus);
       searchPanel.relocalize(localization);
+      importPanel.relocalize(localization);
       refresh();
     },
   });
@@ -733,7 +748,7 @@ async function boot() {
   }
   // The hash, written by both render paths. Search uses "replace" so typing never floods history.
   function writeHash(urlMode: "push" | "replace") {
-    const next = `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline, query)}`;
+    const next = `#${encodeHash(state.selected, state.pointCap, canonical, selectedBenefits, benefitCanonical, baseline, query, source)}`;
     // Only touch history when the hash actually changed: no-op refreshes (language switch,
     // popover re-renders) must create no entry and leave the current one alone.
     if (next === location.hash) return;
@@ -834,6 +849,101 @@ async function boot() {
       searchTimer = setTimeout(repaint, 120);
     },
   });
+
+  // Fetched on first use rather than at boot: only an import needs it, and first load is
+  // byte-budgeted. Cache-busted with the same buildId the other data files use.
+  let starTable: StarTable | null = null;
+  let tableDataVersion = "";
+  async function loadStarTable(): Promise<StarTable | null> {
+    if (starTable) return starTable;
+    // The user-facing message for a failure here is the same "import service" one the worker
+    // gets, which is imprecise: this file is ours and same-origin. Warn so the real cause (a
+    // deploy that dropped data/grimtools-stars.json) is diagnosable from the console rather
+    // than only from a misleading toast, matching httpDataSource's degrade-and-warn habit.
+    try {
+      const res = await fetch(`./data/grimtools-stars.json?v=${buildId}`);
+      if (!res.ok) {
+        console.warn(`grimtools-stars.json fetch ${res.status}; import unavailable`);
+        return null;
+      }
+      const doc = (await res.json()) as { dataVersion: string; stars: StarTable };
+      tableDataVersion = doc.dataVersion;
+      starTable = doc.stars;
+      return starTable;
+    } catch (e) {
+      console.warn("grimtools-stars.json load failed; import unavailable", e);
+      return null;
+    }
+  }
+
+  async function runImport(slug: string): Promise<void> {
+    if (!slug) {
+      // The clear button: drop the association only. Selection and cap are deliberately untouched.
+      source = "";
+      importPanel.setState({ kind: "idle" });
+      writeHash("push");
+      return;
+    }
+    importPanel.setState({ kind: "loading" });
+    const starIdTable = await loadStarTable();
+    // This is our own same-origin data/grimtools-stars.json, not the worker, so "network" is a
+    // stand-in: no catalog key describes "our own bundled data failed to load" and this is rare
+    // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
+    if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
+
+    // `title` is optional in the type, not just possibly null: a response served from the
+    // worker's 24h edge cache can predate this field entirely, so it may be absent as well as
+    // explicitly null. Both must fall back the same way in the panel.
+    let body: { skills: string[]; dataVersion: string | null; title?: string | null };
+    try {
+      // `v=${IMPORT_CONTRACT_VERSION}` busts only the *browser's* cache for this URL, and only when
+      // the worker's response contract actually changes (unlike buildId, which changes on every
+      // deploy - see grimtools.ts for why a shared constant is used instead). The worker
+      // deliberately ignores this param when building its own edge-cache key, using the same
+      // constant on its own side instead - a caller-supplied value there would let anyone inflate
+      // the worker's keyspace.
+      const res = await fetch(`${importApi}/?slug=${encodeURIComponent(slug)}&v=${IMPORT_CONTRACT_VERSION}`);
+      if (res.status === 404) return importPanel.setState({ kind: "error", code: "notFound" });
+      if (!res.ok) return importPanel.setState({ kind: "error", code: "network" });
+      body = (await res.json()) as { skills: string[]; dataVersion: string | null; title?: string | null };
+    } catch {
+      return importPanel.setState({ kind: "error", code: "network" });
+    }
+
+    // A null dataVersion means the worker could not determine it: degrade rather than block. A
+    // version that is present and different means the table is stale and the mapping would be
+    // plausible but wrong, which is the failure mode worth refusing outright.
+    if (body.dataVersion && body.dataVersion !== tableDataVersion)
+      return importPanel.setState({ kind: "error", code: "version" });
+
+    // body.skills mixes mastery skills and devotion stars (the worker cannot tell them apart);
+    // mapStars is what actually splits stars out, via membership in the committed table.
+    const stars = mapStars(body.skills, starIdTable);
+    if (!stars.length) return importPanel.setState({ kind: "error", code: "empty" });
+
+    // Raise the cap to fit, never lower an existing higher one.
+    const cap = Math.max(state.pointCap, stars.length);
+    const wanted = new Set(stars);
+    // `table` here is the cover table from boot(), not the mapping table above.
+    state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
+    const pruned = wanted.size - state.selected.size;
+    source = slug;
+    importPanel.setState({ kind: "done", slug, pruned, title: body.title });
+    // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
+    // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
+    // and must be recomputed, same as every other state-changing action in this file.
+    refresh("push");
+  }
+
+  const importPanel = mountImportPanel(document.getElementById("import-panel") as HTMLElement, localization, {
+    onSubmit: (slug) => void runImport(slug),
+  });
+  // Reflects `source` into the panel: called once at mount (for a build restored from the boot
+  // hash) and again on every hashchange, mirroring how the search box re-syncs there.
+  function syncImportPanel(): void {
+    importPanel.setState(source ? { kind: "done", slug: source } : { kind: "idle" });
+  }
+  syncImportPanel();
 
   // Expose the header height to CSS so the corner toggles sit just below the top bar.
   function setHeaderH() {
@@ -972,6 +1082,7 @@ async function boot() {
     clearTimeout(searchTimer);
     applyHash(location.hash);
     searchPanel.setValue(query); // the box must agree with the restored hash
+    syncImportPanel(); // ditto, for the source link
     refresh("replace");
   });
 

@@ -31,10 +31,17 @@ hand-written regex or a hand-read byte offset made first.
 
 ## Getting the build out of grimtools
 
-The build is **not** server-rendered and there is **no API call to intercept**:
-the whole character is encoded in the URL slug and decoded client side, so the
-page has to actually run. Confirmed by watching the network, where nothing
-fetches build data.
+The build arrives **inline in the page HTML**. A `GET` of `grimtools.com/calc/<slug>`
+returns a document carrying the whole character as `window['buildInfo'] = {...}`,
+server-rendered by PHP from the slug, which is a server-side key rather than an
+encoding of the character. There is no XHR to intercept, but there is also no need to
+run the page: one plain HTTP request is enough to read gear, skills and devotion star
+ids.
+
+Headless Chrome is still required for **this audit**, which needs the rendered
+character sheet, the buff panel and tooltip text. It is not required merely to learn
+which stars a build took; see
+[the devotion import spec](superpowers/specs/2026-08-09-grimtools-devotion-import-design.md).
 
 Drive headless Chromium over CDP. `web/e2e/smoke.ts` already carries that
 machinery, including the reason for a raw CDP client rather than Playwright's

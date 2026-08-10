@@ -1,0 +1,39 @@
+# ABOUTME: Daily check that a known grimtools build still imports to the expected star count.
+# ABOUTME: Catches upstream shape changes and sk-id renumbering before a user hits them.
+name: Import canary
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Import a known build and check it
+        env:
+          WORKER_URL: ${{ vars.IMPORT_API_URL }}
+        run: |
+          set -euo pipefail
+          # The worker URL lives in the IMPORT_API_URL repository variable (Settings, Secrets
+          # and variables, Actions, Variables), set once after `just deploy-worker`'s first run
+          # (see worker/README.md). Fail loudly rather than skip: a canary that quietly passes
+          # with nothing configured defeats the point of having one.
+          if [ -z "$WORKER_URL" ]; then
+            echo "::error::IMPORT_API_URL repository variable is not set. Set it to the deployed worker URL (see worker/README.md) before this canary can run." >&2
+            exit 1
+          fi
+          BODY=$(curl -sS --fail "$WORKER_URL/?slug=qNYgbjeV")
+          # Assert the quantity the app actually depends on: skills mapped through our own table
+          # to real devotion stars, not the worker's raw skill count (which includes mastery
+          # skills the app never uses and the worker cannot tell apart from stars anyway).
+          COUNT=$(jq -n --argjson body "$BODY" --slurpfile table data/grimtools-stars.json \
+            '[$body.skills[] | select(. as $s | $table[0].stars | has($s))] | length')
+          EXPECTED=$(jq -r '.dataVersion' data/grimtools-stars.json)
+          LIVE=$(echo "$BODY" | jq -r '.dataVersion')
+          echo "mapped stars: $COUNT, table version: $EXPECTED, live version: $LIVE"
+          # 55 devotion stars on this build; the count is what a renumbering would move.
+          [ "$COUNT" = "55" ] || { echo "mapped star count changed: expected 55, got $COUNT"; exit 1; }
+          [ "$LIVE" = "$EXPECTED" ] || { echo "grimtools devotion data version moved to $LIVE; run: just gt-star-table"; exit 1; }

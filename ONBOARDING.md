@@ -9,7 +9,9 @@ but each with its own hexagonal core: the **devotion planner** (`data/devotions.
 tabulates every RR source with a debuff ledger; the **monster resistance explorer**
 (`data/monsters.json`, `web/src/monsters/`) ranks damage types by how well enemies
 resist them and lets you filter/sort the underlying monster table. Deployed to
-GitHub Pages; no backend, no accounts.
+GitHub Pages, plus one small Cloudflare Worker (`worker/`) whose only job is to
+fetch a grimtools build past its CORS header for the devotion planner's import
+feature.
 
 ## Stack
 - Language: TypeScript (planner), Python 3 (parser), Rust (reachability core)
@@ -38,6 +40,10 @@ GitHub Pages; no backend, no accounts.
 - Reachability correctness fixtures: regenerate with `just gen-reach-fixtures`
 - Reachability heavy validation (minutes, before big engine changes): `just validate-reach`
 - Headless browser smoke: `just e2e` (run `just install-e2e` once first)
+- Grimtools import worker, local dev (no Cloudflare account needed): `just worker-dev`
+- Grimtools import worker, first-time/manual deploy (normal deploys are from CI): `just deploy-worker`
+- Grimtools import worker, one-time Cloudflare token setup/rotation: `just setup-worker-auth`
+- Regenerate `data/grimtools-stars.json` (needs headless Chrome: `just install-e2e`): `just gt-star-table`
 - Pre-commit hook (opt-in, runs `just check`): `just install-hooks`
 - Tool/data check: `just doctor`
 - Raw game-data deposit (full records tree + labels as parquet): `just deposit`, then
@@ -84,6 +90,8 @@ dimming. Every page's full view state lives in its own URL hash
 - `web/scripts/` -- bundler, cover-table builder, perf harness, correctness fuzzer
 - `web/e2e/smoke.ts`, `web/e2e/rr-smoke.ts`, `web/e2e/mon-smoke.ts` -- headless-Chromium
   smoke tests (one per page), driven over CDP and run together by `just e2e`
+- `worker/` -- Cloudflare Worker that fetches a grimtools build server-side (CORS blocks
+  reading it from the browser) for the devotion planner's import feature; see `worker/README.md`
 
 ## How to run
 `just serve`, then open:
@@ -101,6 +109,8 @@ Pages, auto-deployed from `main`).
 - `docs/item-schema.md` -- derived typed item schema: tables, curated inputs, known gaps
 - `docs/item-cli.md` -- the item query CLI: flags, name resolution, tier semantics
 - `docs/grimtools-build-audit.md` -- reading a shared grimtools build and auditing it against our data
+- `docs/grimtools-import.md` -- importing a build's devotions: the three pieces, the mapping table's gates, why a worker exists
+- `worker/README.md` -- the grimtools import worker: contract, local dev, deployment, one-time Cloudflare setup
 - `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings
 - `docs/reachability-engine.md` -- shipped vs costed engine comparison + the current-state decision

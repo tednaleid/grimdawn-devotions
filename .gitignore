@@ -38,6 +38,13 @@ web/dist/
 web/bun.lockb
 web/bun.lock
 
+# Cloudflare Worker local dev: `wrangler dev --local`'s state directory, and the per-developer
+# ALLOWED_ORIGIN override for testing against `just serve` (see worker/README.md). Nothing in
+# .dev.vars is secret today, but it is wrangler's convention for local-only var files and never
+# committed, so that stays true if it ever does hold one.
+worker/.wrangler/
+worker/.dev.vars
+
 # Precomputed cover table (build artifact, regenerated from data/devotions.json)
 /data/cover-table.bin
 

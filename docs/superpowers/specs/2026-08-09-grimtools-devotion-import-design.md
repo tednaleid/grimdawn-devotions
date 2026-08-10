@@ -69,6 +69,7 @@ stars positionally within each constellation, yields:
 | `sk<id>` to DBR entries derived | 559 of 559 |
 | Stars in our `data/devotions.json` left uncovered | 0 |
 | Bonus magnitudes cross-checked against grimtools tooltips | 47 of 47 |
+| Within-constellation orderings confirmed | 559 of 559 |
 
 The strongest confirmation was not designed for: every celestial power lands in its
 parent constellation (Targo's Hammer in Anvil, Elemental Storm in Rhowan's Crown,
@@ -101,8 +102,9 @@ import and never per view.
 **A committed lookup table**, `data/grimtools-stars.json`, mapping `sk<id>` to our
 star id, 559 entries, plus the grimtools devotion data version it was derived from.
 
-**A Cloudflare Worker** that fetches a build by slug and returns its star ids. It
-holds no game knowledge.
+**A Cloudflare Worker** that fetches a build by slug and returns its skill ids
+(mastery skills and devotion stars both - it holds no game knowledge, so it cannot
+tell them apart). It never claims otherwise: the response field is `skills`.
 
 **The planner**, which maps those ids through the committed table, applies the
 selection, and records the source slug in the URL hash.
@@ -138,7 +140,22 @@ deployment is from CI on push to `main`. A `just deploy-worker` recipe wraps the
 path.
 
 Contract: `GET /?slug=<slug>` returns
-`{slug, stars: ["sk688", ...], gameVersion, dataVersion}`.
+`{slug, skills: ["sk688", ...], title, gameVersion, dataVersion}`. The field is
+`skills`, not `stars`: it is every `sk<id>` in the build, mastery skills included,
+since the worker cannot tell the two apart (see below).
+
+`title` is the build's display name, pulled from the calculator page's
+server-rendered `<title>` (stripped of the trailing " - Grim Dawn Build
+Calculator"), or `null` when there is none, when it is empty after sanitizing, or
+when the slug is not a build. `buildInfo` itself carries no class/build name, so
+the `<title>` is the only cheap source; no mastery-code lookup is attempted.
+`title` is the first upstream text this feature ever puts in the UI, so the worker
+sanitizes rather than trusts it before it ever leaves the response: `<`/`>` are
+stripped outright (entities are left encoded on purpose, since decoding them is
+what would reintroduce markup), whitespace collapses to single spaces, and the
+result is trimmed and capped at 100 characters. The app still HTML-escapes it
+again where it is interpolated into the panel's markup, since defense in depth
+against upstream-relayed text costs nothing here.
 
 The security design rests on one decision: **the worker never accepts a URL.** It
 accepts only a slug, validated against `^[A-Za-z0-9_-]{1,24}$`, and builds the
@@ -152,9 +169,14 @@ The rest follows from the same principle:
   response, re-validating each id against `^sk\d+$` before emitting it. The response
   is structurally incapable of carrying attacker-influenced content, so the worker
   cannot be used to serve arbitrary material from our domain.
-- **It caches on slug** with a long TTL via the Cache API. Builds are immutable, so a
-  slug's content never changes and the hit rate is near perfect. This caps both our
-  cost and any amplification against grimtools.
+- **It caches on slug plus its own `IMPORT_CONTRACT_VERSION`** with a long TTL via the
+  Cache API. Builds are immutable, so a slug's content never changes and the hit rate
+  is near perfect. Keying on the slug alone (never the whole request) caps both our
+  cost and any amplification against grimtools; the client sends its own version
+  param too, but purely to bust its own browser cache with a new URL - the worker
+  never reads it for keying, since doing so would hand a caller unbounded control of
+  the keyspace. See `worker/README.md`'s "Changing the response shape" for the full
+  mechanism.
 - **It bounds its work**: a byte cap on the response it will read, a subrequest
   timeout, and an early exit once `buildInfo` is located, so a hostile or oversized
   upstream cannot exhaust the CPU budget.
@@ -253,8 +275,10 @@ Errors are specific rather than generic: worker unreachable, unknown slug (grimt
 Every string is a catalog key added to the `web/test/appCatalog.test.ts` guard, with
 no literals, per the internationalization invariant.
 
-On success the planner shows "Imported from grimtools", linking to
-`https://www.grimtools.com/calc/<slug>`.
+On success the planner shows "grimtools: <build title>" when the worker returned
+one, linking to `https://www.grimtools.com/calc/<slug>`. It falls back to
+"Imported from grimtools" when the title is absent or null, which includes a
+response served from the worker's edge cache from before this field existed.
 
 ### URL state
 
@@ -323,6 +347,12 @@ detectable loss.
 - `gt=` hash round-trip, including a malformed slug being dropped on decode.
 - A guard test that the committed table has 559 entries and that every value resolves
   to a real star id in `data/devotions.json`.
+- A guard test on the within-constellation ordering invariant: the game numbers a
+  constellation's star skills sequentially, so sorting a constellation's `sk` ids
+  ascending must reproduce our own star indices `0..n-1`. This is emergent from the
+  join rather than imposed by it, so it catches a within-constellation scramble the
+  count checks above would miss. Gated both at generation time
+  (`scripts/gt_star_table.ts`) and on the committed table (no Chrome, no network).
 - The table generator's own assertions, which gate regeneration.
 - The scheduled canary.
 

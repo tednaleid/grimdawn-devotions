@@ -5,6 +5,31 @@ Each item includes implementation pointers for whoever picks it up. This file
 is future work ONLY: shipped features and their history live in the code, in
 git history, and in the reference docs under `docs/`.
 
+## Grimtools import: deferred follow-ups
+
+Shipped: paste a grimtools calc link or slug to load its devotions, with `gt=`
+provenance in the hash and a link back to the source build. See
+`docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`.
+
+- **No e2e leg for the import wiring.** The core parsing, the mapping and the panel
+  adapter are unit tested, but nothing drives the three together in a browser. Belongs
+  in `web/e2e/smoke.ts` beside the search checks. Note `just e2e` is not in CI, so this
+  buys a repeatable local check rather than an enforced gate.
+- **No divergence marking.** The source link persists after the build is edited and is
+  dismissed by hand with the `✕`. A "modified since import" indicator was considered and
+  deferred: it is a third state to design, translate into 13 locales, and test, for a
+  nuance nobody has asked for. Pointer: `ImportState` in
+  `web/src/adapters/importPanel.ts`.
+- **Import covers devotions only.** `buildInfo` also carries gear, mastery skills,
+  attributes and item skills, all already in the worker's reach. Nothing consumes them
+  because the planner models devotions.
+- **Overlapping imports race.** `runImport` in `web/src/app/main.ts` has no guard against
+  a second submit landing while the first is still in flight (two fetches outstanding,
+  whichever settles last wins the applied state, whatever the panel is showing at that
+  point may not match). Not fixed here, since it needed real UX judgment (disable the
+  input while loading? cancel-and-restart? a request token?) that was out of scope for
+  a review-fix pass.
+
 ## Map / List view toggle
 
 A header button at top-center toggles the planner between "Map" (the current
@@ -850,3 +875,28 @@ a diff against the committed tables rather than a blind regeneration. Pointers:
 `load_translations` in `scripts/gd_dbr.py`, consumers in
 `scripts/build_game_tables.py` and `scripts/parse_devotions.py`, and the
 placeholder-aware version in `gd_save.load_tags`.
+
+## Extract the shared CDP client out of the grimtools scripts
+
+`scripts/gt_star_table.ts` copies about 90 lines of CDP client verbatim from
+`scripts/gt_scrape.ts` (the Chrome launch, `cleanup`, `pageWsUrl`, and the `CDP`
+class), differing only in the debug port. A protocol fix or a Chrome-path change
+now has to be applied twice, with nothing to remind anyone the second copy
+exists.
+
+The devotion-import plan mandated the copy on the grounds that `scripts/` are
+standalone programs. That rationale does not survive contact with the repo:
+`scripts/gd_dbr.py` is already a shared helper with three Python consumers, so
+this codebase shares script helpers where it helps. The TS scripts simply never
+had a second consumer until now.
+
+Deferred rather than declined, deliberately: the extraction rewrites the very
+region of `gt_scrape.ts` that a sibling branch also modified, so doing it before
+both branches land turns a clean merge into a hand-resolved conflict. **Both have
+now landed, so this is unblocked.**
+
+Pointers: extract to `scripts/gd_cdp.ts`, mirroring `scripts/gd_dbr.py`'s role;
+the block is the Chrome launch through the `CDP` class in `scripts/gt_scrape.ts`
+and the matching head of `scripts/gt_star_table.ts`. Only the debug port differs,
+so it should be a parameter. Find the block by name rather than by line number:
+the save-reader work shifted those lines.

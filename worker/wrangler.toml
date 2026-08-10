@@ -1,0 +1,19 @@
+# ABOUTME: Wrangler config for the grimtools devotion-import worker (worker/src/index.ts).
+# ABOUTME: account_id is reported by `just setup-worker-auth` and set here; deploy is CI on push to main.
+name = "grimdawn-devotions-import"
+main = "src/index.ts"
+# Deliberately not "today": the installed wrangler's local workerd binary only knows dates up to
+# its own build day, so pinning this to the day it was written breaks `just worker-dev` for
+# anyone whose local wrangler build (or clock) trails by even one day - which is everyone, right
+# after writing it. A short-elapsed, known-good date avoids that; bump deliberately if a newer
+# runtime behavior is needed, not automatically.
+compatibility_date = "2026-08-08"
+# Reported by `just setup-worker-auth` and set by hand. It is an identifier, not a credential,
+# so it belongs in this committed file rather than in repository secrets.
+account_id = "7cae8ab768aa00c37c65e84dc7e30aff"
+
+[vars]
+ALLOWED_ORIGIN = "https://tednaleid.github.io"
+# The production origin the worker allows in Access-Control-Allow-Origin. Overridden for local
+# development by worker/.dev.vars (gitignored - see worker/README.md "Running locally" for the
+# exact file to create), so `just serve`'s localhost origin is not blocked by CORS.

@@ -142,7 +142,9 @@ function commitHtml(loc: Localization, commit?: { label: Text; enabled: boolean 
 }
 
 const ESCAPES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" };
-const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ESCAPES[c]!);
+/** Escapes text destined for an innerHTML string. Exported so other adapters that also build
+ * markup as innerHTML (e.g. importPanel.ts, for upstream-sourced text) reuse this one helper. */
+export const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ESCAPES[c]!);
 
 // The live search query, so the tooltip can show WHICH text matched. Module scope because the
 // module-level row builders below need it too, and there is one tooltip per page; the handle's

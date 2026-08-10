@@ -646,6 +646,73 @@ main {
   color: #9aa4b2;
   font-size: 0.75rem;
 }
+/* Import panel. Reuses the search panel's palette (#161d27 on #283446, 4px radius) so the two
+   boxes read as one family of controls. */
+.import-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+#import-input {
+  flex: 1;
+  min-width: 0;
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 0.3rem 0.4rem;
+  color: #e6edf3;
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+#import-input::placeholder {
+  color: #6b7688;
+}
+#import-input:focus {
+  outline: none;
+  border-color: #6cb6ff;
+}
+#import-go,
+#import-clear {
+  flex: none;
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+#import-go:hover,
+#import-clear:hover {
+  background: #1d2530;
+  border-color: #3d4a5c;
+  color: #e6edf3;
+}
+#import-go:disabled {
+  color: #6b7688;
+  cursor: default;
+  pointer-events: none;
+}
+#import-msg {
+  margin-top: 0.35rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+}
+/* The source link fills the row the way #import-input does while it is showing, since the two
+   are never visible at the same time. */
+#import-source {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #8fb6e0;
+}
 .power,
 .tip-power {
   color: #f0c14b;

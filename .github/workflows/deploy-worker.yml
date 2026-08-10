@@ -1,0 +1,26 @@
+# ABOUTME: Deploys the grimtools import worker to Cloudflare on push to main.
+# ABOUTME: Never runs on pull_request, which keeps the API token out of PR-triggered runs.
+name: Deploy import worker
+on:
+  push:
+    branches: [main]
+    paths: ["worker/**", "web/src/core/grimtools.ts", ".github/workflows/deploy-worker.yml"]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: oven-sh/setup-bun@v2
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: just
+      - run: just web-install
+      - run: cd worker && ../web/node_modules/.bin/wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
