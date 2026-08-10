@@ -39,7 +39,11 @@ const result = await Bun.build({
   minify: true,
   sourcemap: "linked", // emits main-<hash>.js.map; only fetched when devtools is open
   naming: "[name]-[hash].[ext]", // dist/main-<hash>.js
-  define: { __BUILD_ID__: JSON.stringify(buildId), __ASSET_V__: JSON.stringify(assetVersion) },
+  define: {
+    __BUILD_ID__: JSON.stringify(buildId),
+    __ASSET_V__: JSON.stringify(assetVersion),
+    __IMPORT_API__: JSON.stringify(process.env.IMPORT_API ?? "http://localhost:8787"),
+  },
 });
 if (!result.success) {
   for (const log of result.logs) console.error(log);

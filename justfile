@@ -732,6 +732,7 @@ build: cover-table
     mkdir -p dist/data
     bun scripts/bundle.ts
     cp "{{justfile_directory()}}/data/devotions.json" dist/data/devotions.json
+    cp "{{justfile_directory()}}/data/grimtools-stars.json" dist/data/grimtools-stars.json
     cp "{{justfile_directory()}}/data/resistance-reduction.json" dist/data/resistance-reduction.json
     cp "{{justfile_directory()}}/data/monsters.json" dist/data/monsters.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin

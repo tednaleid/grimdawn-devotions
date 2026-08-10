@@ -5,6 +5,25 @@ Each item includes implementation pointers for whoever picks it up. This file
 is future work ONLY: shipped features and their history live in the code, in
 git history, and in the reference docs under `docs/`.
 
+## Grimtools import: deferred follow-ups
+
+Shipped: paste a grimtools calc link or slug to load its devotions, with `gt=`
+provenance in the hash and a link back to the source build. See
+`docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`.
+
+- **No e2e leg for the import wiring.** The core parsing, the mapping and the panel
+  adapter are unit tested, but nothing drives the three together in a browser. Belongs
+  in `web/e2e/smoke.ts` beside the search checks. Note `just e2e` is not in CI, so this
+  buys a repeatable local check rather than an enforced gate.
+- **No divergence marking.** The source link persists after the build is edited and is
+  dismissed by hand with the `✕`. A "modified since import" indicator was considered and
+  deferred: it is a third state to design, translate into 13 locales, and test, for a
+  nuance nobody has asked for. Pointer: `ImportState` in
+  `web/src/adapters/importPanel.ts`.
+- **Import covers devotions only.** `buildInfo` also carries gear, mastery skills,
+  attributes and item skills, all already in the worker's reach. Nothing consumes them
+  because the planner models devotions.
+
 ## Map / List view toggle
 
 A header button at top-center toggles the planner between "Map" (the current
