@@ -109,6 +109,7 @@ Pages, auto-deployed from `main`).
 - `docs/item-schema.md` -- derived typed item schema: tables, curated inputs, known gaps
 - `docs/item-cli.md` -- the item query CLI: flags, name resolution, tier semantics
 - `docs/grimtools-build-audit.md` -- reading a shared grimtools build and auditing it against our data
+- `docs/grimtools-import.md` -- importing a build's devotions: the three pieces, the mapping table's gates, why a worker exists
 - `worker/README.md` -- the grimtools import worker: contract, local dev, deployment, one-time Cloudflare setup
 - `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings
