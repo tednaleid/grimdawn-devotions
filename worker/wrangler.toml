@@ -1,5 +1,5 @@
 # ABOUTME: Wrangler config for the grimtools devotion-import worker (worker/src/index.ts).
-# ABOUTME: account_id is filled in by `just setup-worker-auth`; deploy is CI on push to main.
+# ABOUTME: account_id is reported by `just setup-worker-auth` and set here; deploy is CI on push to main.
 name = "grimdawn-devotions-import"
 main = "src/index.ts"
 # Deliberately not "today": the installed wrangler's local workerd binary only knows dates up to
@@ -8,9 +8,9 @@ main = "src/index.ts"
 # after writing it. A short-elapsed, known-good date avoids that; bump deliberately if a newer
 # runtime behavior is needed, not automatically.
 compatibility_date = "2026-08-08"
-# account_id is filled in by `just setup-worker-auth` (Task 8). It is an identifier, not a
-# credential, so it belongs in this committed file rather than in repository secrets.
-account_id = ""
+# Reported by `just setup-worker-auth` and set by hand. It is an identifier, not a credential,
+# so it belongs in this committed file rather than in repository secrets.
+account_id = "7cae8ab768aa00c37c65e84dc7e30aff"
 
 [vars]
 ALLOWED_ORIGIN = "https://tednaleid.github.io"
