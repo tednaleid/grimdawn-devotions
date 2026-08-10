@@ -23,6 +23,12 @@ provenance in the hash and a link back to the source build. See
 - **Import covers devotions only.** `buildInfo` also carries gear, mastery skills,
   attributes and item skills, all already in the worker's reach. Nothing consumes them
   because the planner models devotions.
+- **Overlapping imports race.** `runImport` in `web/src/app/main.ts` has no guard against
+  a second submit landing while the first is still in flight (two fetches outstanding,
+  whichever settles last wins the applied state, whatever the panel is showing at that
+  point may not match). Not fixed here, since it needed real UX judgment (disable the
+  input while loading? cancel-and-restart? a request token?) that was out of scope for
+  a review-fix pass.
 
 ## Map / List view toggle
 

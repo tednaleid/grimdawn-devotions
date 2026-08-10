@@ -1,5 +1,5 @@
-// ABOUTME: Pure logic for reading a grimtools build: slug parsing and inline buildInfo extraction.
-// ABOUTME: Shared by the planner and the Cloudflare worker so there is one tested implementation.
+// ABOUTME: Pure logic for reading a grimtools build: slug/buildInfo parsing, plus mapStars,
+// ABOUTME: which maps its skill ids to ours. Shared by the planner and the Cloudflare worker.
 
 /** Grimtools slug charset. Also the worker's input validation, so keep the two identical. */
 const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;

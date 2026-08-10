@@ -106,6 +106,10 @@ export function mountImportPanel(
     setState(s) {
       state = s;
       if (s.kind === "done") input.value = s.slug;
+      // "idle" is not only the clear button (which already empties the box itself): a hash
+      // change with no gt= (e.g. pressing Back after an import) reaches here too, and must not
+      // leave a slug in the box with no association shown.
+      if (s.kind === "idle") input.value = "";
       paint();
     },
     relocalize(next) {
