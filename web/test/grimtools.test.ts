@@ -1,7 +1,8 @@
 // ABOUTME: Tests slug parsing and buildInfo extraction against a committed real calculator page.
 // ABOUTME: No network: the fixture is what pins the extraction contract.
 import { test, expect } from "bun:test";
-import { parseSlug, extractBuildInfo } from "../src/core/grimtools";
+import { parseSlug, extractBuildInfo, mapStars } from "../src/core/grimtools";
+import realTable from "../../data/grimtools-stars.json";
 
 test("parseSlug accepts a bare slug", () => {
   expect(parseSlug("qNYgbjeV")).toBe("qNYgbjeV");
@@ -51,4 +52,34 @@ test("extractBuildInfo does not run past the end of the object", () => {
   const info = extractBuildInfo(html);
   expect(info!.skillIds).toEqual(["sk1"]);
   expect(info!.gameVersion).toBe("9.9.9.9");
+});
+
+test("mapStars keeps devotion stars and drops mastery skills", () => {
+  // Mastery skills are absent from the table by construction, which is exactly what separates
+  // them from devotion stars in buildInfo's single flat skills array.
+  const table = { sk688: "raven:0", sk689: "raven:1" };
+  expect(mapStars(["sk688", "sk1145", "sk689"], table)).toEqual(["raven:0", "raven:1"]);
+});
+
+test("mapStars preserves the order stars appear in", () => {
+  const table = { sk688: "raven:0", sk689: "raven:1" };
+  expect(mapStars(["sk689", "sk688"], table)).toEqual(["raven:1", "raven:0"]);
+});
+
+test("mapStars deduplicates repeated ids", () => {
+  expect(mapStars(["sk688", "sk688"], { sk688: "raven:0" })).toEqual(["raven:0"]);
+});
+
+test("mapStars tolerates an empty build and an empty table", () => {
+  expect(mapStars([], { sk688: "raven:0" })).toEqual([]);
+  expect(mapStars(["sk688"], {})).toEqual([]);
+});
+
+test("a real build maps to exactly 55 stars against the committed table", async () => {
+  const html = await Bun.file("test/fixtures/grimtools-calc.html").text();
+  const info = extractBuildInfo(html)!;
+  const stars = mapStars(info.skillIds, (realTable as { stars: Record<string, string> }).stars);
+  expect(stars.length).toBe(55);
+  // Every mapped id must be a real star id shape; the table guard proves they exist in the model.
+  for (const s of stars) expect(s).toMatch(/^[a-z0-9_]+:\d+$/);
 });

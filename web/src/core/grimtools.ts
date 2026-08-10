@@ -88,3 +88,30 @@ export function extractBuildInfo(html: string): { skillIds: string[]; gameVersio
   const skillIds = skills.map((s) => s?.name).filter((n): n is string => typeof n === "string");
   return { skillIds, gameVersion: typeof doc.created_for_build === "string" ? doc.created_for_build : "" };
 }
+
+/** The committed `sk<id>` to star-id table (`data/grimtools-stars.json`, `stars` field). */
+export type StarTable = Record<string, string>;
+
+/**
+ * Turn a build's flat skill-id list into our star ids.
+ *
+ * `buildInfo.data.skills` mixes mastery skills and devotion stars in one array with no marker
+ * distinguishing them, so membership in the table IS the split: the table holds only devotion
+ * stars. That is also why nothing is reported as "unmapped" here. An absent id cannot be told
+ * apart from a mastery skill, and the case that would matter (a star added since the table was
+ * generated) is caught by the caller's data-version check instead.
+ *
+ * Input order is preserved and duplicates collapse.
+ */
+export function mapStars(skillIds: string[], table: StarTable): string[] {
+  const stars: string[] = [];
+  const seen = new Set<string>();
+  for (const id of skillIds) {
+    const star = table[id];
+    if (star === undefined) continue;
+    if (seen.has(star)) continue;
+    seen.add(star);
+    stars.push(star);
+  }
+  return stars;
+}
