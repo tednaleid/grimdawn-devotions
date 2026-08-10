@@ -57,6 +57,12 @@ secrets, so keeping the trigger to `push`/`workflow_dispatch` keeps the token ou
 PR-triggered runs. A `just deploy-worker` recipe wraps the same `wrangler deploy` for
 the first deploy and as a manual escape hatch, but CI is the usual path.
 
+`web/package.json` pins `wrangler` to an exact version (no `^` range) on purpose.
+`web/bun.lock` is gitignored, so a range would let CI resolve a fresh wrangler on
+every run and deploy a version nobody tested against. Bumping it is a deliberate,
+manual step (update the version, reinstall, re-run the checks, commit), not
+something to "helpfully" widen back to a range to match `biome` or `typescript`.
+
 ## One-time manual setup
 
 Nothing above works until a Cloudflare account exists and has authorized CI to
