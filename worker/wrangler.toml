@@ -1,3 +1,5 @@
+# ABOUTME: Wrangler config for the grimtools devotion-import worker (worker/src/index.ts).
+# ABOUTME: account_id is filled in by `just setup-worker-auth`; deploy is CI on push to main.
 name = "grimdawn-devotions-import"
 main = "src/index.ts"
 compatibility_date = "2026-08-09"

@@ -31,7 +31,37 @@ function json(body: unknown, status: number, origin: string): Response {
 async function boundedText(res: Response): Promise<string> {
   const reader = res.body?.getReader();
   if (!reader) return "";
-  const chunks: Uint8Array[] = [];
+  const decoder = new TextDecoder();
+  let text = "";
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) {
+      text += decoder.decode(); // flush any trailing partial multi-byte char
+      break;
+    }
+    total += value.byteLength;
+    if (total > MAX_BYTES) {
+      await reader.cancel();
+      break;
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  return text;
+}
+
+/**
+ * Read a response body incrementally, stopping the moment a complete `buildInfo` object is found,
+ * so a hostile or oversized upstream cannot force a full-body brace-matching scan on the whole
+ * MAX_BYTES cap. MAX_BYTES is the backstop for the case where `buildInfo` never appears. Uses
+ * `{ stream: true }` so a multi-byte character split across a chunk boundary decodes correctly
+ * rather than as a replacement character.
+ */
+async function readBuildInfo(res: Response): Promise<ReturnType<typeof extractBuildInfo>> {
+  const reader = res.body?.getReader();
+  if (!reader) return null;
+  const decoder = new TextDecoder();
+  let text = "";
   let total = 0;
   for (;;) {
     const { done, value } = await reader.read();
@@ -41,15 +71,14 @@ async function boundedText(res: Response): Promise<string> {
       await reader.cancel();
       break;
     }
-    chunks.push(value);
+    text += decoder.decode(value, { stream: true });
+    const info = extractBuildInfo(text);
+    if (info) {
+      await reader.cancel();
+      return info;
+    }
   }
-  const merged = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    merged.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  return new TextDecoder().decode(merged);
+  return null;
 }
 
 export async function handleRequest(request: Request, env: Env): Promise<Response> {
@@ -67,12 +96,24 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   if (!SLUG_RE.test(slug)) return json({ error: "bad_slug" }, 400, origin);
 
   const signal = AbortSignal.timeout(TIMEOUT_MS);
-  const headers = { "User-Agent": UA };
-  const page = await doFetch(`${CALC}${slug}`, { headers, signal });
-  if (page.status === 404) return json({ error: "not_found" }, 404, origin);
-  if (!page.ok) return json({ error: "upstream", status: page.status }, 502, origin);
+  // "manual" so a redirect response is never silently followed: the slug design guarantees WE
+  // never name a host, but nothing stops grimtools itself redirecting us off grimtools.com (a
+  // compromise, a misconfiguration, an open redirect). A refused redirect falls into the same
+  // non-ok branch below as any other upstream failure.
+  const fetchOpts = { headers: { "User-Agent": UA }, signal, redirect: "manual" as const };
 
-  const info = extractBuildInfo(await boundedText(page));
+  let info: ReturnType<typeof extractBuildInfo>;
+  try {
+    const page = await doFetch(`${CALC}${slug}`, fetchOpts);
+    if (page.status === 404) return json({ error: "not_found" }, 404, origin);
+    if (!page.ok) return json({ error: "upstream", status: page.status }, 502, origin);
+    info = await readBuildInfo(page);
+  } catch {
+    // Covers a network failure and the shared timeout firing mid-fetch or mid-read, so every
+    // failure path still returns our structured JSON (with CORS headers) rather than an
+    // uncaught exception reaching the caller with no Access-Control-Allow-Origin at all.
+    return json({ error: "upstream" }, 502, origin);
+  }
   if (!info) return json({ error: "unparseable" }, 502, origin);
 
   // Re-validate rather than trusting upstream: the response must be incapable of carrying
@@ -82,7 +123,7 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   // Best effort. A missing data version degrades to "cannot check", never to a blocked import.
   let dataVersion: string | null = null;
   try {
-    const dv = await doFetch(DEVOTION_JSON, { headers, signal });
+    const dv = await doFetch(DEVOTION_JSON, fetchOpts);
     if (dv.ok) dataVersion = (await boundedText(dv)).match(/"version"\s*:\s*"([0-9a-f]+)"/)?.[1] ?? null;
   } catch {
     dataVersion = null;

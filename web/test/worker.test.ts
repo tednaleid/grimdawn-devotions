@@ -73,3 +73,17 @@ test("rejects non-GET methods", async () => {
   const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV", { method: "POST" }), env(ok as never));
   expect(res.status).toBe(405);
 });
+
+test("refuses a redirect from upstream instead of following it", async () => {
+  // grimtools itself could redirect us off grimtools.com (compromise, misconfiguration, an open
+  // redirect); the fix is asking fetch never to follow, then treating a redirect as any other
+  // upstream failure.
+  let redirectMode: string | undefined;
+  const spy = (async (_url: string, init?: RequestInit) => {
+    redirectMode = init?.redirect;
+    return new Response(null, { status: 302, headers: { Location: "https://evil.example/" } });
+  }) as never;
+  const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV"), env(spy));
+  expect(redirectMode).toBe("manual");
+  expect(res.status).toBe(502);
+});
