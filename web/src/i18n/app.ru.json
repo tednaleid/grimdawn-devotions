@@ -173,6 +173,7 @@
   "ui.import.placeholder": "ссылка или id билда grimtools",
   "ui.import.pruned": "Не удалось разместить {n} звезд(ы); они были удалены.",
   "ui.import.source": "Импортировано из grimtools",
+  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Импортировать",
   "ui.info.aria": "Об этом планировщике",
   "ui.info.build": "сборка {buildid}",

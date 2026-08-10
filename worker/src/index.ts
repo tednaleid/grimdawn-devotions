@@ -1,7 +1,7 @@
 // ABOUTME: Cloudflare Worker that returns a grimtools build's devotion star ids for one slug.
 // ABOUTME: Takes a slug and never a URL, so there is no code path that fetches a caller-named host.
 /// <reference path="./worker-env.d.ts" />
-import { extractBuildInfo, buildIsMissing } from "../../web/src/core/grimtools";
+import { extractBuildInfo, extractBuildTitle, buildIsMissing } from "../../web/src/core/grimtools";
 
 const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
 const CALC = "https://www.grimtools.com/calc/";
@@ -65,7 +65,7 @@ async function boundedText(res: Response): Promise<string> {
  * other way. Kept distinct so the caller can tell "no such build" from "could not understand the
  * response", which are different failures worth reporting differently to the user. */
 type BuildInfoResult =
-  | { kind: "found"; info: NonNullable<ReturnType<typeof extractBuildInfo>> }
+  | { kind: "found"; info: NonNullable<ReturnType<typeof extractBuildInfo>>; title: string | null }
   | { kind: "missing" }
   | { kind: "unparseable" };
 
@@ -94,7 +94,9 @@ async function readBuildInfo(res: Response): Promise<BuildInfoResult> {
     const info = extractBuildInfo(text);
     if (info) {
       await reader.cancel();
-      return { kind: "found", info };
+      // <title> sits in <head>, ahead of the <body> script that carries buildInfo, so it is
+      // already present in `text` by the time buildInfo resolves - no extra read needed.
+      return { kind: "found", info, title: extractBuildTitle(text) };
     }
     if (buildIsMissing(text)) {
       await reader.cancel();
@@ -159,7 +161,7 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     dataVersion = null;
   }
 
-  return json({ slug, skills, gameVersion: info.gameVersion, dataVersion }, 200, origin);
+  return json({ slug, skills, title: result.title, gameVersion: info.gameVersion, dataVersion }, 200, origin);
 }
 
 export default {

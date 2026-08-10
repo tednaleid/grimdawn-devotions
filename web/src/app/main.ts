@@ -891,12 +891,15 @@ async function boot() {
     // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
     if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
 
-    let body: { skills: string[]; dataVersion: string | null };
+    // `title` is optional in the type, not just possibly null: a response served from the
+    // worker's 24h edge cache can predate this field entirely, so it may be absent as well as
+    // explicitly null. Both must fall back the same way in the panel.
+    let body: { skills: string[]; dataVersion: string | null; title?: string | null };
     try {
       const res = await fetch(`${importApi}/?slug=${encodeURIComponent(slug)}`);
       if (res.status === 404) return importPanel.setState({ kind: "error", code: "notFound" });
       if (!res.ok) return importPanel.setState({ kind: "error", code: "network" });
-      body = (await res.json()) as { skills: string[]; dataVersion: string | null };
+      body = (await res.json()) as { skills: string[]; dataVersion: string | null; title?: string | null };
     } catch {
       return importPanel.setState({ kind: "error", code: "network" });
     }
@@ -919,7 +922,7 @@ async function boot() {
     state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
     const pruned = wanted.size - state.selected.size;
     source = slug;
-    importPanel.setState({ kind: "done", slug, pruned });
+    importPanel.setState({ kind: "done", slug, pruned, title: body.title });
     // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
     // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
     // and must be recomputed, same as every other state-changing action in this file.

@@ -173,6 +173,7 @@
   "ui.import.placeholder": "link lub id builda z grimtools",
   "ui.import.pruned": "{n} gwiazd(y) nie udało się umieścić i zostały pominięte.",
   "ui.import.source": "Zaimportowano z grimtools",
+  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importuj",
   "ui.info.aria": "O tym planerze",
   "ui.info.build": "kompilacja {buildid}",

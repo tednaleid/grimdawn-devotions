@@ -173,6 +173,7 @@
   "ui.import.placeholder": "odkaz nebo ID buildu z grimtools",
   "ui.import.pruned": "{n} hvězd(y) se nepodařilo umístit a byly odstraněny.",
   "ui.import.source": "Importováno z grimtools",
+  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importovat",
   "ui.info.aria": "O tomto plánovači",
   "ui.info.build": "sestavení {buildid}",

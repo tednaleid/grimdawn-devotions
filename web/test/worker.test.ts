@@ -37,9 +37,21 @@ test("returns the stars for a valid slug", async () => {
   expect(body).toEqual({
     slug: "qNYgbjeV",
     skills: ["sk688"],
+    title: null, // the fixture page above has no <title>
     gameVersion: "1.2.1.6",
     dataVersion: "1a801e4bd308",
   });
+});
+
+test("extracts a sanitized build title from a real calculator page", async () => {
+  const realPage = await Bun.file("test/fixtures/grimtools-calc.html").text();
+  const withTitle = (async (u: string) =>
+    String(u).includes("devotion.json")
+      ? new Response('{"version":"1a801e4bd308"}', { status: 200 })
+      : new Response(realPage, { status: 200 })) as never;
+  const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV"), env(withTitle));
+  const body = await res.json();
+  expect(body.title).toBe("Warder, Level 100 (GD 1.2.1.6)");
 });
 
 test("rejects a slug outside the charset without fetching anything", async () => {

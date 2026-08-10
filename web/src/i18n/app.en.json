@@ -43,6 +43,7 @@
   "ui.import.submit": "Import",
   "ui.import.loading": "Loading build...",
   "ui.import.source": "Imported from grimtools",
+  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.err.badInput": "That is not a grimtools build link.",
   "ui.import.err.notFound": "No build with that id.",
   "ui.import.err.network": "Could not reach the import service.",

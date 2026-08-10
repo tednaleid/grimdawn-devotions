@@ -140,9 +140,22 @@ deployment is from CI on push to `main`. A `just deploy-worker` recipe wraps the
 path.
 
 Contract: `GET /?slug=<slug>` returns
-`{slug, skills: ["sk688", ...], gameVersion, dataVersion}`. The field is `skills`,
-not `stars`: it is every `sk<id>` in the build, mastery skills included, since the
-worker cannot tell the two apart (see below).
+`{slug, skills: ["sk688", ...], title, gameVersion, dataVersion}`. The field is
+`skills`, not `stars`: it is every `sk<id>` in the build, mastery skills included,
+since the worker cannot tell the two apart (see below).
+
+`title` is the build's display name, pulled from the calculator page's
+server-rendered `<title>` (stripped of the trailing " - Grim Dawn Build
+Calculator"), or `null` when there is none, when it is empty after sanitizing, or
+when the slug is not a build. `buildInfo` itself carries no class/build name, so
+the `<title>` is the only cheap source; no mastery-code lookup is attempted.
+`title` is the first upstream text this feature ever puts in the UI, so the worker
+sanitizes rather than trusts it before it ever leaves the response: `<`/`>` are
+stripped outright (entities are left encoded on purpose, since decoding them is
+what would reintroduce markup), whitespace collapses to single spaces, and the
+result is trimmed and capped at 100 characters. The app still HTML-escapes it
+again where it is interpolated into the panel's markup, since defense in depth
+against upstream-relayed text costs nothing here.
 
 The security design rests on one decision: **the worker never accepts a URL.** It
 accepts only a slug, validated against `^[A-Za-z0-9_-]{1,24}$`, and builds the
@@ -257,8 +270,10 @@ Errors are specific rather than generic: worker unreachable, unknown slug (grimt
 Every string is a catalog key added to the `web/test/appCatalog.test.ts` guard, with
 no literals, per the internationalization invariant.
 
-On success the planner shows "Imported from grimtools", linking to
-`https://www.grimtools.com/calc/<slug>`.
+On success the planner shows "grimtools: <build title>" when the worker returned
+one, linking to `https://www.grimtools.com/calc/<slug>`. It falls back to
+"Imported from grimtools" when the title is absent or null, which includes a
+response served from the worker's edge cache from before this field existed.
 
 ### URL state
 

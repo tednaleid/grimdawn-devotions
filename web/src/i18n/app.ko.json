@@ -173,6 +173,7 @@
   "ui.import.placeholder": "grimtools 빌드 링크 또는 ID",
   "ui.import.pruned": "{n}개의 별을 배치할 수 없어 제외되었습니다.",
   "ui.import.source": "grimtools에서 가져옴",
+  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "가져오기",
   "ui.info.aria": "이 플래너 정보",
   "ui.info.build": "빌드 {buildid}",

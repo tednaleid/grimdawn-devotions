@@ -1,6 +1,7 @@
 // ABOUTME: DOM adapter for the grimtools import box, its status line and the source-build link.
 // ABOUTME: Mounted once into a stable container, mirroring searchPanel.ts.
 import { parseSlug } from "../core/grimtools";
+import { escapeHtml } from "./tooltipView";
 import type { Localization } from "../ports/Localization";
 
 export type ImportErrorCode = "notFound" | "network" | "version" | "empty";
@@ -9,8 +10,10 @@ export type ImportState =
   | { kind: "idle" }
   | { kind: "loading" }
   | { kind: "error"; code: ImportErrorCode }
-  /** `pruned` counts stars the engine could not place; absent or 0 means a clean import. */
-  | { kind: "done"; slug: string; pruned?: number };
+  /** `pruned` counts stars the engine could not place; absent or 0 means a clean import.
+   * `title` is the build's grimtools display name (already sanitized by the worker); absent or
+   * null falls back to the untitled source link, which also covers a pre-`title` cached response. */
+  | { kind: "done"; slug: string; pruned?: number; title?: string | null };
 
 export interface ImportPanelHandle {
   setState(s: ImportState): void;
@@ -52,7 +55,8 @@ export function mountImportPanel(
     input.placeholder = localization.translate("ui.import.placeholder");
     input.setAttribute("aria-label", localization.translate("ui.import.label"));
     go.textContent = localization.translate("ui.import.submit");
-    source.textContent = localization.translate("ui.import.source");
+    // source's own text is state-dependent (it names the build once one is known) and is set in
+    // paint() instead; nothing here needs it to also hold a value between "done" states.
     clear.setAttribute("aria-label", localization.translate("ui.import.clear"));
     clear.textContent = "✕";
   }
@@ -70,6 +74,12 @@ export function mountImportPanel(
 
     if (state.kind === "done") {
       source.setAttribute("href", `${CALC}${state.slug}`);
+      // title is upstream content relayed through the worker; escape it before it enters this
+      // innerHTML string. The slug above needs no escaping - parseSlug's charset already
+      // guarantees it, so it is never attacker-influenced text.
+      source.innerHTML = state.title
+        ? localization.translate("ui.import.sourceTitled", { title: escapeHtml(state.title) })
+        : localization.translate("ui.import.source");
       msg.innerHTML =
         state.pruned && state.pruned > 0
           ? `<div id="import-pruned">${localization.translate("ui.import.pruned", { n: state.pruned })}</div>`

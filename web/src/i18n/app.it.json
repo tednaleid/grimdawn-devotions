@@ -173,6 +173,7 @@
   "ui.import.placeholder": "link o id build di grimtools",
   "ui.import.pruned": "{n} stella/e non sono state posizionate e sono state rimosse.",
   "ui.import.source": "Importato da grimtools",
+  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importa",
   "ui.info.aria": "Informazioni su questo pianificatore",
   "ui.info.build": "build {buildid}",

@@ -112,6 +112,32 @@ export function buildIsMissing(html: string): boolean {
   return start >= 0 && /^null\b/.test(html.slice(start, start + 8));
 }
 
+const TITLE_SUFFIX = " - Grim Dawn Build Calculator";
+const MAX_TITLE_LEN = 100;
+
+/**
+ * Pull the human-readable build title out of a calculator page's server-rendered `<title>`
+ * element, for display only (it is never used to build a link or as an id, and `buildInfo`
+ * itself carries no class/build name - see the design doc). This is the first upstream text we
+ * ever put in our UI, so it is sanitized rather than trusted: any `<`/`>` is removed outright,
+ * runs of whitespace collapse to one space, the result is trimmed and capped at
+ * `MAX_TITLE_LEN`. Entities are deliberately left encoded - decoding them is what would
+ * reintroduce markup after the `<`/`>` strip above.
+ *
+ * Returns null when there is no `<title>`, when sanitizing leaves nothing, or when the page
+ * marks the slug as not a build (`buildIsMissing`): a missing-build page still serves a generic
+ * `<title>`, and that text is not a build name.
+ */
+export function extractBuildTitle(html: string): string | null {
+  if (buildIsMissing(html)) return null;
+  const m = /<title>([\s\S]*?)<\/title>/i.exec(html);
+  if (!m) return null;
+  let title = m[1] ?? "";
+  if (title.endsWith(TITLE_SUFFIX)) title = title.slice(0, -TITLE_SUFFIX.length);
+  title = title.replace(/[<>]/g, "").replace(/\s+/g, " ").trim().slice(0, MAX_TITLE_LEN);
+  return title.length > 0 ? title : null;
+}
+
 /** The committed `sk<id>` to star-id table (`data/grimtools-stars.json`, `stars` field). */
 export type StarTable = Record<string, string>;
 

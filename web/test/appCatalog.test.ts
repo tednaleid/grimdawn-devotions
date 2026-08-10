@@ -130,6 +130,7 @@ const REQUIRED = [
   "ui.import.submit",
   "ui.import.loading",
   "ui.import.source",
+  "ui.import.sourceTitled",
   "ui.import.err.badInput",
   "ui.import.err.notFound",
   "ui.import.err.network",

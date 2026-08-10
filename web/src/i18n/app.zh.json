@@ -173,6 +173,7 @@
   "ui.import.placeholder": "grimtools构筑链接或id",
   "ui.import.pruned": "{n}颗星无法放置，已被丢弃。",
   "ui.import.source": "已从grimtools导入",
+  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "导入",
   "ui.info.aria": "关于此规划器",
   "ui.info.build": "构建 {buildid}",

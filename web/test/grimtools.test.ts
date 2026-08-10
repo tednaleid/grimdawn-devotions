@@ -1,7 +1,7 @@
 // ABOUTME: Tests slug parsing and buildInfo extraction against a committed real calculator page.
 // ABOUTME: No network: the fixture is what pins the extraction contract.
 import { test, expect } from "bun:test";
-import { parseSlug, extractBuildInfo, buildIsMissing, mapStars } from "../src/core/grimtools";
+import { parseSlug, extractBuildInfo, extractBuildTitle, buildIsMissing, mapStars } from "../src/core/grimtools";
 import realTable from "../../data/grimtools-stars.json";
 
 test("parseSlug accepts a bare slug", () => {
@@ -104,4 +104,45 @@ test("a real build maps to exactly 55 stars against the committed table", async 
   expect(stars.length).toBe(55);
   // Every mapped id must be a real star id shape; the table guard proves they exist in the model.
   for (const s of stars) expect(s).toMatch(/^[a-z0-9_]+:\d+$/);
+});
+
+test("extractBuildTitle strips the site suffix from a real page's <title>", async () => {
+  const html = await Bun.file("test/fixtures/grimtools-calc.html").text();
+  expect(extractBuildTitle(html)).toBe("Warder, Level 100 (GD 1.2.1.6)");
+});
+
+test("extractBuildTitle returns null when there is no <title>", () => {
+  expect(extractBuildTitle("<html><body>nothing here</body></html>")).toBeNull();
+  expect(extractBuildTitle("")).toBeNull();
+});
+
+test("extractBuildTitle returns null when the title is empty after stripping the suffix", () => {
+  expect(extractBuildTitle("<title> - Grim Dawn Build Calculator</title>")).toBeNull();
+  expect(extractBuildTitle("<title>   </title>")).toBeNull();
+});
+
+test("extractBuildTitle returns null for a missing build, even if the page still has a <title>", () => {
+  const html = `<title>Grim Dawn Build Calculator</title><script>window['buildInfo'] = null;</script>`;
+  expect(extractBuildTitle(html)).toBeNull();
+});
+
+test("extractBuildTitle strips angle brackets rather than passing them through", () => {
+  // A build name is untrusted, upstream-relayed text (see the design doc): this belt-and-braces
+  // strip is the extraction-side half of neutering markup, ahead of the panel's own HTML-escape.
+  const html = "<title><script>alert(1)</script> - Grim Dawn Build Calculator</title>";
+  expect(extractBuildTitle(html)).toBe("scriptalert(1)/script");
+});
+
+test("extractBuildTitle collapses whitespace and trims", () => {
+  const html = "<title>  My   Build   - Grim Dawn Build Calculator</title>";
+  expect(extractBuildTitle(html)).toBe("My Build");
+});
+
+test("extractBuildTitle caps an over-long title at 100 characters", () => {
+  const long = "x".repeat(150);
+  const html = `<title>${long} - Grim Dawn Build Calculator</title>`;
+  const result = extractBuildTitle(html);
+  expect(result).not.toBeNull();
+  expect(result!.length).toBe(100);
+  expect(result).toBe("x".repeat(100));
 });
