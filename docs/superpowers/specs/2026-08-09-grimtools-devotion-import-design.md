@@ -69,6 +69,7 @@ stars positionally within each constellation, yields:
 | `sk<id>` to DBR entries derived | 559 of 559 |
 | Stars in our `data/devotions.json` left uncovered | 0 |
 | Bonus magnitudes cross-checked against grimtools tooltips | 47 of 47 |
+| Within-constellation orderings confirmed | 559 of 559 |
 
 The strongest confirmation was not designed for: every celestial power lands in its
 parent constellation (Targo's Hammer in Anvil, Elemental Storm in Rhowan's Crown,
@@ -326,6 +327,12 @@ detectable loss.
 - `gt=` hash round-trip, including a malformed slug being dropped on decode.
 - A guard test that the committed table has 559 entries and that every value resolves
   to a real star id in `data/devotions.json`.
+- A guard test on the within-constellation ordering invariant: the game numbers a
+  constellation's star skills sequentially, so sorting a constellation's `sk` ids
+  ascending must reproduce our own star indices `0..n-1`. This is emergent from the
+  join rather than imposed by it, so it catches a within-constellation scramble the
+  count checks above would miss. Gated both at generation time
+  (`scripts/gt_star_table.ts`) and on the committed table (no Chrome, no network).
 - The table generator's own assertions, which gate regeneration.
 - The scheduled canary.
 

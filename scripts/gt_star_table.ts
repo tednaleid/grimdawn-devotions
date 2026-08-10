@@ -249,6 +249,31 @@ for (const [sk, dbr] of skToDbr) {
 const covered = new Set(Object.values(stars));
 if (covered.size !== 559) fail(`expected 559 distinct star ids, got ${covered.size}`);
 
+// The game numbers a constellation's star skills sequentially, so sorting a constellation's own
+// sk ids ascending must reproduce our own star indices 0..n-1 exactly (a bijection onto
+// 0..n-1, so this also rules out a gap or a duplicate). This is emergent from the join above,
+// not imposed by it - f6I's key order does not ascend and devotion.json's order isn't sk-numeric
+// either - so any within-constellation scramble the count checks above missed breaks it here.
+const byCon = new Map<string, { sk: number; idx: number }[]>();
+for (const [sk, id] of Object.entries(stars)) {
+  const [conId, idx] = id.split(":") as [string, string];
+  const entries = byCon.get(conId) ?? [];
+  entries.push({ sk: Number(sk.slice(2)), idx: Number(idx) });
+  byCon.set(conId, entries);
+}
+for (const [conId, entries] of byCon) {
+  const idxBySkAscending = [...entries].sort((a, b) => a.sk - b.sk).map((e) => e.idx);
+  idxBySkAscending.forEach((idx, i) => {
+    if (idx !== i)
+      fail(
+        `${conId}: sk-ascending order gives indices ${idxBySkAscending.join(",")}, expected 0..${entries.length - 1}`,
+      );
+  });
+}
+console.error(
+  `within-constellation ordering: ${byCon.size} of ${byCon.size} constellations monotone, ${covered.size} of 559 stars`,
+);
+
 // The counts above prove every constellation joined with the right star COUNT, but not that
 // the stars within a constellation joined in the right ORDER: a scrambled-but-same-length
 // pairing would pass every assertion so far. dumpDevotion() gives the calc's own rendered
