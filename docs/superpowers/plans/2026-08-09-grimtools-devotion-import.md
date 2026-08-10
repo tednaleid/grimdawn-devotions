@@ -1311,7 +1311,6 @@ After `applyHash` runs, call `importPanel.setState(source ? { kind: "done", slug
 
 Add beside the search panel mounting (line 829):
 
-```ts
 **Naming care:** `main.ts` already has a module-scoped `table` (the cover table, line 82). The import code must not shadow it, so the mapping table local is `starTable` and `repairSelection` receives the existing `table` unchanged.
 
 ```ts
