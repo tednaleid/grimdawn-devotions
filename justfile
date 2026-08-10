@@ -499,6 +499,11 @@ item-browser:
 web-install:
     cd "{{justfile_directory()}}/web" && bun install
 
+# Run the import worker locally (http://localhost:8787) for developing the planner against it
+[group("web")]
+worker-dev:
+    cd "{{justfile_directory()}}/worker" && ../web/node_modules/.bin/wrangler dev --local --port 8787
+
 # Generate the precomputed cover table from data/devotions.json (only if stale)
 [group("web")]
 cover-table:
@@ -669,11 +674,11 @@ typecheck:
 [group("check")]
 lint:
     cd "{{justfile_directory()}}/web" && bunx biome lint --error-on-warnings
-    # scripts/ is a separate Biome project (root biome.json; web/biome.json extends it).
-    # The path argument is what scopes this: without it Biome also walks web/scripts.
-    # Use web's pinned binary - at the repo root `bunx biome` resolves an unrelated
-    # npm package called "biome" that exits 0 without checking anything.
-    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome lint --error-on-warnings scripts
+    # scripts/ and worker/ are separate Biome projects (root biome.json; web/biome.json extends
+    # it). The path argument is what scopes this: without it Biome also walks web/scripts. Use
+    # web's pinned binary - at the repo root `bunx biome` resolves an unrelated npm package
+    # called "biome" that exits 0 without checking anything.
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome lint --error-on-warnings scripts worker
 
 # Auto-fix the safe lint findings Biome can resolve on its own
 [group("check")]
@@ -684,13 +689,13 @@ lint-fix:
 [group("check")]
 fmt:
     cd "{{justfile_directory()}}/web" && bunx biome format --write
-    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format --write scripts
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format --write scripts worker
 
 # Verify formatting without writing (fails if anything is unformatted); used by check + CI
 [group("check")]
 fmt-check:
     cd "{{justfile_directory()}}/web" && bunx biome format
-    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format scripts
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format scripts worker
 
 # Lint the standalone Python scripts (bug catchers only; see ruff.toml for why it is narrow).
 # The version is pinned so a ruff release cannot fail an unrelated change: unpinned, `uvx ruff`

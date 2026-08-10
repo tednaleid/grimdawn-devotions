@@ -1,0 +1,9 @@
+name = "grimdawn-devotions-import"
+main = "src/index.ts"
+compatibility_date = "2026-08-09"
+# account_id is filled in by `just setup-worker-auth` (Task 8). It is an identifier, not a
+# credential, so it belongs in this committed file rather than in repository secrets.
+account_id = ""
+
+[vars]
+ALLOWED_ORIGIN = "https://tednaleid.github.io"
