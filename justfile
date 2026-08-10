@@ -688,7 +688,11 @@ lint:
     # it). The path argument is what scopes this: without it Biome also walks web/scripts. Use
     # web's pinned binary - at the repo root `bunx biome` resolves an unrelated npm package
     # called "biome" that exits 0 without checking anything.
-    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome lint --error-on-warnings scripts worker
+    # worker/src rather than worker/: `just worker-dev` leaves wrangler's generated bundles under
+    # the gitignored worker/.wrangler/, and Biome lints them anyway (an ignore file does not cover
+    # paths named on the command line), so `just check` would fail on machine-generated code for
+    # anyone who had run the worker locally.
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome lint --error-on-warnings scripts worker/src
 
 # Auto-fix the safe lint findings Biome can resolve on its own
 [group("check")]
@@ -699,13 +703,14 @@ lint-fix:
 [group("check")]
 fmt:
     cd "{{justfile_directory()}}/web" && bunx biome format --write
-    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format --write scripts worker
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format --write scripts worker/src
 
 # Verify formatting without writing (fails if anything is unformatted); used by check + CI
 [group("check")]
 fmt-check:
     cd "{{justfile_directory()}}/web" && bunx biome format
-    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format scripts worker
+    # worker/src, not worker/: see the note in `lint` about wrangler's gitignored bundles.
+    cd "{{justfile_directory()}}" && ./web/node_modules/.bin/biome format scripts worker/src
 
 # Lint the standalone Python scripts (bug catchers only; see ruff.toml for why it is narrow).
 # The version is pinned so a ruff release cannot fail an unrelated change: unpinned, `uvx ruff`
