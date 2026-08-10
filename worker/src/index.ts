@@ -1,7 +1,12 @@
 // ABOUTME: Cloudflare Worker that returns a grimtools build's devotion star ids for one slug.
 // ABOUTME: Takes a slug and never a URL, so there is no code path that fetches a caller-named host.
 /// <reference path="./worker-env.d.ts" />
-import { extractBuildInfo, extractBuildTitle, buildIsMissing } from "../../web/src/core/grimtools";
+import {
+  extractBuildInfo,
+  extractBuildTitle,
+  buildIsMissing,
+  IMPORT_CONTRACT_VERSION,
+} from "../../web/src/core/grimtools";
 
 const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
 const CALC = "https://www.grimtools.com/calc/";
@@ -175,12 +180,19 @@ export default {
     if (slug === null) return handleRequest(request, env);
 
     const cache = caches.default;
-    // Normalize the cache key to the slug alone. Keying on the whole request (as `cache.match
-    // (request)` would) makes `?slug=X&n=1`, `?slug=X&n=2` and `/anything?slug=X` distinct
-    // entries that each miss and each make a fresh upstream fetch - one client could turn many
-    // requests into many upstream hits. Builds are immutable, so a slug's content never changes:
-    // caching on the slug alone caps both our cost and any amplification against grimtools.
-    const cacheKey = new Request(new URL(`/?slug=${slug}`, request.url).toString());
+    // Normalize the cache key to the slug plus our own IMPORT_CONTRACT_VERSION (see grimtools.ts).
+    // Keying on the whole request (as `cache.match(request)` would) makes `?slug=X&n=1`,
+    // `?slug=X&n=2` and `/anything?slug=X` distinct entries that each miss and each make a fresh
+    // upstream fetch - one client could turn many requests into many upstream hits. Builds are
+    // immutable, so a slug's content never changes: caching on the slug (and our own contract
+    // version) alone caps both our cost and any amplification against grimtools. The client sends
+    // its own version param too (see web/src/app/main.ts), purely so the *browser* cache sees a
+    // new URL when the contract changes - it is deliberately NOT read here. Folding a
+    // caller-supplied value into this key would hand anyone unbounded control of the keyspace
+    // (`v=1`, `v=2`, ... `v=999999` each becoming a distinct entry and a fresh grimtools fetch),
+    // exactly the amplification the slug-only key was normalized to prevent. Keying stays derived
+    // from our own constant and the validated slug only.
+    const cacheKey = new Request(new URL(`/?slug=${slug}&cv=${IMPORT_CONTRACT_VERSION}`, request.url).toString());
     const hit = await cache.match(cacheKey);
     if (hit) return hit;
     const res = await handleRequest(request, env);

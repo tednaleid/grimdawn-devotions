@@ -4,6 +4,21 @@
 /** Grimtools slug charset. Also the worker's input validation, so keep the two identical. */
 const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
 
+/**
+ * Version of the worker's response contract (`{ slug, skills, gameVersion, dataVersion, title }`).
+ * Shared by both the app and the worker so there is exactly one definition and no chance of the
+ * two drifting - see `worker/src/index.ts` and `web/src/app/main.ts`.
+ *
+ * Bump this when the shape changes in a way an old cached response cannot tolerate for a new
+ * client (a rename or removal, not an additive field - those degrade gracefully and don't need
+ * it). The app puts it in the request URL so the browser cache sees a new URL; the worker folds it
+ * into its own edge-cache key so stale entries stop being served instead of expiring over 24h.
+ * `web/test/worker.test.ts`'s response-shape guard test fails loudly if a field is added or
+ * removed without this being bumped, so forgetting is caught by CI rather than relied on not to
+ * happen.
+ */
+export const IMPORT_CONTRACT_VERSION = 1;
+
 /** Hosts a calculator URL may name. An allowlist, not a substring check. */
 const HOSTS = new Set(["grimtools.com", "www.grimtools.com"]);
 

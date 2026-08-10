@@ -167,3 +167,38 @@ test("the caching wrapper shares one cache entry across query strings differing 
   expect(calls).toBe(callsAfterFirst);
   expect(await second.json()).toEqual(firstBody);
 });
+
+// The security property this whole cache-invalidation mechanism depends on: the client's own
+// version param (`v=`, sent so the *browser* cache sees a new URL - see main.ts) must never widen
+// the worker's own keyspace. If it did, `v=1`, `v=2`, ... `v=999999` would each become a distinct
+// edge-cache entry and a distinct upstream fetch, handing any caller unbounded amplification
+// against grimtools - the exact thing the slug-only key was normalized to prevent.
+test("the caching wrapper shares one cache entry across requests differing only in the client's version param", async () => {
+  installFakeCache();
+  let calls = 0;
+  const spy = (async (u: string) => {
+    calls++;
+    return ok(String(u));
+  }) as never;
+  const first = await worker.fetch(new Request("https://w/?slug=qNYgbjeV&v=1"), env(spy));
+  const firstBody = await first.json();
+  const callsAfterFirst = calls;
+  const second = await worker.fetch(new Request("https://w/?slug=qNYgbjeV&v=999999"), env(spy));
+  expect(calls).toBe(callsAfterFirst); // no new upstream fetch: same cache entry, not a new one
+  expect(await second.json()).toEqual(firstBody);
+});
+
+test("the client's version param does not leak into the response body", async () => {
+  const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV&v=999999"), env(ok as never));
+  expect(JSON.stringify(await res.json())).not.toContain("999999");
+});
+
+// Pins the exact response shape so a rename or removal is caught by CI instead of relied on not to
+// happen. If this test fails because a field was intentionally added or removed, and an old cached
+// response cannot tolerate the change, bump IMPORT_CONTRACT_VERSION in
+// web/src/core/grimtools.ts, then update this test's expected field list.
+test("the success response has exactly the contracted field names", async () => {
+  const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV"), env(ok as never));
+  const body = await res.json();
+  expect(Object.keys(body).sort()).toEqual(["dataVersion", "gameVersion", "skills", "slug", "title"]);
+});

@@ -48,7 +48,7 @@ import { parseTag } from "../core/benefitTag";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
-import { mapStars, type StarTable } from "../core/grimtools";
+import { mapStars, IMPORT_CONTRACT_VERSION, type StarTable } from "../core/grimtools";
 import { mountImportPanel } from "../adapters/importPanel";
 import { affinityTotals } from "../core/affinity";
 import {
@@ -896,7 +896,13 @@ async function boot() {
     // explicitly null. Both must fall back the same way in the panel.
     let body: { skills: string[]; dataVersion: string | null; title?: string | null };
     try {
-      const res = await fetch(`${importApi}/?slug=${encodeURIComponent(slug)}`);
+      // `v=${IMPORT_CONTRACT_VERSION}` busts only the *browser's* cache for this URL, and only when
+      // the worker's response contract actually changes (unlike buildId, which changes on every
+      // deploy - see grimtools.ts for why a shared constant is used instead). The worker
+      // deliberately ignores this param when building its own edge-cache key, using the same
+      // constant on its own side instead - a caller-supplied value there would let anyone inflate
+      // the worker's keyspace.
+      const res = await fetch(`${importApi}/?slug=${encodeURIComponent(slug)}&v=${IMPORT_CONTRACT_VERSION}`);
       if (res.status === 404) return importPanel.setState({ kind: "error", code: "notFound" });
       if (!res.ok) return importPanel.setState({ kind: "error", code: "network" });
       body = (await res.json()) as { skills: string[]; dataVersion: string | null; title?: string | null };

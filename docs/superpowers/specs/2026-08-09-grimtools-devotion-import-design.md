@@ -169,9 +169,14 @@ The rest follows from the same principle:
   response, re-validating each id against `^sk\d+$` before emitting it. The response
   is structurally incapable of carrying attacker-influenced content, so the worker
   cannot be used to serve arbitrary material from our domain.
-- **It caches on slug** with a long TTL via the Cache API. Builds are immutable, so a
-  slug's content never changes and the hit rate is near perfect. This caps both our
-  cost and any amplification against grimtools.
+- **It caches on slug plus its own `IMPORT_CONTRACT_VERSION`** with a long TTL via the
+  Cache API. Builds are immutable, so a slug's content never changes and the hit rate
+  is near perfect. Keying on the slug alone (never the whole request) caps both our
+  cost and any amplification against grimtools; the client sends its own version
+  param too, but purely to bust its own browser cache with a new URL - the worker
+  never reads it for keying, since doing so would hand a caller unbounded control of
+  the keyspace. See `worker/README.md`'s "Changing the response shape" for the full
+  mechanism.
 - **It bounds its work**: a byte cap on the response it will read, a subrequest
   timeout, and an early exit once `buildInfo` is located, so a hostile or oversized
   upstream cannot exhaust the CPU budget.

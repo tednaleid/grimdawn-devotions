@@ -6,14 +6,18 @@ grimtools calculator link. Grimtools serves those pages with
 cannot read them directly. This worker fetches the page server-side and hands back
 the build's skill ids.
 
-Contract: `GET /?slug=<slug>` returns
-`{ slug, skills: ["sk688", ...], gameVersion, dataVersion }`. `skills` is every
+Contract: `GET /?slug=<slug>&v=<contract version>` returns
+`{ slug, skills: ["sk688", ...], gameVersion, dataVersion, title }`. `skills` is every
 `sk<id>` in the build - mastery skills and devotion stars both, since the worker has
 no way to tell them apart (see "Slug, never a URL" for the ids-only design, and
 `web/src/core/grimtools.ts`'s `mapStars` for where the split actually happens). It is
 not called `stars`: that name would claim a distinction the worker cannot make.
 `dataVersion` is `null` when grimtools' own `devotion.json` could not be checked;
-that never blocks the import.
+that never blocks the import. `title` may be absent as well as `null`, since a
+response served from an entry cached before the field existed predates it entirely.
+`v` is the caller's own `IMPORT_CONTRACT_VERSION` (see "Changing the response shape"
+below) - present purely so the app can bust its own browser cache; the worker never
+reads it.
 
 ## Slug, never a URL
 
@@ -23,6 +27,33 @@ path that fetches anywhere but grimtools — it cannot be turned into an open pr
 an SSRF relay. See `docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`
 ("Part 2: the worker") for the full security rationale, including why it never
 returns upstream bytes, how it caches, and how it bounds its own work.
+
+## Changing the response shape
+
+Two caches sit between the worker and the app, and each needs a different key to
+invalidate: the edge cache inside the worker (`caches.default`), keyed on the slug
+plus `IMPORT_CONTRACT_VERSION`, which the worker controls completely; and the
+browser's own cache from our `Cache-Control: public, max-age=86400`, keyed on the
+request URL, which only a new URL can invalidate. `IMPORT_CONTRACT_VERSION`
+(`web/src/core/grimtools.ts`) is the one constant both sides fold in - the app puts it
+in the request URL's `v` param so the browser sees a new URL, and the worker folds the
+same constant into its own cache key so a stale edge entry stops being served instead
+of expiring over 24h. The worker never reads the client's `v` param for its own
+keying: doing so would let a caller mint unbounded distinct cache keys (`v=1`, `v=2`,
+... `v=999999`), each a fresh grimtools fetch.
+
+Bump `IMPORT_CONTRACT_VERSION` when a change is non-degradable for an old client (a
+rename or removal of a field an old bundle depends on) - not for an additive field,
+which old clients already tolerate by ignoring it. Forgetting to bump is caught by
+`web/test/worker.test.ts`'s response-shape guard test, which pins the exact set of
+field names and fails loudly if one changes.
+
+Neither cache trick helps the case that actually matters most during a rollout: a
+browser tab that already has the *old* app bundle loaded, talking to the *new*
+worker. That tab never re-requests a new URL, so it goes on hitting whatever the
+worker returns under the old contract version's key. Tolerant parsing in the app
+(optional fields, graceful degradation for absent ones) is the real defense for that
+window, not a cache key - see `main.ts`'s handling of a possibly-absent `title`.
 
 ## Running locally
 
