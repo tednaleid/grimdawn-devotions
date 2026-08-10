@@ -101,8 +101,9 @@ import and never per view.
 **A committed lookup table**, `data/grimtools-stars.json`, mapping `sk<id>` to our
 star id, 559 entries, plus the grimtools devotion data version it was derived from.
 
-**A Cloudflare Worker** that fetches a build by slug and returns its star ids. It
-holds no game knowledge.
+**A Cloudflare Worker** that fetches a build by slug and returns its skill ids
+(mastery skills and devotion stars both - it holds no game knowledge, so it cannot
+tell them apart). It never claims otherwise: the response field is `skills`.
 
 **The planner**, which maps those ids through the committed table, applies the
 selection, and records the source slug in the URL hash.
@@ -138,7 +139,9 @@ deployment is from CI on push to `main`. A `just deploy-worker` recipe wraps the
 path.
 
 Contract: `GET /?slug=<slug>` returns
-`{slug, stars: ["sk688", ...], gameVersion, dataVersion}`.
+`{slug, skills: ["sk688", ...], gameVersion, dataVersion}`. The field is `skills`,
+not `stars`: it is every `sk<id>` in the build, mastery skills included, since the
+worker cannot tell the two apart (see below).
 
 The security design rests on one decision: **the worker never accepts a URL.** It
 accepts only a slug, validated against `^[A-Za-z0-9_-]{1,24}$`, and builds the

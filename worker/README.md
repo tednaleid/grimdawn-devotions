@@ -4,12 +4,16 @@ A small Cloudflare Worker that lets the planner import a devotion build from a
 grimtools calculator link. Grimtools serves those pages with
 `Access-Control-Allow-Origin` locked to its own origin, so a browser on our site
 cannot read them directly. This worker fetches the page server-side and hands back
-just the devotion star ids.
+the build's skill ids.
 
 Contract: `GET /?slug=<slug>` returns
-`{ slug, stars: ["sk688", ...], gameVersion, dataVersion }`. `dataVersion` is `null`
-when grimtools' own `devotion.json` could not be checked; that never blocks the
-import.
+`{ slug, skills: ["sk688", ...], gameVersion, dataVersion }`. `skills` is every
+`sk<id>` in the build - mastery skills and devotion stars both, since the worker has
+no way to tell them apart (see "Slug, never a URL" for the ids-only design, and
+`web/src/core/grimtools.ts`'s `mapStars` for where the split actually happens). It is
+not called `stars`: that name would claim a distinction the worker cannot make.
+`dataVersion` is `null` when grimtools' own `devotion.json` could not be checked;
+that never blocks the import.
 
 ## Slug, never a URL
 
@@ -51,7 +55,9 @@ CORS refusal itself.
 ## Deployment
 
 Normal deployment is from CI (`.github/workflows/deploy-worker.yml`) on push to
-`main`, filtered to `worker/**`. It never runs on `pull_request`: the deploy token is
+`main`, filtered to `worker/**` plus `web/src/core/grimtools.ts` (the worker imports
+it directly, so a change there needs the same redeploy). It never runs on
+`pull_request`: the deploy token is
 a repository secret, and any workflow that can run in the repo can reach repository
 secrets, so keeping the trigger to `push`/`workflow_dispatch` keeps the token out of
 PR-triggered runs. A `just deploy-worker` recipe wraps the same `wrangler deploy` for
@@ -106,7 +112,15 @@ which is a worse trade than a five-minute dashboard visit. In order:
    - `.github/workflows/canary-import.yml` uses it as the target to import against.
      Left unset, the canary fails outright (`::error::`) rather than skip: a canary
      that quietly passes with nothing configured would be worse than no canary.
-6. **Verify**: reload the deployed planner, import `qNYgbjeV`, and confirm 55 stars
+6. **Re-run the Pages deploy before verifying anything.** `IMPORT_API_URL` is baked
+   into the production bundle at *build* time (`web/scripts/bundle.ts`), and setting
+   a repository variable does not itself trigger a build. Without this step the site
+   deployed in step 4's era is still live and still points at
+   `http://localhost:8787`, so step 7 below would fail even though everything up to
+   here was done correctly. Go to **Actions, Deploy to GitHub Pages, Run workflow**
+   (it has `workflow_dispatch`) and wait for it to finish. This step must come after
+   step 5 and before step 7 - do not reorder it.
+7. **Verify**: reload the deployed planner, import `qNYgbjeV`, and confirm 55 stars
    and a working source link. Then run **Actions, Import canary, Run workflow** by
    hand once and confirm it passes.
 

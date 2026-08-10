@@ -26,10 +26,14 @@ jobs:
             exit 1
           fi
           BODY=$(curl -sS --fail "$WORKER_URL/?slug=qNYgbjeV")
-          COUNT=$(echo "$BODY" | jq '[.stars[] | select(test("^sk[0-9]+$"))] | length')
+          # Assert the quantity the app actually depends on: skills mapped through our own table
+          # to real devotion stars, not the worker's raw skill count (which includes mastery
+          # skills the app never uses and the worker cannot tell apart from stars anyway).
+          COUNT=$(jq -n --argjson body "$BODY" --slurpfile table data/grimtools-stars.json \
+            '[$body.skills[] | select(. as $s | $table[0].stars | has($s))] | length')
           EXPECTED=$(jq -r '.dataVersion' data/grimtools-stars.json)
           LIVE=$(echo "$BODY" | jq -r '.dataVersion')
-          echo "stars: $COUNT, table version: $EXPECTED, live version: $LIVE"
-          # 83 total skills on this build; the count is what a renumbering would move.
-          [ "$COUNT" = "83" ] || { echo "skill count changed: expected 83, got $COUNT"; exit 1; }
+          echo "mapped stars: $COUNT, table version: $EXPECTED, live version: $LIVE"
+          # 55 devotion stars on this build; the count is what a renumbering would move.
+          [ "$COUNT" = "55" ] || { echo "mapped star count changed: expected 55, got $COUNT"; exit 1; }
           [ "$LIVE" = "$EXPECTED" ] || { echo "grimtools devotion data version moved to $LIVE; run: just gt-star-table"; exit 1; }

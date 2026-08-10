@@ -1,7 +1,7 @@
 // ABOUTME: Tests the worker's request handling: slug validation, response shape, and refusals.
 // ABOUTME: Upstream fetch is stubbed, so this runs with no network and no Cloudflare account.
 import { test, expect } from "bun:test";
-import { handleRequest } from "../../worker/src/index";
+import worker, { handleRequest } from "../../worker/src/index";
 
 const ORIGIN = "https://planner.example";
 const page = `<script>window['buildInfo'] = {"data":{"skills":[{"name":"sk688","level":1}]},"created_for_build":"1.2.1.6"};</script>`;
@@ -14,6 +14,21 @@ const ok = async (url: string) =>
     ? new Response('{"version":"1a801e4bd308"}', { status: 200 })
     : new Response(page, { status: 200 });
 
+/** Minimal stand-in for the Workers runtime's `caches.default`, keyed the same way (by request
+ * URL), so the default export's caching wrapper can be exercised with no real edge cache. */
+class FakeCache {
+  private store = new Map<string, Response>();
+  async match(req: Request): Promise<Response | undefined> {
+    return this.store.get(req.url)?.clone();
+  }
+  async put(req: Request, res: Response): Promise<void> {
+    this.store.set(req.url, res.clone());
+  }
+}
+function installFakeCache(): void {
+  (globalThis as unknown as { caches: { default: FakeCache } }).caches = { default: new FakeCache() };
+}
+
 test("returns the stars for a valid slug", async () => {
   const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV"), env(ok as never));
   expect(res.status).toBe(200);
@@ -21,7 +36,7 @@ test("returns the stars for a valid slug", async () => {
   const body = await res.json();
   expect(body).toEqual({
     slug: "qNYgbjeV",
-    stars: ["sk688"],
+    skills: ["sk688"],
     gameVersion: "1.2.1.6",
     dataVersion: "1a801e4bd308",
   });
@@ -104,4 +119,39 @@ test("refuses a redirect from upstream instead of following it", async () => {
   const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV"), env(spy));
   expect(redirectMode).toBe("manual");
   expect(res.status).toBe(502);
+});
+
+// Every test above exercises handleRequest directly, which never touches the cache. The two
+// below exercise the default-exported `fetch` wrapper, where the caching (and the cache-key
+// normalization fix) actually lives.
+
+test("the caching wrapper serves a repeat request without a fresh upstream fetch", async () => {
+  installFakeCache();
+  let calls = 0;
+  const spy = (async (u: string) => {
+    calls++;
+    return ok(String(u));
+  }) as never;
+  const first = await worker.fetch(new Request("https://w/?slug=qNYgbjeV"), env(spy));
+  expect(first.status).toBe(200);
+  const callsAfterFirst = calls;
+  const second = await worker.fetch(new Request("https://w/?slug=qNYgbjeV"), env(spy));
+  expect(second.status).toBe(200);
+  expect(calls).toBe(callsAfterFirst); // no new upstream fetch on the repeat request
+});
+
+test("the caching wrapper shares one cache entry across query strings differing only by extra noise", async () => {
+  installFakeCache();
+  let calls = 0;
+  const spy = (async (u: string) => {
+    calls++;
+    return ok(String(u));
+  }) as never;
+  const first = await worker.fetch(new Request("https://w/?slug=qNYgbjeV"), env(spy));
+  const firstBody = await first.json();
+  const callsAfterFirst = calls;
+  // Same slug, an extra query param: without a normalized cache key this misses and re-fetches.
+  const second = await worker.fetch(new Request("https://w/?slug=qNYgbjeV&n=2"), env(spy));
+  expect(calls).toBe(callsAfterFirst);
+  expect(await second.json()).toEqual(firstBody);
 });

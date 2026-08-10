@@ -878,14 +878,17 @@ async function boot() {
     }
     importPanel.setState({ kind: "loading" });
     const starIdTable = await loadStarTable();
+    // This is our own same-origin data/grimtools-stars.json, not the worker, so "network" is a
+    // stand-in: no catalog key describes "our own bundled data failed to load" and this is rare
+    // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
     if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
 
-    let body: { stars: string[]; dataVersion: string | null };
+    let body: { skills: string[]; dataVersion: string | null };
     try {
       const res = await fetch(`${importApi}/?slug=${encodeURIComponent(slug)}`);
       if (res.status === 404) return importPanel.setState({ kind: "error", code: "notFound" });
       if (!res.ok) return importPanel.setState({ kind: "error", code: "network" });
-      body = (await res.json()) as { stars: string[]; dataVersion: string | null };
+      body = (await res.json()) as { skills: string[]; dataVersion: string | null };
     } catch {
       return importPanel.setState({ kind: "error", code: "network" });
     }
@@ -896,7 +899,9 @@ async function boot() {
     if (body.dataVersion && body.dataVersion !== tableDataVersion)
       return importPanel.setState({ kind: "error", code: "version" });
 
-    const stars = mapStars(body.stars, starIdTable);
+    // body.skills mixes mastery skills and devotion stars (the worker cannot tell them apart);
+    // mapStars is what actually splits stars out, via membership in the committed table.
+    const stars = mapStars(body.skills, starIdTable);
     if (!stars.length) return importPanel.setState({ kind: "error", code: "empty" });
 
     // Raise the cap to fit, never lower an existing higher one.

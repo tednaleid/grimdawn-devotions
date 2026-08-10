@@ -16,13 +16,23 @@ export interface Env {
   fetchImpl?: typeof fetch;
 }
 
+/** Extracts and validates the `slug` query param. Null when absent or outside SLUG_RE, which is
+ * also what the caching wrapper uses to decide whether a request is cacheable at all. */
+function validSlug(request: Request): string | null {
+  const slug = new URL(request.url).searchParams.get("slug") ?? "";
+  return SLUG_RE.test(slug) ? slug : null;
+}
+
 function json(body: unknown, status: number, origin: string): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": origin,
-      "Cache-Control": "public, max-age=86400",
+      // Only a 200 is a build that will never change, so only a 200 is storable/reusable. An
+      // explicit max-age on an error status (per RFC 9111) would let a transient 502 get pinned
+      // into a caller's cache for a day with no way to retry.
+      "Cache-Control": status === 200 ? "public, max-age=86400" : "no-store",
     },
   });
 }
@@ -104,9 +114,9 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     });
   if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, origin);
 
-  const slug = new URL(request.url).searchParams.get("slug") ?? "";
   // The only caller-controlled value, and it can never name a host: CALC is a constant.
-  if (!SLUG_RE.test(slug)) return json({ error: "bad_slug" }, 400, origin);
+  const slug = validSlug(request);
+  if (slug === null) return json({ error: "bad_slug" }, 400, origin);
 
   const signal = AbortSignal.timeout(TIMEOUT_MS);
   // "manual" so a redirect response is never silently followed: the slug design guarantees WE
@@ -135,8 +145,10 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   const info = result.info;
 
   // Re-validate rather than trusting upstream: the response must be incapable of carrying
-  // anything but ids of our own shape.
-  const stars = info.skillIds.filter((s) => /^sk\d+$/.test(s));
+  // anything but ids of our own shape. Named `skills`, not `stars`: this still mixes mastery
+  // skills in with devotion stars (see extractBuildInfo) - the worker has no way to tell them
+  // apart, so the field name must not claim otherwise.
+  const skills = info.skillIds.filter((s) => /^sk\d+$/.test(s));
 
   // Best effort. A missing data version degrades to "cannot check", never to a blocked import.
   let dataVersion: string | null = null;
@@ -147,18 +159,31 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
     dataVersion = null;
   }
 
-  return json({ slug, stars, gameVersion: info.gameVersion, dataVersion }, 200, origin);
+  return json({ slug, skills, gameVersion: info.gameVersion, dataVersion }, 200, origin);
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
+    // Only a validated GET is ever cached: the cache key below is built from the slug alone, so
+    // an OPTIONS preflight or a request that fails validation must never consult or populate it
+    // (an OPTIONS request sharing a GET's cache key would return a cached JSON body in place of
+    // its 204 preflight response).
+    if (request.method !== "GET") return handleRequest(request, env);
+    const slug = validSlug(request);
+    if (slug === null) return handleRequest(request, env);
+
     const cache = caches.default;
-    const hit = await cache.match(request);
+    // Normalize the cache key to the slug alone. Keying on the whole request (as `cache.match
+    // (request)` would) makes `?slug=X&n=1`, `?slug=X&n=2` and `/anything?slug=X` distinct
+    // entries that each miss and each make a fresh upstream fetch - one client could turn many
+    // requests into many upstream hits. Builds are immutable, so a slug's content never changes:
+    // caching on the slug alone caps both our cost and any amplification against grimtools.
+    const cacheKey = new Request(new URL(`/?slug=${slug}`, request.url).toString());
+    const hit = await cache.match(cacheKey);
     if (hit) return hit;
     const res = await handleRequest(request, env);
-    // Builds are immutable, so a slug's content never changes: cache aggressively, which caps
-    // both our cost and any amplification against grimtools.
-    if (res.status === 200) await cache.put(request, res.clone());
+    // json() already marks every non-200 no-store; only put a 200 here too, belt-and-suspenders.
+    if (res.status === 200) await cache.put(cacheKey, res.clone());
     return res;
   },
 };
