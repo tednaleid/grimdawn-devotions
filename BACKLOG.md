@@ -831,3 +831,27 @@ assertion to the bun suite, which always runs: load the committed JSON and
 assert every constellation has a non-null `description_tag`. Pointer: the
 model/data tests under `web/test/`; the Python-side check is "every
 constellation has a description_tag" in `scripts/test_parse_devotions.py`.
+
+## Extract the shared CDP client out of the grimtools scripts
+
+`scripts/gt_star_table.ts` copies about 90 lines of CDP client verbatim from
+`scripts/gt_scrape.ts` (the Chrome launch, `cleanup`, `pageWsUrl`, and the `CDP`
+class), differing only in the debug port. A protocol fix or a Chrome-path change
+now has to be applied twice, with nothing to remind anyone the second copy
+exists.
+
+The devotion-import plan mandated the copy on the grounds that `scripts/` are
+standalone programs. That rationale does not survive contact with the repo:
+`scripts/gd_dbr.py` is already a shared helper with three Python consumers, so
+this codebase shares script helpers where it helps. The TS scripts simply never
+had a second consumer until now.
+
+Deferred rather than declined, deliberately: the extraction rewrites the very
+region of `gt_scrape.ts` that a sibling branch also modified, so doing it before
+both branches land turns a clean merge into a hand-resolved conflict. Do it once
+they are both in.
+
+Pointers: extract to `scripts/gd_cdp.ts`, mirroring `scripts/gd_dbr.py`'s role;
+the block is `scripts/gt_scrape.ts` lines 21-128 and the matching head of
+`scripts/gt_star_table.ts`. Only the debug port differs, so it should be a
+parameter.
