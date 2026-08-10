@@ -258,3 +258,29 @@ test("a hash with no recognized param still decodes to null", () => {
   expect(decodeHash("#garbage", canonical)).toBeNull();
   expect(decodeHash("#zzz=1", canonical)).toBeNull();
 });
+
+test("encodeHash carries the source slug and decodeHash returns it", () => {
+  const h = encodeHash(new Set(["bat:0"]), 55, canonical, new Set(), [], null, "", "qNYgbjeV");
+  expect(h).toContain("gt=qNYgbjeV");
+  expect(decodeHash(h, canonical, [])!.source).toBe("qNYgbjeV");
+});
+
+test("an absent gt= decodes to an empty source", () => {
+  expect(decodeHash("p=55&s=AA", canonical, [])!.source).toBe("");
+});
+
+test("a malformed gt= is dropped rather than restored", () => {
+  // Same tolerance discipline as every other param: a hand-edited link restores a sensible
+  // planner rather than propagating junk into a rendered outbound link.
+  expect(decodeHash("p=55&gt=not a slug", canonical, [])!.source).toBe("");
+  expect(decodeHash(`p=55&gt=${"a".repeat(25)}`, canonical, [])!.source).toBe("");
+  expect(decodeHash("p=55&gt=%3Cscript%3E", canonical, [])!.source).toBe("");
+});
+
+test("gt= alone is enough to make a hash ours to decode", () => {
+  expect(decodeHash("gt=qNYgbjeV", canonical, [])).not.toBeNull();
+});
+
+test("an empty source emits no gt= at all", () => {
+  expect(encodeHash(new Set(), 55, canonical, new Set(), [], null, "", "")).not.toContain("gt=");
+});

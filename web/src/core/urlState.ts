@@ -9,7 +9,7 @@ const MAX_CAP = 55;
 const MAX_QUERY = 100; // a shared link carries a search box's worth of text, not a document
 
 /** Every param decodeHash understands. Presence of any one makes a hash ours to decode. */
-const KNOWN_PARAMS = ["p", "s", "b", "q", "cs", "cp"] as const;
+const KNOWN_PARAMS = ["p", "s", "b", "q", "cs", "cp", "gt"] as const;
 
 /**
  * A point-cap param (`p=` live, `cp=` baseline). Absent, empty, or unparseable all mean the full
@@ -33,6 +33,20 @@ function decodeCap(raw: string | null): number {
  */
 export function normalizeQuery(q: string): string {
   return q.trim().slice(0, MAX_QUERY);
+}
+
+/** Grimtools slug charset, duplicated from core/grimtools.ts deliberately: urlState stays dependency-free. */
+const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
+
+/**
+ * The one normal form for a source slug: anything outside the charset becomes "".
+ *
+ * `gt=` is provenance only and is rendered as an outbound link, so a hand-edited hash must not be
+ * able to put arbitrary text into that href.
+ */
+export function normalizeSource(s: string): string {
+  const v = s.trim();
+  return SLUG_RE.test(v) ? v : "";
 }
 
 /** Stable ordering of every star id: constellation insertion order, then star index. */
@@ -140,6 +154,7 @@ export function encodeHash(
   statCanonical: string[] = [],
   baseline: { selected: Set<StarId>; pointCap: number } | null = null,
   query: string = "",
+  source: string = "",
 ): string {
   // p=0 is the uncapped sentinel (0 is otherwise an invalid cap; the real min is 1).
   const cap = Number.isFinite(pointCap) ? pointCap : 0;
@@ -154,6 +169,9 @@ export function encodeHash(
   // Only when a search is active, same as b=; an empty box leaves the hash as it was.
   const q = normalizeQuery(query);
   if (q) out += `&q=${encodeURIComponent(q)}`;
+  // Provenance only: the selection above is authoritative, so this never affects what is restored.
+  const gt = normalizeSource(source);
+  if (gt) out += `&gt=${gt}`;
   return out;
 }
 
@@ -168,6 +186,7 @@ export function decodeHash(
   benefits: Set<string>;
   baseline: { selected: Set<StarId>; pointCap: number } | null;
   query: string;
+  source: string;
 } | null {
   const raw = hash.replace(/^#/, "").trim();
   if (!raw) return null;
@@ -194,5 +213,7 @@ export function decodeHash(
   // padded one is trimmed and capped rather than rejected.
   const query = normalizeQuery(params.get("q") ?? "");
 
-  return { selected, pointCap, benefits, baseline, query };
+  const source = normalizeSource(params.get("gt") ?? "");
+
+  return { selected, pointCap, benefits, baseline, query, source };
 }
