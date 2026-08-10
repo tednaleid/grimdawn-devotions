@@ -693,12 +693,24 @@ main {
   border-color: #3d4a5c;
   color: #e6edf3;
 }
+#import-go:disabled {
+  color: #6b7688;
+  cursor: default;
+  pointer-events: none;
+}
 #import-msg {
   margin-top: 0.35rem;
   color: #9aa4b2;
   font-size: 0.75rem;
 }
+/* The source link fills the row the way #import-input does while it is showing, since the two
+   are never visible at the same time. */
 #import-source {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: #8fb6e0;
 }
 .power,
