@@ -1,22 +1,28 @@
-// ABOUTME: Scrape a grimtools.com/calc/<id> build into one JSON file via headless Chrome + CDP.
-// ABOUTME: Captures gear, skills, devotions and the character sheet in three named buff states.
+// ABOUTME: Scrape a grimtools build into one JSON file via headless Chrome + CDP.
+// ABOUTME: Takes a calc URL or a local player.gdc; captures gear, skills, devotions and the sheet.
 //
-// Usage: bun scripts/gt_scrape.ts <calc-url> <out.json>
+// Usage: bun scripts/gt_scrape.ts <calc-url|path/to/player.gdc> <out.json>
 //
 // The build is not server-rendered and there is no API call to intercept: the whole
 // character is encoded in the URL slug and decoded client side, so the page has to run.
 // Playwright's own transports do not connect under Bun on Windows (see web/e2e/smoke.ts),
 // hence the raw CDP client here.
+//
+// A local save takes the calculator's own Import control instead of a URL. That upload
+// is server-side (calc.js posts to upload_save.php), so this path sends the save file to
+// grimtools - see docs/grimtools-build-audit.md before pointing it at someone else's save.
 import { readdirSync, writeFileSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 
-const URL_TO_LOAD = process.argv[2];
+const SOURCE = process.argv[2];
 const OUT = process.argv[3];
-if (!URL_TO_LOAD || !OUT) {
-  console.error("usage: bun scripts/gt_scrape.ts <calc-url> <out.json>");
+if (!SOURCE || !OUT) {
+  console.error("usage: bun scripts/gt_scrape.ts <calc-url|path/to/player.gdc> <out.json>");
   process.exit(2);
 }
+const IS_SAVE = SOURCE.toLowerCase().endsWith(".gdc");
+const CALC_URL = "https://www.grimtools.com/calc/";
 
 const isWin = process.platform === "win32";
 function chromeShellPath(): string {
@@ -203,20 +209,27 @@ const PROBE = String.raw`(() => {
     .find((a) => a.textContent.trim() === "Ultimate");
   if (ult) ult.click();
 
+  // buildInfo is populated by decoding a calc URL slug. A save-file import leaves it
+  // null, so everything taken from it falls back to the DOM rather than throwing.
+  const bi = (typeof buildInfo === "object" && buildInfo) ? buildInfo : null;
+  const bidata = (bi && bi.data) ? bi.data : {};
+  const domLevel = Number((document.body.innerText.match(/Level (\d+)/) || [])[1]) || null;
+  const domVersion = (document.body.innerText.match(/\b\d+\.\d+\.\d+\.\d+\b/) || [])[0] || null;
+
   const out = {
     url: location.href,
     difficultyAsShared,
     difficulty: difficultyLabel(),
     className: getCombinedClassName(),
-    gameVersion: buildInfo.created_for_build,
-    masteries: buildInfo.masteries,
-    bio: buildInfo.data.bio,
-    equipmentRaw: buildInfo.data.equipment,
+    gameVersion: bi ? bi.created_for_build : domVersion,
+    masteries: bi ? bi.masteries : null,
+    bio: bidata.bio || { level: domLevel },
+    equipmentRaw: bidata.equipment || null,
     items: dumpItems(),
     skills: dumpSkills(),
     devotions: dumpDevotion(),
-    itemSkills: buildInfo.data.itemSkills,
-    potions: buildInfo.data.potions,
+    itemSkills: bidata.itemSkills || null,
+    potions: bidata.potions || null,
     states: {},
   };
   openPanel();
@@ -243,21 +256,52 @@ const PROBE = String.raw`(() => {
   return JSON.stringify(out);
 })()`;
 
+/**
+ * Hand a local player.gdc to the calculator's own Import control.
+ *
+ * The file input is hidden behind an overlay, so this sets it directly rather than
+ * clicking through: CDP's DOM.setFileInputFiles fires input+change, which is what
+ * calc.js listens for. The upload itself is server-side.
+ */
+async function importSave(cdp: CDP, file: string): Promise<void> {
+  let present = false;
+  for (let i = 0; i < 60; i++) {
+    await Bun.sleep(500);
+    present = await cdp.evaluate<boolean>(`!!document.querySelector("#file-save")`);
+    if (present) break;
+  }
+  if (!present) throw new Error("the calculator never rendered its import control (#file-save)");
+  const doc = (await cdp.send("DOM.getDocument", { depth: 0 })) as unknown as { root?: { nodeId?: number } };
+  const rootId = doc.root?.nodeId;
+  if (!rootId) throw new Error("CDP returned no document root");
+  const node = (await cdp.send("DOM.querySelector", {
+    nodeId: rootId,
+    selector: "#file-save",
+  })) as unknown as { nodeId?: number };
+  if (!node.nodeId) throw new Error("could not resolve #file-save to a DOM node");
+  await cdp.send("DOM.setFileInputFiles", { files: [file], nodeId: node.nodeId });
+}
+
 try {
   const cdp = await CDP.connect(await pageWsUrl());
   await cdp.send("Page.enable");
   await cdp.send("Runtime.enable");
-  await cdp.send("Page.navigate", { url: URL_TO_LOAD });
+  await cdp.send("DOM.enable");
+  await cdp.send("Page.navigate", { url: IS_SAVE ? CALC_URL : SOURCE });
+
+  if (IS_SAVE) await importSave(cdp, resolve(SOURCE));
 
   let ready = false;
   for (let i = 0; i < 80; i++) {
     await Bun.sleep(500);
+    // A save import rebuilds the calculator without a URL slug, so `player` is the
+    // signal in both paths; only the URL path also has buildInfo.
     ready = await cdp.evaluate<boolean>(
       `typeof player === "object" && player !== null && !!document.body.innerText.match(/Level \\d+/)`,
     );
     if (ready === true) break;
   }
-  if (!ready) throw new Error(`the calculator never decoded a build at ${URL_TO_LOAD}`);
+  if (!ready) throw new Error(`the calculator never decoded a build from ${SOURCE}`);
   await Bun.sleep(3000);
 
   const raw = await cdp.evaluate<string>(PROBE);
