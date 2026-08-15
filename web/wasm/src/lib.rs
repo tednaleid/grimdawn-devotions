@@ -318,12 +318,12 @@ fn order_peak(order: &[&Member], pool: &[usize], total_size: i32, node_cap: i32)
     peak
 }
 
-// The TS peelOrder, bit-for-bit: zero-requirement members first, then the rest peeled back to front -
-// each pick is the member whose requirement, with every requirement not yet peeled, is covered by the
-// OTHER unpeeled members' grants plus the front; ties prefer the largest member, then input order; when
-// none qualifies, the smallest summed deficit.
-fn peel_order<'a>(g: &[&'a Member]) -> Vec<&'a Member> {
-    let req_free = |m: &Member| m.0 == [0, 0, 0, 0, 0];
+// The TS peelOrder, bit-for-bit: with `zero_req_first` the zero-requirement members go in front, then the
+// rest are peeled back to front - each pick is the member whose requirement, with every requirement not
+// yet peeled, is covered by the OTHER unpeeled members' grants plus the front; ties prefer the largest
+// member, then input order; when none qualifies, the smallest summed deficit.
+fn peel_order<'a>(g: &[&'a Member], zero_req_first: bool) -> Vec<&'a Member> {
+    let req_free = |m: &Member| zero_req_first && m.0 == [0, 0, 0, 0, 0];
     let mut out: Vec<&Member> = g.iter().cloned().filter(|m| req_free(m)).collect();
     let mut rest: Vec<&Member> = g.iter().cloned().filter(|m| !req_free(m)).collect();
     let mut base = [0; 5];
@@ -366,7 +366,7 @@ fn peel_order<'a>(g: &[&'a Member]) -> Vec<&'a Member> {
 
 // Smallest peak over the deterministic candidate orders for self-covering build `members` (the TS
 // minPeakSampled with tries=0): the bootstrap heuristic (lowest requirement first, then highest grant
-// density), then the peel order when the heuristic overshoots. `gsorted` is every granting con index
+// density), then each peel variant while the best so far overshoots. `gsorted` is every granting con index
 // ratio-sorted; `in_b` masks B's own constellations out of the scaffold pool. Returns BIG (= not within
 // budget) if not self-covering, if the build itself overflows budget, or if no candidate's deficits can be
 // scaffolded.
@@ -397,11 +397,14 @@ fn min_peak(members: &[Member], gsorted: &[usize], in_b: &[bool], budget: i32, n
         ratio(&b.1, b.2).partial_cmp(&ratio(&a.1, a.2)).unwrap_or(std::cmp::Ordering::Equal)
     });
     let pool: Vec<usize> = gsorted.iter().cloned().filter(|&i| !in_b[i]).collect();
-    let best = order_peak(&heuristic, &pool, total_size, node_cap);
-    if best <= budget {
-        return best;
+    let mut best = order_peak(&heuristic, &pool, total_size, node_cap);
+    for zero_req_first in [true, false] {
+        if best <= budget {
+            return best;
+        }
+        best = best.min(order_peak(&peel_order(&g, zero_req_first), &pool, total_size, node_cap));
     }
-    best.min(order_peak(&peel_order(&g), &pool, total_size, node_cap))
+    best
 }
 
 const PEAK_NODE_CAP: i32 = 3000;

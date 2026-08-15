@@ -85,6 +85,24 @@ test("minPeakSampled: a member that only meets its requirement with its own gran
   expect(minPeakSampled(cons, table, B, 15, 0)).toBe(15);
 });
 
+test("minPeakSampled: crossroads members whose colors nobody needs are not placed before the scaffold step", () => {
+  // Build: a +2 chaos / +3 asc granter (2 stars), a +2 eld granter (1), a member needing chaos 3 and eld 4
+  // (1 star, +2 eld), and two crossroads members of colors no requirement uses. Budget 10, build size 6.
+  // The needy member's activation needs eld 2 more than the build supplies before it, so a 5-point
+  // scaffold (the eld crossroads plus a 4-star +1 eld tier-1) is held at its step. Placing the two idle
+  // crossroads first (zero requirement first) puts that step at size 6: peak 11. Peeling them to the end
+  // puts it at size 4: peak 9. The deterministic candidates alone (tries = 0) must find 9.
+  const granter = con("granter", 2, z(), v(2, 3));
+  const eld2 = con("eld2", 1, z(), v(0, 0, 2));
+  const needy = con("needy", 1, v(0, 3, 4), v(0, 0, 2));
+  const tier1 = con("tier1", 4, v(1), v(0, 0, 1));
+  const idleA = cx(3, "idle_a");
+  const idleB = cx(4, "idle_b");
+  const { cons, table } = withTable([granter, eld2, needy, tier1, idleA, idleB, cx(0), cx(1), cx(2)]);
+  const B = [needy, idleA, idleB, granter, eld2];
+  expect(minPeakSampled(cons, table, B, 10, 0)).toBe(9);
+});
+
 test("classifyForSelection: the crossroads seed is never counted twice", () => {
   // A one-star member that needs chaos 4 to activate, in a model whose OTHER chaos sources total 3
   // (a two-star +2 granter and the chaos crossroads). Its own +1 counts for sustain, not activation, so
