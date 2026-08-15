@@ -35,8 +35,7 @@ feature.
 - Per-click engine perf: `just perf` (times `selectionView`, the exact cost one UI click pays = the core
   to optimize; deployed WASM path) or `just perf --ts` (the pure TS core algorithm you iterate on)
 - Reachability correctness: `just fuzz` (forward-built valid builds) and `just harvest-false-dims`
-  (downward-closure false-dim finder; the `test.failing` guards in `web/test/` lock in the engine's
-  known gaps - see BACKLOG "Reachability engine: current state and known gaps")
+  (downward-closure false-dim finder); the engine's known limits are in docs/reachability-engine.md
 - Reachability correctness fixtures: regenerate with `just gen-reach-fixtures`
 - Reachability heavy validation (minutes, before big engine changes): `just validate-reach`
 - Headless browser smoke: `just e2e` (run `just install-e2e` once first)

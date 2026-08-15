@@ -13,9 +13,33 @@ const CAP_MAX: Vec = [20, 8, 20, 10, 20];
 const NOCOST = 65535;
 export const INF = 1e9;
 export const BUDGET = 55;
-// Crossroads supply 1 affinity of each color and are refundable, so any build can be seeded
-// with one point per color for free while bootstrapping.
-const SEED: Vec = [1, 1, 1, 1, 1];
+/**
+ * The color of a crossroads-like constellation (one star, no requirement, a single +1 of one color), or -1.
+ * A crossroads is refundable, so a build may hold one transiently while a member activates: the engine's
+ * "seed". A seed is honest only for a crossroads the build is not already counting - one placed as a
+ * member or as filler already contributes its +1 - so every seed below is computed against what is
+ * placed, never assumed. Structural, so a synthetic model's crossroads are recognized too.
+ */
+export function crossroadsColor(c: ReachCon): number {
+  if (c.size !== 1 || c.req[0] || c.req[1] || c.req[2] || c.req[3] || c.req[4]) return -1;
+  let color = -1;
+  for (let k = 0; k < 5; k++) {
+    if (c.grant[k] === 0) continue;
+    if (c.grant[k] !== 1 || color >= 0) return -1;
+    color = k;
+  }
+  return color;
+}
+
+/** The transient seed a build may draw on: +1 per color with a crossroads-like constellation not in `counted`. */
+function seedFor(cons: ReachCon[], counted: (c: ReachCon) => boolean): Vec {
+  const seed = zero();
+  for (const c of cons) {
+    const k = crossroadsColor(c);
+    if (k >= 0 && !counted(c)) seed[k] = 1;
+  }
+  return seed;
+}
 // Peak-witness search bounds (see classifyForSelection): it samples this many construction orders, each
 // with a per-scaffold node cap, so it stays cheap even across a full sweep. The witness is self-bounding -
 // it returns instantly for a non-self-covering build (no order can help) and only samples for a complete
@@ -279,8 +303,8 @@ function fillerFor(cons: ReachCon[], st: ReachState): ReachCon[] {
 
 /**
  * Refund-aware greedy: construct a valid build placing every claimed constellation, seeded by
- * the free crossroads, repeatedly adding the unlocked constellation that best closes the affinity
- * deficit per star. Once the claimed are placed and the build's own affinity covers every placed
+ * the crossroads it has not placed (seedFor), repeatedly adding the unlocked constellation that best
+ * closes the affinity deficit per star. Once the claimed are placed and the build's own affinity covers every placed
  * member's requirement, the crossroads are refunded and the cost excludes them.
  *
  * Returns the post-refund STEADY-STATE cost, which is a lower bound on the construction PEAK (you end
@@ -319,19 +343,32 @@ export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): n
   const built = st.built;
   const pool = [...built, ...fillerFor(cons, st)];
   const placed = new Array(pool.length).fill(false);
+  // Every crossroads-like constellation is in the pool (started ones in built, the rest as filler); the
+  // seed offers a color only while one of its crossroads is unplaced, so a crossroads is never counted
+  // twice (once as the transient seed, again as a placed member or filler).
+  const seedLeft = zero();
+  for (const c of pool) {
+    const k = crossroadsColor(c);
+    if (k >= 0) seedLeft[k]!++;
+  }
+  const seed = (): Vec => seedLeft.map((n) => (n > 0 ? 1 : 0)) as Vec;
+  const place = (i: number): void => {
+    placed[i] = true;
+    const k = crossroadsColor(pool[i]!);
+    if (k >= 0) seedLeft[k]!--;
+  };
   let build = zero(); // affinity from placed constellations (excludes the transient seed)
   let maxReqPlaced = zero(); // every placed constellation must stand under this once seed is gone
   let cost = 0,
     builtLeft = built.length;
   let bootMask = 0; // colors any placement needed the seed crossroads for (req[c] > build[c] at placement)
   for (;;) {
-    const gain = addCap(SEED, build);
     let did = false;
     // Auto-place the committed members as they unlock; filler is added selectively below.
     for (let i = 0; i < built.length; i++) {
-      if (placed[i] || !covers(gain, built[i]!.req)) continue;
+      if (placed[i] || !covers(addCap(seed(), build), built[i]!.req)) continue;
       for (let c = 0; c < 5; c++) if (built[i]!.req[c]! > build[c]!) bootMask |= 1 << c;
-      placed[i] = true;
+      place(i);
       cost += built[i]!.size;
       build = addCap(build, built[i]!.grant);
       maxReqPlaced = maxV(maxReqPlaced, built[i]!.req);
@@ -343,7 +380,7 @@ export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): n
       return cost <= budget ? cost : INF;
     }
     if (did) continue;
-    const g2 = addCap(SEED, build);
+    const g2 = addCap(seed(), build);
     const target = covers(build, maxReqPlaced) ? st.target : maxReqPlaced; // close self-sustain first, then started reqs
     const deficit: Vec = [
       Math.max(0, target[0]! - build[0]),
@@ -366,7 +403,7 @@ export function greedyFrom(cons: ReachCon[], st: ReachState, budget = BUDGET): n
     }
     if (best < 0 || bestScore === 0) return INF;
     for (let c = 0; c < 5; c++) if (pool[best]!.req[c]! > build[c]!) bootMask |= 1 << c;
-    placed[best] = true;
+    place(best);
     cost += pool[best]!.size;
     build = addCap(build, pool[best]!.grant);
     maxReqPlaced = maxV(maxReqPlaced, pool[best]!.req);
@@ -387,7 +424,7 @@ export function classify(cons: ReachCon[], table: CoverTable, claimedIds: string
   // Sound reachable proof that charges the transient crossroads peak (greedyMinCost's refunded cost did
   // not, so it false-reached tight builds). The tight band it cannot decide stays "unknown" for the
   // exact resolver, which models the peak.
-  if (peakGateReachable(claimed, budget)) return "reachable";
+  if (peakGateReachable(cons, claimed, budget)) return "reachable";
   return "unknown";
 }
 
@@ -414,9 +451,10 @@ function coverCostAt(table: CoverTable, deficit: Vec): number {
   return v === NOCOST ? INF : v;
 }
 
-/** Can every member of B be completed in some order, seeded by the free crossroads? */
-function constructible(B: ReachCon[]): boolean {
-  let gain: Vec = [...SEED];
+/** Can every member of B be completed in some order, seeded by the crossroads B does not already contain? */
+function constructible(cons: ReachCon[], B: ReachCon[]): boolean {
+  const inB = new Set(B.map((m) => m.id));
+  let gain = seedFor(cons, (c) => inB.has(c.id));
   const done = B.map(() => false);
   let placed = 0,
     changed = true;
@@ -438,7 +476,7 @@ function constructible(B: ReachCon[]): boolean {
  * transient construction peak that `constructible`/greedy ignore. Affinity persists, so each distinct
  * required color needs at most one refundable crossroads held at once; a no-refund schedule that places
  * one crossroads per required color and then the whole self-covering build peaks at
- * `size + distinctRequiredColors`. So if B is self-covering AND unit-seed-constructible (an order
+ * `size + distinctRequiredColors`. So if B is self-covering AND seed-constructible (an order
  * exists) AND `size + distinctRequiredColors <= budget`, a genuine construction order fits the budget.
  *
  * Sound: it never accepts an unbuildable build (measured 0 wrong-accepts across ~18k near-ceiling
@@ -446,7 +484,7 @@ function constructible(B: ReachCon[]): boolean {
  * bootstrap sequentially so not every crossroads is held at once - returns false and must fall through
  * to the peak witness. Crucially RNG-free, so the WASM resolver port stays verdict-equivalent.
  */
-function peakGateReachable(B: ReachCon[], budget: number): boolean {
+function peakGateReachable(cons: ReachCon[], B: ReachCon[], budget: number): boolean {
   let size = 0;
   let grant = zero(),
     req = zero();
@@ -459,7 +497,7 @@ function peakGateReachable(B: ReachCon[], budget: number): boolean {
   let colors = 0;
   for (let i = 0; i < 5; i++) if (req[i]! > 0) colors++;
   if (size + colors > budget) return false; // peak may exceed budget; defer to the witness
-  return constructible(B); // a unit-seed order must exist, else the peak bound is not valid
+  return constructible(cons, B); // a seeded order must exist, else the peak bound is not valid
 }
 
 /**
@@ -1048,7 +1086,7 @@ export function reachableExactFrom(cons: ReachCon[], table: CoverTable, st: Reac
       // transient crossroads peak and was the source of the off-by-one false-reaches.
       const members = [...builtCons, ...chosen];
       if (
-        peakGateReachable(members, budget) ||
+        peakGateReachable(cons, members, budget) ||
         minPeakSampled(cons, table, members, budget, GATE_WITNESS_TRIES, PEAK_NODE_CAP) <= budget
       )
         found = true;
@@ -1125,7 +1163,7 @@ export function classifyForSelection(cons: ReachCon[], table: CoverTable, st: Re
   const g = greedyFrom(cons, st, budget);
   if (g + lastGreedyBootColors() <= budget) return "reachable";
   // Peak-bounded witness for the exact resolver's blind spot. Its constructibility check models only
-  // the free crossroads seed, so it wrongly dims tight self-covering builds that are reachable only by
+  // the transient crossroads seed, so it wrongly dims tight self-covering builds that are reachable only by
   // holding transient refundable scaffolding (a crossroads or constellation beyond the seed) until the
   // build self-covers, then refunding it. When the started set is itself a complete whole-constellation
   // build (no partials), minPeakSampled samples real construction orders: a sampled peak <= budget is a

@@ -122,34 +122,6 @@ Deferred:
 - Distinct map treatment for a power match vs a bonus match (today both reuse the
   benefit-match highlight on the diamond).
 
-## Reachability engine: residual synthetic false-reach (seed double-count)
-
-`just validate-reach` Part A shows ~450 false-reaches per 12k random small
-models vs the independent BFS oracle. Attributed: ~92% fire on the greedy gate
-(`greedyFrom + lastGreedyBootColors`), the rest on the exact resolver. The
-mechanism is the crossroads seed double-count: `SEED` assumes a free +1 per
-color while `fillerFor` (greedy) and `wholeFiller`/members (resolver's
-`peakGateReachable -> constructible`) can place the same crossroads again, so a
-member whose activation needs exactly one more point of a color than every other
-source supplies is judged startable. Confirmed on validate-reach seed 2
-(c3 needs chaos 4, others supply 3; greedy lights it, and does not once the
-chaos crossroads is removed from its pool). Real-map exposure: a 90k-state
-sample found 283 states where the double-count was what let greedy fire: 105
-independently proven reachable by a sound witness, 178 (partial or
-filler-needing states, beyond the min-peak oracle) still lit by the resolver, so
-0 verdict changes but that tail is not independently proven; `just realmap-hunt`
-finds 0. See `docs/reachability-engine.md` Soundness / Known limits.
-
-Fix sketch (TS-only for greedy; the resolver's `constructible` is mirrored in
-Rust and would need `just wasm` + `just validate-wasm`): make the seed
-per-color and honest, +1 for a color only while its crossroads is neither a
-placed member nor placed filler (identify crossroads structurally: size 1,
-zero requirement, single +1 grant, so synthetic models are covered too), and
-charge `bootColors` only for colors actually bootstrapped by the seed. Then
-`reachability-oracle.test.ts` should stop needing `test.failing`. Re-run the
-gates in "Verifying after a resolver change" plus `just perf` (fewer greedy
-proofs may push more candidates to the witness/resolver).
-
 ## Build-order popup: touch e2e via Playwright
 
 The step popup's touch path (tap shows, re-tap and tap-away dismiss) is wired

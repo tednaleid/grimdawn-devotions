@@ -1,8 +1,16 @@
 // ABOUTME: Unit tests pinning the peak-aware construction-cost helpers (peakToReach, minPeakSampled) on
 // ABOUTME: small hand-computed models where "peak points held" differs from "subset size" (the scaffold crux).
 import { test, expect } from "bun:test";
-import { buildCoverTable, peakToReach, minPeakSampled, INF, type ReachCon, type Vec } from "../src/core/reachability";
-import { reachableSet, randModel, mulberry32 } from "./support/reach-oracle";
+import {
+  buildCoverTable,
+  classifyForSelection,
+  peakToReach,
+  minPeakSampled,
+  INF,
+  type ReachCon,
+  type Vec,
+} from "../src/core/reachability";
+import { reachableSet, extendableReachable, randModel, mulberry32, stateFromCounts } from "./support/reach-oracle";
 
 const z = (): Vec => [0, 0, 0, 0, 0];
 const v = (asc = 0, cha = 0, eld = 0, ord = 0, pri = 0): Vec => [asc, cha, eld, ord, pri];
@@ -75,6 +83,20 @@ test("minPeakSampled: a member that only meets its requirement with its own gran
   const { cons, table } = withTable([cx(0), tier1, selfDep, late, scaffold]);
   const B = [cx(0), tier1, selfDep, late];
   expect(minPeakSampled(cons, table, B, 15, 0)).toBe(15);
+});
+
+test("classifyForSelection: the crossroads seed is never counted twice", () => {
+  // A one-star member that needs chaos 4 to activate, in a model whose OTHER chaos sources total 3
+  // (a two-star +2 granter and the chaos crossroads). Its own +1 counts for sustain, not activation, so
+  // it can never be started at any budget. Modeling a free transient +1 seed AND placing the same
+  // crossroads as filler would count that crossroads twice and wrongly light it.
+  const granter = con("granter", 2, z(), v(0, 2));
+  const needy = con("needy", 1, v(0, 4), v(0, 1));
+  const cons = [granter, needy, cx(0), cx(1), cx(2), cx(3), cx(4)];
+  const table = buildCoverTable(cons);
+  const counts = cons.map((c) => (c.id === "needy" ? 1 : 0));
+  expect(extendableReachable(counts, reachableSet(cons, 12)!)).toBe(false); // the BFS oracle agrees
+  expect(classifyForSelection(cons, table, stateFromCounts(counts, cons), 12)).toBe("dim");
 });
 
 // --- minPeakSampled is a SOUND witness vs the BFS oracle ---------------------------------------------
