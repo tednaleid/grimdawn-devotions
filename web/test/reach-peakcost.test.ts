@@ -61,6 +61,22 @@ test("peakToReach: a zero deficit costs nothing", () => {
   expect(peakToReach(cons, table, z())).toBe(0);
 });
 
+test("minPeakSampled: a member that only meets its requirement with its own grant is not placed last", () => {
+  // Build: the ascendant crossroads (+1), a tier-1 granter (needs asc 1, +5), a "self-dependent" member
+  // that needs asc 8 but the others supply only 6 (so it needs a 2-asc scaffold whenever it is placed),
+  // and a zero-grant-in-asc member needing asc 6. The bootstrap heuristic (lowest requirement first)
+  // places the asc-8 member LAST, at the build's full 15 points plus the 3-star scaffold = peak 18.
+  // Placing it third (11 + 3 = 14) and the asc-6 member last (covered by 1 + 5 + 3 = 9) peaks at the
+  // build size, 15. The deterministic candidates alone (tries = 0) must find that order.
+  const tier1 = con("tier1", 4, v(1), v(5));
+  const selfDep = con("self_dep", 6, v(8), v(3));
+  const late = con("late", 4, v(6), v(0, 1));
+  const scaffold = con("scaffold", 3, z(), v(2));
+  const { cons, table } = withTable([cx(0), tier1, selfDep, late, scaffold]);
+  const B = [cx(0), tier1, selfDep, late];
+  expect(minPeakSampled(cons, table, B, 15, 0)).toBe(15);
+});
+
 // --- minPeakSampled is a SOUND witness vs the BFS oracle ---------------------------------------------
 // minPeakSampled(B) samples real construction orders for a self-covering whole-constellation build B and
 // returns the smallest peak found. It is SOUND: whenever minPeakSampled(B) <= budget it has an actual order

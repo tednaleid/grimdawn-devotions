@@ -9,7 +9,10 @@ and the non-obvious rules for which selections form a legal build (activation be
 self-sustain, refundable crossroads, temporary scaffolding and refund). All of that
 is documented in [docs/devotion-system.md](docs/devotion-system.md), the core
 reference for the whole system. Read it before working on selection, reachability,
-or URL state.
+or URL state. How the engine decides a verdict, and how to reproduce and pin a
+user-reported link ("it will not let me spend my last point"), is in
+[docs/reachability-engine.md](docs/reachability-engine.md), which ends with the
+investigation playbook and the regression gates to run after a resolver change.
 
 ## Backlog / new ideas
 

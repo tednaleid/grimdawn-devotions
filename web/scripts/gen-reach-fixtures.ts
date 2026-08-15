@@ -36,6 +36,13 @@ const namedCases: ReachableCase[] = [
     label: "thunder-warder-real-forum-build",
     sel: { crossroads_order: 1, crossroads_eldritch: 1, crossroads_ascendant: 1, eel: 3, jackal: 3, tortoise: 5, tsunami: 5, chariot_of_the_dead: 7, harvestman_s_scythe: 6, kraken: 5, rhowan_s_crown: 5, tempest: 7, spear_of_the_heavens: 6 },
   },
+  // A real user's 54-point build at cap 55 (web/test/reach-last-point.test.ts) plus each unselected
+  // crossroads: three 55-point builds the engine dimmed, hiding the last point. Four members meet their
+  // own requirement only with their own grant, so any order placing one of them last overshoots the cap.
+  ...(["primordial", "order", "eldritch"] as const).map((color) => ({
+    label: `last-point-crossroads-${color}-real-user-build`,
+    sel: { crossroads_chaos: 1, crossroads_ascendant: 1, fox: 4, harpy: 4, lotus: 4, sailor_s_guide: 4, amatok_the_spirit_of_winter: 7, blades_of_nadaan: 6, dire_bear: 6, murmur_mistress_of_rumors: 6, scales_of_ulcama: 6, solemn_watcher: 5, [`crossroads_${color}`]: 1 },
+  })),
 ];
 
 const falseDims: ReachableCase[] = [];

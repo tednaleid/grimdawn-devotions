@@ -170,7 +170,7 @@ fn peak_gate_reachable(members: &[([i32; 5], [i32; 5], i32)], budget: i32) -> bo
 
 // --- peak witness (scaffold-then-refund construction), the TS minPeakSampled with GATE_WITNESS_TRIES=0 ---
 // Sound peak-bounded construction check: it can only flip a false-dim to reachable, never a false-reach.
-// Verdict-identical to the TS gate witness (deterministic heuristic order, no RNG).
+// Verdict-identical to the TS gate witness (deterministic candidate orders, no RNG).
 #[inline]
 fn con_req(i: usize) -> [i32; 5] {
     unsafe { [CON_REQ[i * 5], CON_REQ[i * 5 + 1], CON_REQ[i * 5 + 2], CON_REQ[i * 5 + 3], CON_REQ[i * 5 + 4]] }
@@ -246,11 +246,92 @@ fn peak_to_reach(scaf: &[usize], deficit: &[i32; 5], base: &[i32; 5], node_cap: 
     ctx.best
 }
 
-// Peak of the deterministic heuristic construction order for self-covering build `members` (the TS
-// minPeakSampled with tries=0). `gsorted` is every granting con index ratio-sorted; `in_b` masks B's own
-// constellations out of the scaffold pool. Returns BIG (= not within budget) if not self-covering, if the
-// build itself overflows budget, or if some step's deficit cannot be scaffolded.
-fn min_peak(members: &[([i32; 5], [i32; 5], i32)], gsorted: &[usize], in_b: &[bool], budget: i32, node_cap: i32) -> i32 {
+type Member = ([i32; 5], [i32; 5], i32); // (req, grant, size)
+
+// Construction peak of placing the granting members in `order` (the TS orderPeak): each step holds the
+// scaffold peak_to_reach sizes for the running requirement not yet covered by the placed grants; the peak
+// is the largest placed size + scaffold, at least the whole build size. BIG if some step's deficit cannot
+// be scaffolded.
+fn order_peak(order: &[&Member], pool: &[usize], total_size: i32, node_cap: i32) -> i32 {
+    let mut grant = [0; 5];
+    let mut mr = [0; 5];
+    let mut size = 0;
+    let mut peak = total_size;
+    for m in order {
+        mr = max_v(&mr, &m.0);
+        size += m.2;
+        let def = [
+            (mr[0] - grant[0]).max(0),
+            (mr[1] - grant[1]).max(0),
+            (mr[2] - grant[2]).max(0),
+            (mr[3] - grant[3]).max(0),
+            (mr[4] - grant[4]).max(0),
+        ];
+        let sc = peak_to_reach(pool, &def, &grant, node_cap);
+        if sc >= BIG {
+            return BIG;
+        }
+        if size + sc > peak {
+            peak = size + sc;
+        }
+        grant = add_cap(&grant, &m.1);
+    }
+    peak
+}
+
+// The TS peelOrder, bit-for-bit: zero-requirement members first, then the rest peeled back to front -
+// each pick is the member whose requirement, with every requirement not yet peeled, is covered by the
+// OTHER unpeeled members' grants plus the front; ties prefer the largest member, then input order; when
+// none qualifies, the smallest summed deficit.
+fn peel_order<'a>(g: &[&'a Member]) -> Vec<&'a Member> {
+    let req_free = |m: &Member| m.0 == [0, 0, 0, 0, 0];
+    let mut out: Vec<&Member> = g.iter().cloned().filter(|m| req_free(m)).collect();
+    let mut rest: Vec<&Member> = g.iter().cloned().filter(|m| !req_free(m)).collect();
+    let mut base = [0; 5];
+    for m in &out {
+        base = add_cap(&base, &m.1);
+    }
+    let mut peeled: Vec<&Member> = Vec::with_capacity(rest.len());
+    while !rest.is_empty() {
+        let mut mreq = [0; 5];
+        for m in &rest {
+            mreq = max_v(&mreq, &m.0);
+        }
+        let mut pick = 0usize;
+        let mut pick_def = i32::MAX;
+        let mut pick_size = -1;
+        for i in 0..rest.len() {
+            let mut others = base;
+            for j in 0..rest.len() {
+                if j != i {
+                    others = add_cap(&others, &rest[j].1);
+                }
+            }
+            let mut def = 0;
+            for k in 0..5 {
+                def += (mreq[k] - others[k]).max(0);
+            }
+            let size = rest[i].2;
+            if def < pick_def || (def == pick_def && size > pick_size) {
+                pick = i;
+                pick_def = def;
+                pick_size = size;
+            }
+        }
+        peeled.push(rest.remove(pick));
+    }
+    peeled.reverse();
+    out.extend(peeled);
+    out
+}
+
+// Smallest peak over the deterministic candidate orders for self-covering build `members` (the TS
+// minPeakSampled with tries=0): the bootstrap heuristic (lowest requirement first, then highest grant
+// density), then the peel order when the heuristic overshoots. `gsorted` is every granting con index
+// ratio-sorted; `in_b` masks B's own constellations out of the scaffold pool. Returns BIG (= not within
+// budget) if not self-covering, if the build itself overflows budget, or if no candidate's deficits can be
+// scaffolded.
+fn min_peak(members: &[Member], gsorted: &[usize], in_b: &[bool], budget: i32, node_cap: i32) -> i32 {
     let mut tot = [0; 5];
     let mut mreq = [0; 5];
     let mut total_size = 0;
@@ -262,13 +343,14 @@ fn min_peak(members: &[([i32; 5], [i32; 5], i32)], gsorted: &[usize], in_b: &[bo
     if !covers(&tot, &mreq) || total_size > budget {
         return BIG;
     }
-    let mut g: Vec<&([i32; 5], [i32; 5], i32)> = members.iter().filter(|m| grants_v(&m.1)).collect();
+    let g: Vec<&Member> = members.iter().filter(|m| grants_v(&m.1)).collect();
     if g.is_empty() {
         return total_size;
     }
     let reqsum = |r: &[i32; 5]| r[0] + r[1] + r[2] + r[3] + r[4];
     let ratio = |gr: &[i32; 5], sz: i32| (gr[0] + gr[1] + gr[2] + gr[3] + gr[4]) as f64 / sz as f64;
-    g.sort_by(|a, b| {
+    let mut heuristic = g.clone();
+    heuristic.sort_by(|a, b| {
         let (ra, rb) = (reqsum(&a.0), reqsum(&b.0));
         if ra != rb {
             return ra.cmp(&rb);
@@ -276,30 +358,11 @@ fn min_peak(members: &[([i32; 5], [i32; 5], i32)], gsorted: &[usize], in_b: &[bo
         ratio(&b.1, b.2).partial_cmp(&ratio(&a.1, a.2)).unwrap_or(std::cmp::Ordering::Equal)
     });
     let pool: Vec<usize> = gsorted.iter().cloned().filter(|&i| !in_b[i]).collect();
-    let mut grant = [0; 5];
-    let mut mr = [0; 5];
-    let mut size = 0;
-    let mut peak = total_size;
-    for m in &g {
-        mr = max_v(&mr, &m.0);
-        size += m.2;
-        let def = [
-            (mr[0] - grant[0]).max(0),
-            (mr[1] - grant[1]).max(0),
-            (mr[2] - grant[2]).max(0),
-            (mr[3] - grant[3]).max(0),
-            (mr[4] - grant[4]).max(0),
-        ];
-        let sc = peak_to_reach(&pool, &def, &grant, node_cap);
-        if sc >= BIG {
-            return BIG;
-        }
-        if size + sc > peak {
-            peak = size + sc;
-        }
-        grant = add_cap(&grant, &m.1);
+    let best = order_peak(&heuristic, &pool, total_size, node_cap);
+    if best <= budget {
+        return best;
     }
-    peak
+    best.min(order_peak(&peel_order(&g), &pool, total_size, node_cap))
 }
 
 const PEAK_NODE_CAP: i32 = 3000;
