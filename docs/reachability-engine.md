@@ -38,23 +38,29 @@ gap exactly. In order:
 3. **Peak witness (sound).** For a complete self-covering selection, `minPeakSampled`
    samples real construction orders; a sampled peak `<= budget` is a genuine order,
    so it proves reachable. It only ever flips a would-be dim to reachable. It tries
-   two deterministic orders first - the bootstrap heuristic (lowest requirement
-   first, then densest grant) and the peel order (`peelOrder`: zero-requirement
-   members first, then the rest chosen back to front so each is placed last among
-   what remains only when the others' grants already cover every remaining
-   requirement) - then `PEAK_WITNESS_TRIES` seeded shuffles. The peel order exists
-   for members whose requirement is met only with their own grant: they need a
-   scaffold whenever they are placed, so the heuristic's habit of placing the
-   highest-requirement member last overshoots a cap-tight build.
+   three deterministic orders first - the bootstrap heuristic (lowest requirement
+   first, then densest grant) and two peel orders (`peelOrder`: members chosen back
+   to front so each is placed last among what remains only when the others' grants
+   already cover every remaining requirement; one variant puts zero-requirement
+   members in front, the other peels them like any member) - then
+   `PEAK_WITNESS_TRIES` seeded shuffles. The peel orders exist for members whose
+   requirement is met only with their own grant: they need a scaffold whenever they
+   are placed, so the heuristic's habit of placing the highest-requirement member
+   last overshoots a cap-tight build. The two variants split on whether the
+   crossroads members' colors are needed: in front they shrink every later deficit,
+   but when nobody needs them they only inflate the size held at the scaffold step.
 4. **Exact resolver.** The remaining gap goes to `reachableExactFrom` (or its WASM
    port): a memoized branch-and-bound DFS over filler subsets, cover-table pruned.
    At every covering node the build is self-covering, so any further filler is
    refundable and the peak witness already models it as a transient scaffold; the
    verdict there is final, so the resolver decides (gate or witness) and returns,
    pruning the post-covering filler-superset subtree. The witness here is the
-   deterministic candidates only (no shuffles), so the Rust port stays RNG-free and
-   verdict-equivalent. Reachable iff some covering build has a construction order
-   within budget.
+   deterministic candidates only (no shuffles): a resolver call witnesses many
+   covering nodes, and shuffling at each one was measured at 2.5x the mean and 4.6x
+   the p99 per-click latency for 32 tries (1.4x / 1.8x for 8), while the second
+   peel variant recovered most of what the shuffles would have for the cost of one
+   more `orderPeak`. It also keeps the Rust port RNG-free and verdict-equivalent.
+   Reachable iff some covering build has a construction order within budget.
 
 The cheap bracket decides almost every candidate; only the gap reaches the resolver.
 
@@ -102,13 +108,13 @@ gate and witness above charge the peak instead.
   the real map `just realmap-hunt` finds 0 construction-peak false-reaches and the
   two formerly-confirmed real-map cases classify dim; both are evidence from
   sampling, not a formal proof.
-- **Conservative false-dims on the synthetic models.** The same Part A dims 77 of
+- **Conservative false-dims on the synthetic models.** The same Part A dims 46 of
   12,000 states the oracle proves reachable: partial selections reachable only by
   transiently over-completing a kept-partial constellation to bootstrap a lock and
   refunding it (a star-level move the whole-build resolver does not model), and
-  covering builds whose only in-budget order both deterministic witness candidates
-  miss (the resolver has no shuffles). Part B finds none of either on real-map
-  whole-constellation builds.
+  covering builds whose only in-budget order all three deterministic witness
+  candidates miss (the resolver has no shuffles). Part B finds none of either on
+  real-map whole-constellation builds.
 - **The peak witness is a sampler**, so its dim is conservative: a build whose only
   valid order the sampler misses can be false-dimmed. `validate-reach` Part B finds
   0 real-model false-dims in 6,618 self-covering builds, and the direction is the safe

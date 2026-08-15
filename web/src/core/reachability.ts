@@ -641,19 +641,23 @@ function orderPeak(
 }
 
 /**
- * The sampler's second deterministic candidate, built back to front. Zero-requirement members go first
- * (they never need a scaffold and their grants lower every later deficit); the rest are peeled from the
- * end: each pick is the member whose requirement, with every requirement not yet peeled, is covered by
- * the OTHER unpeeled members' grants (plus the front), so it needs no scaffold when it is placed last
- * among them. Ties prefer the largest member (it defers size to where no scaffold is held), then input
- * order; when no member qualifies, the one with the smallest summed deficit is peeled. This is the
- * bootstrap heuristic's blind spot: it places the highest-requirement member last, and a member whose
- * requirement is only met with its own grant needs a scaffold whenever it is placed, so placing it at
- * the build's full size overshoots the peak. RNG-free, mirrored in the Rust resolver (peel_order).
+ * The sampler's peel candidates, built back to front: each pick is the member whose requirement, with
+ * every requirement not yet peeled, is covered by the OTHER unpeeled members' grants (plus the front), so
+ * it needs no scaffold when it is placed last among them. Ties prefer the largest member (it defers size
+ * to where no scaffold is held), then input order; when no member qualifies, the one with the smallest
+ * summed deficit is peeled. This is the bootstrap heuristic's blind spot: it places the highest-requirement
+ * member last, and a member whose requirement is only met with its own grant needs a scaffold whenever it
+ * is placed, so placing it at the build's full size overshoots the peak.
+ *
+ * Two variants, one flag: with `zeroReqFirst` the zero-requirement members (crossroads) go in front,
+ * which wins when their grants feed colors the build needs (every later deficit shrinks); without it
+ * they are peeled like any other member, which wins when their colors are not needed at all, so placing
+ * them first only inflates the size held at the step that still needs a scaffold. Each is one orderPeak,
+ * RNG-free, mirrored in the Rust resolver (peel_order).
  */
-function peelOrder(G: ReachCon[]): ReachCon[] {
+function peelOrder(G: ReachCon[], zeroReqFirst: boolean): ReachCon[] {
   const reqFree = (c: ReachCon) =>
-    c.req[0] === 0 && c.req[1] === 0 && c.req[2] === 0 && c.req[3] === 0 && c.req[4] === 0;
+    zeroReqFirst && c.req[0] === 0 && c.req[1] === 0 && c.req[2] === 0 && c.req[3] === 0 && c.req[4] === 0;
   const front = G.filter(reqFree);
   const rest = G.filter((c) => !reqFree(c));
   let base = zero();
@@ -684,9 +688,9 @@ function peelOrder(G: ReachCon[]): ReachCon[] {
 }
 
 // Core sampler shared by minPeakSampled (which wants the peak) and minPeakSampledOrder (which wants the
-// witness order). Tries two deterministic orders - the bootstrap heuristic (lowest requirement first,
-// then highest grant density) and the peel order (peelOrder) - plus up to `tries` seeded shuffles of the
-// granting members, keeping the smallest-peak order and early-exiting the moment one lands at or under
+// witness order). Tries three deterministic orders - the bootstrap heuristic (lowest requirement first,
+// then highest grant density) and both peel variants (peelOrder) - plus up to `tries` seeded shuffles of
+// the granting members, keeping the smallest-peak order and early-exiting the moment one lands at or under
 // budget. `order` is the granting members in their best-peak order; `tail` is the zero-grant members
 // (placed last - they never raise the peak above the build size).
 function sampledConstruction(
@@ -710,13 +714,15 @@ function sampledConstruction(
   let best = orderPeak(order, pool, table, totalSize, peakNodeCap);
   let bestOrder = [...order];
   if (best <= budget) return { peak: best, order: bestOrder, tail };
-  const peeled = peelOrder(G);
-  const peeledPeak = orderPeak(peeled, pool, table, totalSize, peakNodeCap);
-  if (peeledPeak < best) {
-    best = peeledPeak;
-    bestOrder = peeled;
+  for (const zeroReqFirst of [true, false]) {
+    const peeled = peelOrder(G, zeroReqFirst);
+    const peeledPeak = orderPeak(peeled, pool, table, totalSize, peakNodeCap);
+    if (peeledPeak < best) {
+      best = peeledPeak;
+      bestOrder = peeled;
+    }
+    if (best <= budget) return { peak: best, order: bestOrder, tail };
   }
-  if (best <= budget) return { peak: best, order: bestOrder, tail };
   let seed = (totalSize * 2654435761 + G.length * 40503) >>> 0; // deterministic per build
   const rnd = () => {
     seed = (seed + 0x6d2b79f5) >>> 0;

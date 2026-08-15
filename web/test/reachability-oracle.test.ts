@@ -41,10 +41,10 @@ test("classifier agrees with the BFS oracle: never false-reach", () => {
   // crossroads seed is honest (a crossroads counts once, as the transient seed OR as a placed member or
   // filler), which is what closed the last false-reach mechanism here.
   expect(falseReach).toBe(0);
-  // The residual false-dim (a little over 1%) is conservative: partial selections reachable only by
+  // The residual false-dim (well under 1%) is conservative: partial selections reachable only by
   // transiently OVER-completing a kept-partial constellation to bootstrap a lock, then refunding it (a
   // star-level move the whole-build resolver does not model), plus builds whose only in-budget order the
   // deterministic witness candidates miss at a covering node. Neither occurs on the real map's
   // whole-constellation builds (`just validate-reach` Part B). Guarded here against regression.
-  expect(falseDim).toBeLessThanOrEqual(Math.ceil(checked * 0.02));
+  expect(falseDim).toBeLessThanOrEqual(Math.ceil(checked * 0.01));
 }, 45_000);
