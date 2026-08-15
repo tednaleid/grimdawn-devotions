@@ -38,7 +38,7 @@ test("peakToReach: a deficit reachable by crossroads alone equals the crossroads
 test("peakToReach: eldritch 3 via Quill peaks at 5, not Quill's 4 stars", () => {
   // Quill needs eld 1 to start and grants asc 3 + eld 3. Reaching eld 3 means holding the eldritch
   // crossroads (1) while placing Quill (4) = peak 5; Quill then self-sustains so the crossroads refunds,
-  // but the peak already hit 5. This is the case the SEED model gets wrong.
+  // but the peak already hit 5. A flat one-point-per-color seed model would miss the held crossroads.
   const quill = con("quill", 4, v(0, 0, 1), v(3, 0, 3));
   const { cons, table } = withTable([cx(2), quill, anchor(v(3, 0, 3))]);
   expect(peakToReach(cons, table, v(0, 0, 3))).toBe(5);

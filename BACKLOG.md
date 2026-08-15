@@ -122,6 +122,23 @@ Deferred:
 - Distinct map treatment for a power match vs a bonus match (today both reuse the
   benefit-match highlight on the diamond).
 
+## Reachability validation: swap-aware oracle and a filler-state arbiter
+
+Two gaps in the validation tooling, not the engine:
+
+- `minPeakCost` (`web/test/support/costed-oracle.ts`, the arbiter behind `just
+  realmap-hunt` and `just build-order-validate`) sizes each step's scaffold in
+  isolation, so its minimum is a lower bound on the true construction peak: `>
+  budget` proves unreachable, `<= budget` is only evidence that a schedule
+  exists. Making it swap-aware (carry the held scaffold set in the DP state, or
+  emit and replay its argmin order through `emitSchedule`) would turn the hunt's
+  "recovered" and the validator's "order exists" lines into proofs. Pointer:
+  docs/reachability-engine.md "The costed-scaffolding oracle".
+- There is no exact real-map arbiter for filler-needing (non-self-covering)
+  states, where the resolver's DFS decides; `validate-reach` Part B covers only
+  whole self-covering builds. Extending the oracle to enumerate filler supersets
+  (bounded, offline) would let Part B cover the resolver path too.
+
 ## Build-order popup: touch e2e via Playwright
 
 The step popup's touch path (tap shows, re-tap and tap-away dismiss) is wired

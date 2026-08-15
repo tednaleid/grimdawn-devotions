@@ -98,38 +98,41 @@ These one-sided facts are exact, and the engine never contradicts them:
   it lends while a member activates or as a placed member or filler, never both
   (`crossroadsColor`/`seedFor`; the seed offers a color only while one of its
   crossroads is unplaced). The resolver's `constructible` gate uses the same seed.
-- a witnessed construction peak `<= budget` implies genuinely reachable.
+- a witnessed construction peak `<= budget` implies genuinely reachable: the peak is
+  that of a legal schedule the independent oracle accepts.
 
-The exact resolver decides the gap on the construction peak. The seed-only
-`constructible` fixpoint and greedy's bare refunded cost both ignore the peak and so
-once produced false-reaches (lighting a build whose construction peak overflows the
-budget, e.g. a 3-star tier-1 constellation at a 3-point budget, whose peak is 4); the
-gate and witness above charge the peak instead.
+Every reachable proof charges the construction peak. Neither `constructible` (a
+seed fixpoint that says an order exists) nor greedy's bare refunded cost is enough
+on its own: each ignores what is held transiently, so each would light a build
+whose peak overflows the budget (a 3-star tier-1 constellation at a 3-point budget
+has a peak of 4: the crossroads is held while its stars go in).
 
 ## Known limits
 
 - **No known false-reach.** Against an exhaustive BFS oracle on small random models
   (`just validate-reach` Part A, 12,000 sampled states on models with only two or
-  three sources per color) the engine false-reaches on 0. The last mechanism was
-  the crossroads seed counted twice (as the free transient +1 and again as the
-  same crossroads placed as filler or member), closed by the honest seed above. On
-  the real map `just realmap-hunt` finds 0 construction-peak false-reaches and the
-  two formerly-confirmed real-map cases classify dim; both are evidence from
-  sampling, not a formal proof.
-- **Conservative false-dims on the synthetic models.** The same Part A dims 46 of
+  three sources per color) the engine false-reaches on 0. On the real map
+  `just realmap-hunt` finds 0 construction-peak false-reaches and the two
+  formerly-confirmed real-map cases classify dim. Both are evidence from sampling,
+  not a formal proof; what is proven is per verdict, since every reachable proof
+  is a schedule (witness) or a schedule-shaped bound (greedy's ladder, the peak
+  gate) with an honest seed. The two mechanisms closed most recently were the
+  crossroads seed counted twice and the witness sizing each step's scaffold in
+  isolation (missing the swap cost); each is pinned by a test.
+- **Conservative false-dims on the synthetic models.** The same Part A dims 48 of
   12,000 states the oracle proves reachable: partial selections reachable only by
   transiently over-completing a kept-partial constellation to bootstrap a lock and
   refunding it (a star-level move the whole-build resolver does not model), and
-  covering builds whose only in-budget order all three deterministic witness
+  covering builds whose only in-budget schedule all three deterministic witness
   candidates miss (the resolver has no shuffles). Part B finds none of either on
   real-map whole-constellation builds.
 - **The peak witness is a sampler**, so its dim is conservative: a build whose only
-  valid order the sampler misses can be false-dimmed. `validate-reach` Part B finds
-  0 real-model false-dims in 6,618 self-covering builds, and the direction is the safe
-  one (hiding an achievable build, never lighting an unbuildable one). On generated
-  near-cap (52-55 point) builds the two deterministic orders plus 32 shuffles miss
-  about 1 in 5,000 that a longer search proves reachable. Raising
-  `PEAK_WITNESS_TRIES` trades speed for fewer of these on the classify path; the
+  valid schedule the sampler misses can be false-dimmed. `validate-reach` Part B
+  finds 0 real-model false-dims in 6,618 self-covering builds, and the direction is
+  the safe one (hiding an achievable build, never lighting an unbuildable one). On
+  5,000 generated near-cap (52-55 point) builds at cap 55 the engine dims 7, none of
+  which a 2,000-try search or the constructor can prove reachable. Raising
+  `PEAK_WITNESS_TRIES` trades speed for fewer misses on the classify path; the
   resolver's covering-node witness has only the deterministic orders.
 
 ## The costed-scaffolding oracle
@@ -258,8 +261,9 @@ UI decides is reproducible headlessly from that hash:
    `web/test/reach-last-point.test.ts`) can pin the exact symptoms: the sweep,
    the validity floor, the live build order, the resolver path.
 5. **Mirror deterministic witness changes in Rust.** Anything that changes the
-   deterministic (tries = 0) verdict of `minPeakSampled`, `peakGateReachable`, or
-   the DFS in `reachableExactFrom` must be ported to `web/wasm/src/lib.rs`, then
+   deterministic (tries = 0) verdict of `minPeakSampled` (its candidate orders and
+   `emitSchedule`, whose peak scores them), `peakGateReachable`, or the DFS in
+   `reachableExactFrom` must be ported to `web/wasm/src/lib.rs`, then
    `just wasm` and `just validate-wasm`. `data/reach.wasm` is a gitignored artifact
    (CI builds it before deploying), so the Rust source is what ships.
 6. **Measure before and after** with `just perf` and, for the reported state, a

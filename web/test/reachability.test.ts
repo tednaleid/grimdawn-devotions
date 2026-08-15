@@ -118,7 +118,7 @@ test("selectionView bundles the validity floor and the floor-raised sweep (the p
 
 // Was a known engine gap (main false-dimmed Oklaine's Lantern, a non-self-covering ~26-point state that
 // needs filler to extend to a valid 55-point build containing Oklaine). The peak-witness gate in the
-// exact resolver (minPeakSampled at covering builds) closes it. See BACKLOG "Reachability engine".
+// exact resolver (minPeakSampled at covering builds) closes it. See docs/reachability-engine.md.
 
 test("Oklaine's Lantern is reachable from the user-reported state (filler-extension fix)", () => {
   // A tight 55-point build containing Oklaine exists (constructor-confirmed reachable, exact min-peak 55).

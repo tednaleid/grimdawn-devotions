@@ -247,10 +247,10 @@ console.log(`\nHunting seeds ${START}..${START + SEEDS - 1} for tight self-cover
 // orders; a peak <= 55 is a SOUND witness (an actual construction exists), so the build is reachable and
 // the engine is correct - it can never be a false-reach. Builds where no sampled order fits in
 // WITNESS_TRIES are SUSPECTS (the heuristic sampler may simply have missed a good order). STAGE 2 (exact,
-// suspects only - a handful): the order-exact min-peak DP (minPeakCost) decides each one. A peak <= 55
-// means the sampler just missed it (recovered, engine correct); a peak > 55 means NO order builds it
-// within budget, so the engine lit an unreachable build - a CONFIRMED false-reach. (The engine lights
-// these via the seed-only constructible() fast path, which ignores the construction peak.)
+// suspects only - a handful): the order-exact min-peak DP (minPeakCost) decides each one. The DP sizes
+// each step's scaffold in isolation (no swap cost), so its minimum is a lower bound: a peak > 55 means NO
+// order builds it within budget, so the engine lit an unreachable build - a CONFIRMED false-reach; a peak
+// <= 55 is evidence the sampler just missed an order (recovered), not a proof.
 const WITNESS_TRIES = 128;
 let generated = 0;
 let litByEngine = 0;
