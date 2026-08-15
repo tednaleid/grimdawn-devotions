@@ -17,8 +17,11 @@ the engine decides a verdict see [reachability-engine.md](reachability-engine.md
   sound moves: a dominance memo (branch-and-bound), a Rust/WebAssembly port, and a
   covering-node prune that stops the search the moment a build self-covers (further
   filler is refundable and can only raise the peak, so the verdict there is final).
-- Current per-click latency (`just perf`, WASM): mean ~6ms, median ~2ms, p95 ~19ms,
-  p99 ~90ms, max ~220ms, with no clicks over 400ms.
+- Current per-click latency (`just perf`, WASM): mean ~4ms, median ~2ms, p95 ~14ms,
+  p99 ~22ms, max ~34ms, with no clicks over 400ms. The peel order in the peak
+  witness (reachability-engine.md) is what pulled the tail in: it witnesses many
+  cap-tight builds the bootstrap heuristic overshoots, so far fewer candidates fall
+  through the shuffles to the resolver.
 
 ## How the hot path stays fast
 

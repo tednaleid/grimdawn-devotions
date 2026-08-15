@@ -176,7 +176,7 @@ test("real-map false-reach (seed 5563): unconstructible 55-pt Affliction stack m
     "Ulo the Keeper of the Waters",
   ]);
   expect(b.stars).toBe(55); // a full 55-point build
-  expect(b.reach).toBe("dim"); // exact min-peak is 56; engine currently wrongly lights it (false-reach)
+  expect(b.reach).toBe("dim"); // exact min-peak is 56
 }, 30_000);
 
 // Open in the app: http://localhost:5173/#p=55&s=AADwAQCADwAAAAAfAAAAAAAAAAAAAD4AAAAAAPADAAAA4AcAAAAAPwCA_wMAAMAP
@@ -194,7 +194,7 @@ test("real-map false-reach (seed 41966): unconstructible 55-pt Affliction stack 
     "Staff of Rattosh",
   ]);
   expect(b.stars).toBe(55); // a full 55-point build
-  expect(b.reach).toBe("dim"); // exact min-peak is 56; engine currently wrongly lights it (false-reach)
+  expect(b.reach).toBe("dim"); // exact min-peak is 56
 }, 30_000);
 
 // Cheap, human-checkable false-reach anchor. At budget 3 the planner used to LIGHT every tier-1
@@ -308,7 +308,7 @@ test("empty map: everything completable at 55, and Leviathan gated below its flo
   expect(classifyForSelection(cons, cover, levFirst, 19)).toBe("dim");
 });
 
-test("selectionView returns a legal buildOrder for a reachable build and null for a false-reach", () => {
+test("selectionView returns a legal buildOrder for a reachable build and null for an unbuildable one", () => {
   // A self-covering reachable build (the affliction share-link state from the fixture): supply covers
   // all requirements so buildOrderPath can find a valid construction order within 55 points.
   const aflNames = [
@@ -329,7 +329,7 @@ test("selectionView returns a legal buildOrder for a reachable build and null fo
   // every heldAfter is within the cap
   for (const s of view.buildOrder!) expect(s.heldAfter).toBeLessThanOrEqual(55);
 
-  // The confirmed false-reach (seed 5563) classifies reachable but has no valid order within 55.
+  // The formerly false-reached build (seed 5563, exact min-peak 56) classifies dim and has no valid order within 55.
   const names = [
     "Akeron's Scorpion",
     "Fiend",

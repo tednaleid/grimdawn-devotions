@@ -122,20 +122,33 @@ Deferred:
 - Distinct map treatment for a power match vs a bonus match (today both reuse the
   benefit-match highlight on the diamond).
 
-## Reachability engine: residual synthetic false-reach
+## Reachability engine: residual synthetic false-reach (seed double-count)
 
 `just validate-reach` Part A shows ~450 false-reaches per 12k random small
-models vs the independent BFS oracle (the resolver calls some unreachable
-selections reachable). The real-map hunt (`just realmap-hunt`) finds 0, but
-only for the Affliction-stack shape it generates. Open work: characterize the
-residual as synthetic-only, or broaden `just realmap-hunt` to other shapes.
-`reachability-oracle.test.ts` stays `test.failing` on the small-model
-mechanism; re-run `just realmap-hunt` + `just validate-reach` + `just
-validate-wasm` after any resolver change. Background: the resolver decides on
-the construction PEAK, not the post-refund cost (see
-`docs/reachability-engine.md`); the order-exact `minPeakCost` oracle lives on
-branch `reachability-costed-scaffolding`, vendored in
-`web/test/support/costed-oracle.ts`.
+models vs the independent BFS oracle. Attributed: ~92% fire on the greedy gate
+(`greedyFrom + lastGreedyBootColors`), the rest on the exact resolver. The
+mechanism is the crossroads seed double-count: `SEED` assumes a free +1 per
+color while `fillerFor` (greedy) and `wholeFiller`/members (resolver's
+`peakGateReachable -> constructible`) can place the same crossroads again, so a
+member whose activation needs exactly one more point of a color than every other
+source supplies is judged startable. Confirmed on validate-reach seed 2
+(c3 needs chaos 4, others supply 3; greedy lights it, and does not once the
+chaos crossroads is removed from its pool). Real-map exposure: a 90k-state
+sample found 283 states where the double-count was what let greedy fire: 105
+independently proven reachable by a sound witness, 178 (partial or
+filler-needing states, beyond the min-peak oracle) still lit by the resolver, so
+0 verdict changes but that tail is not independently proven; `just realmap-hunt`
+finds 0. See `docs/reachability-engine.md` Soundness / Known limits.
+
+Fix sketch (TS-only for greedy; the resolver's `constructible` is mirrored in
+Rust and would need `just wasm` + `just validate-wasm`): make the seed
+per-color and honest, +1 for a color only while its crossroads is neither a
+placed member nor placed filler (identify crossroads structurally: size 1,
+zero requirement, single +1 grant, so synthetic models are covered too), and
+charge `bootColors` only for colors actually bootstrapped by the seed. Then
+`reachability-oracle.test.ts` should stop needing `test.failing`. Re-run the
+gates in "Verifying after a resolver change" plus `just perf` (fewer greedy
+proofs may push more candidates to the witness/resolver).
 
 ## Build-order popup: touch e2e via Playwright
 
@@ -194,9 +207,9 @@ Pointers: the touch block at the end of `web/e2e/smoke.ts` (the
   random scan did not surface a natural cliff-miss; a constructed synthetic model
   is the likely route.
 - Minor cleanup: extract the duplicated `esc` HTML helper into a shared
-  `web/src/adapters/html.ts`; tighten the `expect(frView.reach).toBeDefined()`
-  no-op in `reachability.test.ts` to assert the engine actually lit the
-  false-reach reachable.
+  `web/src/adapters/html.ts`; the `expect(frView.reach).toBeDefined()` in
+  `reachability.test.ts` is a no-op (that build now classifies dim, so the
+  test only shows `buildOrder` is null for a dim selection).
 
 ## Performance: monotone dim-cache for the reachability sweep
 
@@ -401,18 +414,6 @@ Pointers: `reachabilityForSelection`'s maxK search in
 The coarse CI guard (`web/test/reachability-perf-guard.test.ts`) runs this TS
 path and had its MAX_MS raised to 3000ms to absorb the slowdown on CI runners
 (slowest state ~1.6s there); re-tighten it when the dedup lands.
-
-## Reachability fuzz: pre-existing conservative false-dims on seeds 97 and 113
-
-`just fuzz` seeds 97 and 113 (outside the CI fuzz range of seeds 1-20, or 1-4
-without WASM) produce 10 pre-existing conservative false-dims: the engine dims
-selections that are members of a valid build. Verified identical on
-pre-feature main, so this is not a regression from partial-constellation
-reachability. Candidates: add to the known-gaps documentation, or a deeper
-engine fix.
-
-Pointers: `web/scripts/reachability-fuzz.ts`; `docs/reachability-engine.md`
-"Known limits".
 
 ## Compare mode: repair the decoded baseline in applyHash
 
