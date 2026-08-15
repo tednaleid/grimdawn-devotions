@@ -79,11 +79,11 @@ The cheap bracket decides almost every candidate; only the gap reaches the resol
 These one-sided facts are exact, and the engine never contradicts them:
 
 - `lowerBoundFrom > budget` implies genuinely dim.
-- `greedyCost + bootColors <= budget` implies genuinely reachable, with one caveat:
-  greedy's transient seed (`SEED`, one free crossroads point per color) is not
-  reconciled with the same crossroads placed as a member or as filler, so a color
-  can be counted twice. This is where the synthetic false-reach residual comes
-  from (Known limits); no real-map verdict has been observed to turn on it.
+- `greedyCost + bootColors <= budget` implies genuinely reachable. Greedy's
+  transient seed is honest: a crossroads counts once, either as the transient +1
+  it lends while a member activates or as a placed member or filler, never both
+  (`crossroadsColor`/`seedFor`; the seed offers a color only while one of its
+  crossroads is unplaced). The resolver's `constructible` gate uses the same seed.
 - a witnessed construction peak `<= budget` implies genuinely reachable.
 
 The exact resolver decides the gap on the construction peak. The seed-only
@@ -94,26 +94,21 @@ gate and witness above charge the peak instead.
 
 ## Known limits
 
-- **Residual false-reach on random synthetic models.** Against an exhaustive BFS
-  oracle on small random models (`just validate-reach` Part A), the engine still
-  false-reaches on roughly 450 of 12,000 sampled states. Attributing them by ladder
-  rung: about 92% are lit by the greedy gate and the rest by the exact resolver.
-  The mechanism, confirmed on a sampled case, is the crossroads seed double-count
-  described under Soundness: greedy assumes a free +1 per color AND places the same
-  crossroads as filler, so a member whose activation needs one more point of a
-  color than every other source can supply is judged startable (`constructible`,
-  used by the resolver's `peakGateReachable`, shares the seed assumption). The
-  synthetic models make this bind because they have only two or three sources per
-  color; the real map's affinity abundance (per-color supply 4-9x the caps) does
-  not. On the real map: `just realmap-hunt` finds 0 construction-peak
-  false-reaches, both formerly-confirmed real-map cases now classify dim, and a
-  90,000-state comparison of the shipped greedy against a seed-reconciled copy found
-  283 states where the double-count was what let greedy fire; 105 of them a sound
-  witness independently proves reachable, and the other 178 (all partial or
-  filler-needing states, outside the exact min-peak oracle's reach) the resolver
-  still lights, so no verdict changed but those 178 are not independently proven.
-  This is evidence from sampling, not a formal proof that no real-map false-reach
-  shape exists.
+- **No known false-reach.** Against an exhaustive BFS oracle on small random models
+  (`just validate-reach` Part A, 12,000 sampled states on models with only two or
+  three sources per color) the engine false-reaches on 0. The last mechanism was
+  the crossroads seed counted twice (as the free transient +1 and again as the
+  same crossroads placed as filler or member), closed by the honest seed above. On
+  the real map `just realmap-hunt` finds 0 construction-peak false-reaches and the
+  two formerly-confirmed real-map cases classify dim; both are evidence from
+  sampling, not a formal proof.
+- **Conservative false-dims on the synthetic models.** The same Part A dims 77 of
+  12,000 states the oracle proves reachable: partial selections reachable only by
+  transiently over-completing a kept-partial constellation to bootstrap a lock and
+  refunding it (a star-level move the whole-build resolver does not model), and
+  covering builds whose only in-budget order both deterministic witness candidates
+  miss (the resolver has no shuffles). Part B finds none of either on real-map
+  whole-constellation builds.
 - **The peak witness is a sampler**, so its dim is conservative: a build whose only
   valid order the sampler misses can be false-dimmed. `validate-reach` Part B finds
   0 real-model false-dims in 6,618 self-covering builds, and the direction is the safe
