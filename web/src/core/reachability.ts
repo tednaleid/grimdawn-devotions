@@ -606,41 +606,6 @@ function buildParts(cons: ReachCon[], B: ReachCon[]): { G: ReachCon[]; totalSize
 }
 
 /**
- * Construction peak for placing the granting members in `order`: each step holds a transient scaffold
- * sized (via peakToReach) to keep every placed member valid until the build's own grants cover it. The
- * peak is the largest (placed size + held scaffold) over the steps, maxed with the whole build size (the
- * deferred zero-grant members fill up to it). A real schedule, so its peak upper-bounds the true min peak.
- */
-function orderPeak(
-  order: ReachCon[],
-  pool: ReachCon[],
-  table: CoverTable,
-  totalSize: number,
-  peakNodeCap: number,
-): number {
-  let grant = zero();
-  let mreq = zero();
-  let size = 0;
-  let peak = totalSize;
-  for (const m of order) {
-    mreq = maxV(mreq, m.req);
-    size += m.size;
-    const def: Vec = [
-      Math.max(0, mreq[0] - grant[0]),
-      Math.max(0, mreq[1] - grant[1]),
-      Math.max(0, mreq[2] - grant[2]),
-      Math.max(0, mreq[3] - grant[3]),
-      Math.max(0, mreq[4] - grant[4]),
-    ];
-    const sc = peakToReach(pool, table, def, grant, peakNodeCap);
-    if (sc >= INF) return INF;
-    if (size + sc > peak) peak = size + sc;
-    grant = addCap(grant, m.grant);
-  }
-  return peak;
-}
-
-/**
  * The sampler's peel candidates, built back to front: each pick is the member whose requirement, with
  * every requirement not yet peeled, is covered by the OTHER unpeeled members' grants (plus the front), so
  * it needs no scaffold when it is placed last among them. Ties prefer the largest member (it defers size
@@ -652,7 +617,7 @@ function orderPeak(
  * Two variants, one flag: with `zeroReqFirst` the zero-requirement members (crossroads) go in front,
  * which wins when their grants feed colors the build needs (every later deficit shrinks); without it
  * they are peeled like any other member, which wins when their colors are not needed at all, so placing
- * them first only inflates the size held at the step that still needs a scaffold. Each is one orderPeak,
+ * them first only inflates the size held at the step that still needs a scaffold. Each is one schedule,
  * RNG-free, mirrored in the Rust resolver (peel_order).
  */
 function peelOrder(G: ReachCon[], zeroReqFirst: boolean): ReachCon[] {
@@ -687,12 +652,22 @@ function peelOrder(G: ReachCon[], zeroReqFirst: boolean): ReachCon[] {
   return [...front, ...peeled];
 }
 
-// Core sampler shared by minPeakSampled (which wants the peak) and minPeakSampledOrder (which wants the
-// witness order). Tries three deterministic orders - the bootstrap heuristic (lowest requirement first,
-// then highest grant density) and both peel variants (peelOrder) - plus up to `tries` seeded shuffles of
-// the granting members, keeping the smallest-peak order and early-exiting the moment one lands at or under
-// budget. `order` is the granting members in their best-peak order; `tail` is the zero-grant members
-// (placed last - they never raise the peak above the build size).
+/** The sampler's result: the smallest schedule peak found, the member order behind it, and that
+ *  order's legal schedule when the peak fits the budget (the witness IS a schedule). */
+interface SampledConstruction {
+  peak: number;
+  order: ReachCon[]; // the granting members in their best-peak order
+  tail: ReachCon[]; // the zero-grant members, placed last (they never raise the peak above the build size)
+  steps: BuildStep[] | null;
+}
+
+// Core sampler shared by minPeakSampled (which wants the peak), minPeakSampledOrder (which wants the
+// witness order) and buildOrderPath (which wants the schedule). Every candidate order is scored by the
+// peak of its actual legal schedule (emitSchedule: scaffolds added before the step that needs them,
+// refunded the moment the rules allow, so a scaffold swap holds both sides until the old one may go).
+// Tries three deterministic orders - the bootstrap heuristic (lowest requirement first, then highest
+// grant density) and both peel variants (peelOrder) - plus up to `tries` seeded shuffles of the granting
+// members, keeping the smallest-peak order and early-exiting the moment one lands at or under budget.
 function sampledConstruction(
   cons: ReachCon[],
   table: CoverTable,
@@ -700,29 +675,33 @@ function sampledConstruction(
   budget: number,
   tries: number,
   peakNodeCap: number,
-): { peak: number; order: ReachCon[]; tail: ReachCon[] } {
+): SampledConstruction {
   const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
   const tail = B.filter((c) => !grants(c));
   const parts = buildParts(cons, B);
-  if (!parts) return { peak: INF, order: [], tail };
+  if (!parts) return { peak: INF, order: [], tail, steps: null };
   const { G, totalSize, pool } = parts;
-  if (totalSize > budget) return { peak: INF, order: [], tail };
-  if (G.length === 0) return { peak: totalSize, order: [], tail };
+  if (totalSize > budget) return { peak: INF, order: [], tail, steps: null };
   const reqsum = (c: ReachCon) => c.req[0] + c.req[1] + c.req[2] + c.req[3] + c.req[4];
   const ratio = (c: ReachCon) => (c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4]) / c.size;
   const order = [...G].sort((a, b) => reqsum(a) - reqsum(b) || ratio(b) - ratio(a));
-  let best = orderPeak(order, pool, table, totalSize, peakNodeCap);
-  let bestOrder = [...order];
-  if (best <= budget) return { peak: best, order: bestOrder, tail };
-  for (const zeroReqFirst of [true, false]) {
-    const peeled = peelOrder(G, zeroReqFirst);
-    const peeledPeak = orderPeak(peeled, pool, table, totalSize, peakNodeCap);
-    if (peeledPeak < best) {
-      best = peeledPeak;
-      bestOrder = peeled;
+  let best = INF;
+  let bestOrder: ReachCon[] = [];
+  let bestSteps: BuildStep[] | null = null;
+  // Score a candidate; true when it fits the budget (the caller stops sampling).
+  const consider = (candidate: ReachCon[]): boolean => {
+    const sched = emitSchedule(candidate, tail, pool, table, budget, peakNodeCap);
+    const peak = sched ? sched.peak : INF;
+    if (peak < best) {
+      best = peak;
+      bestOrder = [...candidate];
+      bestSteps = sched?.steps ?? null;
     }
-    if (best <= budget) return { peak: best, order: bestOrder, tail };
-  }
+    return best <= budget;
+  };
+  const done = (): SampledConstruction => ({ peak: best, order: bestOrder, tail, steps: bestSteps });
+  if (consider(order)) return done();
+  for (const zeroReqFirst of [true, false]) if (consider(peelOrder(G, zeroReqFirst))) return done();
   let seed = (totalSize * 2654435761 + G.length * 40503) >>> 0; // deterministic per build
   const rnd = () => {
     seed = (seed + 0x6d2b79f5) >>> 0;
@@ -737,21 +716,19 @@ function sampledConstruction(
       order[i] = order[j]!;
       order[j] = tmp;
     }
-    const p = orderPeak(order, pool, table, totalSize, peakNodeCap);
-    if (p < best) {
-      best = p;
-      bestOrder = [...order];
-    }
+    consider(order);
   }
-  return { peak: best, order: bestOrder, tail };
+  return done();
 }
 
 /**
- * Fast sound construction-peak witness for the self-covering whole-build `B`: the smallest peak among the
- * sampled orders (see sampledConstruction). A peak at or under budget is a GENUINE witness (that order
- * builds `B` within budget), so it is SOUND for "reachable" - it can only flip a false-dim, never invent a
- * false-reach. It does not compute the true minimum, so it may overshoot a hard-to-sample reachable build
- * (a conservative dim, closed only by the exact engine). Deterministic. INF if `B` is not self-covering.
+ * Fast sound construction-peak witness for the self-covering whole-build `B`: the smallest schedule peak
+ * among the sampled orders (see sampledConstruction). A peak at or under budget is a GENUINE witness: that
+ * order's schedule builds `B` within budget and replays legally through the oracle (web/test/
+ * witness-schedule.test.ts pins this), so it is SOUND for "reachable" - it can only flip a false-dim, never
+ * invent a false-reach. It does not compute the true minimum, so it may overshoot a hard-to-sample
+ * reachable build (a conservative dim, closed only by the exact engine). Deterministic. INF if `B` is not
+ * self-covering.
  */
 export function minPeakSampled(
   cons: ReachCon[],
@@ -766,10 +743,9 @@ export function minPeakSampled(
 
 /**
  * The construction ORDER behind the witness: the constellations of self-covering build `B` in an order
- * that builds it within `budget` points held at once (granting members first, in their peak-minimizing
- * order, then the zero-grant members), or null when no sampled order fits the budget. This is the
- * design-agnostic substrate for guided build order; the transient scaffold to hold (and refund) at each
- * step is a further step the UI design will specify (see the guided-build-order spec). Deterministic.
+ * whose schedule builds it within `budget` points held at once (granting members first, in their
+ * peak-minimizing order, then the zero-grant members), or null when no sampled order fits the budget.
+ * buildOrderPath turns it into the step-by-step schedule (scaffolds held and refunded). Deterministic.
  */
 export function minPeakSampledOrder(
   cons: ReachCon[],
@@ -872,13 +848,25 @@ export function churnPoints(steps: BuildStep[]): number {
   return pts;
 }
 
+/** A member order's legal schedule: the most points held at once, and the steps when that fits the budget. */
+interface Schedule {
+  peak: number; // when over budget: the running total at the first over-cap add, itself already over
+  steps: BuildStep[] | null; // present exactly when peak <= budget
+}
+
+/** The scaffold-search node cap for the cold path (the panel's schedule): find the exact min subset,
+ *  immune to the witness's sampling cap. */
+const REPLAY_CAP = 300_000;
+
 /**
  * Emit the add/complete/refund schedule for a member `order` plus zero-grant `tail`: at each step,
  * hold the exact scaffold SET peakToReach picks (crossroads-biased), draining refunds the moment
- * they are legal (docs/devotion-system.md: removal cannot strand a dependent). Null when any step
- * would exceed `budget` or a held scaffold can never be legally refunded - the honest signal that
- * this ORDER does not work; the caller decides what other order to try. This is buildOrderPath's
- * legality-bearing loop, extracted so more than one order generator can feed it.
+ * they are legal (docs/devotion-system.md: removal cannot strand a dependent). A scaffold swap adds
+ * the new scaffold before the old one may go, so the peak counts both, as the game does. Returns the
+ * peak, and the steps only when it fits `budget`; null when a step's deficit cannot be scaffolded or
+ * a held scaffold can never be legally refunded - the honest signal that this ORDER does not work;
+ * the caller decides what other order to try. This is the one legality-bearing loop: the peak witness
+ * scores every candidate order with it, and buildOrderPath renders its steps.
  */
 function emitSchedule(
   order: ReachCon[],
@@ -886,14 +874,20 @@ function emitSchedule(
   pool: ReachCon[],
   table: CoverTable,
   budget: number,
-): BuildStep[] | null {
-  const REPLAY_CAP = 300_000; // cold path: find the exact min subset, immune to the sampling node cap
+  peakNodeCap = REPLAY_CAP,
+): Schedule | null {
   const steps: BuildStep[] = [];
+  let peak = 0;
+  const step = (kind: BuildStep["kind"], conId: string, points: number, heldAfter: number): void => {
+    steps.push({ kind, conId, points, heldAfter });
+    if (heldAfter > peak) peak = heldAfter;
+  };
   let grant: Vec = zero();
   let mreq: Vec = zero(); // max requirement incl. the member being placed (drives the scaffold need-set)
   let creq: Vec = zero(); // max requirement over COMPLETED members only (drives refund legality)
   let held: ReachCon[] = [];
   let running = 0;
+  const over = (): Schedule => ({ peak: running, steps: null });
   // In-game refund rule: a scaffold may be refunded only if everything still standing (completed
   // members plus the other held scaffolds) keeps its requirement covered without the scaffold's grant.
   const canRefund = (s: ReachCon, keep: ReachCon[]): boolean => {
@@ -916,7 +910,7 @@ function emitSchedule(
         if (!canRefund(s, keep)) continue;
         held = keep;
         running -= s.size;
-        steps.push({ kind: "scaffold-refund", conId: s.id, points: -s.size, heldAfter: running });
+        step("scaffold-refund", s.id, -s.size, running);
         progress = true;
       }
     }
@@ -931,7 +925,7 @@ function emitSchedule(
       Math.max(0, mreq[4] - grant[4]),
     ];
     const need: ReachCon[] = [];
-    const sz = peakToReach(pool, table, def, grant, REPLAY_CAP, { collect: need, preferSmall: true });
+    const sz = peakToReach(pool, table, def, grant, peakNodeCap, { collect: need, preferSmall: true });
     if (sz >= INF) return null;
     const needIds = new Set(need.map((s) => s.id));
     drainRefunds(needIds);
@@ -940,14 +934,13 @@ function emitSchedule(
       if (!heldIds.has(s.id)) {
         held.push(s);
         running += s.size;
-        if (running > budget) return null; // an over-cap add is illegal: honest null, never an illegal step
-        steps.push({ kind: "scaffold-add", conId: s.id, points: s.size, heldAfter: running });
+        if (running > budget) return over(); // an over-cap add is illegal: no steps, never an illegal step
+        step("scaffold-add", s.id, s.size, running);
       }
     drainRefunds(needIds); // retry refunds the new scaffolds' grants may have made safe
-    if (running > budget) return null; // soundness guard
     running += m.size;
-    steps.push({ kind: "complete", conId: m.id, points: m.size, heldAfter: running });
-    if (running > budget) return null;
+    step("complete", m.id, m.size, running);
+    if (running > budget) return over();
     grant = addCap(grant, m.grant);
     creq = maxV(creq, m.req);
   }
@@ -955,10 +948,10 @@ function emitSchedule(
   if (held.length) return null; // a scaffold no drain can legally refund: honest null, never an illegal step
   for (const t of tail) {
     running += t.size;
-    steps.push({ kind: "complete", conId: t.id, points: t.size, heldAfter: running });
-    if (running > budget) return null;
+    step("complete", t.id, t.size, running);
+    if (running > budget) return over();
   }
-  return steps;
+  return { peak, steps };
 }
 
 /**
@@ -989,9 +982,13 @@ export function buildOrderPath(
   if (!parts) return null; // not self-covering
   if (parts.totalSize > budget) return null;
   const nd = needDrivenOrder(cons, B);
-  const viaGreedy = nd ? emitSchedule(nd.order, nd.tail, parts.pool, table, budget) : null;
+  const viaGreedy = nd ? (emitSchedule(nd.order, nd.tail, parts.pool, table, budget)?.steps ?? null) : null;
+  // The sampled witness comes with its own legal schedule (at the sampling cap); re-emitting its order at
+  // the cold-path cap usually finds smaller scaffolds, but the witness's schedule is the fallback so a lit
+  // build always has an order.
   const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
-  const viaSampler = sc.peak <= budget ? emitSchedule(sc.order, sc.tail, parts.pool, table, budget) : null;
+  const viaSampler =
+    sc.steps === null ? null : (emitSchedule(sc.order, sc.tail, parts.pool, table, budget)?.steps ?? sc.steps);
   if (!viaGreedy || !viaSampler) return viaGreedy ?? viaSampler;
   const g = churnPoints(viaGreedy);
   const s = churnPoints(viaSampler);

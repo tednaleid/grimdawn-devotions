@@ -35,10 +35,17 @@ gap exactly. In order:
    (each bootstrapped color is one transiently held Crossroads), so
    `greedyCost + bootColors <= budget` proves reachable. This is the ladder bound:
    affinity persists, so each color is a one-time bottom-of-ladder cost.
-3. **Peak witness (sound).** For a complete self-covering selection, `minPeakSampled`
-   samples real construction orders; a sampled peak `<= budget` is a genuine order,
-   so it proves reachable. It only ever flips a would-be dim to reachable. It tries
-   three deterministic orders first - the bootstrap heuristic (lowest requirement
+3. **Peak witness (sound, schedule-backed).** For a complete self-covering selection,
+   `minPeakSampled` samples member orders and scores each by the peak of its actual
+   legal schedule (`emitSchedule`, the same loop the build-order panel renders:
+   scaffolds added before the step that needs them and refunded the moment the
+   rules allow, so a scaffold swap holds both sides until the old one may go). A
+   peak `<= budget` therefore comes with a schedule the independent oracle
+   verifies (web/test/witness-schedule.test.ts pins "lit implies a verified
+   order"), so it proves reachable and only ever flips a would-be dim to reachable.
+   A per-step model that sized each step's scaffold in isolation undercounted the
+   swap and lit a real 53-point build at 53 whose cheapest schedule needs 54. It
+   tries three deterministic orders first - the bootstrap heuristic (lowest requirement
    first, then densest grant) and two peel orders (`peelOrder`: members chosen back
    to front so each is placed last among what remains only when the others' grants
    already cover every remaining requirement; one variant puts zero-requirement
@@ -59,8 +66,9 @@ gap exactly. In order:
    covering nodes, and shuffling at each one was measured at 2.5x the mean and 4.6x
    the p99 per-click latency for 32 tries (1.4x / 1.8x for 8), while the second
    peel variant recovered most of what the shuffles would have for the cost of one
-   more `orderPeak`. It also keeps the Rust port RNG-free and verdict-equivalent.
-   Reachable iff some covering build has a construction order within budget.
+   more schedule. It also keeps the Rust port RNG-free and verdict-equivalent
+   (`schedule_peak` in web/wasm/src/lib.rs mirrors `emitSchedule`'s peak).
+   Reachable iff some covering build has a construction schedule within budget.
 
 The cheap bracket decides almost every candidate; only the gap reaches the resolver.
 
@@ -129,12 +137,13 @@ gate and witness above charge the peak instead.
 An order-exact minimum-construction-peak DP (`minPeakCost`) lives on branch
 `reachability-costed-scaffolding` and is vendored into
 `web/test/support/costed-oracle.ts`. It is far too slow for the interactive path
-(it searches ~100 real scaffolds per query), but it is sound by construction, so it
-serves as the validation oracle: the arbiter in `just realmap-hunt` and the ground
-truth in the costed-oracle tests. The shipped engine returns only a verdict; the
-guided build order (`buildOrderPath`) builds its construction schedule from its
-own order generators (the need-driven greedy and the sampled witness, next
-section), not from this DP.
+(it searches ~100 real scaffolds per query). It sizes each step's scaffold in
+isolation, without the swap cost a real schedule pays, so its minimum is a lower
+bound on the true minimum peak: `minPeakCost > budget` proves unreachable (the
+arbiter `just realmap-hunt` relies on, sound), while `minPeakCost <= budget` is
+only evidence that an order exists (what `just build-order-validate` and the
+"recovered" line of the hunt report). The shipped engine's witness is stricter
+than this oracle: it lights nothing without a schedule.
 
 ## The guided build order: legal at every step, verified or absent
 
@@ -144,13 +153,16 @@ emitted and the better schedule wins by the ordering objective (fewer scaffold
 churn points, then fewer steps): the need-driven greedy order
 (`needDrivenOrder`, each member activated by what the build has already placed
 plus at most a refundable crossroads, so the build builds itself), and the
-sampled peak-minimizing order (`sampledConstruction`), which also remains the
-engine's untouched reachability witness (`minPeakSampled`). Neither generator
-dominates - the greedy wins cap-tight builds the sampler scaffolds heavily,
-the sampler's deterministic orders win typical builds - so the per-build best
-of both is never worse than either alone. Both orders feed the same emission
-loop, which adds transient scaffold constellations before the steps that need
-them and refunds each the moment the in-game rules allow. Its contract:
+sampled peak-minimizing order (`sampledConstruction`), which is also the
+engine's reachability witness (`minPeakSampled`) and arrives with its own legal
+schedule. Neither generator dominates - the greedy wins cap-tight builds the
+sampler scaffolds heavily, the sampler's deterministic orders win typical builds
+- so the per-build best of both is never worse than either alone. Both orders
+feed the same emission loop (`emitSchedule`), which adds transient scaffold
+constellations before the steps that need them and refunds each the moment the
+in-game rules allow; the panel re-emits the sampled order at a deeper
+scaffold-search cap for smaller scaffolds and falls back to the witness's own
+schedule, so a lit build always has an order. Its contract:
 
 - **Canonical input.** The member array is sorted by constellation id at entry,
   so the output is a pure function of the build set. Panel, tests, and scripts
