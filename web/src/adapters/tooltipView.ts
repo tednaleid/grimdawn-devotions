@@ -97,11 +97,13 @@ function powerRowsHtml(loc: Localization, power: PowerRows): string {
     .join("");
 }
 
-// Star tooltip: power name + proc trigger ("Scorpion Sting (25% Chance on Attack)"),
-// description, granted level, then the ability's stat lines GD-style.
+// Star tooltip: power name + proc qualifier ("Scorpion Sting (25% Chance on Attack)"),
+// description, granted level, then the ability's stat lines GD-style. Each trigger.<key>
+// entry is the whole "{chance}% Chance ..." phrase, since the game's wording ("on Attack",
+// "when Hit", "on Block") varies per trigger and is not one template.
 function powerHtml(loc: Localization, power: CelestialPower): string {
   const proc = power.proc
-    ? ` <span class="tip-proc">${loc.translate("ui.tooltip.procQualifier", { chance: power.proc.chance, trigger: loc.translate(`trigger.${power.proc.triggerKey}`) })}</span>`
+    ? ` <span class="tip-proc">${loc.translate("ui.tooltip.procQualifier", { trigger: loc.translate(`trigger.${power.proc.triggerKey}`, { chance: power.proc.chance }) })}</span>`
     : "";
   const desc = power.descriptionTag
     ? `<div class="tip-power-desc">${hl(loc.gameText(power.descriptionTag))}</div>`

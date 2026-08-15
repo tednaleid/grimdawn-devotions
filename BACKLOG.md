@@ -357,6 +357,21 @@ full design. Remaining work:
   value-templated row shape is added later, it could render the game's exact
   string (authoritative in every language) instead. Pointer: `OVERRIDES` +
   `stat.override.characterHealIncreasePercent` in `web/src/core/statFormat.ts`.
+- **Proc qualifier: source it from the game tables and carry the low-health
+  threshold.** The `trigger.<enum>` catalog values are hand-transcribed from
+  the game's `tagAutoSkillCondition01..12` strings (see docs/i18n.md), which
+  is correct today but is a copy: a `data/proc-tags.json` (trigger enum ->
+  tag) fed to `build_game_tables.py` like `stat-format-tags.json`, plus a
+  `{%d0}` -> chance interpolation at render, would make `gameText` the source
+  in all 13 languages and remove 13 x 12 catalog entries. Blocked on a game
+  table regeneration (`just i18n-tables`, Windows extraction; see "Game text
+  tables are stale" below). Do the LowHealth/LowMana threshold at the same
+  time: the game says "(100% Chance at 33% Health)" for Ghoulish Hunger and
+  "at 40% Health" for Turtle Shell, but `extract_proc` in
+  `scripts/parse_devotions.py` reads only `chanceToRun`/`triggerType` from the
+  autocast controller, so the app says "on Low Health". Read the threshold
+  field off the controller record, carry it in `proc`, and interpolate the
+  game's `{%.0f1}`.
 - **ICU-style plural handling.** Simple named-placeholder interpolation
   (`web/src/core/localization.ts`) is used today. Add narrowly only if a
   target language's grammar needs real plural rules, not preemptively.
