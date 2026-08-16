@@ -27,6 +27,7 @@ const model = buildModel(doc);
 const view = (completable: string[]): ReachView => ({
   completable: new Set(completable),
   reachableStars: new Set<string>(),
+  legal: true,
   have: [0, 0, 0, 0, 0],
   need: [0, 0, 0, 0, 0],
   needSource: new Map(),

@@ -326,7 +326,7 @@ async function boot() {
     const completable = new Set<string>([...model.constellations.keys()]);
     const reachableStars = new Set<string>();
     for (const st of model.stars.values()) if (!state.selected.has(st.id)) reachableStars.add(st.id);
-    return { completable, reachableStars, have: s.supplyUncapped, need: s.target, needSource };
+    return { completable, reachableStars, have: s.supplyUncapped, need: s.target, needSource, legal: false };
   }
 
   // Why a faded constellation (or a locked star) is dim: the completion minimum searched past the
