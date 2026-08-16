@@ -769,6 +769,17 @@ artifact policy, item source, grimtools boundary).
   per tier (a Fast 1h axe, a scepter, a Slow 2h mace) pins them.
 - **AND toggle within stat families.** OR is the only launch semantics
   (R16); the stats table already supports AND via `GROUP BY/HAVING`.
+- **Pet stats in the filterable stats table.** `pet_ranks.parquet` now rolls a
+  summon's pet up for its skill panel (the creature's resistances plus its
+  rank-scaled abilities), but those rows never reach `stats.parquet`, so no
+  facet can ask "items whose summoned pet deals fire damage". Folding them in
+  needs a `source` value of its own and a decision about which rank to report,
+  since a pet stat has three breakpoints where an item stat has one.
+- **Player-level pet scaling.** A pet's base life, offensive and defensive
+  ability live in its `characterAttributeEquations` bio record, written in
+  `charLevel`, and 15 of the 71 ability grants set their level to a `charLevel`
+  equation. `pet_ranks` reports summon RANK, so none of it is evaluated;
+  a panel showing pet damage is a rank comparison, not a character sheet.
 - **Exception-only stat-label generator.** Decompose stat-id naming into
   candidate game tags, verify against `Text_EN`, hand-curate only the misses;
   scales item stat labels to 13 locales without hand-authoring 700+ ids.

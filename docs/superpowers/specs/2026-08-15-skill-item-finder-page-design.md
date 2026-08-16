@@ -275,12 +275,25 @@ released with the rest.
 | `skills.parquet` | one row per skill in the class-tree roster (315). `record`, `mastery_record`, `group_record` (the base skill it hangs under), `node_kind` (base / modifier / transmuter / pet_modifier), `ui_x` / `ui_y` (null for the 4 transform abilities with no button), `name_tag`, `icon`, `max_level`, `ultimate_level`, `effect_record` (the walk-resolved record carrying the stats) |
 | `skill_ranks.parquet` | `(skill_record, stat_id, at_first, at_max, at_ultimate)`, each clamped to the array's real length |
 | `skill_modifiers.parquet` | `(item_record, modified_skill, modifier_record, stat_id, value)`, stats resolved by the same walk |
+| `pet_ranks.parquet` | `(skill_record, pet_record, source_kind, source_record, stat_id, at_first, at_max, at_ultimate)`, the pet chain for the 20 pet summon skills |
 
-The pet-chain walk (`spawnObjects` to the pet record to its `petskill_*`
-abilities) feeds `skill_ranks` for the 20 pet summon skills. This closes the
-"Pet-skill stat rollup" gap in BACKLOG. Numbers there stay caveated in the UI:
-pet damage also scales off the player's pet bonuses, so a static maxed value is
-an upper reference, not a prediction.
+The pet-chain walk (`spawnObjects` to the per-rank pet record, then to that
+creature's `defensive*`/`character*` stats and to the `petskill_*` abilities it
+grants at the rank the creature record names) feeds its OWN table, `pet_ranks`,
+not `skill_ranks`. It has to: one summon routinely has two sources naming the
+same stat, so `skill_ranks`' `(skill_record, stat_id)` key would collide them,
+and a pet's damage is not the player's stat line. The 17 summons carrying
+`spawnObjects` are joined by the 3 pet-modifier nodes that swap the pet outright
+(`modSpawnObjects`), which are one-rank nodes indexed by their group base's rank.
+Without this a summon's panel is its mana cost and cooldown and nothing else:
+Summon Hellhound's own record has four rank rows and the pet chain adds 25.
+
+Two pieces stay outside it and stay tracked in BACKLOG: the pet's base life,
+offensive and defensive ability come from a `characterAttributeEquations` record
+written in `charLevel`, and pet stats are not folded into the filterable
+`stats.parquet`. Numbers stay caveated in the UI for a third reason: pet damage
+also scales off the player's pet bonuses, so a static maxed value is an upper
+reference, not a prediction.
 
 **3. `just skill-items`** emits two committed files from the derived tables
 joined to `entities`, `stats` and `boosts`, top tier per `group_key`:
