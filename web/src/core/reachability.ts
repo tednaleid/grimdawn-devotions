@@ -1241,10 +1241,21 @@ export function selectionMinCost(
   maxBudget = BUDGET,
 ): number {
   const st = selectionSummary(model, selected);
+  if (st.own === 0) return 0;
+  if (st.own >= maxBudget) return maxBudget;
+  return minCostFrom(cons, table, st, maxBudget) ?? maxBudget;
+}
+
+/**
+ * The smallest budget in [own, maxBudget] at which `st` classifies "reachable", or null when even
+ * maxBudget does not (a binary search: the verdict is monotone in budget). Callers that only need
+ * a number within the cap wrap it (selectionMinCost); callers explaining a dim verdict pass a bound
+ * past the cap so they can say how many points the target really needs.
+ */
+export function minCostFrom(cons: ReachCon[], table: CoverTable, st: ReachState, maxBudget: number): number | null {
   let lo = st.own; // cannot cost less than the stars already selected
-  if (lo === 0) return 0;
-  if (lo >= maxBudget) return maxBudget;
-  if (classifyForSelection(cons, table, st, maxBudget) !== "reachable") return maxBudget;
+  if (lo > maxBudget) return null;
+  if (classifyForSelection(cons, table, st, maxBudget) !== "reachable") return null;
   let hi = maxBudget;
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
