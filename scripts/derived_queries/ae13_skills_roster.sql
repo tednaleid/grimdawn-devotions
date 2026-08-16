@@ -25,6 +25,11 @@ WITH checks AS (
                                 HAVING count(*) FILTER (WHERE record = group_record) != 1))
           = 0 AS one_base_per_group,
         (SELECT count(DISTINCT group_record) FROM skills) = 146 AS group_count_exact,
+        -- Every group's A member must itself be classified base, regardless of
+        -- its Class fact (Relic Training's Class is SkillSecondary_PetModifier
+        -- even though it is the sole member of its own group).
+        (SELECT count(*) FROM skills WHERE record = group_record AND node_kind != 'base')
+          = 0 AS group_base_is_base,
         -- Chosen Visage's two boosted skills, one ordinary buff and one pet summon.
         (SELECT max_level || '/' || ultimate_level FROM skills
           WHERE record = 'records/skills/playerclass02/blastshield1.dbr')
@@ -42,6 +47,7 @@ FROM skills s CROSS JOIN checks c
 WHERE c.roster_exact AND c.all_named AND c.all_have_icons AND c.all_resolved
   AND c.four_without_button AND c.buttonless_all_class10 AND c.caps_ordered
   AND c.groups_resolve AND c.one_base_per_group AND c.group_count_exact
+  AND c.group_base_is_base
   AND c.flame_touched_caps AND c.hellhound_caps AND c.hellhound_group_size
   AND s.group_record = 'records/skills/playerclass03/summon_hellhound1.dbr'
 ORDER BY s.record;

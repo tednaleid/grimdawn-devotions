@@ -626,14 +626,13 @@ def build_skills(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> i
         button AS (
             SELECT max(CASE WHEN key = 'skillName' THEN value END) AS record,
                    max(CASE WHEN key = 'bitmapPositionX' THEN value END)::INTEGER AS ui_x,
-                   max(CASE WHEN key = 'bitmapPositionY' THEN value END)::INTEGER AS ui_y,
-                   max(CASE WHEN key = 'isCircular' THEN value END) AS circular
+                   max(CASE WHEN key = 'bitmapPositionY' THEN value END)::INTEGER AS ui_y
             FROM facts
             WHERE regexp_matches(record, 'records/ui/skills/class(0[1-9]|10)/skill')
             GROUP BY record
         ),
         joined AS (
-            SELECT r.record, r.mastery_record, b.ui_x, b.ui_y, b.circular,
+            SELECT r.record, r.mastery_record, b.ui_x, b.ui_y,
                    e.effect_record,
                    (SELECT f.value FROM facts f
                      WHERE f.record = r.record AND f.key = 'Class') AS cls
@@ -671,10 +670,10 @@ def build_skills(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> i
                   WHERE b.group_tag = j.group_tag AND b.group_letter IN ('A', '')),
                 j.record) AS group_record,
             CASE
+                WHEN j.group_letter IN ('A', '') THEN 'base'
                 WHEN j.cls = 'Skill_Transmuter' THEN 'transmuter'
                 WHEN j.cls = 'SkillSecondary_PetModifier' THEN 'pet_modifier'
-                WHEN j.group_letter NOT IN ('A', '') THEN 'modifier'
-                ELSE 'base'
+                ELSE 'modifier'
             END AS node_kind,
             j.ui_x, j.ui_y,
             j.tag AS name_tag,
