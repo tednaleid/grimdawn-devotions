@@ -117,13 +117,17 @@ counted in the `expansion_defaulted` diagnostic.
 - `just clean-derived` - delete the artifacts
 
 After a patch: `just extract` -> `just deposit` -> `just derive` ->
-`just skill-items` -> `just i18n-tables` -> `just q-ae-all`.
+`just skill-items` -> `just stat-item-tags` -> `just i18n-tables` ->
+`just q-ae-all`.
 
-`i18n-tables` must run after `skill-items`, not before: it reads
-`data/skill-items.json` to collect the mastery, skill, pet and item name tags it
-resolves into every locale table. Running it first builds all 13 tables from the
-previous patch's dataset, so anything the patch added falls through to its raw
-tag on the page in every language.
+`i18n-tables` must run after `skill-items` and `stat-item-tags`, not before: it
+reads `data/skill-items.json` for the mastery, skill, pet and item name tags and
+`data/stat-item-tags.json` for the stat-label tags it resolves into every locale
+table. Running it first builds all 13 tables from the previous patch's dataset, so
+anything the patch added falls through to its raw tag on the page in every
+language. `stat-item-tags` fails loudly on a stat id it can neither derive a tag
+for nor find declared non-display, which is how a patch's new stat announces
+itself; see "Deriving a stat's game tag" in `docs/i18n.md`.
 
 ## Known gaps
 

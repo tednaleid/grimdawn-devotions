@@ -50,6 +50,8 @@ feature.
 - Derived typed item schema (entities/stats/relations parquet): `just derive`, then
   `just q-ae-all` for the acceptance queries - see `docs/item-schema.md`
 - Emit `data/skill-items.json`, the committed dataset behind the `/items/` page: `just skill-items`
+- Emit `data/stat-item-tags.json`, the raw stat id to game tag map that names those
+  stats in every locale: `just stat-item-tags` - see `docs/i18n.md`
 - Dataset releases (parquet lives in GitHub Releases, pinned by `deposit.lock`):
   `just fetch-deposit` pulls it on any machine; `just publish-deposit` (Windows)
   releases a new build - see `docs/deposit.md`
@@ -80,6 +82,8 @@ dimming. Every page's full view state lives in its own URL hash
   -- committed datasets, each page's source of truth
 - `data/skill-items.json` -- committed dataset behind the `/items/` page (skills,
   masteries, and the endgame items that boost or modify them); see `docs/item-schema.md`
+- `data/stat-item-tags.json` -- committed map from a raw GD stat id to the game tag
+  that names it, derived by `scripts/build_stat_item_tags.py`; see `docs/i18n.md`
 - `web/src/app/main.ts` -- planner entry point and wiring
 - `web/src/core/` -- pure planner logic: model, rules, reachability, aggregate, affinity
 - `web/src/core/search.ts` -- pure text-search corpus and matcher over the devotion map
