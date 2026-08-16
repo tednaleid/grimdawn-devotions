@@ -8,8 +8,10 @@ git history, and in the reference docs under `docs/`.
 ## Grimtools import/export: deferred follow-ups
 
 Shipped: paste a grimtools calc link or slug to load its devotions, with `gt=`
-provenance in the hash and a link back to the source build. See
-`docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`.
+provenance in the hash and a link back to the source build. Also shipped: one-click
+export of a legal selection to a fresh grimtools build, associated the same way as
+`gt=`. See `docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`
+(import) and `docs/superpowers/specs/2026-08-16-grimtools-export-design.md` (export).
 
 - **No e2e leg for the import wiring.** The core parsing, the mapping and the panel
   adapter are unit tested, but nothing drives the three together in a browser. Belongs

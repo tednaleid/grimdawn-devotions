@@ -1,12 +1,16 @@
 # Importing and exporting devotions with grimtools
 
 Paste a grimtools calculator link (or a bare slug) into the planner and that build's
-devotion stars appear on the map, with a link back to the build it came from.
+devotion stars appear on the map, with a link back to the build it came from. Press
+Export and the current selection is saved as a fresh grimtools build, with that same
+link back.
 
-This describes how the feature works now. The dated design record that led to it, with
-the full investigation, is
-[docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md](superpowers/specs/2026-08-09-grimtools-devotion-import-design.md);
-prefer this document when the two disagree.
+This describes how the feature works now. The dated design records that led to it,
+with the full investigation, are
+[docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md](superpowers/specs/2026-08-09-grimtools-devotion-import-design.md)
+(import) and
+[docs/superpowers/specs/2026-08-16-grimtools-export-design.md](superpowers/specs/2026-08-16-grimtools-export-design.md)
+(export); prefer this document when they disagree.
 
 ## Two facts the whole design rests on
 
@@ -19,8 +23,8 @@ encoding of the character.
 **A browser cannot read it from our origin.** Grimtools serves
 `Access-Control-Allow-Origin: https://www.grimtools.com`, hardcoded, and it does not
 reflect. There is no JSONP. GitHub Pages cannot help: it is a static CDN with no
-request-time execution. So a cooperating server is required, and that is the only
-reason the worker exists.
+request-time execution. So a cooperating server is required, for reading a build and,
+for the same CORS reason, for saving one; that is the only reason the worker exists.
 
 ## The three pieces
 
@@ -110,8 +114,9 @@ The rest follows from the same principle:
 - **It bounds its work**: a byte cap, a subrequest timeout, and an early exit as soon as
   `buildInfo` parses. The early exit is safe because the brace matcher fails on
   unbalanced input, so "extraction succeeded" cannot mean "truncated".
-- **GET only, single route**, with `Access-Control-Allow-Origin` scoped to our Pages
-  origin rather than `*`.
+- **Two routes and nothing else** (`GET /` reads a build, `POST /export` saves one),
+  each with `Access-Control-Allow-Origin` scoped to our Pages origin rather than `*`;
+  the export route additionally requires the request's `Origin` to be that origin.
 - **It holds no secrets**, no auth, no storage.
 
 ### Response contract

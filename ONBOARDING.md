@@ -90,7 +90,8 @@ dimming. Every page's full view state lives in its own URL hash
 - `web/e2e/smoke.ts`, `web/e2e/rr-smoke.ts`, `web/e2e/mon-smoke.ts` -- headless-Chromium
   smoke tests (one per page), driven over CDP and run together by `just e2e`
 - `worker/` -- Cloudflare Worker that fetches a grimtools build server-side (CORS blocks
-  reading it from the browser) for the devotion planner's import feature; see `worker/README.md`
+  reading it from the browser) for the devotion planner's import and export features; see
+  `worker/README.md`
 
 ## How to run
 `just serve`, then open:
