@@ -107,14 +107,24 @@ def main(argv=None) -> int:
     boosts = group("""SELECT b.record, b.target, b.level, b.kind
                       FROM boosts b JOIN top t ON t.record = b.record
                       ORDER BY b.record, b.target""", "record")
-    mods = group("""SELECT m.item_record, m.modified_skill, m.stat_id, m.value
+    # modifier_record is in the sort key, not the output: one item can attach two
+    # different carriers to the same skill and both can name the same stat with
+    # different values (Bloodlord's Blade gives Possession skillCooldownReduction
+    # 100 on the chance-gated reset carrier and 5 on the flat one), so the pair is
+    # kept, and without the record in the sort their order is not determined.
+    mods = group("""SELECT m.item_record, m.modified_skill, m.stat_id, m.value,
+                           m.from_type, m.to_type
                     FROM skill_modifiers m JOIN top t ON t.record = m.item_record
-                    ORDER BY m.item_record, m.modified_skill, m.stat_id""", "item_record")
+                    ORDER BY m.item_record, m.modified_skill, m.modifier_record,
+                             m.stat_id""", "item_record")
     stats = group("""SELECT s.record, s.stat_id, s.source, s.display_low, s.display_high,
                             s.value_min, s.value_max
                      FROM stats s JOIN top t ON t.record = s.record
                      ORDER BY s.record, s.source, s.stat_id""", "record")
-    tiers = group("""SELECT e.group_key, e.item_level FROM entities e
+    # A family is a ladder of item levels (20/40/55/70/84/94), one rung per tier.
+    # Several families hold more than one record at the same level (an Awakened
+    # copy beside its plain one), and listing every record repeats that rung.
+    tiers = group("""SELECT DISTINCT e.group_key, e.item_level FROM entities e
                      WHERE e.group_key IN (SELECT group_key FROM top)
                      ORDER BY e.group_key, e.item_level""", "group_key")
 
@@ -124,8 +134,14 @@ def main(argv=None) -> int:
         rec = t["record"]
         by_skill = {}
         for m in mods.get(rec, []):
-            by_skill.setdefault(m["modified_skill"], []).append(
-                {"stat": m["stat_id"], "value": m["value"]})
+            stat = {"stat": m["stat_id"], "value": m["value"]}
+            # A conversion percentage reads as a bare number without the pair of
+            # damage types it converts between, so those ride along on the rows
+            # that have them and are absent everywhere else.
+            if m["from_type"] is not None:
+                stat["from_type"] = m["from_type"]
+                stat["to_type"] = m["to_type"]
+            by_skill.setdefault(m["modified_skill"], []).append(stat)
         name = t.get("name_tag")
         en_name = t.get("en_name")
         stats_by_record[rec] = [

@@ -296,7 +296,7 @@ were most of the payload and none of the first paint. An earlier single-file
 design put everything in one document and came out at 5.9 MB, five times the
 estimate, so the split is what keeps first load at 242 KB.
 
-Two correctness rules the emitter must hold, both of which were violated by an
+Four correctness rules the emitter must hold, all of which were violated by an
 earlier revision and are easy to get wrong again:
 
 - **Grimtools links carry the English item name, not the tag.** grimtools
@@ -312,6 +312,19 @@ earlier revision and are easy to get wrong again:
   one sharing a name tag. Order by item level, then rarity descending, then
   record path, so the higher-rarity variant wins on an endgame-focused page and
   the committed output is reproducible across runs.
+- **A modifier stat is identified by its carrier as well as its skill.** One item
+  can attach two carrier records to the same skill and both can name the same
+  stat: Bloodlord's Blade gives Possession `skillCooldownReduction` 100 on the
+  chance-gated reset carrier and 5 on the flat one, two real card lines. Neither
+  may be dropped or summed, and the carrier belongs in the sort key, or the two
+  rows come out in an order the query never fixed and the committed file churns
+  between runs on unchanged input. A `conversionPercentage` row carries
+  `from_type`/`to_type` alongside its value, since a conversion percentage with
+  no damage types reads as a bare number.
+- **The tier ladder is a list of distinct levels.** `tiers` is the family's rungs
+  (20/40/55/70/84/94), not its records: 137 families hold more than one record at
+  a level, typically an Awakened copy beside its plain one, and listing records
+  repeats the rung.
 
 The route is `/items/` but the dataset is `skill-items.json` deliberately: the
 route is the durable public URL and is named broadly so the page can grow, while
