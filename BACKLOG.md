@@ -769,8 +769,6 @@ artifact policy, item source, grimtools boundary).
   per tier (a Fast 1h axe, a scepter, a Slow 2h mace) pins them.
 - **AND toggle within stat families.** OR is the only launch semantics
   (R16); the stats table already supports AND via `GROUP BY/HAVING`.
-- **Pet-skill stat rollup.** Pet chains are relations only (`spawns_pet`);
-  rolling pet-skill stats into the filterable stats table is deferred.
 - **Exception-only stat-label generator.** Decompose stat-id naming into
   candidate game tags, verify against `Text_EN`, hand-curate only the misses;
   scales item stat labels to 13 locales without hand-authoring 700+ ids.

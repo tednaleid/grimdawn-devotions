@@ -111,11 +111,16 @@ display name instead, so asking for `--boosts-skill "Chilling Rounds"` reads
 back as `boosts skill Chilling Rounds` rather than
 `boosts skill records/skills/playerclass07/wpattack02.dbr`.
 
-A record with no display name in the game data keeps its record path. 46 of
-the 245 boost targets are genuinely nameless (hidden buff-carrier records
-carrying no `skillDisplayName` fact at all, for example
-`records/skills/playerclass01/cadence3.dbr`); a name derived from the file
-stem would assert one the game does not have.
+A record with no display name in the game data keeps its record path. 49 of
+the 272 boost targets carry no `skillDisplayName` fact directly (hidden
+buff-carrier records, for example `records/skills/playerclass01/cadence3.dbr`),
+so this direct fact-then-labels lookup falls back to the record path for
+them. That is not because the game has no name for these skills: `cadence3.dbr`
+itself carries a `buffSkillName` fact pointing at `cadence3_buff.dbr`, which
+does carry a `skillDisplayName` (`tagClass01SkillName01C`). The link-walking
+resolver that builds `skill_effect.parquet` (see docs/item-schema.md) follows
+exactly this kind of buff/pet-skill chain and names all 272 of 272 boost-skill
+targets; this direct lookup simply has not been extended to walk it.
 
 In `--json` each scored part carries both forms: `name` is the record-keyed
 label (the `--weights` key, and what `unmatched_criteria` names), and
@@ -157,9 +162,9 @@ legitimate even though recommending one never is.
 ## Name resolution for skill and mastery flags
 
 `--boosts-skill` and `--mastery` resolve names against the skills a mastery
-*boosts* (`boosts.target`, 245 records, 199 with a display name).
+*boosts* (`boosts.target`, 272 records, 223 with a direct display name).
 `--grants-skill` resolves against skills an item outright *grants*
-(`relations.dst` where `kind = 'grants_skill'`, 724 records, 616 named).
+(`relations.dst` where `kind = 'grants_skill'`, 826 records, 702 named).
 `--mastery` and `--boosts-mastery` resolve against masteries (9 records, all
 named). Each flag reads only the vocabulary key that belongs to it - never
 another flag's - because `skills` and `granted_skills` share nine display
@@ -169,8 +174,8 @@ different records in eight of those nine cases. Resolving a bare name against
 the wrong key would silently land on the wrong item's skill.
 
 A raw `records/...` path is always accepted directly, unresolved against any
-vocabulary map. This is the only way to address the 46 skill records and 108
-granted-skill records that carry no display name at all.
+vocabulary map. This is the only way to address the 49 skill records and 124
+granted-skill records with no direct display name that this lookup resolves.
 
 An unrecognised token exits non-zero, naming near matches computed from that
 flag's own vocabulary only:

@@ -20,13 +20,17 @@ install needed.
 | `sources.parquet` | `(item, kind, vendor_record, vendor_tag, faction_tag, tier, provenance)` | item acquisition sources, tier 1. `kind` = `faction_vendor` (derived from the merchant chain: merchant `marketFileName` -> merchant-table tier keys -> tier table `marketStaticItems`; `tier` is friendly/respected/honored/revered from the referencing key, `vendor_tag` the merchant's `description` name tag, `faction_tag` the curated `tagFaction*` tag) or `crafted` (materialized from the `crafts` edges; the blueprint's record and name tag ride in the vendor columns, `faction_tag` and `tier` are NULL). `provenance` = `flat-fact` for derived rows, `curated-oracle` reserved for hand-fixed ones. Items with no rows are unsourced (displayed silently; "world drop" waits for the loot walk). Localized reputation-tier display names exist as `tagFactionState*` label tags when a consumer needs them |
 | `boosts.parquet` | `(record, kind, target, mastery_record, level)` | per-skill and per-mastery level bonuses (`augmentSkillName<N>`/`augmentSkillLevel<N>` and `augmentMasteryName<N>`/`augmentMasteryLevel<N>`, the trailing number pairing a name key to its level key). A skill boost and a mastery boost differ structurally, not by heuristic: `kind = 'skill'` has `target` naming a skill record with `mastery_record` resolved from the `playerclassNN` segment of that path; `kind = 'mastery'` has `target` equal to `mastery_record`, both naming the mastery's own `_classtraining_class<NN>` record directly |
 | `conversions.parquet` | `(record, from_type, to_type, percent)` | damage conversion as from/to/percent triples, keyed `conversionInType`/`conversionOutType`/`conversionPercentage` with a trailing digit numbering multiple conversions on one record (the unnumbered key is index 1). Joined from `facts` directly rather than pivoted into `entities`: a wide pivot takes `max()` per key, which would collapse a multi-conversion record down to a single row, so a record with several conversions keeps one row per conversion here |
+| `skill_effect.parquet` | `(skill_record, effect_record, hops)` | maps every `records/skills/%` record to the record that actually carries its display name, icon and per-rank stat arrays - the link-walking resolver. A skill node is frequently a thin shell holding nothing but a `buffSkillName` or `petSkillName` pointing at the record with the real content, and chains mix both link types (six pet-modifier nodes go `petSkillName` then `buffSkillName`), so the walk is iterative rather than an ordered direct/buff/pet rule. It follows `buffSkillName`/`petSkillName` up to 8 hops and stops at the first record carrying `skillDisplayName`; `hops` is 0 for a record that already carries its own name |
+| `skills.parquet` | `(record, mastery_record, group_record, node_kind, ui_x, ui_y, name_tag, icon, max_level, ultimate_level, effect_record)` | the 315-row mastery skill roster. Roster membership comes from `_classtree_class<NN>.dbr`, which is authoritative: every `skillName*` entry it lists resolves to a real record. The `records/ui/skills/class<NN>/skill*.dbr` button records supply `ui_x`/`ui_y` (`bitmapPositionX`/`Y`) but are never trusted for membership - they carry references to records with no facts at all; four playerclass10 transform abilities have no button and keep `ui_x`/`ui_y` NULL rather than an invented position. `group_record` groups a skill with its modifiers: the game encodes this in the display-name tag itself (`tagClass<NN>SkillName<GG><L>`, group number then member letter - Dreeg's Evil Eye is `11A` with modifiers `11B`..`11E`), and every one of the 146 groups has exactly one `A` member, which becomes that group's `group_record` and gets `node_kind = 'base'`. Non-base rows are `transmuter`, `pet_modifier`, or `modifier` from the record's own `Class`. `icon` and the name/cap facts are read off `effect_record` (this table's own `skill_effect` join), not off `record` itself |
+| `skill_ranks.parquet` | `(skill_record, stat_id, at_first, at_max, at_ultimate)` | every numeric per-rank stat array on a skill's `effect_record`, sampled at the three breakpoints a player actually decides between (rank 1, max rank, ultimate rank). Array length is not reliably `skillUltimateLevel` - at build 24756825, 17 of 1,370 numeric arrays disagree (9 shorter, 8 longer than `ultimate_level`), tracked by the `rank_array_len_mismatch` diagnostic - so each breakpoint clamps to the array's own length rather than indexing past its end. A skill with no `skillUltimateLevel` (a transmuter) is fully maxed at `max_level`, since gear cannot push a transmuter past its own cap, so `at_ultimate` coalesces to `at_max` for those rows rather than reporting a missing value |
+| `skill_modifiers.parquet` | `(item_record, modified_skill, modifier_record, stat_id, value)` | the extra stats one item attaches to one specific skill, paired by `modifiedSkillName<N>`/`modifierSkillName<N>`'s trailing number. `modifier_record` is frequently a shell of its own - Chosen Visage's Summon Hellhound modifier is a pet-modifier record whose `petSkillName` reaches the record that actually carries 200 fire damage and 18% crit damage - so this has its own link walk, separate from `skill_effect`: it stops at the first record carrying a non-zero numeric stat, not the first carrying a display name, because modifier stats routinely sit on anonymous carrier records the name-gated walk would run past |
 
 The filter contract maps onto these directly: facet groups are predicates on
 `entities` columns (domain, type, slot, rarity, level range, expansion),
 semi-joins on `stats`+`families` (stat families, OR within a family) and
 `relations` (applies-to, crafts, sets), and text search joins `labels` (active
 locale with per-tag English fallback) over `name_tag`, `text_tag`, and the
-granted skill's name/description tags. `scripts/derived_queries/` holds eleven
+granted skill's name/description tags. `scripts/derived_queries/` holds fifteen
 acceptance queries proving the whole contract; filters evaluate per entity row
 (variant), and a card UI collapses rows by `group_key`.
 
@@ -101,8 +105,9 @@ counted in the `expansion_defaulted` diagnostic.
 - `just derive` - rebuild `data/derived/` from the deposit + curation (runs
   the drift guards, prints per-domain counts, diagnostics, artifact sizes)
 - `just q "SQL"` - ad-hoc SQL; the derived views (`entities`, `stats`,
-  `relations`, `families`, `sources`, `boosts`, `conversions`) register alongside `facts`/`labels`/`meta`
-- `just q-ae-all` - the eleven acceptance recipes (AE1-AE11). Each gates its
+  `relations`, `families`, `sources`, `boosts`, `conversions`, `skill_effect`,
+  `skills`, `skill_ranks`, `skill_modifiers`) register alongside `facts`/`labels`/`meta`
+- `just q-ae-all` - the fifteen acceptance recipes (AE1-AE15). Each gates its
   output on pinned oracle checks, so zero rows AND oracle drift both fail;
   after a game patch, expect count pins (97 ring/amulet augments, 14 legendary
   2h axes, 284 vendor-sourced augments) to fail until re-checked against
@@ -121,8 +126,6 @@ After a patch: `just extract` -> `just i18n-tables` -> `just deposit` ->
 - **Scaled offensive bonus lines** display a wider, level-linked upside on
   grimtools than plain jitter reproduces (`variance.json` `known_gap`).
 - **Middle attack-speed tiers** are interpolated pending card oracles.
-- **Pet-skill stats** are not rolled up; pet chains exist as `spawns_pet`
-  relations only.
 - **Unnamed records** (740 affixes without `lootRandomizerName`, 97 pure
   monster-equipment gear pieces, 5 blueprints) keep `group_key = record` and
   no display name; a UI filters them out by requiring a name label.

@@ -312,6 +312,7 @@ i18n-tables *LANGS:
       fi
       uv run scripts/build_game_tables.py --devotions "{{out}}" --stat-tags data/stat-tags.json \
         --stat-format-tags data/stat-format-tags.json --rr "{{out_rr}}" --monsters "{{out_mon}}" \
+        --skill-items "data/skill-items.json" \
         --text-dir "$tdir" --lang "$L" --out "data/i18n/game.$L.json"
       built="$built $L"
     done
@@ -374,6 +375,13 @@ q-search-de:
 derive:
     uv run scripts/build_derived.py build --deposit-dir "{{deposit_dir}}" \
         --curation-dir "{{justfile_directory()}}/data/item-curation" --out-dir "{{derived_dir}}"
+
+# Emit data/skill-items.json, the committed dataset behind the /items/ page
+[group("deposit")]
+skill-items:
+    uv run scripts/build_skill_items.py --deposit-dir "{{deposit_dir}}" \
+        --derived-dir "{{derived_dir}}" \
+        --out "{{justfile_directory()}}/data/skill-items.json"
 
 # One derived acceptance query (all fifteen below fail on zero rows AND on oracle mismatch,
 # since each SQL gates its output on its pinned checks - see scripts/derived_queries/)

@@ -35,7 +35,8 @@ def _add(tags: set[str], tag: str | None) -> None:
 
 def collect_referenced_tags(
     devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None,
-    rr: dict | None = None, monsters: dict | None = None
+    rr: dict | None = None, monsters: dict | None = None,
+    skill_items: dict | None = None
 ) -> set[str]:
     """Every *_tag value referenced in devotions.json (constellation/power/pet/weapon),
     plus every game tag value in stat-tags.json and stat-format-tags.json, plus the
@@ -43,7 +44,8 @@ def collect_referenced_tags(
     of every monster in monsters.json. RR sources whose name/parent could not resolve to
     a real tag carry a synthesized x: placeholder (no game text exists), so only
     tag-prefixed values are collected. A monster with no resolvable race carries a null
-    race_tag, which _add skips."""
+    race_tag, which _add skips. skill-items contributes the name tags of its masteries,
+    skills and items; a nameless item carries a null name_tag, which _add also skips."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
@@ -66,6 +68,9 @@ def collect_referenced_tags(
     for m in (monsters or {}).get("monsters", []):
         _add(tags, m.get("name_tag"))
         _add(tags, m.get("race_tag"))
+    for key in ("masteries", "skills", "items"):
+        for row in (skill_items or {}).get(key, []):
+            _add(tags, row.get("name_tag"))
     tags.update(stat_tags.values())
     tags.update((stat_format_tags or {}).values())
     return tags
@@ -92,6 +97,8 @@ def main(argv=None) -> int:
                     help="Optional resistance-reduction.json (adds its source name/parent tags)")
     ap.add_argument("--monsters", type=Path,
                     help="Optional monsters.json (adds its monster name + race tags)")
+    ap.add_argument("--skill-items", type=Path,
+                    help="Optional skill-items.json (adds its mastery, skill and item name tags)")
     ap.add_argument("--text-dir", required=True, type=Path)
     ap.add_argument("--lang", required=True, help="Language code, e.g. en (used only for logging)")
     ap.add_argument("--out", required=True, type=Path)
@@ -102,7 +109,9 @@ def main(argv=None) -> int:
     stat_format_tags = json.loads(args.stat_format_tags.read_text(encoding="utf-8")) if args.stat_format_tags else {}
     rr = json.loads(args.rr.read_text(encoding="utf-8")) if args.rr else {}
     monsters = json.loads(args.monsters.read_text(encoding="utf-8")) if args.monsters else {}
-    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr, monsters)
+    skill_items = json.loads(args.skill_items.read_text(encoding="utf-8")) if args.skill_items else {}
+    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr,
+                                         monsters, skill_items)
 
     text_table = load_translations(args.text_dir)
     table = build_table(referenced, text_table)

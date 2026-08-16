@@ -129,5 +129,21 @@ check("a null race tag is skipped", None in mon_refs, False)
 check("monsters argument is optional",
       isinstance(bgt.collect_referenced_tags({}, {}, {}, {}), set), True)
 
+# --- skill-items: mastery, skill and item name tags are collected ---
+skill_items_doc = {
+    "masteries": [{"record": "records/skills/playerclass03/_classtraining_class03.dbr",
+                   "name_tag": "tagClass03SkillName00"}],
+    "skills": [{"record": "records/skills/playerclass03/summon_hellhound1.dbr",
+                "name_tag": "tagClass03SkillName02A"},
+               {"record": "records/skills/nameless.dbr", "name_tag": None}],
+    "items": [{"record": "records/items/gearhead/b201f_head.dbr",
+               "name_tag": "tagGDX2HeadB201"}],
+}
+tags = bgt.collect_referenced_tags({}, {}, {}, {}, {}, skill_items_doc)
+check("skill-items contributes mastery name tags", "tagClass03SkillName00" in tags, True)
+check("skill-items contributes skill name tags", "tagClass03SkillName02A" in tags, True)
+check("skill-items contributes item name tags", "tagGDX2HeadB201" in tags, True)
+check("a null name_tag is skipped, not added", None not in tags, True)
+
 print("ALL PASSED" if failures == 0 else f"{failures} FAILURE(S)")
 raise SystemExit(1 if failures else 0)

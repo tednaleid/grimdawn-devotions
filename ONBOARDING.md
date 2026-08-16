@@ -49,6 +49,7 @@ feature.
   `just census` / `just q "SQL"` to mine it - see `docs/deposit.md`
 - Derived typed item schema (entities/stats/relations parquet): `just derive`, then
   `just q-ae-all` for the acceptance queries - see `docs/item-schema.md`
+- Emit `data/skill-items.json`, the committed dataset behind the `/items/` page: `just skill-items`
 - Dataset releases (parquet lives in GitHub Releases, pinned by `deposit.lock`):
   `just fetch-deposit` pulls it on any machine; `just publish-deposit` (Windows)
   releases a new build - see `docs/deposit.md`
@@ -77,6 +78,8 @@ dimming. Every page's full view state lives in its own URL hash
   game `.dbr` records to `devotions.json` / `resistance-reduction.json` / `monsters.json`
 - `data/devotions.json`, `data/resistance-reduction.json`, `data/monsters.json`
   -- committed datasets, each page's source of truth
+- `data/skill-items.json` -- committed dataset behind the `/items/` page (skills,
+  masteries, and the endgame items that boost or modify them); see `docs/item-schema.md`
 - `web/src/app/main.ts` -- planner entry point and wiring
 - `web/src/core/` -- pure planner logic: model, rules, reachability, aggregate, affinity
 - `web/src/core/search.ts` -- pure text-search corpus and matcher over the devotion map
