@@ -274,9 +274,13 @@ assets *ARGS: _require-game-closed
 # ArchiveTool needs an ABSOLUTE -extract path (a relative one fails to open the output file: it prints
 # progress and exits 0 but writes zero files, and pops an archivewriter.cpp assert on debug builds) and
 # stdin redirected (`< /dev/null`, else it blocks). Both are handled below.
+# Guarded because this recipe is destructive-then-re-extract: it `rm -rf`s each
+# extracted/text_<lang> BEFORE running ArchiveTool, and the extract is `|| true`. With the
+# game open the archives are locked, ArchiveTool writes nothing, and every language is
+# skipped with its extracted text already deleted.
 [group("devotions")]
 [doc("Build data/i18n/game.<lang>.json for every installed language, or just the ones you name")]
-i18n-tables *LANGS:
+i18n-tables *LANGS: _require-game-closed
     #!/usr/bin/env bash
     set -euo pipefail
     GD="{{gd_dir}}"
