@@ -1,5 +1,5 @@
-// ABOUTME: DOM adapter for the grimtools import box, its status line and the source-build link.
-// ABOUTME: Mounted once into a stable container, mirroring searchPanel.ts.
+// ABOUTME: DOM adapter for the grimtools panel: the import box with its status line and source link,
+// ABOUTME: and the Export button with its own state and hint. Mounted once, mirroring searchPanel.ts.
 import { parseSlug } from "../core/grimtools";
 import { escapeHtml } from "./tooltipView";
 import type { Localization } from "../ports/Localization";
@@ -15,8 +15,21 @@ export type ImportState =
    * null falls back to the untitled source link, which also covers a pre-`title` cached response. */
   | { kind: "done"; slug: string; pruned?: number; title?: string | null };
 
+export type ExportDisabledReason = "empty" | "uncapped" | "incomplete";
+export type ExportErrorCode = "rateLimited" | "network" | "upstream";
+
+/** The Export button, independent of the import state (see the spec's panel table). `hidden` is
+ * "the link already is the export": the current selection matches the associated build. */
+export type ExportState =
+  | { kind: "hidden" }
+  | { kind: "disabled"; reason: ExportDisabledReason }
+  | { kind: "ready" }
+  | { kind: "exporting" }
+  | { kind: "error"; code: ExportErrorCode };
+
 export interface ImportPanelHandle {
   setState(s: ImportState): void;
+  setExportState(e: ExportState): void;
   relocalize(loc: Localization): void;
 }
 
@@ -25,10 +38,11 @@ const CALC = "https://www.grimtools.com/calc/";
 export function mountImportPanel(
   el: HTMLElement,
   loc: Localization,
-  opts: { onSubmit(slug: string): void },
+  opts: { onSubmit(slug: string): void; onExport(): void },
 ): ImportPanelHandle {
   let localization = loc;
   let state: ImportState = { kind: "idle" };
+  let exportState: ExportState = { kind: "hidden" };
 
   // Import and ✕ are two states of one control, not two things that coexist: State A
   // (idle/loading/error) has nothing yet to clear, so it shows the textbox and Import; State B
@@ -41,7 +55,10 @@ export function mountImportPanel(
     `<button id="import-go" type="button"></button>` +
     `<a id="import-source" href="${CALC}" target="_blank" rel="noopener noreferrer" hidden></a>` +
     `<button id="import-clear" type="button" hidden></button>` +
-    `</div><div id="import-msg" aria-live="polite"></div>`;
+    `</div><div id="import-msg" aria-live="polite"></div>` +
+    `<div class="import-row" id="export-row" hidden>` +
+    `<button id="export-go" type="button"></button>` +
+    `</div><div id="export-msg" aria-live="polite"></div>`;
 
   const head = el.querySelector("#import-h") as HTMLElement;
   const input = el.querySelector("#import-input") as HTMLInputElement;
@@ -49,9 +66,12 @@ export function mountImportPanel(
   const source = el.querySelector("#import-source") as HTMLAnchorElement;
   const clear = el.querySelector("#import-clear") as HTMLButtonElement;
   const msg = el.querySelector("#import-msg") as HTMLElement;
+  const exportRow = el.querySelector("#export-row") as HTMLElement;
+  const exportGo = el.querySelector("#export-go") as HTMLButtonElement;
+  const exportMsg = el.querySelector("#export-msg") as HTMLElement;
 
   function applyChrome() {
-    head.textContent = localization.translate("ui.import.label");
+    head.textContent = localization.translate("ui.grimtools.label");
     input.placeholder = localization.translate("ui.import.placeholder");
     input.setAttribute("aria-label", localization.translate("ui.import.label"));
     go.textContent = localization.translate("ui.import.submit");
@@ -59,6 +79,7 @@ export function mountImportPanel(
     // paint() instead; nothing here needs it to also hold a value between "done" states.
     clear.setAttribute("aria-label", localization.translate("ui.import.clear"));
     clear.textContent = "✕";
+    exportGo.textContent = localization.translate("ui.export.submit");
   }
 
   // #import-msg stays innerHTML-driven in every branch, including the plain-text ones: the
@@ -108,6 +129,25 @@ export function mountImportPanel(
     msg.innerHTML = "";
   }
 
+  // The export row is its own state machine: it shows in State A and State B alike, and only
+  // `hidden` removes it (the associated link already is the export). Messages go through
+  // innerHTML for the same reason #import-msg does.
+  function paintExport() {
+    const hidden = exportState.kind === "hidden";
+    exportRow.hidden = hidden;
+    if (hidden) {
+      exportMsg.innerHTML = "";
+      return;
+    }
+    exportGo.disabled = exportState.kind === "disabled" || exportState.kind === "exporting";
+    if (exportState.kind === "disabled")
+      exportMsg.innerHTML = localization.translate(`ui.export.hint.${exportState.reason}`);
+    else if (exportState.kind === "exporting") exportMsg.innerHTML = localization.translate("ui.export.exporting");
+    else if (exportState.kind === "error")
+      exportMsg.innerHTML = localization.translate(`ui.export.err.${exportState.code}`);
+    else exportMsg.innerHTML = "";
+  }
+
   function submit() {
     const slug = parseSlug(input.value);
     // The Import button is disabled and the hint already shown whenever this would fail, but
@@ -129,7 +169,9 @@ export function mountImportPanel(
     opts.onSubmit(""); // an empty slug means "drop the association", not "clear the build"
     input.focus();
   });
+  exportGo.addEventListener("click", () => opts.onExport());
   paint();
+  paintExport();
 
   return {
     setState(s) {
@@ -141,10 +183,15 @@ export function mountImportPanel(
       if (s.kind === "idle") input.value = "";
       paint();
     },
+    setExportState(e) {
+      exportState = e;
+      paintExport();
+    },
     relocalize(next) {
       localization = next;
       applyChrome();
       paint();
+      paintExport();
     },
   };
 }

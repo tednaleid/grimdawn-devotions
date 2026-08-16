@@ -672,7 +672,8 @@ main {
   border-color: #6cb6ff;
 }
 #import-go,
-#import-clear {
+#import-clear,
+#export-go {
   flex: none;
   background: #161d27;
   border: 1px solid #283446;
@@ -688,12 +689,14 @@ main {
     color 0.12s;
 }
 #import-go:hover,
-#import-clear:hover {
+#import-clear:hover,
+#export-go:hover {
   background: #1d2530;
   border-color: #3d4a5c;
   color: #e6edf3;
 }
-#import-go:disabled {
+#import-go:disabled,
+#export-go:disabled {
   color: #6b7688;
   cursor: default;
   pointer-events: none;
@@ -712,6 +715,17 @@ main {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #8fb6e0;
+}
+#export-row {
+  margin-top: 0.35rem;
+}
+#export-go {
+  flex: 1;
+}
+#export-msg {
+  margin-top: 0.35rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
 }
 .power,
 .tip-power {

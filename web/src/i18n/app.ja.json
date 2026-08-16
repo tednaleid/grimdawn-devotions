@@ -173,7 +173,7 @@
   "ui.import.loading": "ビルドを読み込み中...",
   "ui.import.placeholder": "grimtoolsのビルドリンクまたはID",
   "ui.import.pruned": "{n}個の星を配置できず、削除されました。",
-  "ui.import.source": "grimtoolsからインポート済み",
+  "ui.import.source": "grimtoolsのビルド",
   "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "インポート",
   "ui.info.aria": "このプランナーについて",
@@ -214,5 +214,14 @@
   "ui.tooltip.petBonus": "全ペットへのボーナス",
   "ui.tooltip.procQualifier": "({trigger})",
   "ui.tooltip.pts": "{count}pt",
-  "ui.tooltip.requires": "必要条件: "
+  "ui.tooltip.requires": "必要条件: ",
+  "ui.grimtools.label": "grimtools",
+  "ui.export.submit": "grimtoolsにエクスポート",
+  "ui.export.hint.empty": "エクスポートする星を選択してください。",
+  "ui.export.hint.uncapped": "エクスポートするには55ポイント上限を復元してください。",
+  "ui.export.hint.incomplete": "エクスポートできるのは完成したビルドのみです。",
+  "ui.export.exporting": "エクスポート中...",
+  "ui.export.err.rateLimited": "エクスポートが多すぎます。1分後にもう一度お試しください。",
+  "ui.export.err.network": "エクスポートサービスに接続できませんでした。",
+  "ui.export.err.upstream": "grimtoolsがビルドを受け付けませんでした。"
 }

@@ -957,6 +957,7 @@ async function boot() {
 
   const importPanel = mountImportPanel(document.getElementById("import-panel") as HTMLElement, localization, {
     onSubmit: (slug) => void runImport(slug),
+    onExport: () => {},
   });
   // Reflects `source` into the panel: called once at mount (for a build restored from the boot
   // hash) and again on every hashchange, mirroring how the search box re-syncs there.
