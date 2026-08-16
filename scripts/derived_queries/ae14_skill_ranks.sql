@@ -31,10 +31,18 @@ checks AS (
         (SELECT count(*) FROM skill_ranks r JOIN skills s ON s.record = r.skill_record
           WHERE s.ultimate_level = 1 AND (r.at_max != r.at_first OR r.at_ultimate != r.at_first))
           = 0 AS rank_one_collapses,
-        (SELECT count(*) FROM skill_ranks WHERE at_ultimate IS NULL) = 0 AS no_null_ultimate
+        (SELECT count(*) FROM skill_ranks WHERE at_ultimate IS NULL) = 0 AS no_null_ultimate,
+        (SELECT count(*) FROM skill_ranks WHERE at_first IS NULL) = 0 AS no_null_first,
+        (SELECT count(*) FROM skill_ranks WHERE at_max IS NULL) = 0 AS no_null_max,
+        -- A skill with no ultimate rank (a transmuter) must report its max value as
+        -- its fully-maxed value, not silently fall back to the rank-1 value.
+        (SELECT count(*) FROM skill_ranks r JOIN skills s ON s.record = r.skill_record
+          WHERE s.ultimate_level IS NULL AND r.at_ultimate != r.at_max) = 0
+          AS null_ultimate_uses_max
 )
 SELECT f.stat_id, f.at_first, f.at_max, f.at_ultimate
 FROM ft f CROSS JOIN checks c
 WHERE c.ft_first AND c.ft_max AND c.ft_ult AND c.ft_oa
   AND c.monotonic AND c.rank_one_collapses AND c.no_null_ultimate
+  AND c.no_null_first AND c.no_null_max AND c.null_ultimate_uses_max
 ORDER BY f.stat_id;

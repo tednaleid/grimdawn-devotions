@@ -1015,10 +1015,13 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
               AND NOT regexp_matches(f.value, '[A-Za-z/]')
         ),
         idx AS (
+            -- DuckDB's greatest()/least() ignore NULL arguments, so greatest(NULL, 1)
+            -- returns 1, not NULL. A skill with no skillUltimateLevel is a transmuter
+            -- (gear cannot push it past its max), so its fully-maxed value IS its max
+            -- value; coalesce to max_level rather than silently falling back to 1.
             SELECT skill_record, stat_id, parts,
-                   least(greatest(max_level, 1), len(parts)) AS i_max,
-                   least(greatest(ultimate_level, 1), len(parts)) AS i_ult,
-                   len(parts) AS n, ultimate_level
+                   least(greatest(coalesce(max_level, 1), 1), len(parts)) AS i_max,
+                   least(greatest(coalesce(ultimate_level, max_level, 1), 1), len(parts)) AS i_ult
             FROM arr
         )
         SELECT skill_record, stat_id,
