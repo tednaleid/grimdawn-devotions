@@ -2,7 +2,7 @@
  "meta": {
   "game_version": "1.3.0.7",
   "steam_buildid": "24756825",
-  "generated_utc": "2026-08-16T16:35:28Z"
+  "generated_utc": "2026-08-16T17:56:00Z"
  },
  "stats": {
   "records/items/awakened/gearaccessories/medals/c010_medal.dbr": [
@@ -7473,15 +7473,6 @@
     "high": 122.0
    }
   ],
-  "records/items/enchants/runes/b301_rune.dbr": [],
-  "records/items/enchants/runes/b302_rune.dbr": [],
-  "records/items/enchants/runes/b303_rune.dbr": [],
-  "records/items/enchants/runes/c301_rune.dbr": [],
-  "records/items/enchants/runes/c302_rune.dbr": [],
-  "records/items/enchants/runes/c303_rune.dbr": [],
-  "records/items/enchants/runes/d301_rune.dbr": [],
-  "records/items/enchants/runes/d302_rune.dbr": [],
-  "records/items/enchants/runes/d303_rune.dbr": [],
   "records/items/faction/accessories/medals/f001a_medal.dbr": [
    {
     "stat": "augmentSkillLevel1",
