@@ -982,6 +982,64 @@ def build_stats(con: duckdb.DuckDBPyConnection, cur: dict, out_dir: Path,
 
 
 # ---------------------------------------------------------------------------
+# skill rank breakpoints
+# ---------------------------------------------------------------------------
+
+# Keys that are per-rank lists of records or effects rather than numbers.
+_RANK_ARRAY_EXCLUDE = ("skillConnectionOn", "skillConnectionOff", "spawnObjects",
+                       "petChanges", "fxChanges", "projectileOverride",
+                       "modSpawnObjects", "radiusEffectName", "skillProjectileName")
+
+
+def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> int:
+    """Per-stat values at the three breakpoints a player actually decides between.
+
+    Every numeric stat on a skill record is a semicolon-separated array, one entry
+    per rank. Array length is not reliably skillUltimateLevel (9 are shorter and
+    8 longer at build 24756825), so each breakpoint clamps to the array's own
+    length. A mismatch count rides out as a diagnostic so a patch that changes the
+    shape is visible instead of silently yielding a wrong number.
+    """
+    excluded = ", ".join(f"'{k}'" for k in _RANK_ARRAY_EXCLUDE)
+    con.execute(f"""
+        CREATE TEMP TABLE skill_ranks AS
+        WITH arr AS (
+            SELECT s.record AS skill_record,
+                   f.key AS stat_id,
+                   str_split(f.value, ';') AS parts,
+                   s.max_level, s.ultimate_level
+            FROM skills s
+            JOIN facts f ON f.record = s.effect_record
+            WHERE f.value LIKE '%;%'
+              AND f.key NOT IN ({excluded})
+              AND NOT regexp_matches(f.value, '[A-Za-z/]')
+        ),
+        idx AS (
+            SELECT skill_record, stat_id, parts,
+                   least(greatest(max_level, 1), len(parts)) AS i_max,
+                   least(greatest(ultimate_level, 1), len(parts)) AS i_ult,
+                   len(parts) AS n, ultimate_level
+            FROM arr
+        )
+        SELECT skill_record, stat_id,
+               TRY_CAST(parts[1] AS DOUBLE) AS at_first,
+               TRY_CAST(parts[i_max] AS DOUBLE) AS at_max,
+               TRY_CAST(parts[i_ult] AS DOUBLE) AS at_ultimate
+        FROM idx
+        WHERE TRY_CAST(parts[1] AS DOUBLE) IS NOT NULL""")
+    diag["rank_array_len_mismatch"] = con.execute("""
+        SELECT count(*) FROM skills s
+        JOIN facts f ON f.record = s.effect_record
+        WHERE f.value LIKE '%;%'
+          AND NOT regexp_matches(f.value, '[A-Za-z/]')
+          AND len(str_split(f.value, ';')) != s.ultimate_level""").fetchone()[0]
+    out = out_dir / "skill_ranks.parquet"
+    con.execute(f"COPY (SELECT * FROM skill_ranks ORDER BY skill_record, stat_id) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM skill_ranks").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 
 def cmd_build(args) -> int:
     deposit_dir = args.deposit_dir.resolve()
@@ -1001,7 +1059,8 @@ def cmd_build(args) -> int:
     diag = {"unnamed": 0, "expansion_defaulted": 0, "aps_missing_tier": 0,
             "cost_default_used": 0, "cost_record_missing": 0, "equation_errors": 0,
             "skill_ref_missing": 0,
-            "skills_without_button": 0, "skills_without_name": 0}
+            "skills_without_button": 0, "skills_without_name": 0,
+            "rank_array_len_mismatch": 0}
     build_wide(con, cur)
     n_skill_effect = build_skill_effect_map(con, out_dir)
     n_relations = build_relations(con, diag)
@@ -1011,6 +1070,7 @@ def cmd_build(args) -> int:
     n_boosts = build_boosts(con, out_dir)
     n_conversions = build_conversions(con, out_dir)
     n_skills = build_skills(con, out_dir, diag)
+    n_skill_ranks = build_skill_ranks(con, out_dir, diag)
 
     rel_out = out_dir / "relations.parquet"
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
@@ -1055,13 +1115,14 @@ def cmd_build(args) -> int:
           "  ".join(f"{k}({n})" for k, n in boost_kind_counts))
     print(f"  conversions: {n_conversions}")
     print(f"  skills: {n_skills}")
+    print(f"  skill ranks: {n_skill_ranks}")
     print(f"  skill effect map: {n_skill_effect}")
     print("  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                         if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
     for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions",
-                 "skills", "skill_effect"):
+                 "skills", "skill_effect", "skill_ranks"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
