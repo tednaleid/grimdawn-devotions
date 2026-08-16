@@ -1071,6 +1071,55 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
 
 
 # ---------------------------------------------------------------------------
+# stat-carrier link walk (shared by pet_ranks and skill_modifiers)
+# ---------------------------------------------------------------------------
+
+def stat_carrier_walk(roots: str, stat_gate: str) -> str:
+    """The `walk`/`stat_record` CTE pair resolving a shell record to its stats.
+
+    A record named by something else is frequently a thin shell holding nothing
+    but a `buffSkillName` or `petSkillName`. A pet's Wind Devil ability is a
+    Skill_BuffRadiusToggled with no stats at all - its 242 physical and 382-463
+    lightning damage sit one hop away on the SkillBuff_Debuf it points at - and an
+    item's pet-modifier record is the same shape over the carrier holding its fire
+    damage. Reading stats straight off the named record silently yields nothing.
+
+    Both callers stop at the first record carrying a STAT, not the first carrying a
+    display name: the carriers are routinely anonymous (three of the five pet
+    shells at build 24756825 reach a target with no `skillDisplayName` at all), so
+    the name-gated `skill_effect` walk runs past them and the whole block vanishes
+    with no diagnostic. That rule lives here once rather than in each caller,
+    because a name-gated or unwalked read has dropped a stat block repeatedly on
+    this schema.
+
+    `roots` is a three-column SELECT seeding (root, cur, depth). `stat_gate` is a
+    predicate over a `facts f` row deciding whether a record carries a stat, and
+    stays the caller's own because the two tables read stats differently: pet
+    abilities gate on the game's rank-key vocabulary, item modifiers on a non-zero
+    first rank. Emits `stat_record(root, cur, rn)`, rn = 1 being the nearest
+    carrier. Must be embedded in a WITH RECURSIVE.
+    """
+    return f"""
+        walk(root, cur, depth) AS (
+            {roots}
+            UNION ALL
+            SELECT w.root, f.value, w.depth + 1
+            FROM walk w
+            JOIN facts f ON f.record = w.cur
+                        AND f.key IN ('buffSkillName', 'petSkillName')
+                        AND f.value LIKE 'records/skills/%'
+            WHERE w.depth < 8
+        ),
+        stat_record AS (
+            SELECT root, cur,
+                   row_number() OVER (PARTITION BY root ORDER BY depth) AS rn
+            FROM walk w
+            WHERE EXISTS (SELECT 1 FROM facts f
+                          WHERE f.record = w.cur AND ({stat_gate}))
+        )"""
+
+
+# ---------------------------------------------------------------------------
 # pet rank breakpoints
 # ---------------------------------------------------------------------------
 
@@ -1104,25 +1153,60 @@ def build_pet_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -
       scaling a pet's resistances shows up instead of being flattened away.
     - `pet_skill`: a stat on an ability the creature is granted. The creature
       record pairs `skillName<N>` with `skillLevel<N>`, and that level IS the
-      summon's rank for 38 of the 56 numeric grants; the other 18 (radius
-      helpers, totem immunities, wraith resists) stay pinned at 1 however far the
-      summon is pushed. Reading the level off the per-rank creature record gets
-      both right without a rule about which is which. At this build every pinned
-      grant happens to carry only scalar stats, so assuming the summon's rank
-      would produce the same numbers today; reading the level is what keeps that
-      an accident rather than a dependency.
+      summon's rank for 45 of the 65 active grants; the other 20 (radius helpers,
+      totem immunities, wraith resists) stay pinned at 1 however far the summon is
+      pushed. Reading the level off the per-rank creature record gets both right
+      without a rule about which is which. At this build every pinned grant
+      happens to carry only scalar stats, so assuming the summon's rank would
+      produce the same numbers today; reading the level is what keeps that an
+      accident rather than a dependency.
 
-    15 further grants set their level to a `charLevel` equation rather than a
-    number (pet armor scaling, the global damage adjuster). Those track the
-    player's level, not the summon's rank, so they have no meaning at a rank
-    breakpoint and are left out rather than evaluated at an invented level. The
-    pet's base life, offensive and defensive ability are the same story one level
-    down: they come from the `characterAttributeEquations` bio record, which is
-    written purely in `charLevel`.
+    Grant counts here are (summon skill, ability record) pairs, since one ability
+    record is shared by several summons and one summon grants several abilities:
+    421 pairs at build 24756825, of which 338 sit at level 0, 18 at a `charLevel`
+    equation and 65 at a positive number. Both excluded groups are dropped by the
+    same `TRY_CAST(level) > 0` filter, for two different reasons, and neither
+    should be loosened:
 
-    A pet-modifier node that swaps the pet outright (`modSpawnObjects`) is itself
-    a one-rank node, but its array is still 26 long because it is indexed by the
-    base summon's rank, so those three nodes borrow their group base's caps.
+    - level 0 is an inactive modifier slot. The creature record reserves the slot
+      so an item or a group modifier can fill it later; nothing grants the ability
+      at a summon rank, so it has no value at a rank breakpoint.
+    - a `charLevel` equation (pet armor scaling, the global damage adjuster)
+      tracks the player's level, not the summon's rank, so it has no meaning at a
+      rank breakpoint either and is left out rather than evaluated at an invented
+      level. The pet's base life, offensive and defensive ability are the same
+      story one level down: they come from the `characterAttributeEquations` bio
+      record, which is written purely in `charLevel`.
+
+    The ability named by `skillName<N>` is frequently a shell of its own - Wind
+    Devil's whirlwind is a Skill_BuffRadiusToggled carrying a `buffSkillName` and
+    nothing else, with all of its damage on the buff record it points at - so the
+    stats are read through `stat_carrier_walk`, the same stat-gated walk
+    build_skill_modifiers uses, not off the named record. Five of the 65 grants
+    hop; the rest resolve at depth 0 and are unaffected. The rank index follows the
+    hop unchanged: the level is the one the creature record grants, whichever
+    record in the chain ends up carrying the array. `source_record` stays the
+    granted ability, not the carrier, because the ability is what the pet has.
+
+    The internal immunity grants (`traps_innate1`, `petskill_totem_immunities`:
+    flat 100/500 sentinels for CC and damage-type immunity, 208 of the rows here)
+    are deliberately KEPT. No honest predicate separates them from content this
+    table must carry: they are unnamed, but so are the raven growth passive and
+    the manticore, blightbeast and celestial-guardian damage abilities; they are
+    flat with rank, but so is every `source_kind = 'pet'` row; and they are 100/500
+    sentinels, but so are 109 of the 204 pet-body defensive rows, including the
+    Hellhound `defensiveFire` 500 that AE16 pins as the mark of a fire pet.
+    Suppressing them here would make the parquet lie about what a summon grants,
+    with nowhere else for the fact to live. Requiring a display name is a
+    presentation filter and belongs to the consumer, which already applies exactly
+    that rule to the unnamed item records.
+
+    A modifier node that swaps the pet outright (`modSpawnObjects`) is itself a
+    one-rank node, but its array is still 26 long because it is indexed by the base
+    summon's rank, so those three nodes borrow their group base's caps. All three
+    carry `node_kind = 'modifier'`, not `pet_modifier`, despite one of them being
+    named `stormtotem01b_petmodifier`: none of the 22 `pet_modifier` nodes reaches
+    this table.
 
     This is deliberately NOT part of skill_ranks. A pet stat needs the carrier in
     its identity, because one summon routinely has two sources naming the same
@@ -1134,9 +1218,19 @@ def build_pet_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -
     """
     excluded = ", ".join(f"'{k}'" for k in _RANK_ARRAY_EXCLUDE)
     prefixes = " OR ".join(f"f.key LIKE '{p}%'" for p in _PET_STAT_PREFIXES)
+    # Same rule as skill_ranks: an array is authored per record and is kept as
+    # written, a bare scalar only counts when it is non-zero, because every skill
+    # record carries the whole template key set with its unused stats at zero. The
+    # walk stops at the first record this admits, so a record it admits is exactly
+    # a record that contributes rows below - the two cannot drift apart.
+    ability_stats = f"""f.key NOT IN ({excluded})
+              AND f.key IN (SELECT key FROM rank_keys)
+              AND NOT regexp_matches(f.value, '[A-Za-z/]')
+              AND (f.value LIKE '%;%'
+                   OR (f.value_num IS NOT NULL AND f.value_num != 0))"""
     con.execute(f"""
         CREATE TEMP TABLE pet_ranks AS
-        WITH summon AS (
+        WITH RECURSIVE summon AS (
             SELECT s.record AS skill_record,
                    coalesce(g.max_level, s.max_level) AS max_level,
                    coalesce(g.ultimate_level, s.ultimate_level) AS ultimate_level,
@@ -1185,23 +1279,27 @@ def build_pet_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -
             JOIN facts l ON l.record = b.at_pet
                         AND l.key = 'skillLevel'
                                  || regexp_extract(n.key, 'skillName(\\d+)', 1)
+            -- Drops the 338 level-0 slots (inactive until an item or a group
+            -- modifier fills them) and the 18 charLevel equations in one test.
+            -- Both are documented above; neither has a value at a summon rank.
             WHERE TRY_CAST(l.value AS INTEGER) > 0
         ),
+        {stat_carrier_walk("SELECT DISTINCT ability, ability, 0 FROM granted",
+                           ability_stats)},
         ability AS (
+            -- The granted ability is the source_record even when the stats come
+            -- from a record one hop further on: the ability is what the pet has,
+            -- and two abilities on one pet can name the same stat. g.lvl is the
+            -- level the creature record grants, and it indexes the carrier's array
+            -- unchanged - the hop resolves where the stats live, not which rank.
             SELECT g.skill_record, g.pet_record, 'pet_skill' AS source_kind,
                    g.ability AS source_record, g.bp, f.key AS stat_id,
                    TRY_CAST(str_split(f.value, ';')[
                        least(g.lvl, len(str_split(f.value, ';')))] AS DOUBLE) AS v
             FROM granted g
-            JOIN facts f ON f.record = g.ability
-            WHERE f.key NOT IN ({excluded})
-              AND f.key IN (SELECT key FROM rank_keys)
-              AND NOT regexp_matches(f.value, '[A-Za-z/]')
-              -- Same rule as skill_ranks: an array is authored per record and is
-              -- kept as written, a bare scalar only counts when it is non-zero,
-              -- because every skill record carries the whole template key set.
-              AND (f.value LIKE '%;%'
-                   OR (f.value_num IS NOT NULL AND f.value_num != 0))
+            JOIN stat_record sr ON sr.root = g.ability AND sr.rn = 1
+            JOIN facts f ON f.record = sr.cur
+            WHERE {ability_stats}
         ),
         sampled AS (SELECT * FROM body UNION ALL SELECT * FROM ability)
         SELECT skill_record, pet_record, source_kind, source_record, stat_id,
@@ -1248,10 +1346,11 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     SkillSecondary_PetModifier whose petSkillName reaches the record actually
     carrying 200 fire damage and 18% crit damage.
 
-    This walk stops at the first record carrying a non-zero numeric stat, NOT at
-    the first record carrying a display name. Modifier stats routinely sit on
-    anonymous carrier records, so the name-gated skill_effect walk stops short of
-    them and silently drops the block.
+    The walk is `stat_carrier_walk`, shared with build_pet_ranks: it stops at the
+    first record carrying a non-zero numeric stat, NOT at the first record carrying
+    a display name. Modifier stats routinely sit on anonymous carrier records, so
+    the name-gated skill_effect walk stops short of them and silently drops the
+    block. Only the stat gate below is this table's own.
 
     A carrier stores a stat either as a bare scalar or, when the modifier skill has
     more than one rank, as a semicolon-separated per-rank array. Both are read with
@@ -1309,25 +1408,10 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
             -- table through it alone would otherwise carry nothing renderable.
             WHERE lower(trim(m.value)) IN (SELECT record FROM skills)
         ),
-        walk(root, cur, depth) AS (
-            SELECT DISTINCT modifier_record, modifier_record, 0 FROM paired
-            UNION ALL
-            SELECT w.root, f.value, w.depth + 1
-            FROM walk w
-            JOIN facts f ON f.record = w.cur
-                        AND f.key IN ('buffSkillName', 'petSkillName')
-                        AND f.value LIKE 'records/skills/%'
-            WHERE w.depth < 8
-        ),
-        stat_record AS (
-            SELECT root, cur,
-                   row_number() OVER (PARTITION BY root ORDER BY depth) AS rn
-            FROM walk w
-            WHERE EXISTS (SELECT 1 FROM facts f
-                          WHERE f.record = w.cur
-                            AND f.key NOT IN ({excluded})
-                            AND coalesce({first_rank}, 0) != 0)
-        )
+        {stat_carrier_walk("SELECT DISTINCT modifier_record, modifier_record, 0 "
+                           "FROM paired",
+                           f"f.key NOT IN ({excluded}) "
+                           f"AND coalesce({first_rank}, 0) != 0")}
         SELECT p.item_record, p.modified_skill, p.modifier_record,
                f.key AS stat_id,
                {first_rank} AS value,
