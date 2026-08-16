@@ -40,6 +40,18 @@ export of a legal selection to a fresh grimtools build, associated the same way 
   capture (spec 2026-08-16, "What the investigation established").
 - Export: the rate limits (5/min per address, 60/min global) are guesses; revisit
   from worker analytics if real users hit them.
+- Export has no data-version guard. Import refuses a stale mapping table by comparing
+  the worker's reading of `devotion.json`'s version against the table's; export sends
+  the table's `sk` ids with no such check, so a grimtools data update would silently
+  produce a build of the wrong stars. The worker already reads that version on the
+  import route, so a `?dv=` check on `/export` (refuse with a distinct error when it
+  differs from the planner's table version) is small. Until then the daily canary is
+  the only alarm.
+- The controller's export logic has no unit tests: `selectionKey`, the `knownBuilds`
+  memo and `exportStateFor`'s precedence (plus the "pinned to the selection it was made
+  from" rule) all live inside `boot()` in `web/src/app/main.ts`, which has no test
+  harness. Lifting those three into a small pure module would make them testable
+  without one.
 - Round-trip a whole grimtools build (planner as the devotions editor). Builds are
   immutable and `gt=<slug>` already points at the full non-devotion state, so no new
   client state is needed: `POST /export` grows an optional `base: <slug>` plus

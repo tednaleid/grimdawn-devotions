@@ -140,6 +140,8 @@ Successful responses are cached at the edge for 24 hours and carry
 `Cache-Control: public, max-age=86400`. **Errors carry `no-store`**, so a brief grimtools
 outage cannot pin a failure into someone's browser for a day.
 
+Only a validated `GET /` consults the cache; every other method and path goes straight
+to the handler, so no route can be answered from an entry that describes the import one.
 The edge cache key is normalized to the validated slug plus the worker's own
 `IMPORT_CONTRACT_VERSION`, so every query-string variant collapses onto one entry.
 **The client's `v` parameter is never used for keying.** If it were, a caller could mint
@@ -203,8 +205,12 @@ models what the game allows and would render stars the game cannot grant.
 **An unchanged selection is not exported twice, within a session.** The planner keeps
 a memo of the star sets behind builds it imported cleanly (nothing pruned) or
 exported; when the current selection matches one, the panel shows that build's link
-and hides Export, and returning to a memoized set re-associates it. A reloaded link
-restores `gt=` but not the memo, so Export is offered again there.
+and hides Export, and returning to a memoized set re-associates it. Where the row is
+still offered for a memoized set (the association was dropped with ✕ or by pressing
+Back), Export re-associates the existing build rather than sending a request. A reloaded
+link restores `gt=` but not the memo, so Export is offered again there. Provenance in a
+restored hash wins over the memo: Back, Forward and a pasted link keep the `gt=` they
+carry.
 
 Both directions go through the `GrimtoolsGateway` port
 (`web/src/ports/GrimtoolsGateway.ts`); `web/src/adapters/grimtoolsWorkerGateway.ts` is
