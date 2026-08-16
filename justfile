@@ -247,8 +247,8 @@ migrate: extract parse parse-rr parse-monsters i18n-tables assets build diff-dat
 [group("devotions")]
 all: extract parse parse-rr parse-monsters i18n-tables
 
-# KEEPS the committed dataset (data/devotions.json, data/stat_labels.json) — those only
-# regenerate via `just parse` on Windows, so clean must never delete them.
+# KEEPS the committed dataset (data/devotions.json) — that only regenerates via
+# `just parse` on Windows, so clean must never delete it.
 # Remove build artifacts: web/dist, data/cover-table.bin, data/reach.wasm, web/wasm/target, csv dump.
 [group("devotions")]
 clean:

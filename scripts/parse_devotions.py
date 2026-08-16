@@ -599,22 +599,6 @@ def write_duckdb_csv(db: DB, out_csv: Path):
     return rows
 
 
-def build_stat_labels(constellations: list[dict]) -> dict[str, str]:
-    """Collect every raw stat key used, with a best-effort human label."""
-    keys = set()
-    for c in constellations:
-        for s in c["stars"]:
-            keys |= set(s["bonuses"])
-            keys |= set(s.get("pet_bonuses", {}))
-
-    def humanize(k: str) -> str:
-        s = re.sub(r"([a-z0-9])([A-Z])", r"\1 \2", k)
-        s = s.replace(".", " ").replace("_", " ")
-        return s[:1].upper() + s[1:]
-
-    return {k: humanize(k) for k in sorted(keys)}
-
-
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Parse Grim Dawn devotion .dbr records into devotions.json")
     ap.add_argument("--records-dir", required=True, type=Path,
@@ -628,8 +612,6 @@ def main(argv=None) -> int:
                     help="Steam build id to record in meta for provenance")
     ap.add_argument("--duckdb", action="store_true",
                     help="Also emit devotion_records.csv (long format) for ad-hoc querying")
-    ap.add_argument("--stat-labels", action="store_true",
-                    help="Also emit stat_labels.json (raw stat id -> human label)")
     args = ap.parse_args(argv)
 
     db = DB(args.records_dir.resolve())
@@ -669,12 +651,6 @@ def main(argv=None) -> int:
     doc = {"meta": meta, "constellations": constellations}
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"Wrote {args.out}  ({len(constellations)} constellations)")
-
-    if args.stat_labels:
-        labels = build_stat_labels(constellations)
-        lp = args.out.parent / "stat_labels.json"
-        lp.write_text(json.dumps(labels, indent=2, ensure_ascii=False), encoding="utf-8")
-        print(f"Wrote {lp}  ({len(labels)} stat keys)")
 
     if args.duckdb:
         cp = args.out.parent / "devotion_records.csv"

@@ -6,6 +6,7 @@
 # dependencies = ["duckdb", "lzstring"]
 # ///
 import argparse
+import gzip
 import json
 import sys
 from datetime import datetime, timezone
@@ -223,8 +224,14 @@ def main(argv=None) -> int:
     print(f"Wrote {args.out}  ({len(items)} items, {len(skills)} skills, {size_kb:.1f} KB)")
     print(f"Wrote {args.out_stats}  ({len(stats_by_record)} item stat entries, "
           f"{stats_size_kb:.1f} KB)")
-    if size_kb > 1400:
-        print(f"WARNING: {size_kb:.1f} KB exceeds the 1.2 MB monsters.json reference",
+    # Budget the transfer size, not the file size: these datasets are served gzipped,
+    # and the accepted split (docs/superpowers/specs/2026-08-15-skill-item-finder-page-design.md)
+    # was sized in gzipped terms. Warning on raw bytes fired on every successful run.
+    gz_kb = len(gzip.compress(args.out.read_bytes())) / 1024
+    print(f"  first load: {gz_kb:.1f} KB gzipped")
+    if gz_kb > 400:
+        print(f"WARNING: {gz_kb:.1f} KB gzipped is well past the ~242 KB the split was "
+              f"sized for; consider what else belongs in the lazily-fetched stats file",
               file=sys.stderr)
     return 0
 
