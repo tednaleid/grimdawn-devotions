@@ -186,11 +186,18 @@ Touched 12/22, Summon Hellhound 16/26, several 10/20), so column headers are
 per-skill. Transmuters and some modifier nodes cap at 1, where all three columns
 collapse and the panel shows a single value instead of three identical ones.
 
-**Array lengths are not uniformly `skillUltimateLevel`.** Of 1,472 stat arrays,
-1,370 match, 87 are shorter, and 15 are longer (`arcaneseal1` carries a 26-entry
-`skillManaCost` against an ultimate of 22). The emitter must clamp to the array's
-own length and emit a diagnostic counting mismatches, so a patch that changes the
-shape is visible instead of silently producing a wrong number.
+**Array lengths are not uniformly `skillUltimateLevel`.** Of the 1,370 numeric
+stat arrays on the roster's effect records, 1,353 match, 9 are shorter and 8 are
+longer (`arcaneseal1` carries a 26-entry `skillManaCost` against an ultimate of
+22). The emitter must clamp to the array's own length and emit a diagnostic
+counting mismatches, so a patch that changes the shape is visible instead of
+silently producing a wrong number.
+
+Count only NUMERIC arrays. Skill records also carry semicolon-separated lists of
+record paths and effect names (`spawnObjects`, `fxChanges`, `petChanges`,
+`skillConnectionOn`), whose lengths have nothing to do with rank counts.
+Including them inflates the mismatch count roughly sixfold and makes the
+diagnostic meaningless as a drift signal.
 
 ### Icons
 

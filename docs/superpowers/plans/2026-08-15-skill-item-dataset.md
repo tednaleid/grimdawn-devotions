@@ -962,8 +962,8 @@ Three breakpoints per stat: at rank 1, at `skillMaxLevel` (the most points a
 player can spend), and at `skillUltimateLevel` (the hard cap reachable with
 +skill gear). The two gaps are the two decisions a player makes.
 
-Array lengths are NOT uniformly `skillUltimateLevel`: of 1,472 stat arrays,
-1,370 match, 87 are shorter and 15 are longer. Clamp to the array's own length
+Array lengths are NOT uniformly `skillUltimateLevel`: of the 1,370 numeric stat
+arrays, 1,353 match, 9 are shorter and 8 are longer. Clamp to the array's own length
 and report the mismatch count as a diagnostic.
 
 **Files:**
@@ -992,8 +992,8 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
     """Per-stat values at the three breakpoints a player actually decides between.
 
     Every numeric stat on a skill record is a semicolon-separated array, one entry
-    per rank. Array length is not reliably skillUltimateLevel (87 are shorter and
-    15 longer at build 24756825), so each breakpoint clamps to the array's own
+    per rank. Array length is not reliably skillUltimateLevel (9 are shorter and
+    8 longer at build 24756825), so each breakpoint clamps to the array's own
     length. A mismatch count rides out as a diagnostic so a patch that changes the
     shape is visible instead of silently yielding a wrong number.
     """
@@ -1107,9 +1107,10 @@ If so, narrow the check to stats that increase rather than deleting it.
 
 - [ ] **Step 5: Record the mismatch diagnostic baseline**
 
-Run: `just derive` and note `rank_array_len_mismatch`. Expected: 102
-(87 shorter plus 15 longer). Add that number to `docs/item-schema.md` when
-Task 7 updates the docs, so a future change to it is noticeable.
+Run: `just derive` and note `rank_array_len_mismatch`. Expected: 17
+(9 shorter plus 8 longer, over 1,370 numeric arrays). Add that number to
+`docs/item-schema.md` when Task 7 updates the docs, so a future change to it is
+noticeable.
 
 - [ ] **Step 6: Commit**
 
