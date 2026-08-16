@@ -248,12 +248,90 @@ sheet. Windows-only, like `just extract`.
 - Create (generated, committed): `data/skill-icons.png`, `data/skill-icons.json`
 
 **Interfaces:**
-- Consumes: `gd_tex.decode_tex` from Task 1.
+- Consumes: `gd_tex.decode_tex` from Task 1, after this task extends it (Step 0).
 - Produces: `data/skill-icons.json`, shape
   `{"meta": {...}, "cell": 32, "columns": N, "icons": {"<archive path>": [col, row]}}`
-  where the archive path is as it appears in `UI.arc`, for example
-  `skills/icons/class03/skillicon_hellhoundsummon1up.tex`. Task 4 maps a skill's
-  `skillUpBitmapName` onto these keys by stripping the leading `ui/`.
+  where the archive path is exactly as it appears in the extracted tree,
+  **including the leading `ui/`**, for example
+  `ui/skills/icons/class03/skillicon_hellhoundsummon1up.tex`. That is
+  byte-identical to the `skillUpBitmapName` value on the skill record, so Task 4
+  joins on it directly with no string surgery.
+
+**Three corrections to the original design, all established empirically:**
+
+1. **The extracted tree keeps the `ui/` prefix.** An earlier reading of
+   `ArchiveTool -list` output suggested the archive stripped it. Extracting for
+   real produces `ui/skills/icons/...`, which is what the skill records
+   reference. Do not strip anything.
+2. **Expansion archives must be layered.** Base `resources/UI.arc` contains
+   class01 through class06 only. Inquisitor, Necromancer, Oathkeeper and
+   Berserker icons live in `gdx1/`, `gdx2/` and `gdx3/` `resources/UI.arc`.
+   Layer them in order, exactly as `just extract` layers records and text, or
+   four masteries have no icons at all.
+3. **138 of the 671 icons are 24-bit,** including real mastery skills
+   (`class03/skillicon_curse1up.tex`, `class03/skillicon_possession1up.tex`).
+   Task 1's decoder raises on anything but 32-bit, so it must learn 24-bit
+   first. That is Step 0 below.
+
+Measured at build 24756825: 671 `*up.tex` icons under `ui/skills/icons/`
+excluding the `_red` variants, every one 32x32, 533 at 32-bit and 138 at 24-bit.
+
+- [ ] **Step 0: Teach the decoder 24-bit, with tests**
+
+24-bit `.tex` files store BGR with no alpha channel. In `scripts/gd_tex.py`,
+replace the bit-count guard:
+
+```python
+    if bitcount not in (24, 32):
+        raise ValueError(f"unsupported bit count {bitcount} (expected uncompressed 24 or 32)")
+```
+
+and replace the pixel-expansion block that follows it:
+
+```python
+    stride = bitcount // 8
+    data = payload[4 + _DDS_HEADER_LEN:]
+    expected = width * height * stride
+    if len(data) < expected:
+        raise ValueError(f"truncated pixels: have {len(data)}, need {expected}")
+
+    # Base mip level only. The channel masks in these files are all zero, so the
+    # layout cannot be read from the header; it is BGR(A), confirmed against the
+    # in-game Summon Hellhound icon. 24-bit icons carry no alpha, so they are
+    # fully opaque.
+    base = data[:expected]
+    rgba = bytearray(b"\xff" * (width * height * 4))
+    rgba[0::4] = base[2::stride]
+    rgba[1::4] = base[1::stride]
+    rgba[2::4] = base[0::stride]
+    if stride == 4:
+        rgba[3::4] = base[3::4]
+    return width, height, bytes(rgba)
+```
+
+Add these cases to `scripts/test_gd_tex.py`, keeping the existing ones. Note the
+existing `make_tex` helper already takes a `bitcount` argument:
+
+```python
+# 24-bit BGR: one opaque red pixel, no alpha channel stored.
+w, h, rgba = decode_tex(make_tex(1, 1, bytes([0x00, 0x00, 0xFF]), bitcount=24))
+check("decodes a 24-bit image", (w, h) == (1, 1))
+check("24-bit reorders BGR to RGB", rgba[:3] == bytes([0xFF, 0x00, 0x00]))
+check("24-bit is fully opaque", rgba[3] == 0xFF)
+
+# 24-bit truncation is still rejected.
+try:
+    decode_tex(make_tex(4, 4, bytes([0x00, 0x00, 0xFF]), bitcount=24))
+    check("rejects a truncated 24-bit buffer", False)
+except ValueError:
+    check("rejects a truncated 24-bit buffer", True)
+```
+
+The existing "rejects a non-32-bit image" case uses `bitcount=16`, which is
+still rejected, so it stays valid unchanged.
+
+Run: `uv run scripts/test_gd_tex.py`
+Expected: all checks pass, `FAILURES: 0`.
 
 - [ ] **Step 1: Write the builder**
 
@@ -287,7 +365,22 @@ CELL = 32
 WANTED_SUFFIX = "up.tex"
 
 
+def ui_archives(gd_dir: Path) -> list[Path]:
+    """Base UI.arc first, then each expansion overlay in version order.
+
+    Base carries class01 through class06 only; Inquisitor, Necromancer,
+    Oathkeeper and Berserker icons ship in the gdx overlays. Expansions are
+    discovered by the gdx* convention so a future release needs no code change,
+    matching how `just extract` layers records and text.
+    """
+    found = [gd_dir / "resources" / "UI.arc"]
+    found += [p / "resources" / "UI.arc" for p in sorted(gd_dir.glob("gdx*"))]
+    return [p for p in found if p.is_file()]
+
+
 def extract(archive: Path, tool: Path, dest: Path) -> None:
+    # stdin must be closed or ArchiveTool can block waiting on it, the same
+    # reason the i18n-tables recipe redirects it.
     subprocess.run([str(tool), str(archive), "-extract", str(dest)],
                    check=True, stdout=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
 
@@ -302,21 +395,23 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
 
     tool = args.gd_dir / "ArchiveTool.exe"
-    archive = args.gd_dir / "resources" / "UI.arc"
-    if not tool.is_file() or not archive.is_file():
-        print(f"ERROR: need {tool} and {archive}. Set GD_DIR; needs a local Grim Dawn install.",
-              file=sys.stderr)
+    archives = ui_archives(args.gd_dir)
+    if not tool.is_file() or not archives:
+        print(f"ERROR: need {tool} and resources/UI.arc under {args.gd_dir}. "
+              f"Set GD_DIR; needs a local Grim Dawn install.", file=sys.stderr)
         return 2
 
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
-        extract(archive, tool, root)
-        # The archive stores skill icons under skills/icons/classNN/, having
-        # stripped the leading "ui/" that the skill records use.
-        found = sorted(p for p in (root / "skills" / "icons").rglob("*.tex")
-                       if p.name.endswith(WANTED_SUFFIX))
+        for arc in archives:
+            extract(arc, tool, root)
+        # The extracted tree keeps the leading "ui/" that the skill records use,
+        # so a key here is byte-identical to a record's skillUpBitmapName.
+        icons_root = root / "ui" / "skills" / "icons"
+        found = sorted(p for p in icons_root.rglob("*.tex")
+                       if p.name.endswith(WANTED_SUFFIX) and "_red" not in p.name)
         if not found:
-            print("ERROR: no skill icons found in UI.arc (archive layout changed?)",
+            print(f"ERROR: no skill icons under {icons_root} (archive layout changed?)",
                   file=sys.stderr)
             return 2
 
@@ -382,10 +477,16 @@ skill-icons: _require-game-closed
 - [ ] **Step 3: Run it**
 
 Run: `just skill-icons`
-Expected: `icons packed: 277` (the number of distinct `*up.tex` skill icons at
-build 24756825) and a sheet around 544x544. If the count differs, stop and
-reconcile against the deposit before committing; a changed count means the game
-changed its icon set.
+Expected: `icons packed: 671` and a 26x26 grid (832x832). That is every
+`*up.tex` under `ui/skills/icons/` across the four archive layers, excluding the
+`_red` variants, measured at build 24756825. The 315 mastery skills reference
+277 of them; the rest are item, rune, potion and shrine skill icons that cost
+almost nothing to carry and spare the page a missing-icon failure if a skill
+outside the mastery trees is ever shown.
+
+If the count differs, stop and reconcile before committing: a changed count
+means the game changed its icon set. In particular a count near 400 means the
+expansion overlays were not layered.
 
 - [ ] **Step 4: Verify a known icon decodes to real image content**
 
@@ -396,7 +497,7 @@ uv run - <<'PY'
 import json
 from PIL import Image
 doc = json.load(open("data/skill-icons.json"))
-col, row = doc["icons"]["skills/icons/class03/skillicon_hellhoundsummon1up.tex"]
+col, row = doc["icons"]["ui/skills/icons/class03/skillicon_hellhoundsummon1up.tex"]
 c = doc["cell"]
 sheet = Image.open("data/skill-icons.png")
 tile = sheet.crop((col*c, row*c, col*c+c, row*c+c))
@@ -686,10 +787,11 @@ def build_skills(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> i
             END AS node_kind,
             j.ui_x, j.ui_y,
             j.tag AS name_tag,
-            regexp_replace(
-                (SELECT f.value FROM facts f
-                  WHERE f.record = j.effect_record AND f.key = 'skillUpBitmapName'),
-                '^ui/', '') AS icon,
+            -- Stored verbatim: the sprite index in data/skill-icons.json is keyed
+            -- by the same `ui/skills/icons/...` path, so this joins with no
+            -- string surgery on either side.
+            (SELECT f.value FROM facts f
+              WHERE f.record = j.effect_record AND f.key = 'skillUpBitmapName') AS icon,
             (SELECT f.value FROM facts f
               WHERE f.record = j.effect_record AND f.key = 'skillMaxLevel')::INTEGER
                 AS max_level,

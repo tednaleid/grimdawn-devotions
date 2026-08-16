@@ -194,23 +194,39 @@ shape is visible instead of silently producing a wrong number.
 
 ### Icons
 
-`resources/UI.arc` holds them at `skills/icons/classNN/skillicon_*.tex` (the
-archive strips the leading `ui/`), extracted by the same ArchiveTool invocation
-`just extract` already uses for `Text_EN.arc`. Base `Menu.arc` is a 2 KB stub
-with zero entries and is not the source.
+`resources/UI.arc` holds them at `ui/skills/icons/classNN/skillicon_*.tex`,
+extracted by the same ArchiveTool invocation `just extract` already uses for
+`Text_EN.arc`. Base `Menu.arc` is a 2 KB stub with zero entries and is not the
+source. The extracted path keeps the `ui/` prefix, so it is byte-identical to
+the `skillUpBitmapName` value on the skill record and the two join directly.
+
+**Layer the expansion archives.** Base `resources/UI.arc` carries class01
+through class06 only. Inquisitor, Necromancer, Oathkeeper and Berserker icons
+ship in `gdx1/`, `gdx2/` and `gdx3/` `resources/UI.arc`, discovered by the same
+`gdx*` convention `just extract` already uses. Without layering, four masteries
+have no icons at all.
 
 A `.tex` is a 12-byte wrapper around a DDS whose 4-byte magic reads `DDSR`.
 Strip the wrapper, replace the magic with `DDS `, and the standard 124-byte
-header follows. The icons are 32x32, uncompressed, 32 bits per pixel, with all
-four channel masks set to zero, which is why Pillow's DDS plugin decodes them to
-solid black. Decoding `frombytes("RGBA", size, data, "raw", "BGRA")` produces the
-correct image; this was verified end to end on
-`skillicon_hellhoundsummon1up.tex`.
+header follows. Every icon is 32x32 and uncompressed, with all four channel
+masks set to zero, which is why Pillow's DDS plugin decodes them to solid black.
+Decoding the bytes directly as BGR(A) produces the correct image; this was
+verified end to end on `skillicon_hellhoundsummon1up.tex`.
+
+**Two pixel formats, both required.** Of the 671 `*up.tex` skill icons
+(excluding the `_red` variants), 533 are 32-bit BGRA and 138 are 24-bit BGR with
+no alpha. The 24-bit set includes real mastery skills, among them
+`class03/skillicon_curse1up.tex` (Curse of Frailty) and
+`skillicon_possession1up.tex`, so a decoder that accepts only 32-bit hard-fails
+the build on ordinary skills. Treat 24-bit as fully opaque. Anything that is
+neither, in particular a block-compressed icon, must fail loudly rather than be
+guessed at.
 
 All 315 skills resolve an icon, drawn from 277 distinct files (a base skill and
-one of its modifier nodes sometimes share one). The decoder must handle, or fail
-loudly on, any icon that turns out to be block-compressed rather than
-uncompressed.
+one of its modifier nodes sometimes share one). The sprite sheet carries all 671
+regardless: the surplus is item, rune, potion and shrine skill icons, which cost
+almost nothing at 32x32 and spare the page a missing-icon failure if a skill
+outside the mastery trees is ever displayed.
 
 ## Approach
 
