@@ -1,8 +1,8 @@
 {
   "meta": {
-    "game_version": "1.3.0.0",
-    "steam_buildid": "24346246",
-    "generated_utc": "2026-07-26T16:43:41Z"
+    "game_version": "1.3.0.7",
+    "steam_buildid": "24756825",
+    "generated_utc": "2026-08-16T01:50:08Z"
   },
   "monsters": [
     {
@@ -15,16 +15,19 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "physical": 100,
+        "pierce": 100,
+        "fire": 100,
+        "cold": 100,
+        "lightning": 100,
+        "poison": 100,
+        "aether": 100,
+        "chaos": 100,
+        "vitality": 100,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -44,16 +47,19 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "physical": 100,
+        "pierce": 100,
+        "fire": 100,
+        "cold": 100,
+        "lightning": 100,
+        "poison": 100,
+        "aether": 100,
+        "chaos": 100,
+        "vitality": 100,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -71,16 +77,19 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "physical": 100,
+        "pierce": 100,
+        "fire": 100,
+        "cold": 100,
+        "lightning": 100,
+        "poison": 100,
+        "aether": 100,
+        "chaos": 100,
+        "vitality": 100,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -100,16 +109,19 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "physical": 100,
+        "pierce": 100,
+        "fire": 100,
+        "cold": 100,
+        "lightning": 100,
+        "poison": 100,
+        "aether": 100,
+        "chaos": 100,
+        "vitality": 100,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -127,16 +139,19 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "physical": 100,
+        "pierce": 100,
+        "fire": 100,
+        "cold": 100,
+        "lightning": 100,
+        "poison": 100,
+        "aether": 100,
+        "chaos": 100,
+        "vitality": 100,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 3,
       "variants_disagree": false,
@@ -156,16 +171,19 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 0,
-        "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 0,
-        "bleeding": 0
+        "physical": 100,
+        "pierce": 100,
+        "fire": 100,
+        "cold": 100,
+        "lightning": 100,
+        "poison": 100,
+        "aether": 100,
+        "chaos": 100,
+        "vitality": 100,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
       },
       "variant_count": 1,
       "variants_disagree": false,
@@ -3783,15 +3801,17 @@
         "chaos": 6,
         "bleeding": 41
       },
-      "variant_count": 6,
+      "variant_count": 8,
       "variants_disagree": false,
       "record_paths": [
         "records/creatures/enemies/boss&quest/beronathfinal_01a.dbr",
         "records/creatures/enemies/boss&quest/beronathfinal_01b.dbr",
         "records/creatures/enemies/boss&quest/beronathfinal_01c.dbr",
+        "records/creatures/enemies/boss&quest/beronathfinal_01d.dbr",
         "records/creatures/enemies/boss&quest/beronathfinal_02a.dbr",
         "records/creatures/enemies/boss&quest/beronathfinal_02b.dbr",
-        "records/creatures/enemies/boss&quest/beronathfinal_02c.dbr"
+        "records/creatures/enemies/boss&quest/beronathfinal_02c.dbr",
+        "records/creatures/enemies/boss&quest/beronathfinal_02d.dbr"
       ]
     },
     {
@@ -4597,10 +4617,11 @@
         "vitality": 60,
         "bleeding": 0
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "variants_disagree": false,
       "record_paths": [
-        "records/creatures/enemies/boss&quest/chthonianservitor_rinnvalgoth.dbr"
+        "records/creatures/enemies/boss&quest/chthonianservitor_rinnvalgoth.dbr",
+        "records/creatures/enemies/boss&quest/chthonianservitor_rinnvalgoth_02.dbr"
       ]
     },
     {
@@ -4627,10 +4648,11 @@
       "passive_resistances": {
         "bleeding": 50
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "variants_disagree": false,
       "record_paths": [
-        "records/creatures/enemies/boss&quest/chthoniantyrant_grulthunn.dbr"
+        "records/creatures/enemies/boss&quest/chthoniantyrant_grulthunn.dbr",
+        "records/creatures/enemies/boss&quest/chthoniantyrant_grulthunn_02.dbr"
       ]
     },
     {
@@ -6847,10 +6869,13 @@
       "passive_resistances": {
         "physical": 6
       },
-      "variant_count": 1,
+      "variant_count": 4,
       "variants_disagree": false,
       "record_paths": [
-        "records/creatures/enemies/boss&quest/human_chthonickurn_blackheart_01.dbr"
+        "records/creatures/enemies/boss&quest/human_chthonickurn_blackheart_01.dbr",
+        "records/creatures/enemies/boss&quest/human_chthonickurn_blackheart_01u.dbr",
+        "records/creatures/enemies/boss&quest/human_kurn_berserker_01.dbr",
+        "records/creatures/enemies/boss&quest/human_kurn_berserker_01u.dbr"
       ]
     },
     {
@@ -6942,10 +6967,11 @@
       "passive_resistances": {
         "physical": 6
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "variants_disagree": false,
       "record_paths": [
-        "records/creatures/enemies/boss&quest/human_chthonickurn_chieftain_01.dbr"
+        "records/creatures/enemies/boss&quest/human_chthonickurn_chieftain_01.dbr",
+        "records/creatures/enemies/boss&quest/human_chthonickurn_chieftain_01u.dbr"
       ]
     },
     {
@@ -7077,10 +7103,11 @@
         "vitality": 0,
         "bleeding": 0
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "variants_disagree": false,
       "record_paths": [
-        "records/creatures/enemies/boss&quest/human_chthonickurn_shaman_01.dbr"
+        "records/creatures/enemies/boss&quest/human_chthonickurn_shaman_01.dbr",
+        "records/creatures/enemies/boss&quest/human_chthonickurn_shaman_01u.dbr"
       ]
     },
     {
@@ -13192,10 +13219,11 @@
         "physical": 6,
         "bleeding": 50
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "variants_disagree": false,
       "record_paths": [
-        "records/creatures/enemies/boss&quest/wraith_chillingend_01.dbr"
+        "records/creatures/enemies/boss&quest/wraith_chillingend_01.dbr",
+        "records/creatures/enemies/boss&quest/wraith_frostveilaltar_01.dbr"
       ]
     },
     {
@@ -39235,10 +39263,11 @@
         "lightning": 1,
         "aether": 1
       },
-      "variant_count": 2,
+      "variant_count": 3,
       "variants_disagree": true,
       "record_paths": [
         "records/creatures/enemies/nemesis/nemesis_aetherial_01.dbr",
+        "records/creatures/enemies/nemesis/nemesis_aetherial_01b.dbr",
         "records/creatures/enemies/special/fun/nemesis_aetherial_01.dbr"
       ]
     },
@@ -39267,10 +39296,11 @@
         "poison": 1,
         "aether": 1
       },
-      "variant_count": 2,
+      "variant_count": 3,
       "variants_disagree": true,
       "record_paths": [
         "records/creatures/enemies/nemesis/nemesis_aetherialvanguard_01.dbr",
+        "records/creatures/enemies/nemesis/nemesis_aetherialvanguard_01b.dbr",
         "records/creatures/enemies/special/fun/nemesis_aetherialvanguard_01.dbr"
       ]
     },
