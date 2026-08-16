@@ -1,11 +1,13 @@
-// ABOUTME: Cloudflare Worker that returns a grimtools build's devotion star ids for one slug.
-// ABOUTME: Takes a slug and never a URL, so there is no code path that fetches a caller-named host.
+// ABOUTME: Cloudflare Worker between the planner and grimtools: reads a build's devotion star ids by
+// ABOUTME: slug (GET /) and saves a selection as a fresh build (POST /export). Never fetches a caller-named host.
 /// <reference path="./worker-env.d.ts" />
 import {
   extractBuildInfo,
   extractBuildTitle,
   buildIsMissing,
   IMPORT_CONTRACT_VERSION,
+  savePayload,
+  isSlug,
 } from "../../web/src/core/grimtools";
 
 const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
@@ -14,9 +16,24 @@ const DEVOTION_JSON = "https://www.grimtools.com/static/gdx3/devotion/devotion.j
 const UA = "grimdawn-devotions-import/1.0 (+https://github.com/tednaleid/grimdawn-devotions)";
 const MAX_BYTES = 2_000_000; // a calc page is ~40KB; this only bounds a hostile upstream
 const TIMEOUT_MS = 10_000;
+const SAVE_URL = "https://www.grimtools.com/save_build.php";
+const CALC_REFERER = "https://www.grimtools.com/calc/";
+const MAX_EXPORT_BODY = 4096; // 55 ids at ~10 bytes each is well under 1 KB; this bounds a hostile body
+const MAX_EXPORT_SKILLS = 55; // the game's devotion budget
+const SKILL_ID_RE = /^sk\d+$/;
+
+/** The surface of a Workers rate-limit binding (`[[ratelimits]]` in wrangler.toml); tests pass a fake. */
+export interface RateLimiter {
+  limit(opts: { key: string }): Promise<{ success: boolean }>;
+}
 
 export interface Env {
   ALLOWED_ORIGIN: string;
+  /** Export brakes: per client address and for everyone together. Absent means unlimited (tests, or
+   * a runtime without the bindings); the two are separate bindings because a binding carries one
+   * limit configuration. */
+  EXPORT_LIMITER_IP?: RateLimiter;
+  EXPORT_LIMITER_GLOBAL?: RateLimiter;
   /** Injected in tests only; production uses global fetch. */
   fetchImpl?: typeof fetch;
 }
@@ -34,9 +51,10 @@ function json(body: unknown, status: number, origin: string): Response {
     headers: {
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": origin,
-      // Only a 200 is a build that will never change, so only a 200 is storable/reusable. An
-      // explicit max-age on an error status (per RFC 9111) would let a transient 502 get pinned
-      // into a caller's cache for a day with no way to retry.
+      // Only the import route's 200 is a build that will never change, so only that is storable;
+      // every export response (201 included) is a write and stays no-store. An explicit max-age on
+      // an error status (per RFC 9111) would let a transient 502 get pinned into a caller's cache
+      // for a day with no way to retry.
       "Cache-Control": status === 200 ? "public, max-age=86400" : "no-store",
     },
   });
@@ -63,6 +81,101 @@ async function boundedText(res: Response): Promise<string> {
     text += decoder.decode(value, { stream: true });
   }
   return text;
+}
+
+/** Read at most `max` bytes of a request body as text; null when it runs over, enforced while
+ * reading so an oversized body is never fully buffered or parsed. */
+async function boundedBody(req: Request, max: number): Promise<string | null> {
+  const reader = req.body?.getReader();
+  if (!reader) return "";
+  const decoder = new TextDecoder();
+  let text = "";
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) {
+      text += decoder.decode();
+      return text;
+    }
+    total += value.byteLength;
+    if (total > max) {
+      await reader.cancel();
+      return null;
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+}
+
+/** The export body: 1..MAX_EXPORT_SKILLS distinct `sk<digits>` strings under `skills`, nothing else
+ * accepted. The worker cannot tell a devotion star from a mastery skill (same as import); this bound
+ * plus the rate limit is the protection. */
+function parseExportBody(text: string): string[] | null {
+  let doc: unknown;
+  try {
+    doc = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (typeof doc !== "object" || doc === null || Array.isArray(doc)) return null;
+  const skills = (doc as { skills?: unknown }).skills;
+  if (!Array.isArray(skills) || skills.length === 0 || skills.length > MAX_EXPORT_SKILLS) return null;
+  if (!skills.every((s) => typeof s === "string" && SKILL_ID_RE.test(s))) return null;
+  if (new Set(skills).size !== skills.length) return null;
+  return skills as string[];
+}
+
+async function allowed(limiter: RateLimiter | undefined, key: string): Promise<boolean> {
+  if (!limiter) return true;
+  return (await limiter.limit({ key })).success;
+}
+
+/**
+ * Save a devotion selection as a fresh anonymous grimtools build and return its slug. One POST to a
+ * constant URL, in the exact shape the calculator's own Share button sends (see savePayload); the
+ * only caller-controlled bytes are the validated skill ids inside the JSON `data` field.
+ */
+async function handleExport(request: Request, env: Env): Promise<Response> {
+  const origin = env.ALLOWED_ORIGIN;
+  const doFetch = env.fetchImpl ?? fetch;
+  // Browsers set Origin and cannot forge it; for anything else this is friction, not security, and
+  // it keeps the CORS response identical to the import route's.
+  if (request.headers.get("Origin") !== origin) return json({ error: "forbidden" }, 403, origin);
+  const text = await boundedBody(request, MAX_EXPORT_BODY);
+  const skills = text === null ? null : parseExportBody(text);
+  if (!skills) return json({ error: "bad_request" }, 400, origin);
+  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+  if (!(await allowed(env.EXPORT_LIMITER_IP, `ip:${ip}`)) || !(await allowed(env.EXPORT_LIMITER_GLOBAL, "global")))
+    return json({ error: "rate_limited" }, 429, origin);
+
+  const form = new URLSearchParams({ data: JSON.stringify(savePayload(skills)), mod: "" });
+  let res: Response;
+  try {
+    res = await doFetch(SAVE_URL, {
+      method: "POST",
+      headers: {
+        "User-Agent": UA,
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Requested-With": "XMLHttpRequest",
+        Referer: CALC_REFERER,
+      },
+      body: form.toString(),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      redirect: "manual", // a redirect (status 3xx, not ok) is an upstream failure, never followed
+    });
+  } catch {
+    return json({ error: "upstream" }, 502, origin);
+  }
+  if (!res.ok) return json({ error: "upstream", status: res.status }, 502, origin);
+  // Re-validate rather than trust: the only upstream byte sequence that ever leaves here is an id
+  // in our own slug charset.
+  let id: unknown;
+  try {
+    id = (JSON.parse(await boundedText(res)) as { id?: unknown } | null)?.id;
+  } catch {
+    return json({ error: "unparseable" }, 502, origin);
+  }
+  if (typeof id !== "string" || !isSlug(id)) return json({ error: "unparseable" }, 502, origin);
+  return json({ slug: id }, 201, origin);
 }
 
 /** The three ways reading a calc page can resolve: a real build, an explicit `null` (no such
@@ -117,8 +230,18 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   if (request.method === "OPTIONS")
     return new Response(null, {
       status: 204,
-      headers: { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "GET, OPTIONS" },
+      headers: {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type", // a JSON POST is preflighted for this
+      },
     });
+  const path = new URL(request.url).pathname;
+  if (path === "/export") {
+    if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, origin);
+    return handleExport(request, env);
+  }
+  if (path !== "/") return json({ error: "not_found" }, 404, origin);
   if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, origin);
 
   // The only caller-controlled value, and it can never name a host: CALC is a constant.

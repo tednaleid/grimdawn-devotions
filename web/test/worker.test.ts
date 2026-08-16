@@ -2,6 +2,7 @@
 // ABOUTME: Upstream fetch is stubbed, so this runs with no network and no Cloudflare account.
 import { test, expect } from "bun:test";
 import worker, { handleRequest } from "../../worker/src/index";
+import { savePayload } from "../src/core/grimtools";
 
 const ORIGIN = "https://planner.example";
 const page = `<script>window['buildInfo'] = {"data":{"skills":[{"name":"sk688","level":1}]},"created_for_build":"1.2.1.6"};</script>`;
@@ -201,4 +202,218 @@ test("the success response has exactly the contracted field names", async () => 
   const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV"), env(ok as never));
   const body = await res.json();
   expect(Object.keys(body).sort()).toEqual(["dataVersion", "gameVersion", "skills", "slug", "title"]);
+});
+
+// --- POST /export -------------------------------------------------------------------------------
+
+const EXPORT_URL = "https://w/export";
+const SAVE_URL = "https://www.grimtools.com/save_build.php";
+type Limiter = { limit(opts: { key: string }): Promise<{ success: boolean }> };
+
+/** A limiter that allows the first `allow` calls for each key and refuses the rest, recording keys. */
+function fakeLimiter(allow: number): Limiter & { keys: string[] } {
+  const counts = new Map<string, number>();
+  const keys: string[] = [];
+  return {
+    keys,
+    async limit({ key }) {
+      keys.push(key);
+      const n = (counts.get(key) ?? 0) + 1;
+      counts.set(key, n);
+      return { success: n <= allow };
+    },
+  };
+}
+
+function exportEnv(fetchImpl: typeof fetch, extra: Record<string, unknown> = {}) {
+  return { ALLOWED_ORIGIN: ORIGIN, fetchImpl, ...extra } as never;
+}
+
+function exportRequest(body: unknown, init: { origin?: string | null; ip?: string; raw?: string } = {}) {
+  const headers = new Headers({ "Content-Type": "application/json" });
+  if (init.origin !== null) headers.set("Origin", init.origin ?? ORIGIN);
+  if (init.ip) headers.set("CF-Connecting-IP", init.ip);
+  return new Request(EXPORT_URL, { method: "POST", headers, body: init.raw ?? JSON.stringify(body) });
+}
+
+const saved = (async () => new Response('{"id":"2ga0aJyZ"}', { status: 200 })) as never;
+
+test("export: a valid body is posted to grimtools as its Share button would post it, and the slug comes back", async () => {
+  let seen: { url: string; init: RequestInit } | null = null;
+  const spy = (async (url: string, init: RequestInit) => {
+    seen = { url: String(url), init };
+    return new Response('{"id":"2ga0aJyZ"}', { status: 200 });
+  }) as never;
+  const res = await handleRequest(exportRequest({ skills: ["sk739"] }), exportEnv(spy));
+  expect(res.status).toBe(201);
+  expect(res.headers.get("Access-Control-Allow-Origin")).toBe(ORIGIN);
+  expect(res.headers.get("Cache-Control")).toBe("no-store");
+  expect(await res.json()).toEqual({ slug: "2ga0aJyZ" });
+
+  const { url, init } = seen!;
+  expect(url).toBe(SAVE_URL);
+  expect(init.method).toBe("POST");
+  expect(init.redirect).toBe("manual");
+  const h = new Headers(init.headers);
+  expect(h.get("Content-Type")).toBe("application/x-www-form-urlencoded; charset=UTF-8");
+  expect(h.get("X-Requested-With")).toBe("XMLHttpRequest");
+  expect(h.get("Referer")).toBe("https://www.grimtools.com/calc/");
+  expect(h.get("User-Agent")).toContain("grimdawn-devotions");
+  const form = new URLSearchParams(String(init.body));
+  expect(form.get("mod")).toBe("");
+  expect(JSON.parse(form.get("data")!)).toEqual(savePayload(["sk739"]));
+});
+
+test("export: the success response has exactly the contracted field names", async () => {
+  const res = await handleRequest(exportRequest({ skills: ["sk739"] }), exportEnv(saved));
+  expect(Object.keys(await res.json()).sort()).toEqual(["slug"]);
+});
+
+test("export: refuses a request from any other origin, or none, before doing anything", async () => {
+  let called = false;
+  const spy = (async () => {
+    called = true;
+    return new Response("");
+  }) as never;
+  expect(
+    (await handleRequest(exportRequest({ skills: ["sk1"] }, { origin: "https://evil.example" }), exportEnv(spy)))
+      .status,
+  ).toBe(403);
+  expect((await handleRequest(exportRequest({ skills: ["sk1"] }, { origin: null }), exportEnv(spy))).status).toBe(403);
+  expect(called).toBe(false);
+});
+
+test("export: rejects every malformed body with 400 and never reaches grimtools", async () => {
+  let called = false;
+  const spy = (async () => {
+    called = true;
+    return new Response("");
+  }) as never;
+  const bad: unknown[] = [
+    {},
+    { skills: [] },
+    { skills: "sk1" },
+    { skills: [1] },
+    { skills: ["sk1", "sk1"] },
+    { skills: ["../x"] },
+    { skills: ["sk1 "] },
+    { skills: Array.from({ length: 56 }, (_, i) => `sk${i}`) },
+    null,
+    [],
+  ];
+  for (const b of bad) {
+    const res = await handleRequest(exportRequest(b), exportEnv(spy));
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "bad_request" });
+  }
+  expect((await handleRequest(exportRequest(null, { raw: "not json" }), exportEnv(spy))).status).toBe(400);
+  expect(called).toBe(false);
+});
+
+test("export: a body over 4 KB is refused as bad_request without being parsed", async () => {
+  let called = false;
+  const spy = (async () => {
+    called = true;
+    return new Response("");
+  }) as never;
+  const raw = JSON.stringify({ skills: ["sk1"], pad: "x".repeat(5000) });
+  const res = await handleRequest(exportRequest(null, { raw }), exportEnv(spy));
+  expect(res.status).toBe(400);
+  expect(called).toBe(false);
+});
+
+test("export: accepts 55 distinct skills", async () => {
+  const res = await handleRequest(
+    exportRequest({ skills: Array.from({ length: 55 }, (_, i) => `sk${i + 1}`) }),
+    exportEnv(saved),
+  );
+  expect(res.status).toBe(201);
+});
+
+test("export: the per-IP limiter is keyed on CF-Connecting-IP and refuses with 429 once spent", async () => {
+  const ip = fakeLimiter(1);
+  const env = exportEnv(saved, { EXPORT_LIMITER_IP: ip });
+  expect((await handleRequest(exportRequest({ skills: ["sk1"] }, { ip: "203.0.113.9" }), env)).status).toBe(201);
+  const second = await handleRequest(exportRequest({ skills: ["sk1"] }, { ip: "203.0.113.9" }), env);
+  expect(second.status).toBe(429);
+  expect(await second.json()).toEqual({ error: "rate_limited" });
+  expect(ip.keys).toEqual(["ip:203.0.113.9", "ip:203.0.113.9"]);
+  // A different address has its own budget.
+  expect((await handleRequest(exportRequest({ skills: ["sk1"] }, { ip: "203.0.113.10" }), env)).status).toBe(201);
+});
+
+test("export: the global limiter caps everyone together, and a refusal never reaches grimtools", async () => {
+  let calls = 0;
+  const spy = (async () => {
+    calls++;
+    return new Response('{"id":"2ga0aJyZ"}', { status: 200 });
+  }) as never;
+  const global = fakeLimiter(1);
+  const env = exportEnv(spy, { EXPORT_LIMITER_GLOBAL: global });
+  expect((await handleRequest(exportRequest({ skills: ["sk1"] }, { ip: "203.0.113.1" }), env)).status).toBe(201);
+  expect((await handleRequest(exportRequest({ skills: ["sk1"] }, { ip: "203.0.113.2" }), env)).status).toBe(429);
+  expect(global.keys).toEqual(["global", "global"]);
+  expect(calls).toBe(1);
+});
+
+test("export: with no limiter bindings (tests, local runtimes without them) nothing is limited", async () => {
+  for (let i = 0; i < 3; i++) {
+    expect((await handleRequest(exportRequest({ skills: ["sk1"] }), exportEnv(saved))).status).toBe(201);
+  }
+});
+
+test("export: an upstream failure, a redirect, or a thrown fetch is 502 upstream", async () => {
+  const cases: (typeof fetch)[] = [
+    (async () => new Response("nope", { status: 500 })) as never,
+    (async () => new Response("", { status: 302, headers: { Location: "https://evil.example/" } })) as never,
+    (async () => {
+      throw new Error("boom");
+    }) as never,
+  ];
+  for (const f of cases) {
+    const res = await handleRequest(exportRequest({ skills: ["sk1"] }), exportEnv(f));
+    expect(res.status).toBe(502);
+    expect((await res.json()).error).toBe("upstream");
+  }
+});
+
+test("export: a 2xx from grimtools without a valid slug id is 502 unparseable, and nothing upstream is relayed", async () => {
+  const cases = ['{"error":"nope"}', "not json", '{"id":"../../etc"}', '{"id":""}', '{"id":42}', '{"id":"<b>x</b>"}'];
+  for (const body of cases) {
+    const f = (async () => new Response(body, { status: 200 })) as never;
+    const res = await handleRequest(exportRequest({ skills: ["sk1"] }), exportEnv(f));
+    expect(res.status).toBe(502);
+    expect(await res.json()).toEqual({ error: "unparseable" });
+  }
+});
+
+test("export: only POST is accepted on /export, and unknown paths are 404", async () => {
+  expect(
+    (await handleRequest(new Request(EXPORT_URL, { method: "GET", headers: { Origin: ORIGIN } }), exportEnv(saved)))
+      .status,
+  ).toBe(405);
+  expect(
+    (await handleRequest(new Request("https://w/other", { headers: { Origin: ORIGIN } }), exportEnv(saved))).status,
+  ).toBe(404);
+});
+
+test("preflight advertises POST and the Content-Type header for the export route", async () => {
+  const res = await handleRequest(new Request(EXPORT_URL, { method: "OPTIONS" }), exportEnv(saved));
+  expect(res.status).toBe(204);
+  expect(res.headers.get("Access-Control-Allow-Methods")).toBe("GET, POST, OPTIONS");
+  expect(res.headers.get("Access-Control-Allow-Headers")).toBe("Content-Type");
+  expect(res.headers.get("Access-Control-Allow-Origin")).toBe(ORIGIN);
+});
+
+test("export: the default export's caching wrapper passes POST straight through, uncached", async () => {
+  installFakeCache();
+  let calls = 0;
+  const spy = (async () => {
+    calls++;
+    return new Response('{"id":"2ga0aJyZ"}', { status: 200 });
+  }) as never;
+  const env = exportEnv(spy);
+  await worker.fetch(exportRequest({ skills: ["sk1"] }), env);
+  await worker.fetch(exportRequest({ skills: ["sk1"] }), env);
+  expect(calls).toBe(2);
 });
