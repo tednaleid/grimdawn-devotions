@@ -10,14 +10,12 @@ import {
   isSlug,
 } from "../../web/src/core/grimtools";
 
-const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
 const CALC = "https://www.grimtools.com/calc/";
 const DEVOTION_JSON = "https://www.grimtools.com/static/gdx3/devotion/devotion.json";
 const UA = "grimdawn-devotions-import/1.0 (+https://github.com/tednaleid/grimdawn-devotions)";
 const MAX_BYTES = 2_000_000; // a calc page is ~40KB; this only bounds a hostile upstream
 const TIMEOUT_MS = 10_000;
 const SAVE_URL = "https://www.grimtools.com/save_build.php";
-const CALC_REFERER = "https://www.grimtools.com/calc/";
 const MAX_EXPORT_BODY = 4096; // 55 ids at ~10 bytes each is well under 1 KB; this bounds a hostile body
 const MAX_EXPORT_SKILLS = 55; // the game's devotion budget
 const SKILL_ID_RE = /^sk\d+$/;
@@ -38,11 +36,12 @@ export interface Env {
   fetchImpl?: typeof fetch;
 }
 
-/** Extracts and validates the `slug` query param. Null when absent or outside SLUG_RE, which is
- * also what the caching wrapper uses to decide whether a request is cacheable at all. */
+/** Extracts and validates the `slug` query param. Null when absent or outside the slug charset
+ * (`isSlug`), which is also what the caching wrapper uses to decide whether a request is cacheable
+ * at all. */
 function validSlug(request: Request): string | null {
   const slug = new URL(request.url).searchParams.get("slug") ?? "";
-  return SLUG_RE.test(slug) ? slug : null;
+  return isSlug(slug) ? slug : null;
 }
 
 function json(body: unknown, status: number, origin: string): Response {
@@ -60,10 +59,17 @@ function json(body: unknown, status: number, origin: string): Response {
   });
 }
 
-/** Read at most MAX_BYTES of a response as text, so an oversized upstream cannot exhaust CPU. */
-async function boundedText(res: Response): Promise<string> {
-  const reader = res.body?.getReader();
-  if (!reader) return "";
+/** Read at most `max` bytes of `body` as text, decoding incrementally (`{ stream: true }`) so a
+ * multi-byte character split across a chunk boundary decodes correctly. `overflowed` is true once
+ * the stream runs past `max`, at which point reading stops and `text` holds only what was read up
+ * to (not including) the chunk that tipped it over - never the full body in that case. Shared by
+ * `boundedText` and `boundedBody`, whose only difference is what an overflow means for their caller. */
+async function readBounded(
+  body: ReadableStream<Uint8Array> | null,
+  max: number,
+): Promise<{ text: string; overflowed: boolean }> {
+  const reader = body?.getReader();
+  if (!reader) return { text: "", overflowed: false };
   const decoder = new TextDecoder();
   let text = "";
   let total = 0;
@@ -71,44 +77,33 @@ async function boundedText(res: Response): Promise<string> {
     const { done, value } = await reader.read();
     if (done) {
       text += decoder.decode(); // flush any trailing partial multi-byte char
-      break;
-    }
-    total += value.byteLength;
-    if (total > MAX_BYTES) {
-      await reader.cancel();
-      break;
-    }
-    text += decoder.decode(value, { stream: true });
-  }
-  return text;
-}
-
-/** Read at most `max` bytes of a request body as text; null when it runs over, enforced while
- * reading so an oversized body is never fully buffered or parsed. */
-async function boundedBody(req: Request, max: number): Promise<string | null> {
-  const reader = req.body?.getReader();
-  if (!reader) return "";
-  const decoder = new TextDecoder();
-  let text = "";
-  let total = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) {
-      text += decoder.decode();
-      return text;
+      return { text, overflowed: false };
     }
     total += value.byteLength;
     if (total > max) {
       await reader.cancel();
-      return null;
+      return { text, overflowed: true };
     }
     text += decoder.decode(value, { stream: true });
   }
 }
 
-/** The export body: 1..MAX_EXPORT_SKILLS distinct `sk<digits>` strings under `skills`, nothing else
- * accepted. The worker cannot tell a devotion star from a mastery skill (same as import); this bound
- * plus the rate limit is the protection. */
+/** Read at most MAX_BYTES of a response as text, so an oversized upstream cannot exhaust CPU. On
+ * overflow, returns whatever partial text was read rather than the whole body. */
+async function boundedText(res: Response): Promise<string> {
+  return (await readBounded(res.body, MAX_BYTES)).text;
+}
+
+/** Read at most `max` bytes of a request body as text; null when it runs over, so an oversized body
+ * is never fully buffered or parsed. */
+async function boundedBody(req: Request, max: number): Promise<string | null> {
+  const { text, overflowed } = await readBounded(req.body, max);
+  return overflowed ? null : text;
+}
+
+/** The export body: 1..MAX_EXPORT_SKILLS distinct `sk<digits>` strings under `skills`; other
+ * top-level keys are ignored. The worker cannot tell a devotion star from a mastery skill (same as
+ * import); this bound plus the rate limit is the protection. */
 function parseExportBody(text: string): string[] | null {
   let doc: unknown;
   try {
@@ -156,7 +151,7 @@ async function handleExport(request: Request, env: Env): Promise<Response> {
         "User-Agent": UA,
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
-        Referer: CALC_REFERER,
+        Referer: CALC,
       },
       body: form.toString(),
       signal: AbortSignal.timeout(TIMEOUT_MS),

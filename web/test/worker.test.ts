@@ -254,6 +254,7 @@ test("export: a valid body is posted to grimtools as its Share button would post
   expect(url).toBe(SAVE_URL);
   expect(init.method).toBe("POST");
   expect(init.redirect).toBe("manual");
+  expect(init.signal).toBeInstanceOf(AbortSignal);
   const h = new Headers(init.headers);
   expect(h.get("Content-Type")).toBe("application/x-www-form-urlencoded; charset=UTF-8");
   expect(h.get("X-Requested-With")).toBe("XMLHttpRequest");
@@ -322,6 +323,25 @@ test("export: a body over 4 KB is refused as bad_request without being parsed", 
   expect(called).toBe(false);
 });
 
+/** A `{"skills":["sk1"],"pad":"..."}` body padded to exactly `totalBytes` (ASCII throughout, so
+ * string length is byte length). */
+function paddedExportBody(totalBytes: number): string {
+  const base = JSON.stringify({ skills: ["sk1"], pad: "" });
+  return JSON.stringify({ skills: ["sk1"], pad: "x".repeat(totalBytes - base.length) });
+}
+
+test("export: a body of exactly 4096 bytes is accepted; one byte more is refused", async () => {
+  const exact = paddedExportBody(4096);
+  expect(exact.length).toBe(4096);
+  const okRes = await handleRequest(exportRequest(null, { raw: exact }), exportEnv(saved));
+  expect(okRes.status).toBe(201);
+
+  const over = paddedExportBody(4097);
+  expect(over.length).toBe(4097);
+  const badRes = await handleRequest(exportRequest(null, { raw: over }), exportEnv(saved));
+  expect(badRes.status).toBe(400);
+});
+
 test("export: accepts 55 distinct skills", async () => {
   const res = await handleRequest(
     exportRequest({ skills: Array.from({ length: 55 }, (_, i) => `sk${i + 1}`) }),
@@ -360,6 +380,29 @@ test("export: with no limiter bindings (tests, local runtimes without them) noth
   for (let i = 0; i < 3; i++) {
     expect((await handleRequest(exportRequest({ skills: ["sk1"] }), exportEnv(saved))).status).toBe(201);
   }
+});
+
+test("export: the 400, 403, and 429 responses all carry Cache-Control: no-store", async () => {
+  const spy = (async () => new Response("")) as never;
+
+  const badOrigin = await handleRequest(
+    exportRequest({ skills: ["sk1"] }, { origin: "https://evil.example" }),
+    exportEnv(spy),
+  );
+  expect(badOrigin.status).toBe(403);
+  expect(badOrigin.headers.get("Cache-Control")).toBe("no-store");
+
+  const badBody = await handleRequest(exportRequest({}), exportEnv(spy));
+  expect(badBody.status).toBe(400);
+  expect(badBody.headers.get("Cache-Control")).toBe("no-store");
+
+  const spent = fakeLimiter(0);
+  const limited = await handleRequest(
+    exportRequest({ skills: ["sk1"] }),
+    exportEnv(saved, { EXPORT_LIMITER_IP: spent }),
+  );
+  expect(limited.status).toBe(429);
+  expect(limited.headers.get("Cache-Control")).toBe("no-store");
 });
 
 test("export: an upstream failure, a redirect, or a thrown fetch is 502 upstream", async () => {
