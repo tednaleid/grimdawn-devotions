@@ -47,8 +47,8 @@ import { parseTag } from "../core/benefitTag";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
-import { mapStars, type StarTable } from "../core/grimtools";
-import { mountImportPanel } from "../adapters/importPanel";
+import { mapStars, invertStarTable, toGrimtoolsSkills, type StarTable } from "../core/grimtools";
+import { mountImportPanel, type ExportErrorCode, type ExportState } from "../adapters/importPanel";
 import { makeWorkerGateway } from "../adapters/grimtoolsWorkerGateway";
 import { affinityTotals } from "../core/affinity";
 import {
@@ -306,7 +306,9 @@ async function boot() {
   // The permissive ReachView for the degraded path (uncapped, or no cover table): nothing dims, every
   // constellation is completable and every unselected star reachable, while have/need still come from the
   // selection summary. The dimming-on path goes through the core selectionView port (see refresh).
-  let reach: ReachView;
+  // Starts permissive because the import panel reads it when it mounts, which is before the boot
+  // render computes the real view.
+  let reach: ReachView = permissiveReach();
   function permissiveReach(): ReachView {
     const s = selectionSummary(model, state.selected);
     const needSource = new Map<number, string[]>();
@@ -811,6 +813,16 @@ async function boot() {
       curBuildOrderStates = null;
       curTransition = null;
     }
+    // The memo is consulted only when the selection actually changes (see lastSelectionKey): a
+    // returning selection re-associates its build, and a stale export error is dropped.
+    const key = selectionKey(state.selected);
+    if (key !== lastSelectionKey) {
+      lastSelectionKey = key;
+      const known = knownBuilds.get(key);
+      if (known !== undefined) source = known;
+      if (exportError && exportError.key !== key) exportError = null;
+    }
+    syncImportPanel();
     document.body.classList.toggle("comparing", baseline !== null);
     updateNarrow();
     paintMap();
@@ -910,11 +922,44 @@ async function boot() {
     }
   }
 
+  // Star sets behind builds this session imported cleanly or exported, keyed by selectionKey, so an
+  // unchanged selection shows its existing link instead of minting a duplicate grimtools build.
+  // Session-only on purpose: a restored gt= carries no star set to compare against, and there is no
+  // way to ask grimtools whether a build matches. Clear (the panel's ✕) leaves this intact, so
+  // returning to that exact selection re-associates it.
+  const knownBuilds = new Map<string, string>();
+  function selectionKey(sel: Set<string>): string {
+    return [...sel].sort().join(",");
+  }
+  // The selection key at the last refresh: the memo is consulted only when the key changes, so a
+  // cleared association stays cleared until the selection actually moves.
+  let lastSelectionKey: string | null = null;
+  // In-flight and failed exports, pinned to the selection they were made from: a change of selection
+  // supersedes both, and a result that arrives after such a change never re-associates the wrong set.
+  let exportingKey: string | null = null;
+  let exportError: { key: string; code: ExportErrorCode } | null = null;
+  // The inverse mapping table, built once from the same file the import loads.
+  let inverseTable: Record<string, string> | null = null;
+
+  // The Export button's state for the current selection, in the spec's precedence: hidden (the link
+  // already is the export), then the three disabled reasons, then in-flight and error, then ready.
+  function exportStateFor(): ExportState {
+    const key = selectionKey(state.selected);
+    if (source && knownBuilds.get(key) === source) return { kind: "hidden" };
+    if (state.selected.size === 0) return { kind: "disabled", reason: "empty" };
+    if (!Number.isFinite(state.pointCap)) return { kind: "disabled", reason: "uncapped" };
+    if (!reach.legal) return { kind: "disabled", reason: "incomplete" };
+    if (exportingKey === key) return { kind: "exporting" };
+    if (exportError && exportError.key === key) return { kind: "error", code: exportError.code };
+    return { kind: "ready" };
+  }
+
   async function runImport(slug: string): Promise<void> {
     if (!slug) {
-      // The clear button: drop the association only. Selection and cap are deliberately untouched.
+      // The clear button: drop the association only. Selection and cap are deliberately untouched,
+      // but the export state is not: with no association, this selection can be exported again.
       source = "";
-      importPanel.setState({ kind: "idle" });
+      syncImportPanel();
       writeHash("push");
       return;
     }
@@ -948,6 +993,9 @@ async function boot() {
     state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
     const pruned = wanted.size - state.selected.size;
     source = slug;
+    // A pruned import is a build the planner does not show as grimtools does, so it is not memoized;
+    // Export stays offered for it.
+    if (pruned === 0) knownBuilds.set(selectionKey(state.selected), slug);
     importPanel.setState({ kind: "done", slug, pruned, title: body.title });
     // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
     // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
@@ -955,14 +1003,57 @@ async function boot() {
     refresh("push");
   }
 
+  async function runExport(): Promise<void> {
+    const key = selectionKey(state.selected);
+    const starIdTable = await loadStarTable();
+    if (!starIdTable) {
+      // loadStarTable already warned with the real cause; "network" is the same stand-in import uses.
+      exportError = { key, code: "network" };
+      return syncImportPanel();
+    }
+    try {
+      inverseTable ??= invertStarTable(starIdTable);
+    } catch (e) {
+      console.warn("export unavailable: grimtools-stars.json does not invert cleanly", e);
+      exportError = { key, code: "network" };
+      return syncImportPanel();
+    }
+    const skills = toGrimtoolsSkills(state.selected, inverseTable);
+    if (!skills) {
+      // Cannot happen with a table that passed its generation gates; a bug report, not a user state.
+      const missing = [...state.selected].filter((s) => inverseTable![s] === undefined);
+      console.warn(`export: selected star(s) missing from grimtools-stars.json: ${missing.join(", ")}`);
+      exportError = { key, code: "network" };
+      return syncImportPanel();
+    }
+    exportingKey = key;
+    exportError = null;
+    syncImportPanel();
+    const result = await gateway.saveBuild(skills);
+    exportingKey = null;
+    if (result.kind !== "ok") {
+      exportError = { key, code: result.kind };
+      return syncImportPanel();
+    }
+    knownBuilds.set(key, result.slug);
+    // The selection may have moved on while the request was in flight: only the selection the build
+    // was made from becomes associated with it (a later return to that set re-associates via the memo).
+    if (selectionKey(state.selected) === key) {
+      source = result.slug;
+      writeHash("push"); // like import: Back returns to the un-associated state
+    }
+    syncImportPanel();
+  }
+
   const importPanel = mountImportPanel(document.getElementById("import-panel") as HTMLElement, localization, {
     onSubmit: (slug) => void runImport(slug),
-    onExport: () => {},
+    onExport: () => void runExport(),
   });
-  // Reflects `source` into the panel: called once at mount (for a build restored from the boot
-  // hash) and again on every hashchange, mirroring how the search box re-syncs there.
+  // Reflects `source` and the export state into the panel: at mount, on every hashchange, on every
+  // refresh (the export state depends on legality and the memo), and around an export request.
   function syncImportPanel(): void {
     importPanel.setState(source ? { kind: "done", slug: source } : { kind: "idle" });
+    importPanel.setExportState(exportStateFor());
   }
   syncImportPanel();
 
