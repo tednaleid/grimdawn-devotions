@@ -12,10 +12,10 @@ Release tagged `deposit-<steam buildid>.<rev>`; git commits only `deposit.lock`,
 a small JSON manifest pinning one exact tag with a sha256 per asset.
 
 Subcommands:
-  lock     hash the fourteen local parquet artifacts and write deposit.lock for a
+  lock     hash the fifteen local parquet artifacts and write deposit.lock for a
            given --tag and --download-base (plumbing shared by publish)
   publish  discover the next deposit-<buildid>.<rev> tag, create the GitHub
-           Release with the fourteen assets via `gh`, write deposit.lock
+           Release with the fifteen assets via `gh`, write deposit.lock
   fetch    download the assets pinned by deposit.lock over plain HTTPS (no gh,
            no auth needed), verify every sha256, then move into data/
 
@@ -39,9 +39,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from build_deposit import open_deposit, read_meta, utc_now
 
-# The fourteen managed release assets, split by target data dir. Census byproducts
+# The fifteen managed release assets, split by target data dir. Census byproducts
 # and anything else living beside them are never released and never touched.
-# The derived eleven are exactly gditems_duckdb.DERIVED_TABLES: a table missing
+# The derived twelve are exactly gditems_duckdb.DERIVED_TABLES: a table missing
 # here downloads a derived set the item CLI cannot open at all.
 ASSETS = (
     ("facts.parquet", "deposit"),
@@ -57,6 +57,7 @@ ASSETS = (
     ("skill_effect.parquet", "derived"),
     ("skills.parquet", "derived"),
     ("skill_ranks.parquet", "derived"),
+    ("pet_ranks.parquet", "derived"),
     ("skill_modifiers.parquet", "derived"),
 )
 
@@ -78,7 +79,7 @@ def sha256_file(path: Path) -> str:
 
 
 def build_asset_entries(deposit_dir: Path, derived_dir: Path) -> list[dict]:
-    """Hash the fourteen local artifacts; loud exit 2 naming anything missing."""
+    """Hash the fifteen local artifacts; loud exit 2 naming anything missing."""
     missing = [
         str(asset_dir(d, deposit_dir, derived_dir) / name)
         for name, d in ASSETS

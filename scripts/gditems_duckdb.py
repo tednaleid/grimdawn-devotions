@@ -106,7 +106,8 @@ class Vocabulary(TypedDict):
     granted_skills: dict[str, str]
 
 DERIVED_TABLES = ("entities", "stats", "relations", "families", "sources", "boosts",
-                   "conversions", "skill_effect", "skills", "skill_ranks", "skill_modifiers")
+                   "conversions", "skill_effect", "skills", "skill_ranks", "pet_ranks",
+                   "skill_modifiers")
 
 # Criteria.sources tokens -> sources.kind. 'unknown' has no row in `sources` at all.
 _SOURCE_KIND_TO_TOKEN = {"faction_vendor": "vendor", "crafted": "crafted"}

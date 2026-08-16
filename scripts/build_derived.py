@@ -991,6 +991,24 @@ _RANK_ARRAY_EXCLUDE = ("skillConnectionOn", "skillConnectionOff", "spawnObjects"
                        "modSpawnObjects", "radiusEffectName", "skillProjectileName")
 
 
+def build_rank_keys(con: duckdb.DuckDBPyConnection) -> None:
+    """The game's own vocabulary of rank-scaling stat keys, as a temp table.
+
+    A key counts as a rank stat when the game writes it as a per-rank array on
+    some skill record somewhere. Admitting any non-zero scalar instead pulls in
+    148 keys the game never scales, from skillMaxLevel and skillTier through
+    cameraShakeAmplitude, roundBitmap and the Mace2h/Shield weapon-restriction
+    flags. Array rows are unaffected: every one of them is in this set by
+    definition. Both build_skill_ranks and build_pet_ranks gate on it, so it is
+    computed once rather than repeated as a CTE in each.
+    """
+    con.execute("""
+        CREATE TEMP TABLE rank_keys AS
+        SELECT DISTINCT key FROM facts
+        WHERE record LIKE 'records/skills/%' AND value LIKE '%;%'
+          AND NOT regexp_matches(value, '[A-Za-z/]')""")
+
+
 def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> int:
     """Per-stat values at the three breakpoints a player actually decides between.
 
@@ -1007,18 +1025,7 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
     excluded = ", ".join(f"'{k}'" for k in _RANK_ARRAY_EXCLUDE)
     con.execute(f"""
         CREATE TEMP TABLE skill_ranks AS
-        WITH rank_keys AS (
-            -- The game's own authoring decides what counts as a rank stat: a key
-            -- it writes as a per-rank array on some skill somewhere. Admitting any
-            -- non-zero scalar instead pulled in 148 keys the game never scales,
-            -- from skillMaxLevel and skillTier through cameraShakeAmplitude,
-            -- roundBitmap and the Mace2h/Shield weapon-restriction flags. Array
-            -- rows are unaffected: every one of them is in this set by definition.
-            SELECT DISTINCT key FROM facts
-            WHERE record LIKE 'records/skills/%' AND value LIKE '%;%'
-              AND NOT regexp_matches(value, '[A-Za-z/]')
-        ),
-        arr AS (
+        WITH arr AS (
             SELECT s.record AS skill_record,
                    f.key AS stat_id,
                    str_split(f.value, ';') AS parts,
@@ -1061,6 +1068,165 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
     con.execute(f"COPY (SELECT * FROM skill_ranks ORDER BY skill_record, stat_id) "
                 f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
     return con.execute("SELECT count(*) FROM skill_ranks").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
+# pet rank breakpoints
+# ---------------------------------------------------------------------------
+
+# A pet creature record carries the whole monster template, most of which is
+# animation, sound and physics. These two prefixes are the pet's own body: its
+# resistances (defensive*) and its speeds, dodge, life floor and light radius
+# (character*). No pet creature record in the game carries an offensive* or
+# retaliation* key with a non-zero value - a pet's damage lives entirely on the
+# abilities it is granted, which this table reads separately.
+_PET_STAT_PREFIXES = ("character", "defensive")
+
+
+def build_pet_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> int:
+    """What a summon's pet is and does, at the same three rank breakpoints.
+
+    A summon skill's own record holds almost nothing a player can judge: Summon
+    Hellhound carries a mana cost, a cooldown and a pet cap and no damage at all,
+    because the pet is a separate creature record. `spawnObjects` on the summon is
+    a per-rank array of those creature records, one entry per rank, so the pet
+    spawned at rank N is entry N. That makes the pet reachable at exactly the
+    breakpoints skill_ranks already uses.
+
+    Two kinds of row come back, distinguished by `source_kind` rather than mixed:
+
+    - `pet`: a stat on the creature record itself (its resistances and speeds).
+      Measured at build 24756825 no such stat scales with the summon's rank - the
+      only keys that differ between the rank-1 and rank-26 creature records are
+      the granted-ability levels, `scale`, `angerMultiplier` and
+      `experiencePoints` - so these three columns normally hold one value. They
+      are still read per breakpoint rather than once, so a patch that starts
+      scaling a pet's resistances shows up instead of being flattened away.
+    - `pet_skill`: a stat on an ability the creature is granted. The creature
+      record pairs `skillName<N>` with `skillLevel<N>`, and that level IS the
+      summon's rank for 38 of the 56 numeric grants; the other 18 (radius
+      helpers, totem immunities, wraith resists) stay pinned at 1 however far the
+      summon is pushed. Reading the level off the per-rank creature record gets
+      both right without a rule about which is which. At this build every pinned
+      grant happens to carry only scalar stats, so assuming the summon's rank
+      would produce the same numbers today; reading the level is what keeps that
+      an accident rather than a dependency.
+
+    15 further grants set their level to a `charLevel` equation rather than a
+    number (pet armor scaling, the global damage adjuster). Those track the
+    player's level, not the summon's rank, so they have no meaning at a rank
+    breakpoint and are left out rather than evaluated at an invented level. The
+    pet's base life, offensive and defensive ability are the same story one level
+    down: they come from the `characterAttributeEquations` bio record, which is
+    written purely in `charLevel`.
+
+    A pet-modifier node that swaps the pet outright (`modSpawnObjects`) is itself
+    a one-rank node, but its array is still 26 long because it is indexed by the
+    base summon's rank, so those three nodes borrow their group base's caps.
+
+    This is deliberately NOT part of skill_ranks. A pet stat needs the carrier in
+    its identity, because one summon routinely has two sources naming the same
+    stat: Summon Hellhound's innate gives `offensiveFireMin` 6/110/234 and its
+    detonate ability gives 58/388/708, two real numbers that a
+    `(skill_record, stat_id)` key would collide into one. It is also a different
+    subject - what the PET has, not what the PLAYER gets - and folding pet damage
+    into the player's rank table would read as the player's own.
+    """
+    excluded = ", ".join(f"'{k}'" for k in _RANK_ARRAY_EXCLUDE)
+    prefixes = " OR ".join(f"f.key LIKE '{p}%'" for p in _PET_STAT_PREFIXES)
+    con.execute(f"""
+        CREATE TEMP TABLE pet_ranks AS
+        WITH summon AS (
+            SELECT s.record AS skill_record,
+                   coalesce(g.max_level, s.max_level) AS max_level,
+                   coalesce(g.ultimate_level, s.ultimate_level) AS ultimate_level,
+                   str_split(f.value, ';') AS pets
+            FROM skills s
+            JOIN facts f ON f.record = s.effect_record
+                        AND f.key IN ('spawnObjects', 'modSpawnObjects')
+                        AND trim(f.value) != ''
+            LEFT JOIN skills g ON f.key = 'modSpawnObjects'
+                              AND g.record = s.group_record
+        ),
+        bp AS (
+            -- The rank-1 creature is the pet's stable identity: only its
+            -- description tag has a label (tagPetHellhoundA01 resolves, the A26
+            -- copy does not), and the later entries are the same pet at a higher
+            -- rank rather than a different one. Breakpoints clamp to the array's
+            -- own length exactly as skill_ranks does.
+            SELECT skill_record, pets[1] AS pet_record, 1 AS bp, pets[1] AS at_pet
+            FROM summon
+            UNION ALL
+            SELECT skill_record, pets[1], 2,
+                   pets[least(greatest(coalesce(max_level, 1), 1), len(pets))]
+            FROM summon
+            UNION ALL
+            SELECT skill_record, pets[1], 3,
+                   pets[least(greatest(coalesce(ultimate_level, max_level, 1), 1),
+                              len(pets))]
+            FROM summon
+        ),
+        body AS (
+            SELECT b.skill_record, b.pet_record, 'pet' AS source_kind,
+                   b.pet_record AS source_record, b.bp, f.key AS stat_id,
+                   f.value_num AS v
+            FROM bp b
+            JOIN facts f ON f.record = b.at_pet
+            WHERE ({prefixes})
+              AND f.value_num IS NOT NULL AND f.value_num != 0
+        ),
+        granted AS (
+            SELECT b.skill_record, b.pet_record, b.bp,
+                   lower(trim(n.value)) AS ability,
+                   TRY_CAST(l.value AS INTEGER) AS lvl
+            FROM bp b
+            JOIN facts n ON n.record = b.at_pet
+                        AND n.key LIKE 'skillName%' AND trim(n.value) != ''
+            JOIN facts l ON l.record = b.at_pet
+                        AND l.key = 'skillLevel'
+                                 || regexp_extract(n.key, 'skillName(\\d+)', 1)
+            WHERE TRY_CAST(l.value AS INTEGER) > 0
+        ),
+        ability AS (
+            SELECT g.skill_record, g.pet_record, 'pet_skill' AS source_kind,
+                   g.ability AS source_record, g.bp, f.key AS stat_id,
+                   TRY_CAST(str_split(f.value, ';')[
+                       least(g.lvl, len(str_split(f.value, ';')))] AS DOUBLE) AS v
+            FROM granted g
+            JOIN facts f ON f.record = g.ability
+            WHERE f.key NOT IN ({excluded})
+              AND f.key IN (SELECT key FROM rank_keys)
+              AND NOT regexp_matches(f.value, '[A-Za-z/]')
+              -- Same rule as skill_ranks: an array is authored per record and is
+              -- kept as written, a bare scalar only counts when it is non-zero,
+              -- because every skill record carries the whole template key set.
+              AND (f.value LIKE '%;%'
+                   OR (f.value_num IS NOT NULL AND f.value_num != 0))
+        ),
+        sampled AS (SELECT * FROM body UNION ALL SELECT * FROM ability)
+        SELECT skill_record, pet_record, source_kind, source_record, stat_id,
+               max(v) FILTER (WHERE bp = 1) AS at_first,
+               max(v) FILTER (WHERE bp = 2) AS at_max,
+               max(v) FILTER (WHERE bp = 3) AS at_ultimate
+        FROM sampled
+        GROUP BY skill_record, pet_record, source_kind, source_record, stat_id""")
+    # The spawn array is one entry per rank of whatever summon drives it, so its
+    # length matching that summon's ultimate rank is the shape this whole table
+    # assumes. A patch that breaks it would silently clamp every breakpoint onto
+    # the last entry, so it rides out as a diagnostic instead.
+    diag["pet_spawn_len_mismatch"] = con.execute("""
+        SELECT count(*) FROM skills s
+        JOIN facts f ON f.record = s.effect_record
+                    AND f.key IN ('spawnObjects', 'modSpawnObjects')
+                    AND trim(f.value) != ''
+        LEFT JOIN skills g ON f.key = 'modSpawnObjects' AND g.record = s.group_record
+        WHERE len(str_split(f.value, ';'))
+              != coalesce(g.ultimate_level, s.ultimate_level)""").fetchone()[0]
+    out = out_dir / "pet_ranks.parquet"
+    con.execute(f"COPY (SELECT * FROM pet_ranks ORDER BY skill_record, source_kind, "
+                f"source_record, stat_id) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM pet_ranks").fetchone()[0]
 
 
 # ---------------------------------------------------------------------------
@@ -1214,7 +1380,7 @@ def cmd_build(args) -> int:
             "cost_default_used": 0, "cost_record_missing": 0, "equation_errors": 0,
             "skill_ref_missing": 0,
             "skills_without_button": 0, "skills_without_name": 0,
-            "rank_array_len_mismatch": 0}
+            "rank_array_len_mismatch": 0, "pet_spawn_len_mismatch": 0}
     build_wide(con, cur)
     n_skill_effect = build_skill_effect_map(con, out_dir)
     n_relations = build_relations(con, diag)
@@ -1224,7 +1390,9 @@ def cmd_build(args) -> int:
     n_boosts = build_boosts(con, out_dir)
     n_conversions = build_conversions(con, out_dir)
     n_skills = build_skills(con, out_dir, diag)
+    build_rank_keys(con)
     n_skill_ranks = build_skill_ranks(con, out_dir, diag)
+    n_pet_ranks = build_pet_ranks(con, out_dir, diag)
     n_skill_modifiers = build_skill_modifiers(con, out_dir)
 
     rel_out = out_dir / "relations.parquet"
@@ -1271,6 +1439,7 @@ def cmd_build(args) -> int:
     print(f"  conversions: {n_conversions}")
     print(f"  skills: {n_skills}")
     print(f"  skill ranks: {n_skill_ranks}")
+    print(f"  pet ranks: {n_pet_ranks}")
     print(f"  skill modifiers: {n_skill_modifiers}")
     print(f"  skill effect map: {n_skill_effect}")
     print("  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
@@ -1278,7 +1447,7 @@ def cmd_build(args) -> int:
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
     for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions",
-                 "skills", "skill_effect", "skill_ranks", "skill_modifiers"):
+                 "skills", "skill_effect", "skill_ranks", "pet_ranks", "skill_modifiers"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
