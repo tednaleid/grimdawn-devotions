@@ -47,8 +47,9 @@ import { parseTag } from "../core/benefitTag";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
-import { mapStars, IMPORT_CONTRACT_VERSION, type StarTable } from "../core/grimtools";
+import { mapStars, type StarTable } from "../core/grimtools";
 import { mountImportPanel } from "../adapters/importPanel";
+import { makeWorkerGateway } from "../adapters/grimtoolsWorkerGateway";
 import { affinityTotals } from "../core/affinity";
 import {
   starsGranting,
@@ -68,6 +69,8 @@ const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/"; // per-build 
 declare const __IMPORT_API__: string;
 declare const __BUILD_ID__: string;
 const importApi = typeof __IMPORT_API__ === "string" ? __IMPORT_API__ : "http://localhost:8787";
+// The one object that talks to the worker, both directions (see ports/GrimtoolsGateway).
+const gateway = makeWorkerGateway(importApi);
 const buildId = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 
 async function boot() {
@@ -922,24 +925,10 @@ async function boot() {
     // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
     if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
 
-    // `title` is optional in the type, not just possibly null: a response served from the
-    // worker's 24h edge cache can predate this field entirely, so it may be absent as well as
-    // explicitly null. Both must fall back the same way in the panel.
-    let body: { skills: string[]; dataVersion: string | null; title?: string | null };
-    try {
-      // `v=${IMPORT_CONTRACT_VERSION}` busts only the *browser's* cache for this URL, and only when
-      // the worker's response contract actually changes (unlike buildId, which changes on every
-      // deploy - see grimtools.ts for why a shared constant is used instead). The worker
-      // deliberately ignores this param when building its own edge-cache key, using the same
-      // constant on its own side instead - a caller-supplied value there would let anyone inflate
-      // the worker's keyspace.
-      const res = await fetch(`${importApi}/?slug=${encodeURIComponent(slug)}&v=${IMPORT_CONTRACT_VERSION}`);
-      if (res.status === 404) return importPanel.setState({ kind: "error", code: "notFound" });
-      if (!res.ok) return importPanel.setState({ kind: "error", code: "network" });
-      body = (await res.json()) as { skills: string[]; dataVersion: string | null; title?: string | null };
-    } catch {
-      return importPanel.setState({ kind: "error", code: "network" });
-    }
+    const result = await gateway.fetchBuild(slug);
+    if (result.kind === "notFound") return importPanel.setState({ kind: "error", code: "notFound" });
+    if (result.kind === "network") return importPanel.setState({ kind: "error", code: "network" });
+    const body = result;
 
     // A null dataVersion means the worker could not determine it: degrade rather than block. A
     // version that is present and different means the table is stale and the mapping would be
