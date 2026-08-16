@@ -220,14 +220,29 @@ binding (wrangler 4.36 or later; the repo pins 4.120).
   stripped body that saved successfully.
 - `EXPORT_CONTRACT_VERSION`.
 
-`core/reachability.ts`: `SelectionView` gains `legal: boolean`, true when the
-selection classifies "reachable" within the full 55-point budget. `minCostFrom`
-already makes exactly that probe first and `selectionMinCost` collapses a `null`
-into `55`; the flag surfaces the distinction instead of losing it. Export
-requires: the cover table loaded, a finite cap, a non-empty selection, and
-`legal`. The cap is auto-raised to the validity floor on every refresh, so a legal
-selection is always legal at the current cap too; the flag is about 55, the game's
-limit, not the slider.
+`core/reachability.ts`: `ReachView` and `SelectionView` gain `legal: boolean`, true
+when the selection is a legal build on its own, which needs two things:
+
+- **Valid.** Every constellation with at least one selected star has its
+  requirement met by the affinity of the completed constellations
+  (`docs/devotion-system.md`, "A selection is valid when..."). On the summary this
+  is `target[i] <= supplyUncapped[i]` for every color, the same comparison the
+  affinity panel and `affinityDeficits` make. The forum link's build (Scales of
+  Ulcama short 2 Order) fails this.
+- **Constructible.** The selection classifies "reachable" at the sweep budget.
+  `reachabilityForSelection` already classifies the selection itself once
+  (`selfReachable`); because the sweep budget is never below the validity floor and
+  never above 55, that verdict is exactly "constructible within 55". The forum
+  build plus all of Dryad (55 stars needing 56) fails this.
+
+The two are distinct: "reachable" for a selection means it can be held within the
+budget with scaffolding still standing, so a selection with an affinity deficit can
+be reachable (the forum build is, at 54) without being a build the game would let
+you finish on. Both must hold, and the flag costs no extra engine work.
+
+Export requires: the cover table loaded, a finite cap, a non-empty selection, and
+`legal`. The cap is auto-raised to the validity floor on every refresh, so `legal`
+is about the game's 55, not the slider.
 
 ## Part 3: the planner
 
@@ -338,8 +353,10 @@ to the `appCatalog.test.ts` guard.
   redirect, thrown, timeout, 2xx with garbage, 2xx with a bad id), and the
   response-shape guard tied to `EXPORT_CONTRACT_VERSION`.
 - **Core**: `invertStarTable` bijection over the committed table; `savePayload`
-  fixture; `SelectionView.legal` for a legal build, an affinity-deficit build (the
-  Lion/Dryad forum link's Dryad case), and a selection whose floor exceeds 55.
+  fixture; `SelectionView.legal` for a legal build (the forum link with Lion
+  completed), an affinity-deficit build (the forum link as posted, which is
+  reachable at 54 but not valid), and a valid selection that cannot be built within
+  55 (the forum link with Dryad completed).
 - **Adapter**: the gateway maps every HTTP outcome to its result union for both
   methods; panel tests for every export state and hint and for the two-state
   layout; i18n catalog guard and characterization snapshots updated.
