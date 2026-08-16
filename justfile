@@ -376,12 +376,14 @@ derive:
     uv run scripts/build_derived.py build --deposit-dir "{{deposit_dir}}" \
         --curation-dir "{{justfile_directory()}}/data/item-curation" --out-dir "{{derived_dir}}"
 
-# Emit data/skill-items.json, the committed dataset behind the /items/ page
+# Emit data/skill-items.json + data/skill-items-stats.json, the committed
+# datasets behind the /items/ page (table view, then lazily loaded stat detail)
 [group("deposit")]
 skill-items:
     uv run scripts/build_skill_items.py --deposit-dir "{{deposit_dir}}" \
         --derived-dir "{{derived_dir}}" \
-        --out "{{justfile_directory()}}/data/skill-items.json"
+        --out "{{justfile_directory()}}/data/skill-items.json" \
+        --out-stats "{{justfile_directory()}}/data/skill-items-stats.json"
 
 # One derived acceptance query (all fifteen below fail on zero rows AND on oracle mismatch,
 # since each SQL gates its output on its pinned checks - see scripts/derived_queries/)

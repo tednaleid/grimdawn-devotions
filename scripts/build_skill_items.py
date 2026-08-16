@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
-# ABOUTME: Emits data/skill-items.json, the committed dataset behind the /items/ page.
-# ABOUTME: Reads the derived parquet only; needs no game install.
+# ABOUTME: Emits data/skill-items.json and data/skill-items-stats.json, the committed
+# ABOUTME: datasets behind the /items/ page. Reads the derived parquet only.
 # /// script
 # requires-python = ">=3.10"
 # dependencies = ["duckdb", "lzstring"]
@@ -29,6 +29,7 @@ def main(argv=None) -> int:
     ap.add_argument("--deposit-dir", required=True, type=Path)
     ap.add_argument("--derived-dir", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path)
+    ap.add_argument("--out-stats", required=True, type=Path)
     args = ap.parse_args(argv)
 
     con = open_deposit(args.deposit_dir.resolve())
@@ -37,18 +38,38 @@ def main(argv=None) -> int:
     meta = read_meta(con)
 
     # Top tier per family: the page targets endgame, so each group_key
-    # contributes only its highest item level.
+    # contributes only its highest item level. About 97 families tie at that
+    # level - typically an Awakened/Legendary variant against a plain Epic
+    # one sharing a name tag (e.g. tagGDX1HeadC122 at level 94) - so without a
+    # tiebreaker DuckDB's choice of surviving row is unspecified and could
+    # churn between runs on unchanged input. Rarity breaks the tie toward the
+    # higher-tier item this endgame page is for; record is a final tiebreaker
+    # purely so the output is reproducible, not because it means anything.
+    #
+    # en_name resolves entities.name_tag to its English label. This is joined
+    # here ONLY to build the outbound grimtools link below: grimtools matches
+    # item names in English, not by tag, and there is no way around that. It
+    # does not violate the i18n invariant - the emitted dataset still stores
+    # name_tag (a tag, resolved to the viewer's locale by the page) for every
+    # display purpose; only the URL string embeds English text.
     con.execute(f"""
         CREATE TEMP TABLE top AS
         WITH hit AS (
-            SELECT e.* FROM entities e
+            SELECT e.*, l.text AS en_name
+            FROM entities e
+            LEFT JOIN labels l ON l.tag = e.name_tag AND l.locale = 'en'
             WHERE e.domain IN {DOMAINS}
               AND (e.record IN (SELECT record FROM boosts)
                 OR e.record IN (SELECT item_record FROM skill_modifiers))
         ),
         ranked AS (
             SELECT *, row_number() OVER (PARTITION BY group_key
-                                         ORDER BY item_level DESC) AS rn
+                                         ORDER BY item_level DESC,
+                                                  CASE rarity WHEN 'Legendary' THEN 4
+                                                              WHEN 'Epic' THEN 3
+                                                              WHEN 'Rare' THEN 2
+                                                              ELSE 1 END DESC,
+                                                  record ASC) AS rn
             FROM hit
         )
         SELECT * FROM ranked WHERE rn = 1""")
@@ -98,6 +119,7 @@ def main(argv=None) -> int:
                      ORDER BY e.group_key, e.item_level""", "group_key")
 
     items = []
+    stats_by_record = {}
     for t in rows(con, "SELECT * FROM top ORDER BY record"):
         rec = t["record"]
         by_skill = {}
@@ -105,6 +127,14 @@ def main(argv=None) -> int:
             by_skill.setdefault(m["modified_skill"], []).append(
                 {"stat": m["stat_id"], "value": m["value"]})
         name = t.get("name_tag")
+        en_name = t.get("en_name")
+        stats_by_record[rec] = [
+            {"stat": s["stat_id"], "source": s["source"],
+             "low": s["display_low"] if s["display_low"] is not None
+                    else s["value_min"],
+             "high": s["display_high"] if s["display_high"] is not None
+                     else s["value_max"]}
+            for s in stats.get(rec, [])]
         items.append({
             "record": rec,
             "name_tag": name,
@@ -113,33 +143,39 @@ def main(argv=None) -> int:
             "rarity": t["rarity"],
             "item_level": t["item_level"],
             "tiers": [r["item_level"] for r in tiers.get(t["group_key"], [])],
-            "grimtools": grimtools_url(name, t["item_level"]) if name else None,
+            "grimtools": grimtools_url(en_name, t["item_level"]) if en_name else None,
             "boosts": [{"skill": b["target"], "level": b["level"]}
                        for b in boosts.get(rec, []) if b["kind"] == "skill"],
             "mastery_boosts": [{"mastery": b["target"], "level": b["level"]}
                                for b in boosts.get(rec, []) if b["kind"] == "mastery"],
             "modifiers": [{"skill": k, "stats": v} for k, v in sorted(by_skill.items())],
-            "stats": [{"stat": s["stat_id"], "source": s["source"],
-                       "low": s["display_low"] if s["display_low"] is not None
-                              else s["value_min"],
-                       "high": s["display_high"] if s["display_high"] is not None
-                               else s["value_max"]}
-                      for s in stats.get(rec, [])],
         })
 
+    doc_meta = {
+        "game_version": meta.get("game_version", ""),
+        "steam_buildid": meta.get("steam_buildid", ""),
+        "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
     doc = {
-        "meta": {
-            "game_version": meta.get("game_version", ""),
-            "steam_buildid": meta.get("steam_buildid", ""),
-            "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        },
+        "meta": doc_meta,
         "masteries": masteries,
         "skills": skills,
         "items": items,
     }
+    # Per-item stats live in a second, lazily loaded file: the table view
+    # needs name/slot/boosts/modifiers, not the full stat-row detail, and
+    # that detail was most of the file (1.9 of 3.9 MB compact).
+    stats_doc = {
+        "meta": doc_meta,
+        "stats": stats_by_record,
+    }
     args.out.write_text(json.dumps(doc, indent=1) + "\n", encoding="utf-8")
+    args.out_stats.write_text(json.dumps(stats_doc, indent=1) + "\n", encoding="utf-8")
     size_kb = args.out.stat().st_size / 1024
+    stats_size_kb = args.out_stats.stat().st_size / 1024
     print(f"Wrote {args.out}  ({len(items)} items, {len(skills)} skills, {size_kb:.1f} KB)")
+    print(f"Wrote {args.out_stats}  ({len(stats_by_record)} item stat entries, "
+          f"{stats_size_kb:.1f} KB)")
     if size_kb > 1400:
         print(f"WARNING: {size_kb:.1f} KB exceeds the 1.2 MB monsters.json reference",
               file=sys.stderr)
