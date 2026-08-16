@@ -55,6 +55,7 @@ ASSETS = (
     ("boosts.parquet", "derived"),
     ("conversions.parquet", "derived"),
     ("skill_effect.parquet", "derived"),
+    ("skills.parquet", "derived"),
 )
 
 

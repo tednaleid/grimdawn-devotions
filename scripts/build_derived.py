@@ -595,6 +595,113 @@ def build_skill_effect_map(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int
 
 
 # ---------------------------------------------------------------------------
+# skills roster
+# ---------------------------------------------------------------------------
+
+def build_skills(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> int:
+    """The mastery skill roster, with tree position joined on where one exists.
+
+    Roster comes from _classtree_classNN.dbr, which is authoritative: every entry
+    resolves to a record that exists. The records/ui/skills/classNN/skill*.dbr
+    buttons supply bitmapPosition and isCircular, but carry three references to
+    records with no facts at all, so they are joined and never trusted as the
+    roster. Four playerclass10 transform abilities have no button; their ui_x and
+    ui_y stay NULL rather than being invented.
+    """
+    con.execute("""
+        CREATE TEMP TABLE skills AS
+        WITH roster AS (
+            SELECT DISTINCT
+                   value AS record,
+                   'records/skills/playerclass'
+                     || regexp_extract(record, '_classtree_class(\\d+)', 1)
+                     || '/_classtraining_class'
+                     || regexp_extract(record, '_classtree_class(\\d+)', 1) || '.dbr'
+                     AS mastery_record
+            FROM facts
+            WHERE regexp_matches(record, '_classtree_class(0[1-9]|10)\\.dbr$')
+              AND key LIKE 'skillName%'
+              AND value NOT LIKE '%_classtraining_%'
+        ),
+        button AS (
+            SELECT max(CASE WHEN key = 'skillName' THEN value END) AS record,
+                   max(CASE WHEN key = 'bitmapPositionX' THEN value END)::INTEGER AS ui_x,
+                   max(CASE WHEN key = 'bitmapPositionY' THEN value END)::INTEGER AS ui_y,
+                   max(CASE WHEN key = 'isCircular' THEN value END) AS circular
+            FROM facts
+            WHERE regexp_matches(record, 'records/ui/skills/class(0[1-9]|10)/skill')
+            GROUP BY record
+        ),
+        joined AS (
+            SELECT r.record, r.mastery_record, b.ui_x, b.ui_y, b.circular,
+                   e.effect_record,
+                   (SELECT f.value FROM facts f
+                     WHERE f.record = r.record AND f.key = 'Class') AS cls
+            FROM roster r
+            LEFT JOIN button b ON b.record = r.record
+            LEFT JOIN skill_effect e ON e.skill_record = r.record
+        ),
+        tagged AS (
+            SELECT j.*,
+                   (SELECT f.value FROM facts f
+                     WHERE f.record = j.effect_record AND f.key = 'skillDisplayName') AS tag
+            FROM joined j
+        ),
+        grouped AS (
+            SELECT t.*,
+                   -- The game encodes the group in the display-name tag itself:
+                   -- tagClass<NN>SkillName<GG><L>, where GG numbers the group and
+                   -- the trailing letter identifies the member. Dreeg's Evil Eye
+                   -- is 11A with its modifiers at 11B..11E. Every one of the 142
+                   -- groups has exactly one A member. Neither the record stem nor
+                   -- the UI geometry works; see the spec for why both were rejected.
+                   CASE WHEN regexp_matches(t.tag, 'SkillName[0-9]+[A-Z]?$')
+                        THEN regexp_extract(t.tag, '^(.*SkillName[0-9]+)[A-Z]?$', 1)
+                        ELSE t.record END AS group_tag,
+                   regexp_extract(t.tag, '^.*SkillName[0-9]+([A-Z])?$', 1) AS group_letter
+            FROM tagged t
+        )
+        SELECT
+            j.record,
+            j.mastery_record,
+            -- The group's base is its 'A' member; a skill whose tag does not match
+            -- the pattern (the four playerclass10 transform abilities) is its own base.
+            coalesce(
+                (SELECT b.record FROM grouped b
+                  WHERE b.group_tag = j.group_tag AND b.group_letter IN ('A', '')),
+                j.record) AS group_record,
+            CASE
+                WHEN j.cls = 'Skill_Transmuter' THEN 'transmuter'
+                WHEN j.cls = 'SkillSecondary_PetModifier' THEN 'pet_modifier'
+                WHEN j.group_letter NOT IN ('A', '') THEN 'modifier'
+                ELSE 'base'
+            END AS node_kind,
+            j.ui_x, j.ui_y,
+            j.tag AS name_tag,
+            -- Stored verbatim: the sprite index in data/skill-icons.json is keyed
+            -- by the same `ui/skills/icons/...` path, so this joins with no
+            -- string surgery on either side.
+            (SELECT f.value FROM facts f
+              WHERE f.record = j.effect_record AND f.key = 'skillUpBitmapName') AS icon,
+            (SELECT f.value FROM facts f
+              WHERE f.record = j.effect_record AND f.key = 'skillMaxLevel')::INTEGER
+                AS max_level,
+            (SELECT f.value FROM facts f
+              WHERE f.record = j.effect_record AND f.key = 'skillUltimateLevel')::INTEGER
+                AS ultimate_level,
+            j.effect_record
+        FROM grouped j""")
+    diag["skills_without_button"] = con.execute(
+        "SELECT count(*) FROM skills WHERE ui_x IS NULL").fetchone()[0]
+    diag["skills_without_name"] = con.execute(
+        "SELECT count(*) FROM skills WHERE name_tag IS NULL").fetchone()[0]
+    out = out_dir / "skills.parquet"
+    con.execute(f"COPY (SELECT * FROM skills ORDER BY mastery_record, record) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM skills").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 # conversions
 # ---------------------------------------------------------------------------
 
@@ -894,7 +1001,8 @@ def cmd_build(args) -> int:
 
     diag = {"unnamed": 0, "expansion_defaulted": 0, "aps_missing_tier": 0,
             "cost_default_used": 0, "cost_record_missing": 0, "equation_errors": 0,
-            "skill_ref_missing": 0}
+            "skill_ref_missing": 0,
+            "skills_without_button": 0, "skills_without_name": 0}
     build_wide(con, cur)
     n_skill_effect = build_skill_effect_map(con, out_dir)
     n_relations = build_relations(con, diag)
@@ -903,6 +1011,7 @@ def cmd_build(args) -> int:
     n_sources = build_sources(con, cur, out_dir)
     n_boosts = build_boosts(con, out_dir)
     n_conversions = build_conversions(con, out_dir)
+    n_skills = build_skills(con, out_dir, diag)
 
     rel_out = out_dir / "relations.parquet"
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
@@ -946,13 +1055,14 @@ def cmd_build(args) -> int:
     print(f"  boosts: {n_boosts}   " +
           "  ".join(f"{k}({n})" for k, n in boost_kind_counts))
     print(f"  conversions: {n_conversions}")
+    print(f"  skills: {n_skills}")
     print(f"  skill effect map: {n_skill_effect}")
     print("  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                         if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
     for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions",
-                 "skill_effect"):
+                 "skills", "skill_effect"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
