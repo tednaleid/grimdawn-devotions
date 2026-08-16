@@ -130,13 +130,39 @@ transform abilities (Wereraven and Werewolf forms) that are granted by the form
 rather than allocated, so having no button is correct. Render them outside the
 tree grid rather than dropping them, since items do boost them.
 
-Grouping rule: walk a row left to right by `bitmapPositionX`; each `isCircular = 0`
-node opens a group and each `isCircular = 1` node joins the most recent one.
-Geometry alone is ambiguous for the offset transmuter nodes (`evileye1b` and
-`pox1b` both sit at y=211, between `evileye1` at y=179 and `pox1` at y=249), so
-the record-stem convention (`pox1b` belongs to `pox1`) resolves those. Validate
-the combined rule across all 10 masteries with a drift guard rather than
-trusting either signal alone.
+### Grouping: the name tag is the key
+
+The game encodes the node group in the skill's own display-name tag:
+`tagClass<NN>SkillName<GG><L>`, where `GG` numbers the group and the trailing
+letter `L` identifies the member. Dreeg's Evil Eye is `tagClass03SkillName11A`
+and its four modifier and transmuter nodes are `11B` through `11E`; Summon
+Hellhound is `tagClass03SkillName02A` with its three pet modifiers at `02B`,
+`02C`, `02D`.
+
+- **Group key** = the tag with its trailing letter removed.
+- **Base skill** = the member whose tag ends in `A`.
+
+Measured at build 24756825 this yields 142 groups over 311 skills, and **every
+group has exactly one `A` member**: none has two, none has zero. The remaining 4
+skills are the `playerclass10` transform abilities, whose tags do not match the
+pattern; each stands alone as its own group.
+
+Two rules that look plausible and both fail, recorded so they are not retried:
+
+- **Record stem** (`pox1b` belongs to `pox1`) breaks on 55 of 315 skills. Many
+  base skills carry no digit at all (`shadowstrike.dbr`), some groups have an
+  unnumbered base with numbered children (`arcanemissile` with
+  `arcanemissile2/3/4`), and worst, it silently merges `passive01` through
+  `passive04`, which are four separate Arcanist skills, into one group.
+- **UI geometry** (walk a row by `bitmapPositionX`, each `isCircular = 0` opens a
+  group) leaves 80 of 207 modifier nodes with no base to their left on the same
+  row. The offset transmuters are genuinely ambiguous: `evileye1b` and `pox1b`
+  both sit at y=211, 32 below `evileye1` at y=179 and 38 above `pox1` at y=249.
+
+`isCircular` remains the right signal for **node shape** when drawing the tree
+(square versus circle), which is a display concern and independent of grouping.
+Note the two do not coincide: there are 142 groups but only 107 `isCircular = 0`
+nodes, so a group's base is not always drawn as a square.
 
 ### The three breakpoints
 
