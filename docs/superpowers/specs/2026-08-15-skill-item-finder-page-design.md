@@ -1,0 +1,326 @@
+# Skill item finder page: design
+
+Status: designed 2026-08-15
+Date: 2026-08-15
+Game version at design: 1.3.0.7
+
+Ship `/items/`, a fourth page alongside the planner, the resistance-reduction
+reference, and the monster explorer. It answers one question: which items in the
+game affect this skill, and is chasing them worth it.
+
+A build picks a mastery and puts points into a subset of its skills. Many items
+raise a skill's rank, and some also attach extra stats to that specific skill.
+The reference case is Chosen Visage, a rare helmet giving `+4 to Flame Touched`
+and `+4 to Summon Hellhound`, plus a distinct stat block under each. Today
+nothing in this repo surfaces that relationship, and grimtools only shows it one
+item at a time.
+
+## Scope decisions
+
+Ratified with Ted during design:
+
+- **One mastery and one skill at a time.** Not two masteries with multi-select
+  skills. The narrower model makes the skill-detail panel coherent (it has a
+  single subject) and matches the question actually being asked: show me every
+  item that touches Summon Hellhound.
+- **Match on the node group, not the bare skill.** Selecting a base skill
+  selects it together with its modifier and transmuter nodes, all toggleable
+  individually and all on by default, so the grouping is visible in the UI
+  rather than implied. Items granting mastery-wide bonuses sit behind an
+  off-by-default toggle.
+- **Domains: gear, relic, augment.** Affixes are excluded. All three included
+  domains carry either a slot or an `applies_to` gear-type edge, so the slot
+  facet is meaningful on every row. Affixes carry neither, and affix-to-gear
+  applicability is the loot-graph gap tracked as roadmap step 3 in BACKLOG.
+- **Top tier per family only.** The page targets endgame, so each `group_key`
+  contributes its highest item level. Chosen Visage's ladder is 20/40/55/70/84/94
+  and the page shows the 94. The ladder renders as a subtle line using the item
+  CLI's honest convention: real item levels, never the words "Empowered" or
+  "Mythical", which the data does not carry.
+- **Skill icons are in scope.** Extraction and decoding are both cheap (below).
+- **Item source is out of scope.** Every row carries a grimtools link instead.
+  Source is only 7.8% populated for gear, so answering "where does this drop"
+  honestly waits on the loot-graph walk.
+
+## Feasibility: what the game data already holds
+
+Every finding below was verified against `records/items/gearhead/b201f_head.dbr`,
+the item level 94 tier of Chosen Visage, and reproduces its in-game card.
+
+| Card element | Source | Already derived |
+| --- | --- | --- |
+| `+4 to Flame Touched` | `augmentSkillName<N>` / `augmentSkillLevel<N>` | yes, `boosts.parquet` |
+| The nested per-skill stat block | `modifiedSkillName<N>` paired with `modifierSkillName<N>` | no |
+| `Bonus to All Pets` | `petBonusName` | yes, `stats.source = 'pet_bonus'` |
+| Skill to mastery membership | `records/skills/playerclassNN/_classtree_classNN.dbr` | no |
+| Skill tree position and node shape | `records/ui/skills/classNN/skill*.dbr` | no |
+| What a skill does at each rank | `;`-separated arrays on the skill record | no |
+| Player-investable and hard caps | `skillMaxLevel`, `skillUltimateLevel` | no |
+
+Nothing requires a new game export beyond the icons. Scale at build 24756825:
+6,191 modifier pairs across 3,362 item records; 2,406 top-tier items across the
+three in-scope domains, carrying 7,456 boost rows, 1,896 modifier rows, and
+27,485 stat rows. 20 of the 315 skills are pet summons.
+
+### The link-walking resolver
+
+Skill records are frequently thin shells. `augmentSkillName1` on Chosen Visage
+points at `playerclass02/blastshield1.dbr`, which holds four keys and no display
+name; "Flame Touched" lives one `buffSkillName` hop away in
+`blastshield1_buff.dbr` along with its icon, caps, and rank arrays.
+
+**The walk is iterative, not a fixed sequence of steps.** From a starting
+record, follow either `buffSkillName` or `petSkillName` repeatedly until a
+record carrying `skillDisplayName` is reached. Chains genuinely mix the two:
+six pet-modifier nodes go `petSkillName` and then `buffSkillName`, so an
+ordered direct-then-buff-then-pet rule leaves them unresolved. Cap the depth
+and guard against cycles rather than trusting the data to terminate.
+
+Measured at build 24756825, the walk names **every** target it is pointed at:
+
+| starting set | resolved | direct | one hop | two hops |
+| --- | --- | --- | --- | --- |
+| the 315 mastery skills | 315 of 315 | 266 | 43 | 6 |
+| the 272 distinct skill-boost targets | 272 of 272 | 223 | 43 | 6 |
+
+Maximum observed depth is 2. No chain requires more.
+
+`docs/item-cli.md` currently asserts that 46 boost targets are "genuinely
+nameless (hidden buff-carrier records carrying no `skillDisplayName` fact at
+all)" and that deriving a name "would assert one the game does not have". That
+claim is wrong. Its own cited example, `playerclass01/cadence3.dbr`, carries a
+`buffSkillName` pointing at a named record. Correct that doc when this work
+lands.
+
+The same resolver does double duty. Chosen Visage's `modifierSkillName2` is a
+`SkillSecondary_PetModifier` shell whose `petSkillName` reaches
+`playerclass03/pets/modifier_head_b201_summonhellhound.dbr`, holding exactly
+`offensiveFireMin 200` and `offensiveCritDamageModifier 18`, which is the card's
+Summon Hellhound block. One function resolves both names and modifier stats.
+
+### Roster from the class tree, layout from the UI records
+
+The two sources answer different questions and only one of them is
+authoritative.
+
+**Roster: `records/skills/playerclassNN/_classtree_classNN.dbr`.** 325 distinct
+entries across the ten masteries, of which 10 are the mastery bars themselves
+(`_classtraining_classNN`), leaving **315 skills**. Every entry resolves to a
+record that exists.
+
+**Layout: `records/ui/skills/classNN/skill*.dbr`.** 314 buttons carrying
+`bitmapPositionX` / `bitmapPositionY` and `isCircular` (107 base, 207 modifier
+or transmuter). Join these onto the roster for tree position and node shape.
+
+Two traps, both of which silently corrupt counts:
+
+- **Scope the glob precisely.** `records/ui/skills/` also holds `classcommon`,
+  `classselection`, `devotion`, `hiddendevskills`, and `skillselectwheel`. A
+  `class%` pattern sweeps up the first two. Match `class01` through `class10`,
+  and the `skill*` filename prefix within them, or page chrome (`classtable`,
+  `classimage`, `classtrainingbar`) lands in the node set.
+- **The UI carries dangling references; the class tree does not.** Three UI
+  buttons name records with zero facts in the tree (for example
+  `playerclass03/bloodofdreeg1b.dbr`). `_classtree` correctly omits those, so
+  it is the superset and the UI adds nothing to the roster. Filter any UI-side
+  node to records that actually exist.
+
+311 skills therefore have a tree button. The remaining 4 are `playerclass10`
+transform abilities (Wereraven and Werewolf forms) that are granted by the form
+rather than allocated, so having no button is correct. Render them outside the
+tree grid rather than dropping them, since items do boost them.
+
+Grouping rule: walk a row left to right by `bitmapPositionX`; each `isCircular = 0`
+node opens a group and each `isCircular = 1` node joins the most recent one.
+Geometry alone is ambiguous for the offset transmuter nodes (`evileye1b` and
+`pox1b` both sit at y=211, between `evileye1` at y=179 and `pox1` at y=249), so
+the record-stem convention (`pox1b` belongs to `pox1`) resolves those. Validate
+the combined rule across all 10 masteries with a drift guard rather than
+trusting either signal alone.
+
+### The three breakpoints
+
+Every stat on a skill record is a `;`-separated array, one entry per rank. The
+panel reports three columns:
+
+| | first point | point max | fully maxed |
+| --- | --- | --- | --- |
+| index | rank 1 | `skillMaxLevel` | `skillUltimateLevel` |
+
+Verified on Flame Touched (12/22): Fire Damage runs +10% / +100% / +210%,
+Offensive Ability 12 / 133 / 220, flat Fire Damage 5 / 33 / 76, Energy Reserved
+75 / 185 / 285. These match the game.
+
+The two gaps are the two decisions a player makes. First-to-max answers "is this
+worth points"; max-to-ultimate answers "is this worth chasing +skill gear",
+which is exactly what a `+4` buys.
+
+Two display constraints. `skillMaxLevel` is per skill, not a constant (Flame
+Touched 12/22, Summon Hellhound 16/26, several 10/20), so column headers are
+per-skill. Transmuters and some modifier nodes cap at 1, where all three columns
+collapse and the panel shows a single value instead of three identical ones.
+
+**Array lengths are not uniformly `skillUltimateLevel`.** Of 1,472 stat arrays,
+1,370 match, 87 are shorter, and 15 are longer (`arcaneseal1` carries a 26-entry
+`skillManaCost` against an ultimate of 22). The emitter must clamp to the array's
+own length and emit a diagnostic counting mismatches, so a patch that changes the
+shape is visible instead of silently producing a wrong number.
+
+### Icons
+
+`resources/UI.arc` holds them at `skills/icons/classNN/skillicon_*.tex` (the
+archive strips the leading `ui/`), extracted by the same ArchiveTool invocation
+`just extract` already uses for `Text_EN.arc`. Base `Menu.arc` is a 2 KB stub
+with zero entries and is not the source.
+
+A `.tex` is a 12-byte wrapper around a DDS whose 4-byte magic reads `DDSR`.
+Strip the wrapper, replace the magic with `DDS `, and the standard 124-byte
+header follows. The icons are 32x32, uncompressed, 32 bits per pixel, with all
+four channel masks set to zero, which is why Pillow's DDS plugin decodes them to
+solid black. Decoding `frombytes("RGBA", size, data, "raw", "BGRA")` produces the
+correct image; this was verified end to end on
+`skillicon_hellhoundsummon1up.tex`.
+
+All 315 skills resolve an icon, drawn from 277 distinct files (a base skill and
+one of its modifier nodes sometimes share one). The decoder must handle, or fail
+loudly on, any icon that turns out to be block-compressed rather than
+uncompressed.
+
+## Approach
+
+Extend `just derive` with the skill tables, then emit the page's dataset from
+them.
+
+Rejected alternatives:
+
+- **Page-local parser straight to JSON** (the `parse_monsters.py` shape) ships
+  faster but strands the link-walking resolver, node grouping, and pet-chain walk
+  in a page-specific script. All three are generally useful to `gditems.py` and
+  to any future item page.
+- **DuckDB-WASM over the released parquet** would force the unresolved
+  facet-bitmaps versus DuckDB bake-off, conflict with the self-contained deploy
+  ethos, and spend the first-load byte budget, all to serve one narrow page.
+  That engine choice deserves its own spec.
+
+### Pipeline
+
+**1. `just skill-icons`** (new, Windows-only like `just extract`). ArchiveTool
+over `UI.arc` for `skills/icons/**`, decode per above, pack one committed sprite
+sheet plus a coordinate index.
+
+**2. `just derive` gains three tables** in `data/derived/`, never committed,
+released with the rest.
+
+| table | shape |
+| --- | --- |
+| `skills.parquet` | one row per skill in the class-tree roster (315). `record`, `mastery_record`, `group_record` (the base skill it hangs under), `node_kind` (base / modifier / transmuter / pet_modifier), `ui_x` / `ui_y` (null for the 4 transform abilities with no button), `name_tag`, `icon`, `max_level`, `ultimate_level`, `effect_record` (the walk-resolved record carrying the stats) |
+| `skill_ranks.parquet` | `(skill_record, stat_id, at_first, at_max, at_ultimate)`, each clamped to the array's real length |
+| `skill_modifiers.parquet` | `(item_record, modified_skill, modifier_record, stat_id, value)`, stats resolved by the same walk |
+
+The pet-chain walk (`spawnObjects` to the pet record to its `petskill_*`
+abilities) feeds `skill_ranks` for the 20 pet summon skills. This closes the
+"Pet-skill stat rollup" gap in BACKLOG. Numbers there stay caveated in the UI:
+pet damage also scales off the player's pet bonuses, so a static maxed value is
+an upper reference, not a prediction.
+
+**3. `just skill-items`** emits committed `data/skill-items.json` from the
+derived tables joined to `entities`, `stats`, and `boosts`, top tier per
+`group_key`. Full item stats are included so a row can expand into a complete
+card; that is the bulk of the file and is expected to land under
+`monsters.json`'s 1.2 MB.
+
+The route is `/items/` but the dataset is `skill-items.json` deliberately: the
+route is the durable public URL and is named broadly so the page can grow, while
+the file name describes the narrow slice it actually contains. A later,
+genuinely general item dataset should be a new file rather than a silent
+redefinition of this one.
+
+**4. `build_game_tables.py` gains `--skill-items`**, alongside the existing
+`--devotions`, `--rr`, and `--monsters`, so skill and item name tags reach
+`data/i18n/game.<locale>.json` for all 13 locales.
+
+### Page
+
+`/items/`, at `web/src/items/`, hexagonal (`core/`, `ports/` as needed,
+`adapters/`, `app/main.ts`). The monster explorer is 969 lines across 11 files
+and is the size reference.
+
+The skill picker renders the actual in-game tree using `ui_x` / `ui_y` and the
+extracted icons: base skills as squares, modifiers and transmuters as circles to
+their right. This makes the node group visible without explaining it.
+
+Facet model, matching the "Vault Zero" shape already recorded in BACKLOG (OR
+within a group, AND across groups):
+
+| group | behavior |
+| --- | --- |
+| mastery | single select |
+| skill group | single select |
+| nodes within the group | multi, all on by default |
+| slot | multi, all on by default |
+| domain (gear / relic / augment) | multi, all on by default |
+| mastery-wide boosts | toggle, off by default |
+| real modifier only, versus rank bonus only | toggle |
+| text search | free text, ANDed |
+| sort column and direction | |
+
+### URL state
+
+Every choice above lives in the hash, per the project invariant, through
+`web/src/items/core/urlState.ts` reusing `web/src/core/hashCodec.ts` for the
+multi-select groups. Three rules:
+
+- Ids are record-derived and language independent. Never display names, so a
+  shared link resolves identically in any locale.
+- Decode is tolerant. An unknown skill or mastery id falls back to no selection
+  rather than throwing; unknown slot or domain tokens are dropped.
+- Groups at their default encode as absent, so a bare `/items/` link stays
+  short and only deviations are carried.
+
+## Testing
+
+- Pure-core unit tests for `filter` and a `urlState` round-trip, including a
+  stale-link case.
+- The existing `i18nBoundary` and `appCatalog` guards apply automatically; every
+  user-facing string is a catalog key.
+- `web/e2e/items-smoke.ts`, added to `just e2e`.
+- Python legs in `just test-scripts` for the link-walking resolver (including a
+  two-hop `petSkillName` then `buffSkillName` chain and a cycle guard), the node
+  grouping rule across all 10 masteries, and the array clamp.
+- Drift guards in `just derive`, failing the build loudly: an unknown skill
+  `Class` value, a node the grouping rule cannot place, a boost target the
+  resolver cannot name, and the array-length mismatch count moving.
+- Oracles, following the existing card-oracle pattern: Chosen Visage pinned end
+  to end (both `+4` bonuses and both modifier blocks, including the pet hop
+  producing 200 Fire and +18% crit), and the three breakpoints pinned for a
+  handful of skills against grimtools, covering a non-pet skill, a pet skill,
+  and a transmuter that caps at 1.
+
+## Known gaps carried, not closed
+
+- **Scaled offensive bonus lines.** Chosen Visage's card reads `+40/+60% Fire
+  Damage` where the jitter rule yields 29/43. This is the level-linked upscale
+  already recorded in `variance.json` under `calibration.known_gap`, and it
+  affects any percentage damage line the page displays.
+- **Item source.** Not modeled; the grimtools link stands in. The link pins by
+  name plus item level and is not always unique (Obsidian War Cleaver repeats
+  item level 30 within its own ladder), so it is a "find this item" link rather
+  than a guaranteed single record.
+- **Affixes.** 1,264 affix families carry skill bonuses and are excluded until
+  the loot graph can say which gear they roll on.
+
+## Prerequisite, completed
+
+The whole pipeline was re-run and committed against 1.3.0.7 as a standalone
+baseline (`chore(data): rebuild every committed dataset against game 1.3.0.7`)
+before any of this work begins, so that patch drift cannot be confused with
+drift caused by these changes. Two count pins moved and were re-pinned against
+diffed evidence rather than blindly. Every number in this spec is measured at
+build 24756825.
+
+One follow-up is deliberately left open: `deposit.lock` still pins the
+1.3.0.0 release, so `just fetch-deposit` on a machine without the game
+installed still retrieves 1.3.0.0 parquet even though the committed datasets
+are 1.3.0.7. Publishing a `deposit-24756825.1` release via
+`just publish-deposit` closes that gap and should happen before the derive-side
+work here is expected to reproduce on CI or another machine.
