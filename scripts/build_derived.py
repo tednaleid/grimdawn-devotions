@@ -1043,6 +1043,78 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
 
 
 # ---------------------------------------------------------------------------
+# skill modifiers
+# ---------------------------------------------------------------------------
+
+# Skill-shape keys that are not stats. Excluded wherever modifier stats are read.
+_MODIFIER_STAT_EXCLUDE = ("skillMaxLevel", "skillUltimateLevel", "skillTier",
+                          "skillMasteryLevelRequired", "isPetBonusScaling",
+                          "instantCast", "petLimit", "petBurstSpawn")
+
+
+def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
+    """The extra stats an item attaches to one specific skill.
+
+    modifiedSkillName<N> names the skill and modifierSkillName<N> names the record
+    holding the stats, the trailing number pairing them. That modifier record is
+    frequently a shell: Chosen Visage's Summon Hellhound modifier is a
+    SkillSecondary_PetModifier whose petSkillName reaches the record actually
+    carrying 200 fire damage and 18% crit damage.
+
+    This walk stops at the first record carrying a non-zero numeric stat, NOT at
+    the first record carrying a display name. Modifier stats routinely sit on
+    anonymous carrier records, so the name-gated skill_effect walk stops short of
+    them and silently drops the block.
+    """
+    excluded = ", ".join(f"'{k}'" for k in _MODIFIER_STAT_EXCLUDE)
+    con.execute(f"""
+        CREATE TEMP TABLE skill_modifiers AS
+        WITH RECURSIVE paired AS (
+            SELECT s.record AS item_record,
+                   lower(trim(m.value)) AS modified_skill,
+                   lower(trim(r.value)) AS modifier_record
+            FROM scoped s
+            JOIN facts m ON m.record = s.record
+                        AND m.key LIKE 'modifiedSkillName%' AND trim(m.value) != ''
+            JOIN facts r ON r.record = s.record
+                        AND r.key = 'modifierSkillName'
+                                 || regexp_extract(m.key, 'modifiedSkillName(\\d+)', 1)
+                        AND trim(r.value) != ''
+        ),
+        walk(root, cur, depth) AS (
+            SELECT DISTINCT modifier_record, modifier_record, 0 FROM paired
+            UNION ALL
+            SELECT w.root, f.value, w.depth + 1
+            FROM walk w
+            JOIN facts f ON f.record = w.cur
+                        AND f.key IN ('buffSkillName', 'petSkillName')
+                        AND f.value LIKE 'records/skills/%'
+            WHERE w.depth < 8
+        ),
+        stat_record AS (
+            SELECT root, cur,
+                   row_number() OVER (PARTITION BY root ORDER BY depth) AS rn
+            FROM walk w
+            WHERE EXISTS (SELECT 1 FROM facts f
+                          WHERE f.record = w.cur
+                            AND f.value_num IS NOT NULL AND f.value_num != 0
+                            AND f.key NOT IN ({excluded}))
+        )
+        SELECT p.item_record, p.modified_skill, p.modifier_record,
+               f.key AS stat_id, f.value_num AS value
+        FROM paired p
+        JOIN stat_record sr ON sr.root = p.modifier_record AND sr.rn = 1
+        JOIN facts f ON f.record = sr.cur
+        WHERE f.value_num IS NOT NULL AND f.value_num != 0
+          AND f.key NOT IN ({excluded})""")
+    out = out_dir / "skill_modifiers.parquet"
+    con.execute(f"COPY (SELECT * FROM skill_modifiers "
+                f"ORDER BY item_record, modified_skill, stat_id) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM skill_modifiers").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 
 def cmd_build(args) -> int:
     deposit_dir = args.deposit_dir.resolve()
@@ -1074,6 +1146,7 @@ def cmd_build(args) -> int:
     n_conversions = build_conversions(con, out_dir)
     n_skills = build_skills(con, out_dir, diag)
     n_skill_ranks = build_skill_ranks(con, out_dir, diag)
+    n_skill_modifiers = build_skill_modifiers(con, out_dir)
 
     rel_out = out_dir / "relations.parquet"
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
@@ -1119,13 +1192,14 @@ def cmd_build(args) -> int:
     print(f"  conversions: {n_conversions}")
     print(f"  skills: {n_skills}")
     print(f"  skill ranks: {n_skill_ranks}")
+    print(f"  skill modifiers: {n_skill_modifiers}")
     print(f"  skill effect map: {n_skill_effect}")
     print("  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                         if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
     for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions",
-                 "skills", "skill_effect", "skill_ranks"):
+                 "skills", "skill_effect", "skill_ranks", "skill_modifiers"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
