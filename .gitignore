@@ -32,6 +32,9 @@ Thumbs.db
 # Scratch space for temporary/LLM-generated files (mockups, notes) - not committed
 .llm/
 
+# playwright-cli session state (snapshots, console logs) from browser checks against a local build
+.playwright-cli/
+
 # Web app
 web/node_modules/
 web/dist/
