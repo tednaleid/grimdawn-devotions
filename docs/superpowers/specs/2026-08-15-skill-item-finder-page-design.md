@@ -92,11 +92,21 @@ claim is wrong. Its own cited example, `playerclass01/cadence3.dbr`, carries a
 `buffSkillName` pointing at a named record. Correct that doc when this work
 lands.
 
-The same resolver does double duty. Chosen Visage's `modifierSkillName2` is a
-`SkillSecondary_PetModifier` shell whose `petSkillName` reaches
+Modifier stats are reached by walking the same links, but the two walks are NOT
+the same function and must not be shared. Chosen Visage's `modifierSkillName2`
+is a `SkillSecondary_PetModifier` shell whose `petSkillName` reaches
 `playerclass03/pets/modifier_head_b201_summonhellhound.dbr`, holding exactly
 `offensiveFireMin 200` and `offensiveCritDamageModifier 18`, which is the card's
-Summon Hellhound block. One function resolves both names and modifier stats.
+Summon Hellhound block.
+
+**The two walks stop on different conditions, because they answer different
+questions.** Naming stops at a record carrying `skillDisplayName`. Stat-reading
+stops at the first record carrying a non-zero numeric stat. That distinction is
+load-bearing: anonymous carrier records like the one above hold real numbers and
+no name at all, so a name-gated walk stops short and the block silently
+disappears rather than coming back wrong. Measured, reusing the naming walk for
+stats drops every modifier stat for 203 in-scope items, including half of the
+reference card.
 
 ### Roster from the class tree, layout from the UI records
 

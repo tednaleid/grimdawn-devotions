@@ -1143,6 +1143,30 @@ is itself often a shell, so the same walk from Task 3 resolves it.
 
 - [ ] **Step 1: Write the builder**
 
+**This walk is NOT `skill_effect`.** An earlier draft reused it and lost the
+Summon Hellhound block entirely. The two walks follow the same links but stop on
+different conditions, because they answer different questions:
+
+- `skill_effect` stops at a record carrying `skillDisplayName`, because its job
+  is to find a skill's NAME.
+- This one stops at the first record carrying a non-zero numeric STAT, because
+  its job is to find the numbers. Modifier stats routinely sit on anonymous
+  carrier records with no display name at all. Chosen Visage's Summon Hellhound
+  modifier reaches `pets/modifier_head_b201_summonhellhound.dbr`, which holds
+  the 200 fire damage and 18% crit damage but has no `skillDisplayName`, so the
+  name-gated walk yields nothing for it and the whole block silently vanishes.
+  Measured: reusing `skill_effect` drops all modifier stats for 203 of the
+  in-scope items.
+
+Add the shared exclusion list as a module constant beside `_RANK_ARRAY_EXCLUDE`:
+
+```python
+# Skill-shape keys that are not stats. Excluded wherever modifier stats are read.
+_MODIFIER_STAT_EXCLUDE = ("skillMaxLevel", "skillUltimateLevel", "skillTier",
+                          "skillMasteryLevelRequired", "isPetBonusScaling",
+                          "instantCast", "petLimit", "petBurstSpawn")
+```
+
 ```python
 def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     """The extra stats an item attaches to one specific skill.
@@ -1151,12 +1175,17 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     holding the stats, the trailing number pairing them. That modifier record is
     frequently a shell: Chosen Visage's Summon Hellhound modifier is a
     SkillSecondary_PetModifier whose petSkillName reaches the record actually
-    carrying 200 fire damage and 18% crit damage, so the same walk that names
-    skills is what reads these stats.
+    carrying 200 fire damage and 18% crit damage.
+
+    This walk stops at the first record carrying a non-zero numeric stat, NOT at
+    the first record carrying a display name. Modifier stats routinely sit on
+    anonymous carrier records, so the name-gated skill_effect walk stops short of
+    them and silently drops the block.
     """
-    con.execute("""
+    excluded = ", ".join(f"'{k}'" for k in _MODIFIER_STAT_EXCLUDE)
+    con.execute(f"""
         CREATE TEMP TABLE skill_modifiers AS
-        WITH paired AS (
+        WITH RECURSIVE paired AS (
             SELECT s.record AS item_record,
                    lower(trim(m.value)) AS modified_skill,
                    lower(trim(r.value)) AS modifier_record
@@ -1168,26 +1197,43 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
                                  || regexp_extract(m.key, 'modifiedSkillName(\\d+)', 1)
                         AND trim(r.value) != ''
         ),
-        resolved AS (
-            SELECT p.item_record, p.modified_skill, p.modifier_record,
-                   coalesce(e.effect_record, p.modifier_record) AS stat_record
-            FROM paired p
-            LEFT JOIN skill_effect e ON e.skill_record = p.modifier_record
+        walk(root, cur, depth) AS (
+            SELECT DISTINCT modifier_record, modifier_record, 0 FROM paired
+            UNION ALL
+            SELECT w.root, f.value, w.depth + 1
+            FROM walk w
+            JOIN facts f ON f.record = w.cur
+                        AND f.key IN ('buffSkillName', 'petSkillName')
+                        AND f.value LIKE 'records/skills/%'
+            WHERE w.depth < 8
+        ),
+        stat_record AS (
+            SELECT root, cur,
+                   row_number() OVER (PARTITION BY root ORDER BY depth) AS rn
+            FROM walk w
+            WHERE EXISTS (SELECT 1 FROM facts f
+                          WHERE f.record = w.cur
+                            AND f.value_num IS NOT NULL AND f.value_num != 0
+                            AND f.key NOT IN ({excluded}))
         )
-        SELECT r.item_record, r.modified_skill, r.modifier_record,
+        SELECT p.item_record, p.modified_skill, p.modifier_record,
                f.key AS stat_id, f.value_num AS value
-        FROM resolved r
-        JOIN facts f ON f.record = r.stat_record
+        FROM paired p
+        JOIN stat_record sr ON sr.root = p.modifier_record AND sr.rn = 1
+        JOIN facts f ON f.record = sr.cur
         WHERE f.value_num IS NOT NULL AND f.value_num != 0
-          AND f.key NOT IN ('skillMaxLevel', 'skillUltimateLevel', 'skillTier',
-                            'skillMasteryLevelRequired', 'isPetBonusScaling',
-                            'instantCast', 'petLimit', 'petBurstSpawn')""")
+          AND f.key NOT IN ({excluded})""")
     out = out_dir / "skill_modifiers.parquet"
     con.execute(f"COPY (SELECT * FROM skill_modifiers "
                 f"ORDER BY item_record, modified_skill, stat_id) "
                 f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
     return con.execute("SELECT count(*) FROM skill_modifiers").fetchone()[0]
 ```
+
+Not every modifier record carries numbers: 198 of the 3,321 distinct modifier
+records hold only effect or pet changes, so they contribute no rows. Across all
+records, 3,257 items resolve to modifier stats; the in-scope figure after the
+`scoped` join is lower and is what the acceptance query should pin.
 
 Wire into `cmd_build` after `build_skill_ranks`, print
 `skill modifiers: {n_skill_modifiers}`, add `"skill_modifiers"` to the artifact
@@ -1234,7 +1280,11 @@ checks AS (
         (SELECT count(*) FROM skill_modifiers m
           WHERE NOT EXISTS (SELECT 1 FROM facts f WHERE f.record = m.modified_skill))
           = 0 AS targets_exist,
-        (SELECT count(DISTINCT item_record) FROM skill_modifiers) = 3362 AS item_count_exact
+        -- Measure this once against the built table and pin what you observe, the
+        -- way every other AE recipe pins a count. It is strictly below the 3,362
+        -- items carrying modifier PAIRS, because 198 modifier records hold only
+        -- effect or pet changes and contribute no stat rows. Report the number.
+        (SELECT count(DISTINCT item_record) FROM skill_modifiers) = 0 AS item_count_exact
 )
 SELECT v.modified_skill, v.stat_id, v.value
 FROM visage v CROSS JOIN checks c
