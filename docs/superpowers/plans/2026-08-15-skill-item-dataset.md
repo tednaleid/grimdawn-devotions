@@ -39,8 +39,9 @@ The one genuinely pure-Python piece, the `.tex` decoder, does get a Python test.
 - Committed datasets under `data/` ARE committed and must build anywhere.
 - Docs and comments: no emojis, no emdashes, no hyperbole.
 - Python scripts are uv-shebang standalone scripts, matching the existing
-  `scripts/*.py` style. Dependencies are declared in the inline script metadata
-  block.
+  `scripts/*.py` style. The exact header order every sibling script uses is:
+  shebang, then the two `# ABOUTME: ` lines, then the `# /// script` metadata
+  block with `requires-python = ">=3.10"`. Do not reorder these.
 - Extraction recipes that need the game installed are Windows-only and must
   fail loudly with a clear message when the game is absent, like `just extract`.
 - All numbers in this plan are measured at Steam build 24756825 (game 1.3.0.7),
@@ -260,12 +261,12 @@ Create `scripts/build_skill_icons.py`:
 
 ```python
 #!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = ["pillow"]
-# ///
 # ABOUTME: Extracts skill icons from the game's UI.arc and packs one sprite sheet.
 # ABOUTME: Windows-only (needs ArchiveTool.exe and a Grim Dawn install).
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["pillow"]
+# ///
 import argparse
 import json
 import math
@@ -1179,12 +1180,12 @@ Create `scripts/build_skill_items.py`:
 
 ```python
 #!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = ["duckdb"]
-# ///
 # ABOUTME: Emits data/skill-items.json, the committed dataset behind the /items/ page.
 # ABOUTME: Reads the derived parquet only; needs no game install.
+# /// script
+# requires-python = ">=3.10"
+# dependencies = ["duckdb"]
+# ///
 import argparse
 import json
 import sys
