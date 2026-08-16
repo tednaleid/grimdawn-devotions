@@ -1297,8 +1297,9 @@ export function reachabilityForSelection(
   // verdict is the current selection's - classify that once and reuse it instead of re-running the
   // (sometimes costly) resolver per complete constellation.
   const selfReachable = classifyForSelection(cons, table, st, budget) === "reachable";
-  // Rule 5 in docs/devotion-system.md, checked on the summary: no started constellation may need more
-  // of a color than the completed ones supply. Same comparison the affinity panel shows as have/need.
+  // The validity definition in docs/devotion-system.md ("A selection is valid when..."), checked on
+  // the summary: no started constellation may need more of a color than the completed ones supply.
+  // Same comparison the affinity panel shows as have/need.
   const selfValid = st.target.every((need, i) => need <= st.supplyUncapped[i]!);
   for (const c of model.constellations.values()) {
     const size = c.starIds.length;
