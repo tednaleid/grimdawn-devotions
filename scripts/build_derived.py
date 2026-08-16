@@ -548,6 +548,53 @@ def build_boosts(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
 
 
 # ---------------------------------------------------------------------------
+# skill effect resolution
+# ---------------------------------------------------------------------------
+
+def build_skill_effect_map(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
+    """Map every skill-ish record to the record that actually carries its stats.
+
+    Skill records are frequently thin shells: a tree node may hold nothing but a
+    buffSkillName pointing at the record with the display name, icon, caps and
+    per-rank arrays. The walk must be iterative rather than an ordered
+    direct/buff/pet rule, because chains mix the two link types: six pet-modifier
+    nodes go petSkillName and then buffSkillName. Depth is capped and visited
+    records are tracked so a malformed cycle cannot hang the build.
+    """
+    con.execute("""
+        CREATE TEMP TABLE skill_effect AS
+        WITH RECURSIVE roots AS (
+            SELECT DISTINCT record AS skill_record FROM facts
+            WHERE record LIKE 'records/skills/%'
+        ),
+        walk(root, cur, depth) AS (
+            SELECT skill_record, skill_record, 0 FROM roots
+            UNION ALL
+            SELECT w.root, f.value, w.depth + 1
+            FROM walk w
+            JOIN facts f ON f.record = w.cur
+                        AND f.key IN ('buffSkillName', 'petSkillName')
+                        AND f.value LIKE 'records/skills/%'
+            WHERE w.depth < 8
+              AND NOT EXISTS (SELECT 1 FROM facts d
+                              WHERE d.record = w.cur AND d.key = 'skillDisplayName')
+        ),
+        named AS (
+            SELECT w.root, w.cur, w.depth,
+                   row_number() OVER (PARTITION BY w.root ORDER BY w.depth) AS rn
+            FROM walk w
+            WHERE EXISTS (SELECT 1 FROM facts d
+                          WHERE d.record = w.cur AND d.key = 'skillDisplayName')
+        )
+        SELECT root AS skill_record, cur AS effect_record, depth AS hops
+        FROM named WHERE rn = 1""")
+    out = out_dir / "skill_effect.parquet"
+    con.execute(f"COPY (SELECT * FROM skill_effect ORDER BY skill_record) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM skill_effect").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
 # conversions
 # ---------------------------------------------------------------------------
 
@@ -849,6 +896,7 @@ def cmd_build(args) -> int:
             "cost_default_used": 0, "cost_record_missing": 0, "equation_errors": 0,
             "skill_ref_missing": 0}
     build_wide(con, cur)
+    n_skill_effect = build_skill_effect_map(con, out_dir)
     n_relations = build_relations(con, diag)
     n_entities = build_entities(con, cur, out_dir, diag)
     n_stats = build_stats(con, cur, out_dir, diag)
@@ -898,11 +946,13 @@ def cmd_build(args) -> int:
     print(f"  boosts: {n_boosts}   " +
           "  ".join(f"{k}({n})" for k, n in boost_kind_counts))
     print(f"  conversions: {n_conversions}")
+    print(f"  skill effect map: {n_skill_effect}")
     print("  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                         if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions"):
+    for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions",
+                 "skill_effect"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")
