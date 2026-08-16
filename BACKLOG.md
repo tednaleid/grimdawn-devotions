@@ -5,7 +5,7 @@ Each item includes implementation pointers for whoever picks it up. This file
 is future work ONLY: shipped features and their history live in the code, in
 git history, and in the reference docs under `docs/`.
 
-## Grimtools import: deferred follow-ups
+## Grimtools import/export: deferred follow-ups
 
 Shipped: paste a grimtools calc link or slug to load its devotions, with `gt=`
 provenance in the hash and a link back to the source build. See
@@ -29,6 +29,35 @@ provenance in the hash and a link back to the source build. See
   point may not match). Not fixed here, since it needed real UX judgment (disable the
   input while loading? cancel-and-restart? a request token?) that was out of scope for
   a review-fix pass.
+- Export: cross-session duplicate detection is impossible without a way to read a
+  build's stars back and compare; if it ever matters, the worker's `GET /` already
+  returns them, so "compare on demand when a `gt=` link is restored" is one fetch
+  (`web/src/app/main.ts` `knownBuilds`).
+- Export: the payload is a fresh level-100 character. If grimtools changes its
+  Share defaults (`bio` numbers), update `savePayload`'s fixture test from a fresh
+  capture (spec 2026-08-16, "What the investigation established").
+- Export: the rate limits (5/min per address, 60/min global) are guesses; revisit
+  from worker analytics if real users hit them.
+- Round-trip a whole grimtools build (planner as the devotions editor). Builds are
+  immutable and `gt=<slug>` already points at the full non-devotion state, so no new
+  client state is needed: `POST /export` grows an optional `base: <slug>` plus
+  `remove`/`add` skill-id lists; the worker fetches the base build's `buildInfo.data`,
+  drops `skills` entries in `remove`, appends `add` at level 1, sets
+  `bio.devotionPoints = base.bio.devotionPoints + remove.length - add.length`, and posts
+  everything else untouched. The planner computes `remove` by fetching the base's skill
+  list through the gateway and intersecting with the mapping table (only the planner
+  knows which ids are devotion stars). Each export becomes the new `gt`, so edits chain;
+  with no `gt` it degrades to today's bare export. Probe first: grimtools binds
+  celestial powers to skills via `autoCastSkill` (on `skills[]` and `itemSkills[]`) and
+  may reference stars from the quickbar; confirm the id space and how grimtools loads a
+  build whose binding points at a removed devotion, then have the worker strip bindings
+  whose id is in `remove`. Extend `extractBuildInfo` to return the whole `data` object.
+- grimtools' own "Devotion path" panel reported "There's no way to include all selected
+  constellations with only 55 devotion points" for an exported 53-star build
+  (`https://www.grimtools.com/calc/2d1W1Q8V`, the forum link with Lion completed) that
+  our oracle proves has a legal 55-point schedule; stars, points and affinities matched.
+  Worth checking whether their path finder ignores refundable scaffolding, and whether
+  the game accepts our schedule for that build (docs/reachability-engine.md playbook).
 
 ## Map / List view toggle
 

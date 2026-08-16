@@ -1,4 +1,4 @@
-# Importing devotions from a grimtools build
+# Importing and exporting devotions with grimtools
 
 Paste a grimtools calculator link (or a bare slug) into the planner and that build's
 devotion stars appear on the map, with a link back to the build it came from.
@@ -28,8 +28,8 @@ reason the worker exists.
 grimtools' internal `sk<id>` skill ids to our star ids, plus the grimtools devotion data
 version it was derived from.
 
-**A Cloudflare Worker** (`worker/`) that fetches a build by slug and returns its skill
-ids. It holds no game knowledge.
+**A Cloudflare Worker** (`worker/`) that fetches a build by slug and returns its skill ids,
+and that saves a list of skill ids as a fresh build. It holds no game knowledge.
 
 **The planner**, which maps those ids through the table, applies the selection, and
 records the source slug in the URL hash.
@@ -166,6 +166,45 @@ replaced by the source link and a clear button.
   not determine" and degrades to proceeding.
 - **Clearing drops the association only**, leaving the selection and cap untouched.
 
+## Exporting a selection to a fresh grimtools build
+
+The reverse direction: one button saves the current selection as a new anonymous
+grimtools build and makes it the associated build (the link-plus-clear state, and
+`gt=<slug>` in the hash). The design record is
+[docs/superpowers/specs/2026-08-16-grimtools-export-design.md](superpowers/specs/2026-08-16-grimtools-export-design.md).
+
+**Grimtools saves a build in one POST.** Its calculator is entirely client-side;
+Share serializes the whole build and posts it to `save_build.php`, which returns the
+slug. No login or token is involved and a non-browser client is accepted, so the
+worker relays it. Builds are immutable: every save mints a new slug.
+
+**The planner maps, the worker relays.** The planner inverts the same
+`data/grimtools-stars.json` it uses for import (`invertStarTable`,
+`toGrimtoolsSkills` in `web/src/core/grimtools.ts`) and posts `{ skills: ["sk739",
+...] }` to `POST /export`. The worker validates shape (1 to 55 distinct `sk<digits>`
+ids, a 4 KB body cap, our origin), rate-limits (5 per minute per address and 60 per
+minute overall, via Workers rate-limit bindings), builds the payload with the shared
+`savePayload` (the exact shape the calculator's Share button posts, at level 100 with
+`devotionPoints` counting down from 55), posts it to the constant
+`https://www.grimtools.com/save_build.php`, and returns the re-validated slug as
+`{ slug }` with status 201. Errors: 400 `bad_request`, 403 `forbidden`, 429
+`rate_limited`, 502 `upstream` or `unparseable`. Nothing is cached.
+
+**Only a complete build can be exported.** Export is disabled, with a one-line hint,
+for an empty selection, for the uncapped point mode, and for any selection the engine
+does not classify as a legal build within 55 points (`ReachView.legal`); grimtools
+models what the game allows and would render stars the game cannot grant.
+
+**An unchanged selection is not exported twice, within a session.** The planner keeps
+a memo of the star sets behind builds it imported cleanly (nothing pruned) or
+exported; when the current selection matches one, the panel shows that build's link
+and hides Export, and returning to a memoized set re-associates it. A reloaded link
+restores `gt=` but not the memo, so Export is offered again there.
+
+Both directions go through the `GrimtoolsGateway` port
+(`web/src/ports/GrimtoolsGateway.ts`); `web/src/adapters/grimtoolsWorkerGateway.ts` is
+the only code that knows the worker's URL, routes and JSON shapes.
+
 ## Running it locally
 
 ```
@@ -185,7 +224,8 @@ from the `IMPORT_API_URL` repository variable at build time.
 **The response shape:** bump `IMPORT_CONTRACT_VERSION` in `web/src/core/grimtools.ts`.
 A guard test pins the exact set of response fields and will tell you when this is needed.
 Tolerant parsing is still the primary defense, because no cache mechanism helps a
-deployed old bundle talking to a new worker mid-rollout.
+deployed old bundle talking to a new worker mid-rollout. The export route has its own
+`EXPORT_CONTRACT_VERSION` beside it, pinned by the same test file.
 
 **The worker:** deploys from CI on push to `main` touching `worker/**` or
 `web/src/core/grimtools.ts` (it bundles that module, so the path filter includes it).
@@ -205,3 +245,6 @@ renumbering reaches us from CI rather than from a confused user.
   and item skills; nothing consumes them because the planner models devotions.
 - The source link persists after the build is edited and is dismissed by hand. There is no
   automatic "modified since import" marking.
+- Export covers devotions only: the saved build is a fresh level-100 character with no
+  masteries or gear.
+- Duplicate-export detection is per session; a reloaded link offers Export again.
