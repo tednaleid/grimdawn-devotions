@@ -8,6 +8,7 @@
 import argparse
 import json
 import math
+import re
 import subprocess
 import sys
 import tempfile
@@ -33,8 +34,11 @@ def ui_archives(gd_dir: Path) -> list[Path]:
     discovered by the gdx* convention so a future release needs no code change,
     matching how `just extract` layers records and text.
     """
+    def gdx_num(p: Path) -> int:
+        m = re.search(r"gdx(\d+)", p.as_posix().lower())
+        return int(m.group(1)) if m else 0
     found = [gd_dir / "resources" / "UI.arc"]
-    found += [p / "resources" / "UI.arc" for p in sorted(gd_dir.glob("gdx*"))]
+    found += sorted(gd_dir.glob("gdx*/resources/UI.arc"), key=gdx_num)
     return [p for p in found if p.is_file()]
 
 
@@ -72,6 +76,16 @@ def main(argv=None) -> int:
                        if p.name.endswith(WANTED_SUFFIX) and "_red" not in p.name)
         if not found:
             print(f"ERROR: no skill icons under {icons_root} (archive layout changed?)",
+                  file=sys.stderr)
+            return 2
+        # An absent expansion overlay is not an error to ArchiveTool, it just yields
+        # fewer icons, so check the ten mastery directories are all present rather
+        # than trusting the archive count.
+        seen = {p.parent.name for p in found}
+        missing = sorted({f"class{n:02d}" for n in range(1, 11)} - seen)
+        if missing:
+            print(f"ERROR: no icons for {', '.join(missing)}. Expansion UI.arc overlays are "
+                  f"missing or failed to extract; layered {len(archives)} archive(s) from {args.gd_dir}.",
                   file=sys.stderr)
             return 2
 

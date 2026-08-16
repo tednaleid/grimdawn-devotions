@@ -59,6 +59,22 @@ check("decodes a 24-bit image", (w, h) == (1, 1))
 check("24-bit reorders BGR to RGB", rgba[:3] == bytes([0xFF, 0x00, 0x00]))
 check("24-bit is fully opaque", rgba[3] == 0xFF)
 
+# 2x2 24-bit with four distinct pixels: 12 bytes in, 16 out. A 1x1 case cannot
+# catch a wrong stride (one pixel is one element at any stride), so this is the
+# case that pins the 3-byte step, the BGR to RGB reorder and the row order.
+bgr_2x2 = bytes([0x03, 0x02, 0x01,   # pixel 0: RGB 01 02 03
+                 0x06, 0x05, 0x04,   # pixel 1: RGB 04 05 06
+                 0x09, 0x08, 0x07,   # pixel 2: RGB 07 08 09
+                 0x0C, 0x0B, 0x0A])  # pixel 3: RGB 0A 0B 0C
+w, h, rgba = decode_tex(make_tex(2, 2, bgr_2x2, bitcount=24))
+check("decodes a 2x2 24-bit image", (w, h) == (2, 2) and len(rgba) == 16)
+check("24-bit keeps pixel and row order", rgba == bytes([
+    0x01, 0x02, 0x03, 0xFF,
+    0x04, 0x05, 0x06, 0xFF,
+    0x07, 0x08, 0x09, 0xFF,
+    0x0A, 0x0B, 0x0C, 0xFF,
+]))
+
 # 24-bit truncation is still rejected.
 try:
     decode_tex(make_tex(4, 4, bytes([0x00, 0x00, 0xFF]), bitcount=24))
@@ -70,7 +86,7 @@ except ValueError:
 for label, blob in (
     ("a non-TEX file", b"NOPE" + b"\x00" * 32),
     ("an unexpected inner magic", make_tex(1, 1, red_bgra, magic=b"JUNK")),
-    ("a non-32-bit image", make_tex(1, 1, red_bgra, bitcount=16)),
+    ("an unsupported bit count", make_tex(1, 1, red_bgra, bitcount=16)),
     ("a truncated pixel buffer", make_tex(4, 4, red_bgra)),
 ):
     try:
