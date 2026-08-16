@@ -1030,7 +1030,9 @@ async function boot() {
     exportError = null;
     syncImportPanel();
     const result = await gateway.saveBuild(skills);
-    exportingKey = null;
+    // Only the export that owns the key clears it: a result for a superseded selection must not
+    // stop a later export's in-flight indicator.
+    if (exportingKey === key) exportingKey = null;
     if (result.kind !== "ok") {
       exportError = { key, code: result.kind };
       return syncImportPanel();

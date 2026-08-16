@@ -719,6 +719,11 @@ main {
 #export-row {
   margin-top: 0.35rem;
 }
+/* The row shares .import-row, whose `display: flex` outranks the browser's `[hidden]` rule, so the
+   hidden attribute needs an author-origin rule of its own to take effect. */
+#export-row[hidden] {
+  display: none;
+}
 #export-go {
   flex: 1;
 }
