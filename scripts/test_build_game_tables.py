@@ -134,7 +134,11 @@ skill_items_doc = {
     "masteries": [{"record": "records/skills/playerclass03/_classtraining_class03.dbr",
                    "name_tag": "tagClass03SkillName00"}],
     "skills": [{"record": "records/skills/playerclass03/summon_hellhound1.dbr",
-                "name_tag": "tagClass03SkillName02A"},
+                "name_tag": "tagClass03SkillName02A",
+                "pets": [{"record": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
+                          "name_tag": "tagPetHellhoundA01",
+                          "stats": [{"source_name_tag": "tagClass03SkillName02E"},
+                                    {"source_name_tag": None}]}]},
                {"record": "records/skills/nameless.dbr", "name_tag": None}],
     "items": [{"record": "records/items/gearhead/b201f_head.dbr",
                "name_tag": "tagGDX2HeadB201"}],
@@ -143,6 +147,9 @@ tags = bgt.collect_referenced_tags({}, {}, {}, {}, {}, skill_items_doc)
 check("skill-items contributes mastery name tags", "tagClass03SkillName00" in tags, True)
 check("skill-items contributes skill name tags", "tagClass03SkillName02A" in tags, True)
 check("skill-items contributes item name tags", "tagGDX2HeadB201" in tags, True)
+check("skill-items contributes pet name tags", "tagPetHellhoundA01" in tags, True)
+check("skill-items contributes pet ability name tags",
+      "tagClass03SkillName02E" in tags, True)
 check("a null name_tag is skipped, not added", None not in tags, True)
 
 print("ALL PASSED" if failures == 0 else f"{failures} FAILURE(S)")

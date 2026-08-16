@@ -45,7 +45,9 @@ def collect_referenced_tags(
     a real tag carry a synthesized x: placeholder (no game text exists), so only
     tag-prefixed values are collected. A monster with no resolvable race carries a null
     race_tag, which _add skips. skill-items contributes the name tags of its masteries,
-    skills and items; a nameless item carries a null name_tag, which _add also skips."""
+    skills and items, plus the pet name and pet-ability name tags a summon skill's panel
+    renders; a nameless item or an unnamed pet ability carries a null tag, which _add
+    also skips."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
@@ -71,6 +73,11 @@ def collect_referenced_tags(
     for key in ("masteries", "skills", "items"):
         for row in (skill_items or {}).get(key, []):
             _add(tags, row.get("name_tag"))
+    for skill in (skill_items or {}).get("skills", []):
+        for pet in skill.get("pets", []):
+            _add(tags, pet.get("name_tag"))
+            for stat in pet.get("stats", []):
+                _add(tags, stat.get("source_name_tag"))
     tags.update(stat_tags.values())
     tags.update((stat_format_tags or {}).values())
     return tags
@@ -98,7 +105,8 @@ def main(argv=None) -> int:
     ap.add_argument("--monsters", type=Path,
                     help="Optional monsters.json (adds its monster name + race tags)")
     ap.add_argument("--skill-items", type=Path,
-                    help="Optional skill-items.json (adds its mastery, skill and item name tags)")
+                    help="Optional skill-items.json (adds its mastery, skill, item, "
+                         "pet and pet-ability name tags)")
     ap.add_argument("--text-dir", required=True, type=Path)
     ap.add_argument("--lang", required=True, help="Language code, e.g. en (used only for logging)")
     ap.add_argument("--out", required=True, type=Path)

@@ -87,6 +87,36 @@ def main(argv=None) -> int:
             {"stat": r["stat_id"], "first": r["at_first"],
              "max": r["at_max"], "ultimate": r["at_ultimate"]})
 
+    # A summon skill's own record says almost nothing (Summon Hellhound carries a
+    # mana cost, a cooldown and a pet cap), so its panel is the pet: the creature's
+    # own resistances plus the rank-scaled abilities it is granted. The pet's name
+    # comes off its `description` tag and an ability's off the same walk that names
+    # every other skill; both are NULL where the game has no name, which the page
+    # renders as an unlabelled block rather than inventing one.
+    pets_by_skill = {}
+    for r in rows(con, """
+            SELECT p.skill_record, p.pet_record, p.source_kind, p.source_record,
+                   p.stat_id, p.at_first, p.at_max, p.at_ultimate,
+                   (SELECT f.value FROM facts f
+                     WHERE f.record = p.pet_record AND f.key = 'description')
+                     AS pet_name_tag,
+                   (SELECT f.value FROM facts f
+                     JOIN skill_effect e ON e.effect_record = f.record
+                    WHERE e.skill_record = p.source_record
+                      AND f.key = 'skillDisplayName') AS source_name_tag
+            FROM pet_ranks p
+            ORDER BY p.skill_record, p.pet_record, p.source_kind, p.source_record,
+                     p.stat_id"""):
+        by_pet = pets_by_skill.setdefault(r["skill_record"], {})
+        pet = by_pet.setdefault(r["pet_record"],
+                                {"record": r["pet_record"],
+                                 "name_tag": r["pet_name_tag"], "stats": []})
+        pet["stats"].append({
+            "source_kind": r["source_kind"], "source": r["source_record"],
+            "source_name_tag": r["source_name_tag"], "stat": r["stat_id"],
+            "first": r["at_first"], "max": r["at_max"], "ultimate": r["at_ultimate"],
+        })
+
     skills = []
     for s in rows(con, "SELECT * FROM skills ORDER BY mastery_record, record"):
         skills.append({
@@ -96,6 +126,7 @@ def main(argv=None) -> int:
             "icon": s["icon"], "max_level": s["max_level"],
             "ultimate_level": s["ultimate_level"],
             "ranks": ranks_by_skill.get(s["record"], []),
+            "pets": list(pets_by_skill.get(s["record"], {}).values()),
         })
 
     def group(sql, key):
