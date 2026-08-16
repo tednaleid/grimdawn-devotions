@@ -198,9 +198,8 @@ test("toGrimtoolsSkills of nothing is an empty list", () => {
 });
 
 test("savePayload is the body grimtools' own Share button posts, minus the fields we never set", () => {
-  // Captured from the live calculator on 2026-08-16 (spec, "What the investigation established"):
-  // a level-100 character with one crossroads star. Quickbars and mouse slots are left empty; the
-  // stripped shape saved and rendered identically to the calculator's own.
+  // One crossroads star on a fresh level-100 character: the calculator's own Share-button payload
+  // minus the quickbar and mouse fields, which are left empty (see docs/superpowers/specs/2026-08-16-grimtools-export-design.md).
   expect(savePayload(["sk739"])).toEqual({
     bio: {
       level: 100,
