@@ -189,6 +189,19 @@ test("the caching wrapper shares one cache entry across requests differing only 
   expect(await second.json()).toEqual(firstBody);
 });
 
+// The cache key is the slug alone, so the wrapper must consult it only for the route that key
+// describes: a warm entry for the import route must never be handed to another path, which has its
+// own answer (404 here) and would otherwise serve the import body once the cache is warm.
+test("a warm import cache entry is not served for another path", async () => {
+  installFakeCache();
+  const spy = (async (u: string) => ok(String(u))) as never;
+  const warm = await worker.fetch(new Request("https://w/?slug=qNYgbjeV"), env(spy));
+  expect(warm.status).toBe(200);
+  const other = await worker.fetch(new Request("https://w/foo?slug=qNYgbjeV"), env(spy));
+  expect(other.status).toBe(404);
+  expect(await other.json()).toEqual({ error: "not_found" });
+});
+
 test("the client's version param does not leak into the response body", async () => {
   const res = await handleRequest(new Request("https://w/?slug=qNYgbjeV&v=999999"), env(ok as never));
   expect(JSON.stringify(await res.json())).not.toContain("999999");

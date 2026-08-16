@@ -6,6 +6,7 @@ import {
   extractBuildTitle,
   buildIsMissing,
   IMPORT_CONTRACT_VERSION,
+  GRIMTOOLS_DEVOTION_POINTS,
   savePayload,
   isSlug,
 } from "../../web/src/core/grimtools";
@@ -17,7 +18,7 @@ const MAX_BYTES = 2_000_000; // a calc page is ~40KB; this only bounds a hostile
 const TIMEOUT_MS = 10_000;
 const SAVE_URL = "https://www.grimtools.com/save_build.php";
 const MAX_EXPORT_BODY = 4096; // 55 ids at ~10 bytes each is well under 1 KB; this bounds a hostile body
-const MAX_EXPORT_SKILLS = 55; // the game's devotion budget
+const MAX_EXPORT_SKILLS = GRIMTOOLS_DEVOTION_POINTS; // the game's devotion budget
 const SKILL_ID_RE = /^sk\d+$/;
 
 /** The surface of a Workers rate-limit binding (`[[ratelimits]]` in wrangler.toml); tests pass a fake. */
@@ -273,7 +274,7 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   // anything but ids of our own shape. Named `skills`, not `stars`: this still mixes mastery
   // skills in with devotion stars (see extractBuildInfo) - the worker has no way to tell them
   // apart, so the field name must not claim otherwise.
-  const skills = info.skillIds.filter((s) => /^sk\d+$/.test(s));
+  const skills = info.skillIds.filter((s) => SKILL_ID_RE.test(s));
 
   // Best effort. A missing data version degrades to "cannot check", never to a blocked import.
   let dataVersion: string | null = null;
@@ -289,11 +290,13 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    // Only a validated GET is ever cached: the cache key below is built from the slug alone, so
-    // an OPTIONS preflight or a request that fails validation must never consult or populate it
-    // (an OPTIONS request sharing a GET's cache key would return a cached JSON body in place of
-    // its 204 preflight response).
-    if (request.method !== "GET") return handleRequest(request, env);
+    // Only a validated GET on the import route is ever cached: the cache key below is built from
+    // the slug alone, so any other request must never consult or populate it (an OPTIONS preflight
+    // sharing a GET's cache key would return a cached JSON body in place of its 204 preflight
+    // response, and `/anything?slug=X` would be answered with the import route's body instead of
+    // the 404 it must get).
+    const { pathname } = new URL(request.url);
+    if (request.method !== "GET" || pathname !== "/") return handleRequest(request, env);
     const slug = validSlug(request);
     if (slug === null) return handleRequest(request, env);
 

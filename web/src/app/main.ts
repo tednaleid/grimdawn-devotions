@@ -819,10 +819,16 @@ async function boot() {
     if (key !== lastSelectionKey) {
       lastSelectionKey = key;
       const known = knownBuilds.get(key);
-      if (known !== undefined) source = known;
+      // Only a re-association repaints the import half. A render is not an import event, so
+      // anything the import side is showing - a typed slug, a loading or error message, the title
+      // and pruned notice of the build just imported - has to survive every other refresh.
+      if (known !== undefined && known !== source) {
+        source = known;
+        importPanel.setState({ kind: "done", slug: source });
+      }
       if (exportError && exportError.key !== key) exportError = null;
     }
-    syncImportPanel();
+    importPanel.setExportState(exportStateFor());
     document.body.classList.toggle("comparing", baseline !== null);
     updateNarrow();
     paintMap();
@@ -909,7 +915,7 @@ async function boot() {
     try {
       const res = await fetch(`./data/grimtools-stars.json?v=${buildId}`);
       if (!res.ok) {
-        console.warn(`grimtools-stars.json fetch ${res.status}; import unavailable`);
+        console.warn(`grimtools-stars.json fetch ${res.status}; import and export unavailable`);
         return null;
       }
       const doc = (await res.json()) as { dataVersion: string; stars: StarTable };
@@ -917,7 +923,7 @@ async function boot() {
       starTable = doc.stars;
       return starTable;
     } catch (e) {
-      console.warn("grimtools-stars.json load failed; import unavailable", e);
+      console.warn("grimtools-stars.json load failed; import and export unavailable", e);
       return null;
     }
   }
@@ -931,8 +937,9 @@ async function boot() {
   function selectionKey(sel: Set<string>): string {
     return [...sel].sort().join(",");
   }
-  // The selection key at the last refresh: the memo is consulted only when the key changes, so a
-  // cleared association stays cleared until the selection actually moves.
+  // The selection key the panel was last reconciled against: the memo is consulted only when the key
+  // changes, so a cleared association stays cleared until the selection actually moves, and a
+  // restored hash (which adopts the key itself) keeps the provenance it arrived with.
   let lastSelectionKey: string | null = null;
   // In-flight and failed exports, pinned to the selection they were made from: a change of selection
   // supersedes both, and a result that arrives after such a change never re-associates the wrong set.
@@ -1005,54 +1012,71 @@ async function boot() {
 
   async function runExport(): Promise<void> {
     const key = selectionKey(state.selected);
-    const starIdTable = await loadStarTable();
-    if (!starIdTable) {
-      // loadStarTable already warned with the real cause; "network" is the same stand-in import uses.
-      exportError = { key, code: "network" };
+    // This selection already has a build from this session, so re-associate it instead of minting a
+    // duplicate. Only reachable with the export row visible, which after a memo hit means the
+    // association was dropped by ✕ or by Back.
+    const known = knownBuilds.get(key);
+    if (known !== undefined) {
+      source = known;
+      writeHash("push");
       return syncImportPanel();
     }
-    try {
-      inverseTable ??= invertStarTable(starIdTable);
-    } catch (e) {
-      console.warn("export unavailable: grimtools-stars.json does not invert cleanly", e);
-      exportError = { key, code: "network" };
-      return syncImportPanel();
-    }
-    const skills = toGrimtoolsSkills(state.selected, inverseTable);
-    if (!skills) {
-      // Cannot happen with a table that passed its generation gates; a bug report, not a user state.
-      const missing = [...state.selected].filter((s) => inverseTable![s] === undefined);
-      console.warn(`export: selected star(s) missing from grimtools-stars.json: ${missing.join(", ")}`);
-      exportError = { key, code: "network" };
-      return syncImportPanel();
-    }
+    // The export is pinned to the selection it was made from: the star set is copied and the
+    // in-flight key claimed before the first await, so a star toggled mid-request neither changes
+    // what ships nor lets a second click mint a second build.
+    const selected = new Set(state.selected);
     exportingKey = key;
     exportError = null;
     syncImportPanel();
-    const result = await gateway.saveBuild(skills);
-    // Only the export that owns the key clears it: a result for a superseded selection must not
-    // stop a later export's in-flight indicator.
-    if (exportingKey === key) exportingKey = null;
-    if (result.kind !== "ok") {
-      exportError = { key, code: result.kind };
-      return syncImportPanel();
+    try {
+      const starIdTable = await loadStarTable();
+      if (!starIdTable) {
+        // loadStarTable already warned with the real cause; "network" is the same stand-in import uses.
+        exportError = { key, code: "network" };
+        return;
+      }
+      try {
+        inverseTable ??= invertStarTable(starIdTable);
+      } catch (e) {
+        console.warn("export unavailable: grimtools-stars.json does not invert cleanly", e);
+        exportError = { key, code: "network" };
+        return;
+      }
+      const skills = toGrimtoolsSkills(selected, inverseTable);
+      if (!skills) {
+        // Cannot happen with a table that passed its generation gates; a bug report, not a user state.
+        const missing = [...selected].filter((s) => inverseTable![s] === undefined);
+        console.warn(`export: selected star(s) missing from grimtools-stars.json: ${missing.join(", ")}`);
+        exportError = { key, code: "network" };
+        return;
+      }
+      const result = await gateway.saveBuild(skills);
+      if (result.kind !== "ok") {
+        exportError = { key, code: result.kind };
+        return;
+      }
+      knownBuilds.set(key, result.slug);
+      // The selection may have moved on while the request was in flight: only the selection the build
+      // was made from becomes associated with it (a later return to that set re-associates via the memo).
+      if (selectionKey(state.selected) === key) {
+        source = result.slug;
+        writeHash("push"); // like import: Back returns to the un-associated state
+      }
+    } finally {
+      // Only the export that owns the key clears it: a result for a superseded selection must not
+      // stop a later export's in-flight indicator.
+      if (exportingKey === key) exportingKey = null;
+      syncImportPanel();
     }
-    knownBuilds.set(key, result.slug);
-    // The selection may have moved on while the request was in flight: only the selection the build
-    // was made from becomes associated with it (a later return to that set re-associates via the memo).
-    if (selectionKey(state.selected) === key) {
-      source = result.slug;
-      writeHash("push"); // like import: Back returns to the un-associated state
-    }
-    syncImportPanel();
   }
 
   const importPanel = mountImportPanel(document.getElementById("import-panel") as HTMLElement, localization, {
     onSubmit: (slug) => void runImport(slug),
     onExport: () => void runExport(),
   });
-  // Reflects `source` and the export state into the panel: at mount, on every hashchange, on every
-  // refresh (the export state depends on legality and the memo), and around an export request.
+  // Reflects `source` and the export state into the panel: at mount, on every hashchange, on the
+  // clear path, and around an export request. A plain refresh pushes only the export state, so
+  // rendering never resets what the import half is showing.
   function syncImportPanel(): void {
     importPanel.setState(source ? { kind: "done", slug: source } : { kind: "idle" });
     importPanel.setExportState(exportStateFor());
@@ -1206,11 +1230,16 @@ async function boot() {
     // would land after this render, writing a stale hash over the one Back just restored.
     clearTimeout(searchTimer);
     applyHash(location.hash);
+    // A hash carries its own gt=, and that provenance wins: adopting the key restored here keeps
+    // refresh from consulting the memo, which would otherwise overwrite the link with a slug this
+    // session happened to make for the same stars.
+    lastSelectionKey = selectionKey(state.selected);
     searchPanel.setValue(query); // the box must agree with the restored hash
     syncImportPanel(); // ditto, for the source link
     refresh("replace");
   });
 
+  lastSelectionKey = selectionKey(state.selected); // the boot hash's gt= is authoritative, as above
   refresh("replace"); // boot render; canonicalize the URL without creating a history entry
 }
 
