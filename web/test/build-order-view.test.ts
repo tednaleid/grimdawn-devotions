@@ -33,12 +33,18 @@ test("buildOrderHtml null defaults to the empty prompt with no button", () => {
   expect(html).not.toContain("Incomplete build");
 });
 
-test("buildOrderHtml incomplete: names the affinity deficit and offers no search button", () => {
-  // deficit [asc, cha, eld, ord, pri] = needs 20 Ascendant + 7 Order (the Oleron-alone shape)
-  const html = buildOrderHtml(enLoc, model, null, null, { kind: "incomplete", deficit: [20, 0, 0, 7, 0] });
+test("buildOrderHtml incomplete: names the affinity deficit, who needs it, and offers no search button", () => {
+  // Oleron alone: needs 20 Ascendant + 7 Order, both set by Oleron's own requirement
+  const html = buildOrderHtml(enLoc, model, null, null, {
+    kind: "incomplete",
+    deficit: [
+      { color: 0, count: 20, sources: ["oleron"] },
+      { color: 3, count: 7, sources: ["oleron"] },
+    ],
+  });
   expect(html).toContain("Incomplete build");
-  expect(html).toContain("20 more Ascendant");
-  expect(html).toContain("7 more Order");
+  expect(html).toContain("20 more Ascendant for Oleron");
+  expect(html).toContain("7 more Order for Oleron");
   expect(html).toContain("and"); // joins multiple deficits
   expect(html).not.toContain("data-find-order"); // searching cannot help an incomplete selection
 });

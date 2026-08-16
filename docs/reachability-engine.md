@@ -88,6 +88,31 @@ The cheap bracket decides almost every candidate; only the gap reaches the resol
   complete). A star is reachable iff its path keeps the count at or under `maxK`. This is what
   lights a 4-point path to a celestial power inside a constellation too expensive to finish.
 
+### Explaining a dim verdict
+
+A dim verdict is a number the UI can explain. `dimReport` (web/src/core/dimReasons.ts) is
+computed on hover only, cached per refresh, for the target asked about (the selection plus a
+whole constellation, or plus a locked star's path). It carries three things, and the star and
+constellation tooltips, the points bar's floor segment, and the build-order panel's empty state
+render them through one adapter (`web/src/adapters/dimText.ts`):
+
+- `needs`: `minCostFrom`, the fewest points at which the target classifies reachable, searched
+  past the cap (`DIM_SEARCH_MAX`, cap plus ten) so the line can say "Needs 56 of your 55 points"
+  rather than only "cannot"; null when nothing within the bound builds it.
+- `deficit`: the colors the target's completed members do not supply for its own requirements,
+  each with the constellations whose requirement sets that need ("2 more Order for Scales of
+  Ulcama"). This is the affinity panel's have/need with its `needSource`, made per-target.
+- `scaffolders`: the members whose requirement in some color exceeds what the rest of the target
+  supplies. Each can only be activated with transient affinity from outside the build, which is
+  why a build sitting exactly at the cap can be unfinishable: the last piece placed must activate
+  with no room for a scaffold. It is a sufficient explanation, not a necessary one: a pure lock
+  (two members each covering the other's requirement) needs a scaffold with an empty list, and
+  the tooltip then shows only the points line.
+
+The floor segment of the points bar (`curMin - used`) is the same idea for the current selection:
+its title names the deficit and the scaffold needers of the selection itself, without a resolver
+call.
+
 ## Soundness
 
 These one-sided facts are exact, and the engine never contradicts them:
@@ -237,7 +262,10 @@ UI decides is reproducible headlessly from that hash:
    supply and target, the complete members (`built`) and any partials
    (`partialFinish`). `selectionView(model, cons, table, selected, cap)` is the
    exact per-click result: `reach.completable`, `reach.reachableStars`, `minCost`,
-   and the verified build order (or null).
+   and the verified build order (or null). `dimReport(model, cons, table, target)` on
+   the selection plus the constellation in question is what the tooltip shows for it:
+   the points it needs past the cap, the affinity short and who needs it, and the
+   members that need transient affinity. Often that alone answers the report.
 2. **Replay the ladder** on the suspect candidate (selection plus the constellation
    or star in question): `lowerBoundFrom`, `greedyFrom` + `lastGreedyBootColors`,
    `minPeakSampled` (partial-free builds only), then `reachableExactFrom` (the TS

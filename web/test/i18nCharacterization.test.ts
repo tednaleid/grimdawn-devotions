@@ -136,7 +136,13 @@ function collectSurfaces(loc: Localization): unknown {
       { kind: "complete", conId: "crane", points: 6, heldAfter: 7 },
       { kind: "scaffold-refund", conId: "crossroads_order", points: -1, heldAfter: 6 },
     ]),
-    buildOrderEmpty: buildOrderHtml(loc, model, null, null, { kind: "incomplete", deficit: [3, 0, 0, 1, 0] }),
+    buildOrderEmpty: buildOrderHtml(loc, model, null, null, {
+      kind: "incomplete",
+      deficit: [
+        { color: 0, count: 3, sources: ["crane"] },
+        { color: 3, count: 1, sources: ["crane"] },
+      ],
+    }),
   };
 }
 

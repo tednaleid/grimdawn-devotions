@@ -3,16 +3,16 @@
 // ABOUTME: (post-step have/need in the Affinity panel's visual language). Pure string output.
 import type { Affinity, DevotionModel } from "../core/types";
 import { AFFINITIES } from "../core/types";
+import type { AffinityDeficit } from "../core/dimReasons";
+import { deficitPhrase } from "./dimText";
 import type { StepState, TransStep } from "../core/orderLegality";
-import type { BuildStep, Vec } from "../core/reachability";
+import type { BuildStep } from "../core/reachability";
 import type { TransitionRung } from "../core/transitionOrder";
 import type { AssetManifest } from "../ports/DataSource";
 import { affinityOrb } from "./affinityColors";
 import type { Localization } from "../ports/Localization";
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
-const AFFINITY = ["Ascendant", "Chaos", "Eldritch", "Order", "Primordial"];
 
 // The five Crossroads share the generic name "Crossroads" and have no art. Label each by its fixed
 // position on the devotion map (cardinal direction) and show a dot in the affinity it grants.
@@ -43,24 +43,8 @@ function stepConName(loc: Localization, model: DevotionModel, conId: string): st
 //   the fewest points at which it would assemble (<= 55), or null when no legal path exists even at 55.
 export type NoOrderInfo =
   | { kind: "empty" }
-  | { kind: "incomplete"; deficit: Vec }
+  | { kind: "incomplete"; deficit: AffinityDeficit[] }
   | { kind: "searched"; minCap: number | null };
-
-// "20 more Ascendant and 7 more Order" from a deficit vector.
-function deficitPhrase(loc: Localization, deficit: Vec): string {
-  const parts = deficit
-    .map((d, i) =>
-      d > 0
-        ? loc.translate("ui.buildOrder.deficitMore", {
-            count: d,
-            affinity: loc.translate(`aff.${AFFINITY[i]!.toLowerCase()}`),
-          })
-        : "",
-    )
-    .filter(Boolean);
-  if (parts.length <= 1) return parts[0] ?? "";
-  return `${parts.slice(0, -1).join(", ")}${loc.translate("ui.buildOrder.deficitJoin")}${parts[parts.length - 1]}`;
-}
 
 export function buildOrderHtml(
   loc: Localization,
@@ -73,7 +57,7 @@ export function buildOrderHtml(
     const info: NoOrderInfo = noOrder ?? { kind: "empty" };
     let body: string;
     if (info.kind === "incomplete") {
-      const deficit = esc(deficitPhrase(loc, info.deficit));
+      const deficit = esc(deficitPhrase(loc, model, info.deficit));
       body =
         `<div class="bo-empty-msg">${loc.translate("ui.buildOrder.incompleteAffinity", { deficit })}</div>` +
         `<div class="bo-empty-sub">${loc.translate("ui.buildOrder.addSupporting")}</div>`;

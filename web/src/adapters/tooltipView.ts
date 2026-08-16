@@ -16,6 +16,8 @@ import { affinityTagId, petTagId } from "../core/benefitTag";
 import { resolveText, sortByResolved, type Text } from "../core/localization";
 import { matchRanges } from "../core/search";
 import type { Localization } from "../ports/Localization";
+import type { DimReport } from "../core/dimReasons";
+import { dimLines } from "./dimText";
 
 type AffinityTotals = Record<Affinity, number>;
 
@@ -137,6 +139,21 @@ function affinitySections(
   );
 }
 
+/** Why a constellation (or a locked star's path) is dim at the current cap: the engine's report plus the cap. */
+export interface DimInfo {
+  report: DimReport;
+  cap: number;
+}
+
+// The dim explanation, one line each: the completion minimum (or the plain "cannot" when the search
+// found none, never the INF sentinel), the affinity short and who needs it, the transient-affinity members.
+function dimHtml(loc: Localization, model: DevotionModel, dim?: DimInfo): string {
+  if (!dim) return "";
+  return dimLines(loc, model, dim.report, dim.cap)
+    .map((line) => `<div class="tip-dim">${hl(line)}</div>`)
+    .join("");
+}
+
 // The interactive commit button for the touch popover; empty in passive (hover) mode.
 function commitHtml(loc: Localization, commit?: { label: Text; enabled: boolean }): string {
   if (!commit) return "";
@@ -203,6 +220,7 @@ export function tooltipView(el: HTMLElement) {
       commit?: { label: Text; enabled: boolean },
       selectedBenefits: Set<string> = new Set(),
       pathCost?: number,
+      dim?: DimInfo,
     ) {
       const star = model.stars.get(starId);
       if (!star) return;
@@ -215,7 +233,7 @@ export function tooltipView(el: HTMLElement) {
         pathCost !== undefined
           ? `<div class="tip-path-cost">${loc.translate("ui.tooltip.pointsToReach", { count: pathCost })}</div>`
           : "";
-      el.innerHTML = `<strong>${hl(loc.gameText(con.nameTag))}</strong>${costLine}${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, (id) => id, star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${commitHtml(loc, commit)}`;
+      el.innerHTML = `<strong>${hl(loc.gameText(con.nameTag))}</strong>${costLine}${power}${bonusRowsHtml(loc, star.bonuses, selectedBenefits, (id) => id, star.racialTarget)}${weaponReqHtml(weaponReqTag ? loc.gameText(weaponReqTag) : null)}${petBonusHtml(loc, star.petBonuses, selectedBenefits)}${affinitySections(loc, con, totals, selectedBenefits)}${dimHtml(loc, model, dim)}${commitHtml(loc, commit)}`;
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
@@ -226,7 +244,7 @@ export function tooltipView(el: HTMLElement) {
       clientX: number,
       clientY: number,
       totals?: AffinityTotals,
-      dim?: { needs?: number; cap: number },
+      dim?: DimInfo,
       commit?: { label: Text; enabled: boolean },
       selectedBenefits: Set<string> = new Set(),
     ) {
@@ -243,13 +261,7 @@ export function tooltipView(el: HTMLElement) {
       const flavour = con.descriptionTag
         ? `<div class="tip-flavour">${hl(loc.gameText(con.descriptionTag))}</div>`
         : "";
-      // `dim` with a `needs` count: how many points would complete it. `dim` without one: the engine
-      // found no completion within the cap (do not leak the INF sentinel as a giant point count).
-      const dimLine = dim
-        ? dim.needs !== undefined
-          ? `<div class="tip-dim">${loc.translate("ui.tooltip.needsPoints", { needs: dim.needs, cap: dim.cap })}</div>`
-          : `<div class="tip-dim">${loc.translate("ui.tooltip.cannotComplete", { cap: dim.cap })}</div>`
-        : "";
+      const dimLine = dimHtml(loc, model, dim);
       // Weapon requirement(s) across the constellation's stars. When every star shares one
       // requirement (true of every gated constellation in the data today), show it verbatim like
       // the star tooltip; only hedge with "Some bonuses require ..." if the gating is partial or mixed.

@@ -15,23 +15,22 @@ import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
 import { buildOrderHtml, transitionHtml, buildStepPopupHtml, type NoOrderInfo } from "../adapters/buildOrderView";
 import type { StepState } from "../core/orderLegality";
-import { tooltipView } from "../adapters/tooltipView";
+import { tooltipView, escapeHtml, type DimInfo } from "../adapters/tooltipView";
+import { affinityDeficits, dimReport, membersNeedingScaffold, type DimReport } from "../core/dimReasons";
+import { reasonLines } from "../adapters/dimText";
 import { toggleDrawer, type DrawerState } from "../core/drawerState";
 import { toggleStar, toggleConstellation, recapValue, repairSelection } from "../core/rules";
 import { commitButton, type CommitTarget } from "../core/commitAction";
 import {
   buildReachCons,
   selectionView,
-  completionMinCost,
   selectionSummary,
   setExactResolver,
   pathToStar,
-  INF,
   type ReachView,
   type ReachCon,
   type BuildStep,
   type SelectionView,
-  type Vec,
 } from "../core/reachability";
 import { loadWasmResolver } from "../adapters/reachWasm";
 import {
@@ -330,19 +329,28 @@ async function boot() {
     return { completable, reachableStars, have: s.supplyUncapped, need: s.target, needSource };
   }
 
-  // The minimum points to complete a faded constellation, cached per refresh. Returns
-  // undefined when the constellation is already completable (no "needs" line) or when
-  // dimming is off, so the tooltip only shows the line for genuinely un-completable ones.
-  const completionCache = new Map<string, number>(); // cleared each refresh
-  function completionInfo(conId: string): { needs?: number; cap: number } | undefined {
+  // Why a faded constellation (or a locked star) is dim: the completion minimum searched past the
+  // cap, the affinity short and who needs it, the members that need transient affinity. Computed on
+  // hover only and cached per refresh (keyed by the constellation or star asked about). Returns
+  // undefined when the target is reachable (no explanation to give) or when dimming is off.
+  const dimCache = new Map<string, DimReport>(); // cleared each refresh
+  function dimInfoFor(key: string, target: Set<StarId>): DimInfo {
+    if (!dimCache.has(key)) dimCache.set(key, dimReport(model, cons, table!, target));
+    return { report: dimCache.get(key)!, cap: state.pointCap };
+  }
+  function completionInfo(conId: string): DimInfo | undefined {
     if (!table || !Number.isFinite(state.pointCap)) return undefined;
-    if (reach.completable.has(conId)) return undefined; // completable -> no "needs" line
-    if (!completionCache.has(conId))
-      completionCache.set(conId, completionMinCost(model, cons, table, state.selected, conId, state.pointCap));
-    const needs = completionCache.get(conId)!;
-    // A finite cost is the completion minimum; INF means no completion within the cap, so show a
-    // plain "cannot" line rather than leaking the sentinel as a giant point count.
-    return needs < INF ? { needs, cap: state.pointCap } : { cap: state.pointCap };
+    if (reach.completable.has(conId)) return undefined;
+    const target = new Set(state.selected);
+    for (const sid of model.constellations.get(conId)!.starIds) target.add(sid);
+    return dimInfoFor(`con:${conId}`, target);
+  }
+  function starDimInfo(starId: StarId): DimInfo | undefined {
+    if (!table || !Number.isFinite(state.pointCap)) return undefined;
+    if (state.selected.has(starId) || reach.reachableStars.has(starId)) return undefined;
+    const target = new Set(state.selected);
+    for (const sid of pathToStar(model, state.selected, starId)) target.add(sid);
+    return dimInfoFor(`star:${starId}`, target);
   }
 
   // The path cost to show in a star tooltip: the star's unselected predecessor path size, only for
@@ -384,7 +392,18 @@ async function boot() {
       }
       const totals = affinityTotals(model, state.selected);
       if (t.kind === "star")
-        tip.show(localization, model, t.id, x, y, totals, undefined, selectedBenefits, starPathCost(t.id));
+        tip.show(
+          localization,
+          model,
+          t.id,
+          x,
+          y,
+          totals,
+          undefined,
+          selectedBenefits,
+          starPathCost(t.id),
+          starDimInfo(t.id),
+        );
       else
         tip.showConstellation(
           localization,
@@ -517,8 +536,20 @@ async function boot() {
     const hideMinLabel = cap - used <= 8;
     const headStart = showMin ? curMin : used;
     let html = `<div class="pb-seg pb-used" style="width:${pct(used)}%"></div>`;
-    if (showMin)
-      html += `<div class="pb-seg pb-min" style="left:${pct(used)}%;width:${pct(curMin) - pct(used)}%"></div>`;
+    if (showMin) {
+      // Why the floor sits above the spent points: the affinity short (and who needs it) and the
+      // members that need transient affinity, from the current selection's summary (no engine call).
+      const st = selectionSummary(model, state.selected);
+      const why = [
+        localization.translate("ui.points.minTitle", { count: curMin }),
+        ...reasonLines(localization, model, {
+          needs: curMin,
+          deficit: affinityDeficits(model, st),
+          scaffolders: membersNeedingScaffold(model, st),
+        }),
+      ].join("\n");
+      html += `<div class="pb-seg pb-min" title="${escapeHtml(why)}" style="left:${pct(used)}%;width:${pct(curMin) - pct(used)}%"></div>`;
+    }
     html += `<div class="pb-seg pb-head" style="left:${pct(headStart)}%;width:${pct(cap) - pct(headStart)}%"></div>`;
     html += `<span class="pb-lab" style="left:0">${localization.translate("ui.points.used", { count: used })}</span>`;
     if (showMin && !hideMinLabel)
@@ -756,7 +787,7 @@ async function boot() {
     else history.replaceState(null, "", next);
   }
   function refresh(urlMode: "push" | "replace" = "push") {
-    completionCache.clear();
+    dimCache.clear();
     recomputeSearch();
     // The full per-click engine cost (validity floor + dimming sweep) is the core selectionView port;
     // this controller is a thin caller, so optimize selectionView, not refresh. The degraded path
@@ -810,8 +841,8 @@ async function boot() {
     if (!curBuildOrder) {
       const capped = !!table && Number.isFinite(state.pointCap);
       if (capped && state.selected.size > 0 && reach.have && reach.need) {
-        const deficit = reach.need.map((n, i) => Math.max(0, n - reach.have[i]!)) as Vec;
-        boInfo = deficit.some((d) => d > 0) ? { kind: "incomplete", deficit } : { kind: "searched", minCap: null };
+        const deficit = affinityDeficits(model, selectionSummary(model, state.selected));
+        boInfo = deficit.length ? { kind: "incomplete", deficit } : { kind: "searched", minCap: null };
       } else {
         boInfo = { kind: "empty" };
       }
@@ -997,7 +1028,18 @@ async function boot() {
     const totals = affinityTotals(model, state.selected);
     const btn = commitButton(model, state.selected, reach, target);
     if (target.kind === "star")
-      tip.show(localization, model, target.id, x, y, totals, btn, selectedBenefits, starPathCost(target.id));
+      tip.show(
+        localization,
+        model,
+        target.id,
+        x,
+        y,
+        totals,
+        btn,
+        selectedBenefits,
+        starPathCost(target.id),
+        starDimInfo(target.id),
+      );
     else
       tip.showConstellation(
         localization,
