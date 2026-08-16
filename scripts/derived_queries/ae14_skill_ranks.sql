@@ -27,7 +27,13 @@ checks AS (
             AND stat_id NOT IN ('skillCooldownTime', 'skillManaCost')
             AND stat_id NOT LIKE 'spawnObjectWeights%')
           = 0 AS monotonic,
-        -- A rank-1 skill collapses all three columns onto the same value.
+        -- A rank-1 skill collapses all three columns onto the same value. It has
+        -- rows to collapse only because a rank-1 skill stores its stats as bare
+        -- scalars rather than arrays; requiring the semicolon left all 29 of them
+        -- out of the table and made the collapse check pass over nothing, so the
+        -- row count is asserted alongside it and the check cannot go vacuous.
+        (SELECT count(*) FROM skill_ranks r JOIN skills s ON s.record = r.skill_record
+          WHERE s.ultimate_level = 1) > 0 AS rank_one_rows_present,
         (SELECT count(*) FROM skill_ranks r JOIN skills s ON s.record = r.skill_record
           WHERE s.ultimate_level = 1 AND (r.at_max != r.at_first OR r.at_ultimate != r.at_first))
           = 0 AS rank_one_collapses,
@@ -43,6 +49,7 @@ checks AS (
 SELECT f.stat_id, f.at_first, f.at_max, f.at_ultimate
 FROM ft f CROSS JOIN checks c
 WHERE c.ft_first AND c.ft_max AND c.ft_ult AND c.ft_oa
-  AND c.monotonic AND c.rank_one_collapses AND c.no_null_ultimate
+  AND c.monotonic AND c.rank_one_rows_present AND c.rank_one_collapses
+  AND c.no_null_ultimate
   AND c.no_null_first AND c.no_null_max AND c.null_ultimate_uses_max
 ORDER BY f.stat_id;

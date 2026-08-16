@@ -994,25 +994,46 @@ _RANK_ARRAY_EXCLUDE = ("skillConnectionOn", "skillConnectionOff", "spawnObjects"
 def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> int:
     """Per-stat values at the three breakpoints a player actually decides between.
 
-    Every numeric stat on a skill record is a semicolon-separated array, one entry
-    per rank. Array length is not reliably skillUltimateLevel (9 are shorter and
-    8 longer at build 24756825), so each breakpoint clamps to the array's own
+    A multi-rank stat is a semicolon-separated array, one entry per rank. A skill
+    that only ever has one rank stores the same stat as a bare scalar instead, so
+    str_split turns both shapes into an array and a scalar is simply a one-element
+    rank list whose three breakpoints collapse onto the same value. Requiring the
+    semicolon dropped every transmuter and every other rank-1 skill from this
+    table entirely. Array length is not reliably skillUltimateLevel (9 are shorter
+    and 8 longer at build 24756825), so each breakpoint clamps to the array's own
     length. A mismatch count rides out as a diagnostic so a patch that changes the
     shape is visible instead of silently yielding a wrong number.
     """
     excluded = ", ".join(f"'{k}'" for k in _RANK_ARRAY_EXCLUDE)
     con.execute(f"""
         CREATE TEMP TABLE skill_ranks AS
-        WITH arr AS (
+        WITH rank_keys AS (
+            -- The game's own authoring decides what counts as a rank stat: a key
+            -- it writes as a per-rank array on some skill somewhere. Admitting any
+            -- non-zero scalar instead pulled in 148 keys the game never scales,
+            -- from skillMaxLevel and skillTier through cameraShakeAmplitude,
+            -- roundBitmap and the Mace2h/Shield weapon-restriction flags. Array
+            -- rows are unaffected: every one of them is in this set by definition.
+            SELECT DISTINCT key FROM facts
+            WHERE record LIKE 'records/skills/%' AND value LIKE '%;%'
+              AND NOT regexp_matches(value, '[A-Za-z/]')
+        ),
+        arr AS (
             SELECT s.record AS skill_record,
                    f.key AS stat_id,
                    str_split(f.value, ';') AS parts,
                    s.max_level, s.ultimate_level
             FROM skills s
             JOIN facts f ON f.record = s.effect_record
-            WHERE f.value LIKE '%;%'
-              AND f.key NOT IN ({excluded})
+            WHERE f.key NOT IN ({excluded})
+              AND f.key IN (SELECT key FROM rank_keys)
               AND NOT regexp_matches(f.value, '[A-Za-z/]')
+              -- Every skill record carries the whole template key set with the
+              -- unused stats sitting at zero, so a bare scalar only counts as a
+              -- rank-1 stat when it is non-zero. An array is authored per skill,
+              -- so it is kept exactly as written.
+              AND (f.value LIKE '%;%'
+                   OR (f.value_num IS NOT NULL AND f.value_num != 0))
         ),
         idx AS (
             -- DuckDB's greatest()/least() ignore NULL arguments, so greatest(NULL, 1)
@@ -1065,11 +1086,47 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     the first record carrying a display name. Modifier stats routinely sit on
     anonymous carrier records, so the name-gated skill_effect walk stops short of
     them and silently drops the block.
+
+    A carrier stores a stat either as a bare scalar or, when the modifier skill has
+    more than one rank, as a semicolon-separated per-rank array. Both are read with
+    the same expression, taking the first element:
+
+    - nothing on the item record names a rank (there is no modifierSkillLevel key
+      of any kind in the deposit), so an item grants its modifier at rank 1;
+    - 2,471 of the 2,835 reachable carriers have skillMaxLevel 1 and store their
+      stats as scalars, which are rank-1 values by definition, so taking element 1
+      makes the two shapes agree;
+    - the numbers agree too. Where a stat appears on both shapes the first elements
+      land in the scalar range and the later ranks do not: offensiveFireMin has a
+      median of 90 across 23 scalar carriers, 100 across the first elements of the
+      6 array carriers, and 200 across their second elements.
+
+    Reading arrays with the same expression also keeps the walk's stat gate honest.
+    A carrier whose only stats are arrays used to look empty, so the walk ran past
+    it and the whole block vanished with no diagnostic.
     """
     excluded = ", ".join(f"'{k}'" for k in _MODIFIER_STAT_EXCLUDE)
+    # facts.value_num is NULL for every one of the 44,013 semicolon-separated
+    # values, so reading it alone dropped every array-valued stat. The split runs
+    # only on the rows that need it and a scalar still comes straight off the
+    # pre-parsed column.
+    first_rank = ("CASE WHEN f.value LIKE '%;%' "
+                  "THEN TRY_CAST(str_split(f.value, ';')[1] AS DOUBLE) "
+                  "ELSE f.value_num END")
+    # The two string keys naming what a conversionPercentage converts between,
+    # pre-filtered to a few thousand rows so the join below stays an equijoin on
+    # (record, key) instead of a predicate over all of facts.
+    conv_key = ("CASE WHEN f.key LIKE 'conversionPercentage%' THEN '{0}' "
+                "|| regexp_extract(f.key, 'conversionPercentage(\\d*)', 1) END")
+    conv_in, conv_out = (conv_key.format(k) for k in
+                         ("conversionInType", "conversionOutType"))
     con.execute(f"""
         CREATE TEMP TABLE skill_modifiers AS
-        WITH RECURSIVE paired AS (
+        WITH RECURSIVE conv AS (
+            SELECT record, key, trim(value) AS value FROM facts
+            WHERE key LIKE 'conversionInType%' OR key LIKE 'conversionOutType%'
+        ),
+        paired AS (
             SELECT s.record AS item_record,
                    lower(trim(m.value)) AS modified_skill,
                    lower(trim(r.value)) AS modifier_record
@@ -1080,6 +1137,11 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
                         AND r.key = 'modifierSkillName'
                                  || regexp_extract(m.key, 'modifiedSkillName(\\d+)', 1)
                         AND trim(r.value) != ''
+            -- Only a mastery skill can be rendered against the skills roster.
+            -- records/skills/default/defaultevade.dbr is the one off-roster target
+            -- at build 24756825, and the nine rune items that qualify for this
+            -- table through it alone would otherwise carry nothing renderable.
+            WHERE lower(trim(m.value)) IN (SELECT record FROM skills)
         ),
         walk(root, cur, depth) AS (
             SELECT DISTINCT modifier_record, modifier_record, 0 FROM paired
@@ -1097,19 +1159,36 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
             FROM walk w
             WHERE EXISTS (SELECT 1 FROM facts f
                           WHERE f.record = w.cur
-                            AND f.value_num IS NOT NULL AND f.value_num != 0
-                            AND f.key NOT IN ({excluded}))
+                            AND f.key NOT IN ({excluded})
+                            AND coalesce({first_rank}, 0) != 0)
         )
         SELECT p.item_record, p.modified_skill, p.modifier_record,
-               f.key AS stat_id, f.value_num AS value
+               f.key AS stat_id,
+               {first_rank} AS value,
+               i.value AS from_type,
+               o.value AS to_type
         FROM paired p
         JOIN stat_record sr ON sr.root = p.modifier_record AND sr.rn = 1
         JOIN facts f ON f.record = sr.cur
-        WHERE f.value_num IS NOT NULL AND f.value_num != 0
-          AND f.key NOT IN ({excluded})""")
+        -- conversionPercentage says nothing on its own: the pair of damage types
+        -- it converts between lives in two sibling string keys that the numeric
+        -- gate below would drop. They ride along on the row instead, paired by the
+        -- key's trailing digit (the unnumbered key is index 1), matching how
+        -- conversions.parquet pairs the same three keys. The key expression is
+        -- NULL on every other stat, so the join simply finds nothing there.
+        LEFT JOIN conv i ON i.record = sr.cur AND i.key = {conv_in}
+        LEFT JOIN conv o ON o.record = sr.cur AND o.key = {conv_out}
+        WHERE f.key NOT IN ({excluded})
+          AND coalesce({first_rank}, 0) != 0""")
     out = out_dir / "skill_modifiers.parquet"
+    # modifier_record is part of the sort key because it is part of the identity:
+    # one item can attach two different carriers to the same skill and both can
+    # name the same stat. Bloodlord's Blade's Possession block carries
+    # skillCooldownReduction 100 (the chance-gated reset) on one carrier and 5 (the
+    # flat reduction) on another, so neither row can be dropped or summed, and
+    # without the record in the sort their order is not determined.
     con.execute(f"COPY (SELECT * FROM skill_modifiers "
-                f"ORDER BY item_record, modified_skill, stat_id) "
+                f"ORDER BY item_record, modified_skill, modifier_record, stat_id) "
                 f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
     return con.execute("SELECT count(*) FROM skill_modifiers").fetchone()[0]
 
