@@ -1356,16 +1356,72 @@ anything the page needs.
 
 - [ ] **Step 4: Add `--skill-items` to the game text table builder**
 
-In `scripts/build_game_tables.py`, add a `--skill-items` argument alongside
-`--devotions`, `--rr` and `--monsters`, and include its referenced tags in
-`collect_referenced_tags`. The tags to collect are every `name_tag` under
-`masteries`, `skills`, and `items`.
+In `scripts/build_game_tables.py`, change the signature of
+`collect_referenced_tags` to accept the new document:
+
+```python
+def collect_referenced_tags(
+    devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None,
+    rr: dict | None = None, monsters: dict | None = None,
+    skill_items: dict | None = None
+) -> set[str]:
+```
+
+Add this loop immediately after the existing `monsters` loop, before
+`tags.update(stat_tags.values())`:
+
+```python
+    for key in ("masteries", "skills", "items"):
+        for row in (skill_items or {}).get(key, []):
+            _add(tags, row.get("name_tag"))
+```
+
+Extend the docstring's final sentence to mention that skill-items contributes
+the name tags of its masteries, skills and items, and that a nameless item
+carries a null `name_tag` which `_add` skips.
+
+Add the argument in `main`, after `--monsters`:
+
+```python
+    ap.add_argument("--skill-items", type=Path,
+                    help="Optional skill-items.json (adds its mastery, skill and item name tags)")
+```
+
+Load it beside the others and pass it through:
+
+```python
+    skill_items = json.loads(args.skill_items.read_text(encoding="utf-8")) if args.skill_items else {}
+    referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr,
+                                         monsters, skill_items)
+```
+
+Then pass `--skill-items "data/skill-items.json"` from the `i18n-tables` recipe
+in the justfile, alongside the existing `--monsters "{{out_mon}}"`.
 
 - [ ] **Step 5: Extend the game-tables test**
 
-In `scripts/test_build_game_tables.py`, add a case that a skill-items document
-contributes its `name_tag` values to the referenced tag set, following the shape
-of the existing `--monsters` case in that file.
+In `scripts/test_build_game_tables.py`, add this case following the shape of the
+existing `--monsters` coverage in that file:
+
+```python
+skill_items_doc = {
+    "masteries": [{"record": "records/skills/playerclass03/_classtraining_class03.dbr",
+                   "name_tag": "tagClass03SkillName00"}],
+    "skills": [{"record": "records/skills/playerclass03/summon_hellhound1.dbr",
+                "name_tag": "tagClass03SkillName02A"},
+               {"record": "records/skills/nameless.dbr", "name_tag": None}],
+    "items": [{"record": "records/items/gearhead/b201f_head.dbr",
+               "name_tag": "tagGDX2HeadB201"}],
+}
+tags = collect_referenced_tags({}, {}, {}, {}, {}, skill_items_doc)
+check("skill-items contributes mastery name tags", "tagClass03SkillName00" in tags)
+check("skill-items contributes skill name tags", "tagClass03SkillName02A" in tags)
+check("skill-items contributes item name tags", "tagGDX2HeadB201" in tags)
+check("a null name_tag is skipped, not added", None not in tags)
+```
+
+Match the surrounding file's assertion helper: if it uses `check(label, ok)` as
+above, keep that; if it uses plain `assert`, follow that instead.
 
 - [ ] **Step 6: Regenerate the locale tables**
 
