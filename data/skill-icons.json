@@ -1,0 +1,2695 @@
+{
+  "meta": {
+    "game_version": "1.3.0.7",
+    "steam_buildid": "24756825",
+    "generated_utc": "2026-08-16T16:56:45Z"
+  },
+  "cell": 32,
+  "columns": 26,
+  "icons": {
+    "ui/skills/icons/class01/skillicon_battlefury2_up.tex": [
+      0,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_battlefury_up.tex": [
+      1,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_bladearc1up.tex": [
+      2,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_bladearc2up.tex": [
+      3,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_blitz1_up.tex": [
+      4,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_blitz2_up.tex": [
+      5,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_cadence1_up.tex": [
+      6,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_cadence2_up.tex": [
+      7,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_cadence3_up.tex": [
+      8,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_counterstrike1up.tex": [
+      9,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_decoratedsoldier1_up.tex": [
+      10,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_fieldcommand1_up.tex": [
+      11,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_fieldcommand1up.tex": [
+      12,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_fieldcommand2up.tex": [
+      13,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_fightingspirit1_up.tex": [
+      14,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_militaryconditioning1_up.tex": [
+      15,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_overguard1_up.tex": [
+      16,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_passive1up.tex": [
+      17,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_passiveshield1up.tex": [
+      18,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_scarsofbattle1_up.tex": [
+      19,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_shieldhammer1up.tex": [
+      20,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_shieldhammer2up.tex": [
+      21,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_shieldhammer3up.tex": [
+      22,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_shockwave_up.tex": [
+      23,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_stancedefensive1up.tex": [
+      24,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_stanceoffensive1up.tex": [
+      25,
+      0
+    ],
+    "ui/skills/icons/class01/skillicon_veterancy1_up.tex": [
+      0,
+      1
+    ],
+    "ui/skills/icons/class01/skillicon_weaponpool1up.tex": [
+      1,
+      1
+    ],
+    "ui/skills/icons/class01/skillicon_weaponpool2up.tex": [
+      2,
+      1
+    ],
+    "ui/skills/icons/class01/skillicon_willtolive1_up.tex": [
+      3,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_ammomod1_up.tex": [
+      4,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_ammomod2_up.tex": [
+      5,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_ammomod3_up.tex": [
+      6,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_blastshield1up.tex": [
+      7,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_blastshield2up.tex": [
+      8,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_canisterbomb1_up.tex": [
+      9,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_canisterbomb2_up.tex": [
+      10,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_canisterbomb3_up.tex": [
+      11,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_firestrike1_up.tex": [
+      12,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_firestrike2_up.tex": [
+      13,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_firestrike3_up.tex": [
+      14,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_firestrike4_up.tex": [
+      15,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flametouched1_up.tex": [
+      16,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flametouched2_up.tex": [
+      17,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flametouched_blue_up.tex": [
+      18,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flametouched_green_up.tex": [
+      19,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flaremine1_up.tex": [
+      20,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flaremine2_up.tex": [
+      21,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flashbang1_up.tex": [
+      22,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_flashbang2_up.tex": [
+      23,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_grenado1_up.tex": [
+      24,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_grenado2_up.tex": [
+      25,
+      1
+    ],
+    "ui/skills/icons/class02/skillicon_grenado3_up.tex": [
+      0,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_grenado3orange_up.tex": [
+      1,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_grenado4_up.tex": [
+      2,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_lightningcharge1_up.tex": [
+      3,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_molotov1_up.tex": [
+      4,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_molotov2_up.tex": [
+      5,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_molotov3_up.tex": [
+      6,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_mortartrap1_up.tex": [
+      7,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_mortartrap2_up.tex": [
+      8,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_mortartrap3_up.tex": [
+      9,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_overload1_up.tex": [
+      10,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_pyrotechnics1_up.tex": [
+      11,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_stunjacks1_up.tex": [
+      12,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_stunjacks2_up.tex": [
+      13,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_vindictiveflame1_up.tex": [
+      14,
+      2
+    ],
+    "ui/skills/icons/class02/skillicon_vindictiveflame2_up.tex": [
+      15,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_bloodofdreeg1up.tex": [
+      16,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_bloodofdreeg2up.tex": [
+      17,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_bondsofbysmiel1up.tex": [
+      18,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_bondsofbysmiel2up.tex": [
+      19,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_chaosswarm1up.tex": [
+      20,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_chaosswarm2up.tex": [
+      21,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_circleofprotection1up.tex": [
+      22,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_circleofprotection2up.tex": [
+      23,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_covenantofbysmiel1_up.tex": [
+      24,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_covenantofdreeg1_up.tex": [
+      25,
+      2
+    ],
+    "ui/skills/icons/class03/skillicon_covenantofsolael1_up.tex": [
+      0,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_curse1up.tex": [
+      1,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_curse2up.tex": [
+      2,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_doombolt1up.tex": [
+      3,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_doombolt2up.tex": [
+      4,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_energytransfer1up.tex": [
+      5,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_evileye1up.tex": [
+      6,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_evileye2up.tex": [
+      7,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_evileye3up.tex": [
+      8,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_evileye4up.tex": [
+      9,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_hellhoundsummon1up.tex": [
+      10,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_hellhoundsummon2up.tex": [
+      11,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_hellhoundsummon3up.tex": [
+      12,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_hellhoundsummon4up.tex": [
+      13,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_possession1up.tex": [
+      14,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_pox1up.tex": [
+      15,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_pox2up.tex": [
+      16,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_pox3up.tex": [
+      17,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_ravensummon1up.tex": [
+      18,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_ravensummon2up.tex": [
+      19,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_ravensummon3up.tex": [
+      20,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_ravensummon4up.tex": [
+      21,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_sigilofdestruction1up.tex": [
+      22,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_sigilofdestruction2up.tex": [
+      23,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_witchfireenchantment1up.tex": [
+      24,
+      3
+    ],
+    "ui/skills/icons/class03/skillicon_witchfireenchantment2up.tex": [
+      25,
+      3
+    ],
+    "ui/skills/icons/class04/skillicon_bladebarrier1up.tex": [
+      0,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_bladespirit1up.tex": [
+      1,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_bladeswarm1up.tex": [
+      2,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_bladeswarm2up.tex": [
+      3,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_bladetrap1up.tex": [
+      4,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_bladetrap2up.tex": [
+      5,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_concussiveblow1up.tex": [
+      6,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_dualblades1up.tex": [
+      7,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_dualblades2up.tex": [
+      8,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_dualblades3up.tex": [
+      9,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_dualblades4up.tex": [
+      10,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_dualblades5up.tex": [
+      11,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_dualblades6up.tex": [
+      12,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_execute1up.tex": [
+      13,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_heartseeker1up.tex": [
+      14,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_judgement1up.tex": [
+      15,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_lethalgambit1up.tex": [
+      16,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_lethalgambit2up.tex": [
+      17,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_nightbladeenchant1up.tex": [
+      18,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_nightbladeenchant2up.tex": [
+      19,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_nightbladeenchant3up.tex": [
+      20,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_passive1up.tex": [
+      21,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_passive2up.tex": [
+      22,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_passive3up.tex": [
+      23,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_phantomblades1up.tex": [
+      24,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_phantomblades2up.tex": [
+      25,
+      4
+    ],
+    "ui/skills/icons/class04/skillicon_phantomblades3up.tex": [
+      0,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_questionablemethods1up.tex": [
+      1,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_ringofsteel1up.tex": [
+      2,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_ringofsteel2up.tex": [
+      3,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_ringofsteel3up.tex": [
+      4,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_shadowdance1up.tex": [
+      5,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_shadowstrike1up.tex": [
+      6,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_shadowstrike2up.tex": [
+      7,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_shadowstrike3up.tex": [
+      8,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_veilofshadows1up.tex": [
+      9,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_veilofshadows2up.tex": [
+      10,
+      5
+    ],
+    "ui/skills/icons/class04/skillicon_veilofshadows3up.tex": [
+      11,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_aetherray1up.tex": [
+      12,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_aetherray2up.tex": [
+      13,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_arcanemissile1_up.tex": [
+      14,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_arcanemissile2up.tex": [
+      15,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_arcanemissile3up.tex": [
+      16,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_arcanemissile4up.tex": [
+      17,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_arcaneshield1up.tex": [
+      18,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_arcanetempest1up.tex": [
+      19,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_arcanetempest2up.tex": [
+      20,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_chillingsurge2up.tex": [
+      21,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_chillingsurge_up.tex": [
+      22,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_devastation1up.tex": [
+      23,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_elementalinfusion1up.tex": [
+      24,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_elementalinfusion2up.tex": [
+      25,
+      5
+    ],
+    "ui/skills/icons/class05/skillicon_elementalinfusion3up.tex": [
+      0,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_icewall1up.tex": [
+      1,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_mindovermatter1up.tex": [
+      2,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_mindovermatter2up.tex": [
+      3,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_nullification1up.tex": [
+      4,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_passive01up.tex": [
+      5,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_passive02up.tex": [
+      6,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_passive03up.tex": [
+      7,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_passive04up.tex": [
+      8,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_skyshard1up.tex": [
+      9,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_skyshard2up.tex": [
+      10,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_skyshard3up.tex": [
+      11,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_sphereofprotection1up.tex": [
+      12,
+      6
+    ],
+    "ui/skills/icons/class05/skillicon_sphereofprotection2up.tex": [
+      13,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_devouringswarm1up.tex": [
+      14,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_devouringswarm2up.tex": [
+      15,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_devouringswarm3up.tex": [
+      16,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_graspingvines1up.tex": [
+      17,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_graspingvines2up.tex": [
+      18,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_manticoresummon1up.tex": [
+      19,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_natureblessing1up.tex": [
+      20,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_natureblessing2up.tex": [
+      21,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_natureblessing3up.tex": [
+      22,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_passive01up.tex": [
+      23,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_passive02up.tex": [
+      24,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_passive03up.tex": [
+      25,
+      6
+    ],
+    "ui/skills/icons/class06/skillicon_passive04up.tex": [
+      0,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_primalbond01up.tex": [
+      1,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_savagery1up.tex": [
+      2,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_savagery2up.tex": [
+      3,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_savagery3up.tex": [
+      4,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_stormcaller1up.tex": [
+      5,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_stormcloud1up.tex": [
+      6,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_stormcloud2up.tex": [
+      7,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_stormcloud3up.tex": [
+      8,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_stormtotem1up.tex": [
+      9,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_thornedhorrorsummon1up.tex": [
+      10,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_thornedhorrorsummon2up.tex": [
+      11,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_thornedhorrorsummon3up.tex": [
+      12,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_thornedhorrorsummon4up.tex": [
+      13,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_totem1up.tex": [
+      14,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_totem2up.tex": [
+      15,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_totem3up.tex": [
+      16,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_weaponpool1up.tex": [
+      17,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_weaponpool2up.tex": [
+      18,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_wildstrike1_up.tex": [
+      19,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_wildstrike2up.tex": [
+      20,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_wildstrike3up.tex": [
+      21,
+      7
+    ],
+    "ui/skills/icons/class06/skillicon_winddevilsummon1up.tex": [
+      22,
+      7
+    ],
+    "ui/skills/icons/class07/skillicon_artifacthandling1up.tex": [
+      23,
+      7
+    ],
+    "ui/skills/icons/class07/skillicon_auraofcensure1up.tex": [
+      24,
+      7
+    ],
+    "ui/skills/icons/class07/skillicon_auraofconviction1up.tex": [
+      25,
+      7
+    ],
+    "ui/skills/icons/class07/skillicon_burstinground1up.tex": [
+      0,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_chillingrounds1up.tex": [
+      1,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_deadlyaim1up.tex": [
+      2,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_flamesofignaffar1up.tex": [
+      3,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_flamesofignaffar2up.tex": [
+      4,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_flamesofignaffar3up.tex": [
+      5,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_flamesofignaffar4up.tex": [
+      6,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_hornofgandarr1up.tex": [
+      7,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_inquisitorseal1up.tex": [
+      8,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_inquisitorseal2up.tex": [
+      9,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_rangedexpertise1up.tex": [
+      10,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_runeofhagarrad1up.tex": [
+      11,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_runeofhagarrad2up.tex": [
+      12,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_runeofhagarrad3up.tex": [
+      13,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_runeofkalastor1up.tex": [
+      14,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_runeofkalastor2up.tex": [
+      15,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_stormbox1up.tex": [
+      16,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_stormbox2up.tex": [
+      17,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_stormspread1up.tex": [
+      18,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_wordofpain1up.tex": [
+      19,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_wordofpain2up.tex": [
+      20,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_wordofpain3up.tex": [
+      21,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_wordofrenewal1up.tex": [
+      22,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_wordofrenewal2up.tex": [
+      23,
+      8
+    ],
+    "ui/skills/icons/class07/skillicon_wordofrenewal3up.tex": [
+      24,
+      8
+    ],
+    "ui/skills/icons/class08/skillicon_blightbeast1up.tex": [
+      25,
+      8
+    ],
+    "ui/skills/icons/class08/skillicon_blightbeast2up.tex": [
+      0,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_blightbeast3up.tex": [
+      1,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_boneharvest1up.tex": [
+      2,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_boneharvest2up.tex": [
+      3,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_boneharvest3up.tex": [
+      4,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_callofthegrave1up.tex": [
+      5,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_drainessence1up.tex": [
+      6,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_drainessence2up.tex": [
+      7,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_drainessence3up.tex": [
+      8,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_harbingerofsouls1up.tex": [
+      9,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_illomen1up.tex": [
+      10,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_markoftorment1up.tex": [
+      11,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_masterofdeath1up.tex": [
+      12,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_necroticedge1up.tex": [
+      13,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_raiseskeletons1up.tex": [
+      14,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_raiseskeletons2up.tex": [
+      15,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_raiseskeletons3up.tex": [
+      16,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_raiseskeletons4up.tex": [
+      17,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_ravenousearth1up.tex": [
+      18,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_ravenousearth2up.tex": [
+      19,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_ravenousearth3up.tex": [
+      20,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_reapingstrike1up.tex": [
+      21,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_reapspirit1up.tex": [
+      22,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_siphonsoul1up.tex": [
+      23,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_siphonsoul2up.tex": [
+      24,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_spectralbinding1up.tex": [
+      25,
+      9
+    ],
+    "ui/skills/icons/class08/skillicon_spectralbinding2up.tex": [
+      0,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_aegis1up.tex": [
+      1,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_aegis2up.tex": [
+      2,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_aegis3up.tex": [
+      3,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_ascension1up.tex": [
+      4,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_ascension2up.tex": [
+      5,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_conjurecelestialguardian1bup.tex": [
+      6,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_conjurecelestialguardian1up.tex": [
+      7,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_conjurecelestialguardian2up.tex": [
+      8,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_divinemandate1up.tex": [
+      9,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_eyeofreckoning1up.tex": [
+      10,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_eyeofreckoning2up.tex": [
+      11,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_judgment1_up.tex": [
+      12,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_judgment2up.tex": [
+      13,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_judgment3up.tex": [
+      14,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_pathofthethree01up.tex": [
+      15,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_presenceofvirtue1up.tex": [
+      16,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_presenceofvirtue2up.tex": [
+      17,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_presenceofvirtue3up.tex": [
+      18,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_resilience1_up.tex": [
+      19,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_righteousfervor1up.tex": [
+      20,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_righteousfervor2up.tex": [
+      21,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_righteousfervor3up.tex": [
+      22,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_shieldmastery1up.tex": [
+      23,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_shieldslam1up.tex": [
+      24,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_shieldsmash1up.tex": [
+      25,
+      10
+    ],
+    "ui/skills/icons/class09/skillicon_viremight1up.tex": [
+      0,
+      11
+    ],
+    "ui/skills/icons/class09/skillicon_viremight2up.tex": [
+      1,
+      11
+    ],
+    "ui/skills/icons/class09/skillicon_viremight3up.tex": [
+      2,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_amatokpact1up.tex": [
+      3,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_amatokpact2up.tex": [
+      4,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_amatokpact3up.tex": [
+      5,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_avalanche1up.tex": [
+      6,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_battlesurge1_up.tex": [
+      7,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_bloodborne1up.tex": [
+      8,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_bloodfangs1up.tex": [
+      9,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_bonechillingcry1up.tex": [
+      10,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_dualwieldmastery1up.tex": [
+      11,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_formofthebeast1up.tex": [
+      12,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_heartofasterkarn1up.tex": [
+      13,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_leap1up.tex": [
+      14,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_leap2up.tex": [
+      15,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_onslaught1up.tex": [
+      16,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_onslaught2up.tex": [
+      17,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_onslaught3up.tex": [
+      18,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_rallyingcry1up.tex": [
+      19,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_rallyingcry2up.tex": [
+      20,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_untamedrage1up.tex": [
+      21,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_wereraven1up.tex": [
+      22,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_wereraven2up.tex": [
+      23,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_wereraven3up.tex": [
+      24,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_wereravenskill1up.tex": [
+      25,
+      11
+    ],
+    "ui/skills/icons/class10/skillicon_wereravenskill2up.tex": [
+      0,
+      12
+    ],
+    "ui/skills/icons/class10/skillicon_werewolf1up.tex": [
+      1,
+      12
+    ],
+    "ui/skills/icons/class10/skillicon_werewolf2up.tex": [
+      2,
+      12
+    ],
+    "ui/skills/icons/class10/skillicon_werewolf3up.tex": [
+      3,
+      12
+    ],
+    "ui/skills/icons/class10/skillicon_werewolfskill1up.tex": [
+      4,
+      12
+    ],
+    "ui/skills/icons/class10/skillicon_werewolfskill2up.tex": [
+      5,
+      12
+    ],
+    "ui/skills/icons/class10/skillicon_windsofasterkarn1up.tex": [
+      6,
+      12
+    ],
+    "ui/skills/icons/class10/skillicon_windsofasterkarn2up.tex": [
+      7,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_abyssalflame_up.tex": [
+      8,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_aether_aoe_up.tex": [
+      9,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_aether_buff_up.tex": [
+      10,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_aether_melee_up.tex": [
+      11,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_aether_projectile_up.tex": [
+      12,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_aetherrayblue1up.tex": [
+      13,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_aetherspread1up.tex": [
+      14,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_agonizingflames_purple_up.tex": [
+      15,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_ancestralbond_purple_up.tex": [
+      16,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_ancestralbond_tealup.tex": [
+      17,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_ancestralbondup.tex": [
+      18,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarn_chthonicdebuff_purple_up.tex": [
+      19,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarn_undeaddebuff_blue_up.tex": [
+      20,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarn_undeaddebuff_teal_up.tex": [
+      21,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarnaura_blue_up.tex": [
+      22,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarnaura_purple_up.tex": [
+      23,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarnaura_teal_up.tex": [
+      24,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarnaura_yellow_up.tex": [
+      25,
+      12
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarnaura_yellowround_up.tex": [
+      0,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarndebuff_blue_up.tex": [
+      1,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarndebuff_green_up.tex": [
+      2,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarndebuff_orange_up.tex": [
+      3,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarndebuff_purple_up.tex": [
+      4,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarndebuff_teal_up.tex": [
+      5,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_asterkarndebuff_yellow_up.tex": [
+      6,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_beronathaspect_up.tex": [
+      7,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bladeflurry_yellow_up.tex": [
+      8,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bladesblueup.tex": [
+      9,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bladesgreenup.tex": [
+      10,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bladesredup.tex": [
+      11,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_blastshieldaetherup.tex": [
+      12,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_blastshieldblueup.tex": [
+      13,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_blastshieldgreenup.tex": [
+      14,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_blastshieldpurpleup.tex": [
+      15,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_blastshieldsquareyellowup.tex": [
+      16,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_blastshieldwhiteup.tex": [
+      17,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_blastshieldyellowup.tex": [
+      18,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bloodfangs1aetherup.tex": [
+      19,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bloodofdreeg_yellow1up.tex": [
+      20,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_boltgreenup.tex": [
+      21,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_boltlightningup.tex": [
+      22,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_boltyellowup.tex": [
+      23,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bondsofbysmiel_blue1up.tex": [
+      24,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bonechillingcryredup.tex": [
+      25,
+      13
+    ],
+    "ui/skills/icons/itemskills/skillicon_bramble_up.tex": [
+      0,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_celestialblaze1_up.tex": [
+      1,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_chaos_aoe_up.tex": [
+      2,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_chaos_buff_up.tex": [
+      3,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_chaos_melee_up.tex": [
+      4,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_chaos_projectile_up.tex": [
+      5,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_chillingpresence_up.tex": [
+      6,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_chthonian_summon_up.tex": [
+      7,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_chthonianherald_up.tex": [
+      8,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_cold_aoe_up.tex": [
+      9,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_cold_buff_up.tex": [
+      10,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_cold_melee_up.tex": [
+      11,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_cold_projectile_up.tex": [
+      12,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_crate_up.tex": [
+      13,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_cratered_up.tex": [
+      14,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_curseblueup.tex": [
+      15,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_cursegreenup.tex": [
+      16,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_cursepurpleup.tex": [
+      17,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_curseredup.tex": [
+      18,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_curseyellowup.tex": [
+      19,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_debuff_mooncrescent01_up.tex": [
+      20,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_defydeath_up.tex": [
+      21,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_devastation_blue1up.tex": [
+      22,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_dreeggaze_blue_up.tex": [
+      23,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_dreeggaze_up.tex": [
+      24,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_dualbladesredup.tex": [
+      25,
+      14
+    ],
+    "ui/skills/icons/itemskills/skillicon_earth_aoe_up.tex": [
+      0,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_earth_buff_up.tex": [
+      1,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_earth_melee_up.tex": [
+      2,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_earth_projectile_up.tex": [
+      3,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_elementalbalance_buff_up.tex": [
+      4,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_elementalinfusion3up.tex": [
+      5,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_energyshield_green_up.tex": [
+      6,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_energyshield_yellow_up.tex": [
+      7,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_eyeofguardian_up.tex": [
+      8,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_eyeofreckoningred1up.tex": [
+      9,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fangsskill1up.tex": [
+      10,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fangsskill2up.tex": [
+      11,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fangsup.tex": [
+      12,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fightingspiritblueup.tex": [
+      13,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fightingspiritgreenup.tex": [
+      14,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fightingspiritredup.tex": [
+      15,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fire_aoe_up.tex": [
+      16,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fire_buff_up.tex": [
+      17,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fire_melee_up.tex": [
+      18,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fire_projectile_up.tex": [
+      19,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_firetetherup.tex": [
+      20,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_fleshhulk_summon_up.tex": [
+      21,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_ghoststrikeup.tex": [
+      22,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_graspingvines_green1up.tex": [
+      23,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_guardianswill_chaos_up.tex": [
+      24,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_guardianswill_up.tex": [
+      25,
+      15
+    ],
+    "ui/skills/icons/itemskills/skillicon_guardianswill_yellow_up.tex": [
+      0,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_guardianswillblue_up.tex": [
+      1,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_heal_blue_up.tex": [
+      2,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_heal_green_up.tex": [
+      3,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_heal_purple_up.tex": [
+      4,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_heal_up.tex": [
+      5,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_heal_yellow_up.tex": [
+      6,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_hellhoundsummon3greenup.tex": [
+      7,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_hookednet_up.tex": [
+      8,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_icechillauraup.tex": [
+      9,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightning_aoe_up.tex": [
+      10,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightning_buff_purple_up.tex": [
+      11,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightning_buff_up.tex": [
+      12,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightning_melee_up.tex": [
+      13,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightning_projectile_up.tex": [
+      14,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightning_storm_up.tex": [
+      15,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightning_stormgreen_up.tex": [
+      16,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightningaether_up.tex": [
+      17,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightningchain_up.tex": [
+      18,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightningshot_up.tex": [
+      19,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_lightningtetherup.tex": [
+      20,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_livingfortress_up.tex": [
+      21,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_magicpower_blueup.tex": [
+      22,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_manticoresummonpurple1up.tex": [
+      23,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_manticoresummonwhite1up.tex": [
+      24,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_meatwallup.tex": [
+      25,
+      16
+    ],
+    "ui/skills/icons/itemskills/skillicon_meteor_up.tex": [
+      0,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatterblue1up.tex": [
+      1,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatterblue2up.tex": [
+      2,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatterpurple1up.tex": [
+      3,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatterpurple2up.tex": [
+      4,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatterred1up.tex": [
+      5,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatterred2up.tex": [
+      6,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatteryelllow1up.tex": [
+      7,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_mindovermatteryellow2up.tex": [
+      8,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_minionfrenzyup.tex": [
+      9,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_multielement_buff_up.tex": [
+      10,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_multimeteor_up.tex": [
+      11,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_natural_gensummon_up.tex": [
+      12,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_natural_gensummonblue_up.tex": [
+      13,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_natural_gensummonred_up.tex": [
+      14,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_natureblessingblueup.tex": [
+      15,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_nerf_up.tex": [
+      16,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_nullificationaetherup.tex": [
+      17,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_nyarlathonproclamationup.tex": [
+      18,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_otherworldly_gensummon_up.tex": [
+      19,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_otherworldly_gensummonblue_up.tex": [
+      20,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_otherworldly_gensummongreen_up.tex": [
+      21,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_otherworldly_gensummonpurple_up.tex": [
+      22,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_otherworldly_gensummonyellow_up.tex": [
+      23,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_overguardblue1_up.tex": [
+      24,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_phantasmalarmorpurpleup.tex": [
+      25,
+      17
+    ],
+    "ui/skills/icons/itemskills/skillicon_physical_melee02_up.tex": [
+      0,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_physical_melee03_up.tex": [
+      1,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_physical_melee_up.tex": [
+      2,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_physical_meleeaoe_up.tex": [
+      3,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_physical_projectile_up.tex": [
+      4,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_physical_shotgunprojectile_up.tex": [
+      5,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_pierce_buff_green_up.tex": [
+      6,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_pierce_buff_purple_up.tex": [
+      7,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_pierce_buff_up.tex": [
+      8,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_pierce_ward_up.tex": [
+      9,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_plagueaetherup.tex": [
+      10,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_plagueblackup.tex": [
+      11,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_plagueblueup.tex": [
+      12,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_plagueredup.tex": [
+      13,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_plaguesilverup.tex": [
+      14,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_plagueup.tex": [
+      15,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_plagueyellowup.tex": [
+      16,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_poison_aoe_up.tex": [
+      17,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_poison_buff_up.tex": [
+      18,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_poison_melee_up.tex": [
+      19,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_poison_projectile_up.tex": [
+      20,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_possessionblue_up.tex": [
+      21,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_possessiongreenup.tex": [
+      22,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_possessionyellow1up.tex": [
+      23,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_prawn_summon_up.tex": [
+      24,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_primalstrikered_up.tex": [
+      25,
+      18
+    ],
+    "ui/skills/icons/itemskills/skillicon_prismaticrage_up.tex": [
+      0,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_psychicattack_up.tex": [
+      1,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_psychicattackblue_up.tex": [
+      2,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_psychicattackgreen_up.tex": [
+      3,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_psychicattackorange_up.tex": [
+      4,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_psychicattackpurple_up.tex": [
+      5,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_psychicattackred_up.tex": [
+      6,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_rageblue_up.tex": [
+      7,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ragered_up.tex": [
+      8,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_rapidfire_up.tex": [
+      9,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringflameblue_up.tex": [
+      10,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringflamegreen_up.tex": [
+      11,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringflamered_up.tex": [
+      12,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringflameyellow_up.tex": [
+      13,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringofsteelblueup.tex": [
+      14,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringofsteelgreenup.tex": [
+      15,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringofsteelredup.tex": [
+      16,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_ringofsteelyellowup.tex": [
+      17,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_shadowstrikered1up.tex": [
+      18,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_shield_green_up.tex": [
+      19,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_shield_purple_up.tex": [
+      20,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_shield_silver_up.tex": [
+      21,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_shieldsmashyellowup.tex": [
+      22,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_sigilaetherup.tex": [
+      23,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_sigilblueup.tex": [
+      24,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_sigilgreenup.tex": [
+      25,
+      19
+    ],
+    "ui/skills/icons/itemskills/skillicon_sigilpurpleup.tex": [
+      0,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_silvershot_up.tex": [
+      1,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_skeleton_summon_green_up.tex": [
+      2,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_skeleton_summon_orange_up.tex": [
+      3,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_smite_greenup.tex": [
+      4,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_smite_tealup.tex": [
+      5,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_spectralbinding_blueup.tex": [
+      6,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_spectralbinding_greenup.tex": [
+      7,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_sphereofprotectionblue1up.tex": [
+      8,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_spikes_purple_up.tex": [
+      9,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_spikes_up.tex": [
+      10,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_stormcaller_aether1up.tex": [
+      11,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_stormcalleryellow1up.tex": [
+      12,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_summonchthonianharbinger_up.tex": [
+      13,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_summoneldritchlizard1up.tex": [
+      14,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_summonplaguehoundup.tex": [
+      15,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_summonrifthoundblueup.tex": [
+      16,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_summonyetiup.tex": [
+      17,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_swordfireup.tex": [
+      18,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_swordpoisonup.tex": [
+      19,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_thedread_up.tex": [
+      20,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_thedreadshadow_up.tex": [
+      21,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_turd_projectile_up.tex": [
+      22,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_veilofshadows_green1up.tex": [
+      23,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_veilofshadows_purple1up.tex": [
+      24,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_vitality_aoe_up.tex": [
+      25,
+      20
+    ],
+    "ui/skills/icons/itemskills/skillicon_vitality_buff_up.tex": [
+      0,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_vitality_melee_up.tex": [
+      1,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_vitality_projectile_up.tex": [
+      2,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_warcry_blue_up.tex": [
+      3,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_warcry_green_up.tex": [
+      4,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_weaponenchantblueup.tex": [
+      5,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_weaponenchantgreenup.tex": [
+      6,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_weaponenchantredup.tex": [
+      7,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_weaponenchantyellowup.tex": [
+      8,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_weaponpool1redup.tex": [
+      9,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_wendigosummon1up.tex": [
+      10,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_wendigosummon2up.tex": [
+      11,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_wolfsummon1up.tex": [
+      12,
+      21
+    ],
+    "ui/skills/icons/itemskills/skillicon_wolfwhitesummon1up.tex": [
+      13,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_auraofcensureblueup.tex": [
+      14,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_auraofcensuregreenup.tex": [
+      15,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_auraofcensurepurpleup.tex": [
+      16,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_auraofcensureredup.tex": [
+      17,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_bladearcaetherup.tex": [
+      18,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_bladearcblueup.tex": [
+      19,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_bladearcvitalityup.tex": [
+      20,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_blitzred_up.tex": [
+      21,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_boneblue_up.tex": [
+      22,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_bonegreen_up.tex": [
+      23,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_boneharvestblueup.tex": [
+      24,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_boneharvestgreenup.tex": [
+      25,
+      21
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_boneharvestredup.tex": [
+      0,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_boneharvestyellowup.tex": [
+      1,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_bonered_up.tex": [
+      2,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_bonewhite_up.tex": [
+      3,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_boneyellow_up.tex": [
+      4,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_callofthegravegreenup.tex": [
+      5,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_callofthegraveredup.tex": [
+      6,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_callofthegraveyellowup.tex": [
+      7,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_chillingroundschaos1up.tex": [
+      8,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_firestrikeaether1_up.tex": [
+      9,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_firestrikepurple_up.tex": [
+      10,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_flamesofignaffargreenup.tex": [
+      11,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_harbingerofsoulsgreenup.tex": [
+      12,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_harbingerofsoulspurpleup.tex": [
+      13,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_harbingerofsoulsredup.tex": [
+      14,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_harbingerofsoulsyellowup.tex": [
+      15,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_illomengreenup.tex": [
+      16,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_illomenredup.tex": [
+      17,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_inquisitorsealyellowup.tex": [
+      18,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_masterofdeath_yellowup.tex": [
+      19,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_masterofdeathgreenup.tex": [
+      20,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_masterofdeathpurpleup.tex": [
+      21,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_masterofdeathredup.tex": [
+      22,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_necroticedgeblueup.tex": [
+      23,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_necroticedgeredup.tex": [
+      24,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_noxiousfumes_up.tex": [
+      25,
+      22
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_reapingstrike_tealup.tex": [
+      0,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_ribsblue_up.tex": [
+      1,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_ribsgreen_up.tex": [
+      2,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_ribsred_up.tex": [
+      3,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_ribswhite_up.tex": [
+      4,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_ribswhiteround_up.tex": [
+      5,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_ribsyellow_up.tex": [
+      6,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_siphonsoulblueup.tex": [
+      7,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_siphonsoulgreenup.tex": [
+      8,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_siphonsoulredup.tex": [
+      9,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_siphonsoulyellowup.tex": [
+      10,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_spectralbindinggreenup.tex": [
+      11,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_spectralbindingredup.tex": [
+      12,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_spectralbindingyellowup.tex": [
+      13,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_stormrune1up.tex": [
+      14,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_summonghostcrabup.tex": [
+      15,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_summonskeletalgolemup.tex": [
+      16,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_summonwraithvitalityup.tex": [
+      17,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_wordofpain3greenup.tex": [
+      18,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_wordofpain3yellowup.tex": [
+      19,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_wordofrenewal2yellowup.tex": [
+      20,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_wordofrenewalgreenup.tex": [
+      21,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_wordofrenewalredup.tex": [
+      22,
+      23
+    ],
+    "ui/skills/icons/itemskillsgdx1/skillicon_wordofrenewalyellowup.tex": [
+      23,
+      23
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_absorbing_up.tex": [
+      24,
+      23
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_amplification_up.tex": [
+      25,
+      23
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_bloodrite_up.tex": [
+      0,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_energyovertime_up.tex": [
+      1,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_freezeimmunity_up.tex": [
+      2,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_pure_up.tex": [
+      3,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_stoneskin_up.tex": [
+      4,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_swift_up.tex": [
+      5,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_truesight_up.tex": [
+      6,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_vampire_up.tex": [
+      7,
+      24
+    ],
+    "ui/skills/icons/potionbuffs/skillicon_potion_wealth_up.tex": [
+      8,
+      24
+    ],
+    "ui/skills/icons/powerups/skillicon_powerup1up.tex": [
+      9,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_charge1-round_up.tex": [
+      10,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_charge1up.tex": [
+      11,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_chargethrough1-round_up.tex": [
+      12,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_chargethrough1up.tex": [
+      13,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_disengage1-round_up.tex": [
+      14,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_disengage1up.tex": [
+      15,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_leap1-round_up.tex": [
+      16,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_leap1up.tex": [
+      17,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_shadowstrike1-round_up.tex": [
+      18,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_shadowstrike1up.tex": [
+      19,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_teleport1-round_up.tex": [
+      20,
+      24
+    ],
+    "ui/skills/icons/runeskills/skillicon_teleport1up.tex": [
+      21,
+      24
+    ],
+    "ui/skills/icons/shrineskills/buff01a_blue_up.tex": [
+      22,
+      24
+    ],
+    "ui/skills/icons/shrineskills/buff01a_death_up.tex": [
+      23,
+      24
+    ],
+    "ui/skills/icons/shrineskills/buff01a_green_up.tex": [
+      24,
+      24
+    ],
+    "ui/skills/icons/shrineskills/buff01a_skull_up.tex": [
+      25,
+      24
+    ],
+    "ui/skills/icons/shrineskills/buff01a_yellow_up.tex": [
+      0,
+      25
+    ],
+    "ui/skills/icons/skillicon_defaultattackup.tex": [
+      1,
+      25
+    ],
+    "ui/skills/icons/skillicon_defaultevade_round_up.tex": [
+      2,
+      25
+    ],
+    "ui/skills/icons/skillicon_defaultevadeup.tex": [
+      3,
+      25
+    ],
+    "ui/skills/icons/skillicon_defaultmagicattackup.tex": [
+      4,
+      25
+    ],
+    "ui/skills/icons/skillicon_defaultpetattackup.tex": [
+      5,
+      25
+    ],
+    "ui/skills/icons/skillicon_defaultswordbuffup.tex": [
+      6,
+      25
+    ],
+    "ui/skills/icons/skillicon_devotionstar01_ascendant_up.tex": [
+      7,
+      25
+    ],
+    "ui/skills/icons/skillicon_devotionstar01_chaos_up.tex": [
+      8,
+      25
+    ],
+    "ui/skills/icons/skillicon_devotionstar01_eldritch_up.tex": [
+      9,
+      25
+    ],
+    "ui/skills/icons/skillicon_devotionstar01_order_up.tex": [
+      10,
+      25
+    ],
+    "ui/skills/icons/skillicon_devotionstar01_primordial_up.tex": [
+      11,
+      25
+    ],
+    "ui/skills/icons/skillicon_devotionstar01_up.tex": [
+      12,
+      25
+    ],
+    "ui/skills/icons/skillicon_gemblue1up.tex": [
+      13,
+      25
+    ],
+    "ui/skills/icons/skillicon_gemgold1up.tex": [
+      14,
+      25
+    ],
+    "ui/skills/icons/skillicon_gemorange1up.tex": [
+      15,
+      25
+    ],
+    "ui/skills/icons/skillicon_gempurple1up.tex": [
+      16,
+      25
+    ],
+    "ui/skills/icons/skillicon_standin1_up.tex": [
+      17,
+      25
+    ],
+    "ui/skills/icons/skillicon_standin2_up.tex": [
+      18,
+      25
+    ],
+    "ui/skills/icons/skillicon_transmuter01up.tex": [
+      19,
+      25
+    ],
+    "ui/skills/icons/skilliicon_nullification_up.tex": [
+      20,
+      25
+    ]
+  }
+}

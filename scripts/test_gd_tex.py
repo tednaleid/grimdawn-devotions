@@ -53,6 +53,19 @@ check("decodes a 2x2 image", (w, h) == (2, 2) and len(rgba) == 16)
 w, h, rgba = decode_tex(make_tex(2, 2, px + b"\xAA" * 4, mips=2))
 check("ignores trailing mip data", len(rgba) == 16)
 
+# 24-bit BGR: one opaque red pixel, no alpha channel stored.
+w, h, rgba = decode_tex(make_tex(1, 1, bytes([0x00, 0x00, 0xFF]), bitcount=24))
+check("decodes a 24-bit image", (w, h) == (1, 1))
+check("24-bit reorders BGR to RGB", rgba[:3] == bytes([0xFF, 0x00, 0x00]))
+check("24-bit is fully opaque", rgba[3] == 0xFF)
+
+# 24-bit truncation is still rejected.
+try:
+    decode_tex(make_tex(4, 4, bytes([0x00, 0x00, 0xFF]), bitcount=24))
+    check("rejects a truncated 24-bit buffer", False)
+except ValueError:
+    check("rejects a truncated 24-bit buffer", True)
+
 # Everything the decoder cannot decode faithfully must raise, not guess.
 for label, blob in (
     ("a non-TEX file", b"NOPE" + b"\x00" * 32),

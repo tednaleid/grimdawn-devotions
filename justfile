@@ -385,6 +385,17 @@ skill-items:
         --out "{{justfile_directory()}}/data/skill-items.json" \
         --out-stats "{{justfile_directory()}}/data/skill-items-stats.json"
 
+# Pack the game's skill icons into a committed sprite sheet (Windows; needs the game)
+[group("deposit")]
+skill-icons: _require-game-closed
+    #!/usr/bin/env bash
+    set -euo pipefail
+    read -r buildid version < <(just _game-version)
+    uv run scripts/build_skill_icons.py --gd-dir "{{gd_dir}}" \
+        --out-png "{{justfile_directory()}}/data/skill-icons.png" \
+        --out-json "{{justfile_directory()}}/data/skill-icons.json" \
+        --game-version "$version" --steam-buildid "$buildid"
+
 # One derived acceptance query (all fifteen below fail on zero rows AND on oracle mismatch,
 # since each SQL gates its output on its pinned checks - see scripts/derived_queries/)
 _q-derived FILE:
