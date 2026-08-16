@@ -282,11 +282,36 @@ abilities) feeds `skill_ranks` for the 20 pet summon skills. This closes the
 pet damage also scales off the player's pet bonuses, so a static maxed value is
 an upper reference, not a prediction.
 
-**3. `just skill-items`** emits committed `data/skill-items.json` from the
-derived tables joined to `entities`, `stats`, and `boosts`, top tier per
-`group_key`. Full item stats are included so a row can expand into a complete
-card; that is the bulk of the file and is expected to land under
-`monsters.json`'s 1.2 MB.
+**3. `just skill-items`** emits two committed files from the derived tables
+joined to `entities`, `stats` and `boosts`, top tier per `group_key`:
+
+| file | contents | raw | gzipped |
+| --- | --- | --- | --- |
+| `data/skill-items.json` | meta, masteries, skills with their rank breakpoints, and items without stats | 2.78 MB | 242 KB |
+| `data/skill-items-stats.json` | `{"stats": {"<item record>": [...]}}`, keyed by item record | 3.11 MB | 125 KB |
+
+**Item stats live in a second file, fetched only when a row is expanded.** The
+table view needs name, slot, boosts, modifiers and tiers; the per-item stat rows
+were most of the payload and none of the first paint. An earlier single-file
+design put everything in one document and came out at 5.9 MB, five times the
+estimate, so the split is what keeps first load at 242 KB.
+
+Two correctness rules the emitter must hold, both of which were violated by an
+earlier revision and are easy to get wrong again:
+
+- **Grimtools links carry the English item name, not the tag.** grimtools
+  matches on the real name, so passing `name_tag` produces a well-formed link
+  that finds nothing. Resolve the English label locally through
+  `labels` at `locale = 'en'`, purely to build the URL. This does not breach the
+  i18n invariant: the dataset still stores tags for display, and only the
+  outbound URL string carries English, which is unavoidable because grimtools
+  understands nothing else. An item with no resolvable name gets no link at all
+  rather than a degenerate one that matches everything.
+- **Top-tier selection needs a total order.** About 97 families have two records
+  tied at the winning item level, typically an Awakened variant against a plain
+  one sharing a name tag. Order by item level, then rarity descending, then
+  record path, so the higher-rarity variant wins on an endgame-focused page and
+  the committed output is reproducible across runs.
 
 The route is `/items/` but the dataset is `skill-items.json` deliberately: the
 route is the durable public URL and is named broadly so the page can grow, while
