@@ -780,9 +780,48 @@ artifact policy, item source, grimtools boundary).
   `charLevel`, and 15 of the 71 ability grants set their level to a `charLevel`
   equation. `pet_ranks` reports summon RANK, so none of it is evaluated;
   a panel showing pet damage is a rank comparison, not a character sheet.
-- **Exception-only stat-label generator.** Decompose stat-id naming into
-  candidate game tags, verify against `Text_EN`, hand-curate only the misses;
-  scales item stat labels to 13 locales without hand-authoring 700+ ids.
+- **Stat labels: page-half consumption.** The data half shipped on
+  `feat/skill-item-dataset`: `scripts/build_stat_item_tags.py` derives
+  `data/stat-item-tags.json` (440 stat ids to 248 game tags, 41 explicitly
+  non-display, zero unresolved), and all 13 `game.<lang>.json` carry the tags.
+  What remains is on the page side. `web/src/core/statFormat.ts` `classify()`
+  still falls through to `litT(humanize(id))` for the ids it has no catalog key
+  for, which is a hardcoded English literal reaching users in every locale.
+  Consult `stat-item-tags.json` (via a `statTags.ts` map, same shape as
+  `STAT_FORMAT_TAGS`) immediately before that fallback, using `gameStrippedT`,
+  and add a guard test asserting every id in the emitted datasets either
+  resolves to a tag, is a declared non-display id, or is a weapon token.
+  `web/test/i18nBoundary.test.ts` cannot catch this today because `litT()` is a
+  legitimate descriptor.
+  Caveat inherited from the data half: 29 of the 248 tags are value-suffix or
+  value-embedded (`tagDamageModifierDamageMult` is `Total Damage Modified by
+  {%.0f0}%`, `DamageStun` is `Stun target{%t0}`) and do not reduce to a bare
+  label by stripping tokens. Either accept an awkward stripped label for those,
+  keep the existing `stat.override.*` app text, or take the value-templated row
+  shape (see the "Heal label full-template upgrade" item), which would render
+  the game's exact sentence in every language.
+
+- **`i18n-tables` extracts destructively.** The recipe `rm -rf`s each
+  `extracted/text_<lang>` before running ArchiveTool, and that call ends in
+  `|| true`. A `_require-game-closed` guard now covers the case that actually
+  bit (the game holding the archives open), but a corrupt or unreadable arc
+  still loses the extracted tree and reports the language as merely skipped.
+  Extract to a temp dir and swap into place only on success, the way
+  `dataset_release.py` `cmd_fetch` already does for downloads.
+
+- **Swapped-pet nodes duplicate their base summon's whole block.**
+  `stormtotem01b_petmodifier` and `summon_celestialguardian1b` reproduce the
+  base summon's entire `pet_ranks` block (41 and 35 rows) rather than a delta,
+  so the two rows of a swapped-pet pair are near-duplicates. That is the table's
+  stated design (a node reports what its pet *is*, not a diff), but it doubles
+  the payload for those pairs and the page will need to decide whether to show
+  both.
+
+- **`pet_ranks` carries presentation noise.** `skillTargetRadius` and duration
+  rows (2.4, 3.3, 3.8, 5.0) appear as stat lines no in-game card shows, the same
+  class as the CC-immunity rows deliberately kept. No honest predicate separates
+  them from real content at the data layer (five candidates were tested and each
+  also condemned real stats), so the filtering decision belongs to the page.
 
 ## Devotion search: follow-ups from the branch review
 
