@@ -1,7 +1,18 @@
 // ABOUTME: Tests slug parsing and buildInfo extraction against a committed real calculator page.
 // ABOUTME: No network: the fixture is what pins the extraction contract.
 import { test, expect } from "bun:test";
-import { parseSlug, extractBuildInfo, extractBuildTitle, buildIsMissing, mapStars } from "../src/core/grimtools";
+import {
+  parseSlug,
+  extractBuildInfo,
+  extractBuildTitle,
+  buildIsMissing,
+  mapStars,
+  isSlug,
+  invertStarTable,
+  toGrimtoolsSkills,
+  savePayload,
+  EXPORT_CONTRACT_VERSION,
+} from "../src/core/grimtools";
 import realTable from "../../data/grimtools-stars.json";
 
 test("parseSlug accepts a bare slug", () => {
@@ -145,4 +156,83 @@ test("extractBuildTitle caps an over-long title at 100 characters", () => {
   expect(result).not.toBeNull();
   expect(result!.length).toBe(100);
   expect(result).toBe("x".repeat(100));
+});
+
+test("isSlug accepts the slug charset and nothing else", () => {
+  expect(isSlug("2ga0aJyZ")).toBe(true);
+  expect(isSlug("a-b_c")).toBe(true);
+  expect(isSlug("")).toBe(false);
+  expect(isSlug("a".repeat(25))).toBe(false);
+  expect(isSlug("../x")).toBe(false);
+  expect(isSlug("has space")).toBe(false);
+});
+
+test("invertStarTable turns the committed table into a star-to-sk bijection", () => {
+  const stars = (realTable as { stars: Record<string, string> }).stars;
+  const inverse = invertStarTable(stars);
+  expect(Object.keys(inverse).length).toBe(Object.keys(stars).length);
+  for (const [sk, star] of Object.entries(stars)) expect(inverse[star]).toBe(sk);
+});
+
+test("invertStarTable refuses a table where two skill ids share one star", () => {
+  expect(() => invertStarTable({ sk1: "bat:0", sk2: "bat:0" })).toThrow(/bat:0/);
+});
+
+test("the crossroads star the investigation saved round-trips: crossroads_primordial:0 is sk739", () => {
+  const stars = (realTable as { stars: Record<string, string> }).stars;
+  expect(invertStarTable(stars)["crossroads_primordial:0"]).toBe("sk739");
+});
+
+test("toGrimtoolsSkills maps a selection in star-id order, whatever order it was given in", () => {
+  const inverse = { "b:1": "sk20", "a:0": "sk10" };
+  expect(toGrimtoolsSkills(new Set(["b:1", "a:0"]), inverse)).toEqual(["sk10", "sk20"]);
+  expect(toGrimtoolsSkills(["a:0", "b:1"], inverse)).toEqual(["sk10", "sk20"]);
+});
+
+test("toGrimtoolsSkills returns null, never a partial list, when a star is unmapped", () => {
+  expect(toGrimtoolsSkills(["a:0", "zzz:9"], { "a:0": "sk10" })).toBeNull();
+});
+
+test("toGrimtoolsSkills of nothing is an empty list", () => {
+  expect(toGrimtoolsSkills([], {})).toEqual([]);
+});
+
+test("savePayload is the body grimtools' own Share button posts, minus the fields we never set", () => {
+  // Captured from the live calculator on 2026-08-16 (spec, "What the investigation established"):
+  // a level-100 character with one crossroads star. Quickbars and mouse slots are left empty; the
+  // stripped shape saved and rendered identically to the calculator's own.
+  expect(savePayload(["sk739"])).toEqual({
+    bio: {
+      level: 100,
+      attributePoints: 109,
+      skillPoints: 250,
+      devotionPoints: 54,
+      physique: 50,
+      cunning: 50,
+      spirit: 50,
+    },
+    equipment: {},
+    potions: {},
+    skills: [{ name: "sk739", level: 1 }],
+    itemSkills: [],
+    transformSkills: [],
+    quickbar: {
+      mouse1: { left: null, right: null },
+      mouse2: { left: null, right: null },
+      quickbar1: [],
+      quickbar2: [],
+    },
+    devotionsProgression: [],
+    skillsProgression: [],
+  });
+});
+
+test("savePayload counts devotionPoints down from grimtools' 55", () => {
+  const full = Array.from({ length: 55 }, (_, i) => `sk${i}`);
+  expect(savePayload(full).bio.devotionPoints).toBe(0);
+  expect(savePayload(full).skills.length).toBe(55);
+});
+
+test("the export contract version is a positive integer", () => {
+  expect(Number.isInteger(EXPORT_CONTRACT_VERSION) && EXPORT_CONTRACT_VERSION >= 1).toBe(true);
 });

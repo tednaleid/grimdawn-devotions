@@ -1,5 +1,5 @@
 // ABOUTME: Pure logic for reading a grimtools build: slug/buildInfo parsing, buildIsMissing for
-// ABOUTME: a slug with no build, and mapStars. Shared by the planner and the Cloudflare worker.
+// ABOUTME: a slug with no build, mapStars, and the export direction (invertStarTable, savePayload).
 
 /** Grimtools slug charset. Also the worker's input validation, so keep the two identical. */
 const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
@@ -18,6 +18,20 @@ const SLUG_RE = /^[A-Za-z0-9_-]{1,24}$/;
  * happen.
  */
 export const IMPORT_CONTRACT_VERSION = 1;
+
+/**
+ * Version of the worker's export contract (`POST /export` with `{ skills }` -> `{ slug }`).
+ * Export responses are never cached, so this only exists to keep the two routes symmetrical:
+ * the app sends it as `?v=` and the response-shape guard in `web/test/worker.test.ts` pins the
+ * field set against it. Bump on a rename or removal, not on an additive field.
+ */
+export const EXPORT_CONTRACT_VERSION = 1;
+
+/** True when `s` is a grimtools slug. The worker uses it on the id grimtools returns and the
+ * gateway adapter uses it again before that id becomes an href. */
+export function isSlug(s: string): boolean {
+  return SLUG_RE.test(s);
+}
 
 /** Hosts a calculator URL may name. An allowlist, not a substring check. */
 const HOSTS = new Set(["grimtools.com", "www.grimtools.com"]);
@@ -178,4 +192,100 @@ export function mapStars(skillIds: string[], table: StarTable): string[] {
     stars.push(star);
   }
   return stars;
+}
+
+/**
+ * The export direction of the committed table: our star id to grimtools' `sk<id>`.
+ *
+ * Throws if two skill ids map to one star. The table's generation gates and
+ * `web/test/grimtoolsTable.test.ts` already forbid that, so the throw is a last guard against a
+ * hand-edited table producing a plausible-but-wrong export rather than a visible failure.
+ */
+export function invertStarTable(table: StarTable): Record<string, string> {
+  const inverse: Record<string, string> = {};
+  for (const [sk, star] of Object.entries(table)) {
+    const prior = inverse[star];
+    if (prior !== undefined) throw new Error(`grimtools table maps ${prior} and ${sk} to the same star ${star}`);
+    inverse[star] = sk;
+  }
+  return inverse;
+}
+
+/**
+ * Turn a selection into the grimtools skill ids that represent it, sorted by star id so one
+ * selection always produces one request body. Returns null (never a partial list) if any star is
+ * absent from `inverse`: the table covers every star, so a miss is a bug worth surfacing, not a
+ * star worth dropping.
+ */
+export function toGrimtoolsSkills(selected: Iterable<string>, inverse: Record<string, string>): string[] | null {
+  const skills: string[] = [];
+  for (const star of [...selected].sort()) {
+    const sk = inverse[star];
+    if (sk === undefined) return null;
+    skills.push(sk);
+  }
+  return skills;
+}
+
+/** grimtools' devotion budget; `bio.devotionPoints` counts down from it. */
+export const GRIMTOOLS_DEVOTION_POINTS = 55;
+
+/** The body `save_build.php` accepts, in the shape the calculator's own Share button posts. */
+export interface SavePayload {
+  bio: {
+    level: number;
+    attributePoints: number;
+    skillPoints: number;
+    devotionPoints: number;
+    physique: number;
+    cunning: number;
+    spirit: number;
+  };
+  equipment: Record<string, never>;
+  potions: Record<string, never>;
+  skills: { name: string; level: number }[];
+  itemSkills: never[];
+  transformSkills: never[];
+  quickbar: {
+    mouse1: { left: null; right: null };
+    mouse2: { left: null; right: null };
+    quickbar1: never[];
+    quickbar2: never[];
+  };
+  devotionsProgression: never[];
+  skillsProgression: never[];
+}
+
+/**
+ * The build grimtools' Share button would post for a fresh level-100 character holding exactly
+ * these devotion stars: no masteries, gear, or quickbar, and empty progressions (grimtools stores
+ * `devotionsProgression` but nothing in its UI records or renders it). The `bio` numbers are the
+ * calculator's own defaults for a fresh level-100 character; grimtools stamps the game version
+ * server-side, so it is not sent.
+ */
+export function savePayload(skills: string[]): SavePayload {
+  return {
+    bio: {
+      level: 100,
+      attributePoints: 109,
+      skillPoints: 250,
+      devotionPoints: GRIMTOOLS_DEVOTION_POINTS - skills.length,
+      physique: 50,
+      cunning: 50,
+      spirit: 50,
+    },
+    equipment: {},
+    potions: {},
+    skills: skills.map((name) => ({ name, level: 1 })),
+    itemSkills: [],
+    transformSkills: [],
+    quickbar: {
+      mouse1: { left: null, right: null },
+      mouse2: { left: null, right: null },
+      quickbar1: [],
+      quickbar2: [],
+    },
+    devotionsProgression: [],
+    skillsProgression: [],
+  };
 }
