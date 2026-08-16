@@ -525,20 +525,31 @@ Skill records are often thin shells. From any starting record, follow either
 direct-then-buff-then-pet rule: six pet-modifier nodes chain `petSkillName` and
 then `buffSkillName`, and an ordered rule leaves them unresolved.
 
-This task adds the resolver as a reusable DuckDB temp table plus an acceptance
-query that pins its coverage. No new parquet yet.
+This task adds the resolver as a persisted derived table plus an acceptance
+query that pins its coverage.
+
+**It must be a real parquet table, not a temp table.** `_q-derived` runs each
+acceptance query in a separate process whose `register_derived()` globs
+`data/derived/*.parquet`; a temp table created inside `build_derived.py`'s own
+connection is invisible there. Every other AE query works only because its table
+is persisted. Persisting also keeps AE12 honest: it tests the shipped artifact
+rather than a re-derivation of the same logic. The table is independently useful
+beyond this plan, since it is what lets any consumer turn a skill record into
+the record that actually carries its name and stats.
 
 **Files:**
 - Modify: `scripts/build_derived.py` (add `build_skill_effect_map`, call it from
   `cmd_build` before the new table builders)
+- Modify: `scripts/dataset_release.py` (`ASSETS`)
+- Modify: `scripts/gditems_duckdb.py` (`DERIVED_TABLES`)
 - Create: `scripts/derived_queries/ae12_skill_effect_walk.sql`
 - Modify: `justfile` (add `q-ae12-skill-effect-walk` and add it to `q-ae-all`)
 
 **Interfaces:**
 - Consumes: the `facts` view from the deposit.
-- Produces: a DuckDB temp table `skill_effect (skill_record VARCHAR,
-  effect_record VARCHAR, hops INTEGER)` covering every record reachable as a
-  walk root, available to Tasks 4, 5, and 6 within the same connection.
+- Produces: `skill_effect.parquet` and a same-named temp table, columns
+  `(skill_record VARCHAR, effect_record VARCHAR, hops INTEGER)`, covering every
+  record reachable as a walk root. Tasks 4, 5 and 6 all read it.
 
 - [ ] **Step 1: Write the resolver**
 
@@ -586,14 +597,26 @@ def build_skill_effect_map(con: duckdb.DuckDBPyConnection) -> int:
         )
         SELECT root AS skill_record, cur AS effect_record, depth AS hops
         FROM named WHERE rn = 1""")
+    out = out_dir / "skill_effect.parquet"
+    con.execute(f"COPY (SELECT * FROM skill_effect ORDER BY skill_record) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
     return con.execute("SELECT count(*) FROM skill_effect").fetchone()[0]
 ```
+
+Note the signature takes the output directory:
+`def build_skill_effect_map(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:`
 
 Wire it into `cmd_build`, immediately after `build_wide(con, cur)`:
 
 ```python
-    n_skill_effect = build_skill_effect_map(con)
+    n_skill_effect = build_skill_effect_map(con, out_dir)
 ```
+
+Add `"skill_effect"` to `DERIVED_TABLES` in `scripts/gditems_duckdb.py` and
+`("skill_effect.parquet", "derived"),` to `ASSETS` in
+`scripts/dataset_release.py`. `scripts/test_dataset_release.py` cross-checks the
+two lists in both directions and fails if you update only one. Also add
+`"skill_effect"` to the artifact size loop near the end of `cmd_build`.
 
 and add to the summary block, after the `conversions` line:
 
@@ -835,8 +858,9 @@ Add `"skills"` to the artifact size loop tuple.
 In `scripts/gditems_duckdb.py`, add `"skills"` to `DERIVED_TABLES`.
 
 In `scripts/dataset_release.py`, add `("skills.parquet", "derived"),` to
-`ASSETS` and update the two leading comment lines to say eleven managed assets
-and the derived eight.
+`ASSETS`. Leave the two leading comment lines that count the assets in prose
+alone for now; Task 6 updates them once, at the final count, so they are not
+rewritten on every table.
 
 - [ ] **Step 3: Write the acceptance query**
 
@@ -1172,7 +1196,9 @@ size loop.
 
 Add `"skill_modifiers"` to `DERIVED_TABLES` and
 `("skill_modifiers.parquet", "derived"),` to `ASSETS`. Update the ASSETS comment
-to say thirteen managed assets and the derived ten.
+to their final counts: fourteen managed assets, of which the derived are eleven
+(the original seven plus `skill_effect`, `skills`, `skill_ranks` and
+`skill_modifiers`).
 
 - [ ] **Step 3: Write the acceptance query with the Chosen Visage oracle**
 
