@@ -283,8 +283,17 @@ grants at the rank the creature record names) feeds its OWN table, `pet_ranks`,
 not `skill_ranks`. It has to: one summon routinely has two sources naming the
 same stat, so `skill_ranks`' `(skill_record, stat_id)` key would collide them,
 and a pet's damage is not the player's stat line. The 17 summons carrying
-`spawnObjects` are joined by the 3 pet-modifier nodes that swap the pet outright
+`spawnObjects` are joined by the 3 nodes that swap the pet outright
 (`modSpawnObjects`), which are one-rank nodes indexed by their group base's rank.
+Those three are `node_kind = 'modifier'`, not `'pet_modifier'`, despite one of
+them being named `stormtotem01b_petmodifier`; none of the 22 `pet_modifier` rows
+reaches `pet_ranks`, so filtering on that kind returns a disjoint set.
+
+An ability named on the creature record is frequently a shell carrying only a
+`buffSkillName`, so this walk is stat-gated (stop at the first record carrying a
+rank-scaling stat), never name-gated. Name-gating it silently cost Wind Devil,
+Thermite Mine, Wendigo Totem and Inquisitor Seal every damage number they have.
+
 Without this a summon's panel is its mana cost and cooldown and nothing else:
 Summon Hellhound's own record has four rank rows and the pet chain adds 25.
 
