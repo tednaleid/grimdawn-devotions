@@ -312,7 +312,7 @@ i18n-tables *LANGS:
       fi
       uv run scripts/build_game_tables.py --devotions "{{out}}" --stat-tags data/stat-tags.json \
         --stat-format-tags data/stat-format-tags.json --rr "{{out_rr}}" --monsters "{{out_mon}}" \
-        --skill-items "data/skill-items.json" \
+        --skill-items "data/skill-items.json" --stat-item-tags "data/stat-item-tags.json" \
         --text-dir "$tdir" --lang "$L" --out "data/i18n/game.$L.json"
       built="$built $L"
     done
@@ -384,6 +384,17 @@ skill-items:
         --derived-dir "{{derived_dir}}" \
         --out "{{justfile_directory()}}/data/skill-items.json" \
         --out-stats "{{justfile_directory()}}/data/skill-items-stats.json"
+
+# Emit data/stat-item-tags.json, the raw stat id -> game tag map that names every stat
+# the /items/ page shows. Pass --report to print each mapping with its English text, and
+# --audit-dll "{{gd_dir}}/Game.dll" to cross-check the tags against the engine's literals.
+# Fails on a stat id that no rule resolves and that is not declared non-display.
+[group("deposit")]
+[doc("Emit data/stat-item-tags.json, the raw stat id -> game tag map behind the /items/ page labels")]
+stat-item-tags *ARGS:
+    uv run scripts/build_stat_item_tags.py --deposit-dir "{{deposit_dir}}" \
+        --derived-dir "{{derived_dir}}" \
+        --out "{{justfile_directory()}}/data/stat-item-tags.json" {{ARGS}}
 
 # Pack the game's skill icons into a committed sprite sheet (Windows; needs the game)
 [group("deposit")]

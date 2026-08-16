@@ -152,5 +152,13 @@ check("skill-items contributes pet ability name tags",
       "tagClass03SkillName02E" in tags, True)
 check("a null name_tag is skipped, not added", None not in tags, True)
 
+# --- stat-item-tags: the raw stat id -> game tag map contributes its tag values ---
+stat_item_tags = {"offensiveFireMin": "DamageFire", "characterStrength": "tagCharAttribute02"}
+item_tag_refs = bgt.collect_referenced_tags({}, {}, {}, {}, {}, {}, stat_item_tags)
+check("stat-item-tags values collected",
+      item_tag_refs, {"DamageFire", "tagCharAttribute02"})
+check("stat-item-tags argument is optional",
+      bgt.collect_referenced_tags({}, {}, {}, {}, {}, {}), set())
+
 print("ALL PASSED" if failures == 0 else f"{failures} FAILURE(S)")
 raise SystemExit(1 if failures else 0)

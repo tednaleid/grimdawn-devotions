@@ -36,10 +36,11 @@ def _add(tags: set[str], tag: str | None) -> None:
 def collect_referenced_tags(
     devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None,
     rr: dict | None = None, monsters: dict | None = None,
-    skill_items: dict | None = None
+    skill_items: dict | None = None, stat_item_tags: dict | None = None
 ) -> set[str]:
     """Every *_tag value referenced in devotions.json (constellation/power/pet/weapon),
-    plus every game tag value in stat-tags.json and stat-format-tags.json, plus the
+    plus every game tag value in stat-tags.json, stat-format-tags.json and
+    stat-item-tags.json, plus the
     name/parent tags of every resistance-reduction source, plus the name and race tags
     of every monster in monsters.json. RR sources whose name/parent could not resolve to
     a real tag carry a synthesized x: placeholder (no game text exists), so only
@@ -80,6 +81,7 @@ def collect_referenced_tags(
                 _add(tags, stat.get("source_name_tag"))
     tags.update(stat_tags.values())
     tags.update((stat_format_tags or {}).values())
+    tags.update((stat_item_tags or {}).values())
     return tags
 
 
@@ -107,6 +109,8 @@ def main(argv=None) -> int:
     ap.add_argument("--skill-items", type=Path,
                     help="Optional skill-items.json (adds its mastery, skill, item, "
                          "pet and pet-ability name tags)")
+    ap.add_argument("--stat-item-tags", type=Path,
+                    help="Optional stat-item-tags.json (raw item/skill stat id -> game tag)")
     ap.add_argument("--text-dir", required=True, type=Path)
     ap.add_argument("--lang", required=True, help="Language code, e.g. en (used only for logging)")
     ap.add_argument("--out", required=True, type=Path)
@@ -118,8 +122,9 @@ def main(argv=None) -> int:
     rr = json.loads(args.rr.read_text(encoding="utf-8")) if args.rr else {}
     monsters = json.loads(args.monsters.read_text(encoding="utf-8")) if args.monsters else {}
     skill_items = json.loads(args.skill_items.read_text(encoding="utf-8")) if args.skill_items else {}
+    stat_item_tags = json.loads(args.stat_item_tags.read_text(encoding="utf-8")) if args.stat_item_tags else {}
     referenced = collect_referenced_tags(devotions, stat_tags, stat_format_tags, rr,
-                                         monsters, skill_items)
+                                         monsters, skill_items, stat_item_tags)
 
     text_table = load_translations(args.text_dir)
     table = build_table(referenced, text_table)
