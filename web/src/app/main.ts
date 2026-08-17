@@ -1109,11 +1109,15 @@ async function boot() {
           return;
         }
         // The read that supplied the base can reveal that this selection is that build: re-associate
-        // rather than mint a copy.
+        // rather than mint a copy. Like the save below, only the selection the export was made from
+        // becomes associated; either way there is nothing left to send, and the memo now re-associates
+        // that set on the next return to it.
         const knownAfterRead = knownBuilds.get(key);
         if (knownAfterRead !== undefined) {
-          source = knownAfterRead;
-          writeHash("push");
+          if (selectionKey(state.selected) === key) {
+            source = knownAfterRead;
+            writeHash("push");
+          }
           return;
         }
         base = { slug: baseSlug, remove: [...new Set(b.skills.filter((id) => starIdTable[id] !== undefined))] };
