@@ -11,6 +11,7 @@ import {
   invertStarTable,
   toGrimtoolsSkills,
   savePayload,
+  spliceDevotions,
   EXPORT_CONTRACT_VERSION,
 } from "../src/core/grimtools";
 import realTable from "../../data/grimtools-stars.json";
@@ -232,6 +233,137 @@ test("savePayload counts devotionPoints down from grimtools' 55", () => {
   expect(savePayload(full).skills.length).toBe(55);
 });
 
-test("the export contract version is a positive integer", () => {
-  expect(Number.isInteger(EXPORT_CONTRACT_VERSION) && EXPORT_CONTRACT_VERSION >= 1).toBe(true);
+test("the export contract version is 2: the body gained the optional base", () => {
+  expect(EXPORT_CONTRACT_VERSION).toBe(2);
+});
+
+const STARS = (realTable as { stars: Record<string, string> }).stars;
+
+async function fixtureData(): Promise<Record<string, unknown>> {
+  const html = await Bun.file("test/fixtures/grimtools-calc.html").text();
+  return extractBuildInfo(html)!.data as Record<string, unknown>;
+}
+type Entry = { name: string; level: number; autoCastSkill?: string };
+
+test("extractBuildInfo returns the whole data object alongside the skill ids", async () => {
+  const data = await fixtureData();
+  expect((data.bio as { physique: number }).physique).toBe(154);
+  expect((data.skills as Entry[]).length).toBe(83);
+  expect(Object.keys(data)).toContain("equipment");
+});
+
+test("spliceDevotions replaces every star with the new set, fixes devotionPoints, and drops every stale binding", async () => {
+  const data = await fixtureData();
+  const allStars = (data.skills as Entry[]).map((s) => s.name).filter((id) => id in STARS);
+  expect(allStars.length).toBe(55);
+  const out = spliceDevotions(data, allStars, ["sk739"])!;
+  expect(out).not.toBeNull();
+  const skills = out.skills as Entry[];
+  expect(skills.length).toBe(29); // 28 mastery skills kept, one star added
+  expect(skills[28]).toEqual({ name: "sk739", level: 1 });
+  expect(skills.some((s) => s.name in STARS && s.name !== "sk739")).toBe(false);
+  expect(skills.some((s) => "autoCastSkill" in s)).toBe(false);
+  expect((out.bio as { devotionPoints: number }).devotionPoints).toBe(54); // 0 + 55 removed - 1 added
+  expect(out.itemSkills).toEqual([]);
+  expect(out.transformSkills).toEqual([]);
+});
+
+test("spliceDevotions passes every other field through unchanged, including the rest of bio and each kept entry", async () => {
+  const data = await fixtureData();
+  const out = spliceDevotions(data, ["sk699"], ["sk739"])!;
+  const { skills: _s, bio: _b, itemSkills: _i, transformSkills: _t, ...rest } = data;
+  const { skills: _s2, bio: _b2, itemSkills: _i2, transformSkills: _t2, ...restOut } = out;
+  expect(restOut).toEqual(rest);
+  const { devotionPoints: _d, ...bioRest } = data.bio as Record<string, unknown>;
+  const { devotionPoints: _d2, ...bioRestOut } = out.bio as Record<string, unknown>;
+  expect(bioRestOut).toEqual(bioRest);
+  // Kept entries are the same objects' contents, in the same order, with one star gone and one appended.
+  const before = (data.skills as Entry[]).filter((s) => s.name !== "sk699");
+  const after = out.skills as Entry[];
+  expect(after.length).toBe(before.length + 1);
+  expect(after.slice(0, -1).map((s) => s.name)).toEqual(before.map((s) => s.name));
+});
+
+test("spliceDevotions strips only the binding whose star is removed and keeps the others", async () => {
+  const data = await fixtureData();
+  const out = spliceDevotions(data, ["sk699"], ["sk739"])!;
+  const skills = out.skills as Entry[];
+  const sk1126 = skills.find((s) => s.name === "sk1126")!;
+  expect(sk1126.level).toBe(14);
+  expect("autoCastSkill" in sk1126).toBe(false);
+  expect(skills.find((s) => s.name === "sk1120")!.autoCastSkill).toBe("sk927");
+  expect((out.itemSkills as unknown[]).length).toBe(1); // sk891 stays, so its item binding stays
+  expect((out.bio as { devotionPoints: number }).devotionPoints).toBe(0); // 0 + 1 - 1
+});
+
+test("spliceDevotions drops an item binding and a transform binding whose star is removed", () => {
+  const data = {
+    bio: { devotionPoints: 3 },
+    skills: [
+      { name: "sk10", level: 5, autoCastSkill: "sk900" },
+      { name: "sk900", level: 1 },
+      { name: "sk901", level: 1 },
+    ],
+    itemSkills: [
+      { autoCastSkill: "sk900", name: "sk20", itemName: "it1", itemSlot: 1 },
+      { autoCastSkill: "sk901", name: "sk21", itemName: "it2", itemSlot: 2 },
+    ],
+    transformSkills: [{ autoCastSkill: "sk900", name: "sk10", mastery: "m", transformSkill: "sk30" }],
+  };
+  const out = spliceDevotions(data, ["sk900"], ["sk902"])!;
+  expect(out.skills).toEqual([
+    { name: "sk10", level: 5 },
+    { name: "sk901", level: 1 },
+    { name: "sk902", level: 1 },
+  ]);
+  expect(out.itemSkills).toEqual([{ autoCastSkill: "sk901", name: "sk21", itemName: "it2", itemSlot: 2 }]);
+  expect(out.transformSkills).toEqual([]);
+  expect((out.bio as { devotionPoints: number }).devotionPoints).toBe(3);
+});
+
+test("spliceDevotions keeps a binding whose star is removed and requested again, re-adding the star at level 1", () => {
+  const data = {
+    bio: { devotionPoints: 3 },
+    skills: [
+      { name: "sk10", level: 5, autoCastSkill: "sk900" },
+      { name: "sk900", level: 1 },
+    ],
+    itemSkills: [{ autoCastSkill: "sk900", name: "sk20", itemName: "it1", itemSlot: 1 }],
+    transformSkills: [],
+  };
+  const out = spliceDevotions(data, ["sk900"], ["sk900"])!;
+  expect(out.skills).toEqual([
+    { name: "sk10", level: 5, autoCastSkill: "sk900" },
+    { name: "sk900", level: 1 },
+  ]);
+  expect((out.itemSkills as unknown[]).length).toBe(1);
+  expect((out.bio as { devotionPoints: number }).devotionPoints).toBe(3);
+});
+
+test("spliceDevotions does not duplicate a requested star that is already kept, and floors devotionPoints at 0", () => {
+  const data = { bio: { devotionPoints: 0 }, skills: [{ name: "sk900", level: 1 }] };
+  const same = spliceDevotions(data, [], ["sk900"])!;
+  expect(same.skills).toEqual([{ name: "sk900", level: 1 }]);
+  expect((same.bio as { devotionPoints: number }).devotionPoints).toBe(0);
+  const over = spliceDevotions(data, [], ["sk901", "sk902"])!;
+  expect((over.skills as unknown[]).length).toBe(3);
+  expect((over.bio as { devotionPoints: number }).devotionPoints).toBe(0); // 0 + 0 - 2, floored
+});
+
+test("spliceDevotions leaves absent itemSkills/transformSkills absent rather than inventing them", () => {
+  const out = spliceDevotions({ bio: { devotionPoints: 54 }, skills: [{ name: "sk1", level: 1 }] }, ["sk1"], ["sk2"])!;
+  expect(out.skills).toEqual([{ name: "sk2", level: 1 }]);
+  expect("itemSkills" in out).toBe(false);
+  expect("transformSkills" in out).toBe(false);
+});
+
+test("spliceDevotions returns null for anything it does not understand", () => {
+  expect(spliceDevotions(null, [], ["sk1"])).toBeNull();
+  expect(spliceDevotions([], [], ["sk1"])).toBeNull();
+  expect(spliceDevotions({ bio: { devotionPoints: 1 } }, [], ["sk1"])).toBeNull(); // no skills
+  expect(spliceDevotions({ bio: { devotionPoints: 1 }, skills: [{ name: "sk1" }] }, [], ["sk1"])).toBeNull(); // no level
+  expect(spliceDevotions({ bio: { devotionPoints: 1 }, skills: [null] }, [], ["sk1"])).toBeNull();
+  expect(spliceDevotions({ bio: {}, skills: [] }, [], ["sk1"])).toBeNull(); // no devotionPoints
+  expect(spliceDevotions({ skills: [] }, [], ["sk1"])).toBeNull(); // no bio
+  expect(spliceDevotions({ bio: { devotionPoints: 1 }, skills: [], itemSkills: "no" }, [], ["sk1"])).toBeNull();
 });
