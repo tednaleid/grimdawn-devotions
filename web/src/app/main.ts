@@ -48,8 +48,9 @@ import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
 import { mapStars, invertStarTable, toGrimtoolsSkills, type StarTable } from "../core/grimtools";
-import { mountImportPanel, type ExportErrorCode, type ExportState } from "../adapters/importPanel";
+import { mountImportPanel, type ExportErrorCode, type ExportState, type ImportState } from "../adapters/importPanel";
 import { makeWorkerGateway } from "../adapters/grimtoolsWorkerGateway";
+import type { ExportBase, FetchBuildResult } from "../ports/GrimtoolsGateway";
 import { affinityTotals } from "../core/affinity";
 import {
   starsGranting,
@@ -824,7 +825,8 @@ async function boot() {
       // and pruned notice of the build just imported - has to survive every other refresh.
       if (known !== undefined && known !== source) {
         source = known;
-        importPanel.setState({ kind: "done", slug: source });
+        importPanel.setState(sourceState());
+        ensureSourceRead();
       }
       if (exportError && exportError.key !== key) exportError = null;
     }
@@ -928,15 +930,42 @@ async function boot() {
     }
   }
 
-  // Star sets behind builds this session imported cleanly or exported, keyed by selectionKey, so an
-  // unchanged selection shows its existing link instead of minting a duplicate grimtools build.
-  // Session-only on purpose: a restored gt= carries no star set to compare against, and there is no
-  // way to ask grimtools whether a build matches. Clear (the panel's ✕) leaves this intact, so
-  // returning to that exact selection re-associates it.
+  // Star sets behind builds this session read (import, the load-time read, export), keyed by
+  // selectionKey, so an unchanged selection shows its existing link instead of minting a duplicate
+  // grimtools build. Session-only on purpose: a restored gt= carries no star set to compare
+  // against, and there is no way to ask grimtools whether a build matches. Clear (the panel's ✕)
+  // leaves this intact, so returning to that exact selection re-associates it.
   const knownBuilds = new Map<string, string>();
   function selectionKey(sel: Set<string>): string {
     return [...sel].sort().join(",");
   }
+
+  // Every build read this session, by slug: the gateway's answer as received (`skills` mixes
+  // devotion stars and mastery skills, in grimtools' `sk` ids). It supplies the link's title on
+  // every repaint and the base an export copies from. Never the selection: only import applies a
+  // build's stars to the planner.
+  type KnownBuild = { title: string | null; skills: string[]; dataVersion: string | null };
+  const builds = new Map<string, KnownBuild>();
+
+  // Read a build through the gateway once per session and remember it. Its full star set is
+  // memoized under its key (see knownBuilds) whenever the table can be trusted for it, because
+  // "this exact set is that build" holds whether or not the planner could show it unpruned; a
+  // data-version mismatch keeps the title (display only) and skips the memo. Errors are not
+  // remembered, so a later read retries.
+  async function readBuild(slug: string): Promise<FetchBuildResult> {
+    const known = builds.get(slug);
+    if (known) return { kind: "ok", ...known };
+    const result = await gateway.fetchBuild(slug);
+    if (result.kind !== "ok") return result;
+    builds.set(slug, { title: result.title, skills: result.skills, dataVersion: result.dataVersion });
+    const table = await loadStarTable();
+    if (table && (!result.dataVersion || result.dataVersion === tableDataVersion)) {
+      const stars = mapStars(result.skills, table);
+      if (stars.length) knownBuilds.set(selectionKey(new Set(stars)), slug);
+    }
+    return result;
+  }
+
   // The selection key the panel was last reconciled against: the memo is consulted only when the key
   // changes, so a cleared association stays cleared until the selection actually moves, and a
   // restored hash (which adopts the key itself) keeps the provenance it arrived with.
@@ -977,7 +1006,7 @@ async function boot() {
     // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
     if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
 
-    const result = await gateway.fetchBuild(slug);
+    const result = await readBuild(slug);
     if (result.kind === "notFound") return importPanel.setState({ kind: "error", code: "notFound" });
     if (result.kind === "network") return importPanel.setState({ kind: "error", code: "network" });
     const body = result;
@@ -1000,9 +1029,6 @@ async function boot() {
     state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
     const pruned = wanted.size - state.selected.size;
     source = slug;
-    // A pruned import is a build the planner does not show as grimtools does, so it is not memoized;
-    // Export stays offered for it.
-    if (pruned === 0) knownBuilds.set(selectionKey(state.selected), slug);
     importPanel.setState({ kind: "done", slug, pruned, title: body.title });
     // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
     // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
@@ -1025,6 +1051,7 @@ async function boot() {
     // in-flight key claimed before the first await, so a star toggled mid-request neither changes
     // what ships nor lets a second click mint a second build.
     const selected = new Set(state.selected);
+    const baseSlug = source; // the base is pinned with the selection: what was on screen when Export was pressed
     exportingKey = key;
     exportError = null;
     syncImportPanel();
@@ -1050,7 +1077,27 @@ async function boot() {
         exportError = { key, code: "network" };
         return;
       }
-      const result = await gateway.saveBuild(skills);
+      // With an associated build, the export is a copy of it with these devotions: read it (usually
+      // from the memo) to learn which of its ids are stars to replace. Only the table decides that.
+      let base: ExportBase | undefined;
+      if (baseSlug) {
+        const b = await readBuild(baseSlug);
+        if (b.kind === "notFound") {
+          exportError = { key, code: "base" };
+          return;
+        }
+        if (b.kind === "network") {
+          exportError = { key, code: "network" };
+          return;
+        }
+        if (b.dataVersion && b.dataVersion !== tableDataVersion) {
+          // Its ids cannot be trusted against this table, the same rule import applies.
+          exportError = { key, code: "base" };
+          return;
+        }
+        base = { slug: baseSlug, remove: [...new Set(b.skills.filter((id) => starIdTable[id] !== undefined))] };
+      }
+      const result = await gateway.saveBuild(skills, base);
       if (result.kind !== "ok") {
         exportError = { key, code: result.kind };
         return;
@@ -1074,12 +1121,33 @@ async function boot() {
     onSubmit: (slug) => void runImport(slug),
     onExport: () => void runExport(),
   });
+  // The panel's view of `source`: the link with the build's title when this session has read it,
+  // else the untitled fallback.
+  function sourceState(): ImportState {
+    return source ? { kind: "done", slug: source, title: builds.get(source)?.title ?? null } : { kind: "idle" };
+  }
+  // A hash-restored or freshly exported gt= is a slug the session may never have read: fetch it
+  // in the background for its title (and memo entry) and repaint if it is still the association
+  // when the answer lands. Only a success repaints, so a failing read cannot loop; the fallback
+  // label simply stays. Never touches the selection.
+  const reading = new Set<string>();
+  function ensureSourceRead(): void {
+    const slug = source;
+    if (!slug || builds.has(slug) || reading.has(slug)) return;
+    reading.add(slug);
+    void readBuild(slug)
+      .finally(() => reading.delete(slug))
+      .then((r) => {
+        if (r.kind === "ok" && source === slug) syncImportPanel();
+      });
+  }
   // Reflects `source` and the export state into the panel: at mount, on every hashchange, on the
   // clear path, and around an export request. A plain refresh pushes only the export state, so
   // rendering never resets what the import half is showing.
   function syncImportPanel(): void {
-    importPanel.setState(source ? { kind: "done", slug: source } : { kind: "idle" });
+    importPanel.setState(sourceState());
     importPanel.setExportState(exportStateFor());
+    ensureSourceRead();
   }
   syncImportPanel();
 
