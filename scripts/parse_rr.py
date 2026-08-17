@@ -958,7 +958,10 @@ def main(argv=None) -> int:
         "game_version": args.game_version,
         "steam_buildid": args.steam_buildid,
         "generated_utc": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "berserker_present": (db.root / "records/skills/playerclass13").is_dir(),
+        # Berserker (Fangs of Asterkarn) is playerclass10, not playerclass13: the mastery
+        # numbering is dense and gdx3 continued it. tagGDX3Class10SkillName00A is "Berserker".
+        # The old probe named a directory that has never existed, so this always read false.
+        "berserker_present": (db.root / "records/skills/playerclass10").is_dir(),
     }
     doc = {"meta": meta, "sources": sources}
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
