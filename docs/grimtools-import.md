@@ -170,8 +170,16 @@ replaced by the source link and a clear button.
 - **`gt=<slug>` in the URL hash is provenance and the base of an export.** The
   authoritative selection stays in `s=`; a hand-edited `gt=` cannot change which build
   renders. On load with a `gt=` the planner reads that build through the gateway once, in
-  the background, for its title and to memoize its star set; the read never changes the
-  selection or the cap. If it fails the link keeps its untitled label.
+  the background, for its title and to memoize its star set; the read never changes a
+  non-empty selection or the cap. If it fails the link keeps its untitled label.
+- **A build with no stars selected is shown as the build.** A hash that names a `gt=` but
+  selects nothing (a link straight to a grimtools build, or a map that was reset while
+  associated) runs the import on the user's behalf at load and on Back/Forward: same
+  import, but the hash is rewritten in place rather than pushed (Back leaves the planner
+  instead of returning to an empty map that would restore itself again), and a star
+  clicked or a build cleared while the read was in flight wins. Any selection with stars
+  restores exactly those stars, edits and all. Reset keeps the association, so it is the
+  way to an empty map for that build; a reload after it shows the build again.
 - **The point cap only rises**, to fit the incoming star count. Importing never reduces a
   budget.
 - **Pruning is reported.** If `repairSelection` drops stars, the count is shown.

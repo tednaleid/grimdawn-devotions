@@ -954,10 +954,19 @@ async function boot() {
   // memoized under its key (see knownBuilds) whenever the table can be trusted for it, because
   // "this exact set is that build" holds whether or not the planner could show it unpruned; a
   // data-version mismatch keeps the title (display only) and skips the memo. Errors are not
-  // remembered, so a later read retries.
-  async function readBuild(slug: string): Promise<FetchBuildResult> {
+  // remembered, so a later read retries. Concurrent callers share one in-flight read: the restore
+  // of a build-only link and the background title read ask for the same slug at the same time.
+  const reading = new Map<string, Promise<FetchBuildResult>>();
+  function readBuild(slug: string): Promise<FetchBuildResult> {
     const known = builds.get(slug);
-    if (known) return { kind: "ok", ...known };
+    if (known) return Promise.resolve({ kind: "ok", ...known });
+    const pending = reading.get(slug);
+    if (pending) return pending;
+    const read = fetchBuild(slug).finally(() => reading.delete(slug));
+    reading.set(slug, read);
+    return read;
+  }
+  async function fetchBuild(slug: string): Promise<FetchBuildResult> {
     const result = await gateway.fetchBuild(slug);
     if (result.kind !== "ok") return result;
     builds.set(slug, { title: result.title, skills: result.skills, dataVersion: result.dataVersion });
@@ -998,7 +1007,10 @@ async function boot() {
     return { kind: "ready" };
   }
 
-  async function runImport(slug: string): Promise<void> {
+  // `restore` is the import a build-only link runs on the user's behalf (see restoreFromSource): the
+  // same import, except that it rewrites the hash in place rather than pushing a history entry, and
+  // it yields to anything the user did while the build was on its way.
+  async function runImport(slug: string, mode: "user" | "restore" = "user"): Promise<void> {
     if (!slug) {
       // The clear button: drop the association only. Selection and cap are deliberately untouched,
       // but the export state is not: with no association, this selection can be exported again.
@@ -1034,6 +1046,11 @@ async function boot() {
     const stars = mapStars(body.skills, starIdTable);
     if (!stars.length) return importPanel.setState({ kind: "error", code: "empty" });
 
+    // A restore applies only to the empty map it was started for: a star clicked, a build cleared or
+    // another slug imported while the read was in flight wins, and the source side simply repaints
+    // (with the title the read just supplied).
+    if (mode === "restore" && (state.selected.size > 0 || source !== slug)) return syncImportPanel();
+
     // Raise the cap to fit, never lower an existing higher one.
     const cap = Math.max(state.pointCap, stars.length);
     const wanted = new Set(stars);
@@ -1045,8 +1062,18 @@ async function boot() {
     importPanel.setState({ kind: "done", slug, pruned, title: body.title });
     // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
     // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
-    // and must be recomputed, same as every other state-changing action in this file.
-    refresh("push");
+    // and must be recomputed, same as every other state-changing action in this file. A restore
+    // canonicalizes the link it arrived on instead of pushing: Back then leaves the planner rather
+    // than returning to an empty map that would restore itself again.
+    refresh(mode === "restore" ? "replace" : "push");
+  }
+
+  // A hash that names a build but selects nothing is a link straight to that grimtools build (or a
+  // map that was reset while associated), and it is shown as the build: the import runs on the
+  // user's behalf. A hash with any stars restores exactly those stars, edits and all; only an empty
+  // selection defers to the build, and Reset (which keeps the association) is the way back to empty.
+  function restoreFromSource(): void {
+    if (source && state.selected.size === 0) void runImport(source, "restore");
   }
 
   async function runExport(): Promise<void> {
@@ -1157,16 +1184,12 @@ async function boot() {
   // label simply stays. Never touches the selection. It also defers to an import that holds the
   // panel (see importOwnsPanel): the import's own paint stands, and the title arrives on the next
   // source repaint.
-  const reading = new Set<string>();
   function ensureSourceRead(): void {
     const slug = source;
-    if (!slug || builds.has(slug) || reading.has(slug)) return;
-    reading.add(slug);
-    void readBuild(slug)
-      .finally(() => reading.delete(slug))
-      .then((r) => {
-        if (r.kind === "ok" && source === slug && !importOwnsPanel) syncImportPanel();
-      });
+    if (!slug || builds.has(slug)) return;
+    void readBuild(slug).then((r) => {
+      if (r.kind === "ok" && source === slug && !importOwnsPanel) syncImportPanel();
+    });
   }
   // Reflects `source` and the export state into the panel: at mount, on every hashchange, on the
   // clear path, and around an export request. A plain refresh pushes only the export state, so
@@ -1333,10 +1356,12 @@ async function boot() {
     searchPanel.setValue(query); // the box must agree with the restored hash
     syncImportPanel(); // ditto, for the source link
     refresh("replace");
+    restoreFromSource();
   });
 
   lastSelectionKey = selectionKey(state.selected); // the boot hash's gt= is authoritative, as above
   refresh("replace"); // boot render; canonicalize the URL without creating a history entry
+  restoreFromSource();
 }
 
 boot().catch((e) => {

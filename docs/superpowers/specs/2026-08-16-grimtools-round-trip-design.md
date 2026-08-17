@@ -59,7 +59,10 @@ mastery and item skills only, because celestial powers are auto-cast in the game
 3. **A fetched build never changes the selection or the cap.** Only Import applies stars
    to the planner. The load-time read (Decision 5) and the export-time read supply the
    title and the base's star list; a user who imported X, toggled stars and refreshed sees
-   their tweaked selection with X's name on the link.
+   their tweaked selection with X's name on the link. One case is an import: a hash that
+   names a build but selects nothing (a link straight to a grimtools build) runs the
+   import on the user's behalf, rewriting the hash in place; a reset map keeps its `gt=`
+   and so shows the build again on reload, which is accepted.
 4. **A base that cannot be read is reported, not worked around.** If the base slug does
    not resolve, or its `dataVersion` disagrees with the table (so `remove` cannot be
    trusted, the same rule import applies), Export shows an error and creates nothing.
