@@ -1,9 +1,9 @@
 {
   "meta": {
-    "game_version": "1.3.0.0",
-    "steam_buildid": "24346246",
-    "generated_utc": "2026-07-24T00:15:42Z",
-    "berserker_present": false
+    "game_version": "1.3.0.7",
+    "steam_buildid": "24756825",
+    "generated_utc": "2026-08-17T06:04:24Z",
+    "berserker_present": true
   },
   "sources": [
     {
@@ -884,7 +884,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_demo3:reduced-flat",
       "name": "tagClass02SkillName01A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113B",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_demo3.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -908,7 +908,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_soldier2:reduced-flat",
       "name": "tagClass01SkillName04A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier2.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-flat",
@@ -1943,10 +1943,10 @@
     },
     {
       "id": "records:skills:playerclass03:pets:modifier_caster_d108_summonrifthound:reduced-flat",
-      "name": "tagClass03SkillName00",
-      "parent": "tagClass03SkillName00",
+      "name": "tagClass03SkillName02A",
+      "parent": "tagGDX1WeaponCaster1hD102",
       "record_path": "records/skills/playerclass03/pets/modifier_caster_d108_summonrifthound.dbr",
-      "category": "mastery skill",
+      "category": "item skill modifier",
       "rr_type": "reduced-flat",
       "resistances": "All",
       "values_per_rank": [
@@ -1962,7 +1962,7 @@
       "trigger_chance_percent": null,
       "trigger": "debuff",
       "proc_condition": null,
-      "mythical": false,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -2003,6 +2003,54 @@
       "value_at_max": 25,
       "value_at_ultimate": 35,
       "duration_seconds": 2,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass07:pets:modifier_focus_d209_runeofkalastor:reduced-flat",
+      "name": "tagGDX1Class07SkillName07A",
+      "parent": "tagGDX2FocusD204",
+      "record_path": "records/skills/playerclass07/pets/modifier_focus_d209_runeofkalastor.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        22
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 22,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass07:pets:modifier_shield_b010_runeofkalastor:reduced-flat",
+      "name": "tagGDX1Class07SkillName07A",
+      "parent": "tagShieldB011",
+      "record_path": "records/skills/playerclass07/pets/modifier_shield_b010_runeofkalastor.dbr",
+      "category": "item skill modifier",
+      "rr_type": "reduced-flat",
+      "resistances": "All",
+      "values_per_rank": [
+        24
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": 24,
+      "value_at_ultimate": null,
+      "duration_seconds": 3,
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
       "trigger": "debuff",
@@ -2242,7 +2290,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_soldier5:reduced-percent",
       "name": "tagClass01SkillName05A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113A",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_soldier5.dbr",
       "category": "item skill modifier",
       "rr_type": "reduced-percent",
@@ -7178,7 +7226,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Life",
       "name": "tagGDX1Class07SkillName02A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113G",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7204,7 +7252,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_inquisitor1:stacking:Poison",
       "name": "tagGDX1Class07SkillName02A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113G",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_inquisitor1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7230,7 +7278,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Aether",
       "name": "tagGDX1Class08SkillName07A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113H",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7256,7 +7304,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_necro2:stacking:Chaos",
       "name": "tagGDX1Class08SkillName07A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113H",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_necro2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7282,7 +7330,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set1_nightblade5:stacking:Life",
       "name": "tagClass04SkillName11A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113D",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set1_nightblade5.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7360,7 +7408,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Aether",
       "name": "tagClass05SkillName16A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113E",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7386,7 +7434,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_arcanist2:stacking:Physical",
       "name": "tagClass05SkillName16A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113E",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_arcanist2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7412,7 +7460,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_inquisitor3:stacking:Physical",
       "name": "tagGDX1Class07SkillName02A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113G",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_inquisitor3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7438,7 +7486,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_necro4:stacking:Chaos",
       "name": "tagGDX1Class08SkillName08A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113H",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_necro4.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7464,7 +7512,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Aether",
       "name": "tagClass04SkillName07A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113D",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7490,7 +7538,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Chaos",
       "name": "tagClass04SkillName07A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113D",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7516,7 +7564,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_nightblade1:stacking:Fire",
       "name": "tagClass04SkillName07A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113D",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_nightblade1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7592,7 +7640,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Pierce",
       "name": "tagClass06SkillName15A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113F",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7618,7 +7666,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman1:stacking:Poison",
       "name": "tagClass06SkillName15A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113F",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7644,7 +7692,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Chaos",
       "name": "tagClass06SkillName15A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113F",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -7670,7 +7718,7 @@
     {
       "id": "records:skills:itemskillsgdx1:skillmodifiers:legendarygdx1:eldritchwhispers:set2_shaman3:stacking:Physical",
       "name": "tagClass06SkillName15A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX1NecklaceD113F",
       "record_path": "records/skills/itemskillsgdx1/skillmodifiers/legendarygdx1/eldritchwhispers/set2_shaman3.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -12263,7 +12311,7 @@
     {
       "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker1:stacking:Aether",
       "name": "tagGDX3Class10SkillName16A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX3NecklaceD113J",
       "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -12289,7 +12337,7 @@
     {
       "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker1:stacking:Physical",
       "name": "tagGDX3Class10SkillName16A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX3NecklaceD113J",
       "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker1.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -12315,7 +12363,7 @@
     {
       "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker2:stacking:Life",
       "name": "tagGDX3Class10SkillName16A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX3NecklaceD113J",
       "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -12341,7 +12389,7 @@
     {
       "id": "records:skills:itemskillsgdx3:skillmodifiers:legendary:eldritchwhispers:set1_berserker2:stacking:Poison",
       "name": "tagGDX3Class10SkillName16A",
-      "parent": "tagGDX1NecklaceD113C",
+      "parent": "tagGDX3NecklaceD113J",
       "record_path": "records/skills/itemskillsgdx3/skillmodifiers/legendary/eldritchwhispers/set1_berserker2.dbr",
       "category": "item skill modifier",
       "rr_type": "stacking",
@@ -13531,6 +13579,377 @@
       "notes": "item skill modifier via records/items/gearweapons/melee2h/d208_blunt2h.dbr"
     },
     {
+      "id": "records:skills:playerclass02:pets:modifier_caster_b303_thermitemine:stacking:Aether",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX3WeaponCaster1hB303",
+      "record_path": "records/skills/playerclass02/pets/modifier_caster_b303_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -10,
+        -20
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_caster_b303_thermitemine:stacking:Lightning",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX3WeaponCaster1hB303",
+      "record_path": "records/skills/playerclass02/pets/modifier_caster_b303_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_caster_d211_thermitemine:stacking:Life",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX2WeaponCaster1hD207",
+      "record_path": "records/skills/playerclass02/pets/modifier_caster_d211_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -12,
+        -24
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -24,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_focus_b019_thermitemine:stacking:Fire",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagFocusB019",
+      "record_path": "records/skills/playerclass02/pets/modifier_focus_b019_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_gun2h_f203_thermitemine:stacking:Chaos",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX2WeaponGun2hF203",
+      "record_path": "records/skills/playerclass02/pets/modifier_gun2h_f203_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -18
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_necklace_d308_thermitemine:stacking:Aether",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX3NecklaceD303",
+      "record_path": "records/skills/playerclass02/pets/modifier_necklace_d308_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_necklace_d308_thermitemine:stacking:Lightning",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX3NecklaceD303",
+      "record_path": "records/skills/playerclass02/pets/modifier_necklace_d308_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_set_d209_thermitemines:stacking:Fire",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX2ItemSetD209Name",
+      "record_path": "records/skills/playerclass02/pets/modifier_set_d209_thermitemines.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_set_d209_thermitemines:stacking:Lightning",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX2ItemSetD209Name",
+      "record_path": "records/skills/playerclass02/pets/modifier_set_d209_thermitemines.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_shield_d304_thermitemine:stacking:Chaos",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX3ShieldD302",
+      "record_path": "records/skills/playerclass02/pets/modifier_shield_d304_thermitemine.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_thermitemine_caster_d110:stacking:Cold",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX1WeaponCaster1hD104",
+      "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_caster_d110.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_thermitemine_casterf110:stacking:Chaos",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX1WeaponCaster1hF110",
+      "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -10,
+        -20
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_thermitemine_casterf110:stacking:Fire",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX1WeaponCaster1hF110",
+      "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_casterf110.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -10,
+        -20
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:modifier_thermitemine_gun1h_d114:stacking:Life",
+      "name": "tagClass02SkillName06A",
+      "parent": "tagGDX1WeaponGun1hD114",
+      "record_path": "records/skills/playerclass02/pets/modifier_thermitemine_gun1h_d114.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -15,
+        -30
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -30,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
       "id": "records:skills:playerclass02:pets:thermitemine_skill_flare1_buff:stacking:Elemental",
       "name": "tagClass02SkillName06C",
       "parent": "tagClass02SkillName00A",
@@ -13570,6 +13989,100 @@
       "ultimate_rank": 26,
       "value_at_max": -30,
       "value_at_ultimate": -40,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:thermitemine_skill_flare2:stacking:Aether",
+      "name": "tagClass02SkillName06B",
+      "parent": "tagClass02SkillName00A",
+      "record_path": "records/skills/playerclass02/pets/thermitemine_skill_flare2.dbr",
+      "category": "modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -5,
+        -8,
+        -11,
+        -14,
+        -17,
+        -20,
+        -23,
+        -26,
+        -29,
+        -31,
+        -33,
+        -35,
+        -36,
+        -37,
+        -38,
+        -39,
+        -40,
+        -41,
+        -42,
+        -43,
+        -44,
+        -45
+      ],
+      "max_rank": 12,
+      "ultimate_rank": 22,
+      "value_at_max": -35,
+      "value_at_ultimate": -45,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass02:pets:thermitemine_skill_flare2:stacking:Chaos",
+      "name": "tagClass02SkillName06B",
+      "parent": "tagClass02SkillName00A",
+      "record_path": "records/skills/playerclass02/pets/thermitemine_skill_flare2.dbr",
+      "category": "modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -5,
+        -8,
+        -11,
+        -14,
+        -17,
+        -20,
+        -23,
+        -26,
+        -29,
+        -31,
+        -33,
+        -35,
+        -36,
+        -37,
+        -38,
+        -39,
+        -40,
+        -41,
+        -42,
+        -43,
+        -44,
+        -45
+      ],
+      "max_rank": 12,
+      "ultimate_rank": 22,
+      "value_at_max": -35,
+      "value_at_ultimate": -45,
       "duration_seconds": null,
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
@@ -14224,6 +14737,446 @@
       "notes": ""
     },
     {
+      "id": "records:skills:playerclass06:pets:modifier_caster_b202_winddevil:stacking:Elemental",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX2WeaponCaster1hB202",
+      "record_path": "records/skills/playerclass06/pets/modifier_caster_b202_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_caster_b304_winddevil:stacking:Aether",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3WeaponCaster1hB304",
+      "record_path": "records/skills/playerclass06/pets/modifier_caster_b304_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -12,
+        -24
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -24,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_caster_d008_winddevil:stacking:Cold",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagWeaponCaster1hD008",
+      "record_path": "records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Cold"
+      ],
+      "values_per_rank": [
+        -10,
+        -20
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_caster_d008_winddevil:stacking:Lightning",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagWeaponCaster1hD008",
+      "record_path": "records/skills/playerclass06/pets/modifier_caster_d008_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -10,
+        -20
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_eldritchwhispers_set1_shaman5:stacking:Poison",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX1NecklaceD113F",
+      "record_path": "records/skills/playerclass06/pets/modifier_eldritchwhispers_set1_shaman5.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll"
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_focus_d219_winddevil:stacking:Aether",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX2FocusD211",
+      "record_path": "records/skills/playerclass06/pets/modifier_focus_d219_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_gun1h_b302_winddevil:stacking:Fire",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3WeaponGun1hB302",
+      "record_path": "records/skills/playerclass06/pets/modifier_gun1h_b302_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -10,
+        -20
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -20,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_head_d019_winddevil:stacking:Elemental",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagHeadD019",
+      "record_path": "records/skills/playerclass06/pets/modifier_head_d019_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_mace1h_b302_winddevil:stacking:Physical",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3WeaponBluntB302",
+      "record_path": "records/skills/playerclass06/pets/modifier_mace1h_b302_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_mace1h_d303_winddevil:stacking:Aether",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3WeaponBluntD301",
+      "record_path": "records/skills/playerclass06/pets/modifier_mace1h_d303_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_mace1h_d303_winddevil:stacking:Lightning",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3WeaponBluntD301",
+      "record_path": "records/skills/playerclass06/pets/modifier_mace1h_d303_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_necklace_d308_winddevil:stacking:Aether",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3NecklaceD303",
+      "record_path": "records/skills/playerclass06/pets/modifier_necklace_d308_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -12
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -12,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_necklace_d308_winddevil:stacking:Lightning",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3NecklaceD303",
+      "record_path": "records/skills/playerclass06/pets/modifier_necklace_d308_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_necklace_d317_winddevil:stacking:Fire",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3NecklaceD313",
+      "record_path": "records/skills/playerclass06/pets/modifier_necklace_d317_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:modifier_shield_b305_winddevil:stacking:Aether",
+      "name": "tagClass06SkillName04A",
+      "parent": "tagGDX3ShieldB305",
+      "record_path": "records/skills/playerclass06/pets/modifier_shield_b305_winddevil.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -12,
+        -24
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -24,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass06:pets:petskill_whirlwind_exposure:stacking:Elemental",
+      "name": "tagClass06SkillName04B",
+      "parent": "tagClass06SkillName00",
+      "record_path": "records/skills/playerclass06/pets/petskill_whirlwind_exposure.dbr",
+      "category": "modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -3,
+        -6,
+        -9,
+        -12,
+        -15,
+        -18,
+        -20,
+        -22,
+        -24,
+        -26,
+        -28,
+        -30,
+        -31,
+        -32,
+        -33,
+        -34,
+        -35,
+        -36,
+        -37,
+        -38,
+        -39,
+        -40
+      ],
+      "max_rank": 12,
+      "ultimate_rank": 22,
+      "value_at_max": -30,
+      "value_at_ultimate": -40,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
       "id": "records:skills:playerclass07:auracensure1_buff:stacking:Elemental",
       "name": "tagGDX1Class07SkillName09A",
       "parent": "tagGDX1Class07SkillName00A",
@@ -14265,6 +15218,106 @@
       "trigger": "debuff",
       "proc_condition": null,
       "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass07:pets:modifier_eldritchwhispersset1_inquisitor5:stacking:Chaos",
+      "name": "tagGDX1Class07SkillName06A",
+      "parent": "tagGDX1NecklaceD113G",
+      "record_path": "records/skills/playerclass07/pets/modifier_eldritchwhispersset1_inquisitor5.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll"
+    },
+    {
+      "id": "records:skills:playerclass07:pets:modifier_gun2h_d203_inquisitorseal:stacking:Physical",
+      "name": "tagGDX1Class07SkillName06A",
+      "parent": "tagGDX2WeaponGun2hD201",
+      "record_path": "records/skills/playerclass07/pets/modifier_gun2h_d203_inquisitorseal.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Physical"
+      ],
+      "values_per_rank": [
+        -18
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass07:pets:modifier_head_b101_inquisitorseal:stacking:Elemental",
+      "name": "tagGDX1Class07SkillName06A",
+      "parent": "tagGDX1HeadB101",
+      "record_path": "records/skills/playerclass07/pets/modifier_head_b101_inquisitorseal.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass07:pets:modifier_sword2h_d106_inquisitorseal2:stacking:Elemental",
+      "name": "tagGDX1Class07SkillName06A",
+      "parent": "tagGDX1WeaponMelee2hD103",
+      "record_path": "records/skills/playerclass07/pets/modifier_sword2h_d106_inquisitorseal2.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": "Elemental",
+      "values_per_rank": [
+        -18
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -18,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
       "per_resistance_values": null,
       "notes": ""
     },
@@ -14625,6 +15678,372 @@
       "ultimate_rank": 20,
       "value_at_max": -25,
       "value_at_ultimate": -35,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_caster_d113_conjurecelestialguardian:stacking:Life",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX1WeaponCaster1hD113",
+      "record_path": "records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_caster_d113_conjurecelestialguardian:stacking:Poison",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX1WeaponCaster1hD113",
+      "record_path": "records/skills/playerclass09/pets/modifier_caster_d113_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Poison & Acid"
+      ],
+      "values_per_rank": [
+        -8,
+        -16
+      ],
+      "max_rank": 2,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_eldritchwhispers_set1_oathkeeper3:stacking:Aether",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2NecklaceD113I",
+      "record_path": "records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll"
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_eldritchwhispers_set1_oathkeeper3:stacking:Chaos",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2NecklaceD113I",
+      "record_path": "records/skills/playerclass09/pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Chaos"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": "random-roll"
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_focus_d214_conjurecelestialguardian:stacking:Lightning",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2FocusD208",
+      "record_path": "records/skills/playerclass09/pets/modifier_focus_d214_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_gun2h_b203_conjurecelestialguardian:stacking:Fire",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2WeaponGun2hB203",
+      "record_path": "records/skills/playerclass09/pets/modifier_gun2h_b203_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -16
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -16,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_head_d213_conjurecelestialguardian:stacking:Aether",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2HeadD210",
+      "record_path": "records/skills/playerclass09/pets/modifier_head_d213_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_necklace_b203_conjurecelestialguardian:stacking:Bleeding",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2NecklaceB203",
+      "record_path": "records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Bleeding"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_necklace_b203_conjurecelestialguardian:stacking:Life",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2NecklaceB203",
+      "record_path": "records/skills/playerclass09/pets/modifier_necklace_b203_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Vitality"
+      ],
+      "values_per_rank": [
+        -10
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -10,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_necklace_d108_conjurecelestialguardian:stacking:Aether",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX1NecklaceD102",
+      "record_path": "records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Aether"
+      ],
+      "values_per_rank": [
+        -15
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -15,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_necklace_d108_conjurecelestialguardian:stacking:Fire",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX1NecklaceD102",
+      "record_path": "records/skills/playerclass09/pets/modifier_necklace_d108_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -6
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -6,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": true,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_set_d211_conjurecelestialguardian_02:stacking:Fire",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2ItemSetD211Name",
+      "record_path": "records/skills/playerclass09/pets/modifier_set_d211_conjurecelestialguardian_02.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_set_d215_conjurecelestialguardian:stacking:Fire",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2ItemSetD215Name",
+      "record_path": "records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Fire"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
+      "duration_seconds": null,
+      "cooldown_seconds": null,
+      "trigger_chance_percent": null,
+      "trigger": "debuff",
+      "proc_condition": null,
+      "mythical": false,
+      "per_resistance_values": null,
+      "notes": ""
+    },
+    {
+      "id": "records:skills:playerclass09:pets:modifier_set_d215_conjurecelestialguardian:stacking:Lightning",
+      "name": "tagGDX2Class09SkillName08A",
+      "parent": "tagGDX2ItemSetD215Name",
+      "record_path": "records/skills/playerclass09/pets/modifier_set_d215_conjurecelestialguardian.dbr",
+      "category": "item skill modifier",
+      "rr_type": "stacking",
+      "resistances": [
+        "Lightning"
+      ],
+      "values_per_rank": [
+        -8
+      ],
+      "max_rank": 1,
+      "ultimate_rank": null,
+      "value_at_max": -8,
+      "value_at_ultimate": null,
       "duration_seconds": null,
       "cooldown_seconds": null,
       "trigger_chance_percent": null,
