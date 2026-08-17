@@ -215,7 +215,7 @@
   "ui.tooltip.pts": "{count} b.",
   "ui.tooltip.requires": "Vyžaduje: ",
   "ui.grimtools.label": "grimtools",
-  "ui.export.submit": "Exportovat do grimtools",
+  "ui.export.submit": "Exportovat nový build",
   "ui.export.hint.empty": "Vyberte hvězdy k exportu.",
   "ui.export.hint.uncapped": "Pro export obnovte limit 55 bodů.",
   "ui.export.hint.incomplete": "Exportovat lze jen úplný build.",
@@ -223,5 +223,8 @@
   "ui.export.err.rateLimited": "Příliš mnoho exportů. Zkuste to znovu za minutu.",
   "ui.export.err.network": "Nepodařilo se spojit se s exportní službou.",
   "ui.export.err.upstream": "grimtools build nepřijal.",
-  "ui.export.err.base": "Zdrojový build se nepodařilo načíst. Zrušte ho (✕) a exportujte nový build."
+  "ui.export.err.base": "Zdrojový build se nepodařilo načíst. Zrušte ho (✕) a exportujte nový build.",
+  "ui.export.saved": "Uloženo jako nový build; odkaz výše na něj nyní ukazuje.",
+  "ui.export.copy": "Kopírovat odkaz",
+  "ui.export.copied": "Zkopírováno"
 }

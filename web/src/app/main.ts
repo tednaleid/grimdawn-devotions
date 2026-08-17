@@ -816,7 +816,8 @@ async function boot() {
       curTransition = null;
     }
     // The memo is consulted only when the selection actually changes (see lastSelectionKey): a
-    // returning selection re-associates its build, and a stale export error is dropped.
+    // returning selection re-associates its build, and a stale export error or saved notice is
+    // dropped.
     const key = selectionKey(state.selected);
     if (key !== lastSelectionKey) {
       lastSelectionKey = key;
@@ -831,6 +832,7 @@ async function boot() {
         ensureSourceRead();
       }
       if (exportError && exportError.key !== key) exportError = null;
+      if (lastSaved && lastSaved.key !== key) lastSaved = null;
     }
     importPanel.setExportState(exportStateFor());
     document.body.classList.toggle("comparing", baseline !== null);
@@ -986,6 +988,11 @@ async function boot() {
   // supersedes both, and a result that arrives after such a change never re-associates the wrong set.
   let exportingKey: string | null = null;
   let exportError: { key: string; code: ExportErrorCode } | null = null;
+  // The build this session minted most recently, pinned the same way: while the selection is still
+  // the one it was made from and the link shows it, the panel says so (grimtools builds are
+  // immutable, so an export is always a new link, which is not obvious from a title that barely
+  // changed). Dropped when the selection moves on.
+  let lastSaved: { key: string; slug: string } | null = null;
   // The import half owns the panel from the moment an import paints `loading` until the source side
   // paints again or the import lands `done`. While it holds, the load-time read's background repaint
   // (see ensureSourceRead) must not overwrite the loading/error state or the textbox with a slug that
@@ -994,11 +1001,15 @@ async function boot() {
   // The inverse mapping table, built once from the same file the import loads.
   let inverseTable: Record<string, string> | null = null;
 
-  // The Export button's state for the current selection, in the spec's precedence: hidden (the link
-  // already is the export), then the three disabled reasons, then in-flight and error, then ready.
+  // The Export button's state for the current selection, in the spec's precedence: hidden or saved
+  // (the link already is the export), then the three disabled reasons, then in-flight and error,
+  // then ready.
   function exportStateFor(): ExportState {
     const key = selectionKey(state.selected);
-    if (source && knownBuilds.get(key) === source) return { kind: "hidden" };
+    if (source && knownBuilds.get(key) === source)
+      return lastSaved && lastSaved.key === key && lastSaved.slug === source
+        ? { kind: "saved", slug: source }
+        : { kind: "hidden" };
     if (state.selected.size === 0) return { kind: "disabled", reason: "empty" };
     if (!Number.isFinite(state.pointCap)) return { kind: "disabled", reason: "uncapped" };
     if (!reach.legal) return { kind: "disabled", reason: "incomplete" };
@@ -1155,6 +1166,7 @@ async function boot() {
         return;
       }
       knownBuilds.set(key, result.slug);
+      lastSaved = { key, slug: result.slug };
       // The selection may have moved on while the request was in flight: only the selection the build
       // was made from becomes associated with it (a later return to that set re-associates via the memo).
       if (selectionKey(state.selected) === key) {

@@ -215,7 +215,7 @@
   "ui.tooltip.pts": "{count} điểm",
   "ui.tooltip.requires": "Yêu cầu: ",
   "ui.grimtools.label": "grimtools",
-  "ui.export.submit": "Xuất sang grimtools",
+  "ui.export.submit": "Xuất bản dựng mới",
   "ui.export.hint.empty": "Chọn các ngôi sao để xuất.",
   "ui.export.hint.uncapped": "Khôi phục giới hạn 55 điểm để xuất.",
   "ui.export.hint.incomplete": "Chỉ có thể xuất bản dựng hoàn chỉnh.",
@@ -223,5 +223,8 @@
   "ui.export.err.rateLimited": "Xuất quá nhiều lần. Hãy thử lại sau một phút.",
   "ui.export.err.network": "Không thể kết nối với dịch vụ xuất.",
   "ui.export.err.upstream": "grimtools không chấp nhận bản dựng.",
-  "ui.export.err.base": "Không đọc được bản dựng gốc. Bỏ liên kết (✕) để xuất một bản dựng mới."
+  "ui.export.err.base": "Không đọc được bản dựng gốc. Bỏ liên kết (✕) để xuất một bản dựng mới.",
+  "ui.export.saved": "Đã lưu thành bản dựng mới; liên kết ở trên giờ trỏ tới nó.",
+  "ui.export.copy": "Sao chép liên kết",
+  "ui.export.copied": "Đã sao chép"
 }

@@ -19,9 +19,12 @@ export type ExportDisabledReason = "empty" | "uncapped" | "incomplete";
 export type ExportErrorCode = "rateLimited" | "network" | "upstream" | "base";
 
 /** The Export button, independent of the import state (see the spec's panel table). `hidden` is
- * "the link already is the export": the current selection matches the associated build. */
+ * "the link already is the export": the current selection matches the associated build. `saved` is
+ * the same, right after this session minted that build: the button stays away and its row explains
+ * that the link above is a new build (grimtools builds are immutable), with a copy button for it. */
 export type ExportState =
   | { kind: "hidden" }
+  | { kind: "saved"; slug: string }
   | { kind: "disabled"; reason: ExportDisabledReason }
   | { kind: "ready" }
   | { kind: "exporting" }
@@ -38,11 +41,17 @@ const CALC = "https://www.grimtools.com/calc/";
 export function mountImportPanel(
   el: HTMLElement,
   loc: Localization,
-  opts: { onSubmit(slug: string): void; onExport(): void },
+  opts: {
+    onSubmit(slug: string): void;
+    onExport(): void;
+    /** Writes the saved build's link to the clipboard; defaults to the browser's clipboard, tests inject. */
+    copyText?(text: string): Promise<void>;
+  },
 ): ImportPanelHandle {
   let localization = loc;
   let state: ImportState = { kind: "idle" };
   let exportState: ExportState = { kind: "hidden" };
+  const copyText = opts.copyText ?? ((text: string) => navigator.clipboard.writeText(text));
 
   // Import and ✕ are two states of one control, not two things that coexist: State A
   // (idle/loading/error) has nothing yet to clear, so it shows the textbox and Import; State B
@@ -131,11 +140,19 @@ export function mountImportPanel(
   }
 
   // The export row is its own state machine: it shows in State A and State B alike, and only
-  // `hidden` removes it (the associated link already is the export). Messages go through
-  // innerHTML for the same reason #import-msg does.
+  // `hidden` and `saved` remove it (the associated link already is the export). Messages go
+  // through innerHTML for the same reason #import-msg does.
   function paintExport() {
-    const hidden = exportState.kind === "hidden";
+    const hidden = exportState.kind === "hidden" || exportState.kind === "saved";
     exportRow.hidden = hidden;
+    if (exportState.kind === "saved") {
+      // The copy button lives inside the message, so it is re-created on every paint and its
+      // click is delegated from #export-msg below rather than bound here.
+      exportMsg.innerHTML =
+        `<div>${localization.translate("ui.export.saved")}</div>` +
+        `<button id="export-copy" type="button">${localization.translate("ui.export.copy")}</button>`;
+      return;
+    }
     if (hidden) {
       exportMsg.innerHTML = "";
       return;
@@ -171,6 +188,18 @@ export function mountImportPanel(
     input.focus();
   });
   exportGo.addEventListener("click", () => opts.onExport());
+  exportMsg.addEventListener("click", (e) => {
+    const target = e.target as Element | null;
+    if (target?.id !== "export-copy" || exportState.kind !== "saved") return;
+    // Confirm in place once the write lands; a refused write (no permission, insecure context)
+    // leaves the button as it was, and the link above can still be copied by hand.
+    void copyText(`${CALC}${exportState.slug}`).then(
+      () => {
+        target.textContent = localization.translate("ui.export.copied");
+      },
+      () => {},
+    );
+  });
   paint();
   paintExport();
 

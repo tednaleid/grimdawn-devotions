@@ -377,7 +377,7 @@
   "monsters.diff.ascendant": "Ascendant",
   "monsters.note.ascendantSameAsUltimate": "In this dataset Ascendant applies the same resistance offsets as Ultimate.",
   "ui.grimtools.label": "grimtools",
-  "ui.export.submit": "Export to grimtools",
+  "ui.export.submit": "Export new build",
   "ui.export.hint.empty": "Select stars to export.",
   "ui.export.hint.uncapped": "Restore the 55-point limit to export.",
   "ui.export.hint.incomplete": "Only a complete build can be exported.",
@@ -385,5 +385,8 @@
   "ui.export.err.rateLimited": "Too many exports. Try again in a minute.",
   "ui.export.err.network": "Could not reach the export service.",
   "ui.export.err.upstream": "grimtools did not accept the build.",
-  "ui.export.err.base": "The source build could not be read. Clear it (✕) to export a fresh build."
+  "ui.export.err.base": "The source build could not be read. Clear it (✕) to export a fresh build.",
+  "ui.export.saved": "Saved as a new build; the link above now points at it.",
+  "ui.export.copy": "Copy link",
+  "ui.export.copied": "Copied"
 }

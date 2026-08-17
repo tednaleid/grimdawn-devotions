@@ -732,6 +732,24 @@ main {
   color: #9aa4b2;
   font-size: 0.75rem;
 }
+/* The copy button sits under the saved message on its own line, styled like the panel's other
+   buttons. */
+#export-copy {
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
+  margin-top: 0.35rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#export-copy:hover {
+  background: #1d2530;
+  border-color: #3d4a5c;
+  color: #e6edf3;
+}
 .power,
 .tip-power {
   color: #f0c14b;
