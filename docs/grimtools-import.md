@@ -205,10 +205,13 @@ memo, or the gateway if it is not there yet) and sets `remove` to the base's ski
 that are keys of the star table, its devotion stars, since a mastery skill is never a
 key. The worker fetches the base page and calls `spliceDevotions`, which drops the
 `remove` entries from `skills[]`, appends the new stars, adjusts `bio.devotionPoints`
-for the count that changed, and drops any celestial-power binding in `skills[]`,
-`itemSkills[]` or `transformSkills[]` that named a removed star; every other field of the
+for the count that changed, and drops a celestial-power binding in `skills[]`,
+`itemSkills[]` or `transformSkills[]` only when its star is not in the new selection, so a
+star that is removed and requested again keeps its binding; every other field of the
 base (gear, masteries, attributes, quickbar, both progressions) passes through
-byte-for-byte. The copy inherits the base's title.
+byte-for-byte. Grimtools derives the title server-side from the character's masteries and
+level and stamps its current game version, so the copy is titled like the base except for
+the version.
 
 The worker validates shape (1 to 55 distinct `sk<digits>` ids in `skills`, and with a
 base a slug plus 0 to 128 distinct `sk<digits>` ids in `remove`, all under a 4 KB body
@@ -285,3 +288,5 @@ renumbering reaches us from CI rather than from a confused user.
   automatic "modified since import" marking.
 - Quickbar entries are passed through untouched on export; celestial powers never appear
   there, so nothing dangles.
+- `devotionsProgression` is passed through unchanged. Grimtools' calculator writes it
+  empty and nothing in its UI records or renders it, so a stale entry there has no effect.

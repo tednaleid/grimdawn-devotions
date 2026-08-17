@@ -31,9 +31,13 @@ worker posts a fresh level-100 character holding exactly `skills`, in the shape 
 calculator's own Share button uses (`savePayload` in `web/src/core/grimtools.ts`). With
 `base` it reads that build's page, drops the `skills` entries named in `remove` (the
 planner's statement of which of the base's ids are devotion stars; the worker cannot tell),
-appends `skills`, fixes `bio.devotionPoints`, drops celestial-power bindings to removed
-stars, and posts everything else exactly as grimtools wrote it (`spliceDevotions`, same
-file). Errors: `400 bad_request`, `403 forbidden`, `429 rate_limited`, `502 upstream`
+appends `skills`, fixes `bio.devotionPoints`, drops a celestial-power binding only when
+its star is not in the new selection (a star removed and requested again keeps its
+binding), and posts everything else exactly as grimtools wrote it (`spliceDevotions`, same
+file). An old worker deployment ignores an unknown `base` field and saves a fresh
+devotions-only build with no error, so while the two deploys race the planner can mint a
+bare build for a minute or two; the Pages bundle and the worker deploy from the same push,
+so the window closes on its own. Errors: `400 bad_request`, `403 forbidden`, `429 rate_limited`, `502 upstream`
 (grimtools failed, redirected, or timed out, for the save or for the base page) or
 `502 unparseable` (grimtools answered without a valid id, or the base page could not be
 read or spliced). Never cached. Rate limits are the two `[[ratelimits]]` bindings in

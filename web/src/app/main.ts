@@ -826,6 +826,7 @@ async function boot() {
       // and pruned notice of the build just imported - has to survive every other refresh.
       if (known !== undefined && known !== source) {
         source = known;
+        importOwnsPanel = false;
         importPanel.setState(sourceState());
         ensureSourceRead();
       }
@@ -905,8 +906,9 @@ async function boot() {
     },
   });
 
-  // Fetched on first use rather than at boot: only an import needs it, and first load is
-  // byte-budgeted. Cache-busted with the same buildId the other data files use.
+  // Fetched on first use rather than at boot: import, export and the load-time read of the
+  // associated build all need it, and first load is byte-budgeted. Cache-busted with the same
+  // buildId the other data files use.
   let starTable: StarTable | null = null;
   let tableDataVersion = "";
   async function loadStarTable(): Promise<StarTable | null> {
@@ -975,10 +977,11 @@ async function boot() {
   // supersedes both, and a result that arrives after such a change never re-associates the wrong set.
   let exportingKey: string | null = null;
   let exportError: { key: string; code: ExportErrorCode } | null = null;
-  // True for the body of runImport (the clear path excepted): guards the load-time read's
-  // background repaint (see ensureSourceRead) from landing mid-import and overwriting the
-  // loading/error state or the textbox with a slug that is not the one being imported.
-  let importing = false;
+  // The import half owns the panel from the moment an import paints `loading` until the source side
+  // paints again or the import lands `done`. While it holds, the load-time read's background repaint
+  // (see ensureSourceRead) must not overwrite the loading/error state or the textbox with a slug that
+  // is not the one being imported.
+  let importOwnsPanel = false;
   // The inverse mapping table, built once from the same file the import loads.
   let inverseTable: Record<string, string> | null = null;
 
@@ -999,51 +1002,51 @@ async function boot() {
     if (!slug) {
       // The clear button: drop the association only. Selection and cap are deliberately untouched,
       // but the export state is not: with no association, this selection can be exported again.
+      // The base error names ✕ as the remedy, so ✕ retires it: the selection is unchanged, so an
+      // error pinned to its key would otherwise stay on screen after the user did as it asked.
       source = "";
+      if (exportError?.code === "base") exportError = null;
       syncImportPanel();
       writeHash("push");
       return;
     }
-    importing = true;
-    try {
-      importPanel.setState({ kind: "loading" });
-      const starIdTable = await loadStarTable();
-      // This is our own same-origin data/grimtools-stars.json, not the worker, so "network" is a
-      // stand-in: no catalog key describes "our own bundled data failed to load" and this is rare
-      // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
-      if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
+    importOwnsPanel = true;
+    importPanel.setState({ kind: "loading" });
+    const starIdTable = await loadStarTable();
+    // This is our own same-origin data/grimtools-stars.json, not the worker, so "network" is a
+    // stand-in: no catalog key describes "our own bundled data failed to load" and this is rare
+    // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
+    if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
 
-      const result = await readBuild(slug);
-      if (result.kind === "notFound") return importPanel.setState({ kind: "error", code: "notFound" });
-      if (result.kind === "network") return importPanel.setState({ kind: "error", code: "network" });
-      const body = result;
+    const result = await readBuild(slug);
+    if (result.kind === "notFound") return importPanel.setState({ kind: "error", code: "notFound" });
+    if (result.kind === "network") return importPanel.setState({ kind: "error", code: "network" });
+    const body = result;
 
-      // A null dataVersion means the worker could not determine it: degrade rather than block. A
-      // version that is present and different means the table is stale and the mapping would be
-      // plausible but wrong, which is the failure mode worth refusing outright.
-      if (body.dataVersion && body.dataVersion !== tableDataVersion)
-        return importPanel.setState({ kind: "error", code: "version" });
+    // A null dataVersion means the worker could not determine it: degrade rather than block. A
+    // version that is present and different means the table is stale and the mapping would be
+    // plausible but wrong, which is the failure mode worth refusing outright.
+    if (body.dataVersion && body.dataVersion !== tableDataVersion)
+      return importPanel.setState({ kind: "error", code: "version" });
 
-      // body.skills mixes mastery skills and devotion stars (the worker cannot tell them apart);
-      // mapStars is what actually splits stars out, via membership in the committed table.
-      const stars = mapStars(body.skills, starIdTable);
-      if (!stars.length) return importPanel.setState({ kind: "error", code: "empty" });
+    // body.skills mixes mastery skills and devotion stars (the worker cannot tell them apart);
+    // mapStars is what actually splits stars out, via membership in the committed table.
+    const stars = mapStars(body.skills, starIdTable);
+    if (!stars.length) return importPanel.setState({ kind: "error", code: "empty" });
 
-      // Raise the cap to fit, never lower an existing higher one.
-      const cap = Math.max(state.pointCap, stars.length);
-      const wanted = new Set(stars);
-      // `table` here is the cover table from boot(), not the mapping table above.
-      state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
-      const pruned = wanted.size - state.selected.size;
-      source = slug;
-      importPanel.setState({ kind: "done", slug, pruned, title: body.title });
-      // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
-      // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
-      // and must be recomputed, same as every other state-changing action in this file.
-      refresh("push");
-    } finally {
-      importing = false;
-    }
+    // Raise the cap to fit, never lower an existing higher one.
+    const cap = Math.max(state.pointCap, stars.length);
+    const wanted = new Set(stars);
+    // `table` here is the cover table from boot(), not the mapping table above.
+    state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
+    const pruned = wanted.size - state.selected.size;
+    source = slug;
+    importOwnsPanel = false;
+    importPanel.setState({ kind: "done", slug, pruned, title: body.title });
+    // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
+    // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
+    // and must be recomputed, same as every other state-changing action in this file.
+    refresh("push");
   }
 
   async function runExport(): Promise<void> {
@@ -1105,6 +1108,14 @@ async function boot() {
           exportError = { key, code: "base" };
           return;
         }
+        // The read that supplied the base can reveal that this selection is that build: re-associate
+        // rather than mint a copy.
+        const knownAfterRead = knownBuilds.get(key);
+        if (knownAfterRead !== undefined) {
+          source = knownAfterRead;
+          writeHash("push");
+          return;
+        }
         base = { slug: baseSlug, remove: [...new Set(b.skills.filter((id) => starIdTable[id] !== undefined))] };
       }
       const result = await gateway.saveBuild(skills, base);
@@ -1139,8 +1150,9 @@ async function boot() {
   // A hash-restored or freshly exported gt= is a slug the session may never have read: fetch it
   // in the background for its title (and memo entry) and repaint if it is still the association
   // when the answer lands. Only a success repaints, so a failing read cannot loop; the fallback
-  // label simply stays. Never touches the selection. Skipped while an import is in flight: an
-  // import's own terminal setState paints, and the title arrives on the next source repaint.
+  // label simply stays. Never touches the selection. It also defers to an import that holds the
+  // panel (see importOwnsPanel): the import's own paint stands, and the title arrives on the next
+  // source repaint.
   const reading = new Set<string>();
   function ensureSourceRead(): void {
     const slug = source;
@@ -1149,13 +1161,14 @@ async function boot() {
     void readBuild(slug)
       .finally(() => reading.delete(slug))
       .then((r) => {
-        if (r.kind === "ok" && source === slug && !importing) syncImportPanel();
+        if (r.kind === "ok" && source === slug && !importOwnsPanel) syncImportPanel();
       });
   }
   // Reflects `source` and the export state into the panel: at mount, on every hashchange, on the
   // clear path, and around an export request. A plain refresh pushes only the export state, so
   // rendering never resets what the import half is showing.
   function syncImportPanel(): void {
+    importOwnsPanel = false;
     importPanel.setState(sourceState());
     importPanel.setExportState(exportStateFor());
     ensureSourceRead();

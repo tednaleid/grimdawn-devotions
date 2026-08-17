@@ -51,7 +51,8 @@ export of a legal selection to a fresh grimtools build, associated the same way 
   memo and `exportStateFor`'s precedence (plus the "pinned to the selection it was made
   from" rule) all live inside `boot()` in `web/src/app/main.ts`, which has no test
   harness. Lifting those three into a small pure module would make them testable
-  without one.
+  without one. The round trip added `readBuild`, `ensureSourceRead`, the `remove`
+  computation and the base data-version refusal to that untested surface.
 - grimtools' own "Devotion path" panel reported "There's no way to include all selected
   constellations with only 55 devotion points" for an exported 53-star build
   (`https://www.grimtools.com/calc/2d1W1Q8V`, the forum link with Lion completed) that

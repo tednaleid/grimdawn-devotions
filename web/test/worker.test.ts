@@ -587,6 +587,7 @@ test("export with a base: every malformed base is 400 and nothing is fetched at 
   }) as never;
   const bad: unknown[] = [
     "qNYgbjeV",
+    ["qNYgbjeV"],
     { slug: "not a slug!", remove: [] },
     { slug: "qNYgbjeV" },
     { slug: "qNYgbjeV", remove: "sk1" },
