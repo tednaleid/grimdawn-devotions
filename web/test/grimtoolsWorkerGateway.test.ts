@@ -79,3 +79,20 @@ test("saveBuild re-checks the slug charset before it can become an href", async 
   expect(await gw({ slug: 7 }).saveBuild(["sk1"])).toEqual({ kind: "network" });
   expect(await gw({}).saveBuild(["sk1"])).toEqual({ kind: "network" });
 });
+
+test("saveBuild without a base sends no base key at all", async () => {
+  const { f, calls } = fakeFetch(() => jsonRes({ slug: "2ga0aJyZ" }, 201));
+  await makeWorkerGateway(BASE, f).saveBuild(["sk739"]);
+  expect(Object.keys(JSON.parse(String(calls[0]!.init?.body)))).toEqual(["skills"]);
+});
+
+test("saveBuild with a base puts it in the body beside the skills", async () => {
+  const { f, calls } = fakeFetch(() => jsonRes({ slug: "2d1W1Q8V" }, 201));
+  const r = await makeWorkerGateway(BASE, f).saveBuild(["sk739"], { slug: "qNYgbjeV", remove: ["sk699", "sk927"] });
+  expect(r).toEqual({ kind: "ok", slug: "2d1W1Q8V" });
+  expect(calls[0]!.url).toBe(`${BASE}/export?v=${EXPORT_CONTRACT_VERSION}`);
+  expect(JSON.parse(String(calls[0]!.init?.body))).toEqual({
+    skills: ["sk739"],
+    base: { slug: "qNYgbjeV", remove: ["sk699", "sk927"] },
+  });
+});

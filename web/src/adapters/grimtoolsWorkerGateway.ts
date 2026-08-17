@@ -1,7 +1,7 @@
 // ABOUTME: GrimtoolsGateway over our Cloudflare Worker: the only code that knows its URL, routes,
 // ABOUTME: contract-version query params and JSON shapes. Maps every HTTP outcome to the port's unions.
 import { EXPORT_CONTRACT_VERSION, IMPORT_CONTRACT_VERSION, isSlug } from "../core/grimtools";
-import type { FetchBuildResult, GrimtoolsGateway, SaveBuildResult } from "../ports/GrimtoolsGateway";
+import type { ExportBase, FetchBuildResult, GrimtoolsGateway, SaveBuildResult } from "../ports/GrimtoolsGateway";
 
 /**
  * `baseUrl` is the worker's origin with no trailing slash. `fetchImpl` is for tests; the default
@@ -42,13 +42,13 @@ export function makeWorkerGateway(
       return { kind: "ok", skills, dataVersion, title };
     },
 
-    async saveBuild(skills: string[]): Promise<SaveBuildResult> {
+    async saveBuild(skills: string[], base?: ExportBase): Promise<SaveBuildResult> {
       let res: Response;
       try {
         res = await fetchImpl(`${baseUrl}/export?v=${EXPORT_CONTRACT_VERSION}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ skills }),
+          body: JSON.stringify(base ? { skills, base } : { skills }),
         });
       } catch {
         return { kind: "network" };
