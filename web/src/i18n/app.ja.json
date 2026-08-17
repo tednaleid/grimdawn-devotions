@@ -215,7 +215,7 @@
   "ui.tooltip.pts": "{count}pt",
   "ui.tooltip.requires": "必要条件: ",
   "ui.grimtools.label": "grimtools",
-  "ui.export.submit": "grimtoolsにエクスポート",
+  "ui.export.submit": "新しいビルドとしてエクスポート",
   "ui.export.hint.empty": "エクスポートする星を選択してください。",
   "ui.export.hint.uncapped": "エクスポートするには55ポイント上限を復元してください。",
   "ui.export.hint.incomplete": "エクスポートできるのは完成したビルドのみです。",
@@ -223,5 +223,8 @@
   "ui.export.err.rateLimited": "エクスポートが多すぎます。1分後にもう一度お試しください。",
   "ui.export.err.network": "エクスポートサービスに接続できませんでした。",
   "ui.export.err.upstream": "grimtoolsがビルドを受け付けませんでした。",
-  "ui.export.err.base": "元のビルドを読み込めませんでした。解除（✕）すると新しいビルドとしてエクスポートできます。"
+  "ui.export.err.base": "元のビルドを読み込めませんでした。解除（✕）すると新しいビルドとしてエクスポートできます。",
+  "ui.export.saved": "新しいビルドとして保存しました。上のリンクはそのビルドを指しています。",
+  "ui.export.copy": "リンクをコピー",
+  "ui.export.copied": "コピーしました"
 }

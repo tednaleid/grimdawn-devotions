@@ -215,7 +215,7 @@
   "ui.tooltip.pts": "{count}点",
   "ui.tooltip.requires": "需要: ",
   "ui.grimtools.label": "grimtools",
-  "ui.export.submit": "导出到grimtools",
+  "ui.export.submit": "导出新构筑",
   "ui.export.hint.empty": "选择要导出的星星。",
   "ui.export.hint.uncapped": "恢复55点上限后才能导出。",
   "ui.export.hint.incomplete": "只能导出完整的构筑。",
@@ -223,5 +223,8 @@
   "ui.export.err.rateLimited": "导出次数过多。请一分钟后重试。",
   "ui.export.err.network": "无法连接导出服务。",
   "ui.export.err.upstream": "grimtools未接受该构筑。",
-  "ui.export.err.base": "无法读取源构筑。清除它（✕）后可导出一个新构筑。"
+  "ui.export.err.base": "无法读取源构筑。清除它（✕）后可导出一个新构筑。",
+  "ui.export.saved": "已保存为新构筑；上方链接现在指向它。",
+  "ui.export.copy": "复制链接",
+  "ui.export.copied": "已复制"
 }

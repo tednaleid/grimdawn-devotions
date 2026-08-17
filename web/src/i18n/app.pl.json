@@ -215,7 +215,7 @@
   "ui.tooltip.pts": "{count} pkt",
   "ui.tooltip.requires": "Wymaga: ",
   "ui.grimtools.label": "grimtools",
-  "ui.export.submit": "Eksportuj do grimtools",
+  "ui.export.submit": "Eksportuj nowy build",
   "ui.export.hint.empty": "Wybierz gwiazdy do eksportu.",
   "ui.export.hint.uncapped": "Przywróć limit 55 punktów, aby eksportować.",
   "ui.export.hint.incomplete": "Eksportować można tylko kompletny build.",
@@ -223,5 +223,8 @@
   "ui.export.err.rateLimited": "Zbyt wiele eksportów. Spróbuj ponownie za minutę.",
   "ui.export.err.network": "Nie udało się połączyć z usługą eksportu.",
   "ui.export.err.upstream": "grimtools nie przyjął builda.",
-  "ui.export.err.base": "Nie udało się odczytać builda źródłowego. Usuń go (✕), aby wyeksportować nowy build."
+  "ui.export.err.base": "Nie udało się odczytać builda źródłowego. Usuń go (✕), aby wyeksportować nowy build.",
+  "ui.export.saved": "Zapisano jako nowy build; link powyżej wskazuje teraz na niego.",
+  "ui.export.copy": "Kopiuj link",
+  "ui.export.copied": "Skopiowano"
 }

@@ -247,6 +247,14 @@ build hides Export after a refresh too (until the read completes it is offered).
 Provenance in a restored hash wins over the memo: Back, Forward and a pasted link keep
 the `gt=` they carry.
 
+**A fresh export says so.** The button reads "Export new build" because that is what it
+does: grimtools builds are immutable, so every export is a new link, and a copied
+character's title barely changes. Right after a build is minted, the row the button
+occupied says the link above is a new build and offers a Copy link button (the panel
+writes the calculator URL to the clipboard). The notice lasts while the selection is the
+one that was exported and clears when the selection moves on; a re-association from the
+memo or a restored link does not show it.
+
 Both directions go through the `GrimtoolsGateway` port
 (`web/src/ports/GrimtoolsGateway.ts`); `web/src/adapters/grimtoolsWorkerGateway.ts` is
 the only code that knows the worker's URL, routes and JSON shapes.

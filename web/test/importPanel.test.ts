@@ -62,8 +62,15 @@ function mount() {
   } as unknown as HTMLElement;
   const calls: string[] = [];
   const exports: number[] = [];
-  const handle = mountImportPanel(root, enLoc, { onSubmit: (s) => calls.push(s), onExport: () => exports.push(1) });
-  return { handle, kids, calls, exports };
+  const copied: string[] = [];
+  const handle = mountImportPanel(root, enLoc, {
+    onSubmit: (s) => calls.push(s),
+    onExport: () => exports.push(1),
+    copyText: async (text) => {
+      copied.push(text);
+    },
+  });
+  return { handle, kids, calls, exports, copied };
 }
 
 // Types into the fake input, firing the "input" event mountImportPanel listens on to recompute
@@ -272,6 +279,47 @@ test("the base error state renders its message", () => {
   handle.setExportState({ kind: "error", code: "base" });
   expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate("ui.export.err.base"));
   expect(kids["#export-go"].disabled).toBe(false);
+});
+
+test("the saved state hides the button and explains that the link is a new build, with a copy button", () => {
+  const { kids, handle } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  expect(kids["#export-row"].hidden).toBe(true);
+  expect(kids["#export-msg"].innerHTML).toContain(enLoc.translate("ui.export.saved"));
+  expect(kids["#export-msg"].innerHTML).toContain(
+    `<button id="export-copy" type="button">${enLoc.translate("ui.export.copy")}</button>`,
+  );
+});
+
+test("clicking the copy button copies the saved build's calculator link and confirms in place", async () => {
+  const { kids, handle, copied } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  const button = { id: "export-copy", textContent: enLoc.translate("ui.export.copy") };
+  kids["#export-msg"].fire("click", { target: button });
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(copied).toEqual(["https://www.grimtools.com/calc/Ze9aYq0Z"]);
+  expect(button.textContent).toBe(enLoc.translate("ui.export.copied"));
+});
+
+test("a click elsewhere in the export message, or a copy click outside the saved state, copies nothing", () => {
+  const { kids, handle, copied } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  kids["#export-msg"].fire("click", { target: { id: "something-else" } });
+  handle.setExportState({ kind: "ready" });
+  kids["#export-msg"].fire("click", { target: { id: "export-copy" } });
+  expect(copied).toEqual([]);
+});
+
+test("leaving the saved state clears its message", () => {
+  const { kids, handle } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  handle.setExportState({ kind: "hidden" });
+  expect(kids["#export-msg"].innerHTML).toBe("");
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  handle.setExportState({ kind: "ready" });
+  expect(kids["#export-row"].hidden).toBe(false);
+  expect(kids["#export-msg"].innerHTML).toBe("");
 });
 
 test("hidden removes the whole export row and clears its message", () => {
