@@ -25,6 +25,9 @@ class FakeElement {
   setAttribute(k: string, v: string) {
     this.attrs.set(k, v);
   }
+  removeAttribute(k: string) {
+    this.attrs.delete(k);
+  }
   getAttribute(k: string) {
     return this.attrs.get(k) ?? null;
   }
@@ -121,36 +124,36 @@ test("the done state hides the textbox and Import button, showing the source lin
   expect(kids["#import-source"].innerHTML).toBe(enLoc.translate("ui.import.source"));
 });
 
-test("a done state with a title renders it via the titled source string", () => {
+test("a done state with a title renders the title itself as the link text, with no prefix, and as the tooltip", () => {
   const { kids, handle } = mount();
   handle.setState({ kind: "done", slug: "qNYgbjeV", title: "Warder, Level 100 (GD 1.2.1.6)" });
-  expect(kids["#import-source"].innerHTML).toBe(
-    enLoc.translate("ui.import.sourceTitled", { title: "Warder, Level 100 (GD 1.2.1.6)" }),
-  );
+  expect(kids["#import-source"].innerHTML).toBe("Warder, Level 100 (GD 1.2.1.6)");
+  expect(kids["#import-source"].getAttribute("title")).toBe("Warder, Level 100 (GD 1.2.1.6)");
 });
 
-test("a done state with no title (absent, e.g. a pre-title cached worker response) falls back to the untitled source string", () => {
+test("a done state with no title (absent, e.g. a pre-title cached worker response) falls back to the untitled source string and no tooltip", () => {
   const { kids, handle } = mount();
+  handle.setState({ kind: "done", slug: "qNYgbjeV", title: "Warder" });
   handle.setState({ kind: "done", slug: "qNYgbjeV" });
   expect(kids["#import-source"].innerHTML).toBe(enLoc.translate("ui.import.source"));
+  expect(kids["#import-source"].getAttribute("title")).toBeNull();
 });
 
 test("a done state with title explicitly null falls back the same as an absent title", () => {
   const { kids, handle } = mount();
   handle.setState({ kind: "done", slug: "qNYgbjeV", title: null });
   expect(kids["#import-source"].innerHTML).toBe(enLoc.translate("ui.import.source"));
+  expect(kids["#import-source"].getAttribute("title")).toBeNull();
 });
 
-test("a title containing markup is HTML-escaped, not passed through as live tags", () => {
+test("a title containing markup is HTML-escaped in the link text, not passed through as live tags", () => {
   const { kids, handle } = mount();
   handle.setState({ kind: "done", slug: "qNYgbjeV", title: '<script>alert(1)</script> & "quoted"' });
   const rendered = kids["#import-source"].innerHTML;
   expect(rendered).not.toContain("<script>");
-  expect(rendered).toBe(
-    enLoc.translate("ui.import.sourceTitled", {
-      title: "&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quoted&quot;",
-    }),
-  );
+  expect(rendered).toBe("&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quoted&quot;");
+  // An attribute value is inert text, so the tooltip carries the title as-is.
+  expect(kids["#import-source"].getAttribute("title")).toBe('<script>alert(1)</script> & "quoted"');
 });
 
 // main.ts's syncImportPanel() applies a "done" state as the very first setState() call, both on
@@ -262,6 +265,13 @@ test("each error code keeps the button enabled for a retry and shows its message
     expect(kids["#export-go"].disabled).toBe(false);
     expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate(`ui.export.err.${code}`));
   }
+});
+
+test("the base error state renders its message", () => {
+  const { kids, handle } = mount();
+  handle.setExportState({ kind: "error", code: "base" });
+  expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate("ui.export.err.base"));
+  expect(kids["#export-go"].disabled).toBe(false);
 });
 
 test("hidden removes the whole export row and clears its message", () => {

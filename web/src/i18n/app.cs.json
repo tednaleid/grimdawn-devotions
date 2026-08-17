@@ -174,7 +174,6 @@
   "ui.import.placeholder": "odkaz nebo ID buildu z grimtools",
   "ui.import.pruned": "{n} hvězd(y) se nepodařilo umístit a byly odstraněny.",
   "ui.import.source": "Build z grimtools",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importovat",
   "ui.info.aria": "O tomto plánovači",
   "ui.info.build": "sestavení {buildid}",
@@ -223,5 +222,6 @@
   "ui.export.exporting": "Exportování...",
   "ui.export.err.rateLimited": "Příliš mnoho exportů. Zkuste to znovu za minutu.",
   "ui.export.err.network": "Nepodařilo se spojit se s exportní službou.",
-  "ui.export.err.upstream": "grimtools build nepřijal."
+  "ui.export.err.upstream": "grimtools build nepřijal.",
+  "ui.export.err.base": "Zdrojový build se nepodařilo načíst. Zrušte ho (✕) a exportujte nový build."
 }

@@ -175,7 +175,6 @@
   "ui.import.placeholder": "grimtools-Build-Link oder ID",
   "ui.import.pruned": "{n} Stern(e) konnten nicht platziert werden und wurden entfernt.",
   "ui.import.source": "grimtools-Build",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importieren",
   "ui.info.aria": "Über diesen Planer",
   "ui.info.build": "Build {buildid}",
@@ -224,5 +223,6 @@
   "ui.export.exporting": "Wird exportiert...",
   "ui.export.err.rateLimited": "Zu viele Exporte. Versuche es in einer Minute erneut.",
   "ui.export.err.network": "Der Export-Dienst konnte nicht erreicht werden.",
-  "ui.export.err.upstream": "grimtools hat den Build nicht angenommen."
+  "ui.export.err.upstream": "grimtools hat den Build nicht angenommen.",
+  "ui.export.err.base": "Der Quell-Build konnte nicht gelesen werden. Entferne ihn (✕), um einen neuen Build zu exportieren."
 }

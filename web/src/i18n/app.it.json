@@ -174,7 +174,6 @@
   "ui.import.placeholder": "link o id build di grimtools",
   "ui.import.pruned": "{n} stella/e non sono state posizionate e sono state rimosse.",
   "ui.import.source": "Build grimtools",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importa",
   "ui.info.aria": "Informazioni su questo pianificatore",
   "ui.info.build": "build {buildid}",
@@ -223,5 +222,6 @@
   "ui.export.exporting": "Esportazione in corso...",
   "ui.export.err.rateLimited": "Troppe esportazioni. Riprova tra un minuto.",
   "ui.export.err.network": "Impossibile raggiungere il servizio di esportazione.",
-  "ui.export.err.upstream": "grimtools non ha accettato la build."
+  "ui.export.err.upstream": "grimtools non ha accettato la build.",
+  "ui.export.err.base": "Impossibile leggere la build di origine. Rimuovila (✕) per esportare una nuova build."
 }

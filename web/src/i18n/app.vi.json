@@ -174,7 +174,6 @@
   "ui.import.placeholder": "liên kết hoặc id build grimtools",
   "ui.import.pruned": "{n} sao không thể đặt được và đã bị loại bỏ.",
   "ui.import.source": "Bản dựng grimtools",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Nhập",
   "ui.info.aria": "Về công cụ này",
   "ui.info.build": "bản dựng {buildid}",
@@ -223,5 +222,6 @@
   "ui.export.exporting": "Đang xuất...",
   "ui.export.err.rateLimited": "Xuất quá nhiều lần. Hãy thử lại sau một phút.",
   "ui.export.err.network": "Không thể kết nối với dịch vụ xuất.",
-  "ui.export.err.upstream": "grimtools không chấp nhận bản dựng."
+  "ui.export.err.upstream": "grimtools không chấp nhận bản dựng.",
+  "ui.export.err.base": "Không đọc được bản dựng gốc. Bỏ liên kết (✕) để xuất một bản dựng mới."
 }

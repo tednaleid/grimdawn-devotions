@@ -174,7 +174,6 @@
   "ui.import.placeholder": "link ou id de build do grimtools",
   "ui.import.pruned": "{n} estrela(s) não puderam ser posicionadas e foram descartadas.",
   "ui.import.source": "Build do grimtools",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importar",
   "ui.info.aria": "Sobre este planejador",
   "ui.info.build": "build {buildid}",
@@ -223,5 +222,6 @@
   "ui.export.exporting": "Exportando...",
   "ui.export.err.rateLimited": "Exportações demais. Tente novamente em um minuto.",
   "ui.export.err.network": "Não foi possível acessar o serviço de exportação.",
-  "ui.export.err.upstream": "O grimtools não aceitou a build."
+  "ui.export.err.upstream": "O grimtools não aceitou a build.",
+  "ui.export.err.base": "Não foi possível ler a build de origem. Remova-a (✕) para exportar uma build nova."
 }

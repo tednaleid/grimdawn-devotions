@@ -174,7 +174,6 @@
   "ui.import.placeholder": "grimtoolsのビルドリンクまたはID",
   "ui.import.pruned": "{n}個の星を配置できず、削除されました。",
   "ui.import.source": "grimtoolsのビルド",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "インポート",
   "ui.info.aria": "このプランナーについて",
   "ui.info.build": "ビルド {buildid}",
@@ -223,5 +222,6 @@
   "ui.export.exporting": "エクスポート中...",
   "ui.export.err.rateLimited": "エクスポートが多すぎます。1分後にもう一度お試しください。",
   "ui.export.err.network": "エクスポートサービスに接続できませんでした。",
-  "ui.export.err.upstream": "grimtoolsがビルドを受け付けませんでした。"
+  "ui.export.err.upstream": "grimtoolsがビルドを受け付けませんでした。",
+  "ui.export.err.base": "元のビルドを読み込めませんでした。解除（✕）すると新しいビルドとしてエクスポートできます。"
 }
