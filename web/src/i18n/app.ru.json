@@ -174,7 +174,6 @@
   "ui.import.placeholder": "ссылка или id билда grimtools",
   "ui.import.pruned": "Не удалось разместить {n} звезд(ы); они были удалены.",
   "ui.import.source": "Билд grimtools",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Импортировать",
   "ui.info.aria": "Об этом планировщике",
   "ui.info.build": "сборка {buildid}",
@@ -223,5 +222,6 @@
   "ui.export.exporting": "Экспорт...",
   "ui.export.err.rateLimited": "Слишком много экспортов. Попробуйте снова через минуту.",
   "ui.export.err.network": "Не удалось подключиться к сервису экспорта.",
-  "ui.export.err.upstream": "grimtools не принял билд."
+  "ui.export.err.upstream": "grimtools не принял билд.",
+  "ui.export.err.base": "Не удалось прочитать исходный билд. Уберите его (✕), чтобы экспортировать новый билд."
 }

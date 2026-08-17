@@ -24,15 +24,25 @@ below) - present purely so the app can bust its own browser cache; the worker ne
 reads it.
 
 Export contract: `POST /export?v=<contract version>` with JSON body
-`{ skills: ["sk739", ...] }` (1 to 55 distinct `sk<digits>` ids, at most 4 KB, `Origin`
-equal to `ALLOWED_ORIGIN`) returns `201 { slug }`. The worker posts the build to
-grimtools' `save_build.php` in the shape the calculator's own Share button uses (see
-`savePayload` in `web/src/core/grimtools.ts`) and hands back the re-validated slug.
-Errors: `400 bad_request`, `403 forbidden`, `429 rate_limited`, `502 upstream` (grimtools
-failed, redirected, or timed out) or `502 unparseable` (grimtools answered without a valid
-id). Never cached. Rate limits are the two `[[ratelimits]]` bindings in `wrangler.toml`
-(per address and global); `wrangler dev --local` simulates them, and the handler treats
-an absent binding as unlimited so tests need no runtime.
+`{ skills: ["sk739", ...], base?: { slug, remove: ["sk699", ...] } }` (`skills` 1 to 55
+distinct `sk<digits>` ids, `remove` 0 to 128 distinct ids, `slug` in the slug charset, at
+most 4 KB, `Origin` equal to `ALLOWED_ORIGIN`) returns `201 { slug }`. Without `base` the
+worker posts a fresh level-100 character holding exactly `skills`, in the shape the
+calculator's own Share button uses (`savePayload` in `web/src/core/grimtools.ts`). With
+`base` it reads that build's page, drops the `skills` entries named in `remove` (the
+planner's statement of which of the base's ids are devotion stars; the worker cannot tell),
+appends `skills`, fixes `bio.devotionPoints`, drops a celestial-power binding only when
+its star is not in the new selection (a star removed and requested again keeps its
+binding), and posts everything else exactly as grimtools wrote it (`spliceDevotions`, same
+file). An old worker deployment ignores an unknown `base` field and saves a fresh
+devotions-only build with no error, so while the two deploys race the planner can mint a
+bare build for a minute or two; the Pages bundle and the worker deploy from the same push,
+so the window closes on its own. Errors: `400 bad_request`, `403 forbidden`, `429 rate_limited`, `502 upstream`
+(grimtools failed, redirected, or timed out, for the save or for the base page) or
+`502 unparseable` (grimtools answered without a valid id, or the base page could not be
+read or spliced). Never cached. Rate limits are the two `[[ratelimits]]` bindings in
+`wrangler.toml` (per address and global); `wrangler dev --local` simulates them, and the
+handler treats an absent binding as unlimited so tests need no runtime.
 
 ## Slug, never a URL
 
@@ -41,9 +51,10 @@ a hardcoded constant. It has no parameter that can name a host, so there is no c
 path that fetches anywhere but grimtools — it cannot be turned into an open proxy or
 an SSRF relay. See `docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`
 ("Part 2: the worker") for the full security rationale, including why it never
-returns upstream bytes, how it caches, and how it bounds its own work. The export
-route is the same: the save URL is a constant and the only caller-controlled bytes
-are validated skill ids inside the JSON `data` field.
+returns upstream bytes, how it caches, and how it bounds its own work. The export route
+is the same: the save URL is a constant, a base is named by slug and fetched from the
+same constant host, and the only caller-controlled bytes are validated skill ids inside
+the JSON `data` field.
 
 ## Changing the response shape
 

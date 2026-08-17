@@ -174,7 +174,6 @@
   "ui.import.placeholder": "grimtools构筑链接或id",
   "ui.import.pruned": "{n}颗星无法放置，已被丢弃。",
   "ui.import.source": "grimtools构筑",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "导入",
   "ui.info.aria": "关于此规划器",
   "ui.info.build": "构建 {buildid}",
@@ -223,5 +222,6 @@
   "ui.export.exporting": "正在导出...",
   "ui.export.err.rateLimited": "导出次数过多。请一分钟后重试。",
   "ui.export.err.network": "无法连接导出服务。",
-  "ui.export.err.upstream": "grimtools未接受该构筑。"
+  "ui.export.err.upstream": "grimtools未接受该构筑。",
+  "ui.export.err.base": "无法读取源构筑。清除它（✕）后可导出一个新构筑。"
 }

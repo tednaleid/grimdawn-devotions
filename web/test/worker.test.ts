@@ -2,7 +2,8 @@
 // ABOUTME: Upstream fetch is stubbed, so this runs with no network and no Cloudflare account.
 import { test, expect } from "bun:test";
 import worker, { handleRequest } from "../../worker/src/index";
-import { savePayload } from "../src/core/grimtools";
+import { savePayload, spliceDevotions, extractBuildInfo } from "../src/core/grimtools";
+import realTable from "../../data/grimtools-stars.json";
 
 const ORIGIN = "https://planner.example";
 const page = `<script>window['buildInfo'] = {"data":{"skills":[{"name":"sk688","level":1}]},"created_for_build":"1.2.1.6"};</script>`;
@@ -472,4 +473,159 @@ test("export: the default export's caching wrapper passes POST straight through,
   await worker.fetch(exportRequest({ skills: ["sk1"] }), env);
   await worker.fetch(exportRequest({ skills: ["sk1"] }), env);
   expect(calls).toBe(2);
+});
+
+// --- POST /export with a base build ------------------------------------------------------------
+
+const CALC_URL = "https://www.grimtools.com/calc/";
+const STARS = (realTable as { stars: Record<string, string> }).stars;
+
+/** Answers the base page for any calc URL and a saved id for the save URL, recording both. */
+function baseFetch(basePage: string, saveStatus = 200) {
+  const calls: { url: string; init?: RequestInit }[] = [];
+  const f = (async (url: string, init?: RequestInit) => {
+    calls.push({ url: String(url), init });
+    if (String(url).startsWith(CALC_URL)) return new Response(basePage, { status: 200 });
+    if (String(url) === SAVE_URL) return new Response('{"id":"2ga0aJyZ"}', { status: saveStatus });
+    return new Response("", { status: 404 });
+  }) as never;
+  return { f, calls };
+}
+
+test("export with a base: the base page is fetched, its stars replaced, and the spliced data posted", async () => {
+  const html = await Bun.file("test/fixtures/grimtools-calc.html").text();
+  const data = extractBuildInfo(html)!.data as { skills: { name: string }[]; equipment: unknown };
+  const remove = data.skills.map((s) => s.name).filter((id) => id in STARS);
+  expect(remove.length).toBe(55);
+  const { f, calls } = baseFetch(html);
+  const res = await handleRequest(
+    exportRequest({ skills: ["sk739"], base: { slug: "qNYgbjeV", remove } }),
+    exportEnv(f),
+  );
+  expect(res.status).toBe(201);
+  expect(await res.json()).toEqual({ slug: "2ga0aJyZ" });
+
+  const pageCall = calls.find((c) => c.url.startsWith(CALC_URL))!;
+  expect(pageCall.url).toBe(`${CALC_URL}qNYgbjeV`);
+  expect(pageCall.init?.redirect).toBe("manual");
+  expect(new Headers(pageCall.init?.headers).get("User-Agent")).toContain("grimdawn-devotions");
+
+  const save = calls.find((c) => c.url === SAVE_URL)!;
+  const form = new URLSearchParams(String(save.init?.body));
+  expect(form.get("mod")).toBe("");
+  const posted = JSON.parse(form.get("data")!);
+  expect(posted).toEqual(spliceDevotions(data, remove, ["sk739"]));
+  expect(posted.equipment).toEqual(data.equipment);
+  expect(posted.skills.length).toBe(29);
+  expect(posted.skills.at(-1)).toEqual({ name: "sk739", level: 1 });
+  expect(posted.bio.devotionPoints).toBe(54);
+});
+
+test("export with a base: an empty remove list is accepted and only appends", async () => {
+  const html = await Bun.file("test/fixtures/grimtools-calc.html").text();
+  const { f, calls } = baseFetch(html);
+  const res = await handleRequest(
+    exportRequest({ skills: ["sk739"], base: { slug: "qNYgbjeV", remove: [] } }),
+    exportEnv(f),
+  );
+  expect(res.status).toBe(201);
+  const form = new URLSearchParams(String(calls.find((c) => c.url === SAVE_URL)!.init?.body));
+  const posted = JSON.parse(form.get("data")!);
+  expect(posted.skills.length).toBe(84);
+  expect(posted.bio.devotionPoints).toBe(0); // 0 + 0 - 1, floored
+});
+
+test("export with a base: a base that is 404, a null build, or unreachable is 502 upstream and nothing is saved", async () => {
+  const cases: (() => Response | Promise<Response>)[] = [
+    () => new Response("nope", { status: 404 }),
+    () => new Response(`<script>window['buildInfo'] = null;</script>`, { status: 200 }),
+    () => new Response("", { status: 302, headers: { Location: "https://elsewhere.example/" } }),
+    () => {
+      throw new TypeError("offline");
+    },
+  ];
+  for (const respond of cases) {
+    const calls: string[] = [];
+    const f = (async (url: string) => {
+      calls.push(String(url));
+      if (String(url).startsWith(CALC_URL)) return respond();
+      return new Response('{"id":"2ga0aJyZ"}', { status: 200 });
+    }) as never;
+    const res = await handleRequest(
+      exportRequest({ skills: ["sk739"], base: { slug: "qNYgbjeV", remove: ["sk688"] } }),
+      exportEnv(f),
+    );
+    expect(res.status).toBe(502);
+    expect(await res.json()).toEqual({ error: "upstream" });
+    expect(calls).not.toContain(SAVE_URL);
+  }
+});
+
+test("export with a base: a base page whose data cannot be spliced is 502 unparseable and nothing is saved", async () => {
+  const pages = [
+    `<script>window['buildInfo'] = {"data":{"skills":[{"name":"sk688","level":1}]},"created_for_build":"1.2.1.6"};</script>`, // no bio
+    `<script>window['buildInfo'] = {"data":{"bio":{"devotionPoints":1},"skills":[{"name":"sk688"}]}};</script>`, // no level
+    `<html>nothing here</html>`,
+  ];
+  for (const page of pages) {
+    const { f, calls } = baseFetch(page);
+    const res = await handleRequest(
+      exportRequest({ skills: ["sk739"], base: { slug: "qNYgbjeV", remove: [] } }),
+      exportEnv(f),
+    );
+    expect(res.status).toBe(502);
+    expect(await res.json()).toEqual({ error: "unparseable" });
+    expect(calls.some((c) => c.url === SAVE_URL)).toBe(false);
+  }
+});
+
+test("export with a base: every malformed base is 400 and nothing is fetched at all", async () => {
+  const calls: string[] = [];
+  const spy = (async (url: string) => {
+    calls.push(String(url));
+    return new Response("", { status: 200 });
+  }) as never;
+  const bad: unknown[] = [
+    "qNYgbjeV",
+    ["qNYgbjeV"],
+    { slug: "not a slug!", remove: [] },
+    { slug: "qNYgbjeV" },
+    { slug: "qNYgbjeV", remove: "sk1" },
+    { slug: "qNYgbjeV", remove: ["nope"] },
+    { slug: "qNYgbjeV", remove: ["sk1", "sk1"] },
+    { slug: "qNYgbjeV", remove: Array.from({ length: 129 }, (_, i) => `sk${i + 1}`) },
+    { remove: [] },
+  ];
+  for (const base of bad) {
+    const res = await handleRequest(exportRequest({ skills: ["sk739"], base }), exportEnv(spy));
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "bad_request" });
+  }
+  expect(calls).toEqual([]);
+});
+
+test("export with a base: 128 distinct remove ids are accepted", async () => {
+  const html = await Bun.file("test/fixtures/grimtools-calc.html").text();
+  const { f } = baseFetch(html);
+  const remove = Array.from({ length: 128 }, (_, i) => `sk${i + 1}`);
+  const res = await handleRequest(
+    exportRequest({ skills: ["sk739"], base: { slug: "qNYgbjeV", remove } }),
+    exportEnv(f),
+  );
+  expect(res.status).toBe(201);
+});
+
+test("export with a base: a refused rate limit never fetches the base page", async () => {
+  const calls: string[] = [];
+  const spy = (async (url: string) => {
+    calls.push(String(url));
+    return new Response("", { status: 200 });
+  }) as never;
+  const env = exportEnv(spy, { EXPORT_LIMITER_IP: fakeLimiter(0) });
+  const res = await handleRequest(
+    exportRequest({ skills: ["sk739"], base: { slug: "qNYgbjeV", remove: [] } }, { ip: "203.0.113.9" }),
+    env,
+  );
+  expect(res.status).toBe(429);
+  expect(calls).toEqual([]);
 });

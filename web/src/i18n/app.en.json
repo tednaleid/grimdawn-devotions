@@ -44,7 +44,6 @@
   "ui.import.submit": "Import",
   "ui.import.loading": "Loading build...",
   "ui.import.source": "grimtools build",
-  "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.err.badInput": "That is not a grimtools build link.",
   "ui.import.err.notFound": "No build with that id.",
   "ui.import.err.network": "Could not reach the import service.",
@@ -385,5 +384,6 @@
   "ui.export.exporting": "Exporting...",
   "ui.export.err.rateLimited": "Too many exports. Try again in a minute.",
   "ui.export.err.network": "Could not reach the export service.",
-  "ui.export.err.upstream": "grimtools did not accept the build."
+  "ui.export.err.upstream": "grimtools did not accept the build.",
+  "ui.export.err.base": "The source build could not be read. Clear it (✕) to export a fresh build."
 }

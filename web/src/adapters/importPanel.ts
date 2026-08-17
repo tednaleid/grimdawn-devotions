@@ -16,7 +16,7 @@ export type ImportState =
   | { kind: "done"; slug: string; pruned?: number; title?: string | null };
 
 export type ExportDisabledReason = "empty" | "uncapped" | "incomplete";
-export type ExportErrorCode = "rateLimited" | "network" | "upstream";
+export type ExportErrorCode = "rateLimited" | "network" | "upstream" | "base";
 
 /** The Export button, independent of the import state (see the spec's panel table). `hidden` is
  * "the link already is the export": the current selection matches the associated build. */
@@ -97,10 +97,11 @@ export function mountImportPanel(
       source.setAttribute("href", `${CALC}${state.slug}`);
       // title is upstream content relayed through the worker; escape it before it enters this
       // innerHTML string. The slug above needs no escaping - parseSlug's charset already
-      // guarantees it, so it is never attacker-influenced text.
-      source.innerHTML = state.title
-        ? localization.translate("ui.import.sourceTitled", { title: escapeHtml(state.title) })
-        : localization.translate("ui.import.source");
+      // guarantees it, so it is never attacker-influenced text. The tooltip carries the full
+      // title for when the CSS truncates the label; an attribute value is inert text.
+      source.innerHTML = state.title ? escapeHtml(state.title) : localization.translate("ui.import.source");
+      if (state.title) source.setAttribute("title", state.title);
+      else source.removeAttribute("title");
       msg.innerHTML =
         state.pruned && state.pruned > 0
           ? `<div id="import-pruned">${localization.translate("ui.import.pruned", { n: state.pruned })}</div>`
