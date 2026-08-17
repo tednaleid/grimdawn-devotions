@@ -89,14 +89,19 @@ def parse_array(raw: str) -> list:
 SKILLS_ROOT = "records/skills/"
 
 
-def _skill_refs(raw: str) -> list[str]:
-    """The ';'-separated record references in one field value that point under records/skills/."""
+def _dbr_refs(raw: str) -> list[str]:
+    """Every ';'-separated record reference in one field value."""
     out = []
     for part in raw.split(";"):
         ref = part.replace("\\", "/").strip()
-        if ref.endswith(".dbr") and ref.startswith(SKILLS_ROOT):
+        if ref.endswith(".dbr"):
             out.append(ref)
     return out
+
+
+def _skill_refs(raw: str) -> list[str]:
+    """The ';'-separated record references in one field value that point under records/skills/."""
+    return [ref for ref in _dbr_refs(raw) if ref.startswith(SKILLS_ROOT)]
 
 
 def _linked_skills(db, ref, depth=3) -> list[str]:
@@ -659,25 +664,64 @@ def _humanize(rec_path: str) -> str:
     return " ".join(w.capitalize() for w in words) or stem
 
 
-# A "Conduit" amulet grants one random skill modifier drawn from a pool its item record does
-# not link back to (the pool is wired through dynamic loot tables), so build_item_skill_map can
-# only reach the nameless roll affix. Match the record-path fragment those modifiers share and
-# map it to the granting amulet, so those rows name the item the player equips. The pool's pet
-# modifiers live beside the pet's other modifiers (playerclassNN/pets/modifier_eldritchwhispers*)
-# rather than in the eldritchwhispers folder, hence a fragment and not a folder. Verified
-# exhaustive: eldritchwhispers is the only RR modifier pool granted purely via lootrandomizer
-# pools (re-check on a new version / new Conduits).
-MODIFIER_POOL_ITEMS = {
-    "eldritchwhispers": "records/items/gearaccessories/necklaces/d113c_necklace.dbr",
-}
+LOOT_TABLES_ROOT = "records/items/loottables/"
+
+
+def build_loot_pool_items(db):
+    """skill record_path -> the item whose random affix roll grants that skill.
+
+    A "Conduit" amulet grants one skill modifier drawn at random from a pool its item record
+    never links to, so build_item_skill_map only ever reaches the nameless roll affix. The
+    wiring runs the other way, through a dynamic loot table that names both the item it rolls
+    (lootNameN) and the affix tables rolled onto it (prefix/suffixTableNameN). So walk that
+    table -> each affix table's randomizerNameN entries -> each affix's modifierSkillNameN, and
+    every skill that chain reaches belongs to the item the same loot table names.
+
+    There are ten Conduits, one per mastery, each rolling only its own mastery's affix table
+    (d113f is the Shaman one, d113g the Inquisitor one), so the amulet has to be read from the
+    data per modifier, never assumed. Deriving it keeps an eleventh Conduit, or a new pool
+    entirely, correct with no code change. A table naming more than one item, or a skill two
+    tables reach naming different items, is ambiguous: leave it unattributed rather than name
+    a wrong item, which sends a player farming the wrong amulet.
+    """
+    out: dict[str, str] = {}
+    ambiguous: set[str] = set()
+    for p in sorted((db.root / LOOT_TABLES_ROOT).rglob("*.dbr")):
+        rec = db.get(p.relative_to(db.root).as_posix())
+        items: set[str] = set()
+        affix_tables: set[str] = set()
+        for field, raw in rec.items():
+            if field.startswith("lootName"):
+                # A nested loot table is a branch of the roll, not the item it yields.
+                items |= {r for r in _dbr_refs(raw) if not r.startswith(LOOT_TABLES_ROOT)}
+            elif field.startswith(("prefixTableName", "suffixTableName")):
+                affix_tables |= set(_dbr_refs(raw))
+        if len(items) != 1 or not affix_tables:
+            continue
+        item = next(iter(items))
+        for table in sorted(affix_tables):
+            for field, raw in db.get(table).items():
+                if not field.startswith("randomizerName"):
+                    continue
+                for affix in _dbr_refs(raw):
+                    affix_rec = db.get(affix)
+                    for i in range(1, 6):
+                        for mod in _skill_refs(affix_rec.get(f"modifierSkillName{i}", "")):
+                            for reached in _linked_skills(db, mod):
+                                if out.setdefault(reached, item) != item:
+                                    ambiguous.add(reached)
+    for skill in ambiguous:
+        del out[skill]
+    return out
 
 
 def _display_name_tag(db, skill_path, depth=2):
-    """The skillDisplayName tag for a skill, following buffSkillName (else petSkillName) when
-    the skill record itself is unnamed - a skill's name often lives on the buff it applies
-    (the internal 'lightningnet1' skill is nameless; its buff is 'Storm Box of Elgoloth') or
-    on the pet skill it wires up (an item's pet-modifier shell carries no name of its own).
-    None if nothing in the short chain names it."""
+    """The skillDisplayName tag for a skill, following buffSkillName when the skill record
+    itself is unnamed - a skill's name often lives on the buff it applies (the internal
+    'lightningnet1' skill is nameless; its buff is 'Storm Box of Elgoloth'). None if nothing
+    in the short chain names it. An item's pet-modifier shell carries no name of its own
+    either, but resolve_names reaches it through build_modifier_modified, whose _linked_skills
+    walk already follows petSkillName, so this chain never needs to."""
     seen = set()
     cur = skill_path
     for _ in range(depth + 1):
@@ -689,7 +733,7 @@ def _display_name_tag(db, skill_path, depth=2):
         tag = rec.get("skillDisplayName", "").strip()
         if tag:
             return tag
-        cur = rec.get("buffSkillName", "").strip() or rec.get("petSkillName", "").strip()
+        cur = rec.get("buffSkillName", "").strip()
     return None
 
 
@@ -701,6 +745,7 @@ def resolve_names(db, tags, game_en, sources, mmap):
     constellation), with a humanized stem as the final resort - so no source ever shows a
     raw synthesized key and an item skill modifier reads as the skill it augments."""
     modmod = build_modifier_modified(db)
+    pool_items = build_loot_pool_items(db)
     for s in sources:
         rec = db.get(s["record_path"])
         if not rec.get("skillDisplayName", "").strip():
@@ -712,15 +757,15 @@ def resolve_names(db, tags, game_en, sources, mmap):
                 s["name"] = s["parent"]
             else:
                 s["name"] = register(_humanize(s["record_path"]), None, game_en)
-        # Attribute a Conduit's random-roll modifier to the amulet the player equips, and flag it:
-        # the amulet rolls ONE augment from a pool, so this source needs that specific roll (identified
-        # by its skill + damage type + value), not merely any copy of the amulet.
-        for fragment, item_path in MODIFIER_POOL_ITEMS.items():
-            if fragment in s["record_path"]:
-                s["parent"] = _item_name_descriptor(tags, game_en, db.get(item_path), s["name"])
-                s["category"] = "item skill modifier"
-                s["notes"] = f"random-roll; {s['notes']}".strip("; ")
-                break
+        # Attribute a random-roll modifier to the item its loot table rolls it onto (the Conduit
+        # amulet the player equips), and flag it: the amulet rolls ONE augment from a pool, so
+        # this source needs that specific roll (identified by its skill + damage type + value),
+        # not merely any copy of the amulet.
+        pool_item = pool_items.get(s["record_path"])
+        if pool_item:
+            s["parent"] = _item_name_descriptor(tags, game_en, db.get(pool_item), s["name"])
+            s["category"] = "item skill modifier"
+            s["notes"] = f"random-roll; {s['notes']}".strip("; ")
         # An unresolved parent (no real item/mastery/constellation) collapses to the name,
         # so the UI never shows a synthesized key in either column.
         if s["parent"].startswith("x:"):

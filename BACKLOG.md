@@ -943,3 +943,25 @@ the block is the Chrome launch through the `CDP` class in `scripts/gt_scrape.ts`
 and the matching head of `scripts/gt_star_table.ts`. Only the debug port differs,
 so it should be a parameter. Find the block by name rather than by line number:
 the save-reader work shifted those lines.
+
+## `just check` does not run the script tests
+
+`check: fmt-check test lint lint-py typecheck` leaves out `test-scripts`, so the
+pre-commit hook runs none of the twelve `scripts/test_*.py` suites. Every oracle
+over the extracted game data is therefore advisory: a parser change that silently
+mislabels rows can be committed and pushed with a green hook. The Conduit amulet
+bug (every Conduit RR row named for the Occultist amulet) shipped through exactly
+that gap.
+
+Blocked on a pre-existing failure, not on the wiring. `just test-scripts` aborts
+early because `scripts/test_parse_monsters.py` has count drift against the
+1.3.0.7 dataset; adding `test-scripts` to `check` today would block every commit
+in the repo. Fix the monster count drift first, then append `test-scripts` to the
+`check` recipe.
+
+Note the suite is a no-op without a local game install: each test skips itself
+when `extracted/records` is absent, so this gate only bites on Windows machines
+that have run `just extract`. That is the same audience that regenerates the
+datasets, which is the audience that needs the gate.
+
+Pointers: the `check` recipe and the `test-scripts` recipe in `justfile`.
