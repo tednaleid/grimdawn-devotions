@@ -149,7 +149,7 @@ export function mountImportPanel(
       // The copy button lives inside the message, so it is re-created on every paint and its
       // click is delegated from #export-msg below rather than bound here.
       exportMsg.innerHTML =
-        `${localization.translate("ui.export.saved")} ` +
+        `<div>${localization.translate("ui.export.saved")}</div>` +
         `<button id="export-copy" type="button">${localization.translate("ui.export.copy")}</button>`;
       return;
     }

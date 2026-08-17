@@ -732,16 +732,16 @@ main {
   color: #9aa4b2;
   font-size: 0.75rem;
 }
-/* The copy button sits inline in the saved message, styled like the panel's other buttons but
-   trimmed to the message's line. */
+/* The copy button sits under the saved message on its own line, styled like the panel's other
+   buttons. */
 #export-copy {
   background: #161d27;
   border: 1px solid #283446;
   border-radius: 4px;
-  padding: 0.15rem 0.4rem;
-  margin-left: 0.25rem;
+  padding: 0.3rem 0.45rem;
+  margin-top: 0.35rem;
   color: #9aa4b2;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   line-height: 1;
   cursor: pointer;
 }
