@@ -10,8 +10,8 @@ tabulates every RR source with a debuff ledger; the **monster resistance explore
 (`data/monsters.json`, `web/src/monsters/`) ranks damage types by how well enemies
 resist them and lets you filter/sort the underlying monster table. Deployed to
 GitHub Pages, plus one small Cloudflare Worker (`worker/`) whose only job is to
-fetch a grimtools build past its CORS header for the devotion planner's import
-feature.
+fetch a grimtools build past its CORS header, and save one, for the devotion
+planner's import and export.
 
 ## Stack
 - Language: TypeScript (planner), Python 3 (parser), Rust (reachability core)
@@ -39,9 +39,9 @@ feature.
 - Reachability correctness fixtures: regenerate with `just gen-reach-fixtures`
 - Reachability heavy validation (minutes, before big engine changes): `just validate-reach`
 - Headless browser smoke: `just e2e` (run `just install-e2e` once first)
-- Grimtools import worker, local dev (no Cloudflare account needed): `just worker-dev`
-- Grimtools import worker, first-time/manual deploy (normal deploys are from CI): `just deploy-worker`
-- Grimtools import worker, one-time Cloudflare token setup/rotation: `just setup-worker-auth`
+- Grimtools import/export worker, local dev (no Cloudflare account needed): `just worker-dev`
+- Grimtools import/export worker, first-time/manual deploy (normal deploys are from CI): `just deploy-worker`
+- Grimtools import/export worker, one-time Cloudflare token setup/rotation: `just setup-worker-auth`
 - Regenerate `data/grimtools-stars.json` (needs headless Chrome: `just install-e2e`): `just gt-star-table`
 - Pre-commit hook (opt-in, runs `just check`): `just install-hooks`
 - Tool/data check: `just doctor`
@@ -90,7 +90,8 @@ dimming. Every page's full view state lives in its own URL hash
 - `web/e2e/smoke.ts`, `web/e2e/rr-smoke.ts`, `web/e2e/mon-smoke.ts` -- headless-Chromium
   smoke tests (one per page), driven over CDP and run together by `just e2e`
 - `worker/` -- Cloudflare Worker that fetches a grimtools build server-side (CORS blocks
-  reading it from the browser) for the devotion planner's import feature; see `worker/README.md`
+  reading it from the browser) for the devotion planner's import and export features; see
+  `worker/README.md`
 
 ## How to run
 `just serve`, then open:

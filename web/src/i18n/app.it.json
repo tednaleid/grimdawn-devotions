@@ -173,7 +173,7 @@
   "ui.import.loading": "Caricamento build...",
   "ui.import.placeholder": "link o id build di grimtools",
   "ui.import.pruned": "{n} stella/e non sono state posizionate e sono state rimosse.",
-  "ui.import.source": "Importato da grimtools",
+  "ui.import.source": "Build grimtools",
   "ui.import.sourceTitled": "grimtools: {title}",
   "ui.import.submit": "Importa",
   "ui.info.aria": "Informazioni su questo pianificatore",
@@ -214,5 +214,14 @@
   "ui.tooltip.petBonus": "Bonus a tutti i Famigli",
   "ui.tooltip.procQualifier": "({trigger})",
   "ui.tooltip.pts": "{count} pt",
-  "ui.tooltip.requires": "Richiede: "
+  "ui.tooltip.requires": "Richiede: ",
+  "ui.grimtools.label": "grimtools",
+  "ui.export.submit": "Esporta su grimtools",
+  "ui.export.hint.empty": "Seleziona delle stelle da esportare.",
+  "ui.export.hint.uncapped": "Ripristina il limite di 55 punti per esportare.",
+  "ui.export.hint.incomplete": "Solo una build completa può essere esportata.",
+  "ui.export.exporting": "Esportazione in corso...",
+  "ui.export.err.rateLimited": "Troppe esportazioni. Riprova tra un minuto.",
+  "ui.export.err.network": "Impossibile raggiungere il servizio di esportazione.",
+  "ui.export.err.upstream": "grimtools non ha accettato la build."
 }

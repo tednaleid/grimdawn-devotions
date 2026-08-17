@@ -4,6 +4,7 @@ import { test, expect } from "bun:test";
 import table from "../../data/grimtools-stars.json";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
+import { invertStarTable } from "../src/core/grimtools";
 
 const stars = (table as { stars: Record<string, string> }).stars;
 
@@ -42,4 +43,11 @@ test("stars are numbered in grimtools sk order within each constellation", () =>
     const idxBySkAscending = [...entries].sort((a, b) => a.sk - b.sk).map((e) => e.idx);
     expect(idxBySkAscending, `${conId} out of order: ${idxBySkAscending.join(",")}`).toEqual(entries.map((_, i) => i));
   }
+});
+
+test("the committed table inverts cleanly, so every star has exactly one grimtools id to export", () => {
+  // The ordering test above forbids two stars sharing an sk id; this is the same guard from the
+  // export side, on the exact artifact the planner ships.
+  const inverse = invertStarTable(stars);
+  expect(Object.keys(inverse).length).toBe(559);
 });

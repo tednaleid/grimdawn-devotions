@@ -1,6 +1,6 @@
-# ABOUTME: Deploys the grimtools import worker to Cloudflare on push to main.
+# ABOUTME: Deploys the grimtools worker to Cloudflare on push to main.
 # ABOUTME: Never runs on pull_request, which keeps the API token out of PR-triggered runs.
-name: Deploy import worker
+name: Deploy grimtools worker
 on:
   push:
     branches: [main]

@@ -1274,6 +1274,12 @@ export interface ReachView {
   have: Vec; // true in-game affinity total from completed constellations (uncapped; the panel's have column)
   need: Vec;
   needSource: Map<number, string[]>;
+  /** The selection is a legal build on its own: valid (every started constellation's requirement is
+   *  met by the completed ones' affinity, docs/devotion-system.md) and constructible (it classifies
+   *  reachable at the sweep budget, which is never below the validity floor nor above 55, so that
+   *  verdict is the verdict at 55). "Reachable" alone is weaker: it means the selection can be held
+   *  within the budget with scaffolding standing, which the game would not let you finish on. */
+  legal: boolean;
 }
 
 /** One full sweep for a selection: what can be completed, what stars are reachable, and the panel vectors. */
@@ -1291,6 +1297,10 @@ export function reachabilityForSelection(
   // verdict is the current selection's - classify that once and reuse it instead of re-running the
   // (sometimes costly) resolver per complete constellation.
   const selfReachable = classifyForSelection(cons, table, st, budget) === "reachable";
+  // The validity definition in docs/devotion-system.md ("A selection is valid when..."), checked on
+  // the summary: no started constellation may need more of a color than the completed ones supply.
+  // Same comparison the affinity panel shows as have/need.
+  const selfValid = st.target.every((need, i) => need <= st.supplyUncapped[i]!);
   for (const c of model.constellations.values()) {
     const size = c.starIds.length;
     let selCount = 0;
@@ -1350,13 +1360,21 @@ export function reachabilityForSelection(
     }
     needSource.set(i, src);
   }
-  return { completable, reachableStars, have: st.supplyUncapped, need: st.target, needSource };
+  return {
+    completable,
+    reachableStars,
+    have: st.supplyUncapped,
+    need: st.target,
+    needSource,
+    legal: selfReachable && selfValid,
+  };
 }
 
 /** The full engine result one UI refresh needs for a selection: the validity floor and the sweep. */
 export interface SelectionView {
   minCost: number; // selectionMinCost: fewest points that keep this selection a legal build (the slider floor)
   reach: ReachView; // reachabilityForSelection: dimming, reachable stars, and the affinity panel vectors
+  legal: boolean; // reach.legal: the selection is a legal build within 55 (export gates on it)
   buildOrder: BuildStep[] | null; // live (tries=16) oracle-verified order to assemble the selection, or null (verified or absent)
   buildOrderStates: StepState[] | null; // per-step post-states from the verifying replay; present exactly when buildOrder is
   /** Compare mode: the verified baseline-to-current transition, with its replay's states; null
@@ -1394,6 +1412,7 @@ export function selectionView(
       return {
         minCost,
         reach,
+        legal: reach.legal,
         buildOrder: null,
         buildOrderStates: null,
         transition: { steps: gated.steps, states: gated.states, rung: raw!.rung },
@@ -1408,6 +1427,7 @@ export function selectionView(
   return {
     minCost,
     reach,
+    legal: reach.legal,
     buildOrder: gated?.steps ?? null,
     buildOrderStates: gated?.states ?? null,
     transition: null,

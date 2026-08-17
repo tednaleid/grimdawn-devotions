@@ -47,8 +47,9 @@ import { parseTag } from "../core/benefitTag";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
-import { mapStars, IMPORT_CONTRACT_VERSION, type StarTable } from "../core/grimtools";
-import { mountImportPanel } from "../adapters/importPanel";
+import { mapStars, invertStarTable, toGrimtoolsSkills, type StarTable } from "../core/grimtools";
+import { mountImportPanel, type ExportErrorCode, type ExportState } from "../adapters/importPanel";
+import { makeWorkerGateway } from "../adapters/grimtoolsWorkerGateway";
 import { affinityTotals } from "../core/affinity";
 import {
   starsGranting,
@@ -68,6 +69,8 @@ const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/"; // per-build 
 declare const __IMPORT_API__: string;
 declare const __BUILD_ID__: string;
 const importApi = typeof __IMPORT_API__ === "string" ? __IMPORT_API__ : "http://localhost:8787";
+// The one object that talks to the worker, both directions (see ports/GrimtoolsGateway).
+const gateway = makeWorkerGateway(importApi);
 const buildId = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 
 async function boot() {
@@ -303,7 +306,9 @@ async function boot() {
   // The permissive ReachView for the degraded path (uncapped, or no cover table): nothing dims, every
   // constellation is completable and every unselected star reachable, while have/need still come from the
   // selection summary. The dimming-on path goes through the core selectionView port (see refresh).
-  let reach: ReachView;
+  // Starts permissive because the import panel reads it when it mounts, which is before the boot
+  // render computes the real view.
+  let reach: ReachView = permissiveReach();
   function permissiveReach(): ReachView {
     const s = selectionSummary(model, state.selected);
     const needSource = new Map<number, string[]>();
@@ -326,7 +331,7 @@ async function boot() {
     const completable = new Set<string>([...model.constellations.keys()]);
     const reachableStars = new Set<string>();
     for (const st of model.stars.values()) if (!state.selected.has(st.id)) reachableStars.add(st.id);
-    return { completable, reachableStars, have: s.supplyUncapped, need: s.target, needSource };
+    return { completable, reachableStars, have: s.supplyUncapped, need: s.target, needSource, legal: false };
   }
 
   // Why a faded constellation (or a locked star) is dim: the completion minimum searched past the
@@ -808,6 +813,22 @@ async function boot() {
       curBuildOrderStates = null;
       curTransition = null;
     }
+    // The memo is consulted only when the selection actually changes (see lastSelectionKey): a
+    // returning selection re-associates its build, and a stale export error is dropped.
+    const key = selectionKey(state.selected);
+    if (key !== lastSelectionKey) {
+      lastSelectionKey = key;
+      const known = knownBuilds.get(key);
+      // Only a re-association repaints the import half. A render is not an import event, so
+      // anything the import side is showing - a typed slug, a loading or error message, the title
+      // and pruned notice of the build just imported - has to survive every other refresh.
+      if (known !== undefined && known !== source) {
+        source = known;
+        importPanel.setState({ kind: "done", slug: source });
+      }
+      if (exportError && exportError.key !== key) exportError = null;
+    }
+    importPanel.setExportState(exportStateFor());
     document.body.classList.toggle("comparing", baseline !== null);
     updateNarrow();
     paintMap();
@@ -894,7 +915,7 @@ async function boot() {
     try {
       const res = await fetch(`./data/grimtools-stars.json?v=${buildId}`);
       if (!res.ok) {
-        console.warn(`grimtools-stars.json fetch ${res.status}; import unavailable`);
+        console.warn(`grimtools-stars.json fetch ${res.status}; import and export unavailable`);
         return null;
       }
       const doc = (await res.json()) as { dataVersion: string; stars: StarTable };
@@ -902,16 +923,50 @@ async function boot() {
       starTable = doc.stars;
       return starTable;
     } catch (e) {
-      console.warn("grimtools-stars.json load failed; import unavailable", e);
+      console.warn("grimtools-stars.json load failed; import and export unavailable", e);
       return null;
     }
   }
 
+  // Star sets behind builds this session imported cleanly or exported, keyed by selectionKey, so an
+  // unchanged selection shows its existing link instead of minting a duplicate grimtools build.
+  // Session-only on purpose: a restored gt= carries no star set to compare against, and there is no
+  // way to ask grimtools whether a build matches. Clear (the panel's ✕) leaves this intact, so
+  // returning to that exact selection re-associates it.
+  const knownBuilds = new Map<string, string>();
+  function selectionKey(sel: Set<string>): string {
+    return [...sel].sort().join(",");
+  }
+  // The selection key the panel was last reconciled against: the memo is consulted only when the key
+  // changes, so a cleared association stays cleared until the selection actually moves, and a
+  // restored hash (which adopts the key itself) keeps the provenance it arrived with.
+  let lastSelectionKey: string | null = null;
+  // In-flight and failed exports, pinned to the selection they were made from: a change of selection
+  // supersedes both, and a result that arrives after such a change never re-associates the wrong set.
+  let exportingKey: string | null = null;
+  let exportError: { key: string; code: ExportErrorCode } | null = null;
+  // The inverse mapping table, built once from the same file the import loads.
+  let inverseTable: Record<string, string> | null = null;
+
+  // The Export button's state for the current selection, in the spec's precedence: hidden (the link
+  // already is the export), then the three disabled reasons, then in-flight and error, then ready.
+  function exportStateFor(): ExportState {
+    const key = selectionKey(state.selected);
+    if (source && knownBuilds.get(key) === source) return { kind: "hidden" };
+    if (state.selected.size === 0) return { kind: "disabled", reason: "empty" };
+    if (!Number.isFinite(state.pointCap)) return { kind: "disabled", reason: "uncapped" };
+    if (!reach.legal) return { kind: "disabled", reason: "incomplete" };
+    if (exportingKey === key) return { kind: "exporting" };
+    if (exportError && exportError.key === key) return { kind: "error", code: exportError.code };
+    return { kind: "ready" };
+  }
+
   async function runImport(slug: string): Promise<void> {
     if (!slug) {
-      // The clear button: drop the association only. Selection and cap are deliberately untouched.
+      // The clear button: drop the association only. Selection and cap are deliberately untouched,
+      // but the export state is not: with no association, this selection can be exported again.
       source = "";
-      importPanel.setState({ kind: "idle" });
+      syncImportPanel();
       writeHash("push");
       return;
     }
@@ -922,24 +977,10 @@ async function boot() {
     // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
     if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
 
-    // `title` is optional in the type, not just possibly null: a response served from the
-    // worker's 24h edge cache can predate this field entirely, so it may be absent as well as
-    // explicitly null. Both must fall back the same way in the panel.
-    let body: { skills: string[]; dataVersion: string | null; title?: string | null };
-    try {
-      // `v=${IMPORT_CONTRACT_VERSION}` busts only the *browser's* cache for this URL, and only when
-      // the worker's response contract actually changes (unlike buildId, which changes on every
-      // deploy - see grimtools.ts for why a shared constant is used instead). The worker
-      // deliberately ignores this param when building its own edge-cache key, using the same
-      // constant on its own side instead - a caller-supplied value there would let anyone inflate
-      // the worker's keyspace.
-      const res = await fetch(`${importApi}/?slug=${encodeURIComponent(slug)}&v=${IMPORT_CONTRACT_VERSION}`);
-      if (res.status === 404) return importPanel.setState({ kind: "error", code: "notFound" });
-      if (!res.ok) return importPanel.setState({ kind: "error", code: "network" });
-      body = (await res.json()) as { skills: string[]; dataVersion: string | null; title?: string | null };
-    } catch {
-      return importPanel.setState({ kind: "error", code: "network" });
-    }
+    const result = await gateway.fetchBuild(slug);
+    if (result.kind === "notFound") return importPanel.setState({ kind: "error", code: "notFound" });
+    if (result.kind === "network") return importPanel.setState({ kind: "error", code: "network" });
+    const body = result;
 
     // A null dataVersion means the worker could not determine it: degrade rather than block. A
     // version that is present and different means the table is stale and the mapping would be
@@ -959,6 +1000,9 @@ async function boot() {
     state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
     const pruned = wanted.size - state.selected.size;
     source = slug;
+    // A pruned import is a build the planner does not show as grimtools does, so it is not memoized;
+    // Export stays offered for it.
+    if (pruned === 0) knownBuilds.set(selectionKey(state.selected), slug);
     importPanel.setState({ kind: "done", slug, pruned, title: body.title });
     // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
     // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
@@ -966,13 +1010,76 @@ async function boot() {
     refresh("push");
   }
 
+  async function runExport(): Promise<void> {
+    const key = selectionKey(state.selected);
+    // This selection already has a build from this session, so re-associate it instead of minting a
+    // duplicate. Only reachable with the export row visible, which after a memo hit means the
+    // association was dropped by ✕ or by Back.
+    const known = knownBuilds.get(key);
+    if (known !== undefined) {
+      source = known;
+      writeHash("push");
+      return syncImportPanel();
+    }
+    // The export is pinned to the selection it was made from: the star set is copied and the
+    // in-flight key claimed before the first await, so a star toggled mid-request neither changes
+    // what ships nor lets a second click mint a second build.
+    const selected = new Set(state.selected);
+    exportingKey = key;
+    exportError = null;
+    syncImportPanel();
+    try {
+      const starIdTable = await loadStarTable();
+      if (!starIdTable) {
+        // loadStarTable already warned with the real cause; "network" is the same stand-in import uses.
+        exportError = { key, code: "network" };
+        return;
+      }
+      try {
+        inverseTable ??= invertStarTable(starIdTable);
+      } catch (e) {
+        console.warn("export unavailable: grimtools-stars.json does not invert cleanly", e);
+        exportError = { key, code: "network" };
+        return;
+      }
+      const skills = toGrimtoolsSkills(selected, inverseTable);
+      if (!skills) {
+        // Cannot happen with a table that passed its generation gates; a bug report, not a user state.
+        const missing = [...selected].filter((s) => inverseTable![s] === undefined);
+        console.warn(`export: selected star(s) missing from grimtools-stars.json: ${missing.join(", ")}`);
+        exportError = { key, code: "network" };
+        return;
+      }
+      const result = await gateway.saveBuild(skills);
+      if (result.kind !== "ok") {
+        exportError = { key, code: result.kind };
+        return;
+      }
+      knownBuilds.set(key, result.slug);
+      // The selection may have moved on while the request was in flight: only the selection the build
+      // was made from becomes associated with it (a later return to that set re-associates via the memo).
+      if (selectionKey(state.selected) === key) {
+        source = result.slug;
+        writeHash("push"); // like import: Back returns to the un-associated state
+      }
+    } finally {
+      // Only the export that owns the key clears it: a result for a superseded selection must not
+      // stop a later export's in-flight indicator.
+      if (exportingKey === key) exportingKey = null;
+      syncImportPanel();
+    }
+  }
+
   const importPanel = mountImportPanel(document.getElementById("import-panel") as HTMLElement, localization, {
     onSubmit: (slug) => void runImport(slug),
+    onExport: () => void runExport(),
   });
-  // Reflects `source` into the panel: called once at mount (for a build restored from the boot
-  // hash) and again on every hashchange, mirroring how the search box re-syncs there.
+  // Reflects `source` and the export state into the panel: at mount, on every hashchange, on the
+  // clear path, and around an export request. A plain refresh pushes only the export state, so
+  // rendering never resets what the import half is showing.
   function syncImportPanel(): void {
     importPanel.setState(source ? { kind: "done", slug: source } : { kind: "idle" });
+    importPanel.setExportState(exportStateFor());
   }
   syncImportPanel();
 
@@ -1123,11 +1230,16 @@ async function boot() {
     // would land after this render, writing a stale hash over the one Back just restored.
     clearTimeout(searchTimer);
     applyHash(location.hash);
+    // A hash carries its own gt=, and that provenance wins: adopting the key restored here keeps
+    // refresh from consulting the memo, which would otherwise overwrite the link with a slug this
+    // session happened to make for the same stars.
+    lastSelectionKey = selectionKey(state.selected);
     searchPanel.setValue(query); // the box must agree with the restored hash
     syncImportPanel(); // ditto, for the source link
     refresh("replace");
   });
 
+  lastSelectionKey = selectionKey(state.selected); // the boot hash's gt= is authoritative, as above
   refresh("replace"); // boot render; canonicalize the URL without creating a history entry
 }
 

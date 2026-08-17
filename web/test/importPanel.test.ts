@@ -49,14 +49,18 @@ function mount() {
     "#import-source": new FakeElement(),
     "#import-clear": new FakeElement(),
     "#import-msg": new FakeElement(),
+    "#export-row": new FakeElement(),
+    "#export-go": new FakeElement(),
+    "#export-msg": new FakeElement(),
   } as const;
   const root = {
     innerHTML: "",
     querySelector: (sel: string) => kids[sel as keyof typeof kids],
   } as unknown as HTMLElement;
   const calls: string[] = [];
-  const handle = mountImportPanel(root, enLoc, { onSubmit: (s) => calls.push(s) });
-  return { handle, kids, calls };
+  const exports: number[] = [];
+  const handle = mountImportPanel(root, enLoc, { onSubmit: (s) => calls.push(s), onExport: () => exports.push(1) });
+  return { handle, kids, calls, exports };
 }
 
 // Types into the fake input, firing the "input" event mountImportPanel listens on to recompute
@@ -211,4 +215,76 @@ test("relocalize re-renders the source link text and a live hint that is current
   handle.setState({ kind: "idle" });
   type(kids, "https://evil.example.com/calc/qNYgbjeV");
   expect(kids["#import-msg"].innerHTML).toBe("FR:ui.import.err.badInput");
+});
+
+test("the heading is the neutral grimtools label, and the import box keeps its own aria-label", () => {
+  const { kids } = mount();
+  expect(kids["#import-h"].textContent).toBe(enLoc.translate("ui.grimtools.label"));
+  expect(kids["#import-input"].getAttribute("aria-label")).toBe(enLoc.translate("ui.import.label"));
+});
+
+test("the export button carries the catalog label and starts hidden until a state is given", () => {
+  const { kids } = mount();
+  expect(kids["#export-go"].textContent).toBe(enLoc.translate("ui.export.submit"));
+  expect(kids["#export-row"].hidden).toBe(true);
+});
+
+test("each disabled reason disables the button and shows its hint", () => {
+  const { handle, kids } = mount();
+  for (const reason of ["empty", "uncapped", "incomplete"] as const) {
+    handle.setExportState({ kind: "disabled", reason });
+    expect(kids["#export-row"].hidden).toBe(false);
+    expect(kids["#export-go"].disabled).toBe(true);
+    expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate(`ui.export.hint.${reason}`));
+  }
+});
+
+test("ready enables the button with no hint; clicking it reports an export", () => {
+  const { handle, kids, exports } = mount();
+  handle.setExportState({ kind: "ready" });
+  expect(kids["#export-go"].disabled).toBe(false);
+  expect(kids["#export-msg"].innerHTML).toBe("");
+  kids["#export-go"].fire("click");
+  expect(exports.length).toBe(1);
+});
+
+test("exporting disables the button and says so", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "exporting" });
+  expect(kids["#export-go"].disabled).toBe(true);
+  expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate("ui.export.exporting"));
+});
+
+test("each error code keeps the button enabled for a retry and shows its message", () => {
+  const { handle, kids } = mount();
+  for (const code of ["rateLimited", "network", "upstream"] as const) {
+    handle.setExportState({ kind: "error", code });
+    expect(kids["#export-go"].disabled).toBe(false);
+    expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate(`ui.export.err.${code}`));
+  }
+});
+
+test("hidden removes the whole export row and clears its message", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "error", code: "network" });
+  handle.setExportState({ kind: "hidden" });
+  expect(kids["#export-row"].hidden).toBe(true);
+  expect(kids["#export-msg"].innerHTML).toBe("");
+});
+
+test("the export row is independent of the import state: it can show in both State A and State B", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "ready" });
+  handle.setState({ kind: "done", slug: "qNYgbjeV" });
+  expect(kids["#export-row"].hidden).toBe(false);
+  handle.setState({ kind: "idle" });
+  expect(kids["#export-row"].hidden).toBe(false);
+});
+
+test("relocalize re-renders the export label and a hint that is currently showing", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "disabled", reason: "incomplete" });
+  handle.relocalize({ ...enLoc, translate: (k: string) => `FR:${k}` } as never);
+  expect(kids["#export-go"].textContent).toBe("FR:ui.export.submit");
+  expect(kids["#export-msg"].innerHTML).toBe("FR:ui.export.hint.incomplete");
 });
