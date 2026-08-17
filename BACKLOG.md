@@ -813,6 +813,14 @@ artifact policy, item source, grimtools boundary).
 but exists only in `game.en.json`, so 12 locales fall back to English for that RR
 source name. A `just i18n-tables` run fixes it.
 
+The pet-modifier fix (`fix/rr-pet-modifier-sources`) raises the stakes: re-running
+`just parse-rr` takes the catalogue from 539 to 591 sources, and 34 of the tags the
+new rows name (Raging Tempest, Hellfire Mine, Hexflame, Veilpiercer, ...) are in no
+`game.*.json` yet, so those rows would render as raw tag keys. Whoever regenerates
+`data/resistance-reduction.json` must run `just i18n-tables` in the same pass -
+that is `just migrate`, which also stamps the current Steam buildid (24756825, not
+yet in `data/steam-build-versions.json`).
+
 The same run also drops `tagEnemyTrapA03` and `tagPetThermiteMineA01` from every
 locale. That is not game-version drift: both still exist in the installed game
 (`extracted/text_en`), and `grep -rl` finds them in no input file, only inside
