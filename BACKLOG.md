@@ -777,8 +777,9 @@ artifact policy, item source, grimtools boundary).
   since a pet stat has three breakpoints where an item stat has one.
 - **Player-level pet scaling.** A pet's base life, offensive and defensive
   ability live in its `characterAttributeEquations` bio record, written in
-  `charLevel`, and 15 of the 71 ability grants set their level to a `charLevel`
-  equation. `pet_ranks` reports summon RANK, so none of it is evaluated;
+  `charLevel`, and 18 of the 421 `(summon skill, ability record)` grant pairs
+  set their level to a `charLevel` equation, across 4 distinct ability records.
+  `pet_ranks` reports summon RANK, so none of it is evaluated;
   a panel showing pet damage is a rank comparison, not a character sheet.
 - **Stat labels: page-half consumption.** The data half shipped on
   `feat/skill-item-dataset`: `scripts/build_stat_item_tags.py` derives
