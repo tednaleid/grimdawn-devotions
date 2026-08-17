@@ -52,20 +52,6 @@ export of a legal selection to a fresh grimtools build, associated the same way 
   from" rule) all live inside `boot()` in `web/src/app/main.ts`, which has no test
   harness. Lifting those three into a small pure module would make them testable
   without one.
-- Round-trip a whole grimtools build (planner as the devotions editor). Builds are
-  immutable and `gt=<slug>` already points at the full non-devotion state, so no new
-  client state is needed: `POST /export` grows an optional `base: <slug>` plus
-  `remove`/`add` skill-id lists; the worker fetches the base build's `buildInfo.data`,
-  drops `skills` entries in `remove`, appends `add` at level 1, sets
-  `bio.devotionPoints = base.bio.devotionPoints + remove.length - add.length`, and posts
-  everything else untouched. The planner computes `remove` by fetching the base's skill
-  list through the gateway and intersecting with the mapping table (only the planner
-  knows which ids are devotion stars). Each export becomes the new `gt`, so edits chain;
-  with no `gt` it degrades to today's bare export. Probe first: grimtools binds
-  celestial powers to skills via `autoCastSkill` (on `skills[]` and `itemSkills[]`) and
-  may reference stars from the quickbar; confirm the id space and how grimtools loads a
-  build whose binding points at a removed devotion, then have the worker strip bindings
-  whose id is in `remove`. Extend `extractBuildInfo` to return the whole `data` object.
 - grimtools' own "Devotion path" panel reported "There's no way to include all selected
   constellations with only 55 devotion points" for an exported 53-star build
   (`https://www.grimtools.com/calc/2d1W1Q8V`, the forum link with Lion completed) that

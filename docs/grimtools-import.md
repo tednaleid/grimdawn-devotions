@@ -2,8 +2,9 @@
 
 Paste a grimtools calculator link (or a bare slug) into the planner and that build's
 devotion stars appear on the map, with a link back to the build it came from. Press
-Export and the current selection is saved as a fresh grimtools build, with that same
-link back.
+Export and the current selection is saved to grimtools: with a build associated, a
+copy of it with its devotions replaced; otherwise a fresh character holding just the
+stars.
 
 This describes how the feature works now. The dated design records that led to it,
 with the full investigation, are
@@ -33,7 +34,8 @@ grimtools' internal `sk<id>` skill ids to our star ids, plus the grimtools devot
 version it was derived from.
 
 **A Cloudflare Worker** (`worker/`) that fetches a build by slug and returns its skill ids,
-and that saves a list of skill ids as a fresh build. It holds no game knowledge.
+and that saves a selection as a new build: a fresh character, or a copy of a named base
+with its devotions replaced. It holds no game knowledge.
 
 **The planner**, which maps those ids through the table, applies the selection, and
 records the source slug in the URL hash.
@@ -42,8 +44,10 @@ The split is deliberate. A grimtools shape change touches only the worker. A gam
 that renumbers skills touches only the table. Neither requires touching the other, and
 the worker never needs redeploying for a data change.
 
-**Grimtools is contacted once per import, never per view.** A shared link restores the
-build from the `s=` bitset alone.
+**Grimtools is contacted once per import, and once per load for an associated build,
+never for a rerender.** A shared link's selection always restores from the `s=` bitset
+alone, without the network; the load-time read only supplies the title and fills the
+duplicate-export memo, and never touches the selection.
 
 ## The mapping table
 
@@ -108,7 +112,8 @@ The rest follows from the same principle:
   every id is re-validated against `^sk\d+$`. The one exception is the build title, which
   is genuinely upstream text: it is sanitized at the worker (angle brackets stripped,
   whitespace collapsed, capped) and HTML-escaped again at the panel, because the panel
-  builds markup as `innerHTML`.
+  builds markup as `innerHTML`, and set unescaped as the link's `title` attribute, which
+  is inert text.
 - **Redirects are refused** (`redirect: "manual"`, 3xx treated as an upstream error), so
   grimtools cannot redirect us off-origin.
 - **It bounds its work**: a byte cap, a subrequest timeout, and an early exit as soon as
@@ -162,9 +167,11 @@ associated it shows a textbox and an Import button, enabled only when the text p
 a slug, with a live hint when it does not. Once a build is associated the textbox is
 replaced by the source link and a clear button.
 
-- **`gt=<slug>` in the URL hash is provenance only.** The authoritative selection stays in
-  `s=`. A shared link restores from the bitset and never re-fetches, and a hand-edited
-  `gt=` cannot change which build renders.
+- **`gt=<slug>` in the URL hash is provenance and the base of an export.** The
+  authoritative selection stays in `s=`; a hand-edited `gt=` cannot change which build
+  renders. On load with a `gt=` the planner reads that build through the gateway once, in
+  the background, for its title and to memoize its star set; the read never changes the
+  selection or the cap. If it fails the link keeps its untitled label.
 - **The point cap only rises**, to fit the incoming star count. Importing never reduces a
   budget.
 - **Pruning is reported.** If `repairSelection` drops stars, the count is shown.
@@ -173,12 +180,14 @@ replaced by the source link and a clear button.
   not determine" and degrades to proceeding.
 - **Clearing drops the association only**, leaving the selection and cap untouched.
 
-## Exporting a selection to a fresh grimtools build
+## Exporting a selection to grimtools
 
-The reverse direction: one button saves the current selection as a new anonymous
-grimtools build and makes it the associated build (the link-plus-clear state, and
-`gt=<slug>` in the hash). The design record is
-[docs/superpowers/specs/2026-08-16-grimtools-export-design.md](superpowers/specs/2026-08-16-grimtools-export-design.md).
+The reverse direction: one button saves the current selection to grimtools and makes
+the result the associated build (the link-plus-clear state, and `gt=<slug>` in the
+hash). The design records are
+[docs/superpowers/specs/2026-08-16-grimtools-export-design.md](superpowers/specs/2026-08-16-grimtools-export-design.md)
+and
+[docs/superpowers/specs/2026-08-16-grimtools-round-trip-design.md](superpowers/specs/2026-08-16-grimtools-round-trip-design.md).
 
 **Grimtools saves a build in one POST.** Its calculator is entirely client-side;
 Share serializes the whole build and posts it to `save_build.php`, which returns the
@@ -187,15 +196,29 @@ worker relays it. Builds are immutable: every save mints a new slug.
 
 **The planner maps, the worker relays.** The planner inverts the same
 `data/grimtools-stars.json` it uses for import (`invertStarTable`,
-`toGrimtoolsSkills` in `web/src/core/grimtools.ts`) and posts `{ skills: ["sk739",
-...] }` to `POST /export`. The worker validates shape (1 to 55 distinct `sk<digits>`
-ids, a 4 KB body cap, our origin), rate-limits (5 per minute per address and 60 per
-minute overall, via Workers rate-limit bindings), builds the payload with the shared
-`savePayload` (the exact shape the calculator's Share button posts, at level 100 with
-`devotionPoints` counting down from 55), posts it to the constant
+`toGrimtoolsSkills` in `web/src/core/grimtools.ts`) and posts to `POST /export`. With
+no build associated the body is `{ skills: ["sk739", ...] }` and the worker builds a
+fresh level-100 character holding only those stars (`savePayload`, at the calculator's
+defaults with `devotionPoints` counting down from 55). With a `gt=` in the hash the body
+also carries `base: { slug, remove }`: the planner reads the base build (the builds
+memo, or the gateway if it is not there yet) and sets `remove` to the base's skill ids
+that are keys of the star table, its devotion stars, since a mastery skill is never a
+key. The worker fetches the base page and calls `spliceDevotions`, which drops the
+`remove` entries from `skills[]`, appends the new stars, adjusts `bio.devotionPoints`
+for the count that changed, and drops any celestial-power binding in `skills[]`,
+`itemSkills[]` or `transformSkills[]` that named a removed star; every other field of the
+base (gear, masteries, attributes, quickbar, both progressions) passes through
+byte-for-byte. The copy inherits the base's title.
+
+The worker validates shape (1 to 55 distinct `sk<digits>` ids in `skills`, and with a
+base a slug plus 0 to 128 distinct `sk<digits>` ids in `remove`, all under a 4 KB body
+cap and our origin), rate-limits (5 per minute per address and 60 per minute overall,
+via Workers rate-limit bindings), posts the built payload to the constant
 `https://www.grimtools.com/save_build.php`, and returns the re-validated slug as
 `{ slug }` with status 201. Errors: 400 `bad_request`, 403 `forbidden`, 429
-`rate_limited`, 502 `upstream` or `unparseable`. Nothing is cached.
+`rate_limited`, 502 `upstream` or `unparseable`. A base that cannot be read at export
+(`notFound`, or its `dataVersion` disagreeing with the table) shows
+`ui.export.err.base`; ✕ is the way to fall back to a fresh build. Nothing is cached.
 
 **Only a complete build can be exported.** Export is disabled, with a one-line hint,
 for an empty selection, for the uncapped point mode, and for any selection the engine
@@ -208,9 +231,10 @@ exported; when the current selection matches one, the panel shows that build's l
 and hides Export, and returning to a memoized set re-associates it. Where the row is
 still offered for a memoized set (the association was dropped with ✕ or by pressing
 Back), Export re-associates the existing build rather than sending a request. A reloaded
-link restores `gt=` but not the memo, so Export is offered again there. Provenance in a
-restored hash wins over the memo: Back, Forward and a pasted link keep the `gt=` they
-carry.
+link restores `gt=` and the load-time read refills the memo, so an unchanged imported
+build hides Export after a refresh too (until the read completes it is offered).
+Provenance in a restored hash wins over the memo: Back, Forward and a pasted link keep
+the `gt=` they carry.
 
 Both directions go through the `GrimtoolsGateway` port
 (`web/src/ports/GrimtoolsGateway.ts`); `web/src/adapters/grimtoolsWorkerGateway.ts` is
@@ -236,7 +260,8 @@ from the `IMPORT_API_URL` repository variable at build time.
 A guard test pins the exact set of response fields and will tell you when this is needed.
 Tolerant parsing is still the primary defense, because no cache mechanism helps a
 deployed old bundle talking to a new worker mid-rollout. The export route has its own
-`EXPORT_CONTRACT_VERSION` beside it, pinned by the same test file.
+`EXPORT_CONTRACT_VERSION` beside it (2: the body carries an optional `base`), pinned by
+the same test file.
 
 **The worker:** deploys from CI on push to `main` touching `worker/**` or
 `web/src/core/grimtools.ts` (it bundles that module, so the path filter includes it).
@@ -253,9 +278,10 @@ renumbering reaches us from CI rather than from a confused user.
   559 stars, so this is corroboration rather than the primary guarantee. Regenerating
   against a build that touches different constellations is cheap insurance.
 - Import covers devotions only. `buildInfo` also carries gear, mastery skills, attributes
-  and item skills; nothing consumes them because the planner models devotions.
+  and item skills; nothing consumes them because the planner models devotions. The rest
+  of `buildInfo` is carried through an export by reference (the worker copies it), but
+  nothing in the planner reads it.
 - The source link persists after the build is edited and is dismissed by hand. There is no
   automatic "modified since import" marking.
-- Export covers devotions only: the saved build is a fresh level-100 character with no
-  masteries or gear.
-- Duplicate-export detection is per session; a reloaded link offers Export again.
+- Quickbar entries are passed through untouched on export; celestial powers never appear
+  there, so nothing dangles.
