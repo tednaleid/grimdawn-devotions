@@ -25,13 +25,38 @@ def rows(con, sql, params=None):
     return [dict(zip(cols, r)) for r in cur.fetchall()]
 
 
+def conversion_type_tags(stat_tags: dict) -> dict:
+    """Game tag for each damage-type token a conversionPercentage names.
+
+    `conversionInType`/`conversionOutType` hold GD's internal damage-type names
+    (`Fire`, `Life`, `Poison`), which are not game tags. Shipping them raw would put
+    an English word on the card in every language, and the one that does happen to
+    resolve as a tag resolves to the wrong thing: GD's internal `Life` is the
+    player-facing Vitality, while a bare `Life` tag is "Health".
+
+    data/stat-tags.json already carries exactly this vocabulary as
+    `stat.damage.<token>`, mapped to the tag the devotion planner labels the same
+    damage type with (Life -> tagCharStatsVitality, Poison -> tagCharStatsAcid), so
+    this reuses it rather than restating it. Every one of those tags is already
+    resolved into every locale table by `just i18n-tables`, which is handed the same
+    file, so naming conversions this way adds no tag that needs translating.
+    """
+    return {k[len("stat.damage."):]: v for k, v in stat_tags.items()
+            if k.startswith("stat.damage.")}
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Emit the /items/ page dataset")
     ap.add_argument("--deposit-dir", required=True, type=Path)
     ap.add_argument("--derived-dir", required=True, type=Path)
+    ap.add_argument("--stat-tags", required=True, type=Path,
+                    help="data/stat-tags.json, for the conversion damage-type tags")
     ap.add_argument("--out", required=True, type=Path)
     ap.add_argument("--out-stats", required=True, type=Path)
     args = ap.parse_args(argv)
+
+    conv_tags = conversion_type_tags(
+        json.loads(args.stat_tags.read_text(encoding="utf-8")))
 
     con = open_deposit(args.deposit_dir.resolve())
     if not register_derived(con, args.derived_dir.resolve(), True):
@@ -149,6 +174,15 @@ def main(argv=None) -> int:
                     FROM skill_modifiers m JOIN top t ON t.record = m.item_record
                     ORDER BY m.item_record, m.modified_skill, m.modifier_record,
                              m.stat_id""", "item_record")
+    # A damage type with no stat.damage.* entry would ship as a missing label, so a
+    # patch that adds a conversion type fails the run instead of half-naming a card.
+    unmapped = sorted({t for rs in mods.values() for r in rs
+                       for t in (r["from_type"], r["to_type"])
+                       if t is not None and t not in conv_tags})
+    if unmapped:
+        print(f"ERROR: conversion damage types absent from stat-tags.json: "
+              f"{', '.join(unmapped)}", file=sys.stderr)
+        return 2
     stats = group("""SELECT s.record, s.stat_id, s.source, s.display_low, s.display_high,
                             s.value_min, s.value_max
                      FROM stats s JOIN top t ON t.record = s.record
@@ -169,10 +203,11 @@ def main(argv=None) -> int:
             stat = {"stat": m["stat_id"], "value": m["value"]}
             # A conversion percentage reads as a bare number without the pair of
             # damage types it converts between, so those ride along on the rows
-            # that have them and are absent everywhere else.
+            # that have them and are absent everywhere else. They ship as game
+            # tags, not as the raw GD type tokens: see conversion_type_tags.
             if m["from_type"] is not None:
-                stat["from_type"] = m["from_type"]
-                stat["to_type"] = m["to_type"]
+                stat["from_tag"] = conv_tags[m["from_type"]]
+                stat["to_tag"] = conv_tags[m["to_type"]]
             by_skill.setdefault(m["modified_skill"], []).append(stat)
         name = t.get("name_tag")
         en_name = t.get("en_name")

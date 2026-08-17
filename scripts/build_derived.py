@@ -1021,17 +1021,38 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
     and 8 longer at build 24756825), so each breakpoint clamps to the array's own
     length. A mismatch count rides out as a diagnostic so a patch that changes the
     shape is visible instead of silently yielding a wrong number.
+
+    Stats are read off the roster record AND its effect_record, not the effect
+    record alone. A shell usually holds nothing but the link, but not always:
+    Artifact Handling keeps its own 20-entry cooldownTime array while its
+    petSkillName target carries the other two lines of its card, and reading only the
+    target lost the skill-recharge line (-0.1 / -1.5 / -2.0) entirely. Two stats over
+    two skills sit this way at build 24756825, the other being Spectral Wrath's
+    onHitActivationChance, which skill_ranks already carries for six other skills
+    whose record and effect_record coincide. Where
+    both records name the same stat the effect record wins, since that is the record
+    every other column here (name, caps, icon) already comes from; no skill is in
+    that position today, and the rule keeps (skill_record, stat_id) a key rather than
+    leaving one of two rows to arrive at random.
     """
     excluded = ", ".join(f"'{k}'" for k in _RANK_ARRAY_EXCLUDE)
     con.execute(f"""
         CREATE TEMP TABLE skill_ranks AS
-        WITH arr AS (
-            SELECT s.record AS skill_record,
+        WITH src AS (
+            SELECT record AS skill_record, effect_record AS rec, 0 AS pref,
+                   max_level, ultimate_level
+            FROM skills
+            UNION ALL
+            SELECT record, record, 1, max_level, ultimate_level
+            FROM skills WHERE record != effect_record
+        ),
+        arr AS (
+            SELECT s.skill_record,
                    f.key AS stat_id,
                    str_split(f.value, ';') AS parts,
                    s.max_level, s.ultimate_level
-            FROM skills s
-            JOIN facts f ON f.record = s.effect_record
+            FROM src s
+            JOIN facts f ON f.record = s.rec
             WHERE f.key NOT IN ({excluded})
               AND f.key IN (SELECT key FROM rank_keys)
               AND NOT regexp_matches(f.value, '[A-Za-z/]')
@@ -1041,6 +1062,8 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
               -- so it is kept exactly as written.
               AND (f.value LIKE '%;%'
                    OR (f.value_num IS NOT NULL AND f.value_num != 0))
+            QUALIFY row_number() OVER (PARTITION BY s.skill_record, f.key
+                                       ORDER BY s.pref) = 1
         ),
         idx AS (
             -- DuckDB's greatest()/least() ignore NULL arguments, so greatest(NULL, 1)
@@ -1058,9 +1081,15 @@ def build_skill_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict)
                TRY_CAST(parts[i_ult] AS DOUBLE) AS at_ultimate
         FROM idx
         WHERE TRY_CAST(parts[1] AS DOUBLE) IS NOT NULL""")
+    # Over both records the table reads, for the same reason it reads both.
     diag["rank_array_len_mismatch"] = con.execute("""
-        SELECT count(*) FROM skills s
-        JOIN facts f ON f.record = s.effect_record
+        WITH src AS (
+            SELECT effect_record AS rec, ultimate_level FROM skills
+            UNION ALL
+            SELECT record, ultimate_level FROM skills WHERE record != effect_record
+        )
+        SELECT count(*) FROM src s
+        JOIN facts f ON f.record = s.rec
         WHERE f.value LIKE '%;%'
           AND NOT regexp_matches(f.value, '[A-Za-z/]')
           AND len(str_split(f.value, ';')) != s.ultimate_level""").fetchone()[0]
@@ -1084,20 +1113,37 @@ def stat_carrier_walk(roots: str, stat_gate: str) -> str:
     item's pet-modifier record is the same shape over the carrier holding its fire
     damage. Reading stats straight off the named record silently yields nothing.
 
-    Both callers stop at the first record carrying a STAT, not the first carrying a
-    display name: the carriers are routinely anonymous (three of the five pet
-    shells at build 24756825 reach a target with no `skillDisplayName` at all), so
-    the name-gated `skill_effect` walk runs past them and the whole block vanishes
-    with no diagnostic. That rule lives here once rather than in each caller,
-    because a name-gated or unwalked read has dropped a stat block repeatedly on
-    this schema.
+    Both callers gate on a STAT, not on a display name: the carriers are anonymous.
+    All 2,978 records this walk reaches for `skill_modifiers` at build 24756825 carry
+    no `skillDisplayName`, and `skill_effect` consequently has no row at all for any
+    of their roots - its walk drops a chain outright when nothing in the chain
+    reaches a name - so the name-gated resolver cannot be reused here whatever its
+    stopping rule. (The five `pet_ranks` shells are the milder case: they are unnamed
+    themselves but their targets are named, so `skill_effect` does resolve those
+    five.) The rule lives in this one place rather than in each caller, because a
+    name-gated or unwalked read has dropped a stat block repeatedly on this schema.
+
+    EVERY stat-bearing record in the chain is emitted, not just the nearest. The
+    records in a chain are different application scopes, not competing copies of one
+    stat block: a `SkillSecondary_PetModifier` shell carries the change to the
+    player's skill (Bloodsworn Codex's -6s Summon Briarthorn recharge) on itself and
+    reaches the pet's own block (+25% total damage) through `petSkillName`, and
+    Anderos' Amplifier's Mortar Trap card likewise shows both its -2s recharge and
+    the 100% physical-to-fire conversion that sits past the hop. Stopping at the
+    nearest carrier shipped one and silently dropped the other. Ten of the 259
+    reachable pet-modifier roots are that shape (35 rows over 28 blocks); the other
+    249 and all 2,709 plain `Skill_Modifier` roots reach exactly one carrier, so
+    collecting the union changes nothing for them, no chain in either caller carries
+    the same stat key on two records, and no `pet_ranks` chain has a second carrier
+    at all.
 
     `roots` is a three-column SELECT seeding (root, cur, depth). `stat_gate` is a
     predicate over a `facts f` row deciding whether a record carries a stat, and
     stays the caller's own because the two tables read stats differently: pet
     abilities gate on the game's rank-key vocabulary, item modifiers on a non-zero
-    first rank. Emits `stat_record(root, cur, rn)`, rn = 1 being the nearest
-    carrier. Must be embedded in a WITH RECURSIVE.
+    first rank. Emits `stat_record(root, cur)`, one row per carrier reached; a
+    record reachable by two paths is emitted once. Must be embedded in a
+    WITH RECURSIVE.
     """
     return f"""
         walk(root, cur, depth) AS (
@@ -1111,8 +1157,7 @@ def stat_carrier_walk(roots: str, stat_gate: str) -> str:
             WHERE w.depth < 8
         ),
         stat_record AS (
-            SELECT root, cur,
-                   row_number() OVER (PARTITION BY root ORDER BY depth) AS rn
+            SELECT DISTINCT root, cur
             FROM walk w
             WHERE EXISTS (SELECT 1 FROM facts f
                           WHERE f.record = w.cur AND ({stat_gate}))
@@ -1297,7 +1342,7 @@ def build_pet_ranks(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -
                    TRY_CAST(str_split(f.value, ';')[
                        least(g.lvl, len(str_split(f.value, ';')))] AS DOUBLE) AS v
             FROM granted g
-            JOIN stat_record sr ON sr.root = g.ability AND sr.rn = 1
+            JOIN stat_record sr ON sr.root = g.ability
             JOIN facts f ON f.record = sr.cur
             WHERE {ability_stats}
         ),
@@ -1346,11 +1391,15 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     SkillSecondary_PetModifier whose petSkillName reaches the record actually
     carrying 200 fire damage and 18% crit damage.
 
-    The walk is `stat_carrier_walk`, shared with build_pet_ranks: it stops at the
-    first record carrying a non-zero numeric stat, NOT at the first record carrying
-    a display name. Modifier stats routinely sit on anonymous carrier records, so
-    the name-gated skill_effect walk stops short of them and silently drops the
-    block. Only the stat gate below is this table's own.
+    The walk is `stat_carrier_walk`, shared with build_pet_ranks: it collects every
+    record in the chain carrying a non-zero numeric stat, and gates on a stat rather
+    than on a display name. Modifier stats routinely sit on anonymous carrier
+    records, so the name-gated skill_effect walk cannot reach them at all. Only the
+    stat gate below is this table's own. Collecting the whole chain rather than the
+    nearest carrier is what keeps a pet-modifier shell's own line and its pet block
+    both on the card: Bloodsworn Codex's Summon Briarthorn shell carries -6s of skill
+    recharge and reaches +25% total damage one petSkillName hop away, and reporting
+    only the nearer of the two dropped a real card line either way.
 
     A carrier stores a stat either as a bare scalar or, when the modifier skill has
     more than one rank, as a semicolon-separated per-rank array. Both are read with
@@ -1358,9 +1407,10 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
 
     - nothing on the item record names a rank (there is no modifierSkillLevel key
       of any kind in the deposit), so an item grants its modifier at rank 1;
-    - 2,471 of the 2,835 reachable carriers have skillMaxLevel 1 and store their
-      stats as scalars, which are rank-1 values by definition, so taking element 1
-      makes the two shapes agree;
+    - 2,406 of the 2,978 carriers the walk reaches (counted once per (root, carrier)
+      pair; 2,403 of 2,947 distinct carrier records) have skillMaxLevel 1 and store
+      their stats as scalars, which are rank-1 values by definition, so taking
+      element 1 makes the two shapes agree;
     - the numbers agree too. Where a stat appears on both shapes the first elements
       land in the scalar range and the later ranks do not: offensiveFireMin has a
       median of 90 across 23 scalar carriers, 100 across the first elements of the
@@ -1378,18 +1428,31 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     first_rank = ("CASE WHEN f.value LIKE '%;%' "
                   "THEN TRY_CAST(str_split(f.value, ';')[1] AS DOUBLE) "
                   "ELSE f.value_num END")
-    # The two string keys naming what a conversionPercentage converts between,
-    # pre-filtered to a few thousand rows so the join below stays an equijoin on
-    # (record, key) instead of a predicate over all of facts.
-    conv_key = ("CASE WHEN f.key LIKE 'conversionPercentage%' THEN '{0}' "
-                "|| regexp_extract(f.key, 'conversionPercentage(\\d*)', 1) END")
-    conv_in, conv_out = (conv_key.format(k) for k in
-                         ("conversionInType", "conversionOutType"))
+    # The conversion index carried by a key's trailing digits, the unnumbered key
+    # being index 1 - the same expression build_conversions uses, so the two tables
+    # pair the same three keys the same way.
+    conv_n = "COALESCE(NULLIF(regexp_extract({0}, '(\\d+)$', 1), ''), '1')"
     con.execute(f"""
         CREATE TEMP TABLE skill_modifiers AS
-        WITH RECURSIVE conv AS (
-            SELECT record, key, trim(value) AS value FROM facts
-            WHERE key LIKE 'conversionInType%' OR key LIKE 'conversionOutType%'
+        WITH RECURSIVE conv_key AS (
+            SELECT record, regexp_replace(key, '\\d+$', '') AS base,
+                   {conv_n.format("key")} AS n, trim(value) AS value
+            FROM facts
+            WHERE (key LIKE 'conversionInType%' OR key LIKE 'conversionOutType%')
+              AND trim(value) != ''
+        ),
+        -- Both halves of a pair or neither. conversions.parquet requires an in-type
+        -- AND an out-type at the same index to build a triple, and a percentage with
+        -- one side missing names nothing a card could render, so the two tables must
+        -- not disagree about the same game data. Two modifier records carry
+        -- conversionInType Stun with no out-type; they keep their percentage row and
+        -- report no types at all rather than shipping half a pair.
+        conv AS (
+            SELECT i.record, i.n, i.value AS from_type, o.value AS to_type
+            FROM conv_key i
+            JOIN conv_key o ON o.record = i.record AND o.n = i.n
+                           AND o.base = 'conversionOutType'
+            WHERE i.base = 'conversionInType'
         ),
         paired AS (
             SELECT s.record AS item_record,
@@ -1415,19 +1478,20 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
         SELECT p.item_record, p.modified_skill, p.modifier_record,
                f.key AS stat_id,
                {first_rank} AS value,
-               i.value AS from_type,
-               o.value AS to_type
+               c.from_type,
+               c.to_type
         FROM paired p
-        JOIN stat_record sr ON sr.root = p.modifier_record AND sr.rn = 1
+        JOIN stat_record sr ON sr.root = p.modifier_record
         JOIN facts f ON f.record = sr.cur
         -- conversionPercentage says nothing on its own: the pair of damage types
         -- it converts between lives in two sibling string keys that the numeric
-        -- gate below would drop. They ride along on the row instead, paired by the
-        -- key's trailing digit (the unnumbered key is index 1), matching how
-        -- conversions.parquet pairs the same three keys. The key expression is
-        -- NULL on every other stat, so the join simply finds nothing there.
-        LEFT JOIN conv i ON i.record = sr.cur AND i.key = {conv_in}
-        LEFT JOIN conv o ON o.record = sr.cur AND o.key = {conv_out}
+        -- gate below would drop. They ride along on the row instead, matched on the
+        -- conversion index. The index expression is applied to every stat key, but
+        -- only a conversionPercentage row can find a conv partner on its record, so
+        -- the join simply finds nothing on the others.
+        LEFT JOIN conv c ON c.record = sr.cur
+                        AND f.key LIKE 'conversionPercentage%'
+                        AND c.n = {conv_n.format("f.key")}
         WHERE f.key NOT IN ({excluded})
           AND coalesce({first_rank}, 0) != 0""")
     out = out_dir / "skill_modifiers.parquet"

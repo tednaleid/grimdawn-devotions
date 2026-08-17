@@ -385,7 +385,7 @@ derive:
 [group("deposit")]
 skill-items:
     uv run scripts/build_skill_items.py --deposit-dir "{{deposit_dir}}" \
-        --derived-dir "{{derived_dir}}" \
+        --derived-dir "{{derived_dir}}" --stat-tags data/stat-tags.json \
         --out "{{justfile_directory()}}/data/skill-items.json" \
         --out-stats "{{justfile_directory()}}/data/skill-items-stats.json"
 
