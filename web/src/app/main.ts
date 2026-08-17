@@ -121,9 +121,10 @@ async function boot() {
   // The live search query. Emphasizes matching map nodes and rides in the URL so a shared
   // link restores it, like the benefit tags.
   let query = "";
-  // The grimtools slug the current build was imported from, or "" when there is none. Provenance
-  // only (see urlState's gt=): rides in the hash so a shared link keeps the source link without
-  // ever re-fetching grimtools on load.
+  // The grimtools slug the current build was imported from, or "" when there is none: provenance
+  // (see urlState's gt=) and the base an export copies from. Rides in the hash so a shared link
+  // keeps it; read once in the background at load for its title (see ensureSourceRead), never
+  // applied back to the selection.
   let source = "";
   // Decode and repair a hash into planner state. Runs at boot and on every hashchange
   // (Back/Forward, bookmark clicks, hand-edited URLs); an undecodable hash is the empty build.
@@ -974,6 +975,10 @@ async function boot() {
   // supersedes both, and a result that arrives after such a change never re-associates the wrong set.
   let exportingKey: string | null = null;
   let exportError: { key: string; code: ExportErrorCode } | null = null;
+  // True for the body of runImport (the clear path excepted): guards the load-time read's
+  // background repaint (see ensureSourceRead) from landing mid-import and overwriting the
+  // loading/error state or the textbox with a slug that is not the one being imported.
+  let importing = false;
   // The inverse mapping table, built once from the same file the import loads.
   let inverseTable: Record<string, string> | null = null;
 
@@ -999,41 +1004,46 @@ async function boot() {
       writeHash("push");
       return;
     }
-    importPanel.setState({ kind: "loading" });
-    const starIdTable = await loadStarTable();
-    // This is our own same-origin data/grimtools-stars.json, not the worker, so "network" is a
-    // stand-in: no catalog key describes "our own bundled data failed to load" and this is rare
-    // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
-    if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
+    importing = true;
+    try {
+      importPanel.setState({ kind: "loading" });
+      const starIdTable = await loadStarTable();
+      // This is our own same-origin data/grimtools-stars.json, not the worker, so "network" is a
+      // stand-in: no catalog key describes "our own bundled data failed to load" and this is rare
+      // enough (a bad deploy, a stripped-down offline copy) not to warrant adding one.
+      if (!starIdTable) return importPanel.setState({ kind: "error", code: "network" });
 
-    const result = await readBuild(slug);
-    if (result.kind === "notFound") return importPanel.setState({ kind: "error", code: "notFound" });
-    if (result.kind === "network") return importPanel.setState({ kind: "error", code: "network" });
-    const body = result;
+      const result = await readBuild(slug);
+      if (result.kind === "notFound") return importPanel.setState({ kind: "error", code: "notFound" });
+      if (result.kind === "network") return importPanel.setState({ kind: "error", code: "network" });
+      const body = result;
 
-    // A null dataVersion means the worker could not determine it: degrade rather than block. A
-    // version that is present and different means the table is stale and the mapping would be
-    // plausible but wrong, which is the failure mode worth refusing outright.
-    if (body.dataVersion && body.dataVersion !== tableDataVersion)
-      return importPanel.setState({ kind: "error", code: "version" });
+      // A null dataVersion means the worker could not determine it: degrade rather than block. A
+      // version that is present and different means the table is stale and the mapping would be
+      // plausible but wrong, which is the failure mode worth refusing outright.
+      if (body.dataVersion && body.dataVersion !== tableDataVersion)
+        return importPanel.setState({ kind: "error", code: "version" });
 
-    // body.skills mixes mastery skills and devotion stars (the worker cannot tell them apart);
-    // mapStars is what actually splits stars out, via membership in the committed table.
-    const stars = mapStars(body.skills, starIdTable);
-    if (!stars.length) return importPanel.setState({ kind: "error", code: "empty" });
+      // body.skills mixes mastery skills and devotion stars (the worker cannot tell them apart);
+      // mapStars is what actually splits stars out, via membership in the committed table.
+      const stars = mapStars(body.skills, starIdTable);
+      if (!stars.length) return importPanel.setState({ kind: "error", code: "empty" });
 
-    // Raise the cap to fit, never lower an existing higher one.
-    const cap = Math.max(state.pointCap, stars.length);
-    const wanted = new Set(stars);
-    // `table` here is the cover table from boot(), not the mapping table above.
-    state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
-    const pruned = wanted.size - state.selected.size;
-    source = slug;
-    importPanel.setState({ kind: "done", slug, pruned, title: body.title });
-    // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
-    // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
-    // and must be recomputed, same as every other state-changing action in this file.
-    refresh("push");
+      // Raise the cap to fit, never lower an existing higher one.
+      const cap = Math.max(state.pointCap, stars.length);
+      const wanted = new Set(stars);
+      // `table` here is the cover table from boot(), not the mapping table above.
+      state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
+      const pruned = wanted.size - state.selected.size;
+      source = slug;
+      importPanel.setState({ kind: "done", slug, pruned, title: body.title });
+      // A full refresh, not repaint(): the import replaces state.selected/pointCap wholesale, so
+      // reach, the points bar, the benefits/affinity panels and the build-order panel are all stale
+      // and must be recomputed, same as every other state-changing action in this file.
+      refresh("push");
+    } finally {
+      importing = false;
+    }
   }
 
   async function runExport(): Promise<void> {
@@ -1129,7 +1139,8 @@ async function boot() {
   // A hash-restored or freshly exported gt= is a slug the session may never have read: fetch it
   // in the background for its title (and memo entry) and repaint if it is still the association
   // when the answer lands. Only a success repaints, so a failing read cannot loop; the fallback
-  // label simply stays. Never touches the selection.
+  // label simply stays. Never touches the selection. Skipped while an import is in flight: an
+  // import's own terminal setState paints, and the title arrives on the next source repaint.
   const reading = new Set<string>();
   function ensureSourceRead(): void {
     const slug = source;
@@ -1138,7 +1149,7 @@ async function boot() {
     void readBuild(slug)
       .finally(() => reading.delete(slug))
       .then((r) => {
-        if (r.kind === "ok" && source === slug) syncImportPanel();
+        if (r.kind === "ok" && source === slug && !importing) syncImportPanel();
       });
   }
   // Reflects `source` and the export state into the panel: at mount, on every hashchange, on the
