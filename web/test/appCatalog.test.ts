@@ -336,6 +336,7 @@ const REQUIRED = [
   "items.slot.ring",
   "items.slot.medal",
   "items.slot.relic",
+  "items.detail.grimtools",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

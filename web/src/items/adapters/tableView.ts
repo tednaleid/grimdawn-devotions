@@ -3,19 +3,29 @@
 import { resolveText, type Text } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
 import { DOMAINS, EFFECT_KINDS, RARITIES, SLOTS } from "../core/facets";
-import { effectLines, type EffectContext, type ModStat } from "../core/effectText";
+import { rowEffectLines, type EffectContext } from "../core/effectText";
 import type { Row } from "../core/filter";
 import type { Catalogue, Item } from "../core/model";
 import type { ViewState } from "../core/urlState";
+import { renderDetail, type DetailContext } from "./detailView";
 
 export interface TableHandlers {
   onView(next: ViewState, mode?: "push" | "replace"): void;
 }
 
+// Row records currently showing their expanded detail. Deliberately not part of ViewState/the
+// URL hash: expanding a row doesn't change which items match the current filters (what a shared
+// link needs to reproduce), it only reveals more detail about one already-visible item, fully
+// derivable from that item's own data. A page reload always starts collapsed.
+const expandedRecords = new Set<string>();
+
 // Single-instance page: the latest render inputs, so the wired-once listeners see current state.
 let ctx: {
   view: ViewState;
   handlers: TableHandlers;
+  loc: Localization;
+  rows: Row[];
+  detailCtx: DetailContext;
 } | null = null;
 
 const COLS: { key: string; label: string; sortable: boolean }[] = [
@@ -77,39 +87,16 @@ function nameCell(loc: Localization, item: Item): string {
     : name;
 }
 
-// Call effectLines once PER BLOCK, never on the blocks flattened together: effectLines keys a
-// byId map and a used-set per call, so a shared call across two skills' blocks lets one skill's
-// Min pair with a different skill's Max (see task-12-13-fix-1.md, C1 - Krieg's Mask fabricated
-// "140-300 Aether Damage" from Blitz's flat 140 and War Cry's real 180-300).
-//
-// Within a single skill-node group, a base skill and its transmuter/modifier sometimes carry
-// literally the same block twice (identical stats, same values - e.g. Blackwater's conversion
-// block on both blackwater1 and blackwater1b). Deduping by structural equality on the rendered
-// Text descriptor (not on resolved, locale-dependent strings) collapses those genuine repeats
-// back to one line, matching the pre-fix output for that case, while two DIFFERENT descriptors
-// that happen to resolve to the same text in some locale are never merged.
-export function rowEffectLines(modBlocks: ModStat[][], effectCtx: EffectContext): Text[] {
-  const seen = new Set<string>();
-  const out: Text[] = [];
-  for (const stats of modBlocks) {
-    for (const line of effectLines(stats, effectCtx)) {
-      const key = JSON.stringify(line);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      out.push(line);
-    }
-  }
-  return out;
-}
-
 function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string {
   const item = row.item;
   const slots = item.slots.map((s) => esc(loc.translate(`items.slot.${slotKey(s)}`))).join(", ");
   const rarity = esc(loc.translate(`items.rarity.${item.rarity.toLowerCase()}`));
   const lines: Text[] = rowEffectLines(row.modBlocks, effectCtx);
   const effect = lines.length ? lines.map((t) => esc(resolveText(loc, t))).join("<br>") : "—";
-  return `<tr data-record="${esc(item.record)}">
-    <td class="name">${nameCell(loc, item)}</td>
+  const expanded = expandedRecords.has(item.record);
+  const caret = expanded ? "▾" : "▸";
+  return `<tr class="item-row" data-record="${esc(item.record)}" role="button" tabindex="0" aria-expanded="${expanded}">
+    <td class="name"><span class="row-caret" aria-hidden="true">${caret}</span>${nameCell(loc, item)}</td>
     <td>${slots}</td>
     <td>${rarity}</td>
     <td class="num">${item.itemLevel}</td>
@@ -185,8 +172,27 @@ function syncControls(el: HTMLElement, loc: Localization, catalogue: Catalogue, 
   if (arr) arr.textContent = view.sortDir === 1 ? " ▲" : " ▼";
 }
 
-function renderBody(el: HTMLElement, loc: Localization, rows: Row[], effectCtx: EffectContext): void {
-  el.querySelector<HTMLElement>("#items-tbody")!.innerHTML = bodyMarkup(loc, rows, effectCtx);
+// Detail rows are inserted after their summary row rather than baked into bodyMarkup's HTML
+// string: renderDetail returns an HTMLElement (built once per skill/pet section from Text
+// descriptors), not markup, so it slots in via the DOM rather than string concatenation. Summary
+// rows and Row entries stay in the same order and count (bodyMarkup emits exactly one <tr> per
+// row, or a single empty-state row when rows is empty), so the two are matched up by index.
+function renderBody(el: HTMLElement, loc: Localization, rows: Row[], detailCtx: DetailContext): void {
+  const tbody = el.querySelector<HTMLElement>("#items-tbody")!;
+  tbody.innerHTML = bodyMarkup(loc, rows, detailCtx);
+  if (!rows.length) return;
+  const summaryRows = tbody.children;
+  rows.forEach((row, i) => {
+    if (!expandedRecords.has(row.item.record)) return;
+    const summaryTr = summaryRows[i] as HTMLElement;
+    const detailTr = document.createElement("tr");
+    detailTr.className = "item-detail-row";
+    const td = document.createElement("td");
+    td.colSpan = COLS.length;
+    td.appendChild(renderDetail(row.item, detailCtx));
+    detailTr.appendChild(td);
+    summaryTr.after(detailTr);
+  });
 }
 
 function renderCount(el: HTMLElement, loc: Localization, catalogue: Catalogue, rows: Row[]): void {
@@ -241,24 +247,55 @@ function wire(el: HTMLElement): void {
     const sortDir = ctx.view.sortKey === key ? ((ctx.view.sortDir * -1) as 1 | -1) : 1;
     fire({ sortKey: key, sortDir });
   });
+  // Whole-row click/keyboard toggles that row's detail (expandedRecords, not ViewState - see the
+  // module comment). A local renderBody call, not fire(): expanding a row is not a view change,
+  // so it must not push/replace the hash. Clicks landing on the name's grimtools link are left
+  // alone so the link still opens the item's page instead of also toggling the row; a click
+  // inside the (detail-row-only) pet <details> never reaches here since that row carries no
+  // data-record for closest() to match.
+  const tbody = el.querySelector<HTMLElement>("#items-tbody")!;
+  const toggleExpanded = (record: string) => {
+    if (!ctx) return;
+    expandedRecords.has(record) ? expandedRecords.delete(record) : expandedRecords.add(record);
+    renderBody(el, ctx.loc, ctx.rows, ctx.detailCtx);
+  };
+  tbody.addEventListener("click", (e) => {
+    const target = e.target as Element;
+    if (target.closest("a")) return;
+    const tr = target.closest<HTMLElement>("tr[data-record]");
+    if (tr) toggleExpanded(tr.dataset.record!);
+  });
+  tbody.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    const target = e.target as Element;
+    if (target.closest("a")) return;
+    const tr = target.closest<HTMLElement>("tr[data-record]");
+    if (tr) {
+      e.preventDefault();
+      toggleExpanded(tr.dataset.record!);
+    }
+  });
 }
 
-/** Render the controls + item table into `el`; wires listeners once, updates rows each call. */
+/** Render the controls + item table into `el`; wires listeners once, updates rows each call.
+ *  detailCtx is a superset of EffectContext (it also carries loc, masteryNameOf, and skillOf for
+ *  the expanded row's level grants, mastery grants, and pet panel - see detailView.ts), so it
+ *  serves both the row-summary effect lines and the detail-row rendering. */
 export function renderTable(
   el: HTMLElement,
   loc: Localization,
   catalogue: Catalogue,
   rows: Row[],
   view: ViewState,
-  effectCtx: EffectContext,
+  detailCtx: DetailContext,
   handlers: TableHandlers,
 ): void {
-  ctx = { view, handlers };
+  ctx = { view, handlers, loc, rows, detailCtx };
   if (!el.querySelector(".items-controls")) {
     el.innerHTML = skeleton(loc);
     wire(el);
   }
   syncControls(el, loc, catalogue, view);
-  renderBody(el, loc, rows, effectCtx);
+  renderBody(el, loc, rows, detailCtx);
   renderCount(el, loc, catalogue, rows);
 }

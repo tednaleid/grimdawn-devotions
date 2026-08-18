@@ -279,3 +279,32 @@ function renderOne(
   used.add(s.stat);
   return valueLine(s.value, tag, template);
 }
+
+// Call effectLines once PER BLOCK, never on blocks flattened together: effectLines keys a
+// byId map and a used-set per call, so a shared call across two blocks' stats lets one
+// block's Min pair with a different block's Max (see task-12-13-fix-1.md, C1 - Krieg's
+// Mask fabricated "140-300 Aether Damage" from Blitz's flat 140 and War Cry's real
+// 180-300). Shared by tableView.ts (one row's in-scope blocks) and detailView.ts (one
+// skill's or one pet source's blocks) - both need "concatenate LINES across blocks,
+// never STATS", so the helper lives here rather than being duplicated or imported
+// adapter-to-adapter (which would create a cycle between tableView.ts and detailView.ts).
+//
+// Within a single skill-node group, a base skill and its transmuter/modifier sometimes carry
+// literally the same block twice (identical stats, same values - e.g. Blackwater's conversion
+// block on both blackwater1 and blackwater1b). Deduping by structural equality on the rendered
+// Text descriptor (not on resolved, locale-dependent strings) collapses those genuine repeats
+// back to one line, matching the pre-fix output for that case, while two DIFFERENT descriptors
+// that happen to resolve to the same text in some locale are never merged.
+export function rowEffectLines(modBlocks: ModStat[][], ctx: EffectContext): Text[] {
+  const seen = new Set<string>();
+  const out: Text[] = [];
+  for (const stats of modBlocks) {
+    for (const line of effectLines(stats, ctx)) {
+      const key = JSON.stringify(line);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(line);
+    }
+  }
+  return out;
+}

@@ -11,8 +11,8 @@ import {
 } from "../../adapters/localizationAdapter";
 import { gameT } from "../../core/localization";
 import { loadCatalogue, loadStatTags } from "../adapters/dataSource";
+import type { DetailContext } from "../adapters/detailView";
 import { renderTable } from "../adapters/tableView";
-import type { EffectContext } from "../core/effectText";
 import { applyView } from "../core/filter";
 import type { Item } from "../core/model";
 import { decodeHash, encodeHash, type ViewState } from "../core/urlState";
@@ -30,6 +30,7 @@ async function boot() {
   // skill record -> mastery record, so decodeHash can backfill a hash's mastery from its skill.
   const knownSkills = new Map(catalogue.skills.map((s) => [s.record, s.mastery]));
   const skillByRecord = new Map(catalogue.skills.map((s) => [s.record, s]));
+  const masteryByRecord = new Map(catalogue.masteries.map((m) => [m.record, m]));
 
   const overrideLocale = storedLocale(SUPPORTED_LOCALES);
   let localization = await loadLocalization({
@@ -53,8 +54,10 @@ async function boot() {
 
   // Rebuilt each render so a locale switch is reflected immediately: templateOf reads the active
   // locale's game text (effectText.ts's valueLine sees the active locale's template, not always
-  // English), and tagOf/nameOf are locale-independent lookups over the loaded catalogue.
-  function effectContext(): EffectContext {
+  // English), and tagOf/nameOf/masteryNameOf are locale-independent lookups over the loaded
+  // catalogue. DetailContext extends EffectContext, so this single context serves both the
+  // row-summary effect lines (tableView.ts) and the expanded detail row (detailView.ts).
+  function detailContext(): DetailContext {
     return {
       tagOf: (statId) => statTags[statId],
       // gameText falls back to the tag itself (never undefined) when a tag is missing from both
@@ -70,6 +73,11 @@ async function boot() {
         const skill = skillByRecord.get(skillRecord);
         return skill?.nameTag ? gameT(skill.nameTag) : undefined;
       },
+      masteryNameOf: (masteryRecord) => {
+        const mastery = masteryByRecord.get(masteryRecord);
+        return mastery?.nameTag ? gameT(mastery.nameTag) : undefined;
+      },
+      loc: localization,
     };
   }
 
@@ -88,7 +96,7 @@ async function boot() {
 
   function render(): void {
     const rows = applyView(catalogue.items, catalogue.skills, view, nameOf);
-    renderTable(tableEl, localization, catalogue, rows, view, effectContext(), handlers);
+    renderTable(tableEl, localization, catalogue, rows, view, detailContext(), handlers);
   }
 
   function refresh(urlMode: "push" | "replace" = "push"): void {

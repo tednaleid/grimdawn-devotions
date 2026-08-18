@@ -2,8 +2,7 @@
 // ABOUTME: lines, never as stats (fix round 1, C1 - see task-12-13-fix-1.md for the Krieg's Mask case).
 import { test, expect } from "bun:test";
 import { makeLocalization, resolveText } from "../../src/core/localization";
-import type { EffectContext } from "../../src/items/core/effectText";
-import { rowEffectLines } from "../../src/items/adapters/tableView";
+import { rowEffectLines, type EffectContext } from "../../src/items/core/effectText";
 import type { Localization } from "../../src/ports/Localization";
 
 // Real tags/templates for the two stat families in play (data/stat-item-tags.json,

@@ -221,3 +221,45 @@
   text-align: center;
   color: var(--it-mut);
 }
+
+.items-page tr.item-row {
+  cursor: pointer;
+}
+.items-page .row-caret {
+  display: inline-block;
+  width: 1em;
+  color: var(--it-mut);
+}
+
+.items-page tr.item-detail-row > td {
+  background: var(--it-panel2);
+  padding: 0;
+}
+.items-page .item-detail {
+  padding: 12px 16px 16px;
+}
+.items-page .item-detail-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.items-page .skill-detail-name {
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--it-ember);
+}
+.items-page .skill-detail-lines,
+.items-page .item-detail-mastery {
+  margin: 0;
+  padding-left: 1.1em;
+}
+.items-page .item-detail-mastery {
+  margin-top: 10px;
+}
+.items-page .item-detail-grimtools {
+  display: inline-block;
+  margin-top: 12px;
+  font: 600 11px / 1 var(--it-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

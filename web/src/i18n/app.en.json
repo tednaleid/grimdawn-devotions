@@ -419,5 +419,6 @@
   "items.slot.amulet": "Amulet",
   "items.slot.ring": "Ring",
   "items.slot.medal": "Medal",
-  "items.slot.relic": "Relic"
+  "items.slot.relic": "Relic",
+  "items.detail.grimtools": "View on Grimtools"
 }
