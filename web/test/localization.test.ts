@@ -1,7 +1,7 @@
 // ABOUTME: Tests the pure localization resolver: fallback chain, interpolation.
 // ABOUTME: No DOM or fetch; exercises makeLocalization directly.
 import { test, expect, describe } from "bun:test";
-import { applyGameFormat, makeLocalization, resolveText } from "../src/core/localization";
+import { applyGameFormat, gameFormatT, makeLocalization, resolveText } from "../src/core/localization";
 
 test("prefers the active-locale value", () => {
   const loc = makeLocalization({ "ui.a": "Activo" }, { "ui.a": "Active" }, "es");
@@ -111,5 +111,29 @@ describe("applyGameFormat", () => {
   });
   test("an unsupplied argument leaves no token behind", () => {
     expect(applyGameFormat("{%t0} to reduce cooldown by {%.1f1} {%z2}", [], r)).toBe("to reduce cooldown by");
+  });
+});
+
+describe("gameFormatT through resolveText", () => {
+  test("round-trips: tag looks up the template, args substitute into it", () => {
+    const tagLoc = makeLocalization({}, {}, "en", {}, { tag: "{%.1f0} Seconds" });
+    expect(resolveText(tagLoc, gameFormatT("tag", [2]))).toBe("2 Seconds");
+  });
+
+  test("t recurses into a nested Text argument (real case: tagSkillCooldownRefreshName)", () => {
+    const condLoc = makeLocalization({}, {}, "en", {}, { "cond.chance": "{%d0}% Chance" });
+    const inner = gameFormatT("cond.chance", [25]);
+    const out = applyGameFormat(
+      "{%t0} to reduce cooldown of {%s1} by {%.1f2} {%z3}",
+      [inner, "Skill Recharge", 1, "Seconds"],
+      (t) => resolveText(condLoc, t),
+    );
+    expect(out).toBe("25% Chance to reduce cooldown of Skill Recharge by 1 Seconds");
+  });
+
+  test("s recurses into a nested Text argument", () => {
+    const condLoc = makeLocalization({}, {}, "en", {}, { "cond.tag": "Bleeding" });
+    const inner = gameFormatT("cond.tag", []);
+    expect(applyGameFormat("{%s0} inflicted", [inner], (t) => resolveText(condLoc, t))).toBe("Bleeding inflicted");
   });
 });
