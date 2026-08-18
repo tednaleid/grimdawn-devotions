@@ -146,6 +146,46 @@ if (!monHtml.includes(monJsName) || !monHtml.includes(cssName) || !monHtml.inclu
 }
 await Bun.write("dist/monster-resistances/index.html", monHtml);
 
+// Fourth page: the skill item finder, its own bundle under dist/items/, sharing the hashed
+// styles.css from the parent dir. Named items-main to avoid colliding.
+const items = await Bun.build({
+  entrypoints: ["src/items/app/main.ts"],
+  outdir: "dist/items",
+  target: "browser",
+  minify: true,
+  sourcemap: "linked",
+  naming: "items-[name]-[hash].[ext]", // dist/items/items-main-<hash>.js
+  define: { __ASSET_V__: JSON.stringify(assetVersion) },
+});
+if (!items.success) {
+  for (const log of items.logs) console.error(log);
+  throw new Error("bundle: items Bun.build failed");
+}
+const itemsEntry = items.outputs.find((o) => o.kind === "entry-point");
+if (!itemsEntry) throw new Error("bundle: no items entry-point output");
+const itemsJsName = itemsEntry.path.split(/[\\/]/).pop()!; // items-main-<hash>.js
+
+const itemsCssBytes = await Bun.file("src/items/items.css").bytes();
+const itemsCssName = `items-${createHash("sha256").update(itemsCssBytes).digest("hex").slice(0, 8)}.css`;
+await Bun.write(`dist/items/${itemsCssName}`, itemsCssBytes);
+
+let itemsHtml = await Bun.file("items.html").text();
+itemsHtml = itemsHtml
+  .replace('src="./items-main.js"', `src="./${itemsJsName}"`)
+  .replace('href="../styles.css"', `href="../${cssName}"`)
+  .replace('href="./items.css"', `href="./${itemsCssName}"`);
+if (
+  itemsHtml.includes('"./items-main.js"') ||
+  itemsHtml.includes('"../styles.css"') ||
+  itemsHtml.includes('"./items.css"')
+) {
+  throw new Error("bundle: items.html still has un-hashed asset refs after rewrite");
+}
+if (!itemsHtml.includes(itemsJsName) || !itemsHtml.includes(cssName) || !itemsHtml.includes(itemsCssName)) {
+  throw new Error("bundle: hashed items asset refs not present after rewrite");
+}
+await Bun.write("dist/items/index.html", itemsHtml);
+
 console.log(
-  `bundled dist: ${jsName}, ${cssName}, ${rrJsName}, ${monJsName} (buildId ${buildId}, assetV ${assetVersion})`,
+  `bundled dist: ${jsName}, ${cssName}, ${rrJsName}, ${monJsName}, ${itemsJsName} (buildId ${buildId}, assetV ${assetVersion})`,
 );

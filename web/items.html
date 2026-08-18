@@ -1,0 +1,42 @@
+<!-- ABOUTME: HTML shell for the Grim Dawn skill item finder page. -->
+<!-- ABOUTME: Declares the layout (header, mastery/skill controls, item table) and loads items-main.js. -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grim Dawn Skill Items</title>
+  <link rel="icon" href="../assets/favicon/favicon.ico" sizes="16x16 32x32 48x48" />
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png" />
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="./items.css" />
+  <script>
+    // Mirror the planner's boot-fail recovery: a cached shell can outlive the hashed entry it names.
+    function bootFailed() {
+      try {
+        if (!sessionStorage.getItem("itemsBootReloaded")) {
+          sessionStorage.setItem("itemsBootReloaded", "1");
+          location.reload();
+          return;
+        }
+      } catch (e) {}
+      var el = document.getElementById("boot-loading");
+      if (el)
+        el.innerHTML =
+          '<p>Couldn\'t load the page.</p><button type="button" onclick="location.reload()">Reload</button>';
+    }
+  </script>
+</head>
+<body class="items-page">
+  <header>
+    <h1 id="items-title">Skill Items</h1>
+  </header>
+  <main id="items-main">
+    <div id="items-table">
+      <div id="boot-loading" role="status"><div class="boot-spinner" aria-hidden="true"></div><p>Loading…</p></div>
+    </div>
+  </main>
+  <script type="module" src="./items-main.js" onerror="bootFailed()"></script>
+</body>
+</html>

@@ -861,6 +861,8 @@ build: cover-table
     cp "{{justfile_directory()}}/data/grimtools-stars.json" dist/data/grimtools-stars.json
     cp "{{justfile_directory()}}/data/resistance-reduction.json" dist/data/resistance-reduction.json
     cp "{{justfile_directory()}}/data/monsters.json" dist/data/monsters.json
+    cp "{{justfile_directory()}}/data/skill-items.json" dist/data/skill-items.json
+    cp "{{justfile_directory()}}/data/stat-item-tags.json" dist/data/stat-item-tags.json
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
     mkdir -p dist/data/i18n && cp "{{justfile_directory()}}/data/i18n/"*.json dist/data/i18n/
     # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that
@@ -889,6 +891,7 @@ serve: build
     @echo "  Planner:              http://localhost:5173/"
     @echo "  Resistance reduction: http://localhost:5173/resistance-reduction/"
     @echo "  Monster resistances:  http://localhost:5173/monster-resistances/"
+    @echo "  Skill items:          http://localhost:5173/items/"
     bunx serve "{{justfile_directory()}}/web/dist" -l 5173
 
 # Open the resistance-reduction page in the default browser (run in another shell while `serve` is up)
