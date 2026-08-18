@@ -2,7 +2,7 @@
 // ABOUTME: damage-over-time/debuff duration composition, refresh, and conversion lines.
 import { test, expect } from "bun:test";
 import { litT, makeLocalization, resolveText } from "../../src/core/localization";
-import { COMPOSER, effectLines } from "../../src/items/core/effectText";
+import { COMPOSER, effectLines, maxPlaceholderIndex } from "../../src/items/core/effectText";
 import statItemTags from "../../../data/stat-item-tags.json";
 import gameEn from "../../../data/i18n/game.en.json";
 
@@ -424,18 +424,12 @@ test("every plain label has a composer or carries its own percent", () => {
 test("every templated tag reachable directly from a stat needs no more than the value we supply, except conversion/refresh composers", () => {
   const tags = statItemTags as Record<string, string>;
   const game = gameEn as Record<string, string>;
-  const placeholderIndex = /%[+-]?(?:\.\d)?[a-z](\d)/g;
-  const maxIndex = (t: string) => {
-    let max = -1;
-    for (const m of t.matchAll(placeholderIndex)) max = Math.max(max, Number(m[1]));
-    return max;
-  };
   const isConversion = (stat: string) => stat.startsWith("conversionPercentage");
   const isRefresh = (stat: string) => /^(refreshCooldown|refreshDuration)(Amount|Chance|Max)$/.test(stat);
   const offenders = Object.entries(tags)
     .filter(([stat, tag]) => {
       const text = game[tag];
-      return text?.includes("{") && !isConversion(stat) && !isRefresh(stat) && maxIndex(text) > 0;
+      return text?.includes("{") && !isConversion(stat) && !isRefresh(stat) && maxPlaceholderIndex(text) > 0;
     })
     .map(([stat]) => stat)
     .sort();

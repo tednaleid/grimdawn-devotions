@@ -60,13 +60,16 @@ const DOT_DAMAGE = new Set([
 // value prefix, which is correct for labels that already carry their own "%"
 // ("% Slow target") and for plain counts ("Bleeding Damage" -> "300 Bleeding Damage").
 //
-// The first 8 rows need an actual unit word or "%" the label itself doesn't carry.
-// The remaining rows are plain counts that data/stat-item-tags.json's full catalog
-// (not just the tags real modifier blocks currently use) also requires a row for; each
-// composes through the game's own generic SkillIntFormat/SkillPercentFormat tags, which
-// render identically to the bare-value-prefix fallback for integer values (verified: no
-// non-integer occurrence of any of these stats in data/skill-items.json), so this list
-// is coverage, not a behavior change, for tags already rendering correctly today.
+// Rows composing through SkillSecondFormat, SkillDistanceFormat, SkillCostFormat, or
+// SkillPercentFormat need an actual unit word or "%" the label itself doesn't carry.
+// Rows composing through SkillIntFormat (including ComboChargeLevels) are plain counts
+// that data/stat-item-tags.json's full catalog (not just the tags real modifier blocks
+// currently use) also requires a row for; SkillIntFormat renders identically to the
+// bare-value-prefix fallback for integer values (verified: no non-integer occurrence of
+// any of these stats in data/skill-items.json), so those rows are coverage, not a
+// behavior change, for tags already rendering correctly today - though SkillIntFormat's
+// %d rounds (Math.round) where the bare fallback used String(value), a difference in
+// kind and arguably more game-faithful, not just in coverage, should a non-integer ever occur.
 export const COMPOSER: Record<string, string> = {
   CooldownTime: "SkillSecondFormat", // "Skill Recharge"
   ActiveDuration: "SkillSecondFormat", // "Duration"
@@ -101,21 +104,26 @@ export const COMPOSER: Record<string, string> = {
 
 // A substitution marker inside a `{...}` group: %<sign><precision><conv><index>. Mirrors
 // core/localization.ts's SUBST closely enough to find the highest arg index a template
-// references; it doesn't need to be exported since only this module inspects it.
+// references. Exported so the test suite's coverage guard calls this directly rather than
+// reimplementing it, keeping the guard and this function from silently drifting apart.
 const PLACEHOLDER_INDEX = /%[+-]?(?:\.\d)?[a-z](\d)/g;
 
-function maxPlaceholderIndex(template: string): number {
+export function maxPlaceholderIndex(template: string): number {
   let max = -1;
   for (const m of template.matchAll(PLACEHOLDER_INDEX)) max = Math.max(max, Number(m[1]));
   return max;
 }
 
 // A plain label carries no `{...}` group, so the value cannot ride inside it: every
-// brace group in data/i18n/game.en.json wraps a substitution (verified against the
-// whole catalog), so "does the template contain a brace" is the templated/plain split -
+// brace group in data/i18n/game.en.json wraps a substitution (verified against the whole
+// English catalog), so "does the template contain a brace" is the templated/plain split -
 // narrower checks like "starts with {%" miss sign-prefixed groups such as "{-%.0f0}"
 // (tagCharDefensiveBlockRecoveryReduction, 13 real occurrences) and silently render the
-// raw template text instead of formatting it.
+// raw template text instead of formatting it. This claim is English-only: game.fr.json's
+// DamageKnockdown is "{^}Ede renverser la cible{%t0}", where {^} is a formatting escape
+// with no substitution, not a counterexample in practice (that tag also carries {%t0}, so
+// it classifies as templated under either check in every locale) but a real caveat, since
+// valueLine sees the active locale's template at render time, not always English.
 function valueLine(value: number, tag: string, template: string): Text | null {
   if (!/\{/.test(template)) {
     // A composer supplies the value and its unit, with the label riding in as %s1.
