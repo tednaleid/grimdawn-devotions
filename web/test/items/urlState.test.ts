@@ -46,10 +46,21 @@ test("masteryWide and q round-trip; both are omitted at their default", () => {
   expect(encodeHash(DEFAULT_VIEW)).not.toContain("q=");
 });
 
+test("a hand-edited wide=0 decodes to false, not just left at the default", () => {
+  // The encoder only ever emits wide=1 (masteryWide's default is already false), so this is
+  // the only test that exercises the false branch of `val === "1"` at all.
+  expect(decodeHash("wide=0", known).masteryWide).toBe(false);
+  expect(decodeHash("wide=0", known)).toEqual(DEFAULT_VIEW);
+});
+
 test("an unknown sort key discards the direction with it, leaving no hybrid state", () => {
   expect(decodeHash("sort=bogus:-1", known)).toEqual(DEFAULT_VIEW);
 });
 
-test("a malformed hash tolerates and yields defaults", () => {
+test("a hash with no '=' anywhere is skipped entirely by the pair guard, yielding defaults", () => {
   expect(decodeHash("%%%bad", known)).toEqual(DEFAULT_VIEW);
+});
+
+test("a value that fails decodeURIComponent is dropped via the catch, yielding defaults", () => {
+  expect(decodeHash("q=%zz", known)).toEqual(DEFAULT_VIEW);
 });

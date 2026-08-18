@@ -69,9 +69,60 @@ test("a from_tag survives parseCatalogue unrenamed", () => {
 
 test("parses the committed catalogue", () => {
   const c = parseCatalogue(doc);
+  const raw = doc as any;
+
   expect(c.items.length).toBeGreaterThan(2000);
   expect(c.skills.length).toBeGreaterThan(200);
   expect(c.masteries.length).toBe(10);
+
+  // Field-by-field cross-check against the raw snake_case source, for every record of every
+  // shape - not hand-written expected values, so this stays correct as the data changes and
+  // catches any mapper that mis-keys, hardcodes, or swaps a field. In particular it pins
+  // uiX/uiY (Task 15 lays the skill tree out from exactly these two fields) and nodeKind
+  // (a hardcoded "base" would be invisible on any base-node fixture).
+  expect(c.masteries.length).toBe(raw.masteries.length);
+  c.masteries.forEach((m, i) => {
+    expect(m.record).toBe(raw.masteries[i].record);
+    expect(m.nameTag).toBe(raw.masteries[i].name_tag);
+  });
+
+  expect(c.skills.length).toBe(raw.skills.length);
+  c.skills.forEach((s, i) => {
+    const r = raw.skills[i];
+    expect(s.record).toBe(r.record);
+    expect(s.mastery).toBe(r.mastery);
+    expect(s.group).toBe(r.group);
+    expect(s.nodeKind).toBe(r.node_kind);
+    expect(s.uiX).toBe(r.ui_x);
+    expect(s.uiY).toBe(r.ui_y);
+    expect(s.nameTag).toBe(r.name_tag);
+    expect(s.icon).toBe(r.icon);
+    expect(s.maxLevel).toBe(r.max_level);
+    expect(s.ultimateLevel).toBe(r.ultimate_level);
+  });
+
+  expect(c.items.length).toBe(raw.items.length);
+  c.items.forEach((it, i) => {
+    const r = raw.items[i];
+    expect(it.record).toBe(r.record);
+    expect(it.nameTag).toBe(r.name_tag);
+    expect(it.domain).toBe(r.domain);
+    expect(it.rarity).toBe(r.rarity);
+    expect(it.itemLevel).toBe(r.item_level);
+    expect(it.grimtools).toBe(r.grimtools);
+
+    expect(it.boosts.length).toBe(r.boosts.length);
+    it.boosts.forEach((b, j) => {
+      expect(b.skill).toBe(r.boosts[j].skill);
+      expect(b.level).toBe(r.boosts[j].level);
+    });
+
+    expect(it.masteryBoosts.length).toBe(r.mastery_boosts.length);
+    it.masteryBoosts.forEach((mb, j) => {
+      expect(mb.mastery).toBe(r.mastery_boosts[j].mastery);
+      expect(mb.level).toBe(r.mastery_boosts[j].level);
+    });
+  });
 
   const medal = c.items.find((i) => i.record.endsWith("c010_medal.dbr"));
   expect(medal?.itemLevel).toBe(94);
