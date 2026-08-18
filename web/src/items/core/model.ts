@@ -38,6 +38,9 @@ export interface Skill {
   uiX: number | null;
   uiY: number | null;
   nameTag: string | null;
+  // The skill's own prose, the paragraph the game opens its tooltip with. Present on every
+  // skill today; typed nullable because it is a game field, not one this page controls.
+  descriptionTag: string | null;
   icon: string;
   maxLevel: number;
   ultimateLevel: number;
@@ -123,6 +126,7 @@ interface RawSkill {
   ui_x: number | null;
   ui_y: number | null;
   name_tag: string | null;
+  description_tag: string | null;
   icon: string;
   max_level: number;
   ultimate_level: number;
@@ -195,6 +199,7 @@ function mapSkill(r: RawSkill): Skill {
     uiX: r.ui_x,
     uiY: r.ui_y,
     nameTag: r.name_tag,
+    descriptionTag: r.description_tag ?? null,
     icon: r.icon,
     maxLevel: r.max_level,
     ultimateLevel: r.ultimate_level,

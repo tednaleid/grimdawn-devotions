@@ -207,14 +207,21 @@ function attachSkillCard(
     if (!skill) return;
     card.innerHTML = skillCardMarkup(skill, loc, effectCtx);
     card.hidden = false;
-    // Anchor to the node, then pull back inside the tree box so a card on the right-hand column
-    // is not clipped away. Measured after unhiding: a hidden element has no size.
-    const box = node.getBoundingClientRect();
+    // Anchor to the node's own shape, NOT to its <g>. The group also holds the icon <image>,
+    // which is the whole sprite sheet shifted into place and clipped: a clip-path does not shrink
+    // the reported box, so the <g> measures the entire sheet and reports a left of -302 for a
+    // node sitting at x=139. The shape is the node's real box.
+    const box = (node.querySelector(".node-shape") ?? node).getBoundingClientRect();
     const wrap = treeEl.getBoundingClientRect();
-    const left = Math.min(box.left - wrap.left + box.width + 8, Math.max(0, wrap.width - card.offsetWidth - 4));
-    const top = Math.min(box.top - wrap.top, Math.max(0, wrap.height - card.offsetHeight - 4));
-    card.style.left = `${Math.max(0, left)}px`;
-    card.style.top = `${Math.max(0, top)}px`;
+    const gap = 8;
+    // Beside the node, and on whichever side it fits. Clamping a right-column card back inside
+    // the box instead would park it on top of the node the reader is pointing at.
+    const toRight = box.left - wrap.left + box.width + gap;
+    const toLeft = box.left - wrap.left - card.offsetWidth - gap;
+    const left = toRight + card.offsetWidth <= wrap.width || toLeft < 0 ? toRight : toLeft;
+    const top = box.top - wrap.top;
+    card.style.left = `${Math.max(0, Math.min(left, Math.max(0, wrap.width - card.offsetWidth)))}px`;
+    card.style.top = `${Math.max(0, Math.min(top, Math.max(0, wrap.height - card.offsetHeight)))}px`;
   };
   const hide = () => {
     card.hidden = true;

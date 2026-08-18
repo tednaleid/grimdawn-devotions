@@ -149,6 +149,7 @@ def main(argv=None) -> int:
             "record": s["record"], "mastery": s["mastery_record"],
             "group": s["group_record"], "node_kind": s["node_kind"],
             "ui_x": s["ui_x"], "ui_y": s["ui_y"], "name_tag": s["name_tag"],
+            "description_tag": s["description_tag"],
             "icon": s["icon"], "max_level": s["max_level"],
             "ultimate_level": s["ultimate_level"],
             "ranks": ranks_by_skill.get(s["record"], []),

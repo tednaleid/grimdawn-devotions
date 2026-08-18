@@ -91,7 +91,11 @@
   border-radius: 6px;
   background: var(--it-panel);
   padding: 10px 14px 14px;
-  /* The hover card is absolutely positioned against this box, so it follows the tree. */
+}
+/* The hover card is absolutely positioned against the tree box and measured against it too:
+   position it against the padded wrapper instead and every card sits the label's height too high,
+   because the offsets would be computed in one box and applied in another. */
+.items-page #items-tree {
   position: relative;
 }
 /* The skill's own card, shown while a node is hovered or focused: what an item's modifier is
@@ -113,6 +117,11 @@
   margin: 0 0 4px;
   font-size: 13.5px;
   color: var(--it-ink);
+}
+.items-page .skill-card .skill-card-desc {
+  margin: 0 0 2px;
+  color: var(--it-mut);
+  line-height: 1.35;
 }
 .items-page .skill-card .skill-card-rank {
   margin: 6px 0 2px;

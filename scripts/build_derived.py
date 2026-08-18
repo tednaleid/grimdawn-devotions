@@ -708,6 +708,12 @@ def build_skills(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> i
             j.node_kind,
             j.ui_x, j.ui_y,
             j.tag AS name_tag,
+            -- The skill's own prose, the paragraph the game's tooltip opens with. Present on
+            -- all 315 skills, and the only thing a node with no renderable stat line has to
+            -- say for itself (Manifestation's whole card was empty without it).
+            (SELECT f.value FROM facts f
+              WHERE f.record = j.effect_record AND f.key = 'skillBaseDescription')
+                AS description_tag,
             -- Stored verbatim: the sprite index in data/skill-icons.json is keyed
             -- by the same `ui/skills/icons/...` path, so this joins with no
             -- string surgery on either side.

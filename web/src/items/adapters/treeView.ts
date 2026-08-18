@@ -147,7 +147,6 @@ function nodeMarkup(
   const name = esc(ctx.nameOf(skill));
   return (
     `<g class="${cls}" data-group="${esc(skill.group)}" data-record="${esc(skill.record)}" aria-label="${name}" aria-pressed="${pressed}" tabindex="0" role="button">` +
-    `<title>${name}</title>` +
     `<clipPath id="${clipId}">${clip}</clipPath>` +
     border +
     icon +

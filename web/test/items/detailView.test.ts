@@ -236,6 +236,7 @@ const petSkill: Skill = {
   uiX: 0,
   uiY: 0,
   nameTag: null,
+  descriptionTag: null,
   icon: "",
   maxLevel: 12,
   ultimateLevel: 22,

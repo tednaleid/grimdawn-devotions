@@ -106,6 +106,9 @@ def collect_referenced_tags(
     for key in ("masteries", "skills", "items"):
         for row in (skill_items or {}).get(key, []):
             _add(tags, row.get("name_tag"))
+    # The skill's own prose, shown on the tree's hover card.
+    for skill in (skill_items or {}).get("skills", []):
+        _add(tags, skill.get("description_tag"))
     for skill in (skill_items or {}).get("skills", []):
         for pet in skill.get("pets", []):
             _add(tags, pet.get("name_tag"))

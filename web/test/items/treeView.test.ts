@@ -72,6 +72,8 @@ test("every node gets an icon from the real sprite index: no missing icon", () =
   }
 });
 
+// No <title>: the browser renders one as a native tooltip, which raced the hover card and put a
+// small bare-name box under the cursor while the card showed. aria-label still names the node.
 test("accessible name is resolved via ctx.nameOf, including a null-nameTag fallback", () => {
   const skills: Skill[] = [
     {
@@ -82,6 +84,7 @@ test("accessible name is resolved via ctx.nameOf, including a null-nameTag fallb
       uiX: 246,
       uiY: 39,
       nameTag: "tagFoo",
+      descriptionTag: null,
       icon: "i1",
       maxLevel: 1,
       ultimateLevel: 1,
@@ -96,6 +99,7 @@ test("accessible name is resolved via ctx.nameOf, including a null-nameTag fallb
       uiX: 326,
       uiY: 39,
       nameTag: null,
+      descriptionTag: null,
       icon: "i2",
       maxLevel: 1,
       ultimateLevel: 1,
@@ -109,9 +113,7 @@ test("accessible name is resolved via ctx.nameOf, including a null-nameTag fallb
   };
   const markup = buildTreeMarkup(skills, "m", NONE, namedCtx);
   expect(markup).toContain('aria-label="Named:tagFoo"');
-  expect(markup).toContain("<title>Named:tagFoo</title>");
   expect(markup).toContain('aria-label="r2"');
-  expect(markup).toContain("<title>r2</title>");
 });
 
 // The four Fangs of Asterkarn shapeshift abilities carry null ui_x/ui_y (playerclass10 /

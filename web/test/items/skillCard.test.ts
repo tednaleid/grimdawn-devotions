@@ -101,3 +101,30 @@ test("every skill in the catalogue renders a card with a name and no empty list"
     for (const line of lines(html)) expect(resolveText(en.loc, { k: "lit", s: line })).not.toBe("");
   }
 });
+
+// Manifestation is the case that motivated carrying the description: every one of its rank stats
+// is an engine internal the tag table does not name, so before this its card was a bare heading.
+test("a skill with no renderable stat line still has its own prose", () => {
+  const manifestation = skill("elementalinfusion1b.dbr");
+  const html = skillCardMarkup(manifestation, en.loc, en.ctx);
+  expect(html).toContain("<h4>Manifestation</h4>");
+  expect(html).toContain("skill-card-desc");
+  expect(html).toContain("Arcane energies manifest in many forms");
+});
+
+test("no skill renders a card that is only a heading", () => {
+  const bare = catalogue.skills.filter((s) => {
+    const html = skillCardMarkup(s, en.loc, en.ctx);
+    return !html.includes("<li>") && !html.includes("skill-card-desc");
+  });
+  expect(bare.map((s) => s.record)).toEqual([]);
+});
+
+test("an unresolved description tag is dropped rather than printed as its own tag name", () => {
+  // gameText falls back to the tag string for an unknown tag, which would put
+  // "tagClass05SkillDescription02D" on the card as if it were prose.
+  const ghost = { ...skill("cadence1.dbr"), descriptionTag: "tagNoSuchDescription" };
+  const html = skillCardMarkup(ghost, en.loc, en.ctx);
+  expect(html).not.toContain("tagNoSuchDescription");
+  expect(html).not.toContain("skill-card-desc");
+});

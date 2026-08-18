@@ -44,6 +44,12 @@ export function skillCardMarkup(skill: Skill, loc: Localization, ctx: EffectCont
       .map((s) => `<li>${esc(s)}</li>`)
       .join("");
 
+  // The game's own prose for this skill, the paragraph its tooltip opens with. It is what a node
+  // with no renderable stat line has to say for itself: Manifestation's card was empty without
+  // it, because every one of its rank stats is an engine internal the tag table does not name.
+  const desc = skill.descriptionTag ? loc.gameText(skill.descriptionTag) : "";
+  const descHtml = desc && desc !== skill.descriptionTag ? `<p class="skill-card-desc">${esc(desc)}</p>` : "";
+
   const maxLines = effectLines(rankStats(skill.ranks, "max"), ctx);
   const blocks: string[] = [];
   if (maxLines.length) {
@@ -57,5 +63,5 @@ export function skillCardMarkup(skill: Skill, loc: Localization, ctx: EffectCont
       blocks.push(`<p class="skill-card-rank">${caption}</p><ul>${render(ultLines)}</ul>`);
     }
   }
-  return `<h4>${name}</h4>${blocks.join("")}`;
+  return `<h4>${name}</h4>${descHtml}${blocks.join("")}`;
 }
