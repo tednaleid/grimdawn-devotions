@@ -1182,6 +1182,32 @@ Any new tag used must be added to `COMPOSER_TAGS` in `scripts/build_game_tables.
 the locale tables regenerated with `just i18n-tables-rebuild` (never `just i18n-tables`
 while the game is running). Task 8's C1 was caused by exactly that omission.
 
+**Third item, added after a grimtools check during Task 9's fix round.** An
+`offensiveSlow<X>Chance` that HAS a value sibling is not noise to drop - the game folds
+it into the composed damage-over-time line as a leading chance. Mythical Viperfang Grips
+(`records/items/upgraded/gearhands/d007_hands.dbr`), Blood of Dreeg block:
+
+    characterAttackSpeedModifier    8
+    offensiveSlowPoisonChance      10
+    offensiveSlowPoisonDurationMin  5
+    offensiveSlowPoisonMin        108
+
+    grimtools: ["10% Chance of 540 Poison Damage over 5 Seconds", "+8% Attack Speed"]
+    ours:      ["+8% Attack Speed", "10 Poison Damage", "540 Poison Damage over 5 Seconds"]
+
+The 540 (108 x 5) is already right. Two things are wrong: a spurious "10 Poison Damage"
+line, and the missing chance prefix. The prefix tag is `tagChanceOf`
+(`{%.1f0}% Chance of `), which is NOT currently collected into `data/i18n/game.en.json`,
+so it needs adding to `COMPOSER_TAGS` and a `just i18n-tables-rebuild`. Note the raw
+game string carries `{^E}`/`{^H}` formatting escapes and an unbalanced brace before
+"Chance of"; check how `applyGameFormat` treats those before assuming a plain
+concatenation. Only 1 block in the dataset exhibits this, and Task 9's fix round left a
+documenting test pinning the current wrong output - update that test rather than adding
+a second one.
+
+Do NOT extend this to the no-sibling case: Task 8b already suppresses that, verified
+against Awakened Inscribed Bracers where grimtools renders the block not at all.
+
 **Acceptance:** the render sweep over every modifier block emits a complete line for all
 6 spark occurrences and the 1 racial occurrence, with no line ending in a dangling
 preposition, and Task 9's R14 guard still passes because nothing is left truncated.
