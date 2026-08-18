@@ -947,3 +947,21 @@ either. That one is deliberate, not an oversight - the justfile notes those test
 need `extracted/text_en` and would "fail with no explanation on a clean clone
 without it". Making them skip cleanly when the extraction is absent would let
 `check` cover them.
+
+## Static page chrome does not re-render on a language switch
+
+Both the items page and the resistance-reduction page build their skeleton once and
+never rebuild it, so switching language updates the chips, the `<option>` labels and the
+table rows while the column headers, control labels, search placeholder and Reset button
+stay in the previous language.
+
+`web/src/items/adapters/tableView.ts` builds the skeleton once and `main.ts`'s `onSelect`
+calls `refresh("replace")`, which only re-renders the body. `web/src/rr/adapters/
+tableView.ts` has the identical structure, so this is an inherited pattern rather than a
+regression introduced by the items page - but the items page makes it more visible,
+because its two selects sit directly beside their stale labels.
+
+Found during the Tasks 12-13 review of the items-page build. Not fixed there because it
+predates that work and spans two pages, so it wants one change that covers both rather
+than a copy in each. The fix is to give the skeleton a rebuild path that the locale
+change calls, or to have the locale change tear down and re-render the whole view.
