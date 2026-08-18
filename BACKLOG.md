@@ -742,6 +742,7 @@ artifact policy, item source, grimtools boundary).
    at build 19149150 - and is designed so that this walk resolves more of
    those `unknown` items automatically once it lands, with no change to the
    CLI's interface.
+
 ### Unsequenced follow-ups
 
 - **Engine bake-off: facet bitmaps vs DuckDB-WASM.** Decide the browser query

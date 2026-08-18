@@ -73,6 +73,14 @@ export function applyGameFormat(template: string, args: FormatArg[], resolve: (t
         if (typeof a === "object") return resolve(a);
         return fmtNumber(Number(a), sign, precision, "f");
       }
+      // A [min, max] tuple can reach any numeric conversion, not just %t (effectText.ts's RANGE
+      // branch hands one to whatever tag the stat happens to carry - see the "NaN Fragments" bug
+      // this fixed: projectileFragmentsLaunchNumberMin/Max on Rune of Kalastor's Concussive Rune
+      // pet renders through a %d tag). Format both halves at THIS conversion's own sign/precision
+      // and join with a hyphen, so a future numeric conversion can't reintroduce the bug by
+      // omitting its own array check.
+      if (Array.isArray(a))
+        return `${fmtNumber(a[0], sign, precision, conv)}-${fmtNumber(a[1], sign, precision, conv)}`;
       return fmtNumber(Number(a), sign, precision, conv);
     }),
   );

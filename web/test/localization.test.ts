@@ -109,6 +109,12 @@ describe("applyGameFormat", () => {
   test("t renders a lone number plainly", () => {
     expect(applyGameFormat("{%t0} Fire Damage", [200], r)).toBe("200 Fire Damage");
   });
+  test("a range through a %d template renders as a hyphenated pair, not NaN", () => {
+    // Regression: projectileFragmentsLaunchNumberMin/Max on Rune of Kalastor's Concussive
+    // Rune pet reaches DamageTaunt-style %d templates via effectText.ts's RANGE branch, which
+    // hands a [min, max] tuple to whatever conversion the tag uses, not just %t.
+    expect(applyGameFormat("{%d0} Fragments", [[2, 3]], r)).toBe("2-3 Fragments");
+  });
   test("an unsupplied argument leaves no token behind", () => {
     expect(applyGameFormat("{%t0} to reduce cooldown by {%.1f1} {%z2}", [], r)).toBe("to reduce cooldown by");
   });
