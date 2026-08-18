@@ -118,6 +118,15 @@ export function maxPlaceholderIndex(template: string): number {
   return max;
 }
 
+// A single value, or a [min, max] pair for a collapsed Min/Max range line. Kept as one type
+// (rather than a range-only sibling function) so plain-vs-templated stays a single decision
+// point in valueLine - see the fix-1 note below on why that property matters.
+type LineValue = number | [number, number];
+
+function bareValue(value: LineValue): string {
+  return Array.isArray(value) ? `${value[0]}-${value[1]}` : String(value);
+}
+
 // A plain label carries no `{...}` group, so the value cannot ride inside it: every
 // brace group in data/i18n/game.en.json wraps a substitution (verified against the whole
 // English catalog), so "does the template contain a brace" is the templated/plain split -
@@ -128,21 +137,38 @@ export function maxPlaceholderIndex(template: string): number {
 // with no substitution, not a counterexample in practice (that tag also carries {%t0}, so
 // it classifies as templated under either check in every locale) but a real caveat, since
 // valueLine sees the active locale's template at render time, not always English.
-function valueLine(value: number, tag: string, template: string): Text | null {
+//
+// The RANGE branch below routes both a scalar and a [min, max] pair through here rather than
+// calling gameFormatT itself, so this stays the ONE place deciding plain-versus-templated
+// (fix-1): a direct gameFormatT([[min,max]]) call substitutes fine into a templated tag's
+// {%t0}, but on a PLAIN tag (no placeholder at all) it has nothing to substitute into and
+// silently drops both numbers - found on Wind Devil's Howling Wind ability
+// (offensiveSlowLightningMin/Max sharing the plain DamageDurationLightning = "Electrocute
+// Damage", with no DurationMin sibling to route it through the DOT branch instead).
+function valueLine(value: LineValue, tag: string, template: string): Text | null {
   if (!/\{/.test(template)) {
-    // A composer supplies the value and its unit, with the label riding in as %s1.
-    const composer = COMPOSER[tag];
-    if (composer) return gameFormatT(composer, [value, gameT(tag)]);
+    // A composer supplies the value and its unit, with the label riding in as %s1 - but
+    // composer templates (SkillSecondFormat, SkillIntFormat, ...) are authored for a single
+    // formatted number (%d/%.Nf), not a range, so a range value skips the composer and
+    // renders as a bare "min-max label" instead, the same shape an uncomposed scalar already
+    // takes. DamageDurationLightning is itself composer-mapped (SkillIntFormat) for its
+    // ordinary scalar case; only the range call bypasses it.
+    if (!Array.isArray(value)) {
+      const composer = COMPOSER[tag];
+      if (composer) return gameFormatT(composer, [value, gameT(tag)]);
+    }
     const label = gameT(tag);
     // A label that already begins with its own percent takes no separator, so
     // "% Slow target" reads "25% Slow target" rather than "25 % Slow target".
-    return template.startsWith("%") ? joinT(String(value), label) : joinT(String(value), " ", label);
+    return template.startsWith("%") ? joinT(bareValue(value), label) : joinT(bareValue(value), " ", label);
   }
   // A tag's own template can reference an argument beyond the single value supplied
   // here - a racial-target name (racialBonusPercentDamage), a target count
   // (sparkChance) - that the pipeline doesn't carry upstream. Dropping just the
   // unfilled {...} group still leaves stray literal text outside it ("+16% Damage to"),
-  // so the whole line is suppressed rather than shipping a truncated sentence.
+  // so the whole line is suppressed rather than shipping a truncated sentence. No real Min/Max
+  // pair reaches this guard today (racialBonusPercentDamage and sparkChance are standalone
+  // stats, not <family>Min/<family>Max), but it now covers a hypothetical range value too.
   if (maxPlaceholderIndex(template) > 0) return null;
   return gameFormatT(tag, [value]);
 }
@@ -273,7 +299,7 @@ function renderOne(
       used.add(s.stat);
       used.add(partner.stat);
       const [minValue, maxValue] = m[2] === "Min" ? [s.value, partner.value] : [partner.value, s.value];
-      return gameFormatT(tag, [[minValue, maxValue] as FormatArg]);
+      return valueLine([minValue, maxValue], tag, template);
     }
   }
   used.add(s.stat);

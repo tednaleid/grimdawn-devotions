@@ -124,7 +124,11 @@ function petPanelHtml(ctx: DetailContext, pet: PetBlock): string {
     : "";
   const unnamedHtml = unnamedLines ? `<ul class="pet-ability-plain">${unnamedLines}</ul>` : "";
 
-  return `<details class="pet-panel">
+  // data-pet-key: PetBlock.record is a specific dbr path, unique per skill, so tableView.ts can
+  // use it to restore this panel's open/closed state after a rebuild (native <details> state
+  // lives in the DOM element itself, which does not survive renderBody replacing the row's
+  // markup - fix-1).
+  return `<details class="pet-panel" data-pet-key="${esc(pet.record)}">
     <summary>${render(loc, gameT(pet.nameTag))}</summary>
     <ul class="pet-own-stats">${ownLines}</ul>
     ${namedHtml}${unnamedHtml}

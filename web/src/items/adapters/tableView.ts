@@ -20,6 +20,28 @@ export interface TableHandlers {
 // derivable from that item's own data. A page reload always starts collapsed.
 const expandedRecords = new Set<string>();
 
+// Open pet <details> panels, keyed by PetBlock.record (a specific dbr path, unique per skill).
+// Native <details> open/closed state lives in the DOM element itself, and renderBody rebuilds
+// every expanded row's detail markup on every call (toggling another row, sorting, a locale
+// switch) - without tracking it separately here, opening a pet panel and then touching anything
+// else on the page silently re-closes it (fix-1). Same rationale as expandedRecords: not in
+// ViewState/the hash, since it doesn't change which items match the current filters.
+const openPetPanels = new Set<string>();
+
+// Restores each pet panel's open state from openPetPanels after (re)inserting a detail row's
+// markup, and keeps openPetPanels in sync with the user's own toggling from then on. Attached
+// directly to each <details> (its "toggle" event does not bubble), not delegated on the tbody.
+function restorePetPanels(detailEl: HTMLElement): void {
+  detailEl.querySelectorAll<HTMLDetailsElement>(".pet-panel[data-pet-key]").forEach((details) => {
+    const key = details.dataset.petKey!;
+    details.open = openPetPanels.has(key);
+    details.addEventListener("toggle", () => {
+      if (details.open) openPetPanels.add(key);
+      else openPetPanels.delete(key);
+    });
+  });
+}
+
 // Single-instance page: the latest render inputs, so the wired-once listeners see current state.
 let ctx: {
   view: ViewState;
@@ -230,7 +252,9 @@ function renderBody(el: HTMLElement, loc: Localization, rows: Row[], detailCtx: 
     detailTr.className = "item-detail-row";
     const td = document.createElement("td");
     td.colSpan = COLS.length;
-    td.appendChild(renderDetail(row.item, detailCtx));
+    const detailEl = renderDetail(row.item, detailCtx);
+    td.appendChild(detailEl);
+    restorePetPanels(detailEl);
     detailTr.appendChild(td);
     summaryTr.after(detailTr);
   });

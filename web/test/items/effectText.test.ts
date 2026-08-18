@@ -146,6 +146,7 @@ const CARD_TAGS: Record<string, string> = {
   offensiveSlowPoisonDurationMin: "DamageDurationPoison",
   offensiveSlowPoisonChance: "DamageDurationPoison",
   offensiveSlowLightningMin: "DamageDurationLightning",
+  offensiveSlowLightningMax: "DamageDurationLightning",
   offensiveSlowLightningDurationMin: "DamageDurationLightning",
   offensiveSlowLightningChance: "DamageDurationLightning",
   offensiveSlowFireMin: "DamageDurationFire",
@@ -338,6 +339,24 @@ test("Awakened Inscribed Bracers: Wind Devil renders nothing, Judgment and Winds
       { stat: "offensiveSlowColdMin", value: 120 },
     ]),
   ).toEqual(["360 Frostburn Damage over 3 Seconds"]);
+});
+
+// fix-1: the real Wind Devil shape that WAS silently dropping its numbers. Howling Wind
+// (records/skills/playerclass06/pets/petskill_whirlwind_whirlwind.dbr) carries
+// offensiveSlowLightningMin/Max but no offensiveSlowLightningDurationMin sibling, so the DOT
+// branch above can't fire and this falls to the RANGE branch. DamageDurationLightning's real
+// template is plain ("Electrocute Damage", no {}), and the RANGE branch used to call
+// gameFormatT([[min,max]]) directly, which has nothing to substitute a bracket-less template
+// into: the line rendered as the bare label "Electrocute Damage" with both numbers gone. Routing
+// through valueLine (as this branch now does) renders the bare "min-max label" shape instead,
+// the same way an uncomposed scalar already does. Values are the real max-rank pair (213/265).
+test("Wind Devil: a Min/Max pair on a plain shared tag renders as a bare range, not a bare label with no numbers", () => {
+  expect(
+    cardRender([
+      { stat: "offensiveSlowLightningMax", value: 265 },
+      { stat: "offensiveSlowLightningMin", value: 213 },
+    ]),
+  ).toEqual(["213-265 Electrocute Damage"]);
 });
 
 // fix round 1, I4a: a plain (non-templated) label reaching the ordinary fallback - not the DOT
