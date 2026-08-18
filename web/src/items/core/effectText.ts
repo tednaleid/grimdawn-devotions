@@ -42,19 +42,25 @@ function renderOne(
   ctx: EffectContext,
   tag: string,
 ): Text | null {
-  used.add(s.stat);
   const template = ctx.templateOf(tag);
   if (!template) return null;
 
-  // A Min with its Max is one range line; a lone Min is a single value. Min appears
-  // alone far more often than paired (1,715 against 80), so the lone case is normal.
+  // A Min and its Max collapse into one range line, regardless of which one appears first
+  // in the stat list: the real data orders by stat id, and "Max" sorts before "Min", so every
+  // paired block in data/skill-items.json hits Max first. A lone half is a single value (far
+  // more common than paired: 1,715 lone-Min against 80 paired). Don't mark either stat used
+  // until we know how the pair renders, or a Max seen before its Min emits a spurious line.
   const m = s.stat.match(RANGE);
-  if (m && m[2] === "Min") {
-    const max = byId.get(`${m[1]}Max`);
-    if (max) {
-      used.add(max.stat);
-      return gameFormatT(tag, [[s.value, max.value] as FormatArg]);
+  if (m) {
+    const partnerId = `${m[1]}${m[2] === "Min" ? "Max" : "Min"}`;
+    const partner = byId.get(partnerId);
+    if (partner && !used.has(partner.stat)) {
+      used.add(s.stat);
+      used.add(partner.stat);
+      const [minValue, maxValue] = m[2] === "Min" ? [s.value, partner.value] : [partner.value, s.value];
+      return gameFormatT(tag, [[minValue, maxValue] as FormatArg]);
     }
   }
+  used.add(s.stat);
   return gameFormatT(tag, [s.value]);
 }

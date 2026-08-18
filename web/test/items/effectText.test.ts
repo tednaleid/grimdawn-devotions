@@ -40,3 +40,36 @@ test("min and max collapse into one range line", () => {
 test("an unknown stat is dropped rather than rendered raw", () => {
   expect(render([{ stat: "overwriteBaseSkill", value: 1 }])).toEqual([]);
 });
+
+// The real data (data/skill-items.json) orders stats by id, and "Max" sorts before "Min",
+// so every one of the 80 paired min/max blocks in the actual dataset hits Max first. The
+// "min and max collapse" test above never exercises that ordering.
+test("max before min still collapses to one range line, values ordered min-max", () => {
+  expect(
+    render([
+      { stat: "offensiveFireMax", value: 180 },
+      { stat: "offensiveFireMin", value: 120 },
+    ]),
+  ).toEqual(["120-180 Fire Damage"]);
+});
+test("min before max still yields exactly one range line (guards the other ordering)", () => {
+  expect(
+    render([
+      { stat: "offensiveFireMin", value: 120 },
+      { stat: "offensiveFireMax", value: 180 },
+    ]),
+  ).toEqual(["120-180 Fire Damage"]);
+});
+test("a max-before-min pair among other stats renders at the pair's first-appearing position", () => {
+  expect(
+    render([
+      { stat: "characterAttackSpeed", value: 5 },
+      { stat: "offensiveFireMax", value: 180 },
+      { stat: "weaponDamagePct", value: 20 },
+      { stat: "offensiveFireMin", value: 120 },
+    ]),
+  ).toEqual(["+5% Attack Speed", "120-180 Fire Damage", "20% Weapon Damage"]);
+});
+test("a lone max renders as a single value, not dropped", () => {
+  expect(render([{ stat: "offensiveFireMax", value: 180 }])).toEqual(["180 Fire Damage"]);
+});
