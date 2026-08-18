@@ -1500,7 +1500,21 @@ git commit -m "feat(items): render the item table with facets and hash state"
 - Modify: `web/src/items/adapters/tableView.ts`
 
 **Interfaces:**
-- Produces: `export function renderDetail(item: Item, ctx: DetailContext): HTMLElement` showing every skill the item touches with its lines, plus the grimtools link.
+- Produces:
+  ```ts
+  // Everything the three steps below actually need, and nothing more. EffectContext
+  // (tagOf / templateOf / nameOf) is exported from items/core/effectText and is what
+  // effectLines consumes; nameOf already covers the skill names for modifier blocks
+  // and level grants, so only the mastery names and the resolver are new.
+  export interface DetailContext extends EffectContext {
+    loc: Localization;                                  // resolves Text and catalog keys
+    masteryNameOf: (record: string) => Text | undefined; // for item.masteryBoosts
+  }
+  export function renderDetail(item: Item, ctx: DetailContext): HTMLElement;
+  ```
+  Shows every skill the item touches with its lines, plus the grimtools link. Extend
+  `DetailContext` if a step genuinely needs more, but do not reach for a global
+  resolver: the i18n boundary guard (`web/test/i18nBoundary.test.ts`) forbids it.
 
 - [ ] **Step 1: Write the row expansion.** Clicking a row toggles a detail row beneath it. Reuse `effectLines` per modifier block, and list level grants separately.
 - [ ] **Step 2: Add the grimtools link** from `item.grimtools`, opening in a new tab, labelled with a catalog key.
