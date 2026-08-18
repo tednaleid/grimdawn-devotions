@@ -62,6 +62,21 @@ deposit and absent from the derived schema. Deposit-wide: `refreshCooldownTrigge
 Note that the target skill is a different skill from the block the modifier sits on.
 Code that assumes the refresh applies to the modified skill will mislabel 115 records.
 
+**Most trigger values are the template default, not a selection.** 851 of the 964
+`refreshCooldownTrigger` values are the complete 13-token enum
+(`OnEquip;OnKill;LowHealth;LowMana;AttackEnemy;...`), which means the record made no
+choice. Only 117 records name a real trigger, and just five distinct values occur:
+`AttackEnemy` (63), `AttackEnemyCrit` (25), `Block` (12), `HitByEnemy` (11), `OnKill`
+(6). `refreshDurationTrigger` is the same shape, 861 defaulted of 920. A reader that
+trusts the field verbatim prints the whole enum onto the card. Any multi-token value
+is treated as absent.
+
+The game names each trigger with a numbered condition tag, and all five used values
+have one: `AttackEnemy` is `tagRefreshSkillCondition07` ("Chance on Attack"),
+`HitByEnemy` is 03, `AttackEnemyCrit` is 10, `Block` is 11, `OnKill` is 12. Twelve
+condition tags exist against thirteen enum tokens; `CastDebuf` has no tag and is never
+used alone, so the mapping is total over the data.
+
 ## Effect text: the model
 
 The game composes a stat line from its own tag tables. We reproduce that composition
@@ -84,16 +99,34 @@ Measured over the 287 distinct stats the payload uses:
   occurrences across 108 items. The other 22 are weapon-class requirement tokens and
   engine geometry the game genuinely never renders, and they stay excluded.
 
-Exactly 11 placeholder shapes appear across every tag we use:
+Eleven placeholder shapes appear across the tags currently in the narrowed tables:
 
 ```
 {%.0f0} {%+.0f0} {%.1f0} {%+.1f0} {%d0} {%d1} {-%.0f0} {%.0f0%} {%t0} {%s1} {%s2}
 ```
 
-`{%t0}` is the range token, fed a min-max pair. `{%s1}` and `{%s2}` are the string
-arguments of `tagDamageConversion = "{%.0f0}% {%s1} converted to {%s2}"`, already
-carried in the payload as `from_tag` and `to_tag` on 795 entries. The rest are
-numeric formats differing in precision, forced sign, and negation.
+`{%s1}` and `{%s2}` are the string arguments of
+`tagDamageConversion = "{%.0f0}% {%s1} converted to {%s2}"`, already carried in the
+payload as `from_tag` and `to_tag` on 795 entries. Most of the rest are numeric
+formats differing in precision, forced sign, and negation.
+
+The composed-line tags that phase 2 adds bring one more shape and overload an
+existing one, so the formatter must handle both from the start:
+
+```
+tagSkillCooldownRefreshName = "{%t0} to reduce cooldown of {%s1} by {%.1f2} {%z3}"
+tagSkillCooldownRefresh     = "{%t0} to reduce cooldown by {%.1f1} {%z2}"
+tagSkillDurationRefresh     = "{%t0} to extend duration by {%.1f1} {%z2}"
+tagRefreshSkillCondition07  = "{%d0}% Chance on Attack"
+```
+
+- **`{%t0}` is overloaded.** In `DamageFire` it is a numeric min-max range. In
+  `tagSkillCooldownRefreshName` it is a nested text slot holding an already-rendered
+  condition line. The formatter resolves an argument by its supplied type, not by the
+  placeholder spelling, so a `Text` argument nests and a number pair ranges.
+- **`{%zN}` is a pluralizing unit**, resolved to `tagSecond` or `tagSeconds` against
+  the accompanying value. Both tags exist in every locale, so plural selection stays
+  in the game's vocabulary rather than in our code.
 
 The composers are game tags too, so they localize with everything else:
 
