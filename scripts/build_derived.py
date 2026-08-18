@@ -1471,6 +1471,32 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
             -- table through it alone would otherwise carry nothing renderable.
             WHERE lower(trim(m.value)) IN (SELECT record FROM skills)
         ),
+        -- The refresh families name a target skill and a trigger in sibling string
+        -- keys that the numeric stat gate drops. They ride along on the rows that
+        -- have them, matched on the family prefix, exactly as conv does for
+        -- conversions.
+        --
+        -- A trigger holding more than one token is the template's untouched default
+        -- (the full 13-value enum), not a selection, so it is read as absent.
+        --
+        -- The guard is defensive rather than load-bearing: at build 24756825 no record
+        -- pairs a defaulted enum with a non-zero refresh amount, so the numeric stat
+        -- gate has already dropped every row this could catch. It stays because the
+        -- alternative failure is silent and ugly (the whole enum printed onto a card),
+        -- and test_no_record_pairs_a_defaulted_trigger_with_a_real_amount fails the
+        -- moment that stops being true.
+        refresh_qual AS (
+            SELECT record,
+                   regexp_extract(key, '^(refreshCooldown|refreshDuration)', 1) AS family,
+                   max(CASE WHEN key LIKE '%Skill' THEN trim(value) END) AS refresh_skill,
+                   max(CASE WHEN key LIKE '%Trigger' AND trim(value) NOT LIKE '%;%'
+                            THEN trim(value) END) AS refresh_trigger
+            FROM facts
+            WHERE (key IN ('refreshCooldownSkill', 'refreshCooldownTrigger',
+                           'refreshDurationSkill', 'refreshDurationTrigger'))
+              AND trim(value) != ''
+            GROUP BY 1, 2
+        ),
         {stat_carrier_walk("SELECT DISTINCT modifier_record, modifier_record, 0 "
                            "FROM paired",
                            f"f.key NOT IN ({excluded}) "
@@ -1479,7 +1505,9 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
                f.key AS stat_id,
                {first_rank} AS value,
                c.from_type,
-               c.to_type
+               c.to_type,
+               rq.refresh_skill,
+               rq.refresh_trigger
         FROM paired p
         JOIN stat_record sr ON sr.root = p.modifier_record
         JOIN facts f ON f.record = sr.cur
@@ -1492,6 +1520,12 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
         LEFT JOIN conv c ON c.record = sr.cur
                         AND f.key LIKE 'conversionPercentage%'
                         AND c.n = {conv_n.format("f.key")}
+        -- regexp_extract returns '' for a non-refresh key, and no refresh_qual row
+        -- has an empty family, so this join finds nothing on unrelated stats
+        -- without needing a guard.
+        LEFT JOIN refresh_qual rq ON rq.record = sr.cur
+                                 AND rq.family = regexp_extract(
+                                       f.key, '^(refreshCooldown|refreshDuration)', 1)
         WHERE f.key NOT IN ({excluded})
           AND coalesce({first_rank}, 0) != 0""")
     out = out_dir / "skill_modifiers.parquet"
