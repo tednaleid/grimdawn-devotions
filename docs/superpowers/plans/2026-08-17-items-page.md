@@ -396,10 +396,31 @@ i18n-tables-rebuild *LANGS:
     [ -n "$skipped" ] && echo "skipped:$skipped" || true
 ```
 
-- [ ] **Step 2: Verify it runs with the game open and changes nothing yet**
+- [ ] **Step 2: Verify it runs with the game open and produces exactly the expected delta**
 
-Run: `git status --short data/i18n/ && just i18n-tables-rebuild && git status --short data/i18n/`
-Expected: 13 languages reported under `built:`, and no file content changes, because the tag selection has not moved yet. This is the proof that the recipe is a faithful rebuild rather than a different computation.
+Run: `just i18n-tables-rebuild` and then diff `data/i18n/`.
+
+Expected: 13 languages reported under `built:`, and the ONLY additions are these three
+tags, in whichever locales have text for them:
+
+```
+tagSkillCooldownRefresh
+tagSkillDurationRefresh
+tagSkillDurationRefreshMax
+```
+
+They appear because Task 3 added five `refresh*` aliases to `data/stat-item-tags.json`,
+and `build_game_tables.py` collects every tag that file references. Measured before this
+task ran: those three are the only tags referenced by `stat-item-tags.json` that are
+absent from `game.en.json`, so nothing else should move.
+
+That exact-delta result is the proof the recipe is a faithful rebuild rather than a
+different computation: it picks up the intended change and nothing else. If any OTHER
+tag is added or removed, or any existing text changes, stop and report it. Do not
+commit a rebuild you cannot account for.
+
+The widening of the tag SELECTION is Task 5's job, not this one. This task only moves
+where the rebuild can run from.
 
 - [ ] **Step 3: Commit**
 
