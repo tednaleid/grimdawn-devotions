@@ -105,10 +105,14 @@ test("Wind Devil: the pet panel renders the pet's own stats and groups ability r
   expect(html).toContain("<summary>Wind Devil</summary>");
   expect(html).toContain('pet-ability-name">Howling Wind<');
   expect(html).toContain('class="pet-ability-plain"');
-  // The pet's own 5 stats render with no per-row attribution: 5 <li>s under pet-own-stats.
+  // The pet's own 5 stats render with no per-row attribution. Two of them
+  // (characterAttackSpeed and characterSpellCastSpeed) are engine MULTIPLIERS sitting at
+  // exactly 1.0, the neutral value, so they carry no bonus to show and no line: 3 <li>s.
   const ownMatch = html.match(/<ul class="pet-own-stats">(.*?)<\/ul>/s);
   expect(ownMatch).not.toBeNull();
-  expect((ownMatch![1]!.match(/<li>/g) ?? []).length).toBe(5);
+  expect((ownMatch![1]!.match(/<li>/g) ?? []).length).toBe(3);
+  // characterRunSpeed 1.2 is a x1.2 multiplier, i.e. +20%, not "+1% Movement Speed".
+  expect(ownMatch![1]).toContain("+20% Movement Speed");
 });
 
 // --- Golden-rule regression: the same Krieg's Mask shape as tableView.test.ts, but through
@@ -210,6 +214,8 @@ const PET_GAME: Record<string, string> = {
   DamageFire: "{%t0} Fire Damage",
   DamagePoison: "{%t0} Poison Damage",
   tagCharAttackSpeed: "{%+.0f0}% Attack Speed",
+  tagCharRunSpeed: "{%+.0f0}% Movement Speed",
+  tagCharSpellCastSpeed: "{%+.0f0}% Casting Speed",
 };
 const PET_TAGS: Record<string, string> = {
   ...SYN_TAGS,
@@ -217,6 +223,8 @@ const PET_TAGS: Record<string, string> = {
   offensiveFireMax: "DamageFire",
   offensivePoisonMin: "DamagePoison",
   characterAttackSpeed: "tagCharAttackSpeed",
+  characterRunSpeed: "tagCharRunSpeed",
+  characterSpellCastSpeed: "tagCharSpellCastSpeed",
 };
 const petSkill: Skill = {
   record: "skills/pet-carrier.dbr",
@@ -235,15 +243,34 @@ const petSkill: Skill = {
       record: "pets/testpet.dbr",
       nameTag: "petName",
       stats: [
-        // own stat: first/max/ultimate all equal.
+        // own stats: first/max/ultimate all equal. These three are engine MULTIPLIERS, not
+        // percentages - x1.05 is +5%, x0.8 is -20%, and x1.0 is no modifier at all.
         {
           sourceKind: "pet",
           source: "pets/testpet.dbr",
           sourceNameTag: null,
           stat: "characterAttackSpeed",
-          first: 5,
-          max: 5,
-          ultimate: 5,
+          first: 1.05,
+          max: 1.05,
+          ultimate: 1.05,
+        },
+        {
+          sourceKind: "pet",
+          source: "pets/testpet.dbr",
+          sourceNameTag: null,
+          stat: "characterRunSpeed",
+          first: 0.8,
+          max: 0.8,
+          ultimate: 0.8,
+        },
+        {
+          sourceKind: "pet",
+          source: "pets/testpet.dbr",
+          sourceNameTag: null,
+          stat: "characterSpellCastSpeed",
+          first: 1,
+          max: 1,
+          ultimate: 1,
         },
         // ability A (named "Firebomb"): differing first/max/ultimate.
         {
@@ -313,6 +340,21 @@ test("pet panel: the pet's own stat renders under its name with no attribution",
   const html = detailMarkup(item, petCtx);
   expect(html).toContain("<summary>Test Pet</summary>");
   expect(html).toContain("+5% Attack Speed");
+});
+
+// Final fix round, C1. characterAttackSpeed/characterRunSpeed/characterSpellCastSpeed are
+// engine multipliers that occur ONLY on pet records (56 rows; 0 item modifier blocks), while
+// their tags are ordinary percentage templates. Passing the raw record value through printed
+// the wrong magnitude on all 56 and the wrong SIGN on every sub-1.0 value, because
+// "{%+.0f0}%" rounds 0.79 and 1.35 alike to "+1%".
+test("pet panel: a multiplier below 1.0 renders as a penalty, not a +1% bonus", () => {
+  const item = synItem({ boosts: [{ skill: petSkill.record, level: 1 }] });
+  expect(detailMarkup(item, petCtx)).toContain("-20% Movement Speed");
+});
+
+test("pet panel: a multiplier of exactly 1.0 renders no line at all", () => {
+  const item = synItem({ boosts: [{ skill: petSkill.record, level: 1 }] });
+  expect(detailMarkup(item, petCtx)).not.toContain("Casting Speed");
 });
 
 test("pet panel: an ability row with a source name renders under its own heading", () => {

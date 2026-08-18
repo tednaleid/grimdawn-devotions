@@ -57,14 +57,27 @@ function touchedSkills(item: Item): SkillEntry[] {
   return order.map((r) => byRecord.get(r)!);
 }
 
+// Three engine MULTIPLIERS that occur only on pet records (0 occurrences across every item
+// modifier block; 56 across the pet panels), while their tags are the ordinary percentage
+// templates ("{%+.0f0}% Attack Speed" and siblings). Passing the raw record value through
+// printed the multiplier as if it were a bonus: 0.79 read "+1% Attack Speed" where the truth
+// is -21%, 1.5 read "+2% Movement Speed" where the truth is +50%, and an untouched 1.0 invented
+// a bonus that does not exist. The multiplier-ness is a property of the pet source, not of the
+// tag - characterAttackSpeedModifier on an item block is an honest percentage and is untouched.
+const PET_MULTIPLIER = new Set(["characterAttackSpeed", "characterRunSpeed", "characterSpellCastSpeed"]);
+
 // PetStat carries first/max/ultimate, not the single `value` ModStat/effectLines need (see
 // task-14-16-report.md for the fuller rationale): this always uses `max`, the value at the
 // skill's normal rank cap without an Ultimate-difficulty unlock. It matches what the table's own
 // "Levels" column already reports (the maximum level an item enables, not an entry-level or
 // Ultimate-gated figure), and picking one number keeps each stat one line instead of a three-way
 // first/max/ultimate spread that effectLines' template composition isn't shaped to produce.
-function petStatToModStat(s: PetStat): ModStat {
-  return { stat: s.stat, value: s.max };
+// Returns null for a stat that has no line to render at all: a multiplier of exactly 1.0 is the
+// engine's neutral value, not a bonus.
+function petStatToModStat(s: PetStat): ModStat | null {
+  if (!PET_MULTIPLIER.has(s.stat)) return { stat: s.stat, value: s.max };
+  if (s.max === 1) return null;
+  return { stat: s.stat, value: (s.max - 1) * 100 };
 }
 
 // Ability rows are grouped for DISPLAY by source_name_tag (Task 16 Step 2), but effectLines is
@@ -80,7 +93,9 @@ function petStatLines(ctx: DetailContext, stats: PetStat[]): Text[] {
     arr.push(s);
     bySource.set(s.source, arr);
   }
-  const blocks = [...bySource.values()].map((group) => group.map(petStatToModStat));
+  const blocks = [...bySource.values()].map((group) =>
+    group.map(petStatToModStat).filter((s): s is ModStat => s !== null),
+  );
   return rowEffectLines(blocks, ctx);
 }
 
