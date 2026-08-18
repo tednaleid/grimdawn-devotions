@@ -36,6 +36,10 @@ const TRIGGER_TAG: Record<string, string> = {
 // total across those six, verified against data/skill-items.json).
 const DOT = /^(.+?)(Duration)?Min$/;
 const REFRESH = /^(refreshCooldown|refreshDuration)(Amount|Chance|Max)$/;
+// A proc chance for an offensiveSlow<X> family, mapped by data/stat-item-tags.json to
+// the same damage-label tag as its <X>Min sibling. Only meaningful alongside that
+// sibling; task-8b-brief.md scopes the fix to the one real block that lacks it.
+const SLOW_CHANCE = /^offensiveSlow(.+)Chance$/;
 
 const unit = (v: number): Text => gameT(v === 1 ? "tagSecond" : "tagSeconds");
 
@@ -172,31 +176,41 @@ function renderOne(
   // A duration sibling makes one line. Damage families show the product and read
   // "over"; every other family keeps its magnitude and reads "for". The real data
   // (data/stat-item-tags.json) maps a DurationMin stat to the SAME tag as its value
-  // stat, and sorts DurationMin first by stat id, so the Duration record is often
-  // visited before its value sibling: it defers to that sibling rather than
-  // rendering on its own (a lone duration collapsing to a plain label would
-  // silently drop the number, the same bug this whole rule exists to avoid). But
-  // exactly one block in the real data (offensiveSlowLightningDurationMin, paired only
-  // with offensiveSlowLightningChance) has no value sibling at all, so the defer is
-  // conditional on that sibling actually existing - otherwise this falls through to
-  // the ordinary single-stat path below rather than being silently dropped.
+  // stat, and sorts DurationMin first by stat id, so the Duration record is almost
+  // always visited before its value sibling: it unconditionally defers to that sibling
+  // rather than rendering on its own. A lone DurationMin with no Min sibling (Awakened
+  // Inscribed Bracers' Wind Devil block: offensiveSlowLightningChance + DurationMin, no
+  // Min) renders nothing, matching grimtools - which shows no Wind Devil block at all -
+  // rather than falling through to the plain-label path below and printing the duration
+  // as a damage amount ("2 Electrocute Damage"). Task 8's fix round 1 made this
+  // conditional on the Min sibling existing, on the theory the unconditional drop was
+  // itself a bug dropping a real line; grimtools drops it too, so that theory was wrong -
+  // reverted in Task 8b.
   const dot = s.stat.match(DOT);
   if (dot) {
     if (dot[2]) {
-      if (byId.has(`${dot[1]}Min`)) return null;
-    } else {
-      const dur = byId.get(`${dot[1]}DurationMin`);
-      if (dur) {
-        used.add(s.stat);
-        used.add(dur.stat);
-        const isDamage = DOT_DAMAGE.has(dot[1]!);
-        const suffixTag = isDamage ? "DamageSingleFormatTime" : "DamageFixedSingleFormatTime";
-        const head = valueLine(isDamage ? s.value * dur.value : s.value, tag, template);
-        if (!head) return null;
-        return ctx.templateOf(suffixTag) ? joinT(head, " ", gameFormatT(suffixTag, [dur.value])) : head;
-      }
+      return null;
+    }
+    const dur = byId.get(`${dot[1]}DurationMin`);
+    if (dur) {
+      used.add(s.stat);
+      used.add(dur.stat);
+      const isDamage = DOT_DAMAGE.has(dot[1]!);
+      const suffixTag = isDamage ? "DamageSingleFormatTime" : "DamageFixedSingleFormatTime";
+      const head = valueLine(isDamage ? s.value * dur.value : s.value, tag, template);
+      if (!head) return null;
+      return ctx.templateOf(suffixTag) ? joinT(head, " ", gameFormatT(suffixTag, [dur.value])) : head;
     }
   }
+
+  // offensiveSlow<X>Chance is a proc chance, but data/stat-item-tags.json maps it to the
+  // same damage-label tag as its <X>Min sibling, so the plain fallback below would print
+  // a chance value as a damage amount ("180 Electrocute Damage" for a 180% chance stat,
+  // the other half of the Wind Devil block above). Only 2 such stats occur in the real
+  // data and only 1 lacks a Min sibling; suppress that one rather than mislabeling it.
+  // The one with a sibling (Blood of Dreeg) is out of scope here - task-8b-brief.md.
+  const slowChance = s.stat.match(SLOW_CHANCE);
+  if (slowChance && !byId.has(`offensiveSlow${slowChance[1]}Min`)) return null;
 
   // A refresh family composes one line from its amount, its chance, and the target
   // and trigger the pipeline carries alongside them. The target is frequently a

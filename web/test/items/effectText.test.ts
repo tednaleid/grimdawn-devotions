@@ -129,6 +129,10 @@ const CARD_GAME: Record<string, string> = {
   SkillIntFormat: "{%d0 %s1}",
   tagCharStatsBlockChance: "Chance to Block",
   SkillPercentFormat: "{%.0f0% %s1}",
+  // Task 8b: Judgment and Winds of Asterkarn, the two DoT families in the oracle test
+  // that must keep rendering correctly. Real text, data/i18n/game.en.json.
+  DamageDurationFire: "Burn Damage",
+  DamageDurationCold: "Frostburn Damage",
 };
 const CARD_TAGS: Record<string, string> = {
   ...TAGS,
@@ -140,9 +144,14 @@ const CARD_TAGS: Record<string, string> = {
   offensiveSlowBleedingDurationMin: "DamageDurationBleeding",
   offensiveSlowPoisonMin: "DamageDurationPoison",
   offensiveSlowPoisonDurationMin: "DamageDurationPoison",
+  offensiveSlowPoisonChance: "DamageDurationPoison",
   offensiveSlowLightningMin: "DamageDurationLightning",
   offensiveSlowLightningDurationMin: "DamageDurationLightning",
   offensiveSlowLightningChance: "DamageDurationLightning",
+  offensiveSlowFireMin: "DamageDurationFire",
+  offensiveSlowFireDurationMin: "DamageDurationFire",
+  offensiveSlowColdMin: "DamageDurationCold",
+  offensiveSlowColdDurationMin: "DamageDurationCold",
   offensiveSlowTotalSpeedMin: "DamageDurationTotalSpeed",
   offensiveSlowTotalSpeedDurationMin: "DamageDurationTotalSpeed",
   offensiveSlowDefensiveAbilityMin: "DamageDurationDefensiveAbility",
@@ -277,11 +286,58 @@ test("offensiveTotalResistanceReductionAbsolute: a non-offensiveSlow debuff fami
   ).toEqual(["32 Reduced target's Resistances for 3 Seconds"]);
 });
 
-// fix round 1, C2 trap: exactly one block in the real data has a lone offensiveSlow*DurationMin
-// with no value sibling (offensiveSlowLightningDurationMin, paired only with
-// offensiveSlowLightningChance). It must render through the ordinary fallback, not be dropped.
-test("a lone duration stat with no value sibling falls through rather than being dropped", () => {
-  expect(cardRender([{ stat: "offensiveSlowLightningDurationMin", value: 2 }])).toEqual(["2 Electrocute Damage"]);
+// Task 8b, reverting a fix round 1 mistake: exactly one block in the real data has a lone
+// offensiveSlow*DurationMin with no value sibling (Awakened Inscribed Bracers' Wind Devil:
+// offensiveSlowLightningDurationMin, paired only with offensiveSlowLightningChance).
+// grimtools shows no Wind Devil block at all for that item, so this must render nothing,
+// not fall through to the plain fallback and print the duration as a damage amount.
+test("a lone duration stat with no value sibling is dropped, not printed as a damage amount", () => {
+  expect(cardRender([{ stat: "offensiveSlowLightningDurationMin", value: 2 }])).toEqual([]);
+});
+
+// Task 8b: the other half of the same Wind Devil block. offensiveSlowLightningChance is a
+// proc chance (180%), but data/stat-item-tags.json maps it to the damage-label tag, so the
+// plain fallback would print it as "180 Electrocute Damage". Suppress it when there's no
+// Min sibling to attach the chance to.
+test("a slow-family chance stat with no Min sibling is dropped, not printed as a damage amount", () => {
+  expect(cardRender([{ stat: "offensiveSlowLightningChance", value: 180 }])).toEqual([]);
+});
+
+// Task 8b: a slow-family chance stat WITH a Min sibling is untouched by this fix (out of
+// scope per task-8b-brief.md) - it still reaches the plain fallback today. Pinning this
+// documents the current (unfixed) shape rather than asserting it is correct.
+test("a slow-family chance stat with a Min sibling still reaches the plain fallback (known gap, out of scope)", () => {
+  expect(
+    cardRender([
+      { stat: "offensiveSlowPoisonChance", value: 10 },
+      { stat: "offensiveSlowPoisonDurationMin", value: 5 },
+      { stat: "offensiveSlowPoisonMin", value: 108 },
+    ]),
+  ).toEqual(["10 Poison Damage", "540 Poison Damage over 5 Seconds"]);
+});
+
+// Task 8b oracle: Awakened Inscribed Bracers (records/items/awakened/gearhands/c029_hands.dbr)
+// across all three of its real modifier blocks. grimtools shows nothing for Wind Devil, and
+// still renders Judgment and Winds of Asterkarn correctly - the fix must not disturb those.
+test("Awakened Inscribed Bracers: Wind Devil renders nothing, Judgment and Winds of Asterkarn are undisturbed", () => {
+  expect(
+    cardRender([
+      { stat: "offensiveSlowLightningChance", value: 180 },
+      { stat: "offensiveSlowLightningDurationMin", value: 2 },
+    ]),
+  ).toEqual([]);
+  expect(
+    cardRender([
+      { stat: "offensiveSlowFireDurationMin", value: 2 },
+      { stat: "offensiveSlowFireMin", value: 120 },
+    ]),
+  ).toEqual(["240 Burn Damage over 2 Seconds"]);
+  expect(
+    cardRender([
+      { stat: "offensiveSlowColdDurationMin", value: 3 },
+      { stat: "offensiveSlowColdMin", value: 120 },
+    ]),
+  ).toEqual(["360 Frostburn Damage over 3 Seconds"]);
 });
 
 // fix round 1, I4a: a plain (non-templated) label reaching the ordinary fallback - not the DOT
