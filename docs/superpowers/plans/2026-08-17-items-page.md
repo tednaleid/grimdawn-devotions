@@ -1366,11 +1366,26 @@ git commit -m "feat(items): facet vocabulary and shareable hash state"
 - Consumes: `Item`, `Skill` from Task 10; `ViewState` from Task 11.
 - Produces:
   ```ts
-  export interface Row { item: Item; levels: number; modStats: ModStat[]; }
+  export interface Row { item: Item; levels: number; modBlocks: ModStat[][]; }
   export function applyView(items: Item[], skills: Skill[], view: ViewState,
     nameOf: (item: Item) => string): Row[];
   ```
-  `levels` is the total skill levels the item grants within the selected scope. `modStats` is the modifier stats for the selected scope, empty when the item only grants levels. Mastery-wide boosts contribute to `levels` only when `view.masteryWide` is true.
+  `levels` is the total skill levels the item grants within the selected scope.
+`modBlocks` is one entry PER IN-SCOPE MODIFIER BLOCK, each holding that block's own stats,
+and is empty when the item only grants levels. Mastery-wide boosts contribute to `levels`
+only when `view.masteryWide` is true.
+
+**Why `ModStat[][]` and not a single flat `ModStat[]`** (this was originally specified as
+flat, and that was a defect caught in review): `effectLines` keys a `byId` map on stat id
+and dedups through one shared `used` set, so it assumes every stat it receives came from a
+single block. Flattening two skills' blocks together lets one skill's `Min` marry another
+skill's `Max`. Measured on the real data, that produced invented lines on 13 rows and
+silently dropped lines on 31 more, including impossible inverted ranges such as
+"200-36 Chaos Damage" on Servitor's Corruptor. Concretely, Krieg's Mask under Soldier
+scope has Blitz at a flat 140 Aether and War Cry at 180-300; flattened, it rendered
+"140-300 Aether Damage", a range on neither skill, and dropped War Cry's "-1 Second Skill
+Recharge". The caller must therefore invoke `effectLines` once per block and concatenate
+the resulting lines, never concatenate the stats.
 
 - [ ] **Step 1: Write the failing test**
 
