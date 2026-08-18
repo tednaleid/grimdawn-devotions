@@ -66,14 +66,41 @@ def test_refresh_qualifiers_ride_along_on_refresh_stats():
     ], rows
 
 
-def test_defaulted_trigger_enum_is_not_a_trigger():
-    """851 of 964 refreshCooldownTrigger values are the full 13-token enum, which
-    means the record made no choice. Storing it verbatim prints the enum on the card."""
+def test_no_record_pairs_a_defaulted_trigger_with_a_real_amount():
+    """Pin the data shape that makes the trigger guard unreachable today.
+
+    Most trigger values are the untouched 13-token enum, meaning the record made no
+    choice, and storing one verbatim would print the enum onto the card. The
+    `NOT LIKE '%;%'` guard in build_skill_modifiers exists to stop that. At build
+    24756825 the guard never actually fires: no record carrying the default enum
+    also carries a non-zero refresh amount, so the numeric stat gate has already
+    excluded every one of them.
+
+    Asserting on the output would therefore be a 0 = 0 over an empty relation. This
+    pins the deposit-level fact instead. If it ever fails, the guard has become
+    load-bearing and needs its own output-level test before this one is relaxed.
+    """
     con = duckdb.connect()
     n = con.execute("""
-        SELECT count(*) FROM read_parquet('data/derived/skill_modifiers.parquet')
-        WHERE refresh_trigger LIKE '%;%'""").fetchone()[0]
-    assert n == 0, f"{n} rows carry a multi-token trigger enum as if it were a choice"
+        WITH trig AS (
+          SELECT record, key, trim(value) AS v FROM read_parquet('data/deposit/facts.parquet')
+          WHERE key IN ('refreshCooldownTrigger', 'refreshDurationTrigger') AND trim(value) != ''
+        ), amt AS (
+          SELECT record, key, try_cast(value AS DOUBLE) AS n
+          FROM read_parquet('data/deposit/facts.parquet')
+          WHERE key IN ('refreshCooldownAmount', 'refreshCooldownChance',
+                        'refreshDurationAmount', 'refreshDurationChance', 'refreshDurationMax')
+        )
+        SELECT count(DISTINCT t.record)
+        FROM trig t JOIN amt a
+          ON a.record = t.record
+         AND regexp_extract(a.key, '^(refreshCooldown|refreshDuration)', 1)
+           = regexp_extract(t.key, '^(refreshCooldown|refreshDuration)', 1)
+        WHERE t.v LIKE '%;%' AND a.n IS NOT NULL AND a.n != 0""").fetchone()[0]
+    assert n == 0, (
+        f"{n} records now pair a defaulted trigger enum with a real refresh amount. "
+        "The NOT LIKE '%;%' guard is now load-bearing: add an output-level test that "
+        "fails when the guard is removed, then update this pin.")
 
 
 def test_refresh_qualifiers_absent_on_unrelated_stats():
@@ -101,8 +128,14 @@ In `build_skill_modifiers`, after the `conv` CTE and before `paired`, add:
         -- conversions.
         --
         -- A trigger holding more than one token is the template's untouched default
-        -- (the full 13-value enum, on 851 of 964 records), not a selection, so it is
-        -- read as absent. Only 117 records name a real trigger.
+        -- (the full 13-value enum), not a selection, so it is read as absent.
+        --
+        -- The guard is defensive rather than load-bearing: at build 24756825 no record
+        -- pairs a defaulted enum with a non-zero refresh amount, so the numeric stat
+        -- gate has already dropped every row this could catch. It stays because the
+        -- alternative failure is silent and ugly (the whole enum printed onto a card),
+        -- and test_no_record_pairs_a_defaulted_trigger_with_a_real_amount fails the
+        -- moment that stops being true.
         refresh_qual AS (
             SELECT record,
                    regexp_extract(key, '^(refreshCooldown|refreshDuration)', 1) AS family,
@@ -144,14 +177,29 @@ Note `regexp_extract` returns `''` for a non-refresh key, and no `refresh_qual` 
 Run: `just derive && uv run scripts/test_build_derived.py`
 Expected: PASS, all three tests.
 
-- [ ] **Step 5: Prove the trigger gate is not vacuous**
+- [ ] **Step 5: Establish whether the trigger guard is reachable**
 
-Temporarily delete `AND trim(value) NOT LIKE '%;%'` from the `refresh_qual` CTE, run `just derive`, and confirm `test_defaulted_trigger_enum_is_not_a_trigger` FAILS with a non-zero count. Restore the line and re-run to green. A gate that cannot fail is not a gate.
+Temporarily delete `AND trim(value) NOT LIKE '%;%'` from the `refresh_qual` CTE, run
+`just derive`, and observe what the tests do. Restore the line and re-run to green
+either way.
+
+At build 24756825 the suite stays green, because no record pairs a defaulted enum with
+a non-zero refresh amount. That is the expected result, and it is why the test above
+pins the deposit-level shape rather than the output. Record the observation in your
+report. Do NOT invent a failing count: an assertion that cannot fail is a defect to
+surface, not a box to tick.
+
+If instead a test does fail, the shape has changed since this plan was measured. Say so
+in your report and stop, rather than re-pinning the number.
 
 - [ ] **Step 6: Commit**
 
+`data/derived/` is gitignored: derived parquet never enters git in this project, since
+the deposit ships through GitHub Releases pinned by `deposit.lock`. Commit code and
+tests only. The parquet is reproduced by `just derive`.
+
 ```bash
-git add scripts/build_derived.py scripts/test_build_derived.py data/derived/skill_modifiers.parquet
+git add scripts/build_derived.py scripts/test_build_derived.py
 git commit -m "feat(derive): carry refresh target and trigger onto modifier rows"
 ```
 
