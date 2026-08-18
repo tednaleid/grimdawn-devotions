@@ -145,23 +145,22 @@ try {
   await cdp.send("Runtime.enable");
   await cdp.send("Page.navigate", { url: ITEMS });
 
-  // Boot: the mastery <select> is populated from the catalogue once loadCatalogue resolves.
-  const booted = await waitFor<number>(cdp, "document.querySelectorAll('#items-mastery option').length", (n) => n > 1);
-  check(booted, "page loads and the mastery select is populated from the catalogue");
+  // Boot: the mastery radiogroup is populated from the catalogue once loadCatalogue resolves.
+  const booted = await waitFor<number>(
+    cdp,
+    "document.querySelectorAll('#items-mastery [data-mastery]').length",
+    (n) => n > 1,
+  );
+  check(booted, "page loads and the mastery picker is populated from the catalogue");
 
   // No mastery chosen yet: the tree area shows the hint, not an SVG, and the table is empty
   // (mastery is the entry point into the item list - see docs/superpowers/specs).
   const hintShown = await cdp.evaluate<boolean>("!!document.querySelector('.items-tree-hint')");
   check(hintShown, "no mastery selected: the tree shows its hint instead of a tree");
 
-  // Pick a mastery through the real <select>, like a user would - not a hash edit, so this also
-  // exercises the change listener wired in tableView.ts.
-  await cdp.evaluate(`(() => {
-    const sel = document.getElementById('items-mastery');
-    const opt = [...sel.options].find((o) => o.value !== '');
-    sel.value = opt.value;
-    sel.dispatchEvent(new Event('change'));
-  })()`);
+  // Pick a mastery by clicking a real button, like a user would - not a hash edit, so this also
+  // exercises the delegated click listener wired in tableView.ts.
+  await cdp.evaluate(`document.querySelector('#items-mastery [data-mastery]').click()`);
   const treeRendered = await waitFor<number>(cdp, "document.querySelectorAll('.tree-node').length", (n) => n > 0);
   const nodeCount = await cdp.evaluate<number>("document.querySelectorAll('.tree-node').length");
   check(treeRendered && nodeCount > 5, `choosing a mastery renders the skill tree (${nodeCount} nodes)`);
@@ -180,6 +179,20 @@ try {
   check(narrowed, `picking a skill node narrows the table (${skillRows} of ${rowsAfterMastery} rows)`);
   const hash = await cdp.evaluate<string>("location.hash");
   check(hash.includes("skill="), `the picked skill is recorded in the hash (${hash})`);
+
+  // A second skill WIDENS rather than replaces: the table shows items touching either group.
+  // Clicking a node of a different group is the whole point of multi-select, so drive it that way
+  // rather than editing the hash.
+  await cdp.evaluate(`(() => {
+    const first = document.querySelector('.tree-node').getAttribute('data-group');
+    const other = [...document.querySelectorAll('.tree-node')].find((n) => n.getAttribute('data-group') !== first);
+    other.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  })()`);
+  const widened = await waitFor<number>(cdp, "document.querySelectorAll('tr.item-row').length", (n) => n > skillRows);
+  const twoSkillRows = await cdp.evaluate<number>("document.querySelectorAll('tr.item-row').length");
+  check(widened, `a second skill widens the table (${skillRows} -> ${twoSkillRows} rows)`);
+  const twoHash = await cdp.evaluate<string>("location.hash");
+  check(/skill=[^&]+,[^&]+/.test(twoHash), "both picked skills are recorded in the hash as one list");
 
   // Expanding a row shows its per-skill detail (Task 14/16's expanded row).
   await cdp.evaluate(`document.querySelector('tr.item-row').dispatchEvent(new MouseEvent('click', {bubbles: true}))`);

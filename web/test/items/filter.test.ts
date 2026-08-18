@@ -31,6 +31,7 @@ const item = (record: string, over: Partial<any> = {}) =>
     nameTag: `tag${record}`,
     domain: "gear",
     slots: ["medal"],
+    gearType: "medal",
     rarity: "Legendary",
     itemLevel: 94,
     tiers: [],
@@ -53,8 +54,8 @@ const items = [badge, plainRing, blitzOnly, wideAmulet, offMastery];
 
 const base = {
   mastery: "m/A",
-  skill: null as string | null,
-  fSlot: new Set<string>(),
+  skills: new Set<string>(),
+  fCat: new Set<string>(),
   fRarity: new Set<string>(),
   fDomain: new Set<string>(),
   fKind: new Set<string>(),
@@ -67,7 +68,7 @@ const nameOf = (i: any) => i.record;
 const recs = (v: any) => applyView(items, skills, v, nameOf).map((r) => r.item.record);
 
 test("a skill selection narrows to that node group", () => {
-  expect(recs({ ...base, skill: "s/cadence1" }).sort()).toEqual(["badge", "ring"]);
+  expect(recs({ ...base, skills: new Set(["s/cadence1"]) }).sort()).toEqual(["badge", "ring"]);
 });
 
 test("a mastery selection unions every skill in the mastery", () => {
@@ -80,11 +81,11 @@ test("mastery-wide boosts are excluded unless the toggle is on", () => {
 });
 
 test("the modifies chip excludes level-only items", () => {
-  expect(recs({ ...base, skill: "s/cadence1", fKind: new Set(["modifies"]) })).toEqual(["badge"]);
+  expect(recs({ ...base, skills: new Set(["s/cadence1"]), fKind: new Set(["modifies"]) })).toEqual(["badge"]);
 });
 
 test("levels sums only the selected scope", () => {
-  const rows = applyView(items, skills, { ...base, skill: "s/cadence1" }, nameOf);
+  const rows = applyView(items, skills, { ...base, skills: new Set(["s/cadence1"]) }, nameOf);
   expect(rows.find((r) => r.item.record === "badge")!.levels).toBe(3);
 });
 
@@ -115,4 +116,48 @@ test("the record tiebreak reverses with sortDir, like every other sort key here"
   const same = [tie("aaa"), tie("bbb")];
   const out = applyView(same, skills, { ...base, sortKey: "rarity", sortDir: -1 }, () => "same");
   expect(out.map((r) => r.item.record)).toEqual(["bbb", "aaa"]);
+});
+
+test("several selected skills widen the scope to the union of their groups", () => {
+  // The point of multi-select: a player planning around both skills sees items touching either,
+  // not the (empty) intersection.
+  expect(recs({ ...base, skills: new Set(["s/cadence1", "s/blitz1"]) }).sort()).toEqual(["badge", "blitz", "ring"]);
+});
+
+test("a skill id outside the catalogue scopes to itself rather than widening to everything", () => {
+  // Mirrors treeView's own fallback for a stale link. Without it, an unknown id would contribute
+  // no group and the selection would silently behave like "the whole mastery".
+  expect(recs({ ...base, skills: new Set(["s/gone"]) })).toEqual([]);
+});
+
+test("the category facet separates weapons that share a slot list", () => {
+  // The regression this facet exists for: every weapon in the game carries the same
+  // ["main_hand","off_hand"] pair, so filtering on slots cannot tell these two apart. gear_type
+  // can, and the facet is built from it.
+  const spear = item("spear", {
+    slots: ["main_hand", "off_hand"],
+    gearType: "spear2h",
+    boosts: [{ skill: "s/cadence1", level: 1 }],
+  });
+  const dagger = item("dagger", {
+    slots: ["main_hand", "off_hand"],
+    gearType: "dagger",
+    boosts: [{ skill: "s/cadence1", level: 1 }],
+  });
+  const both = [spear, dagger];
+  const pick = (cat: string) =>
+    applyView(both, skills, { ...base, fCat: new Set([cat]) }, nameOf).map((r) => r.item.record);
+  expect(pick("melee2h")).toEqual(["spear"]);
+  expect(pick("daggerScepter")).toEqual(["dagger"]);
+});
+
+test("an unknown gear class falls back to its raw id instead of vanishing from the table", () => {
+  // A game patch adding a weapon class core/facets.ts has not been taught must not make items
+  // disappear: unfiltered they still show, and they only fail to match the known chips.
+  const exotic = item("exotic", { gearType: "whip1h", boosts: [{ skill: "s/cadence1", level: 1 }] });
+  expect(recs({ ...base })).toBeDefined();
+  const all = applyView([exotic], skills, base, nameOf).map((r) => r.item.record);
+  expect(all).toEqual(["exotic"]);
+  const filtered = applyView([exotic], skills, { ...base, fCat: new Set(["melee1h"]) }, nameOf);
+  expect(filtered).toEqual([]);
 });

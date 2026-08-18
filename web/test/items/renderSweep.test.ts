@@ -141,6 +141,7 @@ function allRenderedLines(ctx: DetailContext): { where: string; line: string; is
       nameTag: null,
       domain: "gear",
       slots: [],
+      gearType: "head",
       rarity: "Legendary",
       itemLevel: 1,
       tiers: [],

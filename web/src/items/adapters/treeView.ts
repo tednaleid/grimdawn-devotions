@@ -78,25 +78,65 @@ function placeNodes(skills: Skill[]): Placed[] {
 // A skill selection scopes to its node group (see core/filter.ts's scopeSkillSet): a group's
 // identity is its base skill's own record, and an id not found among `skills` (a stale link)
 // falls back to itself, mirroring scopeSkillSet's own fallback so the tree and the table filter
-// never disagree about what a given `selected` value means.
-function selectedGroup(skills: Skill[], selected: string | null): string | null {
-  if (!selected) return null;
-  const target = skills.find((s) => s.record === selected);
-  return target ? target.group : selected;
+// never disagree about what a given selection means. Several selections highlight several groups.
+function selectedGroups(skills: Skill[], selected: ReadonlySet<string>): Set<string> {
+  const groups = new Set<string>();
+  for (const record of selected) {
+    const target = skills.find((s) => s.record === record);
+    groups.add(target ? target.group : record);
+  }
+  return groups;
+}
+
+// The connectors the game itself draws between a skill and its upgrades. The layout is the
+// game's own (ui_x/ui_y straight off the records), and it puts a base skill's modifiers on the
+// base's own row at increasing x - Cadence sits at (246,319) with its two modifiers at 486 and
+// 806, same y - while a transmuter branches off the base diagonally, Cadence's at (326,281).
+// So the chain is drawn along the row and the transmuter is joined straight back to its base.
+// Nothing here needs new data: `group` and `nodeKind` already say which nodes belong together.
+function linkMarkup(placed: Placed[]): string {
+  const byGroup = new Map<string, Placed[]>();
+  for (const p of placed) {
+    // An off-tree node carries no game coordinates and is parked in its own row, so a line to it
+    // would cross the whole box describing a position the game never gave it.
+    if (p.offTree) continue;
+    const g = byGroup.get(p.skill.group);
+    if (g) g.push(p);
+    else byGroup.set(p.skill.group, [p]);
+  }
+  const segments: string[] = [];
+  for (const members of byGroup.values()) {
+    const base = members.find((p) => p.skill.nodeKind === "base");
+    if (!base) continue;
+    // Modifiers chain left to right from the base; a pet_modifier hangs off the base the same
+    // way a transmuter does, since it upgrades the summon rather than continuing the row.
+    const chain = members.filter((p) => p.skill.nodeKind === "modifier").sort((a, b) => a.x - b.x);
+    let prev = base;
+    for (const next of chain) {
+      segments.push(`<line class="tree-link" x1="${prev.x}" y1="${prev.y}" x2="${next.x}" y2="${next.y}"/>`);
+      prev = next;
+    }
+    for (const p of members) {
+      if (p.skill.nodeKind === "modifier" || p === base) continue;
+      segments.push(`<line class="tree-link" x1="${base.x}" y1="${base.y}" x2="${p.x}" y2="${p.y}"/>`);
+    }
+  }
+  return segments.join("");
 }
 
 function nodeMarkup(
   p: Placed,
   i: number,
-  selGroup: string | null,
+  selGroups: Set<string>,
   ctx: TreeContext,
   sheet: { w: number; h: number },
 ): string {
   const { skill, x, y, offTree } = p;
   const shape = skill.nodeKind === "base" ? "square" : "circle";
   const clipId = `tree-clip-${i}`;
-  const selected = selGroup !== null && skill.group === selGroup;
+  const selected = selGroups.has(skill.group);
   const cls = ["tree-node", shape, offTree ? "off-tree" : "", selected ? "selected" : ""].filter(Boolean).join(" ");
+  const pressed = selected ? "true" : "false";
   const clip =
     shape === "square"
       ? `<rect x="${x - ICON_R}" y="${y - ICON_R}" width="${ICON_R * 2}" height="${ICON_R * 2}"/>`
@@ -117,7 +157,7 @@ function nodeMarkup(
   // a real accessible name, not just the ones with a nameTag.
   const name = esc(ctx.nameOf(skill));
   return (
-    `<g class="${cls}" data-group="${esc(skill.group)}" data-record="${esc(skill.record)}" aria-label="${name}" tabindex="0" role="button">` +
+    `<g class="${cls}" data-group="${esc(skill.group)}" data-record="${esc(skill.record)}" aria-label="${name}" aria-pressed="${pressed}" tabindex="0" role="button">` +
     `<title>${name}</title>` +
     `<clipPath id="${clipId}">${clip}</clipPath>` +
     border +
@@ -133,22 +173,30 @@ function nodeMarkup(
  *  the exact matching node, since that is what stays in scope together (see core/filter.ts's
  *  scopeSkillSet). Exported separately from renderTree so it is testable without a DOM (this repo
  *  has no jsdom/happy-dom - see test/importPanel.test.ts). */
-export function buildTreeMarkup(skills: Skill[], mastery: string, selected: string | null, ctx: TreeContext): string {
+export function buildTreeMarkup(
+  skills: Skill[],
+  mastery: string,
+  selected: ReadonlySet<string>,
+  ctx: TreeContext,
+): string {
   const masterySkills = skills.filter((s) => s.mastery === mastery);
   const placed = placeNodes(masterySkills);
-  const selGroup = selectedGroup(skills, selected);
+  const selGroups = selectedGroups(skills, selected);
   const sheet = sheetSize(ctx.icons);
-  const nodes = placed.map((p, i) => nodeMarkup(p, i, selGroup, ctx, sheet)).join("");
-  return `<svg class="tree-svg" viewBox="${VIEW_BOX}" preserveAspectRatio="xMidYMid meet">${nodes}</svg>`;
+  // Links first so every node draws over them: a line ends at a node's centre, not its edge.
+  const links = linkMarkup(placed);
+  const nodes = placed.map((p, i) => nodeMarkup(p, i, selGroups, ctx, sheet)).join("");
+  return `<svg class="tree-svg" viewBox="${VIEW_BOX}" preserveAspectRatio="xMidYMid meet">${links}${nodes}</svg>`;
 }
 
 /** Render one mastery's tree as a live, wired SVGElement: buildTreeMarkup's string turned into
  *  DOM, with clicks delegated to onPick(group) - a node's group is itself for a base skill and
- *  its base's record for a modifier/transmuter/pet_modifier, matching core/filter.ts's scoping. */
+ *  its base's record for a modifier/transmuter/pet_modifier, matching core/filter.ts's scoping.
+ *  onPick toggles rather than sets: selection is a set, and clicking a selected node clears it. */
 export function renderTree(
   skills: Skill[],
   mastery: string,
-  selected: string | null,
+  selected: ReadonlySet<string>,
   onPick: (group: string) => void,
   ctx: TreeContext,
 ): SVGElement {

@@ -231,6 +231,14 @@ def main(argv=None) -> int:
             "name_tag": name,
             "domain": t["domain"],
             "slots": list(t["slots"]) if t["slots"] else [],
+            # The slots list cannot tell a one-handed weapon from a two-handed one:
+            # data/item-curation/gear-types.json gives every weapon class the same
+            # ["main_hand", "off_hand"] pair, so a dagger and a two-handed spear are
+            # indistinguishable by slot alone. gear_type is the field that separates
+            # them (sword1h/sword2h/ranged1h/ranged2h/shield/offhand/...), and the page
+            # groups it into the game's own loot-filter categories - see the gear
+            # category table in web/src/items/core/facets.ts.
+            "gear_type": t["gear_type"],
             "rarity": t["rarity"],
             "item_level": t["item_level"],
             "tiers": [r["item_level"] for r in tiers.get(t["group_key"], [])],

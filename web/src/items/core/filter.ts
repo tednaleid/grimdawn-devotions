@@ -1,7 +1,7 @@
 // ABOUTME: Pure filter/sort over the skill-items catalogue, driven by a ViewState.
 // ABOUTME: i18n-free: callers inject a nameOf resolver so search/sort see resolved display text.
 import type { ModStat } from "./effectText";
-import { RARITIES, SLOTS } from "./facets";
+import { CATEGORIES, categoryOf, RARITIES } from "./facets";
 import type { Item, Skill } from "./model";
 import type { ViewState } from "./urlState";
 
@@ -19,17 +19,35 @@ export interface Row {
 type NameOf = (item: Item) => string;
 
 const RARITY_RANK: Record<string, number> = Object.fromEntries(RARITIES.map((r, i) => [r, i]));
-const SLOT_RANK: Record<string, number> = Object.fromEntries(SLOTS.map((s, i) => [s, i]));
+const CATEGORY_RANK: Record<string, number> = Object.fromEntries(CATEGORIES.map((c, i) => [c, i]));
+
+/** The item's gear category, falling back to its raw gear_type when the dataset carries a class
+ *  core/facets.ts does not know yet. Filtering and sorting both go through this, so a new weapon
+ *  class in a game patch sorts last and matches no chip rather than making items disappear. */
+export function itemCategory(item: Item): string {
+  return categoryOf(item.gearType) ?? item.gearType;
+}
 
 // A skill selection scopes to its node group (the base skill and its modifier/transmuter
 // nodes), not the bare skill: see docs/superpowers/specs/2026-08-15-skill-item-finder-page-design.md.
 // A mastery selection (no skill) scopes to every skill in that mastery. Neither selected means
 // no scope at all, so applyView correctly returns no rows.
 function scopeSkillSet(skills: Skill[], view: ViewState): Set<string> {
-  if (view.skill) {
-    const target = skills.find((s) => s.record === view.skill);
-    if (!target) return new Set([view.skill]);
-    return new Set(skills.filter((s) => s.group === target.group).map((s) => s.record));
+  if (view.skills.size) {
+    // Several skills widen the scope rather than narrowing it: the union of their groups, so a
+    // player planning around Cadence and Blitz sees every item touching either.
+    const scope = new Set<string>();
+    for (const record of view.skills) {
+      const target = skills.find((s) => s.record === record);
+      // A record not in the catalogue (a stale link) scopes to itself, matching the tree's own
+      // fallback in treeView.ts so the two never disagree about what a selection means.
+      if (!target) {
+        scope.add(record);
+        continue;
+      }
+      for (const s of skills) if (s.group === target.group) scope.add(s.record);
+    }
+    return scope;
   }
   if (view.mastery) {
     return new Set(skills.filter((s) => s.mastery === view.mastery).map((s) => s.record));
@@ -64,7 +82,7 @@ function kindOf(row: Row): string {
 
 function matchesFilters(row: Row, view: ViewState, nameOf: NameOf): boolean {
   const item = row.item;
-  if (view.fSlot.size && !item.slots.some((s) => view.fSlot.has(s))) return false;
+  if (view.fCat.size && !view.fCat.has(itemCategory(item))) return false;
   if (view.fRarity.size && !view.fRarity.has(item.rarity)) return false;
   if (view.fDomain.size && !view.fDomain.has(item.domain)) return false;
   if (view.fKind.size && !view.fKind.has(kindOf(row))) return false;
@@ -80,10 +98,8 @@ function sortKeyValue(row: Row, key: string, nameOf: NameOf): string | number {
   switch (key) {
     case "name":
       return nameOf(row.item);
-    case "slot": {
-      const ranks = row.item.slots.map((s) => SLOT_RANK[s] ?? SLOTS.length);
-      return ranks.length ? Math.min(...ranks) : SLOTS.length;
-    }
+    case "slot":
+      return CATEGORY_RANK[itemCategory(row.item)] ?? CATEGORIES.length;
     case "rarity":
       return RARITY_RANK[row.item.rarity] ?? RARITIES.length;
     case "ilvl":

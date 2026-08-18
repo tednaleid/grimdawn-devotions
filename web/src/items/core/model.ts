@@ -67,6 +67,10 @@ export interface Item {
   nameTag: string | null;
   domain: "gear" | "relic";
   slots: string[];
+  // The item's gear class (sword2h, dagger, head, ...). `slots` cannot tell a one-handed
+  // weapon from a two-handed one - every weapon carries the same pair - so this is what the
+  // page's category facet is built from. See core/facets.ts.
+  gearType: string;
   rarity: string;
   itemLevel: number;
   tiers: number[];
@@ -148,6 +152,7 @@ interface RawItem {
   name_tag: string | null;
   domain: "gear" | "relic";
   slots: string[];
+  gear_type: string;
   rarity: string;
   item_level: number;
   tiers: number[];
@@ -218,6 +223,7 @@ function mapItem(r: RawItem): Item {
     nameTag: r.name_tag,
     domain: r.domain,
     slots: r.slots ?? [],
+    gearType: r.gear_type ?? "",
     rarity: r.rarity,
     itemLevel: r.item_level,
     tiers: r.tiers ?? [],

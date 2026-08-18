@@ -20,6 +20,8 @@ const masteryRecords = catalogue.masteries.map((m) => m.record);
 const nameOf = (skill: Skill): string => skill.nameTag ?? skill.record;
 const ctx: TreeContext = { icons, nameOf };
 const noIconsCtx: TreeContext = { icons: { cell: 32, columns: 1, icons: {} }, nameOf };
+// "nothing selected", the state most of these tests render in.
+const NONE: ReadonlySet<string> = new Set<string>();
 
 // A node's own <g> opening tag, in the exact attribute order treeView.ts emits it, so a count of
 // matches is a count of rendered nodes (one <g> per skill, real or off-tree).
@@ -31,14 +33,14 @@ function nodeGroups(markup: string): { cls: string; group: string; record: strin
 
 test("every mastery renders with the one fixed viewBox", () => {
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
     expect(markup).toContain('viewBox="246 39 640 420"');
   }
 });
 
 test("every mastery renders at least 30 nodes", () => {
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
     expect(nodeGroups(markup).length).toBeGreaterThanOrEqual(30);
   }
 });
@@ -46,7 +48,7 @@ test("every mastery renders at least 30 nodes", () => {
 test("base skills render as squares, everything else as circles", () => {
   const mastery = masteryRecords[0]!;
   const skillsByRecord = new Map(catalogue.skills.map((s) => [s.record, s]));
-  const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
+  const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
   for (const { cls, record } of nodeGroups(markup)) {
     const skill = skillsByRecord.get(record)!;
     const wantSquare = skill.nodeKind === "base";
@@ -57,13 +59,13 @@ test("base skills render as squares, everything else as circles", () => {
 
 test("with no icon in the index, that node renders with no <image> (graceful, not a throw)", () => {
   const mastery = masteryRecords[0]!;
-  const markup = buildTreeMarkup(catalogue.skills, mastery, null, noIconsCtx);
+  const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, noIconsCtx);
   expect(markup).not.toContain("<image");
 });
 
 test("every node gets an icon from the real sprite index: no missing icon", () => {
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
     const nodeCount = nodeGroups(markup).length;
     const imageCount = (markup.match(/<image /g) ?? []).length;
     expect(imageCount).toBe(nodeCount);
@@ -105,7 +107,7 @@ test("accessible name is resolved via ctx.nameOf, including a null-nameTag fallb
     icons: { cell: 32, columns: 1, icons: {} },
     nameOf: (skill) => (skill.nameTag ? `Named:${skill.nameTag}` : skill.record),
   };
-  const markup = buildTreeMarkup(skills, "m", null, namedCtx);
+  const markup = buildTreeMarkup(skills, "m", NONE, namedCtx);
   expect(markup).toContain('aria-label="Named:tagFoo"');
   expect(markup).toContain("<title>Named:tagFoo</title>");
   expect(markup).toContain('aria-label="r2"');
@@ -117,7 +119,7 @@ test("accessible name is resolved via ctx.nameOf, including a null-nameTag fallb
 const BERSERKER = "records/skills/playerclass10/_classtraining_class10.dbr";
 
 test("the four off-tree Berserker abilities render, not dropped", () => {
-  const markup = buildTreeMarkup(catalogue.skills, BERSERKER, null, ctx);
+  const markup = buildTreeMarkup(catalogue.skills, BERSERKER, NONE, ctx);
   const offTree = nodeGroups(markup).filter((n) => n.cls.includes("off-tree"));
   expect(offTree.length).toBe(4);
   const expected = new Set([
@@ -135,7 +137,7 @@ test("no two nodes in the same mastery land on the same position", () => {
   const RECT = /class="node-shape" x="([-\d.]+)" y="([-\d.]+)" width="([-\d.]+)" height="([-\d.]+)"/g;
   const CIRCLE = /class="node-shape" cx="([-\d.]+)" cy="([-\d.]+)"/g;
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
     const points = new Set<string>();
     for (const m of markup.matchAll(RECT)) {
       const x = Number(m[1]) + Number(m[3]) / 2;
@@ -151,7 +153,7 @@ test("no two nodes in the same mastery land on the same position", () => {
 test("selecting a base skill highlights its whole group, including a modifier sibling", () => {
   const modifier = catalogue.skills.find((s) => s.nodeKind === "modifier" && s.group !== s.record)!;
   const mastery = modifier.mastery;
-  const markup = buildTreeMarkup(catalogue.skills, mastery, modifier.group, ctx);
+  const markup = buildTreeMarkup(catalogue.skills, mastery, new Set([modifier.group]), ctx);
   const groups = nodeGroups(markup);
   const base = groups.find((n) => n.record === modifier.group)!;
   const mod = groups.find((n) => n.record === modifier.record)!;
@@ -164,6 +166,90 @@ test("selecting a base skill highlights its whole group, including a modifier si
 
 test("a selected id absent from the catalogue (a stale link) selects nothing, never throws", () => {
   const mastery = masteryRecords[0]!;
-  const markup = buildTreeMarkup(catalogue.skills, mastery, "no-such-skill-record", ctx);
+  const markup = buildTreeMarkup(catalogue.skills, mastery, new Set(["no-such-skill-record"]), ctx);
   expect(nodeGroups(markup).some((n) => n.cls.includes("selected"))).toBe(false);
+});
+
+// The connector lines. These exist because the tree used to render as unconnected icons on a
+// black field, giving no hint which upgrades belong to which skill - the relationship is in the
+// data (group + nodeKind) and the game draws it, so the tree does too.
+const LINE = /<line class="tree-link" x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="([\d.]+)"\/>/g;
+
+function links(markup: string): { x1: number; y1: number; x2: number; y2: number }[] {
+  return [...markup.matchAll(LINE)].map((m) => ({
+    x1: Number(m[1]),
+    y1: Number(m[2]),
+    x2: Number(m[3]),
+    y2: Number(m[4]),
+  }));
+}
+
+test("every on-tree group draws exactly one link per non-base member", () => {
+  for (const mastery of masteryRecords) {
+    const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
+    const onTree = catalogue.skills.filter((s) => s.mastery === mastery && s.uiX !== null && s.uiY !== null);
+    const byGroup = new Map<string, number>();
+    for (const s of onTree) byGroup.set(s.group, (byGroup.get(s.group) ?? 0) + 1);
+    let want = 0;
+    for (const [group, n] of byGroup) {
+      // Only a group whose base is itself on-tree gets links; the chain is anchored on the base.
+      if (onTree.some((s) => s.group === group && s.nodeKind === "base")) want += n - 1;
+    }
+    expect(links(markup).length).toBe(want);
+  }
+});
+
+test("every link ends on a real node centre, so no line points at empty space", () => {
+  for (const mastery of masteryRecords) {
+    const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
+    const centres = new Set<string>();
+    for (const m of markup.matchAll(/<circle class="node-shape" cx="([\d.]+)" cy="([\d.]+)"/g)) {
+      centres.add(`${m[1]},${m[2]}`);
+    }
+    // A base renders as a <rect>, whose x/y is the top-left corner: recover its centre.
+    for (const m of markup.matchAll(/<rect class="node-shape" x="([\d.]+)" y="([\d.]+)" width="(\d+)"/g)) {
+      const half = Number(m[3]) / 2;
+      centres.add(`${Number(m[1]) + half},${Number(m[2]) + half}`);
+    }
+    for (const l of links(markup)) {
+      expect(centres.has(`${l.x1},${l.y1}`)).toBe(true);
+      expect(centres.has(`${l.x2},${l.y2}`)).toBe(true);
+    }
+  }
+});
+
+test("modifiers chain left to right off the base rather than all radiating from it", () => {
+  // Cadence is the clearest case in the data: base at (246,319) with modifiers at 486 and 806 on
+  // the same row, and a transmuter off at (326,281). A star layout would link 246->806 directly;
+  // the game draws a chain, so the far modifier hangs off the near one.
+  const soldier = catalogue.skills.find((s) => s.record.endsWith("cadence1.dbr"))!;
+  const markup = buildTreeMarkup(catalogue.skills, soldier.mastery, NONE, ctx);
+  const row = links(markup).filter((l) => l.y1 === 319 && l.y2 === 319);
+  const spans = row.map((l) => `${l.x1}->${l.x2}`).sort();
+  expect(spans).toContain("246->486");
+  expect(spans).toContain("486->806");
+  expect(spans).not.toContain("246->806");
+  // The transmuter joins the base directly, on its own diagonal.
+  expect(links(markup)).toContainEqual({ x1: 246, y1: 319, x2: 326, y2: 281 });
+});
+
+test("off-tree nodes are left unlinked: they carry no game coordinates to draw a line to", () => {
+  const offTree = catalogue.skills.find((s) => s.uiX === null || s.uiY === null)!;
+  const markup = buildTreeMarkup(catalogue.skills, offTree.mastery, NONE, ctx);
+  // The off-tree row sits at a y the real tree is compressed away from; no link may reach it.
+  const offTreeY = 39 + 420 - 60 / 2;
+  for (const l of links(markup)) {
+    expect(l.y1).not.toBe(offTreeY);
+    expect(l.y2).not.toBe(offTreeY);
+  }
+});
+
+test("selecting two groups highlights both, and leaves the rest alone", () => {
+  const mastery = masteryRecords[0]!;
+  const groups = [...new Set(catalogue.skills.filter((s) => s.mastery === mastery).map((s) => s.group))];
+  const [a, b] = [groups[0]!, groups[1]!];
+  const markup = buildTreeMarkup(catalogue.skills, mastery, new Set([a, b]), ctx);
+  const selected = nodeGroups(markup).filter((n) => n.cls.includes("selected"));
+  expect(new Set(selected.map((n) => n.group))).toEqual(new Set([a, b]));
+  expect(selected.length).toBeGreaterThanOrEqual(2);
 });

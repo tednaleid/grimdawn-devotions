@@ -1,12 +1,15 @@
 // ABOUTME: The items page ViewState (every view-changing control) and its hash codec.
 // ABOUTME: ViewState is the single source of view state; main.ts round-trips it through the URL hash.
 import { putSet, readSet } from "../../core/hashCodec";
-import { DOMAINS, EFFECT_KINDS, RARITIES, SLOTS, SORT_KEYS } from "./facets";
+import { CATEGORIES, DOMAINS, EFFECT_KINDS, RARITIES, SORT_KEYS } from "./facets";
 
 export interface ViewState {
   mastery: string | null;
-  skill: string | null;
-  fSlot: Set<string>;
+  // Several skills widen the scope: the table shows items touching ANY of them, so a player can
+  // see everything relevant to a planned build at once. Empty means the whole mastery is in
+  // scope (see core/filter.ts's scopeSkillSet). Every member belongs to `mastery`.
+  skills: Set<string>;
+  fCat: Set<string>;
   fRarity: Set<string>;
   fDomain: Set<string>;
   fKind: Set<string>;
@@ -18,8 +21,8 @@ export interface ViewState {
 
 export const DEFAULT_VIEW: ViewState = {
   mastery: null,
-  skill: null,
-  fSlot: new Set(),
+  skills: new Set(),
+  fCat: new Set(),
   fRarity: new Set(),
   fDomain: new Set(),
   fKind: new Set(),
@@ -29,7 +32,7 @@ export const DEFAULT_VIEW: ViewState = {
   sortDir: 1,
 };
 
-const SLOT_VALUES = new Set(SLOTS);
+const CATEGORY_VALUES = new Set(CATEGORIES);
 const RARITY_VALUES = new Set(RARITIES);
 const DOMAIN_VALUES = new Set(DOMAINS);
 const KIND_VALUES = new Set(EFFECT_KINDS);
@@ -40,8 +43,8 @@ const SORT_VALUES = new Set(SORT_KEYS);
 export function encodeHash(v: ViewState): string {
   const parts: string[] = [];
   if (v.mastery) parts.push(`mastery=${encodeURIComponent(v.mastery)}`);
-  if (v.skill) parts.push(`skill=${encodeURIComponent(v.skill)}`);
-  putSet(parts, "slot", v.fSlot);
+  putSet(parts, "skill", v.skills);
+  putSet(parts, "cat", v.fCat);
   putSet(parts, "rarity", v.fRarity);
   putSet(parts, "domain", v.fDomain);
   putSet(parts, "kind", v.fKind);
@@ -56,18 +59,21 @@ export function encodeHash(v: ViewState): string {
 /** Decode a hash body onto DEFAULT_VIEW, tolerating garbage and stale links.
  *
  *  `known` comes from the loaded catalogue rather than a constant: mastery and skill ids are
- *  data, not a fixed vocabulary. A mastery or skill id absent from `known` (a stale link after
- *  a dataset update) falls back to no selection rather than throwing. `skills` maps each skill
- *  record to its owning mastery record, so a hash carrying a valid `skill` but no (or a stale)
- *  `mastery` can backfill the mastery from the skill itself: `mastery` and `skill` are validated
- *  independently above, and without this a valid skill with a missing mastery would filter the
- *  table while the mastery/skill pickers show no selection and Reset can't clear it (fix round 1,
- *  M4) - the only escape was picking a mastery by hand.
+ *  data, not a fixed vocabulary. A mastery id absent from `known` (a stale link after a dataset
+ *  update) falls back to no selection rather than throwing, and an unknown skill id is dropped
+ *  from the list on its own. `known.skills` maps each skill record to its owning mastery record,
+ *  which serves two invariants at the end of this function: a hash carrying valid skills but no
+ *  (or a stale) `mastery` backfills the mastery from the first of them, and any skill outside the
+ *  resulting mastery is dropped. Both exist so the pickers and the active filter can never
+ *  disagree - without the backfill, a valid skill with a missing mastery filtered the table while
+ *  both pickers showed no selection and Reset could not clear it (fix round 1, M4), and the only
+ *  escape was picking a mastery by hand.
  */
 export function decodeHash(hash: string, known: { masteries: Set<string>; skills: Map<string, string> }): ViewState {
   const v: ViewState = {
     ...DEFAULT_VIEW,
-    fSlot: new Set(),
+    skills: new Set(),
+    fCat: new Set(),
     fRarity: new Set(),
     fDomain: new Set(),
     fKind: new Set(),
@@ -80,8 +86,14 @@ export function decodeHash(hash: string, known: { masteries: Set<string>; skills
     const rawVal = pair.slice(eq + 1);
     // Set-valued keys read the raw value: readSet drops bad tokens individually, where the
     // outer decode below would discard the whole list on one malformed member.
-    if (key === "slot") {
-      v.fSlot = readSet(rawVal, SLOT_VALUES);
+    if (key === "cat") {
+      v.fCat = readSet(rawVal, CATEGORY_VALUES);
+      continue;
+    }
+    if (key === "skill") {
+      // Validated against the catalogue rather than a fixed vocabulary: skill ids are data.
+      // readSet drops an unknown id (a stale link) on its own, leaving the rest of the list.
+      v.skills = readSet(rawVal, new Set(known.skills.keys()));
       continue;
     }
     if (key === "rarity") {
@@ -105,9 +117,6 @@ export function decodeHash(hash: string, known: { masteries: Set<string>; skills
     switch (key) {
       case "mastery":
         v.mastery = known.masteries.has(val) ? val : null;
-        break;
-      case "skill":
-        v.skill = known.skills.has(val) ? val : null;
         break;
       case "wide":
         v.masteryWide = val === "1";
@@ -134,8 +143,17 @@ export function decodeHash(hash: string, known: { masteries: Set<string>; skills
   // mastery/skill pickers and the active filter never disagree. mastery and skill are decoded
   // independently above and each can arrive in either order, so this runs once the whole hash
   // has been read rather than inline in the "skill" case.
-  if (v.skill && !v.mastery) {
-    v.mastery = known.skills.get(v.skill) ?? null;
+  const firstSkill = [...v.skills][0];
+  if (firstSkill && !v.mastery) {
+    v.mastery = known.skills.get(firstSkill) ?? null;
+  }
+  // Every selected skill must belong to the selected mastery. The tree only ever shows one
+  // mastery, so a hand-edited hash mixing two would filter the table by skills the tree cannot
+  // display or clear - the same disagreement the mastery backfill above exists to prevent.
+  if (v.mastery) {
+    for (const record of [...v.skills]) {
+      if (known.skills.get(record) !== v.mastery) v.skills.delete(record);
+    }
   }
   return v;
 }

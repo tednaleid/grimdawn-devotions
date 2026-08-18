@@ -54,6 +54,15 @@ COMPOSER_TAGS = frozenset({
     "tagSkillDurationRefreshMax", "tagSkillDurationRefreshNameMax",
 } | {f"tagRefreshSkillCondition{n:02d}" for n in range(1, 13)})
 
+# The /items/ page's gear-category chips. The game groups weapons this way in its own
+# loot filter, and each of the 13 weapon gear_types falls into exactly one of these
+# (the game's own help text confirms the grouping: tagLootFilter10Info reads
+# "Two-handed Axes, Maces, Spears and Swords" against axe2h/mace2h/spear2h/sword2h).
+# Shipping the game's tags rather than our own strings means the categories are already
+# translated everywhere. No dataset names them, so they are listed here.
+# See the gear category table in web/src/items/core/facets.ts.
+FACET_TAGS = frozenset({f"tagLootFilter{n:02d}" for n in range(9, 16)})
+
 
 def collect_referenced_tags(
     devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None,
@@ -70,7 +79,8 @@ def collect_referenced_tags(
     race_tag, which _add skips. skill-items contributes the name tags of its masteries,
     skills and items, plus the pet name and pet-ability name tags a summon skill's panel
     renders; a nameless item or an unnamed pet ability carries a null tag, which _add
-    also skips. Always also includes COMPOSER_TAGS, the formatter's grammar tags."""
+    also skips. Always also includes COMPOSER_TAGS, the formatter's grammar tags, and
+    FACET_TAGS, the /items/ page's gear-category chip labels."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
@@ -105,6 +115,7 @@ def collect_referenced_tags(
     tags.update((stat_format_tags or {}).values())
     tags.update((stat_item_tags or {}).values())
     tags.update(COMPOSER_TAGS)
+    tags.update(FACET_TAGS)
     return tags
 
 

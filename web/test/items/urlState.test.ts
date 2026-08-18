@@ -11,9 +11,10 @@ const known = {
 };
 
 test("round-trips a non-default state", () => {
-  const v = decodeHash("mastery=m1&skill=s1&slot=medal,amulet&rarity=Legendary&sort=ilvl:-1", known);
+  const v = decodeHash("mastery=m1&skill=s1&cat=medal,amulet&rarity=Legendary&sort=ilvl:-1", known);
   expect(v.mastery).toBe("m1");
-  expect(v.fSlot).toEqual(new Set(["medal", "amulet"]));
+  expect(v.skills).toEqual(new Set(["s1"]));
+  expect(v.fCat).toEqual(new Set(["medal", "amulet"]));
   expect(decodeHash(encodeHash(v), known)).toEqual(v);
 });
 
@@ -24,11 +25,11 @@ test("defaults encode as absent so a bare link stays short", () => {
 test("a stale skill id falls back to no selection rather than throwing", () => {
   const v = decodeHash("mastery=m1&skill=deleted-skill", known);
   expect(v.mastery).toBe("m1");
-  expect(v.skill).toBeNull();
+  expect(v.skills).toEqual(new Set());
 });
 
-test("unknown slot tokens are dropped, known ones kept", () => {
-  expect(decodeHash("slot=medal,teapot", known).fSlot).toEqual(new Set(["medal"]));
+test("unknown category tokens are dropped, known ones kept", () => {
+  expect(decodeHash("cat=medal,teapot", known).fCat).toEqual(new Set(["medal"]));
 });
 
 test("a stale mastery id falls back to no selection", () => {
@@ -43,7 +44,7 @@ test("a stale mastery id falls back to no selection", () => {
 test("a skill with no mastery in the hash backfills mastery from the skill's own record", () => {
   const v = decodeHash("skill=s2", known);
   expect(v.mastery).toBe("m2");
-  expect(v.skill).toBe("s2");
+  expect(v.skills).toEqual(new Set(["s2"]));
 });
 
 test("a skill with a stale mastery in the hash backfills from the skill, not the stale value", () => {
@@ -89,4 +90,42 @@ test("a hash with no '=' anywhere is skipped entirely by the pair guard, yieldin
 
 test("a value that fails decodeURIComponent is dropped via the catch, yielding defaults", () => {
   expect(decodeHash("q=%zz", known)).toEqual(DEFAULT_VIEW);
+});
+
+test("several skills round-trip as one comma-joined list", () => {
+  const known2 = {
+    masteries: new Set(["m1"]),
+    skills: new Map([
+      ["s1", "m1"],
+      ["s1b", "m1"],
+    ]),
+  };
+  const v = decodeHash("mastery=m1&skill=s1,s1b", known2);
+  expect(v.skills).toEqual(new Set(["s1", "s1b"]));
+  expect(decodeHash(encodeHash(v), known2)).toEqual(v);
+});
+
+test("one stale id in a skill list drops only itself, keeping the rest of the selection", () => {
+  const known2 = {
+    masteries: new Set(["m1"]),
+    skills: new Map([
+      ["s1", "m1"],
+      ["s1b", "m1"],
+    ]),
+  };
+  expect(decodeHash("mastery=m1&skill=s1,deleted,s1b", known2).skills).toEqual(new Set(["s1", "s1b"]));
+});
+
+test("a hand-edited hash mixing two masteries keeps only the skills of the chosen one", () => {
+  // The tree can only draw one mastery, so a selection it cannot show or clear would leave the
+  // table filtered by something invisible - the same disagreement the mastery backfill prevents.
+  const v = decodeHash("mastery=m1&skill=s1,s2", known);
+  expect(v.mastery).toBe("m1");
+  expect(v.skills).toEqual(new Set(["s1"]));
+});
+
+test("with no mastery in the hash, the first skill backfills it and the rest are filtered to match", () => {
+  const v = decodeHash("skill=s2,s1", known);
+  expect(v.mastery).toBe("m2");
+  expect(v.skills).toEqual(new Set(["s2"]));
 });

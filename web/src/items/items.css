@@ -57,6 +57,11 @@
   flex-direction: column;
   gap: 4px;
 }
+/* The mastery radiogroup is ten buttons wide, so it takes its own line and the narrower controls
+   wrap underneath rather than being squeezed onto the end of it. */
+.items-page .ctl-wide {
+  flex-basis: 100%;
+}
 .items-page .ctl-label {
   font-family: var(--it-mono);
   font-size: 10.5px;
@@ -100,9 +105,18 @@
   display: block;
   overflow: visible; /* nodes at the box edge (e.g. y=459) sit half outside the pinned viewBox */
   width: 100%;
-  max-width: 560px;
+  /* Wide enough that the icons render near their native 32px rather than shrunk, and that the
+     tree fills its panel instead of floating in a band of empty background. Still capped, so a
+     very wide window does not stretch the tree to absurdity. */
+  max-width: 900px;
   height: auto;
   margin: 0 auto;
+}
+/* Connectors sit under the nodes (they are emitted first) and stay quiet: they exist to show
+   which upgrades belong to which skill, not to compete with the icons. */
+.items-page .tree-link {
+  stroke: var(--it-line);
+  stroke-width: 2px;
 }
 .items-page .tree-node {
   cursor: pointer;
@@ -178,7 +192,10 @@
   color: var(--it-ink);
   border-color: #444c56;
 }
-.items-page .chip[aria-pressed="true"] {
+/* The mastery picker is a radiogroup, so its buttons carry aria-checked where the facet chips
+   carry aria-pressed; both mean "on" and look the same. */
+.items-page .chip[aria-pressed="true"],
+.items-page .chip[aria-checked="true"] {
   color: var(--it-ink);
   background: rgba(240, 193, 75, 0.12);
   border-color: var(--it-ember);

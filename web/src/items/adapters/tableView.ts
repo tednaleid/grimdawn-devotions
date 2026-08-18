@@ -2,9 +2,9 @@
 // ABOUTME: Every change round-trips through onView; the skill picker is the SVG mastery tree from treeView.ts.
 import { resolveText, type Text } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
-import { DOMAINS, EFFECT_KINDS, RARITIES, SLOTS } from "../core/facets";
+import { CATEGORIES, categoryGameTag, DOMAINS, EFFECT_KINDS, RARITIES } from "../core/facets";
 import { rowEffectLines, type EffectContext } from "../core/effectText";
-import type { Row } from "../core/filter";
+import { itemCategory, type Row } from "../core/filter";
 import type { Catalogue, Item } from "../core/model";
 import type { ViewState } from "../core/urlState";
 import type { SkillIconIndex } from "./dataSource";
@@ -65,10 +65,16 @@ function esc(s: string): string {
   return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
 }
 
-// "main_hand" -> "mainHand": SLOTS ids are snake_case (matching the game record fields), catalog
-// keys follow this project's camelCase convention.
-function slotKey(id: string): string {
-  return id.replace(/_([a-z])/g, (_all, c: string) => c.toUpperCase());
+const CATEGORY_SET = new Set(CATEGORIES);
+
+// The weapon categories are the game's own (from its loot filter), so they resolve as game text
+// and arrive translated; armour, jewellery and relic have no such tag and resolve from the app
+// catalogue. A category outside the known vocabulary is a gear class core/facets.ts has not been
+// taught yet (see itemCategory): it shows as its raw id rather than as a missing catalog key.
+function categoryLabel(loc: Localization, category: string): string {
+  const tag = categoryGameTag(category);
+  if (tag) return loc.gameText(tag);
+  return CATEGORY_SET.has(category) ? loc.translate(`items.category.${category}`) : category;
 }
 
 function chip(facetKey: string, value: string, label: string, pressed: boolean): string {
@@ -82,9 +88,7 @@ function facetGroup(loc: Localization, labelKey: string, chips: string): string 
 
 /** Pure markup for the four chip facet groups; aria-pressed reflects the current view's sets. */
 export function facetsMarkup(loc: Localization, view: ViewState): string {
-  const slot = SLOTS.map((s) => chip("fSlot", s, loc.translate(`items.slot.${slotKey(s)}`), view.fSlot.has(s))).join(
-    "",
-  );
+  const cat = CATEGORIES.map((c) => chip("fCat", c, categoryLabel(loc, c), view.fCat.has(c))).join("");
   const rarity = RARITIES.map((r) =>
     chip("fRarity", r, loc.translate(`items.rarity.${r.toLowerCase()}`), view.fRarity.has(r)),
   ).join("");
@@ -93,7 +97,7 @@ export function facetsMarkup(loc: Localization, view: ViewState): string {
   );
   const kind = EFFECT_KINDS.map((k) => chip("fKind", k, loc.translate(`items.kind.${k}`), view.fKind.has(k))).join("");
   return (
-    facetGroup(loc, "items.ctl.slot", slot) +
+    facetGroup(loc, "items.ctl.slot", cat) +
     facetGroup(loc, "items.ctl.rarity", rarity) +
     facetGroup(loc, "items.ctl.domain", domain) +
     facetGroup(loc, "items.ctl.kind", kind)
@@ -113,7 +117,7 @@ function nameCell(loc: Localization, item: Item): string {
 
 function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string {
   const item = row.item;
-  const slots = item.slots.map((s) => esc(loc.translate(`items.slot.${slotKey(s)}`))).join(", ");
+  const category = esc(categoryLabel(loc, itemCategory(item)));
   const rarity = esc(loc.translate(`items.rarity.${item.rarity.toLowerCase()}`));
   const lines: Text[] = rowEffectLines(row.modBlocks, effectCtx);
   const effect = lines.length ? lines.map((t) => esc(resolveText(loc, t))).join("<br>") : "—";
@@ -121,7 +125,7 @@ function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string 
   const caret = expanded ? "▾" : "▸";
   return `<tr class="item-row" data-record="${esc(item.record)}" role="button" tabindex="0" aria-expanded="${expanded}">
     <td class="name"><span class="row-caret" aria-hidden="true">${caret}</span>${nameCell(loc, item)}</td>
-    <td>${slots}</td>
+    <td>${category}</td>
     <td>${rarity}</td>
     <td class="num">${item.itemLevel}</td>
     <td class="num">${row.levels}</td>
@@ -130,15 +134,23 @@ function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string 
 }
 
 /** Pure tbody markup for the current sorted rows, or the empty-state row. */
-export function bodyMarkup(loc: Localization, rows: Row[], effectCtx: EffectContext): string {
+export function bodyMarkup(loc: Localization, rows: Row[], effectCtx: EffectContext, view: ViewState): string {
   if (!rows.length) {
-    return `<tr class="empty"><td colspan="${COLS.length}">${esc(loc.translate("items.table.empty"))}</td></tr>`;
+    // Nothing is filtered out before a mastery is chosen - there is simply no scope yet - so
+    // saying "no items match the current filters" there would be a lie about the user's filters.
+    const key = view.mastery ? "items.table.empty" : "items.table.pickMastery";
+    return `<tr class="empty"><td colspan="${COLS.length}">${esc(loc.translate(key))}</td></tr>`;
   }
   return rows.map((r) => rowHtml(loc, r, effectCtx)).join("");
 }
 
 function skeleton(loc: Localization): string {
-  const mastery = `<div class="ctl"><label class="ctl-label" for="items-mastery">${esc(loc.translate("items.ctl.mastery"))}</label><select id="items-mastery"></select></div>`;
+  // A radio group rather than a <select>: ten masteries fit on screen at once, so the whole
+  // vocabulary is visible instead of hidden behind a click. Exactly one is ever chosen, which is
+  // what role=radiogroup says and what the tree below needs (it draws one mastery).
+  const mastery =
+    `<div class="ctl ctl-wide"><span class="ctl-label" id="items-mastery-lab">${esc(loc.translate("items.ctl.mastery"))}</span>` +
+    `<div class="chips mastery-chips" id="items-mastery" role="radiogroup" aria-labelledby="items-mastery-lab"></div></div>`;
   const wideLabel = esc(loc.translate("items.ctl.masteryWide"));
   const wide = `<div class="ctl"><button type="button" class="chip" id="items-wide" aria-pressed="false">${wideLabel}</button></div>`;
   const search = `<div class="ctl"><label class="ctl-label" for="items-q">${esc(loc.translate("items.ctl.search"))}</label><input type="search" id="items-q" placeholder="${esc(loc.translate("items.ctl.searchPlaceholder"))}" /></div>`;
@@ -186,10 +198,14 @@ function syncTree(
   const svg = renderTree(
     catalogue.skills,
     view.mastery,
-    view.skill,
+    view.skills,
     (group) => {
-      const next = view.skill === group ? null : group;
-      handlers.onView({ ...view, skill: next });
+      // Toggle into the set: several skills widen the scope (the table shows items touching any
+      // of them), and clicking the last selected node clears back to the whole mastery.
+      const next = new Set(view.skills);
+      if (next.has(group)) next.delete(group);
+      else next.add(group);
+      handlers.onView({ ...view, skills: next });
     },
     treeCtx,
   );
@@ -211,15 +227,22 @@ function syncControls(
   view: ViewState,
   handlers: TableHandlers,
 ): void {
-  const masterySel = el.querySelector<HTMLSelectElement>("#items-mastery")!;
+  const masteryEl = el.querySelector<HTMLElement>("#items-mastery")!;
   const masteryOpts = catalogue.masteries
     .map((m) => ({ record: m.record, label: loc.gameText(m.nameTag) }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-    .map(
-      (m) => `<option value="${esc(m.record)}"${m.record === view.mastery ? " selected" : ""}>${esc(m.label)}</option>`,
-    )
+    .sort((a, b) => a.label.localeCompare(b.label));
+  masteryEl.innerHTML = masteryOpts
+    .map((m, i) => {
+      const on = m.record === view.mastery;
+      // tabindex follows the radiogroup convention: exactly one option is in the tab order - the
+      // chosen one, or the first while nothing is chosen yet - and arrows move within the group.
+      const tab = on || (!view.mastery && i === 0) ? 0 : -1;
+      return (
+        `<button type="button" class="chip" role="radio" data-mastery="${esc(m.record)}"` +
+        ` aria-checked="${on}" tabindex="${tab}">${esc(m.label)}</button>`
+      );
+    })
     .join("");
-  masterySel.innerHTML = `<option value="">${esc(loc.translate("items.ctl.selectMastery"))}</option>${masteryOpts}`;
 
   syncTree(el, loc, catalogue, icons, view, handlers);
 
@@ -242,9 +265,9 @@ function syncControls(
 // descriptors), not markup, so it slots in via the DOM rather than string concatenation. Summary
 // rows and Row entries stay in the same order and count (bodyMarkup emits exactly one <tr> per
 // row, or a single empty-state row when rows is empty), so the two are matched up by index.
-function renderBody(el: HTMLElement, loc: Localization, rows: Row[], detailCtx: DetailContext): void {
+function renderBody(el: HTMLElement, loc: Localization, rows: Row[], detailCtx: DetailContext, view: ViewState): void {
   const tbody = el.querySelector<HTMLElement>("#items-tbody")!;
-  tbody.innerHTML = bodyMarkup(loc, rows, detailCtx);
+  tbody.innerHTML = bodyMarkup(loc, rows, detailCtx, view);
   if (!rows.length) return;
   const summaryRows = tbody.children;
   rows.forEach((row, i) => {
@@ -274,11 +297,33 @@ function wire(el: HTMLElement): void {
     if (!ctx) return;
     ctx.handlers.onView({ ...ctx.view, ...patch }, mode);
   };
-  el.querySelector<HTMLSelectElement>("#items-mastery")!.addEventListener("change", (e) => {
-    const value = (e.target as HTMLSelectElement).value;
+  // Delegated, like the facet chips: the buttons are regenerated on every render.
+  const masteryGroup = el.querySelector<HTMLElement>("#items-mastery")!;
+  const pickMastery = (value: string) => {
+    if (!ctx || value === ctx.view.mastery) return; // radio: re-picking the chosen one is a no-op
     // Changing mastery drops the skill selection: a skill id from the old mastery is meaningless
     // (and possibly invalid) once the mastery scope changes.
-    fire({ mastery: value || null, skill: null });
+    fire({ mastery: value, skills: new Set() });
+  };
+  masteryGroup.addEventListener("click", (e) => {
+    const b = (e.target as Element).closest<HTMLElement>("[data-mastery]");
+    if (b) pickMastery(b.dataset.mastery!);
+  });
+  // Arrow keys move within the group, as a radiogroup is expected to: only one option is in the
+  // tab order (see syncControls), so without this the keyboard could reach the picker but never
+  // change it - worse than the <select> this replaced.
+  masteryGroup.addEventListener("keydown", (e) => {
+    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+    if (!step) return;
+    const buttons = [...masteryGroup.querySelectorAll<HTMLElement>("[data-mastery]")];
+    const from = buttons.indexOf(e.target as HTMLElement);
+    if (from < 0) return;
+    e.preventDefault();
+    const next = buttons[(from + step + buttons.length) % buttons.length]!;
+    // Re-rendering replaces these buttons, so focus is restored by position afterwards.
+    const index = buttons.indexOf(next);
+    pickMastery(next.dataset.mastery!);
+    masteryGroup.querySelectorAll<HTMLElement>("[data-mastery]")[index]?.focus();
   });
   el.querySelector<HTMLButtonElement>("#items-wide")!.addEventListener("click", () => {
     if (!ctx) return;
@@ -291,7 +336,7 @@ function wire(el: HTMLElement): void {
   el.querySelector<HTMLElement>("#items-facets")!.addEventListener("click", (e) => {
     const b = (e.target as Element).closest<HTMLElement>(".chip");
     if (!b || !ctx) return;
-    const facetKey = b.dataset.facet as "fSlot" | "fRarity" | "fDomain" | "fKind";
+    const facetKey = b.dataset.facet as "fCat" | "fRarity" | "fDomain" | "fKind";
     const val = b.dataset.val!;
     const next = new Set(ctx.view[facetKey]);
     next.has(val) ? next.delete(val) : next.add(val);
@@ -300,7 +345,7 @@ function wire(el: HTMLElement): void {
   // Reset restores the chip facets, mastery-wide toggle, and search to their defaults, but leaves
   // the mastery/skill selection alone: clearing those too would defeat the point of a filter reset.
   el.querySelector<HTMLButtonElement>("#items-reset")!.addEventListener("click", () => {
-    fire({ fSlot: new Set(), fRarity: new Set(), fDomain: new Set(), fKind: new Set(), masteryWide: false, q: "" });
+    fire({ fCat: new Set(), fRarity: new Set(), fDomain: new Set(), fKind: new Set(), masteryWide: false, q: "" });
   });
   // Sort: click a header (toggle dir when re-clicking the active key).
   el.querySelector("thead")!.addEventListener("click", (e) => {
@@ -320,7 +365,7 @@ function wire(el: HTMLElement): void {
   const toggleExpanded = (record: string) => {
     if (!ctx) return;
     expandedRecords.has(record) ? expandedRecords.delete(record) : expandedRecords.add(record);
-    renderBody(el, ctx.loc, ctx.rows, ctx.detailCtx);
+    renderBody(el, ctx.loc, ctx.rows, ctx.detailCtx, ctx.view);
   };
   tbody.addEventListener("click", (e) => {
     const target = e.target as Element;
@@ -360,6 +405,6 @@ export function renderTable(
     wire(el);
   }
   syncControls(el, loc, catalogue, icons, view, handlers);
-  renderBody(el, loc, rows, detailCtx);
+  renderBody(el, loc, rows, detailCtx, view);
   renderCount(el, loc, catalogue, rows);
 }
