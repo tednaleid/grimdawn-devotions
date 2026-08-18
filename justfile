@@ -323,6 +323,35 @@ i18n-tables *LANGS: _require-game-closed
     echo "built:$built"
     [ -n "$skipped" ] && echo "skipped:$skipped" || true
 
+# Rebuild data/i18n/game.<lang>.json from the trees `i18n-tables` already extracted.
+# Unguarded on purpose: this reads extracted/text_<lang>/ and never touches the game's
+# archives, so it is safe while Grim Dawn is running. Use it whenever only the tag
+# SELECTION changed (a new tag referenced by a dataset) rather than the game's text.
+[group("devotions")]
+[doc("Rebuild game.<lang>.json from already-extracted text, without the game")]
+i18n-tables-rebuild *LANGS:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    langs="{{LANGS}}"
+    if [ -z "$langs" ]; then
+      langs=$(ls -d "{{justfile_directory()}}"/extracted/text_* 2>/dev/null \
+        | sed -E 's#.*/text_##' | sort | tr '\n' ' ')
+    fi
+    built=""; skipped=""
+    for L in $langs; do
+      if [ "$L" = "en" ]; then tdir="{{text_dir}}"; else tdir="{{justfile_directory()}}/extracted/text_$L"; fi
+      if [ "$(find "$tdir" -name '*.txt' 2>/dev/null | wc -l)" -eq 0 ]; then
+        echo "skip $L (no extracted text at $tdir)"; skipped="$skipped $L"; continue
+      fi
+      uv run scripts/build_game_tables.py --devotions "{{out}}" --stat-tags data/stat-tags.json \
+        --stat-format-tags data/stat-format-tags.json --rr "{{out_rr}}" --monsters "{{out_mon}}" \
+        --skill-items "data/skill-items.json" --stat-item-tags "data/stat-item-tags.json" \
+        --text-dir "$tdir" --lang "$L" --out "data/i18n/game.$L.json"
+      built="$built $L"
+    done
+    echo "built:$built"
+    [ -n "$skipped" ] && echo "skipped:$skipped" || true
+
 # --- Raw game-data deposit ----------------------------------------------------
 # Lossless long-format extraction of the FULL records/ tree plus per-locale label
 # tables, queryable anywhere via DuckDB (no game install needed after `deposit`).
