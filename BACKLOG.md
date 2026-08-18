@@ -824,6 +824,44 @@ artifact policy, item source, grimtools boundary).
   them from real content at the data layer (five candidates were tested and each
   also condemned real stats), so the filtering decision belongs to the page.
 
+## effectLines: a Min/Max range drops its value when the shared tag is a plain label
+
+Found while building the Task 16 pet panel (`web/src/items/adapters/detailView.ts`) and
+verifying it in a real browser against the committed dataset, not introduced by that work:
+`effectLines`'s RANGE branch (`web/src/items/core/effectText.ts`) calls `gameFormatT(tag,
+[[minValue, maxValue]])` directly instead of going through `valueLine`. That is correct
+when `tag`'s template is braced (`applyGameFormat` substitutes into the `{...}` group), but
+when the shared tag resolves to a **plain** label (no `{...}`, e.g. `DamageDurationLightning`
+= "Electrocute Damage"), `applyGameFormat`'s substitution regex finds nothing to replace and
+returns the template unchanged - the range silently vanishes. Confirmed via
+`effectLines([{stat:"offensiveSlowLightningMax",value:463},{stat:"offensiveSlowLightningMin",value:382}], ctx)`
+with `DamageDurationLightning` mapped to the real plain-label template: yields
+`{k:"gameFormat", tag:"DamageDurationLightning", args:[[382,463]]}`, which resolves to the
+bare string "Electrocute Damage" with no numbers at all.
+
+This shape (a Min/Max pair whose tag is plain, with no `DurationMin` sibling to route it
+through the DOT branch's own valueLine-based composer instead) occurs exactly once in the
+whole committed dataset: Wind Devil's "Howling Wind" pet ability
+(`records/skills/playerclass06/pets/petskill_whirlwind_whirlwind.dbr`,
+`offensiveSlowLightningMin`/`Max`, no `offensiveSlowLightningDurationMin`). It does not occur
+anywhere in the 2000+ item-modifier blocks the existing `/items/` table already ships (checked
+programmatically: 0 hits), which is why nothing surfaced it before - the pet panel is the
+first code path to exercise a plain-label Min/Max pair with real data. Left unfixed here
+because it lives in a shared, already-tested file outside both tasks' scope, and Task 16's
+one occurrence (a cosmetic "Electrocute Damage" line with no number, buried under an
+already-collapsed `<details>` panel) did not seem worth reopening `effectText.ts`'s
+carefully-reasoned RANGE/DOT logic without dedicated test coverage and sign-off.
+
+Fix: route the RANGE branch's plain-label case through `valueLine` (or an equivalent
+composer-aware call) the same way the DOT branch already does for its own value, rather than
+calling `gameFormatT` directly on a `FormatArg` tuple `applyGameFormat` cannot substitute into
+a brace-less template.
+
+Pointers: the `RANGE` branch in `effectLines` (`web/src/items/core/effectText.ts`); a
+regression test alongside `web/test/items/effectText.test.ts`'s existing RANGE-family tests,
+using a plain (non-templated) tag as the fixture (the existing tests only cover templated tags
+like `"{%t0} Fire Damage"`).
+
 ## Devotion search: follow-ups from the branch review
 
 The text search over the devotion map shipped (search box, corpus, per-locale

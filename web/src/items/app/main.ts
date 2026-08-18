@@ -54,8 +54,8 @@ async function boot() {
 
   // Rebuilt each render so a locale switch is reflected immediately: templateOf reads the active
   // locale's game text (effectText.ts's valueLine sees the active locale's template, not always
-  // English), and tagOf/nameOf/masteryNameOf are locale-independent lookups over the loaded
-  // catalogue. DetailContext extends EffectContext, so this single context serves both the
+  // English), and tagOf/nameOf/masteryNameOf/skillOf are locale-independent lookups over the
+  // loaded catalogue. DetailContext extends EffectContext, so this single context serves both the
   // row-summary effect lines (tableView.ts) and the expanded detail row (detailView.ts).
   function detailContext(): DetailContext {
     return {
@@ -77,6 +77,7 @@ async function boot() {
         const mastery = masteryByRecord.get(masteryRecord);
         return mastery?.nameTag ? gameT(mastery.nameTag) : undefined;
       },
+      skillOf: (skillRecord) => skillByRecord.get(skillRecord),
       loc: localization,
     };
   }

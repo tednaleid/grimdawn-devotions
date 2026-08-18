@@ -1,10 +1,10 @@
 // ABOUTME: Tests for detailMarkup: per-skill grouping (level grants + modifier blocks stay
-// ABOUTME: correctly attributed, never flattened across skills), and the grimtools link.
+// ABOUTME: correctly attributed, never flattened across skills), the pet panel, and the grimtools link.
 import { test, expect } from "bun:test";
 import { gameT, litT, makeLocalization } from "../../src/core/localization";
 import { detailMarkup, type DetailContext } from "../../src/items/adapters/detailView";
 import { parseCatalogue } from "../../src/items/core/model";
-import type { Item } from "../../src/items/core/model";
+import type { Item, Skill } from "../../src/items/core/model";
 import doc from "../../../data/skill-items.json";
 import statItemTags from "../../../data/stat-item-tags.json";
 import gameEn from "../../../data/i18n/game.en.json";
@@ -30,6 +30,7 @@ const realCtx: DetailContext = {
     const m = masteryByRecord.get(r);
     return m?.nameTag ? gameT(m.nameTag) : undefined;
   },
+  skillOf: (r) => skillByRecord.get(r),
   loc,
 };
 
@@ -80,6 +81,36 @@ test("Badge of the Crimson Company: both the Cadence and Leap blocks render, alo
   expect(html).toContain(">View on Grimtools<");
 });
 
+// Wind Devil (records/skills/playerclass06/squall1.dbr): the Task 16 Step 3 check. 5 pet-own-stat
+// rows (no attribution), 31 pet-ability rows across 3 distinct source records - one named
+// ("Howling Wind"), two unnamed (petskill_totem_immunities, petskill_winddevil_radius).
+test("Wind Devil: the pet panel renders the pet's own stats and groups ability rows by name", () => {
+  const skill = catalogue.skills.find((s) => s.record.endsWith("squall1.dbr"))!;
+  expect(skill.pets.length).toBe(1);
+  expect(skill.pets[0]!.stats.length).toBe(36);
+  const item: Item = {
+    record: "test-item",
+    nameTag: null,
+    domain: "gear",
+    slots: [],
+    rarity: "Legendary",
+    itemLevel: 1,
+    tiers: [],
+    grimtools: null,
+    boosts: [{ skill: skill.record, level: 1 }],
+    masteryBoosts: [],
+    modifiers: [],
+  };
+  const html = detailMarkup(item, realCtx);
+  expect(html).toContain("<summary>Wind Devil</summary>");
+  expect(html).toContain('pet-ability-name">Howling Wind<');
+  expect(html).toContain('class="pet-ability-plain"');
+  // The pet's own 5 stats render with no per-row attribution: 5 <li>s under pet-own-stats.
+  const ownMatch = html.match(/<ul class="pet-own-stats">(.*?)<\/ul>/s);
+  expect(ownMatch).not.toBeNull();
+  expect((ownMatch![1]!.match(/<li>/g) ?? []).length).toBe(5);
+});
+
 // --- Golden-rule regression: the same Krieg's Mask shape as tableView.test.ts, but through
 // detailMarkup's per-skill grouping rather than a single row's in-scope modBlocks. Two DIFFERENT
 // skills - one with a flat Min, the other with a real Min/Max pair on the same stat id - must
@@ -103,6 +134,7 @@ const synCtx: DetailContext = {
   templateOf: (t) => SYN_GAME[t],
   nameOf: (r) => (synSkillNames[r] ? litT(synSkillNames[r]!) : undefined),
   masteryNameOf: (r) => (r === "masteries/soldier.dbr" ? litT("Soldier") : undefined),
+  skillOf: () => undefined,
   loc: synLoc,
 };
 
@@ -168,4 +200,143 @@ test("the grimtools link points at item.grimtools and opens in a new tab", () =>
   const html = detailMarkup(item, synCtx);
   expect(html).toContain('href="https://www.grimtools.com/db/items/1"');
   expect(html).toContain('target="_blank"');
+});
+
+// --- Pet panel: value choice and per-source safety, using synthetic PetStat fixtures so the
+// first/max/ultimate choice and the golden-rule-for-pets grouping are pinned independently of
+// the real dataset's current shape.
+const PET_GAME: Record<string, string> = {
+  ...SYN_GAME,
+  DamageFire: "{%t0} Fire Damage",
+  DamagePoison: "{%t0} Poison Damage",
+  tagCharAttackSpeed: "{%+.0f0}% Attack Speed",
+};
+const PET_TAGS: Record<string, string> = {
+  ...SYN_TAGS,
+  offensiveFireMin: "DamageFire",
+  offensiveFireMax: "DamageFire",
+  offensivePoisonMin: "DamagePoison",
+  characterAttackSpeed: "tagCharAttackSpeed",
+};
+const petSkill: Skill = {
+  record: "skills/pet-carrier.dbr",
+  mastery: "masteries/shaman.dbr",
+  group: "skills/pet-carrier.dbr",
+  nodeKind: "base",
+  uiX: 0,
+  uiY: 0,
+  nameTag: null,
+  icon: "",
+  maxLevel: 12,
+  ultimateLevel: 22,
+  ranks: [],
+  pets: [
+    {
+      record: "pets/testpet.dbr",
+      nameTag: "petName",
+      stats: [
+        // own stat: first/max/ultimate all equal.
+        {
+          sourceKind: "pet",
+          source: "pets/testpet.dbr",
+          sourceNameTag: null,
+          stat: "characterAttackSpeed",
+          first: 5,
+          max: 5,
+          ultimate: 5,
+        },
+        // ability A (named "Firebomb"): differing first/max/ultimate.
+        {
+          sourceKind: "pet_skill",
+          source: "pets/ability-a.dbr",
+          sourceNameTag: "abilityAName",
+          stat: "offensiveFireMin",
+          first: 10,
+          max: 50,
+          ultimate: 90,
+        },
+        // ability B (unnamed): a flat Min, no Max sibling.
+        {
+          sourceKind: "pet_skill",
+          source: "pets/ability-b.dbr",
+          sourceNameTag: null,
+          stat: "offensiveFireMin",
+          first: 1,
+          max: 20,
+          ultimate: 20,
+        },
+        // ability C (unnamed, a DIFFERENT source than B): a real Min/Max pair on the SAME stat id
+        // as ability B - the pet-panel analogue of Krieg's Mask. Must not pair with B's Min.
+        {
+          sourceKind: "pet_skill",
+          source: "pets/ability-c.dbr",
+          sourceNameTag: null,
+          stat: "offensiveFireMin",
+          first: 1,
+          max: 30,
+          ultimate: 30,
+        },
+        {
+          sourceKind: "pet_skill",
+          source: "pets/ability-c.dbr",
+          sourceNameTag: null,
+          stat: "offensiveFireMax",
+          first: 2,
+          max: 60,
+          ultimate: 60,
+        },
+      ],
+    },
+  ],
+};
+const petCtx: DetailContext = {
+  tagOf: (s) => PET_TAGS[s],
+  templateOf: (t) => PET_GAME[t],
+  nameOf: () => undefined,
+  masteryNameOf: () => undefined,
+  skillOf: (r) => (r === petSkill.record ? petSkill : undefined),
+  loc: makeLocalization(
+    {},
+    {},
+    "en",
+    { ...PET_GAME, petName: "Test Pet", abilityAName: "Firebomb" },
+    {
+      ...PET_GAME,
+      petName: "Test Pet",
+      abilityAName: "Firebomb",
+    },
+  ),
+};
+
+test("pet panel: the pet's own stat renders under its name with no attribution", () => {
+  const item = synItem({ boosts: [{ skill: petSkill.record, level: 1 }] });
+  const html = detailMarkup(item, petCtx);
+  expect(html).toContain("<summary>Test Pet</summary>");
+  expect(html).toContain("+5% Attack Speed");
+});
+
+test("pet panel: an ability row with a source name renders under its own heading", () => {
+  const item = synItem({ boosts: [{ skill: petSkill.record, level: 1 }] });
+  const html = detailMarkup(item, petCtx);
+  expect(html).toContain('pet-ability-name">Firebomb<');
+});
+
+test("pet panel: uses the max value, not first or ultimate", () => {
+  const item = synItem({ boosts: [{ skill: petSkill.record, level: 1 }] });
+  const html = detailMarkup(item, petCtx);
+  // Ability A: first 10, max 50, ultimate 90 - only max should appear.
+  expect(html).toContain("50 Fire Damage");
+  expect(html).not.toContain("10 Fire Damage");
+  expect(html).not.toContain("90 Fire Damage");
+});
+
+test("pet panel: two different unnamed sources on the same stat id never fabricate a range", () => {
+  const item = synItem({ boosts: [{ skill: petSkill.record, level: 1 }] });
+  const html = detailMarkup(item, petCtx);
+  // Ability B (max 20, no Max sibling) stays a lone value; ability C (max 30/60) collapses to
+  // its own range. Neither may pair with the other's stats.
+  expect(html).toContain("20 Fire Damage");
+  expect(html).toContain("30-60 Fire Damage");
+  expect(html).not.toContain("20-60");
+  expect(html).not.toContain("20-30");
 });

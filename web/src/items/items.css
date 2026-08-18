@@ -249,7 +249,10 @@
   color: var(--it-ember);
 }
 .items-page .skill-detail-lines,
-.items-page .item-detail-mastery {
+.items-page .item-detail-mastery,
+.items-page .pet-own-stats,
+.items-page .pet-ability ul,
+.items-page .pet-ability-plain {
   margin: 0;
   padding-left: 1.1em;
 }
@@ -262,4 +265,26 @@
   font: 600 11px / 1 var(--it-mono);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.items-page .pet-panel {
+  margin-top: 6px;
+  border: 1px solid var(--it-line);
+  border-radius: 4px;
+  padding: 6px 10px;
+  background: var(--it-panel);
+}
+.items-page .pet-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--it-ink);
+}
+.items-page .pet-ability {
+  margin-top: 8px;
+}
+.items-page .pet-ability-name {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--it-mut);
 }
