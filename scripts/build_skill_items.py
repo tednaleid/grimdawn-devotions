@@ -170,7 +170,7 @@ def main(argv=None) -> int:
     # 100 on the chance-gated reset carrier and 5 on the flat one), so the pair is
     # kept, and without the record in the sort their order is not determined.
     mods = group("""SELECT m.item_record, m.modified_skill, m.stat_id, m.value,
-                           m.from_type, m.to_type
+                           m.from_type, m.to_type, m.refresh_skill, m.refresh_trigger
                     FROM skill_modifiers m JOIN top t ON t.record = m.item_record
                     ORDER BY m.item_record, m.modified_skill, m.modifier_record,
                              m.stat_id""", "item_record")
@@ -208,6 +208,14 @@ def main(argv=None) -> int:
             if m["from_type"] is not None:
                 stat["from_tag"] = conv_tags[m["from_type"]]
                 stat["to_tag"] = conv_tags[m["to_type"]]
+            # A refresh amount reads as a bare number without the skill it targets
+            # and the trigger that fires it. The target is frequently a different
+            # skill from the block's own (Badge of the Crimson Company sits on
+            # Cadence and reduces Leap), so it cannot be inferred at read time.
+            if m["refresh_skill"] is not None:
+                stat["refresh_skill"] = m["refresh_skill"]
+            if m["refresh_trigger"] is not None:
+                stat["refresh_trigger"] = m["refresh_trigger"]
             by_skill.setdefault(m["modified_skill"], []).append(stat)
         name = t.get("name_tag")
         en_name = t.get("en_name")
