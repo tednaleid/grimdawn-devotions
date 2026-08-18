@@ -33,6 +33,26 @@ def _add(tags: set[str], tag: str | None) -> None:
         tags.add(tag)
 
 
+# Tags the /items/ effect formatter composes with, rather than any dataset naming them.
+# The game builds a stat line from a label tag plus one of these, so reproducing its
+# wording means shipping them to every locale. See the effect-text section of
+# docs/superpowers/specs/2026-08-17-items-page-design.md.
+COMPOSER_TAGS = frozenset({
+    # Damage-over-time and range suffixes ("over 2 Seconds").
+    "DamageSingleFormatTime", "DamageRangeFormatTime",
+    "DamageFixedSingleFormatTime", "DamageFixedRangeFormatTime",
+    # Value-plus-label composers for the 32 tags that carry no template of their own.
+    "SkillSecondFormat", "SkillDistanceFormat", "SkillCostFormat",
+    "SkillPercentFormat", "SkillIntFormat", "SkillFloatFormat",
+    # Pluralized units, selected by the composition site against its value.
+    "tagSecond", "tagSeconds",
+    # The refresh families' composed lines. The *Name variant is chosen when the
+    # record names a target skill.
+    "tagSkillCooldownRefresh", "tagSkillCooldownRefreshName",
+    "tagSkillDurationRefresh", "tagSkillDurationRefreshMax",
+} | {f"tagRefreshSkillCondition{n:02d}" for n in range(1, 13)})
+
+
 def collect_referenced_tags(
     devotions: dict, stat_tags: dict, stat_format_tags: dict | None = None,
     rr: dict | None = None, monsters: dict | None = None,
@@ -48,7 +68,7 @@ def collect_referenced_tags(
     race_tag, which _add skips. skill-items contributes the name tags of its masteries,
     skills and items, plus the pet name and pet-ability name tags a summon skill's panel
     renders; a nameless item or an unnamed pet ability carries a null tag, which _add
-    also skips."""
+    also skips. Always also includes COMPOSER_TAGS, the formatter's grammar tags."""
     tags: set[str] = set()
     for c in devotions.get("constellations", []):
         _add(tags, c.get("name_tag"))
@@ -82,6 +102,7 @@ def collect_referenced_tags(
     tags.update(stat_tags.values())
     tags.update((stat_format_tags or {}).values())
     tags.update((stat_item_tags or {}).values())
+    tags.update(COMPOSER_TAGS)
     return tags
 
 

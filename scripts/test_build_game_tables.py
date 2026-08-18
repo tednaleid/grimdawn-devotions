@@ -56,7 +56,8 @@ check("collects pet name_tag", "tagPetName" in referenced, True)
 check("collects weapon description_tag", "tagWeaponDesc" in referenced, True)
 check("collects stat-tags values", {"tagCharStatsDA", "Life"} <= referenced, True)
 check("collects stat-format-tags values", "DefenseConvert" in referenced, True)
-check("referenced tag count", len(referenced), 9)
+check("collects COMPOSER_TAGS", bgt.COMPOSER_TAGS <= referenced, True)
+check("referenced tag count", len(referenced), 9 + len(bgt.COMPOSER_TAGS))
 check("collect works without stat-format-tags", "tagConA" in bgt.collect_referenced_tags(devotions, stat_tags), True)
 
 # --- rr sources: tag-prefixed name/parent collected; synthesized x: keys skipped ---
@@ -156,9 +157,27 @@ check("a null name_tag is skipped, not added", None not in tags, True)
 stat_item_tags = {"offensiveFireMin": "DamageFire", "characterStrength": "tagCharAttribute02"}
 item_tag_refs = bgt.collect_referenced_tags({}, {}, {}, {}, {}, {}, stat_item_tags)
 check("stat-item-tags values collected",
-      item_tag_refs, {"DamageFire", "tagCharAttribute02"})
+      item_tag_refs, {"DamageFire", "tagCharAttribute02"} | bgt.COMPOSER_TAGS)
 check("stat-item-tags argument is optional",
-      bgt.collect_referenced_tags({}, {}, {}, {}, {}, {}), set())
+      bgt.collect_referenced_tags({}, {}, {}, {}, {}, {}), set(bgt.COMPOSER_TAGS))
+
+# --- COMPOSER_TAGS: the formatter's grammar tags reach the built English table ---
+game_en = json.loads(Path("data/i18n/game.en.json").read_text(encoding="utf-8"))
+for tag in ("DamageSingleFormatTime", "DamageRangeFormatTime", "SkillSecondFormat",
+            "SkillDistanceFormat", "SkillCostFormat", "SkillPercentFormat",
+            "SkillIntFormat", "tagSecond", "tagSeconds",
+            "tagSkillCooldownRefresh", "tagSkillCooldownRefreshName",
+            "tagSkillDurationRefresh"):
+    check(f"composer tag reaches game.en.json: {tag}", tag in game_en, True)
+check("DamageSingleFormatTime text", game_en.get("DamageSingleFormatTime"), "over {%.1f0} Seconds")
+check("tagSkillCooldownRefreshName text", game_en.get("tagSkillCooldownRefreshName"),
+      "{%t0} to reduce cooldown of {%s1} by {%.1f2} {%z3}")
+
+# --- every used trigger has a condition tag, or a trigger would render unlabelled ---
+for tag in ("tagRefreshSkillCondition03", "tagRefreshSkillCondition07",
+            "tagRefreshSkillCondition10", "tagRefreshSkillCondition11",
+            "tagRefreshSkillCondition12"):
+    check(f"trigger condition tag present: {tag}", tag in game_en, True)
 
 print("ALL PASSED" if failures == 0 else f"{failures} FAILURE(S)")
 raise SystemExit(1 if failures else 0)
