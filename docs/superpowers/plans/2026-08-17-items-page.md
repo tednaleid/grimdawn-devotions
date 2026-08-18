@@ -1469,6 +1469,32 @@ git commit -m "feat(items): filter and sort items for a view state"
 - Create: `web/src/items/adapters/dataSource.ts`, `web/src/items/adapters/tableView.ts`, `web/src/items/app/main.ts`
 - Create: `web/items.html`
 - Modify: `web/scripts/bundle.ts` (register the new entry point)
+- Modify: `justfile`, the `build` recipe
+
+**The justfile edit is not optional and the original plan omitted it.** `build` copies
+each data file by name into `dist/data/`; it does not glob. Without these two lines the
+page bundles cleanly and then 404s on its own data at runtime, which no unit test
+catches:
+
+```
+    cp "{{justfile_directory()}}/data/skill-items.json" dist/data/skill-items.json
+    cp "{{justfile_directory()}}/data/stat-item-tags.json" dist/data/stat-item-tags.json
+```
+
+Task 15 adds the icon sprite the same way (`data/skill-icons.json`,
+`data/skill-icons.png`). All four are committed, not gitignored, so nothing needs
+regenerating - and `just skill-icons` must NOT be run, since it is gated on the game
+being closed.
+
+`bundle.ts` already has three near-identical per-page blocks (index, resistance-reduction,
+monster-resistances). Add a fourth matching them rather than refactoring: consistency
+within the file wins here, and the de-duplication is a separate change. Note that each
+block asserts its HTML was rewritten and throws if the markup drifts, so `web/items.html`
+must carry the same asset-ref shape the sibling pages use.
+
+Payload note: `data/skill-items.json` is 3.1 MB, several times the largest file any
+existing page loads (`monsters.json` is the current biggest). Fetch it once and parse
+once; do not re-fetch per facet change.
 
 **Interfaces:**
 - Consumes: everything from Tasks 7 to 12.
