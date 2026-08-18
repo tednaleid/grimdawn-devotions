@@ -2,7 +2,7 @@
  "meta": {
   "game_version": "1.3.0.7",
   "steam_buildid": "24756825",
-  "generated_utc": "2026-08-18T17:41:01Z"
+  "generated_utc": "2026-08-18T18:36:11Z"
  },
  "masteries": [
   {
@@ -1562,8 +1562,8 @@
   {
    "record": "records/skills/playerclass01/weaponpool2.dbr",
    "mastery": "records/skills/playerclass01/_classtraining_class01.dbr",
-   "group": "records/skills/playerclass01/weaponpool1.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass01/weaponpool2.dbr",
+   "node_kind": "base",
    "ui_x": 406,
    "ui_y": 39,
    "name_tag": "tagClass01SkillName06B",
@@ -2601,7 +2601,7 @@
    "record": "records/skills/playerclass02/grenado1b.dbr",
    "mastery": "records/skills/playerclass02/_classtraining_class02.dbr",
    "group": "records/skills/playerclass02/grenado1.dbr",
-   "node_kind": "modifier",
+   "node_kind": "transmuter",
    "ui_x": 566,
    "ui_y": 351,
    "name_tag": "tagClass02SkillName01C",
@@ -6798,8 +6798,8 @@
   {
    "record": "records/skills/playerclass04/passive2.dbr",
    "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-   "group": "records/skills/playerclass04/passive1.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass04/passive2.dbr",
+   "node_kind": "base",
    "ui_x": 566,
    "ui_y": 459,
    "name_tag": "tagClass04SkillName13B",
@@ -6855,8 +6855,8 @@
   {
    "record": "records/skills/playerclass04/passive3.dbr",
    "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-   "group": "records/skills/playerclass04/passive1.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass04/passive3.dbr",
+   "node_kind": "base",
    "ui_x": 726,
    "ui_y": 459,
    "name_tag": "tagClass04SkillName13C",
@@ -8047,8 +8047,8 @@
   {
    "record": "records/skills/playerclass04/wpattack1.dbr",
    "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-   "group": "records/skills/playerclass04/wpattack0.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass04/wpattack1.dbr",
+   "node_kind": "base",
    "ui_x": 326,
    "ui_y": 39,
    "name_tag": "tagClass04SkillName05B",
@@ -8110,8 +8110,8 @@
   {
    "record": "records/skills/playerclass04/wpattack2.dbr",
    "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-   "group": "records/skills/playerclass04/wpattack0.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass04/wpattack2.dbr",
+   "node_kind": "base",
    "ui_x": 486,
    "ui_y": 39,
    "name_tag": "tagClass04SkillName05C",
@@ -8155,8 +8155,8 @@
   {
    "record": "records/skills/playerclass04/wpattack3.dbr",
    "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-   "group": "records/skills/playerclass04/wpattack0.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass04/wpattack3.dbr",
+   "node_kind": "base",
    "ui_x": 646,
    "ui_y": 39,
    "name_tag": "tagClass04SkillName05D",
@@ -8281,8 +8281,8 @@
   {
    "record": "records/skills/playerclass04/wpattack5.dbr",
    "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-   "group": "records/skills/playerclass04/wpattack0.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass04/wpattack5.dbr",
+   "node_kind": "base",
    "ui_x": 886,
    "ui_y": 39,
    "name_tag": "tagClass04SkillName05F",
@@ -9178,8 +9178,8 @@
   {
    "record": "records/skills/playerclass05/mindovermatter2.dbr",
    "mastery": "records/skills/playerclass05/_classtraining_class05.dbr",
-   "group": "records/skills/playerclass05/mindovermatter1.dbr",
-   "node_kind": "modifier",
+   "group": "records/skills/playerclass05/mindovermatter2.dbr",
+   "node_kind": "base",
    "ui_x": 886,
    "ui_y": 389,
    "name_tag": "tagClass05SkillName15B",
@@ -11704,7 +11704,7 @@
    "record": "records/skills/playerclass06/stormtotem01b_petmodifier.dbr",
    "mastery": "records/skills/playerclass06/_classtraining_class06.dbr",
    "group": "records/skills/playerclass06/stormtotem01.dbr",
-   "node_kind": "modifier",
+   "node_kind": "transmuter",
    "ui_x": 806,
    "ui_y": 141,
    "name_tag": "tagClass06SkillName16B",
@@ -18379,7 +18379,7 @@
    "record": "records/skills/playerclass08/summon_blightbeast1b.dbr",
    "mastery": "records/skills/playerclass08/_classtraining_class08.dbr",
    "group": "records/skills/playerclass08/summon_blightbeast1.dbr",
-   "node_kind": "modifier",
+   "node_kind": "transmuter",
    "ui_x": 566,
    "ui_y": 421,
    "name_tag": "tagGDX1Class08SkillName05D",
@@ -20932,7 +20932,7 @@
    "record": "records/skills/playerclass09/summon_celestialguardian1b.dbr",
    "mastery": "records/skills/playerclass09/_classtraining_class09.dbr",
    "group": "records/skills/playerclass09/summon_celestialguardian1.dbr",
-   "node_kind": "modifier",
+   "node_kind": "transmuter",
    "ui_x": 806,
    "ui_y": 141,
    "name_tag": "tagGDX2Class09SkillName08C",

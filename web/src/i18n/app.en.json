@@ -396,6 +396,7 @@
   "items.col.rarity": "Rarity",
   "items.col.ilvl": "Item Level",
   "items.col.levels": "Levels",
+  "items.col.skills": "Skills",
   "items.col.effect": "Effect",
   "items.count": "{shown} of {total} items",
   "items.table.empty": "No items match the current filters.",
@@ -421,6 +422,8 @@
   "items.table.pickMastery": "Pick a mastery to see the items that affect its skills.",
   "items.detail.grimtools": "View on Grimtools",
   "items.tree.offTree": "Other abilities",
+  "items.card.atRank": "At rank {rank}",
+  "items.card.atUltimate": "At rank {rank} (item-granted)",
   "items.effect.chanceOf": "{chance}% Chance of {effect}",
   "items.effect.chanceTo": "{chance}% Chance to {effect}"
 }

@@ -150,18 +150,24 @@ test("no two nodes in the same mastery land on the same position", () => {
   }
 });
 
-test("selecting a base skill highlights its whole group, including a modifier sibling", () => {
+test("selecting a base skill highlights only that node, not its modifiers", () => {
+  // Selection is per node. A group says which upgrades belong to which skill, and picking the
+  // base used to drag its whole group in - which also meant picking one of a pair the game files
+  // together but treats as independent (Reckless Power / Star Pact) silently selected the other.
   const modifier = catalogue.skills.find((s) => s.nodeKind === "modifier" && s.group !== s.record)!;
-  const mastery = modifier.mastery;
-  const markup = buildTreeMarkup(catalogue.skills, mastery, new Set([modifier.group]), ctx);
+  const markup = buildTreeMarkup(catalogue.skills, modifier.mastery, new Set([modifier.group]), ctx);
   const groups = nodeGroups(markup);
-  const base = groups.find((n) => n.record === modifier.group)!;
-  const mod = groups.find((n) => n.record === modifier.record)!;
-  expect(base.cls.includes("selected")).toBe(true);
-  expect(mod.cls.includes("selected")).toBe(true);
-  // An unrelated skill (a different group entirely) in the same mastery must not also light up.
-  const other = groups.find((n) => n.group !== modifier.group);
-  expect(other?.cls.includes("selected")).toBe(false);
+  expect(groups.find((n) => n.record === modifier.group)!.cls.includes("selected")).toBe(true);
+  expect(groups.find((n) => n.record === modifier.record)!.cls.includes("selected")).toBe(false);
+  expect(groups.filter((n) => n.cls.includes("selected")).length).toBe(1);
+});
+
+test("selecting a modifier highlights it without dragging in its base", () => {
+  const modifier = catalogue.skills.find((s) => s.nodeKind === "modifier" && s.group !== s.record)!;
+  const markup = buildTreeMarkup(catalogue.skills, modifier.mastery, new Set([modifier.record]), ctx);
+  const groups = nodeGroups(markup);
+  expect(groups.find((n) => n.record === modifier.record)!.cls.includes("selected")).toBe(true);
+  expect(groups.find((n) => n.record === modifier.group)!.cls.includes("selected")).toBe(false);
 });
 
 test("a selected id absent from the catalogue (a stale link) selects nothing, never throws", () => {

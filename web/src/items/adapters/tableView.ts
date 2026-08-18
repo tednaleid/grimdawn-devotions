@@ -1,6 +1,6 @@
 // ABOUTME: Renders the item table (mastery picker, skill tree, chip facets, sortable columns) into #items-table.
 // ABOUTME: Every change round-trips through onView; the skill picker is the SVG mastery tree from treeView.ts.
-import { resolveText, type Text } from "../../core/localization";
+import { litT, resolveText, type Text } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
 import { CATEGORIES, categoryGameTag, DOMAINS, EFFECT_KINDS, RARITIES } from "../core/facets";
 import { rowEffectLines, type EffectContext } from "../core/effectText";
@@ -9,6 +9,7 @@ import type { Catalogue, Item } from "../core/model";
 import type { ViewState } from "../core/urlState";
 import type { SkillIconIndex } from "./dataSource";
 import { renderDetail, type DetailContext } from "./detailView";
+import { skillCardMarkup } from "./skillCard";
 import { renderTree, type TreeContext } from "./treeView";
 
 export interface TableHandlers {
@@ -58,6 +59,7 @@ const COLS: { key: string; label: string; sortable: boolean }[] = [
   { key: "rarity", label: "items.col.rarity", sortable: true },
   { key: "ilvl", label: "items.col.ilvl", sortable: true },
   { key: "levels", label: "items.col.levels", sortable: true },
+  { key: "skills", label: "items.col.skills", sortable: false },
   { key: "effect", label: "items.col.effect", sortable: false },
 ];
 
@@ -121,6 +123,13 @@ function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string 
   const rarity = esc(loc.translate(`items.rarity.${item.rarity.toLowerCase()}`));
   const lines: Text[] = rowEffectLines(row.modBlocks, effectCtx);
   const effect = lines.length ? lines.map((t) => esc(resolveText(loc, t))).join("<br>") : "—";
+  // Which in-scope skills put this row in the table. Without it the answer is only visible by
+  // expanding the row, and with several skills picked (or a whole mastery in scope) the effect
+  // lines alone do not say which power they belong to. Falls back to the raw record for a skill
+  // the game never named, matching nameOf's convention elsewhere in this file.
+  const skills = row.skills.length
+    ? row.skills.map((r) => esc(resolveText(loc, effectCtx.nameOf(r) ?? litT(r)))).join("<br>")
+    : "—";
   const expanded = expandedRecords.has(item.record);
   const caret = expanded ? "▾" : "▸";
   return `<tr class="item-row" data-record="${esc(item.record)}" role="button" tabindex="0" aria-expanded="${expanded}">
@@ -129,6 +138,7 @@ function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string 
     <td>${rarity}</td>
     <td class="num">${item.itemLevel}</td>
     <td class="num">${row.levels}</td>
+    <td class="skills">${skills}</td>
     <td class="effect">${effect}</td>
   </tr>`;
 }
@@ -171,6 +181,51 @@ function skeleton(loc: Localization): string {
 // dozen skills per mastery) and simpler than trying to patch an existing tree in place. Picking a
 // node toggles: clicking the already-selected skill's group clears the selection, restoring the
 // "All skills" escape hatch the old <select> offered via its empty option.
+// Shows one skill's card while the pointer (or keyboard focus) is on its node. The card is
+// positioned against the tree wrapper rather than the page, so it follows the tree when the page
+// scrolls, and it is rebuilt per hover rather than per node up front: a mastery is a few dozen
+// skills and only one card is ever visible.
+function attachSkillCard(
+  treeEl: HTMLElement,
+  svg: SVGElement,
+  loc: Localization,
+  catalogue: Catalogue,
+  effectCtx: EffectContext,
+): void {
+  const card = document.createElement("div");
+  card.className = "skill-card";
+  card.hidden = true;
+  // Hover-only detail, and the node itself already carries the skill's accessible name, so the
+  // card must not be announced a second time as the user tabs through the tree.
+  card.setAttribute("aria-hidden", "true");
+  treeEl.appendChild(card);
+
+  const show = (target: Element) => {
+    const node = target.closest<SVGGElement>("[data-record]");
+    if (!node) return;
+    const skill = catalogue.skills.find((s) => s.record === node.dataset.record);
+    if (!skill) return;
+    card.innerHTML = skillCardMarkup(skill, loc, effectCtx);
+    card.hidden = false;
+    // Anchor to the node, then pull back inside the tree box so a card on the right-hand column
+    // is not clipped away. Measured after unhiding: a hidden element has no size.
+    const box = node.getBoundingClientRect();
+    const wrap = treeEl.getBoundingClientRect();
+    const left = Math.min(box.left - wrap.left + box.width + 8, Math.max(0, wrap.width - card.offsetWidth - 4));
+    const top = Math.min(box.top - wrap.top, Math.max(0, wrap.height - card.offsetHeight - 4));
+    card.style.left = `${Math.max(0, left)}px`;
+    card.style.top = `${Math.max(0, top)}px`;
+  };
+  const hide = () => {
+    card.hidden = true;
+  };
+
+  svg.addEventListener("mouseover", (e) => show(e.target as Element));
+  svg.addEventListener("mouseout", hide);
+  svg.addEventListener("focusin", (e) => show(e.target as Element));
+  svg.addEventListener("focusout", hide);
+}
+
 function syncTree(
   el: HTMLElement,
   loc: Localization,
@@ -178,6 +233,7 @@ function syncTree(
   icons: SkillIconIndex,
   view: ViewState,
   handlers: TableHandlers,
+  effectCtx: EffectContext,
 ): void {
   const treeEl = el.querySelector<HTMLElement>("#items-tree")!;
   treeEl.innerHTML = "";
@@ -199,17 +255,18 @@ function syncTree(
     catalogue.skills,
     view.mastery,
     view.skills,
-    (group) => {
-      // Toggle into the set: several skills widen the scope (the table shows items touching any
-      // of them), and clicking the last selected node clears back to the whole mastery.
+    (record) => {
+      // Toggle exactly that node: several skills widen the scope (the table shows items touching
+      // any of them), and clearing the last one goes back to the whole mastery.
       const next = new Set(view.skills);
-      if (next.has(group)) next.delete(group);
-      else next.add(group);
+      if (next.has(record)) next.delete(record);
+      else next.add(record);
       handlers.onView({ ...view, skills: next });
     },
     treeCtx,
   );
   treeEl.appendChild(svg);
+  attachSkillCard(treeEl, svg, loc, catalogue, effectCtx);
   const hasOffTree = catalogue.skills.some((s) => s.mastery === view.mastery && (s.uiX === null || s.uiY === null));
   if (hasOffTree) {
     const caption = document.createElement("p");
@@ -226,6 +283,7 @@ function syncControls(
   icons: SkillIconIndex,
   view: ViewState,
   handlers: TableHandlers,
+  effectCtx: EffectContext,
 ): void {
   const masteryEl = el.querySelector<HTMLElement>("#items-mastery")!;
   const masteryOpts = catalogue.masteries
@@ -244,7 +302,7 @@ function syncControls(
     })
     .join("");
 
-  syncTree(el, loc, catalogue, icons, view, handlers);
+  syncTree(el, loc, catalogue, icons, view, handlers, effectCtx);
 
   el.querySelector<HTMLButtonElement>("#items-wide")!.setAttribute("aria-pressed", String(view.masteryWide));
 
@@ -404,7 +462,7 @@ export function renderTable(
     el.innerHTML = skeleton(loc);
     wire(el);
   }
-  syncControls(el, loc, catalogue, icons, view, handlers);
+  syncControls(el, loc, catalogue, icons, view, handlers, detailCtx);
   renderBody(el, loc, rows, detailCtx, view);
   renderCount(el, loc, catalogue, rows);
 }

@@ -91,6 +91,41 @@
   border-radius: 6px;
   background: var(--it-panel);
   padding: 10px 14px 14px;
+  /* The hover card is absolutely positioned against this box, so it follows the tree. */
+  position: relative;
+}
+/* The skill's own card, shown while a node is hovered or focused: what an item's modifier is
+   actually modifying. Pointer-events off so moving toward the card never makes it flicker by
+   stealing the hover from the node underneath it. */
+.items-page .skill-card {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  max-width: 320px;
+  border: 1px solid var(--it-line);
+  border-radius: 6px;
+  background: var(--it-panel2);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 55%);
+  padding: 8px 11px 10px;
+  font-size: 12.5px;
+}
+.items-page .skill-card h4 {
+  margin: 0 0 4px;
+  font-size: 13.5px;
+  color: var(--it-ink);
+}
+.items-page .skill-card .skill-card-rank {
+  margin: 6px 0 2px;
+  font-family: var(--it-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--it-mut);
+}
+.items-page .skill-card ul {
+  margin: 0;
+  padding-left: 16px;
+  color: var(--it-ink);
 }
 .items-page .items-tree-wrap .ctl-label {
   display: block;
@@ -112,11 +147,19 @@
   height: auto;
   margin: 0 auto;
 }
+/* The skills column answers "why is this row here"; it is supporting detail next to the item's
+   own name, so it reads a step quieter and never crowds out the effect lines. */
+.items-page td.skills {
+  color: var(--it-mut);
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+
 /* Connectors sit under the nodes (they are emitted first) and stay quiet: they exist to show
    which upgrades belong to which skill, not to compete with the icons. */
 .items-page .tree-link {
-  stroke: var(--it-line);
-  stroke-width: 2px;
+  stroke: #4a5560;
+  stroke-width: 3.5px;
 }
 .items-page .tree-node {
   cursor: pointer;

@@ -659,22 +659,53 @@ def build_skills(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> i
                         ELSE t.record END AS group_tag,
                    regexp_extract(t.tag, '^.*SkillName[0-9]+([A-Z])?$', 1) AS group_letter
             FROM tagged t
+        ),
+        kinded AS (
+            -- What a node IS comes from its record's own Class, not from its display-name tag.
+            -- The tag says which nodes Crate numbered together, which is a good grouping signal
+            -- and a bad classification one: it files Zolhan's Technique under Markovian's
+            -- Advantage (06A/06B) and Star Pact under Reckless Power (15A/15B), though each
+            -- pair is two independent skills the game's own tree draws no connector between
+            -- (checked against grimtools, which renders the game's connector sprites). Class
+            -- separates them cleanly: the modifier family is Skill_Modifier,
+            -- Skill_ProjectileModifier and the SkillSecondary_* variants, and every one of
+            -- those appears ONLY as a non-'A' member, while Skill_WPAttack_BasicAttack,
+            -- Skill_Passive and Skill_BuffSelfToggled all appear as bases far more often than
+            -- not (8/5, 14/2 and 16/1 at build 24756825). Naming a transmuter by an exact
+            -- Class also missed Skill_ProjectileTransmuter and Skill_SpawnPetTransmuter, whose
+            -- four nodes carry the tree's own 'b' record suffix.
+            SELECT g.*,
+                   CASE
+                       -- A node with nothing to modify is not a modifier: the sole member of
+                       -- its tag group is its own base whatever its Class says (one node,
+                       -- playerclass10/passive04.dbr, a Skill_Modifier alone in its group).
+                       WHEN (SELECT count(*) FROM grouped o WHERE o.group_tag = g.group_tag) = 1
+                            THEN 'base'
+                       WHEN g.cls LIKE '%Transmuter' THEN 'transmuter'
+                       WHEN g.cls = 'SkillSecondary_PetModifier' THEN 'pet_modifier'
+                       WHEN g.cls IN ('Skill_Modifier', 'Skill_ProjectileModifier')
+                            OR g.cls LIKE 'SkillSecondary=_%' ESCAPE '=' THEN 'modifier'
+                       ELSE 'base'
+                   END AS node_kind
+            FROM grouped g
         )
         SELECT
             j.record,
             j.mastery_record,
-            -- The group's base is its 'A' member; a skill whose tag does not match
-            -- the pattern (the four playerclass10 transform abilities) is its own base.
-            coalesce(
-                (SELECT b.record FROM grouped b
-                  WHERE b.group_tag = j.group_tag AND b.group_letter IN ('A', '')),
-                j.record) AS group_record,
-            CASE
-                WHEN j.group_letter IN ('A', '') THEN 'base'
-                WHEN j.cls = 'Skill_Transmuter' THEN 'transmuter'
-                WHEN j.cls = 'SkillSecondary_PetModifier' THEN 'pet_modifier'
-                ELSE 'modifier'
-            END AS node_kind,
+            -- A base is its own group. Everything else belongs to the group its display-name
+            -- tag names, whose base is that group's 'A' member; a skill whose tag does not
+            -- match the pattern (the four playerclass10 transform abilities) is its own base.
+            -- The 'A' test still does the picking rather than node_kind alone, because a tag
+            -- group can now hold more than one base: Reckless Power and Star Pact share
+            -- tagClass05SkillName15 and are both independent skills.
+            CASE WHEN j.node_kind = 'base' THEN j.record ELSE
+                coalesce(
+                    (SELECT b.record FROM kinded b
+                      WHERE b.group_tag = j.group_tag AND b.group_letter IN ('A', '')
+                        AND b.node_kind = 'base'),
+                    j.record)
+            END AS group_record,
+            j.node_kind,
             j.ui_x, j.ui_y,
             j.tag AS name_tag,
             -- Stored verbatim: the sprite index in data/skill-icons.json is keyed
@@ -689,7 +720,7 @@ def build_skills(con: duckdb.DuckDBPyConnection, out_dir: Path, diag: dict) -> i
               WHERE f.record = j.effect_record AND f.key = 'skillUltimateLevel')::INTEGER
                 AS ultimate_level,
             j.effect_record
-        FROM grouped j""")
+        FROM kinded j""")
     diag["skills_without_button"] = con.execute(
         "SELECT count(*) FROM skills WHERE ui_x IS NULL").fetchone()[0]
     diag["skills_without_name"] = con.execute(

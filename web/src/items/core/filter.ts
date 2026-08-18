@@ -14,6 +14,10 @@ export interface Row {
   // .superpowers/sdd/2026-08-17-items-page/task-12-13-fix-1.md, C1). Callers must call
   // effectLines once per block and concatenate the resulting Text lines, not the stats.
   modBlocks: ModStat[][];
+  // The in-scope skill records this item actually touches, boosted or modified, in the order the
+  // item lists them. This is the row's answer to "why is this here", which otherwise could only
+  // be had by expanding it.
+  skills: string[];
 }
 
 type NameOf = (item: Item) => string;
@@ -34,20 +38,12 @@ export function itemCategory(item: Item): string {
 // no scope at all, so applyView correctly returns no rows.
 function scopeSkillSet(skills: Skill[], view: ViewState): Set<string> {
   if (view.skills.size) {
-    // Several skills widen the scope rather than narrowing it: the union of their groups, so a
+    // Exactly the nodes picked, not their whole node groups. Picking a skill is how the player
+    // says which power they care about, and a group is a rendering relationship, not a claim
+    // that its members are interchangeable - Reckless Power and Star Pact shared a group tag
+    // while being mutually exclusive in game. Several picks WIDEN the scope (the union), so a
     // player planning around Cadence and Blitz sees every item touching either.
-    const scope = new Set<string>();
-    for (const record of view.skills) {
-      const target = skills.find((s) => s.record === record);
-      // A record not in the catalogue (a stale link) scopes to itself, matching the tree's own
-      // fallback in treeView.ts so the two never disagree about what a selection means.
-      if (!target) {
-        scope.add(record);
-        continue;
-      }
-      for (const s of skills) if (s.group === target.group) scope.add(s.record);
-    }
-    return scope;
+    return new Set(view.skills);
   }
   if (view.mastery) {
     return new Set(skills.filter((s) => s.mastery === view.mastery).map((s) => s.record));
@@ -62,15 +58,24 @@ function scopeSkillSet(skills: Skill[], view: ViewState): Set<string> {
 // view.masteryWide.
 function buildRow(item: Item, scope: Set<string>, view: ViewState): Row | null {
   let levels = 0;
-  for (const b of item.boosts) if (scope.has(b.skill)) levels += b.level;
+  const matched = new Set<string>();
+  for (const b of item.boosts) {
+    if (!scope.has(b.skill)) continue;
+    levels += b.level;
+    matched.add(b.skill);
+  }
   if (view.masteryWide && view.mastery) {
     for (const mb of item.masteryBoosts) if (mb.mastery === view.mastery) levels += mb.level;
   }
   const modBlocks: ModStat[][] = [];
-  for (const mb of item.modifiers) if (scope.has(mb.skill)) modBlocks.push(mb.stats);
+  for (const mb of item.modifiers) {
+    if (!scope.has(mb.skill)) continue;
+    modBlocks.push(mb.stats);
+    matched.add(mb.skill);
+  }
 
   if (levels === 0 && modBlocks.length === 0) return null;
-  return { item, levels, modBlocks };
+  return { item, levels, modBlocks, skills: [...matched] };
 }
 
 // A row's effect kind is derived from its already-scoped modBlocks, not recomputed from the raw

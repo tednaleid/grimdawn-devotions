@@ -67,7 +67,7 @@ const base = {
 const nameOf = (i: any) => i.record;
 const recs = (v: any) => applyView(items, skills, v, nameOf).map((r) => r.item.record);
 
-test("a skill selection narrows to that node group", () => {
+test("a skill selection narrows to exactly that skill", () => {
   expect(recs({ ...base, skills: new Set(["s/cadence1"]) }).sort()).toEqual(["badge", "ring"]);
 });
 
@@ -160,4 +160,29 @@ test("an unknown gear class falls back to its raw id instead of vanishing from t
   expect(all).toEqual(["exotic"]);
   const filtered = applyView([exotic], skills, { ...base, fCat: new Set(["melee1h"]) }, nameOf);
   expect(filtered).toEqual([]);
+});
+
+test("selecting a base does not pull in items that only touch its modifier", () => {
+  // Selection is per node, so a group is a rendering relationship and not a filter scope. The
+  // fixture's three skills are all their own group, so this needs a real modifier to be a test
+  // of anything: modOnly is reachable only by picking the modifier itself.
+  const withMod = [
+    ...skills,
+    skill("s/cadence2", "s/cadence1", "m/A"), // a modifier inside Cadence's group
+  ];
+  const modOnly = item("modonly", { boosts: [{ skill: "s/cadence2", level: 1 }] });
+  const pool = [badge, modOnly];
+  const pick = (record: string) =>
+    applyView(pool, withMod, { ...base, skills: new Set([record]) }, nameOf).map((r) => r.item.record);
+  expect(pick("s/cadence1")).toEqual(["badge"]);
+  expect(pick("s/cadence2")).toEqual(["modonly"]);
+});
+
+test("a row reports which in-scope skills it matched, so the table can say why it is there", () => {
+  const rows = applyView(items, skills, { ...base }, nameOf);
+  expect(rows.find((r) => r.item.record === "badge")!.skills).toEqual(["s/cadence1"]);
+  expect(rows.find((r) => r.item.record === "blitz")!.skills).toEqual(["s/blitz1"]);
+  // A mastery-wide boost grants levels without naming a skill, so it matches no skill record.
+  const wide = applyView(items, skills, { ...base, masteryWide: true }, nameOf);
+  expect(wide.find((r) => r.item.record === "amulet")!.skills).toEqual([]);
 });

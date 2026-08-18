@@ -5,6 +5,7 @@ import { gameT, makeLocalization, resolveText } from "../../src/core/localizatio
 import type { Localization } from "../../src/ports/Localization";
 import { detailMarkup, type DetailContext } from "../../src/items/adapters/detailView";
 import { effectLines } from "../../src/items/core/effectText";
+import { skillCardMarkup } from "../../src/items/adapters/skillCard";
 import { parseCatalogue, type Item } from "../../src/items/core/model";
 import doc from "../../../data/skill-items.json";
 import statItemTags from "../../../data/stat-item-tags.json";
@@ -122,12 +123,12 @@ function unescapeHtml(s: string): string {
 
 // Every line the page can put in front of a reader, each tagged with where it came from so a
 // failure names the block rather than just the string.
-function allRenderedLines(ctx: DetailContext): { where: string; line: string; isModBlock: boolean }[] {
-  const out: { where: string; line: string; isModBlock: boolean }[] = [];
+function allRenderedLines(ctx: DetailContext): { where: string; line: string; source: "mod" | "pet" | "card" }[] {
+  const out: { where: string; line: string; source: "mod" | "pet" | "card" }[] = [];
   for (const item of catalogue.items) {
     for (const block of item.modifiers) {
       for (const t of effectLines(block.stats, ctx)) {
-        out.push({ where: `${item.record} / ${block.skill}`, line: resolveText(ctx.loc, t), isModBlock: true });
+        out.push({ where: `${item.record} / ${block.skill}`, line: resolveText(ctx.loc, t), source: "mod" });
       }
     }
   }
@@ -158,7 +159,16 @@ function allRenderedLines(ctx: DetailContext): { where: string; line: string; is
     const at = html.indexOf("<details");
     if (at < 0) throw new Error(`pet panel markup changed: no <details> in ${skill.record}'s detail`);
     for (const m of html.slice(at).matchAll(/<li>(.*?)<\/li>/g)) {
-      out.push({ where: `${skill.record} (pet panel)`, line: unescapeHtml(m[1]!), isModBlock: false });
+      out.push({ where: `${skill.record} (pet panel)`, line: unescapeHtml(m[1]!), source: "pet" });
+    }
+  }
+  // The tree's hover card. It runs the same rank rows through effectLines that the item blocks
+  // use, but at a different arity (a whole skill's stats at once, not one modifier block), so it
+  // composes pairs the item path never puts side by side. Swept for the same shapes.
+  for (const skill of catalogue.skills) {
+    const html = skillCardMarkup(skill, ctx.loc, ctx);
+    for (const m of html.matchAll(/<li>(.*?)<\/li>/g)) {
+      out.push({ where: `${skill.record} (hover card)`, line: unescapeHtml(m[1]!), source: "card" });
     }
   }
   return out;
@@ -218,8 +228,9 @@ for (const locale of LOCALES) {
   // of the former, so a floor with more slack than that would not notice every one of them
   // disappearing. A dataset rebuild that legitimately adds or removes content moves these.
   test(`${locale}: the sweep reads the whole dataset`, () => {
-    expect(lines.filter((l) => l.isModBlock).length).toBeGreaterThanOrEqual(4300);
-    expect(lines.filter((l) => !l.isModBlock).length).toBeGreaterThanOrEqual(640);
+    expect(lines.filter((l) => l.source === "mod").length).toBeGreaterThanOrEqual(4300);
+    expect(lines.filter((l) => l.source === "pet").length).toBeGreaterThanOrEqual(640);
+    expect(lines.filter((l) => l.source === "card").length).toBeGreaterThanOrEqual(1800);
   });
 }
 
@@ -238,8 +249,8 @@ for (const locale of LOCALES) {
 test("no modifier block renders two lines that differ only in their numbers", () => {
   const dupes: string[] = [];
   const byBlock = new Map<string, string[]>();
-  for (const { where, line, isModBlock } of LINES) {
-    if (!isModBlock) continue;
+  for (const { where, line, source } of LINES) {
+    if (source !== "mod") continue;
     byBlock.set(where, [...(byBlock.get(where) ?? []), line]);
   }
   for (const [where, lines] of byBlock) {

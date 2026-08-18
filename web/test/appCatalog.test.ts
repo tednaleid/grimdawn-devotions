@@ -312,6 +312,7 @@ const REQUIRED = [
   "items.col.rarity",
   "items.col.ilvl",
   "items.col.levels",
+  "items.col.skills",
   "items.col.effect",
   "items.count",
   "items.table.empty",
@@ -337,6 +338,8 @@ const REQUIRED = [
   "items.category.relic",
   "items.detail.grimtools",
   "items.tree.offTree",
+  "items.card.atRank",
+  "items.card.atUltimate",
   "items.effect.chanceOf",
   "items.effect.chanceTo",
 ];

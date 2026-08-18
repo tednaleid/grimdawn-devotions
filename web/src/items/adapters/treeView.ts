@@ -1,5 +1,5 @@
 // ABOUTME: Renders the /items/ page's SVG mastery tree: nodes positioned by the game's own UI
-// ABOUTME: coordinates, icons from the skill-icons sprite sheet, clicks delegated to onPick(group).
+// ABOUTME: coordinates, icons from the skill-icons sprite sheet, clicks delegated to onPick(record).
 import { withVersion } from "../../adapters/assetVersion";
 import type { Skill } from "../core/model";
 import type { SkillIconIndex } from "./dataSource";
@@ -75,19 +75,6 @@ function placeNodes(skills: Skill[]): Placed[] {
   return placed;
 }
 
-// A skill selection scopes to its node group (see core/filter.ts's scopeSkillSet): a group's
-// identity is its base skill's own record, and an id not found among `skills` (a stale link)
-// falls back to itself, mirroring scopeSkillSet's own fallback so the tree and the table filter
-// never disagree about what a given selection means. Several selections highlight several groups.
-function selectedGroups(skills: Skill[], selected: ReadonlySet<string>): Set<string> {
-  const groups = new Set<string>();
-  for (const record of selected) {
-    const target = skills.find((s) => s.record === record);
-    groups.add(target ? target.group : record);
-  }
-  return groups;
-}
-
 // The connectors the game itself draws between a skill and its upgrades. The layout is the
 // game's own (ui_x/ui_y straight off the records), and it puts a base skill's modifiers on the
 // base's own row at increasing x - Cadence sits at (246,319) with its two modifiers at 486 and
@@ -127,16 +114,18 @@ function linkMarkup(placed: Placed[]): string {
 function nodeMarkup(
   p: Placed,
   i: number,
-  selGroups: Set<string>,
+  selected: ReadonlySet<string>,
   ctx: TreeContext,
   sheet: { w: number; h: number },
 ): string {
   const { skill, x, y, offTree } = p;
   const shape = skill.nodeKind === "base" ? "square" : "circle";
   const clipId = `tree-clip-${i}`;
-  const selected = selGroups.has(skill.group);
-  const cls = ["tree-node", shape, offTree ? "off-tree" : "", selected ? "selected" : ""].filter(Boolean).join(" ");
-  const pressed = selected ? "true" : "false";
+  // Exactly the picked node lights up, not its whole group: a group is a rendering relationship
+  // between a skill and its upgrades, not a claim that picking one means picking them all.
+  const isSelected = selected.has(skill.record);
+  const cls = ["tree-node", shape, offTree ? "off-tree" : "", isSelected ? "selected" : ""].filter(Boolean).join(" ");
+  const pressed = isSelected ? "true" : "false";
   const clip =
     shape === "square"
       ? `<rect x="${x - ICON_R}" y="${y - ICON_R}" width="${ICON_R * 2}" height="${ICON_R * 2}"/>`
@@ -168,10 +157,10 @@ function nodeMarkup(
 
 /** Pure markup for one mastery's tree: nodes positioned by the game's own ui_x/ui_y (or the
  *  off-tree row for the handful that carry none), icons from the skill-icons sprite sheet, each
- *  carrying a `data-group` for the caller to wire clicks against, an accessible name resolved via
- *  `ctx.nameOf`. `selected` highlights every node sharing the selected skill's group, not just
- *  the exact matching node, since that is what stays in scope together (see core/filter.ts's
- *  scopeSkillSet). Exported separately from renderTree so it is testable without a DOM (this repo
+ *  carrying a `data-record` for the caller to wire clicks against, an accessible name resolved via
+ *  `ctx.nameOf`. `selected` highlights exactly the nodes it names, matching core/filter.ts's
+ *  scopeSkillSet, which scopes the table to exactly the picked skills.
+ *  Exported separately from renderTree so it is testable without a DOM (this repo
  *  has no jsdom/happy-dom - see test/importPanel.test.ts). */
 export function buildTreeMarkup(
   skills: Skill[],
@@ -181,23 +170,22 @@ export function buildTreeMarkup(
 ): string {
   const masterySkills = skills.filter((s) => s.mastery === mastery);
   const placed = placeNodes(masterySkills);
-  const selGroups = selectedGroups(skills, selected);
   const sheet = sheetSize(ctx.icons);
   // Links first so every node draws over them: a line ends at a node's centre, not its edge.
   const links = linkMarkup(placed);
-  const nodes = placed.map((p, i) => nodeMarkup(p, i, selGroups, ctx, sheet)).join("");
+  const nodes = placed.map((p, i) => nodeMarkup(p, i, selected, ctx, sheet)).join("");
   return `<svg class="tree-svg" viewBox="${VIEW_BOX}" preserveAspectRatio="xMidYMid meet">${links}${nodes}</svg>`;
 }
 
 /** Render one mastery's tree as a live, wired SVGElement: buildTreeMarkup's string turned into
- *  DOM, with clicks delegated to onPick(group) - a node's group is itself for a base skill and
- *  its base's record for a modifier/transmuter/pet_modifier, matching core/filter.ts's scoping.
- *  onPick toggles rather than sets: selection is a set, and clicking a selected node clears it. */
+ *  DOM, with clicks delegated to onPick(record) - the node itself, not its group, matching
+ *  core/filter.ts scoping the table to exactly the picked skills. onPick toggles rather than
+ *  sets: selection is a set, and clicking a selected node clears it. */
 export function renderTree(
   skills: Skill[],
   mastery: string,
   selected: ReadonlySet<string>,
-  onPick: (group: string) => void,
+  onPick: (record: string) => void,
   ctx: TreeContext,
 ): SVGElement {
   const wrap = document.createElement("div");
@@ -205,8 +193,8 @@ export function renderTree(
   const svg = wrap.firstElementChild as SVGElement;
 
   const pick = (target: Element) => {
-    const group = target.closest("[data-group]")?.getAttribute("data-group");
-    if (group) onPick(group);
+    const record = target.closest("[data-record]")?.getAttribute("data-record");
+    if (record) onPick(record);
   };
   svg.addEventListener("click", (e) => pick(e.target as Element));
   // Space/Enter activates the focused node, matching the item table's own row keyboard handling.
