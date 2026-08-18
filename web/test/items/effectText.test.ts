@@ -5,6 +5,7 @@ import { litT, makeLocalization, resolveText } from "../../src/core/localization
 import { COMPOSER, effectLines, maxPlaceholderIndex } from "../../src/items/core/effectText";
 import statItemTags from "../../../data/stat-item-tags.json";
 import gameEn from "../../../data/i18n/game.en.json";
+import appEn from "../../src/i18n/app.en.json";
 
 const GAME: Record<string, string> = {
   DamageFire: "{%t0} Fire Damage",
@@ -190,7 +191,12 @@ const cardCtx = {
     return SKILL_NAMES[r] ? litT(SKILL_NAMES[r]) : undefined;
   },
 };
-const cardLoc = makeLocalization({}, {}, "en", CARD_GAME, CARD_GAME);
+// The real app catalog: effectLines composes the chance prefix from items.effect.chance*, the
+// one app-authored piece of grammar on this path (the game's own tagChanceOf/tagChanceTo do not
+// survive its table build - see BACKLOG.md), so a fixture with an empty catalog would render
+// the raw key and hide what these lines actually say.
+const APP = appEn as Record<string, string>;
+const cardLoc = makeLocalization(APP, APP, "en", CARD_GAME, CARD_GAME);
 const cardRender = (stats: any[]) => effectLines(stats, cardCtx).map((t) => resolveText(cardLoc, t));
 
 test("Badge of the Crimson Company: DoT total is the per-second value times duration", () => {
@@ -310,17 +316,18 @@ test("a slow-family chance stat with no Min sibling is dropped, not printed as a
   expect(cardRender([{ stat: "offensiveSlowLightningChance", value: 180 }])).toEqual([]);
 });
 
-// Task 8b: a slow-family chance stat WITH a Min sibling is untouched by this fix (out of
-// scope per task-8b-brief.md) - it still reaches the plain fallback today. Pinning this
-// documents the current (unfixed) shape rather than asserting it is correct.
-test("a slow-family chance stat with a Min sibling still reaches the plain fallback (known gap, out of scope)", () => {
+// Ruling R19's oracle, closed in the final fix round. Mythical Viperfang Grips, Blood of Dreeg
+// block. grimtools card: "10% Chance of 540 Poison Damage over 5 Seconds". The chance folds into
+// the composed DoT line as a leading prefix; it used to print itself as "10 Poison Damage" above
+// it, a second line that reads as a damage amount.
+test("a slow-family chance stat with a Min sibling folds into the DoT line as a leading chance", () => {
   expect(
     cardRender([
       { stat: "offensiveSlowPoisonChance", value: 10 },
       { stat: "offensiveSlowPoisonDurationMin", value: 5 },
       { stat: "offensiveSlowPoisonMin", value: 108 },
     ]),
-  ).toEqual(["10 Poison Damage", "540 Poison Damage over 5 Seconds"]);
+  ).toEqual(["10% Chance of 540 Poison Damage over 5 Seconds"]);
 });
 
 // Task 8b oracle: Awakened Inscribed Bracers (records/items/awakened/gearhands/c029_hands.dbr)
@@ -595,4 +602,137 @@ test("a stat id repeated by a second carrier in the same block keeps both values
       { stat: "skillCooldownReduction", value: 5 },
     ]),
   ).toEqual(["+100% Skill Cooldown Reduction", "+5% Skill Cooldown Reduction"]);
+});
+
+// --- final fix round, C2/I1/I2: a <X>Chance that shares its family's display tag is a
+// probability, and a crowd-control tag's {%t0} is a duration clause, not a number.
+
+const CC_GAME: Record<string, string> = {
+  ...CARD_GAME,
+  DamagePetrify: "Petrify target{%t0}",
+  DamageFreeze: "Freeze target{%t0}",
+  DamageTrap: "Immobilize target{%t0}",
+  DamageStun: "Stun target{%t0}",
+  DamageFixedRangeFormatTime: "for {%.1f0} - {%.1f1} Seconds",
+  RetaliationFear: "{%t0} of Terrify Retaliation",
+  DamageElemental: "{%t0} Elemental Damage",
+};
+const CC_TAGS: Record<string, string> = {
+  ...CARD_TAGS,
+  offensivePetrify: "DamagePetrify",
+  offensivePetrifyMin: "DamagePetrify",
+  offensivePetrifyChance: "DamagePetrify",
+  offensiveFreezeMin: "DamageFreeze",
+  offensiveFreezeChance: "DamageFreeze",
+  offensiveTrap: "DamageTrap",
+  offensiveTrapChance: "DamageTrap",
+  offensiveStunMin: "DamageStun",
+  offensiveStunMax: "DamageStun",
+  retaliationFear: "RetaliationFear",
+  retaliationFearMin: "RetaliationFear",
+  offensiveElementalMin: "DamageElemental",
+  offensiveElementalChance: "DamageElemental",
+};
+const ccCtx = {
+  tagOf: (s: string) => CC_TAGS[s],
+  templateOf: (t: string) => CC_GAME[t],
+  nameOf: () => undefined,
+};
+const ccLoc = makeLocalization(APP, APP, "en", CC_GAME, CC_GAME);
+const ccRender = (stats: any[]) => effectLines(stats, ccCtx).map((t) => resolveText(ccLoc, t));
+
+// The oracle for this whole shape. Mythical Mark of Anathema, Callidor's Tempest block:
+// offensivePetrifyChance 10 + offensivePetrifyMin 2. grimtools card:
+// "10% Chance to Petrify target for 2 Seconds". It used to render as two jammed lines,
+// "Petrify target10" and "Petrify target2".
+test("Mark of Anathema: a crowd-control chance and duration compose one line", () => {
+  expect(
+    ccRender([
+      { stat: "offensivePetrifyChance", value: 10 },
+      { stat: "offensivePetrifyMin", value: 2 },
+    ]),
+  ).toEqual(["10% Chance to Petrify target for 2 Seconds"]);
+});
+
+// Deathbound Amethyst's Drain Essence block, the same shape at a fractional duration.
+test("a fractional crowd-control duration keeps its precision", () => {
+  expect(
+    ccRender([
+      { stat: "offensiveFreezeChance", value: 8 },
+      { stat: "offensiveFreezeMin", value: 0.8 },
+    ]),
+  ).toEqual(["8% Chance to Freeze target for 0.8 Seconds"]);
+});
+
+// Witch Moon's Rune of Hagarrad block: a duration with no chance beside it is still a
+// duration, not a magnitude jammed onto the label ("Freeze target1").
+test("a crowd-control duration with no chance sibling still reads as a duration", () => {
+  expect(ccRender([{ stat: "offensiveFreezeMin", value: 1 }])).toEqual(["Freeze target for 1 Seconds"]);
+});
+
+// A Min/Max pair on a clause tag fills the range variant of the same clause. No block carries
+// one today (offensiveStunMax is in the catalog, unused), so this pins the shape before data
+// arrives rather than after.
+test("a crowd-control Min/Max pair composes the range duration clause", () => {
+  expect(
+    ccRender([
+      { stat: "offensiveStunMax", value: 2 },
+      { stat: "offensiveStunMin", value: 1 },
+    ]),
+  ).toEqual(["Stun target for 1 - 2 Seconds"]);
+});
+
+// The mirror case: a chance with no duration beside it. The clause reads correctly with an
+// empty slot, so it keeps its line rather than printing "Immobilize target15".
+test("a crowd-control chance with no duration sibling renders the clause with no duration", () => {
+  expect(ccRender([{ stat: "offensiveTrapChance", value: 15 }])).toEqual(["15% Chance to Immobilize target"]);
+});
+
+// Uroboruuk's Visage, Spectral Binding block: retaliationFearMin 0.8. The retaliation half of
+// the crowd-control family does NOT take the "for N Seconds" clause - its label already carries
+// the preposition - so its slot holds a bare quantity. It used to render "1 of Terrify
+// Retaliation": rounded, and with the unit gone.
+test("a retaliation duration slot takes a bare quantity, not the for-N-Seconds clause", () => {
+  expect(ccRender([{ stat: "retaliationFearMin", value: 0.8 }])).toEqual(["0.8 Seconds of Terrify Retaliation"]);
+});
+
+// I2. Dawnshard Grip, Pneumatic Burst block: offensiveElementalChance 10 shares DamageElemental
+// with offensiveElementalMin 100, and printed itself as "10 Elemental Damage" directly above
+// the real "100 Elemental Damage".
+test("Dawnshard Grip: a chance sharing a damage tag folds in rather than printing as damage", () => {
+  expect(
+    ccRender([
+      { stat: "offensiveElementalChance", value: 10 },
+      { stat: "offensiveElementalMin", value: 100 },
+    ]),
+  ).toEqual(["10% Chance of 100 Elemental Damage"]);
+});
+
+// I1. Horns of Ekket'Zul, Blitz block: skillCooldownReduction 100 and
+// skillCooldownReductionChance 20 share one tag and rendered as two contradictory lines.
+test("Horns of Ekket'Zul: a cooldown-reduction chance and its value are one line", () => {
+  expect(
+    cardRender([
+      { stat: "skillCooldownReduction", value: 100 },
+      { stat: "skillCooldownReductionChance", value: 20 },
+    ]),
+  ).toEqual(["20% Chance of +100% Skill Cooldown Reduction"]);
+});
+
+// C3 and the chance rule together, on the real Bloodlord's Blade Possession block: the
+// chance belongs to the carrier it was entered on (the 100), not to the flat 5 beside it.
+test("Bloodlord's Blade: the chance attaches to its own carrier, not to the second value", () => {
+  expect(
+    cardRender([
+      { stat: "skillCooldownReduction", value: 100 },
+      { stat: "skillCooldownReductionChance", value: 12 },
+      { stat: "skillCooldownReduction", value: 5 },
+    ]),
+  ).toEqual(["12% Chance of +100% Skill Cooldown Reduction", "+5% Skill Cooldown Reduction"]);
+});
+
+// The four genuinely independent chances (defensiveBlockChance, offensivePhysicalChance,
+// projectilePiercingChance, sparkChance) carry their own tag, so the rule must not touch them.
+test("a chance stat with its own tag keeps rendering as its own line", () => {
+  expect(cardRender([{ stat: "defensiveBlockChance", value: 15 }])).toEqual(["15% Chance to Block"]);
 });

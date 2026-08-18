@@ -1,6 +1,6 @@
 // ABOUTME: Turns a modifier block's raw stats into the card lines the game would show.
 // ABOUTME: Pure and i18n-free: returns Text descriptors built from the game's own tags.
-import { type FormatArg, type Text, gameFormatT, gameT, joinT } from "../../core/localization";
+import { type FormatArg, type Text, appT, gameFormatT, gameT, joinT } from "../../core/localization";
 
 export interface ModStat {
   stat: string;
@@ -36,10 +36,38 @@ const TRIGGER_TAG: Record<string, string> = {
 // total across those six, verified against data/skill-items.json).
 const DOT = /^(.+?)(Duration)?Min$/;
 const REFRESH = /^(refreshCooldown|refreshDuration)(Amount|Chance|Max)$/;
-// A proc chance for an offensiveSlow<X> family, mapped by data/stat-item-tags.json to
-// the same damage-label tag as its <X>Min sibling. Only meaningful alongside that
-// sibling; task-8b-brief.md scopes the fix to the one real block that lacks it.
-const SLOW_CHANCE = /^offensiveSlow(.+)Chance$/;
+const CHANCE = /^(.+)Chance$/;
+
+// The tags whose {%t0} is a TEXT slot holding a duration, not a number to substitute. Both
+// sets are the complete reachable answer from data/i18n/game.en.json, not a prefix list that
+// grows: CLAUSE_SLOT is every tag in data/stat-item-tags.json's range whose template ENDS in
+// "{%t0}" with label text before it ("Petrify target{%t0}"), and QUANTITY_SLOT is every one
+// whose template STARTS with "{%t0} of " ("{%t0} of Terrify Retaliation").
+//
+// CLAUSE_SLOT's slot takes the whole clause, DamageFixedSingleFormatTime ("for {%.1f0}
+// Seconds"), pinned to the grimtools card for Mark of Anathema's Callidor's Tempest block:
+// offensivePetrifyChance 10 + offensivePetrifyMin 2 reads "10% Chance to Petrify target for
+// 2 Seconds". All ten keep the trailing-slot shape in all 13 shipped locales.
+//
+// QUANTITY_SLOT does NOT fit that composition, and forcing it through one would double the
+// preposition: Italian's RetaliationFear is "Ritorsione che Spaventa per {%t0}", so its slot
+// holds a bare "0.8 Seconds", not "for 0.8 Seconds". The game's own filler for it is
+// RetaliationFixedSingleFormatTime ("{%.1f0} Seconds"), which the committed game tables do not
+// carry (see BACKLOG.md), so the same text is composed from the value and the game's own unit
+// tag - the shape the refresh composers already use for their own durations.
+const CLAUSE_SLOT = new Set([
+  "DamageConfusion",
+  "DamageConvert",
+  "DamageDisruption",
+  "DamageFear",
+  "DamageFreeze",
+  "DamageKnockdown",
+  "DamagePetrify",
+  "DamageStun",
+  "DamageTrap",
+  "tagDamageSleep",
+]);
+const QUANTITY_SLOT = new Set(["RetaliationConfusion", "RetaliationFear", "RetaliationFreeze", "RetaliationStun"]);
 
 const unit = (v: number): Text => gameT(v === 1 ? "tagSecond" : "tagSeconds");
 
@@ -220,10 +248,144 @@ export function effectLines(stats: ModStat[], ctx: EffectContext): Text[] {
   return out;
 }
 
+// A <X>Chance is a PROBABILITY, never a magnitude, whenever data/stat-item-tags.json points it
+// at the display tag its own <X> family's value stat already carries - which the catalog itself
+// answers, through tagOf, for every family at once rather than by a growing prefix list. That
+// covers offensiveSlow<X>Chance (Blood of Dreeg), skillCooldownReductionChance (Horns of
+// Ekket'Zul rendered "+100%" and "+20% Skill Cooldown Reduction" as two contradictory lines),
+// offensiveElementalChance (Dawnshard Grip rendered "10 Elemental Damage" above the real "100
+// Elemental Damage") and the crowd-control chances. The four real independent chances
+// (defensiveBlockChance, offensivePhysicalChance, projectilePiercingChance, sparkChance) carry
+// their own tag and are untouched.
+function isProcChance(stat: string, tag: string, ctx: EffectContext): boolean {
+  const m = stat.match(CHANCE);
+  if (!m) return false;
+  return ctx.tagOf(m[1]!) === tag || ctx.tagOf(`${m[1]}Min`) === tag || ctx.tagOf(`${m[1]}Max`) === tag;
+}
+
+// The duration Text filling a CLAUSE_SLOT/QUANTITY_SLOT tag's {%t0}, or null if uncomposable.
+// Leads with the separator the game's own text table carries and the table build strips: the raw
+// DamageFixedSingleFormatTime is " {^E}for {^H}{%.1f0} {^E}Seconds", and clean_text's .strip()
+// takes that first space off. Same restoration the damage-over-time branch does with
+// joinT(head, " ", ...). Harmless where the slot leads the label, since applyGameFormat trims.
+function durationSlot(tag: string, seconds: LineValue, ctx: EffectContext): Text | null {
+  if (!CLAUSE_SLOT.has(tag)) {
+    return joinT(" ", bareValue(seconds), " ", unit(Array.isArray(seconds) ? seconds[1] : seconds));
+  }
+  const composer = Array.isArray(seconds) ? "DamageFixedRangeFormatTime" : "DamageFixedSingleFormatTime";
+  if (!ctx.templateOf(composer)) return null;
+  return joinT(" ", gameFormatT(composer, Array.isArray(seconds) ? [seconds[0], seconds[1]] : [seconds]));
+}
+
+// A refresh family composes one line from its amount, its chance, and the target and trigger
+// the pipeline carries alongside them. The target is frequently a different skill from the
+// block's own, so it is never inferred. Only refreshDuration ships a Max variant (23 of its 29
+// blocks; refreshCooldown carries one on 0 of 73), so the "(Max N Seconds)" suffix only ever
+// applies to that family. Returns undefined when the entry is not a refresh stat at all, which
+// is what separates "this family declines to render a line" from "not this family's business".
+function renderRefresh(stats: ModStat[], i: number, used: Set<number>, ctx: EffectContext): Text | null | undefined {
+  const ref = stats[i]!.stat.match(REFRESH);
+  if (!ref) return undefined;
+  const family = ref[1];
+  const amountIdx = nearestStat(stats, used, i, `${family}Amount`);
+  if (amountIdx < 0) return null;
+  const amount = stats[amountIdx]!;
+  const chanceIdx = nearestStat(stats, used, amountIdx, `${family}Chance`);
+  const maxIdx = family === "refreshDuration" ? nearestStat(stats, used, amountIdx, `${family}Max`) : -1;
+  const chance = chanceIdx >= 0 ? stats[chanceIdx] : undefined;
+  const max = maxIdx >= 0 ? stats[maxIdx] : undefined;
+  used.add(i);
+  used.add(amountIdx);
+  if (chanceIdx >= 0) used.add(chanceIdx);
+  if (maxIdx >= 0) used.add(maxIdx);
+  const q = amount.refresh_trigger ? TRIGGER_TAG[amount.refresh_trigger] : undefined;
+  const cond: FormatArg = q ? gameFormatT(q, [chance?.value ?? 0]) : (chance?.value ?? 0);
+  const target = amount.refresh_skill ? ctx.nameOf(amount.refresh_skill) : undefined;
+  const composerTag =
+    family === "refreshCooldown"
+      ? target
+        ? "tagSkillCooldownRefreshName"
+        : "tagSkillCooldownRefresh"
+      : max
+        ? target
+          ? "tagSkillDurationRefreshNameMax"
+          : "tagSkillDurationRefreshMax"
+        : target
+          ? "tagSkillDurationRefreshName"
+          : "tagSkillDurationRefresh";
+  const args: FormatArg[] = target
+    ? [cond, target, amount.value, unit(amount.value)]
+    : [cond, amount.value, unit(amount.value)];
+  if (max) args.push(max.value, unit(max.value));
+  return gameFormatT(composerTag, args);
+}
+
+/** "10% Chance to Petrify target for 2 Seconds" / "10% Chance of 540 Poison Damage over 5 Seconds". */
+function withChance(body: Text, chance: number, tag: string): Text {
+  // The game's own prefixes are tagChanceOf and tagChanceTo, picked by exactly this split (a
+  // clause takes "to", a noun phrase takes "of"). Neither survives the game-table build - both
+  // clean to an unbalanced "{" in English - so they are app catalog keys here. See BACKLOG.md.
+  return appT(CLAUSE_SLOT.has(tag) ? "items.effect.chanceTo" : "items.effect.chanceOf", { chance, effect: body });
+}
+
 function renderOne(stats: ModStat[], i: number, used: Set<number>, ctx: EffectContext, tag: string): Text | null {
   const s = stats[i]!;
   const template = ctx.templateOf(tag);
   if (!template) return null;
+
+  // The refresh family folds its own chance into its own composed line, so it is settled
+  // before the general proc-chance rule below ever sees refreshCooldownChance.
+  const refresh = renderRefresh(stats, i, used, ctx);
+  if (refresh !== undefined) return refresh;
+
+  const sameTag = (o: ModStat, j: number) => j !== i && ctx.tagOf(o.stat) === tag;
+  if (isProcChance(s.stat, tag, ctx)) {
+    // The magnitude sibling renders the line and reads this chance back off the block, so this
+    // entry never renders one of its own - except on a clause tag, whose label is a whole
+    // sentence that reads correctly with an empty duration slot ("15% Chance to Immobilize
+    // target"). On any other tag the label alone is a lie ("10 Poison Damage"), so it is dropped,
+    // which is what the lone offensiveSlowLightningChance on Awakened Inscribed Bracers' Wind
+    // Devil block needs: grimtools shows no Wind Devil block for that item at all.
+    if (nearestIndex(stats, used, i, (o, j) => sameTag(o, j) && !isProcChance(o.stat, tag, ctx)) >= 0) return null;
+    if (!CLAUSE_SLOT.has(tag)) return null;
+    used.add(i);
+    return withChance(gameFormatT(tag, []), s.value, tag);
+  }
+  const chanceIdx = nearestIndex(stats, used, i, (o, j) => sameTag(o, j) && isProcChance(o.stat, tag, ctx));
+
+  const body = renderBody(stats, i, used, ctx, tag, template);
+  if (!body) return null;
+  if (chanceIdx < 0) return body;
+  used.add(chanceIdx);
+  return withChance(body, stats[chanceIdx]!.value, tag);
+}
+
+function renderBody(
+  stats: ModStat[],
+  i: number,
+  used: Set<number>,
+  ctx: EffectContext,
+  tag: string,
+  template: string,
+): Text | null {
+  const s = stats[i]!;
+
+  // A crowd-control tag's {%t0} is a text slot, and its Min is the DURATION that fills it, not
+  // a magnitude: substituting the number straight in produced "Petrify target10" and
+  // "Freeze target1". A Min/Max pair fills the range variant instead.
+  if (CLAUSE_SLOT.has(tag) || QUANTITY_SLOT.has(tag)) {
+    const range = s.stat.match(RANGE);
+    const partnerIdx = range ? nearestStat(stats, used, i, `${range[1]}${range[2] === "Min" ? "Max" : "Min"}`) : -1;
+    used.add(i);
+    let seconds: LineValue = s.value;
+    if (partnerIdx >= 0) {
+      used.add(partnerIdx);
+      const partner = stats[partnerIdx]!.value;
+      seconds = range![2] === "Min" ? [s.value, partner] : [partner, s.value];
+    }
+    const slot = durationSlot(tag, seconds, ctx);
+    return slot ? gameFormatT(tag, [slot]) : null;
+  }
 
   // A duration sibling makes one line. Damage families show the product and read
   // "over"; every other family keeps its magnitude and reads "for". The real data
@@ -254,56 +416,6 @@ function renderOne(stats: ModStat[], i: number, used: Set<number>, ctx: EffectCo
       if (!head) return null;
       return ctx.templateOf(suffixTag) ? joinT(head, " ", gameFormatT(suffixTag, [dur.value])) : head;
     }
-  }
-
-  // offensiveSlow<X>Chance is a proc chance, but data/stat-item-tags.json maps it to the
-  // same damage-label tag as its <X>Min sibling, so the plain fallback below would print
-  // a chance value as a damage amount ("180 Electrocute Damage" for a 180% chance stat,
-  // the other half of the Wind Devil block above). Only 2 such stats occur in the real
-  // data and only 1 lacks a Min sibling; suppress that one rather than mislabeling it.
-  // The one with a sibling (Blood of Dreeg) is out of scope here - task-8b-brief.md.
-  const slowChance = s.stat.match(SLOW_CHANCE);
-  if (slowChance && !stats.some((o) => o.stat === `offensiveSlow${slowChance[1]}Min`)) return null;
-
-  // A refresh family composes one line from its amount, its chance, and the target
-  // and trigger the pipeline carries alongside them. The target is frequently a
-  // different skill from the block's own, so it is never inferred. Only refreshDuration
-  // ships a Max variant (23 of its 29 blocks; refreshCooldown carries one on 0 of 73),
-  // so the "(Max N Seconds)" suffix only ever applies to that family.
-  const ref = s.stat.match(REFRESH);
-  if (ref) {
-    const family = ref[1];
-    const amountIdx = nearestStat(stats, used, i, `${family}Amount`);
-    if (amountIdx < 0) return null;
-    const amount = stats[amountIdx]!;
-    const chanceIdx = nearestStat(stats, used, amountIdx, `${family}Chance`);
-    const maxIdx = family === "refreshDuration" ? nearestStat(stats, used, amountIdx, `${family}Max`) : -1;
-    const chance = chanceIdx >= 0 ? stats[chanceIdx] : undefined;
-    const max = maxIdx >= 0 ? stats[maxIdx] : undefined;
-    used.add(i);
-    used.add(amountIdx);
-    if (chanceIdx >= 0) used.add(chanceIdx);
-    if (maxIdx >= 0) used.add(maxIdx);
-    const q = amount.refresh_trigger ? TRIGGER_TAG[amount.refresh_trigger] : undefined;
-    const cond: FormatArg = q ? gameFormatT(q, [chance?.value ?? 0]) : (chance?.value ?? 0);
-    const target = amount.refresh_skill ? ctx.nameOf(amount.refresh_skill) : undefined;
-    const isCooldown = family === "refreshCooldown";
-    const composerTag = isCooldown
-      ? target
-        ? "tagSkillCooldownRefreshName"
-        : "tagSkillCooldownRefresh"
-      : max
-        ? target
-          ? "tagSkillDurationRefreshNameMax"
-          : "tagSkillDurationRefreshMax"
-        : target
-          ? "tagSkillDurationRefreshName"
-          : "tagSkillDurationRefresh";
-    const args: FormatArg[] = target
-      ? [cond, target, amount.value, unit(amount.value)]
-      : [cond, amount.value, unit(amount.value)];
-    if (max) args.push(max.value, unit(max.value));
-    return gameFormatT(composerTag, args);
   }
 
   // Each conversion percentage is its own line, carrying its own type pair. They

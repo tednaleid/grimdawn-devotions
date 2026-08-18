@@ -421,5 +421,7 @@
   "items.slot.medal": "Medal",
   "items.slot.relic": "Relic",
   "items.detail.grimtools": "View on Grimtools",
-  "items.tree.offTree": "Other abilities"
+  "items.tree.offTree": "Other abilities",
+  "items.effect.chanceOf": "{chance}% Chance of {effect}",
+  "items.effect.chanceTo": "{chance}% Chance to {effect}"
 }

@@ -338,6 +338,8 @@ const REQUIRED = [
   "items.slot.relic",
   "items.detail.grimtools",
   "items.tree.offTree",
+  "items.effect.chanceOf",
+  "items.effect.chanceTo",
 ];
 
 test("every required chrome key exists in app.en.json", () => {
