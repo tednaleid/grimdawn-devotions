@@ -157,6 +157,24 @@ check("no stat id is both aliased and declared non-display",
 check("every alias names a tag", all(bsit.ALIASES.values()), True)
 check("every non-display entry carries a reason", all(bsit.NON_DISPLAY.values()), True)
 
+# --- the refresh families are aliased, not declared non-display --------------
+check("refreshCooldownAmount aliases to the cooldown refresh tag",
+      bsit.ALIASES.get("refreshCooldownAmount"), "tagSkillCooldownRefresh")
+check("refreshCooldownChance aliases to the cooldown refresh tag",
+      bsit.ALIASES.get("refreshCooldownChance"), "tagSkillCooldownRefresh")
+check("refreshDurationAmount aliases to the duration refresh tag",
+      bsit.ALIASES.get("refreshDurationAmount"), "tagSkillDurationRefresh")
+check("refreshDurationChance aliases to the duration refresh tag",
+      bsit.ALIASES.get("refreshDurationChance"), "tagSkillDurationRefresh")
+check("refreshDurationMax aliases to the duration refresh max tag",
+      bsit.ALIASES.get("refreshDurationMax"), "tagSkillDurationRefreshMax")
+
+# --- the other composed facets stay declared non-display ---------------------
+for sid in ("onHitActivationChance", "skillProcChance", "offensiveGlobalChance",
+            "defensiveManaBurn", "defensiveProtectionChance",
+            "skillLifeBonusBuffDuration", "skillLifePercentBuffDuration"):
+    check(f"{sid} is still declared non-display", sid in bsit.NON_DISPLAY, True)
+
 # --- reduces_to_label --------------------------------------------------------
 check("a value-prefix format reduces to its noun",
       bsit.reduces_to_label("{%+.0f0}% Fire Damage"), True)

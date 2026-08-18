@@ -127,6 +127,16 @@ ALIASES: dict[str, str] = {
     "weaponDamagePct": "SkillWeaponDamageFormat",
     "retaliationDamagePct": "SkillRetaliationDamageFormat",
     "sparkChance": "tagSparkMaxNumberChance",
+    # The refresh families compose one card line from an amount, a chance, and the
+    # target/trigger qualifiers carried alongside them since 2026-08-17. Amount and
+    # chance share the family's tag; the formatter reads both off the block and
+    # renders a single line. Pinned to Badge of the Crimson Company, whose card reads
+    # "25% Chance on Attack to reduce cooldown of Leap by 1 Second".
+    "refreshCooldownAmount": "tagSkillCooldownRefresh",
+    "refreshCooldownChance": "tagSkillCooldownRefresh",
+    "refreshDurationAmount": "tagSkillDurationRefresh",
+    "refreshDurationChance": "tagSkillDurationRefresh",
+    "refreshDurationMax": "tagSkillDurationRefreshMax",
 }
 
 # Stat ids the game never renders as a labelled line. Declared rather than left to
@@ -178,11 +188,6 @@ NON_DISPLAY: dict[str, str] = {
         "chance-of block header; the wording depends on the sibling XOR flag "
         "(GlobalPercentChanceOfAllTag vs GlobalPercentChanceOfOneTag)"
     ),
-    "refreshCooldownAmount": "composed into tagSkillCooldownRefresh with its chance",
-    "refreshCooldownChance": "composed into tagSkillCooldownRefresh with its amount",
-    "refreshDurationAmount": "composed into tagSkillDurationRefresh with its chance",
-    "refreshDurationChance": "composed into tagSkillDurationRefresh with its amount",
-    "refreshDurationMax": "composed into tagSkillDurationRefreshMax",
 }
 
 
