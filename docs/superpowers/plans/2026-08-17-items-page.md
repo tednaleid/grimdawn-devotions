@@ -1142,6 +1142,52 @@ git commit -m "feat(items): compose the plain stat labels through their game com
 
 ---
 
+### Task 9b: Carry the spark and racial-bonus arguments through the pipeline
+
+Added during execution, not in the original plan. Task 9's R14 guard suppresses any
+templated line whose placeholder indices outrun the args we supply. Two real stats hit
+that guard and are currently rendered as nothing; the game renders both. This task
+restores them by carrying the missing values, the same way Task 1 carried the refresh
+qualifiers.
+
+Grimtools oracle, verified 2026-08-18 on Crystallum (item level 84):
+- `"+16% Damage to Chthonics"` for `racialBonusPercentDamage`
+- `"Affects up to 5 targets"` for spark
+
+Both source values already exist in `data/deposit/facts.parquet` and are simply never
+carried forward: `racialBonusRace` (n=592) and `sparkMaxNumber` (n=77).
+
+**Files:**
+- Modify: `scripts/build_derived.py` (the `build_skill_modifiers` query)
+- Modify: `scripts/build_skill_items.py` (per-stat emission)
+- Modify: `web/src/items/core/effectText.ts` (consume the new fields)
+- Test: `scripts/test_build_derived.py`, `web/test/items/effectText.test.ts`
+
+**Two traps that make this bigger than one field each:**
+
+1. The game ships EIGHT spark tag variants, selected by whether a chance is present,
+   whether the count is exactly 1, and whether the value is a modifier rather than an
+   absolute: `tagSparkMaxNumber`, `tagSparkMaxNumberChance`,
+   `tagSparkMaxNumberChanceSingle`, `tagSparkMaxNumberSingle`, and a `Mod` variant of
+   each (the `Mod` forms prefix a `+`). Item modifiers are the `Mod` case; confirm
+   against a card before picking. Grimtools showed the no-chance form for a 100% chance,
+   so a chance of 100 is not rendered as "100% Chance".
+
+2. `racialBonusRace` holds either a single `Race004` or a semicolon list such as
+   `Race007;Race013`. The display name is the PLURAL tag - `tagRace004P` is "Chthonics",
+   which is the form grimtools shows, while `tagRace004` is the singular "Chthonic".
+   Decide and pin how a multi-race list joins before implementing; do not guess.
+
+Any new tag used must be added to `COMPOSER_TAGS` in `scripts/build_game_tables.py` and
+the locale tables regenerated with `just i18n-tables-rebuild` (never `just i18n-tables`
+while the game is running). Task 8's C1 was caused by exactly that omission.
+
+**Acceptance:** the render sweep over every modifier block emits a complete line for all
+6 spark occurrences and the 1 racial occurrence, with no line ending in a dangling
+preposition, and Task 9's R14 guard still passes because nothing is left truncated.
+
+---
+
 ## Phase 4: Page core
 
 ### Task 10: Parse the payload

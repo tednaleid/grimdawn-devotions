@@ -912,3 +912,38 @@ the block is the Chrome launch through the `CDP` class in `scripts/gt_scrape.ts`
 and the matching head of `scripts/gt_star_table.ts`. Only the debug port differs,
 so it should be a parameter. Find the block by name rather than by line number:
 the save-reader work shifted those lines.
+
+## Wire a Python type-checker into `just check`
+
+`just check` runs `fmt-check test lint lint-py typecheck`, but `typecheck` is
+`tsc --noEmit` over the web sources only and `lint-py` is ruff, which lints
+without checking types. Nothing type-checks `scripts/`, so the Python half of the
+repo has no equivalent gate and agents working there see IDE diagnostics that no
+recipe would ever have caught.
+
+`uvx ty check scripts/` reported 106 diagnostics. Two reductions have landed or
+are known:
+
+- 36 were the `importlib.util.spec_from_file_location` preamble failing to narrow
+  its two Optionals, three per file across thirteen files. Fixed in 569643c.
+- 16 more were sibling-script imports (`build_deposit`, `gd_dbr`,
+  `parse_devotions`, `gd_tex`, `gditems_core`, `gditems_duckdb`) that resolve once
+  ty is given `--extra-search-path scripts`. A `ty.toml` should encode this rather
+  than every caller passing the flag; note that `[environment] root = ["scripts"]`
+  was tried and did NOT work, so the config key needs checking against ty's
+  current schema.
+
+That leaves 44, which is the actual work:
+
+- 32 are in `scripts/gt_audit.py` alone, a genuine cleanup rather than boilerplate.
+- The rest are unresolved third-party imports (`duckdb`, `PIL`, `lzstring`).
+  These scripts declare deps in PEP 723 `# /// script` blocks that `uv run
+  --script` resolves into ephemeral environments, so there is no persistent
+  `sys.prefix` for ty's `--python` to point at. Decide whether to maintain a
+  checker-only venv, or to accept those as suppressed.
+
+Also worth settling in the same pass: `just test-scripts` is not part of `check`
+either. That one is deliberate, not an oversight - the justfile notes those tests
+need `extracted/text_en` and would "fail with no explanation on a clean clone
+without it". Making them skip cleanly when the extraction is absent would let
+`check` cover them.
