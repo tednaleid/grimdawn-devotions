@@ -485,8 +485,14 @@ const loc = makeLocalization({}, {}, "en", {}, {});
 
 describe("applyGameFormat", () => {
   const r = (t: any) => resolveText(loc, t);
-  test("fixed point with precision", () => {
-    expect(applyGameFormat("{%.1f0} Seconds", [2], r)).toBe("2.0 Seconds");
+  test("fixed point keeps a real decimal", () => {
+    expect(applyGameFormat("{%.1f0} Second Duration", [0.5], r)).toBe("0.5 Second Duration");
+  });
+  test("fixed point strips a trailing .0, as the game does", () => {
+    // Pinned to three grimtools cards rendered from {%.1f} templates: Mark of the
+    // Shadow Queen "2 Meter Target Area" (2.0), Badge of the Crimson Company
+    // "1 Second" (1.0), Mark of Lethal Intents "0.5 Second Duration" (0.5).
+    expect(applyGameFormat("{%.1f0} Seconds", [2], r)).toBe("2 Seconds");
   });
   test("forced sign only on non-negative", () => {
     expect(applyGameFormat("{%+.0f0}% Attack Speed", [5], r)).toBe("+5% Attack Speed");
@@ -497,7 +503,7 @@ describe("applyGameFormat", () => {
   });
   test("literal text and two args inside one group", () => {
     expect(applyGameFormat("{%.1f0 Second %s1}", [3, "Skill Recharge"], r))
-      .toBe("3.0 Second Skill Recharge");
+      .toBe("3 Second Skill Recharge");
   });
   test("a literal minus inside the group is printed", () => {
     expect(applyGameFormat("{-%.0f0}% Shield Recovery Time", [20], r))
@@ -536,7 +542,10 @@ export type FormatArg = number | [number, number] | string | Text;
 const SUBST = /%([+-]?)(?:\.(\d))?([a-z])(\d)/g;
 
 function fmtNumber(n: number, sign: string, precision: string | undefined, conv: string): string {
-  const v = conv === "d" ? String(Math.round(n)) : n.toFixed(precision ? Number(precision) : 0);
+  // The game formats at the template's precision, then drops a trailing ".0": a
+  // {%.1f} radius of 2 reads "2 Meter", but a duration of 0.5 keeps "0.5 Second".
+  const raw = conv === "d" ? String(Math.round(n)) : n.toFixed(precision ? Number(precision) : 0);
+  const v = raw.replace(/\.0+$/, "");
   return sign === "+" && n >= 0 ? `+${v}` : v;
 }
 
@@ -823,17 +832,14 @@ test("Badge of the Crimson Company: the refresh line names its target and trigge
       refresh_skill: "records/skills/playerclass10/leap1.dbr", refresh_trigger: "AttackEnemy" },
     { stat: "refreshCooldownChance", value: 25,
       refresh_skill: "records/skills/playerclass10/leap1.dbr", refresh_trigger: "AttackEnemy" },
-  // Ruling R4: the game's own template says {%.1f2}, so it yields "1.0 Second".
-  // The grimtools card trims to "1 Second"; that is the site's display choice, and
-  // the spec's principle is to reproduce the game's composition, not to invent it.
-  ])).toEqual(["25% Chance on Attack to reduce cooldown of Leap by 1.0 Second"]);
+  ])).toEqual(["25% Chance on Attack to reduce cooldown of Leap by 1 Second"]);
 });
 
 test("a refresh line with no target skill uses the unnamed variant", () => {
   expect(cardRender([
     { stat: "refreshCooldownAmount", value: 2, refresh_trigger: "AttackEnemy" },
     { stat: "refreshCooldownChance", value: 30, refresh_trigger: "AttackEnemy" },
-  ])).toEqual(["30% Chance on Attack to reduce cooldown by 2.0 Seconds"]);
+  ])).toEqual(["30% Chance on Attack to reduce cooldown by 2 Seconds"]);
 });
 
 test("Scarstone Memento: two conversions on one block stay two lines", () => {
@@ -976,7 +982,7 @@ git commit -m "feat(items): compose DoT, conversion and refresh card lines"
 test("a seconds-unit label composes through SkillSecondFormat", () => {
   // CooldownTime = "Skill Recharge", SkillSecondFormat = "{%.1f0 Second %s1}"
   expect(cardRender([{ stat: "skillCooldownTime", value: 3 }]))
-    .toEqual(["3.0 Second Skill Recharge"]);
+    .toEqual(["3 Second Skill Recharge"]);
 });
 test("a label already carrying its percent takes a bare value prefix", () => {
   // DamageDurationTotalSpeed = "% Slow target"
@@ -985,7 +991,7 @@ test("a label already carrying its percent takes a bare value prefix", () => {
 });
 test("a radius label composes through SkillDistanceFormat", () => {
   expect(cardRender([{ stat: "skillTargetRadius", value: 4 }]))
-    .toEqual(["4.0 Meter Target Area"]);
+    .toEqual(["4 Meter Target Area"]);
 });
 ```
 
