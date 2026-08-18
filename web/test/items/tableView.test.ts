@@ -1,8 +1,12 @@
-// ABOUTME: Regression tests for rowEffectLines: per-block effectLines calls concatenated as
-// ABOUTME: lines, never as stats (fix round 1, C1 - see task-12-13-fix-1.md for the Krieg's Mask case).
+// ABOUTME: Regression tests for rowEffectLines (per-block effectLines calls concatenated as lines,
+// ABOUTME: never as stats - fix round 1, C1) and for bodyMarkup's Skills column pick buttons.
 import { test, expect } from "bun:test";
-import { makeLocalization, resolveText } from "../../src/core/localization";
+import { litT, makeLocalization, resolveText } from "../../src/core/localization";
+import { bodyMarkup } from "../../src/items/adapters/tableView";
 import { rowEffectLines, type EffectContext } from "../../src/items/core/effectText";
+import type { Row } from "../../src/items/core/filter";
+import type { Item } from "../../src/items/core/model";
+import { DEFAULT_VIEW, type ViewState } from "../../src/items/core/urlState";
 import type { Localization } from "../../src/ports/Localization";
 
 // Real tags/templates for the two stat families in play (data/stat-item-tags.json,
@@ -25,6 +29,27 @@ const ctx: EffectContext = {
 const loc: Localization = makeLocalization({}, {}, "en", GAME, GAME);
 const render = (blocks: { stat: string; value: number }[][]) =>
   rowEffectLines(blocks, ctx).map((t) => resolveText(loc, t));
+
+// The Skills column resolves its names through the same EffectContext.nameOf the effect lines
+// use, so this ctx is the row-rendering one with two named skills in it.
+const SKILL_NAMES: Record<string, string> = { sk1: "Cadence", sk2: "Blitz" };
+const namedCtx: EffectContext = { ...ctx, nameOf: (r) => (SKILL_NAMES[r] ? litT(SKILL_NAMES[r]!) : undefined) };
+
+const ITEM: Item = {
+  record: "records/items/x.dbr",
+  nameTag: null,
+  domain: "gear",
+  slots: ["head"],
+  gearType: "head",
+  rarity: "epic",
+  itemLevel: 70,
+  tiers: [],
+  grimtools: null,
+  boosts: [],
+  masteryBoosts: [],
+  modifiers: [],
+};
+const row = (skills: string[]): Row => ({ item: ITEM, levels: 1, modBlocks: [], skills });
 
 // Krieg's Mask under Soldier scope (records/items/gearhead/d112_head.dbr): Blitz's block
 // carries a flat offensiveAetherMin with no Max sibling; War Cry's block carries a real
@@ -58,4 +83,42 @@ test("Krieg's Mask shape: a flat Min in one block and a Min/Max pair in another 
 test("two blocks carrying the identical modifier collapse to one line, not two", () => {
   const sharedBlock = [{ stat: "skillCooldownTime", value: -0.4 }];
   expect(render([sharedBlock, sharedBlock])).toEqual(["-0.4 Second Skill Recharge"]);
+});
+
+// The Skills column is the row's answer to "why is this here", and its names are the page's
+// second skill picker: each is a button carrying the same data-record the tree node does, so
+// hovering shows that skill's card and clicking toggles it. Plain text (the pre-change markup)
+// can do neither.
+test("every skill in the Skills column is a pick button naming its record", () => {
+  const view: ViewState = { ...DEFAULT_VIEW, mastery: "m1", skills: new Set(["sk1"]) };
+  const html = bodyMarkup(loc, [row(["sk1", "sk2"])], namedCtx, view);
+  expect(html).toContain(
+    '<button type="button" class="skill-pick" data-record="sk1" aria-pressed="true">Cadence</button>',
+  );
+  expect(html).toContain(
+    '<button type="button" class="skill-pick" data-record="sk2" aria-pressed="false">Blitz</button>',
+  );
+});
+
+// aria-pressed is the only thing that says which of the listed names are actually picked, and
+// the column is where a reader with no matching tree node sees the selection at all.
+test("an unpicked mastery-wide scope renders every name unpressed", () => {
+  const view: ViewState = { ...DEFAULT_VIEW, mastery: "m1" };
+  const html = bodyMarkup(loc, [row(["sk1", "sk2"])], namedCtx, view);
+  expect(html).not.toContain('aria-pressed="true"');
+  expect((html.match(/class="skill-pick"/g) ?? []).length).toBe(2);
+});
+
+// A skill the game never named falls back to its raw record, matching nameOf's convention
+// elsewhere in the file - it must still be pickable, not rendered as bare text.
+test("a nameless skill still renders as a pick button, labelled by its record", () => {
+  const html = bodyMarkup(loc, [row(["sk9"])], namedCtx, { ...DEFAULT_VIEW, mastery: "m1" });
+  expect(html).toContain('data-record="sk9" aria-pressed="false">sk9</button>');
+});
+
+// An item in scope for its level grants alone touches no named skill line, and an em dash is not
+// something to click.
+test("a row matching no named skill renders no pick button", () => {
+  const html = bodyMarkup(loc, [row([])], namedCtx, { ...DEFAULT_VIEW, mastery: "m1" });
+  expect(html).not.toContain("skill-pick");
 });

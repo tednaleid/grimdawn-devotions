@@ -168,6 +168,39 @@ try {
   const rowsAfterMastery = await cdp.evaluate<number>("document.querySelectorAll('tr.item-row').length");
   check(rowsAfterMastery > 0, `the table lists items touching that mastery (${rowsAfterMastery} rows)`);
 
+  // The Skills column is the page's second picker, exercised here in mastery-wide scope so the
+  // row a name is clicked from stays in the table afterwards: hovering a name shows the same card
+  // a tree node does (a row can name a skill whose node is nowhere near the pointer), and clicking
+  // one picks that skill without also expanding the row the name sits in.
+  const cardShown = await cdp.evaluate<boolean>(`(() => {
+    const b = document.querySelector('td.skills .skill-pick');
+    if (!b) return false;
+    b.dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));
+    const card = [...document.querySelectorAll('.skill-card')].find((c) => !c.hidden);
+    return !!card && card.textContent.trim().length > 0;
+  })()`);
+  check(cardShown, "hovering a name in the Skills column shows that skill's card");
+
+  const pickedFromTable = await cdp.evaluate<string>(
+    `(() => { const b = document.querySelector('td.skills .skill-pick[aria-pressed="false"]');
+       b.dispatchEvent(new MouseEvent('click', {bubbles: true})); return b.dataset.record; })()`,
+  );
+  const tablePickTook = await waitFor<string>(cdp, "location.hash", (h) => h.includes("skill="));
+  check(tablePickTook, `clicking a name in the Skills column picks that skill (${pickedFromTable})`);
+  const openDetails = await cdp.evaluate<number>("document.querySelectorAll('.item-detail').length");
+  check(openDetails === 0, "picking a skill from the table does not also expand the row it sits in");
+
+  // And picking it again clears it, back to the whole mastery - the same toggle the tree's nodes do.
+  await cdp.evaluate(
+    `document.querySelector('td.skills .skill-pick[aria-pressed="true"]').dispatchEvent(new MouseEvent('click', {bubbles: true}))`,
+  );
+  const clearedFromTable = await waitFor<string>(cdp, "location.hash", (h) => !h.includes("skill="));
+  const backToMastery = await cdp.evaluate<number>("document.querySelectorAll('tr.item-row').length");
+  check(
+    clearedFromTable && backToMastery === rowsAfterMastery,
+    "clicking it again clears the skill, back to the whole mastery",
+  );
+
   // Pick one skill node: the table narrows to that node group, and the hash records the skill.
   await cdp.evaluate(`document.querySelector('.tree-node').dispatchEvent(new MouseEvent('click', {bubbles: true}))`);
   const narrowed = await waitFor<number>(

@@ -117,7 +117,7 @@ function nameCell(loc: Localization, item: Item): string {
     : name;
 }
 
-function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string {
+function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext, view: ViewState): string {
   const item = row.item;
   const category = esc(categoryLabel(loc, itemCategory(item)));
   const rarity = esc(loc.translate(`items.rarity.${item.rarity.toLowerCase()}`));
@@ -127,8 +127,16 @@ function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string 
   // expanding the row, and with several skills picked (or a whole mastery in scope) the effect
   // lines alone do not say which power they belong to. Falls back to the raw record for a skill
   // the game never named, matching nameOf's convention elsewhere in this file.
+  // Each name is a button, not text: it carries the same hover card the tree node does (a row
+  // can name a skill the reader cannot see on the tree at all), and clicking it toggles that
+  // skill in the selection, so the table is a second way into the same picker.
   const skills = row.skills.length
-    ? row.skills.map((r) => esc(resolveText(loc, effectCtx.nameOf(r) ?? litT(r)))).join("<br>")
+    ? row.skills
+        .map((r) => {
+          const label = esc(resolveText(loc, effectCtx.nameOf(r) ?? litT(r)));
+          return `<button type="button" class="skill-pick" data-record="${esc(r)}" aria-pressed="${view.skills.has(r)}">${label}</button>`;
+        })
+        .join("")
     : "—";
   const expanded = expandedRecords.has(item.record);
   const caret = expanded ? "▾" : "▸";
@@ -151,7 +159,7 @@ export function bodyMarkup(loc: Localization, rows: Row[], effectCtx: EffectCont
     const key = view.mastery ? "items.table.empty" : "items.table.pickMastery";
     return `<tr class="empty"><td colspan="${COLS.length}">${esc(loc.translate(key))}</td></tr>`;
   }
-  return rows.map((r) => rowHtml(loc, r, effectCtx)).join("");
+  return rows.map((r) => rowHtml(loc, r, effectCtx, view)).join("");
 }
 
 function skeleton(loc: Localization): string {
@@ -181,16 +189,17 @@ function skeleton(loc: Localization): string {
 // dozen skills per mastery) and simpler than trying to patch an existing tree in place. Picking a
 // node toggles: clicking the already-selected skill's group clears the selection, restoring the
 // "All skills" escape hatch the old <select> offered via its empty option.
-// Shows one skill's card while the pointer (or keyboard focus) is on its node. The card is
-// positioned against the tree wrapper rather than the page, so it follows the tree when the page
-// scrolls, and it is rebuilt per hover rather than per node up front: a mastery is a few dozen
-// skills and only one card is ever visible.
+// Shows one skill's card while the pointer (or keyboard focus) is on something that names a
+// skill: a node in the tree, or a name in the table's Skills column. `host` is both where the card
+// is parked and the box it is positioned against, so it must be a positioned element that does not
+// clip its overflow; `source` is where the hover/focus events are delegated from and `selector`
+// what carries the skill's data-record. The card is rebuilt per hover rather than per anchor up
+// front: a page holds hundreds of these and only one card is ever visible.
 function attachSkillCard(
-  treeEl: HTMLElement,
-  svg: SVGElement,
-  loc: Localization,
-  catalogue: Catalogue,
-  effectCtx: EffectContext,
+  host: HTMLElement,
+  source: Element,
+  selector: string,
+  markupFor: (record: string) => string | null,
 ): void {
   const card = document.createElement("div");
   card.className = "skill-card";
@@ -198,21 +207,23 @@ function attachSkillCard(
   // Hover-only detail, and the node itself already carries the skill's accessible name, so the
   // card must not be announced a second time as the user tabs through the tree.
   card.setAttribute("aria-hidden", "true");
-  treeEl.appendChild(card);
+  host.appendChild(card);
 
   const show = (target: Element) => {
-    const node = target.closest<SVGGElement>("[data-record]");
+    // Both an HTMLElement and an SVG <g> carry dataset and getBoundingClientRect; nothing here
+    // needs either one's own interface.
+    const node = target.closest(selector) as (Element & { dataset: DOMStringMap }) | null;
     if (!node) return;
-    const skill = catalogue.skills.find((s) => s.record === node.dataset.record);
-    if (!skill) return;
-    card.innerHTML = skillCardMarkup(skill, loc, effectCtx);
+    const markup = markupFor(node.dataset.record ?? "");
+    if (markup === null) return;
+    card.innerHTML = markup;
     card.hidden = false;
     // Anchor to the node's own shape, NOT to its <g>. The group also holds the icon <image>,
     // which is the whole sprite sheet shifted into place and clipped: a clip-path does not shrink
     // the reported box, so the <g> measures the entire sheet and reports a left of -302 for a
     // node sitting at x=139. The shape is the node's real box.
     const box = (node.querySelector(".node-shape") ?? node).getBoundingClientRect();
-    const wrap = treeEl.getBoundingClientRect();
+    const wrap = host.getBoundingClientRect();
     const gap = 8;
     // Beside the node, and on whichever side it fits. Clamping a right-column card back inside
     // the box instead would park it on top of the node the reader is pointing at.
@@ -227,10 +238,32 @@ function attachSkillCard(
     card.hidden = true;
   };
 
-  svg.addEventListener("mouseover", (e) => show(e.target as Element));
-  svg.addEventListener("mouseout", hide);
-  svg.addEventListener("focusin", (e) => show(e.target as Element));
-  svg.addEventListener("focusout", hide);
+  source.addEventListener("mouseover", (e) => show(e.target as Element));
+  source.addEventListener("mouseout", hide);
+  source.addEventListener("focusin", (e) => show(e.target as Element));
+  source.addEventListener("focusout", hide);
+}
+
+/** One skill's card markup, or null when the catalogue does not know that record. Shared by the
+ *  tree's nodes and the table's Skills column so both hovers say exactly the same thing. */
+function skillCardFor(
+  record: string,
+  loc: Localization,
+  catalogue: Catalogue,
+  effectCtx: EffectContext,
+): string | null {
+  const skill = catalogue.skills.find((s) => s.record === record);
+  return skill ? skillCardMarkup(skill, loc, effectCtx) : null;
+}
+
+// Toggling one skill: several picks widen the scope (the table shows items touching any of them),
+// and clearing the last one goes back to the whole mastery. Shared by the tree's nodes and the
+// table's Skills column, which must agree on what picking a skill means.
+function toggledSkills(skills: ReadonlySet<string>, record: string): Set<string> {
+  const next = new Set(skills);
+  if (next.has(record)) next.delete(record);
+  else next.add(record);
+  return next;
 }
 
 function syncTree(
@@ -262,18 +295,11 @@ function syncTree(
     catalogue.skills,
     view.mastery,
     view.skills,
-    (record) => {
-      // Toggle exactly that node: several skills widen the scope (the table shows items touching
-      // any of them), and clearing the last one goes back to the whole mastery.
-      const next = new Set(view.skills);
-      if (next.has(record)) next.delete(record);
-      else next.add(record);
-      handlers.onView({ ...view, skills: next });
-    },
+    (record) => handlers.onView({ ...view, skills: toggledSkills(view.skills, record) }),
     treeCtx,
   );
   treeEl.appendChild(svg);
-  attachSkillCard(treeEl, svg, loc, catalogue, effectCtx);
+  attachSkillCard(treeEl, svg, "[data-record]", (record) => skillCardFor(record, loc, catalogue, effectCtx));
   const hasOffTree = catalogue.skills.some((s) => s.mastery === view.mastery && (s.uiX === null || s.uiY === null));
   if (hasOffTree) {
     const caption = document.createElement("p");
@@ -357,7 +383,7 @@ function renderCount(el: HTMLElement, loc: Localization, catalogue: Catalogue, r
   });
 }
 
-function wire(el: HTMLElement): void {
+function wire(el: HTMLElement, catalogue: Catalogue): void {
   const fire = (patch: Partial<ViewState>, mode?: "push" | "replace") => {
     if (!ctx) return;
     ctx.handlers.onView({ ...ctx.view, ...patch }, mode);
@@ -427,6 +453,13 @@ function wire(el: HTMLElement): void {
   // inside the (detail-row-only) pet <details> never reaches here since that row carries no
   // data-record for closest() to match.
   const tbody = el.querySelector<HTMLElement>("#items-tbody")!;
+  // The Skills column carries the same hover card the tree does. Its host is #items-table, not
+  // the table wrapper: that wrapper scrolls (overflow:auto) and would clip the card. The
+  // catalogue is loaded once and never replaced, so capturing it here is safe; the locale is
+  // read from ctx at hover time because it can change under a language switch.
+  attachSkillCard(el, tbody, ".skill-pick", (record) =>
+    ctx ? skillCardFor(record, ctx.loc, catalogue, ctx.detailCtx) : null,
+  );
   const toggleExpanded = (record: string) => {
     if (!ctx) return;
     expandedRecords.has(record) ? expandedRecords.delete(record) : expandedRecords.add(record);
@@ -435,13 +468,20 @@ function wire(el: HTMLElement): void {
   tbody.addEventListener("click", (e) => {
     const target = e.target as Element;
     if (target.closest("a")) return;
+    // A skill name picks that skill; it must not also expand the row it happens to sit in.
+    const pick = target.closest<HTMLElement>(".skill-pick");
+    if (pick) {
+      if (ctx) fire({ skills: toggledSkills(ctx.view.skills, pick.dataset.record!) });
+      return;
+    }
     const tr = target.closest<HTMLElement>("tr[data-record]");
     if (tr) toggleExpanded(tr.dataset.record!);
   });
   tbody.addEventListener("keydown", (e) => {
     if (e.key !== "Enter" && e.key !== " ") return;
     const target = e.target as Element;
-    if (target.closest("a")) return;
+    // A focused skill-pick button raises its own click for Enter and Space, handled above.
+    if (target.closest("a") || target.closest(".skill-pick")) return;
     const tr = target.closest<HTMLElement>("tr[data-record]");
     if (tr) {
       e.preventDefault();
@@ -467,7 +507,7 @@ export function renderTable(
   ctx = { view, handlers, loc, rows, detailCtx };
   if (!el.querySelector(".items-controls")) {
     el.innerHTML = skeleton(loc);
-    wire(el);
+    wire(el, catalogue);
   }
   syncControls(el, loc, catalogue, icons, view, handlers, detailCtx);
   renderBody(el, loc, rows, detailCtx, view);

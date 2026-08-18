@@ -92,10 +92,13 @@
   background: var(--it-panel);
   padding: 10px 14px 14px;
 }
-/* The hover card is absolutely positioned against the tree box and measured against it too:
-   position it against the padded wrapper instead and every card sits the label's height too high,
-   because the offsets would be computed in one box and applied in another. */
-.items-page #items-tree {
+/* The hover card is absolutely positioned against the box it is measured against: position it
+   against the padded wrapper instead and every card sits the label's height too high, because the
+   offsets would be computed in one box and applied in another. The tree's card is hosted by the
+   tree, the Skills column's by the whole page block - never by .tablewrap, which scrolls and
+   would clip it. */
+.items-page #items-tree,
+.items-page #items-table {
   position: relative;
 }
 /* The skill's own card, shown while a node is hovered or focused: what an item's modifier is
@@ -161,6 +164,25 @@
   color: var(--it-mut);
   font-size: 12.5px;
   white-space: nowrap;
+}
+/* Each name in that column is a picker: same hover card as the tree node, and a click toggles the
+   skill. Styled as text rather than as a button so the column still reads as supporting detail. */
+.items-page .skill-pick {
+  display: block;
+  appearance: none;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+.items-page .skill-pick:hover {
+  color: var(--it-ink);
+}
+.items-page .skill-pick[aria-pressed="true"] {
+  color: var(--it-ember);
 }
 
 /* Connectors sit under the nodes (they are emitted first) and stay quiet: they exist to show
