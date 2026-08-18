@@ -4681,6 +4681,8 @@
   "tagSkillCooldownRefreshName": "{%t0} na snížení prodlevy ({%s1}) o {%.1f2} {%z3}",
   "tagSkillDurationRefresh": "{%t0} na prodloužení doby působení o {%.1f1} {%z2}",
   "tagSkillDurationRefreshMax": "{%t0} na obnovení doby působení o {%.1f1} {%z2} (max {%.1f3} {%z4})",
+  "tagSkillDurationRefreshName": "{%t0} na prodloužení doby působení ({%s1}) o {%.1f2} {%z3}",
+  "tagSkillDurationRefreshNameMax": "{%t0} na obnovení doby působení ({%s1}) o {%.1f2} {%z3} (max {%.1f4} {%z5})",
   "tagSkillPetTimeToLive": "Žije {%.1f0} sekund",
   "tagSlitbBossB03": "Ellena, první Slith",
   "tagSlithBossB01": "Viloth Narušitelka",

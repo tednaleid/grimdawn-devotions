@@ -29,18 +29,31 @@ const TRIGGER_TAG: Record<string, string> = {
   Block: "tagRefreshSkillCondition11",
   OnKill: "tagRefreshSkillCondition12",
 };
-const DOT = /^offensiveSlow(.+?)(Duration)?Min$/;
-const REFRESH = /^(refreshCooldown|refreshDuration)(Amount|Chance)$/;
+// Any <family>Min with a <family>DurationMin sibling composes one line, not just the
+// offensiveSlow families: offensiveTotalResistanceReductionAbsolute, offensiveTotalDamageReductionPercent,
+// offensiveProjectileFumble, offensiveFumble, offensiveElementalResistanceReductionAbsolute, and
+// offensiveTotalResistanceReductionPercent carry the same DurationMin-plus-sibling shape (45 blocks
+// total across those six, verified against data/skill-items.json).
+const DOT = /^(.+?)(Duration)?Min$/;
+const REFRESH = /^(refreshCooldown|refreshDuration)(Amount|Chance|Max)$/;
 
 const unit = (v: number): Text => gameT(v === 1 ? "tagSecond" : "tagSeconds");
 
-// Only these seven offensiveSlow families are damage over time, where the record
-// stores damage PER SECOND and the card shows the total. The other five that also
-// carry a DurationMin are debuffs whose magnitude is already absolute: a 25% slow
-// lasting 2 seconds is 25%, not 50%. Verified on one grimtools card, Eldrun's
-// Cursed Vision, which shows "160 Electrocute Damage over 2 Seconds" beside
-// "25% Slow target for 2 Seconds" from the same block at the same duration.
-const DOT_DAMAGE = new Set(["Bleeding", "Fire", "Cold", "Lightning", "Poison", "Life", "Physical"]);
+// Only these seven families are damage over time, where the record stores damage PER
+// SECOND and the card shows the total. Every other <family>Min with a DurationMin
+// sibling is a debuff whose magnitude is already absolute: a 25% slow lasting 2 seconds
+// is 25%, not 50%. Verified on one grimtools card, Eldrun's Cursed Vision, which shows
+// "160 Electrocute Damage over 2 Seconds" beside "25% Slow target for 2 Seconds" from
+// the same block at the same duration.
+const DOT_DAMAGE = new Set([
+  "offensiveSlowBleeding",
+  "offensiveSlowFire",
+  "offensiveSlowCold",
+  "offensiveSlowLightning",
+  "offensiveSlowPoison",
+  "offensiveSlowLife",
+  "offensiveSlowPhysical",
+]);
 
 // A plain label carries no placeholder, so the value cannot ride inside it. Task 9
 // extends this with the COMPOSER table; here it is only the plain/templated split.
@@ -86,51 +99,73 @@ function renderOne(
   // stat, and sorts DurationMin first by stat id, so the Duration record is often
   // visited before its value sibling: it defers to that sibling rather than
   // rendering on its own (a lone duration collapsing to a plain label would
-  // silently drop the number, the same bug this whole rule exists to avoid).
+  // silently drop the number, the same bug this whole rule exists to avoid). But
+  // exactly one block in the real data (offensiveSlowLightningDurationMin, paired only
+  // with offensiveSlowLightningChance) has no value sibling at all, so the defer is
+  // conditional on that sibling actually existing - otherwise this falls through to
+  // the ordinary single-stat path below rather than being silently dropped.
   const dot = s.stat.match(DOT);
   if (dot) {
-    if (dot[2]) return null;
-    const dur = byId.get(`offensiveSlow${dot[1]}DurationMin`);
-    if (dur) {
-      used.add(dur.stat);
-      const isDamage = DOT_DAMAGE.has(dot[1]!);
-      const suffixTag = isDamage ? "DamageSingleFormatTime" : "DamageFixedSingleFormatTime";
-      const head = valueLine(isDamage ? s.value * dur.value : s.value, tag, template);
-      return ctx.templateOf(suffixTag) ? joinT(head, " ", gameFormatT(suffixTag, [dur.value])) : head;
+    if (dot[2]) {
+      if (byId.has(`${dot[1]}Min`)) return null;
+    } else {
+      const dur = byId.get(`${dot[1]}DurationMin`);
+      if (dur) {
+        used.add(s.stat);
+        used.add(dur.stat);
+        const isDamage = DOT_DAMAGE.has(dot[1]!);
+        const suffixTag = isDamage ? "DamageSingleFormatTime" : "DamageFixedSingleFormatTime";
+        const head = valueLine(isDamage ? s.value * dur.value : s.value, tag, template);
+        return ctx.templateOf(suffixTag) ? joinT(head, " ", gameFormatT(suffixTag, [dur.value])) : head;
+      }
     }
   }
 
   // A refresh family composes one line from its amount, its chance, and the target
   // and trigger the pipeline carries alongside them. The target is frequently a
-  // different skill from the block's own, so it is never inferred.
+  // different skill from the block's own, so it is never inferred. Only refreshDuration
+  // ships a Max variant (23 of its 29 blocks; refreshCooldown carries one on 0 of 73),
+  // so the "(Max N Seconds)" suffix only ever applies to that family.
   const ref = s.stat.match(REFRESH);
   if (ref) {
     const family = ref[1];
     const amount = byId.get(`${family}Amount`);
     const chance = byId.get(`${family}Chance`);
+    const max = family === "refreshDuration" ? byId.get(`${family}Max`) : undefined;
     if (!amount) return null;
     used.add(`${family}Amount`);
     used.add(`${family}Chance`);
+    if (max) used.add(max.stat);
     const q = amount.refresh_trigger ? TRIGGER_TAG[amount.refresh_trigger] : undefined;
     const cond: FormatArg = q ? gameFormatT(q, [chance?.value ?? 0]) : (chance?.value ?? 0);
     const target = amount.refresh_skill ? ctx.nameOf(amount.refresh_skill) : undefined;
-    return target
-      ? gameFormatT(`${family === "refreshCooldown" ? "tagSkillCooldownRefreshName" : "tagSkillDurationRefresh"}`, [
-          cond,
-          target,
-          amount.value,
-          unit(amount.value),
-        ])
-      : gameFormatT(`${family === "refreshCooldown" ? "tagSkillCooldownRefresh" : "tagSkillDurationRefresh"}`, [
-          cond,
-          amount.value,
-          unit(amount.value),
-        ]);
+    const isCooldown = family === "refreshCooldown";
+    const composerTag = isCooldown
+      ? target
+        ? "tagSkillCooldownRefreshName"
+        : "tagSkillCooldownRefresh"
+      : max
+        ? target
+          ? "tagSkillDurationRefreshNameMax"
+          : "tagSkillDurationRefreshMax"
+        : target
+          ? "tagSkillDurationRefreshName"
+          : "tagSkillDurationRefresh";
+    const args: FormatArg[] = target
+      ? [cond, target, amount.value, unit(amount.value)]
+      : [cond, amount.value, unit(amount.value)];
+    if (max) args.push(max.value, unit(max.value));
+    return gameFormatT(composerTag, args);
   }
 
   // Each conversion percentage is its own line, carrying its own type pair. They
   // share one tag, so a naive shared-tag merge would wrongly fuse them on 148 blocks.
-  if (s.stat.startsWith("conversionPercentage") && s.from_tag && s.to_tag) {
+  // 1 of 796 conversion stats in the real data lacks a from_tag or to_tag; without
+  // both, the 3-arg composer has nothing sensible to render, so the line is dropped
+  // rather than falling through to the plain renderer (which would hand it one value
+  // for three placeholders).
+  if (s.stat.startsWith("conversionPercentage")) {
+    if (!s.from_tag || !s.to_tag) return null;
     return gameFormatT(tag, [s.value, gameT(s.from_tag), gameT(s.to_tag)]);
   }
 

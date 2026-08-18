@@ -167,11 +167,16 @@ for tag in ("DamageSingleFormatTime", "DamageRangeFormatTime", "SkillSecondForma
             "SkillDistanceFormat", "SkillCostFormat", "SkillPercentFormat",
             "SkillIntFormat", "tagSecond", "tagSeconds",
             "tagSkillCooldownRefresh", "tagSkillCooldownRefreshName",
-            "tagSkillDurationRefresh"):
+            "tagSkillDurationRefresh", "tagSkillDurationRefreshName",
+            "tagSkillDurationRefreshMax", "tagSkillDurationRefreshNameMax"):
     check(f"composer tag reaches game.en.json: {tag}", tag in game_en, True)
 check("DamageSingleFormatTime text", game_en.get("DamageSingleFormatTime"), "over {%.1f0} Seconds")
 check("tagSkillCooldownRefreshName text", game_en.get("tagSkillCooldownRefreshName"),
       "{%t0} to reduce cooldown of {%s1} by {%.1f2} {%z3}")
+check("tagSkillDurationRefreshName text", game_en.get("tagSkillDurationRefreshName"),
+      "{%t0} to extend duration of {%s1} by {%.1f2} {%z3}")
+check("tagSkillDurationRefreshNameMax text", game_en.get("tagSkillDurationRefreshNameMax"),
+      "{%t0} to refresh duration of {%s1} by {%.1f2} {%z3} (Max {%.1f4} {%z5})")
 
 # --- every used trigger has a condition tag, or a trigger would render unlabelled ---
 for tag in ("tagRefreshSkillCondition03", "tagRefreshSkillCondition07",

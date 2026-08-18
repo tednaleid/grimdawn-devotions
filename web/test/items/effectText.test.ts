@@ -73,6 +73,18 @@ test("a max-before-min pair among other stats renders at the pair's first-appear
 test("a lone max renders as a single value, not dropped", () => {
   expect(render([{ stat: "offensiveFireMax", value: 180 }])).toEqual(["180 Fire Damage"]);
 });
+// The DOT pattern was widened (fix round 1, C2) from anchoring on "offensiveSlow" to matching
+// any "<f>Min"/"<f>DurationMin" pair, so an ordinary ranged stat like offensiveFireMin now
+// matches DOT too. It must still fall through to the range rule below when no
+// offensiveFireDurationMin sibling exists, rather than being swallowed by the DOT branch.
+test("a widened DOT match on an ordinary Min/Max pair still falls through to the range rule", () => {
+  expect(
+    render([
+      { stat: "offensiveFireMin", value: 120 },
+      { stat: "offensiveFireMax", value: 180 },
+    ]),
+  ).toEqual(["120-180 Fire Damage"]);
+});
 
 // Pinned to real grimtools cards: damage-over-time, debuff duration, refresh, and
 // conversion composition. The real stat->tag catalog (data/stat-item-tags.json) maps
@@ -86,6 +98,7 @@ const CARD_GAME: Record<string, string> = {
   DamageDurationLightning: "Electrocute Damage",
   DamageDurationTotalSpeed: "% Slow target",
   DamageDurationDefensiveAbility: "Reduced target's Defensive Ability",
+  DamageDurationResistanceReduction: "Reduced target's Resistances",
   DamageSingleFormatTime: "over {%.1f0} Seconds",
   DamageFixedSingleFormatTime: "for {%.1f0} Seconds",
   tagDamageConversion: "{%.0f0}% {%s1} converted to {%s2}",
@@ -93,6 +106,13 @@ const CARD_GAME: Record<string, string> = {
   tagCharStatsFire: "Fire",
   tagSkillCooldownRefreshName: "{%t0} to reduce cooldown of {%s1} by {%.1f2} {%z3}",
   tagSkillCooldownRefresh: "{%t0} to reduce cooldown by {%.1f1} {%z2}",
+  // fix round 1, C1: the plan's COMPOSER_TAGS omitted these two; the duration family
+  // needs all four name/max combinations (data/skill-items.json: 23 of its 29 blocks
+  // carry a Max), the cooldown family only ever needs the two above (0 of 73 do).
+  tagSkillDurationRefresh: "{%t0} to extend duration by {%.1f1} {%z2}",
+  tagSkillDurationRefreshName: "{%t0} to extend duration of {%s1} by {%.1f2} {%z3}",
+  tagSkillDurationRefreshMax: "{%t0} to refresh duration by {%.1f1} {%z2} (Max {%.1f3} {%z4})",
+  tagSkillDurationRefreshNameMax: "{%t0} to refresh duration of {%s1} by {%.1f2} {%z3} (Max {%.1f4} {%z5})",
   tagRefreshSkillCondition07: "{%d0}% Chance on Attack",
   tagSecond: "Second",
   tagSeconds: "Seconds",
@@ -105,14 +125,23 @@ const CARD_TAGS: Record<string, string> = {
   offensiveSlowPoisonDurationMin: "DamageDurationPoison",
   offensiveSlowLightningMin: "DamageDurationLightning",
   offensiveSlowLightningDurationMin: "DamageDurationLightning",
+  offensiveSlowLightningChance: "DamageDurationLightning",
   offensiveSlowTotalSpeedMin: "DamageDurationTotalSpeed",
   offensiveSlowTotalSpeedDurationMin: "DamageDurationTotalSpeed",
   offensiveSlowDefensiveAbilityMin: "DamageDurationDefensiveAbility",
   offensiveSlowDefensiveAbilityDurationMin: "DamageDurationDefensiveAbility",
+  // fix round 1, C2: the DoT/debuff-duration shape isn't limited to offensiveSlow*
+  // families. offensiveTotalResistanceReductionAbsolute is one of six such families
+  // (45 blocks total) that the old offensiveSlow-anchored regex missed.
+  offensiveTotalResistanceReductionAbsoluteMin: "DamageDurationResistanceReduction",
+  offensiveTotalResistanceReductionAbsoluteDurationMin: "DamageDurationResistanceReduction",
   conversionPercentage: "tagDamageConversion",
   conversionPercentage2: "tagDamageConversion",
   refreshCooldownAmount: "tagSkillCooldownRefresh",
   refreshCooldownChance: "tagSkillCooldownRefresh",
+  refreshDurationAmount: "tagSkillDurationRefresh",
+  refreshDurationChance: "tagSkillDurationRefresh",
+  refreshDurationMax: "tagSkillDurationRefreshMax",
 };
 const SKILL_NAMES: Record<string, string> = {
   "records/skills/playerclass10/leap1.dbr": "Leap",
@@ -120,7 +149,13 @@ const SKILL_NAMES: Record<string, string> = {
 const cardCtx = {
   tagOf: (s: string) => CARD_TAGS[s],
   templateOf: (t: string) => CARD_GAME[t],
-  nameOf: (r: string) => (SKILL_NAMES[r] ? litT(SKILL_NAMES[r]) : undefined),
+  // Throws on a falsy skill record rather than silently returning undefined, so a
+  // regression that drops the `amount.refresh_skill ?` guard (fix round 1, I4b) fails
+  // loudly instead of coincidentally matching the unnamed-variant test below.
+  nameOf: (r: string) => {
+    if (!r) throw new Error("nameOf called with no refresh_skill - the guard was removed");
+    return SKILL_NAMES[r] ? litT(SKILL_NAMES[r]) : undefined;
+  },
 };
 const cardLoc = makeLocalization({}, {}, "en", CARD_GAME, CARD_GAME);
 const cardRender = (stats: any[]) => effectLines(stats, cardCtx).map((t) => resolveText(cardLoc, t));
@@ -207,4 +242,107 @@ test("Scarstone Memento: two conversions on one block stay two lines", () => {
       { stat: "conversionPercentage2", value: 20, from_tag: "tagCharStatsFire", to_tag: "tagCharStatsVitality" },
     ]),
   ).toEqual(["100% Vitality converted to Fire", "20% Fire converted to Vitality"]);
+});
+
+// fix round 1, I2: 1 of 796 conversion stats in the real data lacks a from_tag or to_tag.
+test("a conversion missing either tag is dropped, not rendered with the value alone", () => {
+  expect(cardRender([{ stat: "conversionPercentage", value: 100, to_tag: "tagCharStatsFire" }])).toEqual([]);
+});
+
+// fix round 1, C2: the DoT/debuff-duration shape occurs outside offensiveSlow too. Pinned to
+// the brief's example wording (verified against the real 22-block family in data/skill-items.json).
+test("offensiveTotalResistanceReductionAbsolute: a non-offensiveSlow debuff family composes too", () => {
+  expect(
+    cardRender([
+      { stat: "offensiveTotalResistanceReductionAbsoluteDurationMin", value: 3 },
+      { stat: "offensiveTotalResistanceReductionAbsoluteMin", value: 32 },
+    ]),
+  ).toEqual(["32 Reduced target's Resistances for 3 Seconds"]);
+});
+
+// fix round 1, C2 trap: exactly one block in the real data has a lone offensiveSlow*DurationMin
+// with no value sibling (offensiveSlowLightningDurationMin, paired only with
+// offensiveSlowLightningChance). It must render through the ordinary fallback, not be dropped.
+test("a lone duration stat with no value sibling falls through rather than being dropped", () => {
+  expect(cardRender([{ stat: "offensiveSlowLightningDurationMin", value: 2 }])).toEqual(["2 Electrocute Damage"]);
+});
+
+// fix round 1, I4a: a plain (non-templated) label reaching the ordinary fallback - not the DOT
+// branch - still carries its value. Mutating the fallback back to gameFormatT(tag, [s.value])
+// would silently drop the value for this template, since it has no placeholder to hold it.
+test("a plain-label stat with no duration sibling still carries its value through the ordinary fallback", () => {
+  expect(cardRender([{ stat: "offensiveSlowTotalSpeedMin", value: 25 }])).toEqual(["25% Slow target"]);
+});
+
+// fix round 1, C1: refreshDuration's Max variant (23 of its 29 blocks carry one) previously
+// reached the plain renderer under its own 5-arg composer tag and emitted a second, broken
+// line; here it composes into the one named line with the "(Max N Seconds)" suffix.
+// Synthetic (no single grimtools card pins Name+Max together): exercises the composer
+// selection directly against the templates in data/i18n/game.en.json.
+test("a refreshDuration line with a target and a Max caps the duration", () => {
+  expect(
+    cardRender([
+      {
+        stat: "refreshDurationAmount",
+        value: 1,
+        refresh_skill: "records/skills/playerclass10/leap1.dbr",
+        refresh_trigger: "AttackEnemy",
+      },
+      {
+        stat: "refreshDurationChance",
+        value: 20,
+        refresh_skill: "records/skills/playerclass10/leap1.dbr",
+        refresh_trigger: "AttackEnemy",
+      },
+      {
+        stat: "refreshDurationMax",
+        value: 5,
+        refresh_skill: "records/skills/playerclass10/leap1.dbr",
+        refresh_trigger: "AttackEnemy",
+      },
+    ]),
+  ).toEqual(["20% Chance on Attack to refresh duration of Leap by 1 Second (Max 5 Seconds)"]);
+});
+
+test("a refreshDuration line with a Max but no target uses the unnamed Max variant", () => {
+  expect(
+    cardRender([
+      { stat: "refreshDurationAmount", value: 2, refresh_trigger: "AttackEnemy" },
+      { stat: "refreshDurationChance", value: 30, refresh_trigger: "AttackEnemy" },
+      { stat: "refreshDurationMax", value: 6, refresh_trigger: "AttackEnemy" },
+    ]),
+  ).toEqual(["30% Chance on Attack to refresh duration by 2 Seconds (Max 6 Seconds)"]);
+});
+
+// fix round 1, C1 second half: REFRESH previously didn't match the *Max stat itself, so if it
+// were ever visited before its Amount/Chance siblings, it would render its own broken line (a
+// 5-arg composer handed one value) in addition to the correctly composed line. Real data always
+// orders Max last (data/skill-items.json), so this specifically exercises the out-of-order case.
+test("a refresh Max stat visited before its Amount/Chance siblings still composes into one line", () => {
+  expect(
+    cardRender([
+      { stat: "refreshDurationMax", value: 5, refresh_trigger: "AttackEnemy" },
+      { stat: "refreshDurationAmount", value: 2, refresh_trigger: "AttackEnemy" },
+      { stat: "refreshDurationChance", value: 30, refresh_trigger: "AttackEnemy" },
+    ]),
+  ).toEqual(["30% Chance on Attack to refresh duration by 2 Seconds (Max 5 Seconds)"]);
+});
+
+test("a refreshDuration line with a target and no Max uses the unnamed-Max-free named variant", () => {
+  expect(
+    cardRender([
+      {
+        stat: "refreshDurationAmount",
+        value: 3,
+        refresh_skill: "records/skills/playerclass10/leap1.dbr",
+        refresh_trigger: "AttackEnemy",
+      },
+      {
+        stat: "refreshDurationChance",
+        value: 15,
+        refresh_skill: "records/skills/playerclass10/leap1.dbr",
+        refresh_trigger: "AttackEnemy",
+      },
+    ]),
+  ).toEqual(["15% Chance on Attack to extend duration of Leap by 3 Seconds"]);
 });

@@ -4683,6 +4683,8 @@
   "tagSkillCooldownRefreshName": "{%t0} to reduce cooldown of {%s1} by {%.1f2} {%z3}",
   "tagSkillDurationRefresh": "{%t0} to extend duration by {%.1f1} {%z2}",
   "tagSkillDurationRefreshMax": "{%t0} to refresh duration by {%.1f1} {%z2} (Max {%.1f3} {%z4})",
+  "tagSkillDurationRefreshName": "{%t0} to extend duration of {%s1} by {%.1f2} {%z3}",
+  "tagSkillDurationRefreshNameMax": "{%t0} to refresh duration of {%s1} by {%.1f2} {%z3} (Max {%.1f4} {%z5})",
   "tagSkillPetTimeToLive": "Lives for {%.1f0} Seconds",
   "tagSlitbBossB03": "Ellena, the First Slith",
   "tagSlithBossB01": "Viloth, the Corruptor",

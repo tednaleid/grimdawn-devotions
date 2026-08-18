@@ -4682,6 +4682,8 @@
   "tagSkillCooldownRefreshName": "{%t0} để giảm thời gian hồi chiêu của {%s1} đi {%.1f2} {%z3}",
   "tagSkillDurationRefresh": "{%t0} để kéo dài thời gian hiệu lực thêm {%.1f1} {%z2}",
   "tagSkillDurationRefreshMax": "{%t0} để làm mới thời gian hiệu lực thêm {%.1f1} {%z2} (Tối đa {%.1f3} {%z4})",
+  "tagSkillDurationRefreshName": "{%t0} để kéo dài thời gian hiệu lực của {%s1} thêm {%.1f2} {%z3}",
+  "tagSkillDurationRefreshNameMax": "{%t0} để làm mới thời gian hiệu lực của {%s1} thêm {%.1f2} {%z3} (Tối đa {%.1f4} {%z5})",
   "tagSkillPetTimeToLive": "Tồn tại trong {%.1f0} giây",
   "tagSlitbBossB03": "Ellena ~ Con Xà Nhân Đầu Tiên",
   "tagSlithBossB01": "Viloth ~ Kẻ Dơ Bẩn",

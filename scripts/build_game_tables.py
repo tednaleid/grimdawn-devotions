@@ -47,9 +47,11 @@ COMPOSER_TAGS = frozenset({
     # Pluralized units, selected by the composition site against its value.
     "tagSecond", "tagSeconds",
     # The refresh families' composed lines. The *Name variant is chosen when the
-    # record names a target skill.
+    # record names a target skill; the *Max variant when it also carries a cap
+    # (refreshDuration only - 23 of its 29 blocks; refreshCooldown never does).
     "tagSkillCooldownRefresh", "tagSkillCooldownRefreshName",
-    "tagSkillDurationRefresh", "tagSkillDurationRefreshMax",
+    "tagSkillDurationRefresh", "tagSkillDurationRefreshName",
+    "tagSkillDurationRefreshMax", "tagSkillDurationRefreshNameMax",
 } | {f"tagRefreshSkillCondition{n:02d}" for n in range(1, 13)})
 
 

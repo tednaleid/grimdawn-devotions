@@ -4682,6 +4682,8 @@
   "tagSkillCooldownRefreshName": "{%t0}, aby skrócić czas odnowienia: {%s1} o {%.1f2} {%z3}",
   "tagSkillDurationRefresh": "{%t0}, aby wydłużyć czas trwania o {%.1f1} {%z2}",
   "tagSkillDurationRefreshMax": "{%t0}, aby odświeżyć czas trwania o {%.1f1} {%z2} (maks. {%.1f3} {%z4})",
+  "tagSkillDurationRefreshName": "{%t0}, aby wydłużyć czas trwania: {%s1} o {%.1f2} {%z3}",
+  "tagSkillDurationRefreshNameMax": "{%t0}, aby odświeżyć czas trwania: {%s1} o {%.1f2} {%z3} (maks. {%.1f4} {%z5})",
   "tagSkillPetTimeToLive": "Istnieje przez {%.1f0} sek.",
   "tagSlitbBossB03": "Ellena, Pierwszy Slith",
   "tagSlithBossB01": "Viloth, Plugawicielka",

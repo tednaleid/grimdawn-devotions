@@ -4682,6 +4682,8 @@
   "tagSkillCooldownRefreshName": "{%t0} pour réduire la recharge de {%s1} de {%.1f2} {%z3}",
   "tagSkillDurationRefresh": "{%t0} pour prolonger la durée de {%.1f1} {%z2}",
   "tagSkillDurationRefreshMax": "{%t0} pour actualiser la durée de {%.1f1} {%z2} ({%.1f3} {%z4} max.)",
+  "tagSkillDurationRefreshName": "{%t0} pour prolonger la durée de {%s1} de {%.1f2} {%z3}",
+  "tagSkillDurationRefreshNameMax": "{%t0} pour actualiser la durée de {%s1} de {%.1f2} {%z3} ({%.1f4} {%z5} max.)",
   "tagSkillPetTimeToLive": "Vit pendant {%.1f0} secondes",
   "tagSlitbBossB03": "Ellena, la Première Slith",
   "tagSlithBossB01": "Viloth, la corruptrice",

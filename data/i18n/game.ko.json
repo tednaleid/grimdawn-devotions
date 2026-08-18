@@ -4680,6 +4680,8 @@
   "tagSkillCooldownRefreshName": "{%t0}(으)로 {%s1}의 쿨타임 {%.1f2} {%z3}감소",
   "tagSkillDurationRefresh": "{%t0}(으)로 지속시간을 {%.1f1} {%z2}연장",
   "tagSkillDurationRefreshMax": "{%t0}(으)로 지속시간을 {%.1f1} {%z2}새로고침 (최대 {%.1f3} {%z4})",
+  "tagSkillDurationRefreshName": "{%t0}(으)로 {%s1}의 지속시간을 {%.1f2} {%z3}연장",
+  "tagSkillDurationRefreshNameMax": "{%t0}(으)로 {%s1}의 지속시간을 {%.1f2} {%z3}새로고침 (최대 {%.1f4} {%z5})",
   "tagSkillPetTimeToLive": "생존 시간 {%.1f0} 초",
   "tagSlitbBossB03": "최초의 슬리스, 엘레나",
   "tagSlithBossB01": "오염시키는 자, 빌로스",

@@ -4682,6 +4682,8 @@
   "tagSkillCooldownRefreshName": "{%t0}{%s1}的冷却时间减少 {%.1f2} {%z3}",
   "tagSkillDurationRefresh": "{%t0}持续时间增加 {%.1f1} {%z2}",
   "tagSkillDurationRefreshMax": "{%t0}持续时间刷新 {%.1f1} {%z2}（最多 {%.1f3} {%z4}）",
+  "tagSkillDurationRefreshName": "{%t0}{%s1}的持续时间增加 {%.1f2} {%z3}",
+  "tagSkillDurationRefreshNameMax": "{%t0}{%s1}的持续时间刷新 {%.1f2} {%z3}（最多 {%.1f4} {%z5}）",
   "tagSkillPetTimeToLive": "召唤持续 {%.1f0} 秒",
   "tagSlitbBossB03": "第一只蛇人 ~ 艾莱纳",
   "tagSlithBossB01": "腐化者 ~ 维洛丝",

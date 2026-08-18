@@ -4682,6 +4682,8 @@
   "tagSkillCooldownRefreshName": "{%t0} {%s1} のクールダウンを {%.1f2} {%z3} 短縮",
   "tagSkillDurationRefresh": "{%t0}持続時間を{%.1f1} {%z2}延長",
   "tagSkillDurationRefreshMax": "{%t0}持続時間を{%.1f1} {%z2}更新 (最大{%.1f3} {%z4})",
+  "tagSkillDurationRefreshName": "{%t0}{%s1}の持続時間を{%.1f2} {%z3}延長",
+  "tagSkillDurationRefreshNameMax": "{%t0} {%s1} の持続時間を {%.1f2} {%z3} 更新 (最大 {%.1f4} {%z5})",
   "tagSkillPetTimeToLive": "存続時間 {%.1f0} 秒",
   "tagSlitbBossB03": "エレナ, 最初のスリス",
   "tagSlithBossB01": "ヴィロス, ザ コラプター",
