@@ -965,9 +965,15 @@ change calls, or to have the locale change tear down and re-render the whole vie
 
 Filed rather than fixed in the final fix round, whose scope was the three Criticals
 and the two related Importants. All of these are in or around
-`web/src/items/core/effectText.ts` and are guarded, in the sense that
-`web/test/items/renderSweep.test.ts` now reads every rendered line in the dataset, so
-any of them becoming visible would fail the suite rather than ship.
+`web/src/items/core/effectText.ts`.
+
+They are NOT all guarded. `web/test/items/renderSweep.test.ts` reads every rendered line
+in the dataset in all 13 locales, but it only fails on lines that are visibly malformed -
+a jammed value, a NaN, an unsubstituted brace, an empty line, a dangling preposition, two
+lines in one block differing only in their numbers. Two of the bullets below render
+perfectly well-formed lines today and sail past it: "500% Fire Resistance" and "3
+Onslaught Stacks:" are in the shipped output right now with a green suite. The sweep is a
+reason these are low priority, not a reason to think they cannot reach a user.
 
 - **The game's own chance prefixes are not in the game tables.** `tagChanceOf` and
   `tagChanceTo` ("{%.1f0}% Chance of/to ") exist in every shipped locale's `tags_ui.txt`,

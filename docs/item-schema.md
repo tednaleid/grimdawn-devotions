@@ -207,10 +207,14 @@ modifier at all rather than a bonus. Their `*Modifier` siblings on item blocks a
 percentages and are not converted.
 
 `web/test/items/renderSweep.test.ts` renders every modifier block and every pet panel in
-the committed dataset and fails on a value jammed onto a word, a NaN, an unsubstituted
-brace, an empty line, a dangling preposition, or two lines in one block differing only in
-their numbers. Every wrong number this page has shipped had one of those shapes; run it
-before believing a change to `effectText.ts` is safe.
+the committed dataset, in all 13 locales, and fails on a value jammed onto a word or a
+word jammed onto a value, a NaN, an unsubstituted brace, an empty line, a dangling
+preposition, or two lines in one block differing only in their numbers. Run it before
+believing a change here is safe - but know what it cannot see: it reads SHAPE, so wrong
+arithmetic in a well-formed line passes it (flipping the damage-over-time branch to print
+per-second values instead of totals leaves it green), as does a stat mapped to the wrong
+tag. The only arithmetic it pins is its handful of oracle cards. A new composition rule
+needs a new oracle of its own.
 
 ## Known gaps
 
