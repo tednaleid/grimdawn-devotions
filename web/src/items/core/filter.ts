@@ -8,7 +8,12 @@ import type { ViewState } from "./urlState";
 export interface Row {
   item: Item;
   levels: number;
-  modStats: ModStat[];
+  // One entry per in-scope modifier block, each holding that block's own stats. Never flatten
+  // these into one array: effectLines keys a byId map and a used-set per call, so feeding it two
+  // blocks' stats at once lets one skill's Min pair with a different skill's Max (see
+  // .superpowers/sdd/2026-08-17-items-page/task-12-13-fix-1.md, C1). Callers must call
+  // effectLines once per block and concatenate the resulting Text lines, not the stats.
+  modBlocks: ModStat[][];
 }
 
 type NameOf = (item: Item) => string;
@@ -32,28 +37,29 @@ function scopeSkillSet(skills: Skill[], view: ViewState): Set<string> {
   return new Set();
 }
 
-// Levels and modStats are both scoped to the selected skill/mastery, per the Task 12 interface:
-// levels is the total skill levels the item grants within the scope, modStats the modifier
-// stats within it (empty when the item only grants levels). A mastery-wide boost only counts
-// toward levels when the caller has opted into it via view.masteryWide.
+// Levels and modBlocks are both scoped to the selected skill/mastery, per the Task 12 interface:
+// levels is the total skill levels the item grants within the scope, modBlocks the item's
+// in-scope modifier blocks, kept separate (empty when the item only grants levels). A
+// mastery-wide boost only counts toward levels when the caller has opted into it via
+// view.masteryWide.
 function buildRow(item: Item, scope: Set<string>, view: ViewState): Row | null {
   let levels = 0;
   for (const b of item.boosts) if (scope.has(b.skill)) levels += b.level;
   if (view.masteryWide && view.mastery) {
     for (const mb of item.masteryBoosts) if (mb.mastery === view.mastery) levels += mb.level;
   }
-  const modStats: ModStat[] = [];
-  for (const mb of item.modifiers) if (scope.has(mb.skill)) modStats.push(...mb.stats);
+  const modBlocks: ModStat[][] = [];
+  for (const mb of item.modifiers) if (scope.has(mb.skill)) modBlocks.push(mb.stats);
 
-  if (levels === 0 && modStats.length === 0) return null;
-  return { item, levels, modStats };
+  if (levels === 0 && modBlocks.length === 0) return null;
+  return { item, levels, modBlocks };
 }
 
-// A row's effect kind is derived from its already-scoped modStats, not recomputed from the raw
+// A row's effect kind is derived from its already-scoped modBlocks, not recomputed from the raw
 // item: "modifies" means it carries a modifier block for the selected scope, "levels" means it
 // only raises rank there.
 function kindOf(row: Row): string {
-  return row.modStats.length > 0 ? "modifies" : "levels";
+  return row.modBlocks.length > 0 ? "modifies" : "levels";
 }
 
 function matchesFilters(row: Row, view: ViewState, nameOf: NameOf): boolean {

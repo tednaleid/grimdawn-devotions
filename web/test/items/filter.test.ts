@@ -89,7 +89,14 @@ test("levels sums only the selected scope", () => {
 });
 
 test("search matches the resolved name, not the raw tag", () => {
-  expect(recs({ ...base, q: "blitz" })).toEqual(["blitz"]);
+  // "z1" and its nameTag "tagz1" don't contain "blitz" anywhere, so this only passes if the
+  // implementation searches nameOf's resolved text and not the item's record or raw tag - unlike
+  // the old fixture, where the raw tag "tagblitz" also happened to contain the query.
+  const cloaked = item("z1", { boosts: [{ skill: "s/cadence1", level: 1 }] });
+  const resolved: Record<string, string> = { z1: "Blitzkrieg Cloak" };
+  const resolvedNameOf = (i: { record: string }) => resolved[i.record] ?? i.record;
+  const rows = applyView([badge, plainRing, cloaked], skills, { ...base, q: "blitz" }, resolvedNameOf);
+  expect(rows.map((r) => r.item.record)).toEqual(["z1"]);
 });
 
 test("sort is stable and breaks ties by record", () => {
@@ -97,4 +104,15 @@ test("sort is stable and breaks ties by record", () => {
   const same = [tie("bbb"), tie("aaa")];
   const out = applyView(same, skills, { ...base, sortKey: "rarity" }, () => "same");
   expect(out.map((r) => r.item.record)).toEqual(["aaa", "bbb"]);
+});
+
+test("the record tiebreak reverses with sortDir, like every other sort key here", () => {
+  // Documents current, intentional behavior (matches web/src/rr/core/filter.ts's own
+  // `cmp * dir` tiebreak): flipping sortDir reverses the whole order, ties included, rather
+  // than always breaking ascending. Kept as-is per fix-1 M6 - this test pins the behavior,
+  // it does not judge it.
+  const tie = (r: string) => item(r, { boosts: [{ skill: "s/cadence1", level: 1 }] });
+  const same = [tie("aaa"), tie("bbb")];
+  const out = applyView(same, skills, { ...base, sortKey: "rarity", sortDir: -1 }, () => "same");
+  expect(out.map((r) => r.item.record)).toEqual(["bbb", "aaa"]);
 });

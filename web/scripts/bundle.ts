@@ -7,10 +7,13 @@ import { computeBuildId } from "../src/adapters/coverTableBlob";
 // buildId identifies the planner data (devotions.json) and is checked against the cover blob.
 const buildId = computeBuildId(await Bun.file("../data/devotions.json").text());
 
-// assetVersion tags the ?v= on every runtime-fetched JSON (planner + RR data, and all i18n catalogs),
-// so a deploy that changes ANY of them busts returning visitors' caches. buildId alone can't: it only
-// reflects devotions.json, so an i18n-only change would leave it unchanged. Hash the source files (in a
-// stable order) before the build recipe copies them into dist.
+// assetVersion tags the ?v= on every runtime-fetched JSON (every page's dataset, and all i18n
+// catalogs), so a deploy that changes ANY of them busts returning visitors' caches. buildId alone
+// can't: it only reflects devotions.json, so an i18n-only change would leave it unchanged. Hash
+// the source files (in a stable order) before the build recipe copies them into dist. Every
+// runtime-fetched JSON must be listed here - fix round 1, I2 found monsters.json, skill-items.json,
+// and stat-item-tags.json missing, so their pages' withVersion() calls were a no-op: regenerating
+// only one of those files left the token unchanged and returning visitors kept a stale cache.
 function assetVersionHash(): string {
   const jsonIn = (dir: string) =>
     readdirSync(dir)
@@ -20,6 +23,9 @@ function assetVersionHash(): string {
   const files = [
     "../data/devotions.json",
     "../data/resistance-reduction.json",
+    "../data/monsters.json",
+    "../data/skill-items.json",
+    "../data/stat-item-tags.json",
     ...jsonIn("src/i18n"), // app.<locale>.json (UI chrome)
     ...jsonIn("../data/i18n"), // game.<locale>.json (game text)
   ];

@@ -3,7 +3,7 @@
 import { resolveText, type Text } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
 import { DOMAINS, EFFECT_KINDS, RARITIES, SLOTS } from "../core/facets";
-import { effectLines, type EffectContext } from "../core/effectText";
+import { effectLines, type EffectContext, type ModStat } from "../core/effectText";
 import type { Row } from "../core/filter";
 import type { Catalogue, Item } from "../core/model";
 import type { ViewState } from "../core/urlState";
@@ -77,11 +77,36 @@ function nameCell(loc: Localization, item: Item): string {
     : name;
 }
 
+// Call effectLines once PER BLOCK, never on the blocks flattened together: effectLines keys a
+// byId map and a used-set per call, so a shared call across two skills' blocks lets one skill's
+// Min pair with a different skill's Max (see task-12-13-fix-1.md, C1 - Krieg's Mask fabricated
+// "140-300 Aether Damage" from Blitz's flat 140 and War Cry's real 180-300).
+//
+// Within a single skill-node group, a base skill and its transmuter/modifier sometimes carry
+// literally the same block twice (identical stats, same values - e.g. Blackwater's conversion
+// block on both blackwater1 and blackwater1b). Deduping by structural equality on the rendered
+// Text descriptor (not on resolved, locale-dependent strings) collapses those genuine repeats
+// back to one line, matching the pre-fix output for that case, while two DIFFERENT descriptors
+// that happen to resolve to the same text in some locale are never merged.
+export function rowEffectLines(modBlocks: ModStat[][], effectCtx: EffectContext): Text[] {
+  const seen = new Set<string>();
+  const out: Text[] = [];
+  for (const stats of modBlocks) {
+    for (const line of effectLines(stats, effectCtx)) {
+      const key = JSON.stringify(line);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(line);
+    }
+  }
+  return out;
+}
+
 function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext): string {
   const item = row.item;
   const slots = item.slots.map((s) => esc(loc.translate(`items.slot.${slotKey(s)}`))).join(", ");
   const rarity = esc(loc.translate(`items.rarity.${item.rarity.toLowerCase()}`));
-  const lines: Text[] = effectLines(row.modStats, effectCtx);
+  const lines: Text[] = rowEffectLines(row.modBlocks, effectCtx);
   const effect = lines.length ? lines.map((t) => esc(resolveText(loc, t))).join("<br>") : "—";
   return `<tr data-record="${esc(item.record)}">
     <td class="name">${nameCell(loc, item)}</td>

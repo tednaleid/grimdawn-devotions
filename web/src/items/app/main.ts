@@ -27,7 +27,8 @@ async function boot() {
   // and parsed exactly once here, never per facet change (renderTable only reads the parsed result).
   const [catalogue, statTags] = await Promise.all([loadCatalogue(".."), loadStatTags("..")]);
   const knownMasteries = new Set(catalogue.masteries.map((m) => m.record));
-  const knownSkills = new Set(catalogue.skills.map((s) => s.record));
+  // skill record -> mastery record, so decodeHash can backfill a hash's mastery from its skill.
+  const knownSkills = new Map(catalogue.skills.map((s) => [s.record, s.mastery]));
   const skillByRecord = new Map(catalogue.skills.map((s) => [s.record, s]));
 
   const overrideLocale = storedLocale(SUPPORTED_LOCALES);
@@ -56,7 +57,15 @@ async function boot() {
   function effectContext(): EffectContext {
     return {
       tagOf: (statId) => statTags[statId],
-      templateOf: (tag) => localization.gameText(tag),
+      // gameText falls back to the tag itself (never undefined) when a tag is missing from both
+      // the active and English catalogs, but effectText.ts relies on templateOf's declared
+      // `string | undefined` contract to drop a line for a genuinely unknown tag rather than
+      // render it as a bare label. Restore that contract without a second fetch of the already-
+      // loaded game text (fix round 1, M5).
+      templateOf: (tag) => {
+        const t = localization.gameText(tag);
+        return t === tag ? undefined : t;
+      },
       nameOf: (skillRecord) => {
         const skill = skillByRecord.get(skillRecord);
         return skill?.nameTag ? gameT(skill.nameTag) : undefined;

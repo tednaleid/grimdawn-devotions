@@ -57,9 +57,14 @@ export function encodeHash(v: ViewState): string {
  *
  *  `known` comes from the loaded catalogue rather than a constant: mastery and skill ids are
  *  data, not a fixed vocabulary. A mastery or skill id absent from `known` (a stale link after
- *  a dataset update) falls back to no selection rather than throwing.
+ *  a dataset update) falls back to no selection rather than throwing. `skills` maps each skill
+ *  record to its owning mastery record, so a hash carrying a valid `skill` but no (or a stale)
+ *  `mastery` can backfill the mastery from the skill itself: `mastery` and `skill` are validated
+ *  independently above, and without this a valid skill with a missing mastery would filter the
+ *  table while the mastery/skill pickers show no selection and Reset can't clear it (fix round 1,
+ *  M4) - the only escape was picking a mastery by hand.
  */
-export function decodeHash(hash: string, known: { masteries: Set<string>; skills: Set<string> }): ViewState {
+export function decodeHash(hash: string, known: { masteries: Set<string>; skills: Map<string, string> }): ViewState {
   const v: ViewState = {
     ...DEFAULT_VIEW,
     fSlot: new Set(),
@@ -124,6 +129,13 @@ export function decodeHash(hash: string, known: { masteries: Set<string>; skills
       default:
         break;
     }
+  }
+  // A valid skill with no (or a stale) mastery backfills from the skill's own record, so the
+  // mastery/skill pickers and the active filter never disagree. mastery and skill are decoded
+  // independently above and each can arrive in either order, so this runs once the whole hash
+  // has been read rather than inline in the "skill" case.
+  if (v.skill && !v.mastery) {
+    v.mastery = known.skills.get(v.skill) ?? null;
   }
   return v;
 }
