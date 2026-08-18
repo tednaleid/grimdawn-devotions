@@ -55,15 +55,83 @@ const DOT_DAMAGE = new Set([
   "offensiveSlowPhysical",
 ]);
 
-// A plain label carries no placeholder, so the value cannot ride inside it. Task 9
-// extends this with the COMPOSER table; here it is only the plain/templated split.
-function valueLine(value: number, tag: string, template: string): Text {
-  if (!/\{%/.test(template)) {
+// The plain-label tags that need a composer and a unit, pinned against real grimtools
+// cards and data/i18n/game.en.json. A tag absent from this map falls back to a bare
+// value prefix, which is correct for labels that already carry their own "%"
+// ("% Slow target") and for plain counts ("Bleeding Damage" -> "300 Bleeding Damage").
+//
+// The first 8 rows need an actual unit word or "%" the label itself doesn't carry.
+// The remaining rows are plain counts that data/stat-item-tags.json's full catalog
+// (not just the tags real modifier blocks currently use) also requires a row for; each
+// composes through the game's own generic SkillIntFormat/SkillPercentFormat tags, which
+// render identically to the bare-value-prefix fallback for integer values (verified: no
+// non-integer occurrence of any of these stats in data/skill-items.json), so this list
+// is coverage, not a behavior change, for tags already rendering correctly today.
+export const COMPOSER: Record<string, string> = {
+  CooldownTime: "SkillSecondFormat", // "Skill Recharge"
+  ActiveDuration: "SkillSecondFormat", // "Duration"
+  ComboChargeDuration: "SkillSecondFormat", // "Onslaught Stack Duration"
+  SkillChargeDuration: "SkillSecondFormat", // "Charge Level Duration"
+  TargetRadius: "SkillDistanceFormat", // "Target Area"
+  ExplosionRadius: "SkillDistanceFormat", // "Radius"
+  ManaCost: "SkillCostFormat", // "Energy Cost"
+  ComboChargeLevels: "SkillIntFormat", // "Onslaught Stacks:"
+  tagCharStatsBlockChance: "SkillPercentFormat", // "Chance to Block"
+  DamageElementalResistanceReductionAbsolute: "SkillIntFormat", // "Reduced target's Elemental Resistances"
+  DamagePhysicalResistanceReductionAbsolute: "SkillIntFormat", // "Reduced target's Physical Resistance"
+  DamageDurationBleeding: "SkillIntFormat", // "Bleeding Damage"
+  DamageDurationCold: "SkillIntFormat", // "Frostburn Damage"
+  DamageDurationDefensiveAbility: "SkillIntFormat", // "Reduced target's Defensive Ability"
+  DamageDurationDefensiveReduction: "SkillIntFormat", // "Reduced target's Armor"
+  DamageDurationFire: "SkillIntFormat", // "Burn Damage"
+  DamageDurationLife: "SkillIntFormat", // "Vitality Decay Damage"
+  DamageDurationLightning: "SkillIntFormat", // "Electrocute Damage"
+  DamageDurationManaLeach: "SkillIntFormat", // "Energy Leech"
+  DamageDurationOffensiveAbility: "SkillIntFormat", // "Reduced target's Offensive Ability"
+  DamageDurationPhysical: "SkillIntFormat", // "Internal Trauma"
+  DamageDurationPoison: "SkillIntFormat", // "Poison Damage"
+  DamageTaunt: "SkillIntFormat", // "Taunt target"
+  DamageTotalResistanceReductionAbsolute: "SkillIntFormat", // "Reduced target's Resistances"
+  RetaliationDurationFire: "SkillIntFormat", // "Burn Retaliation"
+  RetaliationDurationLightning: "SkillIntFormat", // "Electrocute Retaliation"
+  RetaliationDurationManaLeach: "SkillIntFormat", // "Energy Leech Retaliation"
+  RetaliationDurationPhysical: "SkillIntFormat", // "Internal Trauma Retaliation"
+  RetaliationDurationPoison: "SkillIntFormat", // "Poison Retaliation"
+};
+
+// A substitution marker inside a `{...}` group: %<sign><precision><conv><index>. Mirrors
+// core/localization.ts's SUBST closely enough to find the highest arg index a template
+// references; it doesn't need to be exported since only this module inspects it.
+const PLACEHOLDER_INDEX = /%[+-]?(?:\.\d)?[a-z](\d)/g;
+
+function maxPlaceholderIndex(template: string): number {
+  let max = -1;
+  for (const m of template.matchAll(PLACEHOLDER_INDEX)) max = Math.max(max, Number(m[1]));
+  return max;
+}
+
+// A plain label carries no `{...}` group, so the value cannot ride inside it: every
+// brace group in data/i18n/game.en.json wraps a substitution (verified against the
+// whole catalog), so "does the template contain a brace" is the templated/plain split -
+// narrower checks like "starts with {%" miss sign-prefixed groups such as "{-%.0f0}"
+// (tagCharDefensiveBlockRecoveryReduction, 13 real occurrences) and silently render the
+// raw template text instead of formatting it.
+function valueLine(value: number, tag: string, template: string): Text | null {
+  if (!/\{/.test(template)) {
+    // A composer supplies the value and its unit, with the label riding in as %s1.
+    const composer = COMPOSER[tag];
+    if (composer) return gameFormatT(composer, [value, gameT(tag)]);
     const label = gameT(tag);
     // A label that already begins with its own percent takes no separator, so
     // "% Slow target" reads "25% Slow target" rather than "25 % Slow target".
     return template.startsWith("%") ? joinT(String(value), label) : joinT(String(value), " ", label);
   }
+  // A tag's own template can reference an argument beyond the single value supplied
+  // here - a racial-target name (racialBonusPercentDamage), a target count
+  // (sparkChance) - that the pipeline doesn't carry upstream. Dropping just the
+  // unfilled {...} group still leaves stray literal text outside it ("+16% Damage to"),
+  // so the whole line is suppressed rather than shipping a truncated sentence.
+  if (maxPlaceholderIndex(template) > 0) return null;
   return gameFormatT(tag, [value]);
 }
 
@@ -116,6 +184,7 @@ function renderOne(
         const isDamage = DOT_DAMAGE.has(dot[1]!);
         const suffixTag = isDamage ? "DamageSingleFormatTime" : "DamageFixedSingleFormatTime";
         const head = valueLine(isDamage ? s.value * dur.value : s.value, tag, template);
+        if (!head) return null;
         return ctx.templateOf(suffixTag) ? joinT(head, " ", gameFormatT(suffixTag, [dur.value])) : head;
       }
     }

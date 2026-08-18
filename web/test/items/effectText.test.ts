@@ -2,7 +2,9 @@
 // ABOUTME: damage-over-time/debuff duration composition, refresh, and conversion lines.
 import { test, expect } from "bun:test";
 import { litT, makeLocalization, resolveText } from "../../src/core/localization";
-import { effectLines } from "../../src/items/core/effectText";
+import { COMPOSER, effectLines } from "../../src/items/core/effectText";
+import statItemTags from "../../../data/stat-item-tags.json";
+import gameEn from "../../../data/i18n/game.en.json";
 
 const GAME: Record<string, string> = {
   DamageFire: "{%t0} Fire Damage",
@@ -116,9 +118,24 @@ const CARD_GAME: Record<string, string> = {
   tagRefreshSkillCondition07: "{%d0}% Chance on Attack",
   tagSecond: "Second",
   tagSeconds: "Seconds",
+  // Task 9: the COMPOSER table's generic unit/count/percent composers, plus the two
+  // plain labels exercised directly below. Real text, data/i18n/game.en.json.
+  CooldownTime: "Skill Recharge",
+  SkillSecondFormat: "{%.1f0 Second %s1}",
+  TargetRadius: "Target Area",
+  SkillDistanceFormat: "{%.1f0 Meter %s1}",
+  ManaCost: "Energy Cost",
+  SkillCostFormat: "{%.1f0 %s1}",
+  SkillIntFormat: "{%d0 %s1}",
+  tagCharStatsBlockChance: "Chance to Block",
+  SkillPercentFormat: "{%.0f0% %s1}",
 };
 const CARD_TAGS: Record<string, string> = {
   ...TAGS,
+  skillCooldownTime: "CooldownTime",
+  skillTargetRadius: "TargetRadius",
+  skillManaCost: "ManaCost",
+  defensiveBlockChance: "tagCharStatsBlockChance",
   offensiveSlowBleedingMin: "DamageDurationBleeding",
   offensiveSlowBleedingDurationMin: "DamageDurationBleeding",
   offensiveSlowPoisonMin: "DamageDurationPoison",
@@ -345,4 +362,124 @@ test("a refreshDuration line with a target and no Max uses the unnamed-Max-free 
       },
     ]),
   ).toEqual(["15% Chance on Attack to extend duration of Leap by 3 Seconds"]);
+});
+
+// Task 9: valueLine's plain/templated split was /\{%/, which misses a sign-prefixed
+// placeholder group like "{-%.0f0}" (the sign sits outside the "%", unlike the more common
+// "{%+.0f0}"). tagCharDefensiveBlockRecoveryReduction is real production data, 13
+// occurrences in data/skill-items.json, and rendered the raw unformatted template text
+// under the old check ("12 {-%.0f0}% Shield Recovery Time") instead of substituting it.
+test("a sign-prefixed placeholder group is recognized as templated, not a plain label", () => {
+  const signGame = { tagCharDefensiveBlockRecoveryReduction: "{-%.0f0}% Shield Recovery Time" };
+  const ctx = {
+    tagOf: (s: string) =>
+      s === "characterDefensiveBlockRecoveryReduction" ? "tagCharDefensiveBlockRecoveryReduction" : undefined,
+    templateOf: (t: string) => signGame[t as keyof typeof signGame],
+    nameOf: () => undefined,
+  };
+  const loc = makeLocalization({}, {}, "en", signGame, signGame);
+  expect(
+    effectLines([{ stat: "characterDefensiveBlockRecoveryReduction", value: 12 }], ctx).map((t) => resolveText(loc, t)),
+  ).toEqual(["-12% Shield Recovery Time"]);
+});
+
+// Task 9: COMPOSER. R12 - "a plain label already carrying its own percent" is not a valid
+// oracle for this table: Task 8's valueLine already handles that case (template.startsWith("%")),
+// so a test built on offensiveSlowTotalSpeedMin passes with or without COMPOSER and proves
+// nothing. These three exercise the three composer families that actually need one.
+test("a seconds-unit label composes through SkillSecondFormat", () => {
+  // CooldownTime = "Skill Recharge", SkillSecondFormat = "{%.1f0 Second %s1}"
+  expect(cardRender([{ stat: "skillCooldownTime", value: 3 }])).toEqual(["3 Second Skill Recharge"]);
+});
+test("a bare-percent-missing label composes through SkillPercentFormat", () => {
+  // tagCharStatsBlockChance = "Chance to Block", unlike "% Slow target" it carries no "%"
+  // of its own, so the bare fallback would read "15 Chance to Block" without a composer.
+  expect(cardRender([{ stat: "defensiveBlockChance", value: 15 }])).toEqual(["15% Chance to Block"]);
+});
+test("a radius label composes through SkillDistanceFormat", () => {
+  expect(cardRender([{ stat: "skillTargetRadius", value: 4 }])).toEqual(["4 Meter Target Area"]);
+});
+
+// Task 9, Step 5: the brief's coverage guard used /\{%/ to detect "templated"; effectText.ts's
+// actual split (valueLine) is /\{/, since every brace group in data/i18n/game.en.json wraps a
+// substitution - a narrower check misses sign-prefixed groups like "{-%.0f0}" and would demand
+// a composer for tags that are actually templated already. This guard mirrors the real split.
+test("every plain label has a composer or carries its own percent", () => {
+  const tags = statItemTags as Record<string, string>;
+  const game = gameEn as Record<string, string>;
+  const unhandled = [...new Set(Object.values(tags))].filter((t) => {
+    const text = game[t];
+    return text !== undefined && !/\{/.test(text) && !COMPOSER[t] && !text.startsWith("%");
+  });
+  expect(unhandled).toEqual([]);
+});
+
+// R14: a templated tag whose highest placeholder index exceeds the single value valueLine
+// supplies must not emit a partial line ("+16% Damage to"). This walks every tag directly
+// assigned to a stat (data/stat-item-tags.json) and flags any templated one that both (a)
+// needs more than index 0 and (b) isn't handled by a path that supplies its own extra args
+// (conversionPercentage's 3-arg composer, the refresh family's composers). A change to the
+// frozen list below means either a new such tag showed up in the data (real bug: check
+// whether it's now suppressed) or an exemption needs updating (not a silent pass).
+test("every templated tag reachable directly from a stat needs no more than the value we supply, except conversion/refresh composers", () => {
+  const tags = statItemTags as Record<string, string>;
+  const game = gameEn as Record<string, string>;
+  const placeholderIndex = /%[+-]?(?:\.\d)?[a-z](\d)/g;
+  const maxIndex = (t: string) => {
+    let max = -1;
+    for (const m of t.matchAll(placeholderIndex)) max = Math.max(max, Number(m[1]));
+    return max;
+  };
+  const isConversion = (stat: string) => stat.startsWith("conversionPercentage");
+  const isRefresh = (stat: string) => /^(refreshCooldown|refreshDuration)(Amount|Chance|Max)$/.test(stat);
+  const offenders = Object.entries(tags)
+    .filter(([stat, tag]) => {
+      const text = game[tag];
+      return text?.includes("{") && !isConversion(stat) && !isRefresh(stat) && maxIndex(text) > 0;
+    })
+    .map(([stat]) => stat)
+    .sort();
+  // Real occurrences in data/skill-items.json: sparkChance x6, racialBonusPercentDamage x1.
+  // augmentSkillLevel1/2 (tag ItemSkillIncrement), augmentMasteryLevel1/2 (tag
+  // ItemMasteryIncrement), and racialBonusPercentDefense share the shape but occur 0 times
+  // today. All seven are suppressed by valueLine's maxPlaceholderIndex check, not rendered.
+  expect(offenders).toEqual([
+    "augmentMasteryLevel1",
+    "augmentMasteryLevel2",
+    "augmentSkillLevel1",
+    "augmentSkillLevel2",
+    "racialBonusPercentDamage",
+    "racialBonusPercentDefense",
+    "sparkChance",
+  ]);
+});
+
+test("racialBonusPercentDamage is suppressed rather than truncated to a dangling 'to'", () => {
+  // Real template (data/i18n/game.en.json): "{%+.0f0}% Damage to {%s1}". grimtools shows
+  // "+16% Damage to Chthonics" (Crystallum, item level 84); the target race name isn't
+  // carried into data/skill-items.json (racialBonusRace), so the line is dropped rather
+  // than rendering "+16% Damage to".
+  const ctx = {
+    tagOf: (s: string) => (s === "racialBonusPercentDamage" ? "RacialBonusPercentDamage" : undefined),
+    templateOf: (t: string) => (t === "RacialBonusPercentDamage" ? "{%+.0f0}% Damage to {%s1}" : undefined),
+    nameOf: () => undefined,
+  };
+  const loc = makeLocalization({}, {}, "en", {}, {});
+  expect(effectLines([{ stat: "racialBonusPercentDamage", value: 16 }], ctx).map((t) => resolveText(loc, t))).toEqual(
+    [],
+  );
+});
+
+test("sparkChance is suppressed rather than truncated with no target count", () => {
+  // Real template: "{%.0f0}% Chance of affecting up to {%d1} targets". The target count
+  // (sparkMaxNumber) isn't carried into data/skill-items.json, so the line is dropped
+  // rather than rendering "30% Chance of affecting up to".
+  const ctx = {
+    tagOf: (s: string) => (s === "sparkChance" ? "tagSparkMaxNumberChance" : undefined),
+    templateOf: (t: string) =>
+      t === "tagSparkMaxNumberChance" ? "{%.0f0}% Chance of affecting up to {%d1} targets" : undefined,
+    nameOf: () => undefined,
+  };
+  const loc = makeLocalization({}, {}, "en", {}, {});
+  expect(effectLines([{ stat: "sparkChance", value: 30 }], ctx).map((t) => resolveText(loc, t))).toEqual([]);
 });
