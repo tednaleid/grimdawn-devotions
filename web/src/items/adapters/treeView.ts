@@ -11,7 +11,6 @@ const BOX_X = 246;
 const BOX_Y = 39;
 const BOX_W = 640;
 const BOX_H = 420;
-const VIEW_BOX = `${BOX_X} ${BOX_Y} ${BOX_W} ${BOX_H}`;
 
 // Sprite sheet geometry (data/skill-icons.json): 32px cells, 26 columns.
 const CELL = 32;
@@ -26,6 +25,14 @@ const OFFTREE_XS = [326, 486, 646, 806];
 
 const NODE_R = 18; // node border half-size (square) / radius (circle)
 const ICON_R = 16; // icon clip half-size (square) / radius (circle): the sprite cell is 32px, unscaled
+
+// Those are node CENTRES, and a node is drawn around its centre: the extreme nodes sit exactly on
+// all four edges of the coordinate box (x 246 and 886, y 39 and 459), so the drawn tree is a node
+// radius larger than the box on every side. The viewBox is padded by that radius plus the selected
+// node's 3px border, so the SVG's own box contains everything it draws instead of the bottom row
+// hanging over the panel behind it.
+const PAD = NODE_R + 2;
+const VIEW_BOX = `${BOX_X - PAD} ${BOX_Y - PAD} ${BOX_W + PAD * 2} ${BOX_H + PAD * 2}`;
 
 const ICON_HREF = withVersion("../data/skill-icons.png");
 

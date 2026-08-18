@@ -34,7 +34,44 @@ function nodeGroups(markup: string): { cls: string; group: string; record: strin
 test("every mastery renders with the one fixed viewBox", () => {
   for (const mastery of masteryRecords) {
     const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
-    expect(markup).toContain('viewBox="246 39 640 420"');
+    expect(markup).toContain('viewBox="226 19 680 460"');
+  }
+});
+
+// The pin above says every mastery gets the SAME box; this says it is the RIGHT box. The game's
+// coordinates are node centres and its extreme nodes sit exactly on all four edges of the range,
+// so a viewBox of the bare coordinate range cuts every edge node in half - the bottom row hung
+// over the panel behind the SVG until the box was padded by a node radius.
+test("every node is drawn entirely inside the viewBox", () => {
+  const SHAPE = /<(rect|circle) class="node-shape" ([^/]+)\/>/g;
+  const attr = (s: string, name: string): number => Number(new RegExp(`(?:^| )${name}="([^"]+)"`).exec(s)![1]);
+  for (const mastery of masteryRecords) {
+    const markup = buildTreeMarkup(catalogue.skills, mastery, NONE, ctx);
+    const [vx, vy, vw, vh] = /viewBox="([^"]+)"/.exec(markup)![1]!.split(" ").map(Number) as number[];
+    const shapes = [...markup.matchAll(SHAPE)];
+    expect(shapes.length).toBe(nodeGroups(markup).length);
+    for (const [, kind, a] of shapes) {
+      const box =
+        kind === "rect"
+          ? {
+              l: attr(a!, "x"),
+              t: attr(a!, "y"),
+              r: attr(a!, "x") + attr(a!, "width"),
+              b: attr(a!, "y") + attr(a!, "height"),
+            }
+          : {
+              l: attr(a!, "cx") - attr(a!, "r"),
+              t: attr(a!, "cy") - attr(a!, "r"),
+              r: attr(a!, "cx") + attr(a!, "r"),
+              b: attr(a!, "cy") + attr(a!, "r"),
+            };
+      // Half the selected node's 3px border, which is drawn outside the shape's own geometry.
+      const stroke = 1.5;
+      expect(box.l - stroke).toBeGreaterThanOrEqual(vx!);
+      expect(box.t - stroke).toBeGreaterThanOrEqual(vy!);
+      expect(box.r + stroke).toBeLessThanOrEqual(vx! + vw!);
+      expect(box.b + stroke).toBeLessThanOrEqual(vy! + vh!);
+    }
   }
 });
 

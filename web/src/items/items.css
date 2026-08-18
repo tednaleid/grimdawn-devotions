@@ -147,7 +147,6 @@
 }
 .items-page .tree-svg {
   display: block;
-  overflow: visible; /* nodes at the box edge (e.g. y=459) sit half outside the pinned viewBox */
   width: 100%;
   /* Wide enough that the icons render near their native 32px rather than shrunk, and that the
      tree fills its panel instead of floating in a band of empty background. Still capped, so a
