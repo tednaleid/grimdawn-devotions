@@ -173,29 +173,55 @@ function valueLine(value: LineValue, tag: string, template: string): Text | null
   return gameFormatT(tag, [value]);
 }
 
+// The nearest entry the block still has spare that satisfies `match`, searched outward from
+// `from` (itself a candidate), forward before backward at equal distance.
+//
+// A ModBlock is one (item, skill) pair, NOT one carrier: scripts/build_skill_items.py merges
+// every modifier record touching that skill into one stats list, ordered by modifier_record
+// then stat id, so one block can carry the same stat id twice and each carrier's own stats sit
+// CONTIGUOUSLY. Three real blocks do (Stormrend's Werewolf block carries two complete refresh
+// carriers, Bloodlord's Blade's Possession block two skillCooldownReduction values, Desert
+// Sting two conversionPercentage entries). Identifying stats by id alone - a `new Map(stats)`,
+// last wins, plus a used-set keyed by id - dropped one carrier's line outright and let the
+// survivor read the OTHER carrier's refresh_skill. Searching outward from the entry being
+// rendered keeps sibling resolution inside the carrier without the payload naming it.
+function nearestIndex(
+  stats: ModStat[],
+  used: Set<number>,
+  from: number,
+  match: (s: ModStat, i: number) => boolean,
+): number {
+  for (let d = 0; d < stats.length; d++) {
+    for (const j of d === 0 ? [from] : [from + d, from - d]) {
+      if (j < 0 || j >= stats.length || used.has(j)) continue;
+      if (match(stats[j]!, j)) return j;
+    }
+  }
+  return -1;
+}
+
+/** Index of the nearest unconsumed entry carrying `statId`, or -1. */
+function nearestStat(stats: ModStat[], used: Set<number>, from: number, statId: string): number {
+  return nearestIndex(stats, used, from, (s) => s.stat === statId);
+}
+
 /** One card line per group, in first-appearance order. */
 export function effectLines(stats: ModStat[], ctx: EffectContext): Text[] {
-  const byId = new Map(stats.map((s) => [s.stat, s]));
-  const used = new Set<string>();
+  const used = new Set<number>();
   const out: Text[] = [];
 
-  for (const s of stats) {
-    if (used.has(s.stat)) continue;
-    const tag = ctx.tagOf(s.stat);
+  for (let i = 0; i < stats.length; i++) {
+    if (used.has(i)) continue;
+    const tag = ctx.tagOf(stats[i]!.stat);
     if (!tag) continue;
-    const line = renderOne(s, byId, used, ctx, tag);
+    const line = renderOne(stats, i, used, ctx, tag);
     if (line) out.push(line);
   }
   return out;
 }
 
-function renderOne(
-  s: ModStat,
-  byId: Map<string, ModStat>,
-  used: Set<string>,
-  ctx: EffectContext,
-  tag: string,
-): Text | null {
+function renderOne(stats: ModStat[], i: number, used: Set<number>, ctx: EffectContext, tag: string): Text | null {
+  const s = stats[i]!;
   const template = ctx.templateOf(tag);
   if (!template) return null;
 
@@ -217,10 +243,11 @@ function renderOne(
     if (dot[2]) {
       return null;
     }
-    const dur = byId.get(`${dot[1]}DurationMin`);
-    if (dur) {
-      used.add(s.stat);
-      used.add(dur.stat);
+    const durIdx = nearestStat(stats, used, i, `${dot[1]}DurationMin`);
+    if (durIdx >= 0) {
+      const dur = stats[durIdx]!;
+      used.add(i);
+      used.add(durIdx);
       const isDamage = DOT_DAMAGE.has(dot[1]!);
       const suffixTag = isDamage ? "DamageSingleFormatTime" : "DamageFixedSingleFormatTime";
       const head = valueLine(isDamage ? s.value * dur.value : s.value, tag, template);
@@ -236,7 +263,7 @@ function renderOne(
   // data and only 1 lacks a Min sibling; suppress that one rather than mislabeling it.
   // The one with a sibling (Blood of Dreeg) is out of scope here - task-8b-brief.md.
   const slowChance = s.stat.match(SLOW_CHANCE);
-  if (slowChance && !byId.has(`offensiveSlow${slowChance[1]}Min`)) return null;
+  if (slowChance && !stats.some((o) => o.stat === `offensiveSlow${slowChance[1]}Min`)) return null;
 
   // A refresh family composes one line from its amount, its chance, and the target
   // and trigger the pipeline carries alongside them. The target is frequently a
@@ -246,13 +273,17 @@ function renderOne(
   const ref = s.stat.match(REFRESH);
   if (ref) {
     const family = ref[1];
-    const amount = byId.get(`${family}Amount`);
-    const chance = byId.get(`${family}Chance`);
-    const max = family === "refreshDuration" ? byId.get(`${family}Max`) : undefined;
-    if (!amount) return null;
-    used.add(`${family}Amount`);
-    used.add(`${family}Chance`);
-    if (max) used.add(max.stat);
+    const amountIdx = nearestStat(stats, used, i, `${family}Amount`);
+    if (amountIdx < 0) return null;
+    const amount = stats[amountIdx]!;
+    const chanceIdx = nearestStat(stats, used, amountIdx, `${family}Chance`);
+    const maxIdx = family === "refreshDuration" ? nearestStat(stats, used, amountIdx, `${family}Max`) : -1;
+    const chance = chanceIdx >= 0 ? stats[chanceIdx] : undefined;
+    const max = maxIdx >= 0 ? stats[maxIdx] : undefined;
+    used.add(i);
+    used.add(amountIdx);
+    if (chanceIdx >= 0) used.add(chanceIdx);
+    if (maxIdx >= 0) used.add(maxIdx);
     const q = amount.refresh_trigger ? TRIGGER_TAG[amount.refresh_trigger] : undefined;
     const cond: FormatArg = q ? gameFormatT(q, [chance?.value ?? 0]) : (chance?.value ?? 0);
     const target = amount.refresh_skill ? ctx.nameOf(amount.refresh_skill) : undefined;
@@ -293,21 +324,21 @@ function renderOne(
   // until we know how the pair renders, or a Max seen before its Min emits a spurious line.
   const m = s.stat.match(RANGE);
   if (m) {
-    const partnerId = `${m[1]}${m[2] === "Min" ? "Max" : "Min"}`;
-    const partner = byId.get(partnerId);
-    if (partner && !used.has(partner.stat)) {
-      used.add(s.stat);
-      used.add(partner.stat);
+    const partnerIdx = nearestStat(stats, used, i, `${m[1]}${m[2] === "Min" ? "Max" : "Min"}`);
+    if (partnerIdx >= 0) {
+      const partner = stats[partnerIdx]!;
+      used.add(i);
+      used.add(partnerIdx);
       const [minValue, maxValue] = m[2] === "Min" ? [s.value, partner.value] : [partner.value, s.value];
       return valueLine([minValue, maxValue], tag, template);
     }
   }
-  used.add(s.stat);
+  used.add(i);
   return valueLine(s.value, tag, template);
 }
 
-// Call effectLines once PER BLOCK, never on blocks flattened together: effectLines keys a
-// byId map and a used-set per call, so a shared call across two blocks' stats lets one
+// Call effectLines once PER BLOCK, never on blocks flattened together: effectLines resolves
+// siblings and a used-set within one call's stats, so a shared call across two blocks' stats lets one
 // block's Min pair with a different block's Max (see task-12-13-fix-1.md, C1 - Krieg's
 // Mask fabricated "140-300 Aether Damage" from Blitz's flat 140 and War Cry's real
 // 180-300). Shared by tableView.ts (one row's in-scope blocks) and detailView.ts (one

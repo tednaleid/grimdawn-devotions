@@ -116,6 +116,8 @@ const CARD_GAME: Record<string, string> = {
   tagSkillDurationRefreshMax: "{%t0} to refresh duration by {%.1f1} {%z2} (Max {%.1f3} {%z4})",
   tagSkillDurationRefreshNameMax: "{%t0} to refresh duration of {%s1} by {%.1f2} {%z3} (Max {%.1f4} {%z5})",
   tagRefreshSkillCondition07: "{%d0}% Chance on Attack",
+  tagRefreshSkillCondition10: "{%d0}% Chance on Critical Attack",
+  SkillCooldownReduction: "+{%.0f0}% Skill Cooldown Reduction",
   tagSecond: "Second",
   tagSeconds: "Seconds",
   // Task 9: the COMPOSER table's generic unit/count/percent composers, plus the two
@@ -169,9 +171,13 @@ const CARD_TAGS: Record<string, string> = {
   refreshDurationAmount: "tagSkillDurationRefresh",
   refreshDurationChance: "tagSkillDurationRefresh",
   refreshDurationMax: "tagSkillDurationRefreshMax",
+  skillCooldownReduction: "SkillCooldownReduction",
+  skillCooldownReductionChance: "SkillCooldownReduction",
 };
 const SKILL_NAMES: Record<string, string> = {
   "records/skills/playerclass10/leap1.dbr": "Leap",
+  "records/skills/playerclass06/savagestrike1.dbr": "Primal Strike",
+  "records/skills/playerclass02/stunjacks1.dbr": "Stun Jacks",
 };
 const cardCtx = {
   tagOf: (s: string) => CARD_TAGS[s],
@@ -551,4 +557,42 @@ test("sparkChance is suppressed rather than truncated with no target count", () 
   };
   const loc = makeLocalization({}, {}, "en", {}, {});
   expect(effectLines([{ stat: "sparkChance", value: 30 }], ctx).map((t) => resolveText(loc, t))).toEqual([]);
+});
+
+// --- final fix round, C3: a ModBlock is one (item, skill) pair, not one carrier.
+// scripts/build_skill_items.py merges every modifier record touching a skill into one stats
+// list (ordered by modifier_record then stat id), so one block can name the same stat twice
+// and each carrier's stats sit contiguously. Three real blocks do.
+
+// Stormrend (records/items/gearweapons/axe1h/d205_axe.dbr), Werewolf block: TWO complete
+// refresh carriers, same amount and chance, different target skills. Keying the used-set by
+// stat id rendered ONE line, and that line read the SECOND carrier's refresh_skill even
+// though it was entered on the first.
+test("Stormrend: two refresh carriers in one block render two lines, each naming its own target", () => {
+  const carrier = (skill: string) => [
+    { stat: "refreshCooldownAmount", value: 2, refresh_skill: skill, refresh_trigger: "AttackEnemyCrit" },
+    { stat: "refreshCooldownChance", value: 30, refresh_skill: skill, refresh_trigger: "AttackEnemyCrit" },
+  ];
+  expect(
+    cardRender([
+      ...carrier("records/skills/playerclass06/savagestrike1.dbr"),
+      ...carrier("records/skills/playerclass02/stunjacks1.dbr"),
+    ]),
+  ).toEqual([
+    "30% Chance on Critical Attack to reduce cooldown of Primal Strike by 2 Seconds",
+    "30% Chance on Critical Attack to reduce cooldown of Stun Jacks by 2 Seconds",
+  ]);
+});
+
+// Bloodlord's Blade (records/items/gearweapons/swords1h/b013e_sword.dbr), Possession block:
+// skillCooldownReduction 100 on the chance-gated carrier and 5 on the flat one - the exact
+// pair build_skill_items.py:167-170 documents as deliberately preserved upstream. The 5 was
+// silently discarded downstream.
+test("a stat id repeated by a second carrier in the same block keeps both values", () => {
+  expect(
+    cardRender([
+      { stat: "skillCooldownReduction", value: 100 },
+      { stat: "skillCooldownReduction", value: 5 },
+    ]),
+  ).toEqual(["+100% Skill Cooldown Reduction", "+5% Skill Cooldown Reduction"]);
 });
