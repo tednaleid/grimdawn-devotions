@@ -863,6 +863,8 @@ build: cover-table
     cp "{{justfile_directory()}}/data/monsters.json" dist/data/monsters.json
     cp "{{justfile_directory()}}/data/skill-items.json" dist/data/skill-items.json
     cp "{{justfile_directory()}}/data/stat-item-tags.json" dist/data/stat-item-tags.json
+    cp "{{justfile_directory()}}/data/skill-icons.json" dist/data/skill-icons.json
+    cp "{{justfile_directory()}}/data/skill-icons.png" dist/data/skill-icons.png
     cp "{{justfile_directory()}}/data/cover-table.bin" dist/data/cover-table.bin
     mkdir -p dist/data/i18n && cp "{{justfile_directory()}}/data/i18n/"*.json dist/data/i18n/
     # Keep the fast resolver in sync with its Rust source: reach.wasm is a gitignored artifact that

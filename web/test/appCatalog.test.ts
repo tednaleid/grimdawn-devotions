@@ -298,7 +298,6 @@ const REQUIRED = [
   "items.ctl.mastery",
   "items.ctl.selectMastery",
   "items.ctl.skill",
-  "items.ctl.allSkills",
   "items.ctl.masteryWide",
   "items.ctl.search",
   "items.ctl.searchPlaceholder",
@@ -337,6 +336,7 @@ const REQUIRED = [
   "items.slot.medal",
   "items.slot.relic",
   "items.detail.grimtools",
+  "items.tree.offTree",
 ];
 
 test("every required chrome key exists in app.en.json", () => {

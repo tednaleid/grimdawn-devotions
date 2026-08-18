@@ -26,6 +26,8 @@ function assetVersionHash(): string {
     "../data/monsters.json",
     "../data/skill-items.json",
     "../data/stat-item-tags.json",
+    "../data/skill-icons.json",
+    "../data/skill-icons.png", // the tree's sprite sheet: not JSON, but still runtime-fetched
     ...jsonIn("src/i18n"), // app.<locale>.json (UI chrome)
     ...jsonIn("../data/i18n"), // game.<locale>.json (game text)
   ];

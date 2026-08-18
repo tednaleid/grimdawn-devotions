@@ -19,3 +19,19 @@ export async function loadStatTags(base = ".."): Promise<Record<string, string>>
   if (!res.ok) throw new Error(`stat-item-tags.json: ${res.status}`);
   return (await res.json()) as Record<string, string>;
 }
+
+/** The skill-icons sprite sheet index: which (col, row) 32px cell of data/skill-icons.png holds
+ *  a given skill's icon (see scripts/build_skill_icons.py). */
+export interface SkillIconIndex {
+  cell: number;
+  columns: number;
+  icons: Record<string, [number, number]>;
+}
+
+/** Load data/skill-icons.json, the index treeView.ts's SVG tree needs to place each skill's icon
+ *  from the sprite sheet. */
+export async function loadSkillIcons(base = ".."): Promise<SkillIconIndex> {
+  const res = await fetch(withVersion(`${base}/data/skill-icons.json`));
+  if (!res.ok) throw new Error(`skill-icons.json: ${res.status}`);
+  return (await res.json()) as SkillIconIndex;
+}

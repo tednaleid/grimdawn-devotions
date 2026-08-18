@@ -76,6 +76,57 @@
   outline-offset: 1px;
 }
 
+.items-page .items-tree-wrap {
+  border: 1px solid var(--it-line);
+  border-radius: 6px;
+  background: var(--it-panel);
+  padding: 10px 14px 14px;
+}
+.items-page .items-tree-wrap .ctl-label {
+  display: block;
+  margin-bottom: 8px;
+}
+.items-page .items-tree-hint {
+  margin: 4px 0 0;
+  color: var(--it-mut);
+  font-size: 12.5px;
+}
+.items-page .tree-svg {
+  display: block;
+  overflow: visible; /* nodes at the box edge (e.g. y=459) sit half outside the pinned viewBox */
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+  margin: 0 auto;
+}
+.items-page .tree-node {
+  cursor: pointer;
+}
+.items-page .tree-node .node-shape {
+  fill: var(--it-panel2);
+  stroke: var(--it-line);
+  stroke-width: 1.5px;
+}
+.items-page .tree-node:hover .node-shape,
+.items-page .tree-node:focus-visible .node-shape {
+  stroke: var(--it-ember);
+}
+.items-page .tree-node.selected .node-shape {
+  stroke: var(--it-ember);
+  stroke-width: 3px;
+}
+.items-page .tree-node.off-tree .node-shape {
+  stroke-dasharray: 3 2;
+}
+.items-page .items-tree-offtree-caption {
+  margin: 4px 0 0;
+  color: var(--it-mut);
+  font-family: var(--it-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+
 .items-page .items-facets {
   display: flex;
   flex-direction: column;

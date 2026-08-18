@@ -382,7 +382,6 @@
   "items.ctl.mastery": "Mastery",
   "items.ctl.selectMastery": "Select a mastery…",
   "items.ctl.skill": "Skill",
-  "items.ctl.allSkills": "All skills",
   "items.ctl.masteryWide": "Include mastery-wide bonuses",
   "items.ctl.search": "Search",
   "items.ctl.searchPlaceholder": "Item name",
@@ -420,5 +419,6 @@
   "items.slot.ring": "Ring",
   "items.slot.medal": "Medal",
   "items.slot.relic": "Relic",
-  "items.detail.grimtools": "View on Grimtools"
+  "items.detail.grimtools": "View on Grimtools",
+  "items.tree.offTree": "Other abilities"
 }

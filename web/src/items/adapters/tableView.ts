@@ -1,5 +1,5 @@
-// ABOUTME: Renders the item table (mastery/skill pickers, chip facets, sortable columns) into #items-table.
-// ABOUTME: Every change round-trips through onView; the skill picker is a plain <select> until Task 15's tree.
+// ABOUTME: Renders the item table (mastery picker, skill tree, chip facets, sortable columns) into #items-table.
+// ABOUTME: Every change round-trips through onView; the skill picker is the SVG mastery tree from treeView.ts.
 import { resolveText, type Text } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
 import { DOMAINS, EFFECT_KINDS, RARITIES, SLOTS } from "../core/facets";
@@ -8,6 +8,7 @@ import type { Row } from "../core/filter";
 import type { Catalogue, Item } from "../core/model";
 import type { ViewState } from "../core/urlState";
 import { renderDetail, type DetailContext } from "./detailView";
+import { renderTree } from "./treeView";
 
 export interface TableHandlers {
   onView(next: ViewState, mode?: "push" | "replace"): void;
@@ -115,13 +116,13 @@ export function bodyMarkup(loc: Localization, rows: Row[], effectCtx: EffectCont
 
 function skeleton(loc: Localization): string {
   const mastery = `<div class="ctl"><label class="ctl-label" for="items-mastery">${esc(loc.translate("items.ctl.mastery"))}</label><select id="items-mastery"></select></div>`;
-  const skill = `<div class="ctl"><label class="ctl-label" for="items-skill">${esc(loc.translate("items.ctl.skill"))}</label><select id="items-skill"></select></div>`;
   const wideLabel = esc(loc.translate("items.ctl.masteryWide"));
   const wide = `<div class="ctl"><button type="button" class="chip" id="items-wide" aria-pressed="false">${wideLabel}</button></div>`;
   const search = `<div class="ctl"><label class="ctl-label" for="items-q">${esc(loc.translate("items.ctl.search"))}</label><input type="search" id="items-q" placeholder="${esc(loc.translate("items.ctl.searchPlaceholder"))}" /></div>`;
+  const tree = `<div class="items-tree-wrap"><span class="ctl-label" id="items-tree-label">${esc(loc.translate("items.ctl.skill"))}</span><div id="items-tree" role="group" aria-labelledby="items-tree-label"></div></div>`;
   const facets = `<div class="items-facets" id="items-facets"></div>`;
   const footer = `<div class="barfoot"><span class="items-count" id="items-count"></span><button type="button" class="reset" id="items-reset">${esc(loc.translate("items.ctl.reset"))}</button></div>`;
-  const controls = `<div class="items-controls"><div class="ctl-row">${mastery}${skill}${wide}${search}</div>${facets}${footer}</div>`;
+  const controls = `<div class="items-controls"><div class="ctl-row">${mastery}${wide}${search}</div>${tree}${facets}${footer}</div>`;
   const heads = COLS.map((c) =>
     c.sortable
       ? `<th data-sort="${c.key}">${esc(loc.translate(c.label))}<span class="arr" data-arr="${c.key}"></span></th>`
@@ -130,12 +131,62 @@ function skeleton(loc: Localization): string {
   return `${controls}<div class="tablewrap"><table><thead><tr>${heads}</tr></thead><tbody id="items-tbody"></tbody></table></div>`;
 }
 
-// A base skill's own group is itself, so grouping into the picker is just "one option per base
-// skill in the selected mastery" - the modifier/transmuter siblings are pulled in automatically
-// by filter.ts's scope resolution once the base is picked. Options are rebuilt on every sync
-// (cheap: at most a few dozen skills per mastery), not just once, since the list depends on
-// the currently selected mastery.
-function syncControls(el: HTMLElement, loc: Localization, catalogue: Catalogue, view: ViewState): void {
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+// Renders the SVG tree for the current mastery (or a hint when none is picked yet) into
+// #items-tree. Rebuilt on every sync, like the mastery <select>'s options: cheap (at most a few
+// dozen skills per mastery) and simpler than trying to patch an existing tree in place. Picking a
+// node toggles: clicking the already-selected skill's group clears the selection, restoring the
+// "All skills" escape hatch the old <select> offered via its empty option.
+function syncTree(
+  el: HTMLElement,
+  loc: Localization,
+  catalogue: Catalogue,
+  view: ViewState,
+  handlers: TableHandlers,
+): void {
+  const treeEl = el.querySelector<HTMLElement>("#items-tree")!;
+  treeEl.innerHTML = "";
+  if (!view.mastery) {
+    const hint = document.createElement("p");
+    hint.className = "items-tree-hint";
+    hint.textContent = loc.translate("items.ctl.selectMastery");
+    treeEl.appendChild(hint);
+    return;
+  }
+  const svg = renderTree(catalogue.skills, view.mastery, view.skill, (group) => {
+    const next = view.skill === group ? null : group;
+    handlers.onView({ ...view, skill: next });
+  });
+  // treeView.ts stays i18n-free (its signature is pinned with no Localization port), so the
+  // accessible name for each node - and the off-tree row's caption - are resolved here instead,
+  // where `loc` is in scope.
+  svg.querySelectorAll<SVGGElement>("[data-name-tag]").forEach((g) => {
+    const tag = g.dataset.nameTag;
+    if (!tag) return;
+    const name = loc.gameText(tag);
+    g.setAttribute("aria-label", name);
+    const title = document.createElementNS(SVG_NS, "title");
+    title.textContent = name;
+    g.prepend(title);
+  });
+  treeEl.appendChild(svg);
+  const hasOffTree = catalogue.skills.some((s) => s.mastery === view.mastery && (s.uiX === null || s.uiY === null));
+  if (hasOffTree) {
+    const caption = document.createElement("p");
+    caption.className = "items-tree-offtree-caption";
+    caption.textContent = loc.translate("items.tree.offTree");
+    treeEl.appendChild(caption);
+  }
+}
+
+function syncControls(
+  el: HTMLElement,
+  loc: Localization,
+  catalogue: Catalogue,
+  view: ViewState,
+  handlers: TableHandlers,
+): void {
   const masterySel = el.querySelector<HTMLSelectElement>("#items-mastery")!;
   const masteryOpts = catalogue.masteries
     .map((m) => ({ record: m.record, label: loc.gameText(m.nameTag) }))
@@ -146,17 +197,7 @@ function syncControls(el: HTMLElement, loc: Localization, catalogue: Catalogue, 
     .join("");
   masterySel.innerHTML = `<option value="">${esc(loc.translate("items.ctl.selectMastery"))}</option>${masteryOpts}`;
 
-  const skillSel = el.querySelector<HTMLSelectElement>("#items-skill")!;
-  skillSel.disabled = !view.mastery;
-  const skillOpts = catalogue.skills
-    .filter((s) => s.mastery === view.mastery && s.nodeKind === "base")
-    .map((s) => ({ record: s.record, label: s.nameTag ? loc.gameText(s.nameTag) : s.record }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-    .map(
-      (s) => `<option value="${esc(s.record)}"${s.record === view.skill ? " selected" : ""}>${esc(s.label)}</option>`,
-    )
-    .join("");
-  skillSel.innerHTML = `<option value="">${esc(loc.translate("items.ctl.allSkills"))}</option>${skillOpts}`;
+  syncTree(el, loc, catalogue, view, handlers);
 
   el.querySelector<HTMLButtonElement>("#items-wide")!.setAttribute("aria-pressed", String(view.masteryWide));
 
@@ -212,10 +253,6 @@ function wire(el: HTMLElement): void {
     // Changing mastery drops the skill selection: a skill id from the old mastery is meaningless
     // (and possibly invalid) once the mastery scope changes.
     fire({ mastery: value || null, skill: null });
-  });
-  el.querySelector<HTMLSelectElement>("#items-skill")!.addEventListener("change", (e) => {
-    const value = (e.target as HTMLSelectElement).value;
-    fire({ skill: value || null });
   });
   el.querySelector<HTMLButtonElement>("#items-wide")!.addEventListener("click", () => {
     if (!ctx) return;
@@ -295,7 +332,7 @@ export function renderTable(
     el.innerHTML = skeleton(loc);
     wire(el);
   }
-  syncControls(el, loc, catalogue, view);
+  syncControls(el, loc, catalogue, view, handlers);
   renderBody(el, loc, rows, detailCtx);
   renderCount(el, loc, catalogue, rows);
 }
