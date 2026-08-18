@@ -1210,8 +1210,31 @@ preposition, and Task 9's R14 guard still passes because nothing is left truncat
   export interface Catalogue { meta: Record<string, unknown>; masteries: Mastery[];
     skills: Skill[]; items: Item[]; }
   export function parseCatalogue(doc: unknown): Catalogue;
+
+  // Measured against data/skill-items.json, not guessed. Every key below is present
+  // on 100% of its records, so none of them need optional markers.
+  export interface Mastery { record: string; nameTag: string; }
+  export interface Boost { skill: string; level: number; }
+  export interface MasteryBoost { mastery: string; level: number; }
+  export interface RankRow { stat: string; first: number; max: number; ultimate: number; }
+  export interface PetStat { sourceKind: "pet" | "pet_skill"; source: string;
+    sourceNameTag: string | null; stat: string;
+    first: number; max: number; ultimate: number; }
+  export interface PetBlock { record: string; nameTag: string; stats: PetStat[]; }
+  export interface ModBlock { skill: string; stats: ModStat[]; }  // ModStat from items/core/effectText
   ```
   Follows `web/src/rr/core/model.ts`: snake_case in, camelCase out, throws only when the doc is not an object, tolerates missing arrays.
+
+  **One documented exception to camelCase-out, and it is load-bearing.** `ModBlock.stats`
+  must be passed through in the RAW snake_case shape. `ModStat`, exported from
+  `web/src/items/core/effectText.ts`, declares `from_tag`, `to_tag`, `refresh_skill`, and
+  `refresh_trigger` with underscores because it reads the emitted JSON directly. Rename
+  those four keys and `effectLines` sees `undefined` for every one of them: conversion
+  lines are dropped outright (Task 8 made a conversion missing either tag return `null`),
+  and every refresh line silently loses its target skill and its trigger. Nothing throws
+  and no test outside `effectText` fails - the page just quietly renders fewer, wronger
+  lines. Convert the other shapes; leave modifier stats alone. Add a test that pins a
+  `from_tag` surviving `parseCatalogue` unrenamed.
 
 - [ ] **Step 1: Write the failing test**
 
