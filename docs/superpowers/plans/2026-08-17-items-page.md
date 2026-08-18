@@ -1630,7 +1630,13 @@ git commit -m "feat(items): show a summon's stat sheet on its skill"
 ### Task 17: Styling
 
 **Files:**
-- Create: `web/src/items/items.css`
+- Modify: `web/src/items/items.css`
+
+**This file already exists.** Task 13 had to create a minimal version because
+`bundle.ts`'s per-page block requires a stylesheet to exist or the build throws - the
+same class of omission as the missing justfile edit. Extend what is there rather than
+replacing it, and check what Task 13's markup already depends on before changing a
+class name.
 
 - [ ] **Step 1: Write the stylesheet** following `web/src/rr/rr.css` for the chips, table, and dark palette. The tree needs a fixed-aspect container that scales with the viewport.
 - [ ] **Step 2: Check the page at 1280px and at 480px.** The table scrolls horizontally inside its own container; the page body never does.
@@ -1647,12 +1653,35 @@ git commit -m "style(items): dark palette, chips and a scaling tree"
 
 **Files:**
 - Create: `web/e2e/items-smoke.ts`
-- Modify: `justfile` (the `e2e` recipe), the shared app menu, `docs/item-schema.md`, `BACKLOG.md`
+- Modify: `justfile` (the `e2e` recipe AND the `doctor` recipe), the shared app menu,
+  `docs/item-schema.md`, `BACKLOG.md`
+
+`just doctor` checks the committed data files needed to build and serve. It was not
+extended when the items data landed, so a clean clone missing `data/skill-items.json`
+or `data/stat-item-tags.json` gets a page that builds and then 404s, with doctor
+reporting healthy. Add both to its checklist.
 
 - [ ] **Step 1: Write the smoke test** following `web/e2e/rr-smoke.ts`: serve `dist`, drive Chrome over CDP, assert the tree renders, pick a skill, assert the table has rows, assert no console errors.
 - [ ] **Step 2: Add it to `just e2e`** beside the other three.
-- [ ] **Step 3: Add `/items/` to the app menu** on all four pages.
-- [ ] **Step 4: Update the docs.** Record the effect-text model in `docs/item-schema.md` (evergreen, rewritten in place, not appended). Remove the items-page entry from `BACKLOG.md`.
+- [ ] **Step 3: Add `/items/` to the app menu** on all four pages. The menu is NOT
+      markup: it is a TypeScript array of `{ href, label }` built independently in each
+      page's `main.ts`, where every page lists the OTHER pages with relative hrefs
+      (`web/src/app/main.ts:223`, `web/src/rr/app/main.ts:120`,
+      `web/src/monsters/app/main.ts:232`). So this is four edits, not one: add an items
+      entry to the three existing pages and give the new page entries for all three
+      others. Mind the relative depth - the root page uses `resistance-reduction/` while
+      the subpages use `../resistance-reduction/`.
+
+      The label needs a new catalog key `ui.nav.items`, following `ui.nav.planner`,
+      `ui.nav.rr`, `ui.nav.monsters`. **Add it to `web/src/i18n/app.en.json` only.** Do
+      not hand-write translations for the other twelve locales: those catalogs are
+      deliberately partial (English carries 378 keys, every other locale about 216) and
+      `ui.nav.monsters` is absent from them entirely, resolving through the documented
+      per-key fallback of active locale, then English, then the raw key. Register the new
+      key in the `web/test/appCatalog.test.ts` guard.
+- [ ] **Step 4: Update the docs.** Record the effect-text model in `docs/item-schema.md` (evergreen, rewritten in place, not appended). Remove the items-page entry from `BACKLOG.md` - it is numbered
+      item 4, "Ship `/items/` on the existing Pages deploy (after 1)", not a heading, so
+      search for the text rather than a `##` line.
 - [ ] **Step 5: Run the full gate**
 
 Run: `just check && just e2e && uv run scripts/test_build_derived.py && uv run scripts/test_build_skill_items.py`
