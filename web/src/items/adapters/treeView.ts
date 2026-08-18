@@ -27,24 +27,23 @@ const OFFTREE_XS = [326, 486, 646, 806];
 const NODE_R = 18; // node border half-size (square) / radius (circle)
 const ICON_R = 16; // icon clip half-size (square) / radius (circle): the sprite cell is 32px, unscaled
 
-let iconIndex: SkillIconIndex | null = null;
-let sheetW = 0;
-let sheetH = 0;
+const ICON_HREF = withVersion("../data/skill-icons.png");
 
-/** Wire the sprite sheet index fetched at boot (data/skill-icons.json). renderTree reads it
- *  through this module-level slot instead of a parameter, keeping its signature exactly what the
- *  task-15 brief pins: (skills, mastery, selected, onPick). main.ts calls this once, before the
- *  first render, alongside loadCatalogue/loadStatTags. */
-export function setIconIndex(idx: SkillIconIndex): void {
-  iconIndex = idx;
-  // The packer lays icons out row-major with no gaps (scripts/build_skill_icons.py), so the sheet's
-  // pixel size is derivable from the icon count and column count alone.
-  const rows = Math.ceil(Object.keys(idx.icons).length / idx.columns);
-  sheetW = idx.columns * idx.cell;
-  sheetH = rows * idx.cell;
+/** Everything renderTree needs beyond the skill list itself: the sprite sheet index (data is
+ *  fetched at boot, not module-level state - see task-15-fix-1.md) and a name resolver so each
+ *  node gets a real accessible name/tooltip. Mirrors detailView.ts's DetailContext: the adapter
+ *  stays i18n-free, the caller (tableView.ts) supplies a `loc`-backed resolver. */
+export interface TreeContext {
+  icons: SkillIconIndex;
+  nameOf: (skill: Skill) => string;
 }
 
-const ICON_HREF = withVersion("../data/skill-icons.png");
+// The packer lays icons out row-major with no gaps (scripts/build_skill_icons.py), so the sheet's
+// pixel size is derivable from the icon count and column count alone.
+function sheetSize(idx: SkillIconIndex): { w: number; h: number } {
+  const rows = Math.ceil(Object.keys(idx.icons).length / idx.columns);
+  return { w: idx.columns * idx.cell, h: rows * idx.cell };
+}
 
 function esc(s: string): string {
   return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
@@ -86,7 +85,13 @@ function selectedGroup(skills: Skill[], selected: string | null): string | null 
   return target ? target.group : selected;
 }
 
-function nodeMarkup(p: Placed, i: number, selGroup: string | null): string {
+function nodeMarkup(
+  p: Placed,
+  i: number,
+  selGroup: string | null,
+  ctx: TreeContext,
+  sheet: { w: number; h: number },
+): string {
   const { skill, x, y, offTree } = p;
   const shape = skill.nodeKind === "base" ? "square" : "circle";
   const clipId = `tree-clip-${i}`;
@@ -100,17 +105,20 @@ function nodeMarkup(p: Placed, i: number, selGroup: string | null): string {
     shape === "square"
       ? `<rect class="node-shape" x="${x - NODE_R}" y="${y - NODE_R}" width="${NODE_R * 2}" height="${NODE_R * 2}" rx="4"/>`
       : `<circle class="node-shape" cx="${x}" cy="${y}" r="${NODE_R}"/>`;
-  const cell = iconIndex?.icons[skill.icon];
+  const cell = ctx.icons.icons[skill.icon];
   let icon = "";
   if (cell) {
     const [col, row] = cell;
     const imgX = x - ICON_R - col * CELL;
     const imgY = y - ICON_R - row * CELL;
-    icon = `<image class="node-icon" href="${ICON_HREF}" x="${imgX}" y="${imgY}" width="${sheetW}" height="${sheetH}" clip-path="url(#${clipId})"/>`;
+    icon = `<image class="node-icon" href="${ICON_HREF}" x="${imgX}" y="${imgY}" width="${sheet.w}" height="${sheet.h}" clip-path="url(#${clipId})"/>`;
   }
-  const nameAttr = skill.nameTag ? ` data-name-tag="${esc(skill.nameTag)}"` : "";
+  // ctx.nameOf is the caller's fallback-to-record resolver (see tableView.ts), so every node gets
+  // a real accessible name, not just the ones with a nameTag.
+  const name = esc(ctx.nameOf(skill));
   return (
-    `<g class="${cls}" data-group="${esc(skill.group)}" data-record="${esc(skill.record)}"${nameAttr} tabindex="0" role="button">` +
+    `<g class="${cls}" data-group="${esc(skill.group)}" data-record="${esc(skill.record)}" aria-label="${name}" tabindex="0" role="button">` +
+    `<title>${name}</title>` +
     `<clipPath id="${clipId}">${clip}</clipPath>` +
     border +
     icon +
@@ -119,17 +127,18 @@ function nodeMarkup(p: Placed, i: number, selGroup: string | null): string {
 }
 
 /** Pure markup for one mastery's tree: nodes positioned by the game's own ui_x/ui_y (or the
- *  off-tree row for the handful that carry none), icons from the skill-icons sprite sheet
- *  (setIconIndex must run first, or nodes render without one), each carrying a `data-group` for
- *  the caller to wire clicks against. `selected` highlights every node sharing the selected
- *  skill's group, not just the exact matching node, since that is what stays in scope together
- *  (see core/filter.ts's scopeSkillSet). Exported separately from renderTree so it is testable
- *  without a DOM (this repo has no jsdom/happy-dom - see test/importPanel.test.ts). */
-export function buildTreeMarkup(skills: Skill[], mastery: string, selected: string | null): string {
+ *  off-tree row for the handful that carry none), icons from the skill-icons sprite sheet, each
+ *  carrying a `data-group` for the caller to wire clicks against, an accessible name resolved via
+ *  `ctx.nameOf`. `selected` highlights every node sharing the selected skill's group, not just
+ *  the exact matching node, since that is what stays in scope together (see core/filter.ts's
+ *  scopeSkillSet). Exported separately from renderTree so it is testable without a DOM (this repo
+ *  has no jsdom/happy-dom - see test/importPanel.test.ts). */
+export function buildTreeMarkup(skills: Skill[], mastery: string, selected: string | null, ctx: TreeContext): string {
   const masterySkills = skills.filter((s) => s.mastery === mastery);
   const placed = placeNodes(masterySkills);
   const selGroup = selectedGroup(skills, selected);
-  const nodes = placed.map((p, i) => nodeMarkup(p, i, selGroup)).join("");
+  const sheet = sheetSize(ctx.icons);
+  const nodes = placed.map((p, i) => nodeMarkup(p, i, selGroup, ctx, sheet)).join("");
   return `<svg class="tree-svg" viewBox="${VIEW_BOX}" preserveAspectRatio="xMidYMid meet">${nodes}</svg>`;
 }
 
@@ -141,9 +150,10 @@ export function renderTree(
   mastery: string,
   selected: string | null,
   onPick: (group: string) => void,
+  ctx: TreeContext,
 ): SVGElement {
   const wrap = document.createElement("div");
-  wrap.innerHTML = buildTreeMarkup(skills, mastery, selected);
+  wrap.innerHTML = buildTreeMarkup(skills, mastery, selected, ctx);
   const svg = wrap.firstElementChild as SVGElement;
 
   const pick = (target: Element) => {

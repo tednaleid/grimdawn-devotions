@@ -2,7 +2,8 @@
 // ABOUTME: catalogue + icon index: viewBox, node counts/shapes, icons, off-tree row, selection.
 import { test, expect } from "bun:test";
 import { parseCatalogue } from "../../src/items/core/model";
-import { buildTreeMarkup, setIconIndex } from "../../src/items/adapters/treeView";
+import type { Skill } from "../../src/items/core/model";
+import { buildTreeMarkup, type TreeContext } from "../../src/items/adapters/treeView";
 import type { SkillIconIndex } from "../../src/items/adapters/dataSource";
 import doc from "../../../data/skill-items.json";
 import iconDoc from "../../../data/skill-icons.json";
@@ -12,6 +13,13 @@ const catalogue = parseCatalogue(doc);
 // tuple the sprite index actually carries (see scripts/build_skill_icons.py) - cast once here.
 const icons = iconDoc as unknown as SkillIconIndex;
 const masteryRecords = catalogue.masteries.map((m) => m.record);
+
+// A plain, no-loc name resolver: real enough to exercise the aria-label/title plumbing without
+// pulling in Localization. Every test builds its own ctx (no shared module state - see
+// task-15-fix-1.md), so tests never depend on execution order.
+const nameOf = (skill: Skill): string => skill.nameTag ?? skill.record;
+const ctx: TreeContext = { icons, nameOf };
+const noIconsCtx: TreeContext = { icons: { cell: 32, columns: 1, icons: {} }, nameOf };
 
 // A node's own <g> opening tag, in the exact attribute order treeView.ts emits it, so a count of
 // matches is a count of rendered nodes (one <g> per skill, real or off-tree).
@@ -23,14 +31,14 @@ function nodeGroups(markup: string): { cls: string; group: string; record: strin
 
 test("every mastery renders with the one fixed viewBox", () => {
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
     expect(markup).toContain('viewBox="246 39 640 420"');
   }
 });
 
 test("every mastery renders at least 30 nodes", () => {
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
     expect(nodeGroups(markup).length).toBeGreaterThanOrEqual(30);
   }
 });
@@ -38,7 +46,7 @@ test("every mastery renders at least 30 nodes", () => {
 test("base skills render as squares, everything else as circles", () => {
   const mastery = masteryRecords[0]!;
   const skillsByRecord = new Map(catalogue.skills.map((s) => [s.record, s]));
-  const markup = buildTreeMarkup(catalogue.skills, mastery, null);
+  const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
   for (const { cls, record } of nodeGroups(markup)) {
     const skill = skillsByRecord.get(record)!;
     const wantSquare = skill.nodeKind === "base";
@@ -47,20 +55,61 @@ test("base skills render as squares, everything else as circles", () => {
   }
 });
 
-test("with no icon index wired, nodes render with no <image> (graceful, not a throw)", () => {
+test("with no icon in the index, that node renders with no <image> (graceful, not a throw)", () => {
   const mastery = masteryRecords[0]!;
-  const markup = buildTreeMarkup(catalogue.skills, mastery, null);
+  const markup = buildTreeMarkup(catalogue.skills, mastery, null, noIconsCtx);
   expect(markup).not.toContain("<image");
 });
 
-test("every node gets an icon once the sprite index is wired: no missing icon", () => {
-  setIconIndex(icons);
+test("every node gets an icon from the real sprite index: no missing icon", () => {
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
     const nodeCount = nodeGroups(markup).length;
     const imageCount = (markup.match(/<image /g) ?? []).length;
     expect(imageCount).toBe(nodeCount);
   }
+});
+
+test("accessible name is resolved via ctx.nameOf, including a null-nameTag fallback", () => {
+  const skills: Skill[] = [
+    {
+      record: "r1",
+      mastery: "m",
+      group: "r1",
+      nodeKind: "base",
+      uiX: 246,
+      uiY: 39,
+      nameTag: "tagFoo",
+      icon: "i1",
+      maxLevel: 1,
+      ultimateLevel: 1,
+      ranks: [],
+      pets: [],
+    },
+    {
+      record: "r2",
+      mastery: "m",
+      group: "r2",
+      nodeKind: "base",
+      uiX: 326,
+      uiY: 39,
+      nameTag: null,
+      icon: "i2",
+      maxLevel: 1,
+      ultimateLevel: 1,
+      ranks: [],
+      pets: [],
+    },
+  ];
+  const namedCtx: TreeContext = {
+    icons: { cell: 32, columns: 1, icons: {} },
+    nameOf: (skill) => (skill.nameTag ? `Named:${skill.nameTag}` : skill.record),
+  };
+  const markup = buildTreeMarkup(skills, "m", null, namedCtx);
+  expect(markup).toContain('aria-label="Named:tagFoo"');
+  expect(markup).toContain("<title>Named:tagFoo</title>");
+  expect(markup).toContain('aria-label="r2"');
+  expect(markup).toContain("<title>r2</title>");
 });
 
 // The four Fangs of Asterkarn shapeshift abilities carry null ui_x/ui_y (playerclass10 /
@@ -68,7 +117,7 @@ test("every node gets an icon once the sprite index is wired: no missing icon", 
 const BERSERKER = "records/skills/playerclass10/_classtraining_class10.dbr";
 
 test("the four off-tree Berserker abilities render, not dropped", () => {
-  const markup = buildTreeMarkup(catalogue.skills, BERSERKER, null);
+  const markup = buildTreeMarkup(catalogue.skills, BERSERKER, null, ctx);
   const offTree = nodeGroups(markup).filter((n) => n.cls.includes("off-tree"));
   expect(offTree.length).toBe(4);
   const expected = new Set([
@@ -86,7 +135,7 @@ test("no two nodes in the same mastery land on the same position", () => {
   const RECT = /class="node-shape" x="([-\d.]+)" y="([-\d.]+)" width="([-\d.]+)" height="([-\d.]+)"/g;
   const CIRCLE = /class="node-shape" cx="([-\d.]+)" cy="([-\d.]+)"/g;
   for (const mastery of masteryRecords) {
-    const markup = buildTreeMarkup(catalogue.skills, mastery, null);
+    const markup = buildTreeMarkup(catalogue.skills, mastery, null, ctx);
     const points = new Set<string>();
     for (const m of markup.matchAll(RECT)) {
       const x = Number(m[1]) + Number(m[3]) / 2;
@@ -102,7 +151,7 @@ test("no two nodes in the same mastery land on the same position", () => {
 test("selecting a base skill highlights its whole group, including a modifier sibling", () => {
   const modifier = catalogue.skills.find((s) => s.nodeKind === "modifier" && s.group !== s.record)!;
   const mastery = modifier.mastery;
-  const markup = buildTreeMarkup(catalogue.skills, mastery, modifier.group);
+  const markup = buildTreeMarkup(catalogue.skills, mastery, modifier.group, ctx);
   const groups = nodeGroups(markup);
   const base = groups.find((n) => n.record === modifier.group)!;
   const mod = groups.find((n) => n.record === modifier.record)!;
@@ -115,6 +164,6 @@ test("selecting a base skill highlights its whole group, including a modifier si
 
 test("a selected id absent from the catalogue (a stale link) selects nothing, never throws", () => {
   const mastery = masteryRecords[0]!;
-  const markup = buildTreeMarkup(catalogue.skills, mastery, "no-such-skill-record");
+  const markup = buildTreeMarkup(catalogue.skills, mastery, "no-such-skill-record", ctx);
   expect(nodeGroups(markup).some((n) => n.cls.includes("selected"))).toBe(false);
 });

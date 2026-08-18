@@ -7,8 +7,9 @@ import { rowEffectLines, type EffectContext } from "../core/effectText";
 import type { Row } from "../core/filter";
 import type { Catalogue, Item } from "../core/model";
 import type { ViewState } from "../core/urlState";
+import type { SkillIconIndex } from "./dataSource";
 import { renderDetail, type DetailContext } from "./detailView";
-import { renderTree } from "./treeView";
+import { renderTree, type TreeContext } from "./treeView";
 
 export interface TableHandlers {
   onView(next: ViewState, mode?: "push" | "replace"): void;
@@ -153,8 +154,6 @@ function skeleton(loc: Localization): string {
   return `${controls}<div class="tablewrap"><table><thead><tr>${heads}</tr></thead><tbody id="items-tbody"></tbody></table></div>`;
 }
 
-const SVG_NS = "http://www.w3.org/2000/svg";
-
 // Renders the SVG tree for the current mastery (or a hint when none is picked yet) into
 // #items-tree. Rebuilt on every sync, like the mastery <select>'s options: cheap (at most a few
 // dozen skills per mastery) and simpler than trying to patch an existing tree in place. Picking a
@@ -164,6 +163,7 @@ function syncTree(
   el: HTMLElement,
   loc: Localization,
   catalogue: Catalogue,
+  icons: SkillIconIndex,
   view: ViewState,
   handlers: TableHandlers,
 ): void {
@@ -176,22 +176,23 @@ function syncTree(
     treeEl.appendChild(hint);
     return;
   }
-  const svg = renderTree(catalogue.skills, view.mastery, view.skill, (group) => {
-    const next = view.skill === group ? null : group;
-    handlers.onView({ ...view, skill: next });
-  });
-  // treeView.ts stays i18n-free (its signature is pinned with no Localization port), so the
-  // accessible name for each node - and the off-tree row's caption - are resolved here instead,
-  // where `loc` is in scope.
-  svg.querySelectorAll<SVGGElement>("[data-name-tag]").forEach((g) => {
-    const tag = g.dataset.nameTag;
-    if (!tag) return;
-    const name = loc.gameText(tag);
-    g.setAttribute("aria-label", name);
-    const title = document.createElementNS(SVG_NS, "title");
-    title.textContent = name;
-    g.prepend(title);
-  });
+  // treeView.ts stays i18n-free (its signature carries no Localization port), so this loc-backed
+  // resolver is the caller's contribution to TreeContext - and its own fallback to the raw record
+  // for a skill with no nameTag, matching nameOf's convention elsewhere in this file.
+  const treeCtx: TreeContext = {
+    icons,
+    nameOf: (skill) => (skill.nameTag ? loc.gameText(skill.nameTag) : skill.record),
+  };
+  const svg = renderTree(
+    catalogue.skills,
+    view.mastery,
+    view.skill,
+    (group) => {
+      const next = view.skill === group ? null : group;
+      handlers.onView({ ...view, skill: next });
+    },
+    treeCtx,
+  );
   treeEl.appendChild(svg);
   const hasOffTree = catalogue.skills.some((s) => s.mastery === view.mastery && (s.uiX === null || s.uiY === null));
   if (hasOffTree) {
@@ -206,6 +207,7 @@ function syncControls(
   el: HTMLElement,
   loc: Localization,
   catalogue: Catalogue,
+  icons: SkillIconIndex,
   view: ViewState,
   handlers: TableHandlers,
 ): void {
@@ -219,7 +221,7 @@ function syncControls(
     .join("");
   masterySel.innerHTML = `<option value="">${esc(loc.translate("items.ctl.selectMastery"))}</option>${masteryOpts}`;
 
-  syncTree(el, loc, catalogue, view, handlers);
+  syncTree(el, loc, catalogue, icons, view, handlers);
 
   el.querySelector<HTMLButtonElement>("#items-wide")!.setAttribute("aria-pressed", String(view.masteryWide));
 
@@ -346,6 +348,7 @@ export function renderTable(
   el: HTMLElement,
   loc: Localization,
   catalogue: Catalogue,
+  icons: SkillIconIndex,
   rows: Row[],
   view: ViewState,
   detailCtx: DetailContext,
@@ -356,7 +359,7 @@ export function renderTable(
     el.innerHTML = skeleton(loc);
     wire(el);
   }
-  syncControls(el, loc, catalogue, view, handlers);
+  syncControls(el, loc, catalogue, icons, view, handlers);
   renderBody(el, loc, rows, detailCtx);
   renderCount(el, loc, catalogue, rows);
 }

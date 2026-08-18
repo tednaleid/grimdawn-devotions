@@ -13,7 +13,6 @@ import { gameT } from "../../core/localization";
 import { loadCatalogue, loadSkillIcons, loadStatTags } from "../adapters/dataSource";
 import type { DetailContext } from "../adapters/detailView";
 import { renderTable } from "../adapters/tableView";
-import { setIconIndex } from "../adapters/treeView";
 import { applyView } from "../core/filter";
 import type { Item } from "../core/model";
 import { decodeHash, encodeHash, type ViewState } from "../core/urlState";
@@ -26,14 +25,13 @@ async function boot() {
 
   // All three fetches are independent IO, so they run concurrently; the 3.1 MB catalogue is
   // fetched and parsed exactly once here, never per facet change (renderTable only reads the
-  // parsed result). setIconIndex wires treeView.ts's sprite-sheet lookup before the first render,
-  // since renderTree's pinned signature has no room for it as a parameter.
+  // parsed result). skillIcons is threaded into every renderTable call below (treeView.ts's
+  // renderTree takes it via a TreeContext parameter, not module-level state).
   const [catalogue, statTags, skillIcons] = await Promise.all([
     loadCatalogue(".."),
     loadStatTags(".."),
     loadSkillIcons(".."),
   ]);
-  setIconIndex(skillIcons);
   const knownMasteries = new Set(catalogue.masteries.map((m) => m.record));
   // skill record -> mastery record, so decodeHash can backfill a hash's mastery from its skill.
   const knownSkills = new Map(catalogue.skills.map((s) => [s.record, s.mastery]));
@@ -105,7 +103,7 @@ async function boot() {
 
   function render(): void {
     const rows = applyView(catalogue.items, catalogue.skills, view, nameOf);
-    renderTable(tableEl, localization, catalogue, rows, view, detailContext(), handlers);
+    renderTable(tableEl, localization, catalogue, skillIcons, rows, view, detailContext(), handlers);
   }
 
   function refresh(urlMode: "push" | "replace" = "push"): void {
