@@ -29,7 +29,12 @@
 }
 
 .items-page main {
+  /* width:100% (not just max-width) is load-bearing: the shared web/src/styles.css sets
+     `main { flex: 1; }` for the planner's row layout, and without an explicit width this
+     flex item's cross-axis stretch loses to the table's intrinsic content width - the
+     page body scrolls horizontally at narrow viewports instead of the table alone. */
   display: block;
+  width: 100%;
   max-width: 1400px;
   margin: 0 auto;
   padding: 16px 24px 60px;
