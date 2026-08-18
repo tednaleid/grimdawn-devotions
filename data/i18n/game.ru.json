@@ -197,6 +197,7 @@
   "TargetAngle": "{%.0f0} градусов угол атаки",
   "TargetNumber": "{%d0} цель(ей)",
   "TargetRadius": "целевая область",
+  "TargetRange": "дальность",
   "tagAetherCrystalA01": "Груда эфирных кристаллов",
   "tagAetherCrystalA02": "Эфирная друза",
   "tagAetherCrystalA03": "Скопление эфирных кристаллов",

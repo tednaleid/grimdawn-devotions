@@ -1025,3 +1025,30 @@ read "15% Chance of affecting up to 3 targets" reads only the second half. The p
 `sparkChance`, and `data/stat-item-tags.json` already maps it. That half is an
 `effectText.ts`-only change of the same shape as the proc-chance rule. The plan text is
 corrected; the `racialBonusRace` half of 9b really is a pipeline change and is unaffected.
+
+## `skillLifePercentBuffDuration` may be a third wrong NON_DISPLAY call
+
+`projectilePiercing` and `waveDistance` were declared non-display on a guess and both
+turned out to be real lines (fixed 2026-08-18). A third entry,
+`skillLifePercentBuffDuration`, is declared as "duration facet folded into the
+SkillLifePercent line". That reason does not hold for item modifiers: of the 43 records
+carrying the stat, only 6 also carry `skillLifePercent`, and those 6 are skill records
+(a devotion, two boss skills, the raven pet heal), never a `Skill_Modifier`. On the 37
+modifier records it is alone.
+
+grimtools renders it. Awakened Sphere of Many Blades
+(`records/items/awakened/gearweapons/focus/c114_focus.dbr`) carries exactly
+`characterLifeModifier 8`, `refreshCooldown* 15/1`, and `skillLifePercentBuffDuration 3`
+on its Blood of Dreeg block, and the card reads "+8% Health", the refresh sentence, and
+"Restores 3% Health Per Second" - the third line can only come from the 3. That points at
+`tagBonusLifePercentBuff` ("Restores {%.0f0}% Health Per Second"), 22 lines across 20
+items in the current dataset.
+
+What blocks the fix: on the 6 skill records the same id IS a duration in seconds (the
+raven heal is `skillLifePercent 4` with `skillLifePercentBuffDuration 1`), so aliasing it
+globally would print "Restores 1% Health Per Second" on that pet panel - trading a missing
+item line for a wrong pet line. `data/stat-item-tags.json` is a flat id-to-tag map with no
+notion of the carrier's `Class`, so honouring both readings needs either a
+context-sensitive map or a rule in `effectText.ts` that suppresses the stat when a
+`skillLifePercent` sibling is present. `skillLifeBonusBuffDuration` (20 records) is the
+same shape and the same open question.

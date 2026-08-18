@@ -109,6 +109,7 @@ export const COMPOSER: Record<string, string> = {
   SkillChargeDuration: "SkillSecondFormat", // "Charge Level Duration"
   TargetRadius: "SkillDistanceFormat", // "Target Area"
   ExplosionRadius: "SkillDistanceFormat", // "Radius"
+  TargetRange: "SkillDistanceFormat", // "Range" (waveDistance, a wave skill's reach)
   ManaCost: "SkillCostFormat", // "Energy Cost"
   ComboChargeLevels: "SkillIntFormat", // "Onslaught Stacks:"
   tagCharStatsBlockChance: "SkillPercentFormat", // "Chance to Block"

@@ -197,6 +197,7 @@
   "TargetAngle": "{%.0f0} 度攻击范围",
   "TargetNumber": "最多作用于 {%d0} 个目标",
   "TargetRadius": "目标区域",
+  "TargetRange": "目标距离",
   "tagAetherCrystalA01": "虚化水晶",
   "tagAetherCrystalA02": "虚化水晶集簇",
   "tagAetherCrystalA03": "虚化水晶体",

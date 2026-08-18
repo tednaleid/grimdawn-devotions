@@ -137,6 +137,18 @@ ALIASES: dict[str, str] = {
     "refreshDurationAmount": "tagSkillDurationRefresh",
     "refreshDurationChance": "tagSkillDurationRefresh",
     "refreshDurationMax": "tagSkillDurationRefreshMax",
+    # Two spellings of one stat. The skill_modifier template calls the pass-through
+    # chance projectilePiercing where a skill record calls it
+    # projectilePiercingChance: no record in the deposit carries both, the 45
+    # occurrences are all on Skill_Modifier records, and every value is a 33-100
+    # percentage, never a flag. Pinned to the Eldritch Storm Emitter, whose Storm
+    # Spread block reads "70% Chance to pass through Enemies".
+    "projectilePiercing": "ProjectilePiercingChance",
+    # A wave skill's reach in meters, on the skill itself (Skill_AttackWave and
+    # friends) and as a bonus on a modifier. The tag is named for the target, not
+    # the wave. Pinned to Ghol's Reach, whose Bone Harvest block reads
+    # "2 Meter Range" beside its recharge and leech lines.
+    "waveDistance": "TargetRange",
 }
 
 # Stat ids the game never renders as a labelled line. Declared rather than left to
@@ -165,7 +177,6 @@ NON_DISPLAY: dict[str, str] = {
     "contagionLimit": "contagion spread mechanics, never displayed",
     "contagionMaxSpread": "contagion spread mechanics, never displayed",
     "overwriteBaseSkill": "skill-wiring flag, never displayed",
-    "projectilePiercing": "pass-through enable flag; the % is projectilePiercingChance",
     "radiusEffectSize": "effect geometry, never displayed",
     "skillChargeMultipliers": "per-charge scaling array, never displayed",
     "skillTargetInterval": "internal tick rate, never displayed",
@@ -173,7 +184,6 @@ NON_DISPLAY: dict[str, str] = {
     "spawnObjectWeights2": "spawn table weighting, never displayed",
     "spawnObjectWeights3": "spawn table weighting, never displayed",
     "spawnObjectWeights4": "spawn table weighting, never displayed",
-    "waveDistance": "wave geometry, never displayed",
     "waveEndWidth": "wave geometry, never displayed",
     "waveStartWidth": "wave geometry, never displayed",
     # Facets the game folds into a sibling stat's line rather than labelling.

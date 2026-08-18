@@ -359,6 +359,7 @@
   "projectileFragmentsLaunchNumberMin": "ProjectileFragmentsLaunchNumber",
   "projectileLaunchNumber": "ProjectileLaunchNumber",
   "projectileLaunchRotation": "ProjectileLaunchRotation",
+  "projectilePiercing": "ProjectilePiercingChance",
   "projectilePiercingChance": "ProjectilePiercingChance",
   "racialBonusPercentDamage": "RacialBonusPercentDamage",
   "racialBonusPercentDefense": "RacialBonusPercentDefense",
@@ -443,5 +444,6 @@
   "sparkChance": "tagSparkMaxNumberChance",
   "sparkMaxNumber": "tagSparkMaxNumber",
   "spawnObjectsTimeToLive": "tagSkillPetTimeToLive",
+  "waveDistance": "TargetRange",
   "weaponDamagePct": "SkillWeaponDamageFormat"
 }

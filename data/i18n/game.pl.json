@@ -197,6 +197,7 @@
   "TargetAngle": "kąt {%.0f0} stopni wokół postaci",
   "TargetNumber": "{%d0} - liczba celów, na które działa umiejętność",
   "TargetRadius": "obszaru działania",
+  "TargetRange": "zasięgu",
   "tagAetherCrystalA01": "Kryształ Aetheru",
   "tagAetherCrystalA02": "Skupisko Kryształów Aetheru",
   "tagAetherCrystalA03": "Formacja Kryształów Aetheru",

@@ -6,6 +6,7 @@ import { COMPOSER, effectLines, maxPlaceholderIndex } from "../../src/items/core
 import statItemTags from "../../../data/stat-item-tags.json";
 import gameEn from "../../../data/i18n/game.en.json";
 import appEn from "../../src/i18n/app.en.json";
+import catalogueDoc from "../../../data/skill-items.json";
 
 const GAME: Record<string, string> = {
   DamageFire: "{%t0} Fire Damage",
@@ -738,4 +739,44 @@ test("Bloodlord's Blade: the chance attaches to its own carrier, not to the seco
 // projectilePiercingChance, sparkChance) carry their own tag, so the rule must not touch them.
 test("a chance stat with its own tag keeps rendering as its own line", () => {
   expect(cardRender([{ stat: "defensiveBlockChance", value: 15 }])).toEqual(["15% Chance to Block"]);
+});
+
+// --- The hand-authored NON_DISPLAY table's two wrong calls (2026-08-18) ------------------
+// scripts/build_stat_item_tags.py declares which stat ids the game never labels. Two entries
+// were guesses that the game contradicts, and each silently cost a real line on every item
+// carrying it. These render the block straight out of the committed dataset, so they fail
+// again if either the stat stops reaching the page or its label stops resolving.
+const realCtx = {
+  tagOf: (s: string) => (statItemTags as Record<string, string>)[s],
+  templateOf: (t: string) => (gameEn as Record<string, string>)[t],
+  nameOf: () => undefined,
+};
+const realGame = gameEn as Record<string, string>;
+const realLoc = makeLocalization(APP, APP, "en", realGame, realGame);
+function realBlock(item: string, skill: string): { stat: string; value: number }[] {
+  const it = ((catalogueDoc as any).items as any[]).find((i) => i.record === item);
+  if (!it) throw new Error(`no such item in the dataset: ${item}`);
+  const block = it.modifiers.find((m: any) => m.skill === skill);
+  if (!block) throw new Error(`${item} has no modifier block for ${skill}`);
+  return block.stats;
+}
+const realRender = (stats: any[]) => effectLines(stats, realCtx).map((t) => resolveText(realLoc, t));
+
+// projectilePiercing was called a "pass-through enable flag" and dropped. It is the percentage
+// itself: the skill_modifier template spells the stat projectilePiercingChance carries on a
+// skill record. grimtools' card for this item reads "70% Chance to pass through Enemies".
+test("Eldritch Storm Emitter: the Storm Spread block keeps its pass-through chance", () => {
+  const lines = realRender(
+    realBlock("records/items/gearweapons/guns1h/b301f_gun1h.dbr", "records/skills/playerclass07/wpattack03.dbr"),
+  );
+  expect(lines).toContain("70% Chance to pass through Enemies");
+});
+
+// waveDistance was called "wave geometry, never displayed". grimtools' card for this item
+// reads "2 Meter Range" between the recharge and the leech line.
+test("Ghol's Reach: a wave modifier's reach reads as a range in meters", () => {
+  const lines = realRender(
+    realBlock("records/items/gearhands/d207_hands.dbr", "records/skills/playerclass08/soulscythe1.dbr"),
+  );
+  expect(lines).toContain("2 Meter Range");
 });

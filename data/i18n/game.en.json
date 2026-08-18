@@ -197,6 +197,7 @@
   "TargetAngle": "{%.0f0} Degree Attack Arc",
   "TargetNumber": "{%d0} Target Maximum",
   "TargetRadius": "Target Area",
+  "TargetRange": "Range",
   "tagAetherCrystalA01": "Aether Crystal",
   "tagAetherCrystalA02": "Aether Crystal Cluster",
   "tagAetherCrystalA03": "Aether Crystal Formation",
