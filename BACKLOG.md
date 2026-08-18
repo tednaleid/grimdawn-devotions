@@ -742,12 +742,6 @@ artifact policy, item source, grimtools boundary).
    at build 19149150 - and is designed so that this walk resolves more of
    those `unknown` items automatically once it lands, with no change to the
    CLI's interface.
-4. **Ship `/items/` on the existing Pages deploy** (after 1). Publish the
-   prototype plus derived parquet at a subpath, with the tier-1 source facet.
-   Not "one workflow edit": CI cannot regenerate parquet (Windows-only
-   extraction), so it depends on step 1's fetchable release; also resolve the
-   prototype's CDN-loaded DuckDB against the self-contained deploy ethos.
-
 ### Unsequenced follow-ups
 
 - **Engine bake-off: facet bitmaps vs DuckDB-WASM.** Decide the browser query

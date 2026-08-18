@@ -218,14 +218,15 @@ try {
        return !!p.querySelector('a.app-menu-nav') && !!p.querySelector('[data-locale]') && !!p.querySelector('a[href*="github.com"]'); })()`,
   );
   check(menuOk, "app menu opens with cross-app link, language list, and GitHub");
-  // Both siblings, and each link's browser-resolved URL must actually serve.
+  // All three siblings, and each link's browser-resolved URL must actually serve.
   const rrNav = await cdp.evaluate<string[]>(
     `Array.from(document.querySelectorAll('.app-menu-panel a.app-menu-nav')).map((a) => a.href)`,
   );
   const rrOrigin = new URL(RR).origin;
-  check(rrNav.length === 2, `the app menu links to both sibling apps (${rrNav.length})`);
+  check(rrNav.length === 3, `the app menu links to all three sibling apps (${rrNav.length})`);
   check(rrNav.includes(`${rrOrigin}/`), `it links to the planner (${rrNav.join(", ")})`);
   check(rrNav.includes(`${rrOrigin}/monster-resistances/`), "it links to the monster-resistances page");
+  check(rrNav.includes(`${rrOrigin}/items/`), "it links to the items page");
   const rrStatuses = await Promise.all(rrNav.map(async (h) => (await fetch(h)).status));
   check(
     rrStatuses.every((s) => s === 200),

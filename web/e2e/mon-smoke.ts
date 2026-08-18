@@ -246,17 +246,18 @@ try {
   check(clearHidden === 0, `and the button hides itself again on an empty box (${clearHidden}px)`);
   check(!(await cdp.evaluate<string>("location.hash")).includes("q="), "clearing the search drops q from the hash");
 
-  // App menu: this page must offer BOTH siblings, not just the planner. `a.href` reports the
+  // App menu: this page must offer ALL THREE siblings, not just the planner. `a.href` reports the
   // browser-resolved absolute URL, so a wrong relative depth (the bug this covers) shows up here,
   // and fetching each one proves the target actually serves rather than merely being well-formed.
   await cdp.evaluate(`document.querySelector('.app-menu-btn').click()`);
   const navHrefs = await cdp.evaluate<string[]>(
     `Array.from(document.querySelectorAll('.app-menu-panel a.app-menu-nav')).map((a) => a.href)`,
   );
-  check(navHrefs.length === 2, `the app menu links to both sibling apps (${navHrefs.length})`);
+  check(navHrefs.length === 3, `the app menu links to all three sibling apps (${navHrefs.length})`);
   const origin = new URL(MON).origin;
   check(navHrefs.includes(`${origin}/`), `it links to the planner (${navHrefs.join(", ")})`);
   check(navHrefs.includes(`${origin}/resistance-reduction/`), "it links to the resistance-reduction page");
+  check(navHrefs.includes(`${origin}/items/`), "it links to the items page");
   const navStatuses = await Promise.all(navHrefs.map(async (h) => (await fetch(h)).status));
   check(
     navStatuses.every((s) => s === 200),

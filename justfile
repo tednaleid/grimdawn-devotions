@@ -43,7 +43,7 @@ doctor:
       *)            check winget "package manager — ships with Windows 10/11" ;;
     esac
     echo "Web data (committed; needed for build/serve):"
-    for f in data/devotions.json:parse data/resistance-reduction.json:parse-rr data/monsters.json:parse-monsters; do
+    for f in data/devotions.json:parse data/resistance-reduction.json:parse-rr data/monsters.json:parse-monsters data/skill-items.json:skill-items data/stat-item-tags.json:stat-item-tags data/skill-icons.png:skill-icons data/skill-icons.json:skill-icons; do
       path="${f%%:*}"; recipe="${f##*:}"
       if [ -f "{{justfile_directory()}}/$path" ]; then echo "  ok   $path"; ok=$((ok+1)); else echo "  MISS $path — run 'just $recipe'"; fail=$((fail+1)); fi
     done
@@ -946,3 +946,4 @@ e2e: build
     cd "{{justfile_directory()}}/web" && bun e2e/smoke.ts
     cd "{{justfile_directory()}}/web" && bun e2e/rr-smoke.ts
     cd "{{justfile_directory()}}/web" && bun e2e/mon-smoke.ts
+    cd "{{justfile_directory()}}/web" && bun e2e/items-smoke.ts

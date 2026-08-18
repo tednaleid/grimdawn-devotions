@@ -12,6 +12,7 @@
   "ui.nav.planner": "Devotion Planner",
   "ui.nav.rr": "Resistance Reduction",
   "ui.nav.monsters": "Monster Resistances",
+  "ui.nav.items": "Skill Items",
   "ui.boot.failed": "Couldn't load the planner.",
   "ui.boot.reload": "Reload",
   "ui.boot.loading": "Loading the devotion map…",

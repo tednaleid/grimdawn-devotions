@@ -119,6 +119,7 @@ async function boot() {
       nav: [
         { href: "../", label: localization.translate("ui.nav.planner") },
         { href: "../monster-resistances/", label: localization.translate("ui.nav.monsters") },
+        { href: "../items/", label: localization.translate("ui.nav.items") },
       ],
       languageHeading: localization.translate("ui.menu.language"),
       current: localization.locale,

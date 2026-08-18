@@ -788,7 +788,7 @@ try {
     "the tapped filter row shows as selected in the re-shown popover",
   );
 
-  // --- App menu: the planner must offer both sibling apps ---
+  // --- App menu: the planner must offer all three sibling apps ---
   // `a.href` reports the browser-resolved absolute URL, so a wrong relative depth shows up here,
   // and fetching each one proves the target serves rather than merely being well-formed.
   await cdp.evaluate(`document.querySelector('.app-menu-btn').click()`);
@@ -796,9 +796,10 @@ try {
     `Array.from(document.querySelectorAll('.app-menu-panel a.app-menu-nav')).map((a) => a.href)`,
   );
   const origin = new URL(BASE).origin;
-  check(navHrefs.length === 2, `the app menu links to both sibling apps (${navHrefs.length})`);
+  check(navHrefs.length === 3, `the app menu links to all three sibling apps (${navHrefs.length})`);
   check(navHrefs.includes(`${origin}/resistance-reduction/`), `it links to the RR page (${navHrefs.join(", ")})`);
   check(navHrefs.includes(`${origin}/monster-resistances/`), "it links to the monster-resistances page");
+  check(navHrefs.includes(`${origin}/items/`), "it links to the items page");
   const navStatuses = await Promise.all(navHrefs.map(async (h) => (await fetch(h)).status));
   check(
     navStatuses.every((s) => s === 200),

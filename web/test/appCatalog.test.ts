@@ -55,6 +55,7 @@ const REQUIRED = [
   "ui.nav.planner",
   "ui.nav.rr",
   "ui.nav.monsters",
+  "ui.nav.items",
   "ui.boot.failed",
   "ui.boot.reload",
   "ui.boot.loading",

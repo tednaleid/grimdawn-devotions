@@ -129,6 +129,52 @@ language. `stat-item-tags` fails loudly on a stat id it can neither derive a tag
 for nor find declared non-display, which is how a patch's new stat announces
 itself; see "Deriving a stat's game tag" in `docs/i18n.md`.
 
+## The `/items/` page dataset and effect-text model
+
+`data/skill-items.json` (`just skill-items`) and its lazily-loaded sibling
+`data/skill-items-stats.json` are the `/items/` page's own catalogue, built from the
+deposit and derived schema above rather than queried live: one row per mastery skill
+(with its rank-scaled stats and, for a summon, its pet's stat sheet) and one row per
+item that grants a skill level or attaches a modifier block. `data/stat-item-tags.json`
+(`just stat-item-tags`) is the raw stat id -> game display tag map behind every stat
+label the page shows - the SAME tags `game.<lang>.json` carries, so a card reuses the
+game's own wording in every locale instead of inventing new labels. A stat id that
+resolves to no tag and is not declared non-display fails the `stat-item-tags` build
+loudly, which is how a patch's new stat announces itself; see "Deriving a stat's game
+tag" in `docs/i18n.md`.
+
+`web/src/items/core/effectText.ts` turns one modifier block's raw stats into the card
+line the game itself would show, composed entirely from tags (`gameFormatT` `Text`
+descriptors, never a hand-written sentence), so the result is free for every locale
+`game.<lang>.json` covers. A tag's own template usually embeds its value placeholder
+(`DamageFire = "{%t0} Fire Damage"`); the plain-label tags that carry no template of
+their own (`CooldownTime = "Skill Recharge"`) compose through one of a handful of game
+composer tags (`SkillSecondFormat`, `SkillDistanceFormat`, `SkillCostFormat`, ...),
+picked per tag by the `COMPOSER` table in `effectText.ts`, each row pinned against a
+real grimtools card.
+
+A modifier block is a set of stats, not a set of lines: four rules resolve stats into
+lines, applied per call to `effectLines` (never across two blocks - see below):
+
+1. **Damage over time.** A `<family>Min` paired with a `<family>DurationMin` sibling
+   becomes one line. For the damage families the value is the product (per-second
+   damage times duration), suffixed "over N Seconds"; every other family keeps its
+   magnitude as-is (already an absolute value, not a rate), suffixed "for N Seconds".
+2. **Range.** A `<X>Min` paired with a `<X>Max` sibling collapses into one `{%t0}`
+   range line. A lone half renders as a single value - the common case.
+3. **Refresh.** `refreshCooldownAmount`/`refreshCooldownChance` (and the matching
+   duration-family pair) compose one line naming the trigger condition and, when the
+   record names a target skill, that skill by name.
+4. **Conversion.** Each `conversionPercentage`/`conversionPercentage2` on a block is
+   its own line carrying its own `from_tag`/`to_tag` pair - two conversions on one
+   block never merge, since they are genuinely separate lines on the card.
+
+Anything left over is one stat, one line. `rowEffectLines` concatenates the lines from
+several modifier blocks (an item can attach more than one block to the same skill) but
+calls `effectLines` once per block: a shared call across blocks would let one block's
+Min pair with a different block's Max and fabricate a range that never existed on
+either card.
+
 ## Known gaps
 
 - **Affix applicability** (which affixes roll on which gear) needs the
