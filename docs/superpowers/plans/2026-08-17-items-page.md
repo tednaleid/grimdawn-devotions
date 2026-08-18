@@ -791,6 +791,31 @@ test("Scarstone Memento: the same rule at a different duration", () => {
   ])).toEqual(["400 Poison Damage over 5 Seconds"]);
 });
 
+test("Eldrun's Cursed Vision: damage multiplies and says over, a debuff does neither", () => {
+  // One Storm Totem block, one duration, both rules. grimtools card:
+  //   "160 Electrocute Damage over 2 Seconds"
+  //   "25% Slow target for 2 Seconds"
+  // This is the pin for R2. A rule that multiplies every offensiveSlow family
+  // prints 50 for the slow, and "over" instead of "for".
+  expect(cardRender([
+    { stat: "offensiveSlowLightningDurationMin", value: 2 },
+    { stat: "offensiveSlowLightningMin", value: 80 },
+    { stat: "offensiveSlowTotalSpeedDurationMin", value: 2 },
+    { stat: "offensiveSlowTotalSpeedMin", value: 25 },
+  ])).toEqual([
+    "160 Electrocute Damage over 2 Seconds",
+    "25% Slow target for 2 Seconds",
+  ]);
+});
+
+test("Diremane Trophy: a reduction debuff keeps its magnitude", () => {
+  // grimtools card: "150 Reduced target's Defensive Ability for 5 Seconds"
+  expect(cardRender([
+    { stat: "offensiveSlowDefensiveAbilityDurationMin", value: 5 },
+    { stat: "offensiveSlowDefensiveAbilityMin", value: 150 },
+  ])).toEqual(["150 Reduced target's Defensive Ability for 5 Seconds"]);
+});
+
 test("Badge of the Crimson Company: the refresh line names its target and trigger", () => {
   // grimtools card: "25% Chance on Attack to reduce cooldown of Leap by 1 Second"
   expect(cardRender([
@@ -798,7 +823,10 @@ test("Badge of the Crimson Company: the refresh line names its target and trigge
       refresh_skill: "records/skills/playerclass10/leap1.dbr", refresh_trigger: "AttackEnemy" },
     { stat: "refreshCooldownChance", value: 25,
       refresh_skill: "records/skills/playerclass10/leap1.dbr", refresh_trigger: "AttackEnemy" },
-  ])).toEqual(["25% Chance on Attack to reduce cooldown of Leap by 1 Second"]);
+  // Ruling R4: the game's own template says {%.1f2}, so it yields "1.0 Second".
+  // The grimtools card trims to "1 Second"; that is the site's display choice, and
+  // the spec's principle is to reproduce the game's composition, not to invent it.
+  ])).toEqual(["25% Chance on Attack to reduce cooldown of Leap by 1.0 Second"]);
 });
 
 test("a refresh line with no target skill uses the unnamed variant", () => {
@@ -844,22 +872,44 @@ const DOT = /^offensiveSlow(.+?)(Duration)?Min$/;
 const REFRESH = /^(refreshCooldown|refreshDuration)(Amount|Chance)$/;
 
 const unit = (v: number): Text => gameT(v === 1 ? "tagSecond" : "tagSeconds");
+
+// Only these seven offensiveSlow families are damage over time, where the record
+// stores damage PER SECOND and the card shows the total. The other five that also
+// carry a DurationMin are debuffs whose magnitude is already absolute: a 25% slow
+// lasting 2 seconds is 25%, not 50%. Verified on one grimtools card, Eldrun's
+// Cursed Vision, which shows "160 Electrocute Damage over 2 Seconds" beside
+// "25% Slow target for 2 Seconds" from the same block at the same duration.
+const DOT_DAMAGE = new Set(["Bleeding", "Fire", "Cold", "Lightning", "Poison", "Life", "Physical"]);
+
+// A plain label carries no placeholder, so the value cannot ride inside it. Task 9
+// extends this with the COMPOSER table; here it is only the plain/templated split.
+function valueLine(value: number, tag: string, template: string): Text {
+  if (!/\{%/.test(template)) {
+    const label = gameT(tag);
+    // A label that already begins with its own percent takes no separator, so
+    // "% Slow target" reads "25% Slow target" rather than "25 % Slow target".
+    return template.startsWith("%") ? joinT(String(value), label) : joinT(String(value), " ", label);
+  }
+  return gameFormatT(tag, [value]);
+}
 ```
 
 Inside `renderOne`, before the range rule:
 
 ```ts
-  // Damage over time. The record stores damage per second and the card shows the
-  // total, so the line's value is the product. Pinned to Badge of the Crimson
-  // Company (150 over 2s reads 300) and Scarstone Memento (80 over 5s reads 400).
+  // A duration sibling makes one line. Damage families show the product and read
+  // "over"; every other family keeps its magnitude and reads "for".
   const dot = s.stat.match(DOT);
   if (dot && !dot[2]) {
     const dur = byId.get(`offensiveSlow${dot[1]}DurationMin`);
     if (dur) {
       used.add(dur.stat);
-      const suffix = ctx.templateOf("DamageSingleFormatTime");
-      const total = gameFormatT(tag, [s.value * dur.value]);
-      return suffix ? joinT(total, " ", gameFormatT("DamageSingleFormatTime", [dur.value])) : total;
+      const isDamage = DOT_DAMAGE.has(dot[1]!);
+      const suffixTag = isDamage ? "DamageSingleFormatTime" : "DamageFixedSingleFormatTime";
+      const head = valueLine(isDamage ? s.value * dur.value : s.value, tag, template);
+      return ctx.templateOf(suffixTag)
+        ? joinT(head, " ", gameFormatT(suffixTag, [dur.value]))
+        : head;
     }
   }
 
@@ -963,18 +1013,27 @@ export const COMPOSER: Record<string, string> = {
 };
 ```
 
-At the end of `renderOne`, replacing the unconditional return:
+Extend the `valueLine` helper Task 8 introduced. Do not add a second copy of the
+plain-versus-templated split; `valueLine` is the one place that decision is made, and
+the damage-over-time path calls it too.
 
 ```ts
-  // A plain label has no placeholder of its own, so a composer supplies the value
-  // and the unit, with the label riding in as the composer's %s1.
+function valueLine(value: number, tag: string, template: string): Text {
   if (!/\{%/.test(template)) {
+    // A composer supplies the value and its unit, with the label riding in as %s1.
     const composer = COMPOSER[tag];
-    return composer
-      ? gameFormatT(composer, [s.value, gameT(tag)])
-      : joinT(String(s.value), gameT(tag));
+    if (composer) return gameFormatT(composer, [value, gameT(tag)]);
+    const label = gameT(tag);
+    return template.startsWith("%") ? joinT(String(value), label) : joinT(String(value), " ", label);
   }
-  return gameFormatT(tag, [s.value]);
+  return gameFormatT(tag, [value]);
+}
+```
+
+Then replace `renderOne`'s unconditional final return with:
+
+```ts
+  return valueLine(s.value, tag, template);
 ```
 
 - [ ] **Step 4: Run the tests**
