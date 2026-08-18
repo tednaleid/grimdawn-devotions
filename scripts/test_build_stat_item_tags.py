@@ -12,6 +12,7 @@ from pathlib import Path
 here = Path(__file__).parent
 sys.path.insert(0, str(here))
 spec = importlib.util.spec_from_file_location("bsit", here / "build_stat_item_tags.py")
+assert spec and spec.loader
 bsit = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bsit)
 

@@ -10,6 +10,7 @@ from pathlib import Path
 
 here = Path(__file__).parent
 spec = importlib.util.spec_from_file_location("gt_audit", here / "gt_audit.py")
+assert spec and spec.loader
 gt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gt)
 

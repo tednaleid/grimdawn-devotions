@@ -9,6 +9,7 @@ from pathlib import Path
 
 here = Path(__file__).parent
 spec = importlib.util.spec_from_file_location("audit_stat_labels", here / "audit_stat_labels.py")
+assert spec and spec.loader
 audit = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(audit)
 

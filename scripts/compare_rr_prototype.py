@@ -20,6 +20,7 @@ from pathlib import Path
 here = Path(__file__).parent
 root = here.parent
 gd = importlib.util.spec_from_file_location("gd", here / "gd_dbr.py")
+assert gd and gd.loader
 gd_mod = importlib.util.module_from_spec(gd)
 gd.loader.exec_module(gd_mod)
 

@@ -307,10 +307,12 @@ check("--source vendor returns only vendor-sourced items",
 # ---------------------------------------------------------------------------
 
 core_spec = importlib.util.spec_from_file_location("gditems_core", HERE / "gditems_core.py")
+assert core_spec and core_spec.loader
 core = importlib.util.module_from_spec(core_spec)
 core_spec.loader.exec_module(core)
 
 cli_spec = importlib.util.spec_from_file_location("gditems", HERE / "gditems.py")
+assert cli_spec and cli_spec.loader
 cli = importlib.util.module_from_spec(cli_spec)
 cli_spec.loader.exec_module(cli)
 

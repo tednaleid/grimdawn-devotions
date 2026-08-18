@@ -12,6 +12,7 @@ root = here.parent
 
 def load(name, file):
     spec = importlib.util.spec_from_file_location(name, here / file)
+    assert spec and spec.loader
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod

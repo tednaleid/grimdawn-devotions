@@ -11,6 +11,7 @@ from pathlib import Path
 
 here = Path(__file__).parent
 spec = importlib.util.spec_from_file_location("bgt", here / "build_game_tables.py")
+assert spec and spec.loader
 bgt = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(bgt)
 

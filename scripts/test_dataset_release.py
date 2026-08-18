@@ -15,6 +15,7 @@ sys.path.insert(0, str(here))
 
 def load(name):
     spec = importlib.util.spec_from_file_location(name, here / f"{name}.py")
+    assert spec and spec.loader
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod

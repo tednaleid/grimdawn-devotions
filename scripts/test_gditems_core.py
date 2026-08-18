@@ -10,6 +10,7 @@ from pathlib import Path
 
 here = Path(__file__).parent
 spec = importlib.util.spec_from_file_location("core", here / "gditems_core.py")
+assert spec and spec.loader
 core = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(core)
 

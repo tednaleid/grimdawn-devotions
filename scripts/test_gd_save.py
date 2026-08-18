@@ -10,6 +10,7 @@ from pathlib import Path
 
 here = Path(__file__).parent
 spec = importlib.util.spec_from_file_location("gs", here / "gd_save.py")
+assert spec and spec.loader
 gs = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(gs)
 

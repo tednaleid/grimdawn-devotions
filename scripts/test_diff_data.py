@@ -8,6 +8,7 @@ import importlib.util
 from pathlib import Path
 
 spec = importlib.util.spec_from_file_location("diff_data", Path(__file__).parent / "diff_data.py")
+assert spec and spec.loader
 dd = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(dd)
 
