@@ -960,3 +960,62 @@ Found during the Tasks 12-13 review of the items-page build. Not fixed there bec
 predates that work and spans two pages, so it wants one change that covers both rather
 than a copy in each. The fix is to give the skeleton a rebuild path that the locale
 change calls, or to have the locale change tear down and re-render the whole view.
+
+## `/items/` effect text: the Minors from the final whole-branch review
+
+Filed rather than fixed in the final fix round, whose scope was the three Criticals
+and the two related Importants. All of these are in or around
+`web/src/items/core/effectText.ts` and are guarded, in the sense that
+`web/test/items/renderSweep.test.ts` now reads every rendered line in the dataset, so
+any of them becoming visible would fail the suite rather than ship.
+
+- **The game's own chance prefixes are not in the game tables.** `tagChanceOf` and
+  `tagChanceTo` ("{%.1f0}% Chance of/to ") exist in every shipped locale's `tags_ui.txt`,
+  and are exactly the split `effectText.ts` now makes between a clause and a noun phrase.
+  They are not in `data/i18n/game.<lang>.json` (`COMPOSER_TAGS` in
+  `scripts/build_game_tables.py` does not list them), and adding them is not just a list
+  entry: the English and German source text is `{%.1f0}% {^E}{Chance of {^H}`, and
+  `clean_text` strips the colour escapes but leaves the unbalanced `{`, which
+  `applyGameFormat` would then render literally ("10% {Chance of ..."). So the prefix is
+  an app catalog key (`items.effect.chanceOf` / `items.effect.chanceTo`) instead, which
+  means non-English locales fall back to English for those two words only. Fixing it
+  properly means teaching the table build about that escape, then a re-run of
+  `just i18n-tables`, then switching `withChance`'s `appT` call to `gameFormatT`.
+- **`RetaliationFixedSingleFormatTime` likewise.** "{%.1f0} Seconds" is the game's own
+  filler for the retaliation crowd-control slot ("{%t0} of Terrify Retaliation") and is
+  clean - no escape problem - but is also absent from `COMPOSER_TAGS`, so the same text is
+  composed app-side from the value and the game's `tagSecond`/`tagSeconds`. Adding it to
+  `COMPOSER_TAGS` and re-running `just i18n-tables` would let `durationSlot` use the tag.
+  One rendered line depends on it today (Uroboruuk's Visage, Spectral Binding).
+- **`{%t}` hardcodes its sign and precision.** `applyGameFormat`'s `t` conversion formats
+  through `fmtNumber(n, sign, precision, "f")` for a scalar but ignores the template's own
+  sign and precision for the `[min, max]` case, where it hardcodes `("", "0", "f")`. No
+  current template pairs a sign or a non-zero precision with a range on `%t`, so this is
+  latent.
+- **Latent `effectText` branch interactions with no data today.** Several branches have
+  zero real occurrences: a `Min`/`Max` pair on a crowd-control clause tag, a lone
+  `<X>Chance` on a clause tag, `refreshDuration`'s `Max` arriving before its `Amount`. Each
+  is covered by a unit test but by no real block, so a data change could exercise a path
+  nobody has seen output from.
+- **Duplicate and tautological tests.** `web/test/items/effectText.test.ts` has three tests
+  that assert the same Min/Max collapse with the operands reordered, and the "plain label
+  already carrying its own percent" case is handled by `valueLine` regardless of the
+  `COMPOSER` table, so a test built on it passes either way.
+- **`ComboChargeLevels` renders a colon mid-line.** Its label is literally "Onslaught
+  Stacks:", so the composed line reads "3 Onslaught Stacks:". The game presumably uses that
+  tag in a two-column layout the card does not have.
+- **Pet resistance sentinels render as numbers.** A pet creature record stores full
+  immunity as 500, so a panel reads "500% Fire Resistance". `docs/item-schema.md` records
+  that these sentinels are kept deliberately in `pet_ranks` and that filtering them is the
+  consumer's job; the `/items/` page is that consumer and does not filter them.
+
+## Task 9b's spark half is still open, and is smaller than the plan said
+
+`sparkChance` is suppressed by the placeholder-count guard while its `sparkMaxNumber`
+sibling renders its own separate "Affects up to N targets" line, so a card that should
+read "15% Chance of affecting up to 3 targets" reads only the second half. The plan
+(`docs/superpowers/plans/2026-08-17-items-page.md`, Task 9b) used to claim
+`sparkMaxNumber` was never carried into the payload; it is, on all 8 blocks that carry
+`sparkChance`, and `data/stat-item-tags.json` already maps it. That half is an
+`effectText.ts`-only change of the same shape as the proc-chance rule. The plan text is
+corrected; the `racialBonusRace` half of 9b really is a pipeline change and is unaffected.

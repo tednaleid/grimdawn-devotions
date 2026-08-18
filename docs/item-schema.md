@@ -153,7 +153,21 @@ composer tags (`SkillSecondFormat`, `SkillDistanceFormat`, `SkillCostFormat`, ..
 picked per tag by the `COMPOSER` table in `effectText.ts`, each row pinned against a
 real grimtools card.
 
-A modifier block is a set of stats, not a set of lines: four rules resolve stats into
+**`ModBlock.stats` stays snake_case.** `parseCatalogue` maps this whole payload to
+camelCase with exactly one documented exception: the four optional keys a modifier stat
+carries (`from_tag`, `to_tag`, `refresh_skill`, `refresh_trigger`) pass through untouched,
+because `effectText.ts`'s `ModStat` reads the emitted JSON directly. Renaming them silently
+drops the conversion pair and the refresh target, which is the shape of bug this page keeps
+producing: plausible output, green suite.
+
+**A modifier block is one (item, skill) pair, not one carrier.** `build_skill_items.py`
+merges every `modifier_record` touching that skill into one stats list, ordered by
+`modifier_record` then `stat_id`, so one block can legitimately name the same stat twice
+(Bloodlord's Blade's Possession block, `skillCooldownReduction` 100 and 5) and a carrier's
+stats sit contiguously. `effectLines` therefore identifies stats by their position in the
+list, never by stat id, and resolves a sibling by nearest unconsumed entry.
+
+A modifier block is a set of stats, not a set of lines: these rules resolve stats into
 lines, applied per call to `effectLines` (never across two blocks - see below):
 
 1. **Damage over time.** A `<family>Min` paired with a `<family>DurationMin` sibling
@@ -168,12 +182,35 @@ lines, applied per call to `effectLines` (never across two blocks - see below):
 4. **Conversion.** Each `conversionPercentage`/`conversionPercentage2` on a block is
    its own line carrying its own `from_tag`/`to_tag` pair - two conversions on one
    block never merge, since they are genuinely separate lines on the card.
+5. **Proc chance.** A `<X>Chance` whose display tag is the one its own `<X>` family's
+   value stat carries is a probability, not a magnitude, and folds into that stat's line
+   as a leading prefix ("10% Chance of 540 Poison Damage over 5 Seconds"). The catalog
+   itself answers this, through `tagOf`, so no list of families is maintained; the four
+   genuinely independent chances carry their own tag and are unaffected.
+6. **Duration slot.** The crowd-control tags put `{%t0}` mid-sentence, where it is a
+   nested TEXT slot for a duration clause rather than a number: "Petrify target{%t0}"
+   takes `DamageFixedSingleFormatTime` ("for 2 Seconds"), so the stat's value is the
+   duration, not a magnitude. The retaliation members of that family put the slot at the
+   front behind their own preposition and take a bare "N Seconds" quantity instead.
 
 Anything left over is one stat, one line. `rowEffectLines` concatenates the lines from
 several modifier blocks (an item can attach more than one block to the same skill) but
 calls `effectLines` once per block: a shared call across blocks would let one block's
 Min pair with a different block's Max and fabricate a range that never existed on
 either card.
+
+A pet panel runs the same renderer over `PetStat.max`, with one correction first
+(`petStatToModStat`): `characterAttackSpeed`, `characterRunSpeed` and
+`characterSpellCastSpeed` are engine MULTIPLIERS on a pet record (x0.79 is -21%), while
+their tags are ordinary percentage templates, and a multiplier of exactly 1.0 is no
+modifier at all rather than a bonus. Their `*Modifier` siblings on item blocks are honest
+percentages and are not converted.
+
+`web/test/items/renderSweep.test.ts` renders every modifier block and every pet panel in
+the committed dataset and fails on a value jammed onto a word, a NaN, an unsubstituted
+brace, an empty line, a dangling preposition, or two lines in one block differing only in
+their numbers. Every wrong number this page has shipped had one of those shapes; run it
+before believing a change to `effectText.ts` is safe.
 
 ## Known gaps
 

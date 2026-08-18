@@ -553,9 +553,12 @@ test("racialBonusPercentDamage is suppressed rather than truncated to a dangling
 });
 
 test("sparkChance is suppressed rather than truncated with no target count", () => {
-  // Real template: "{%.0f0}% Chance of affecting up to {%d1} targets". The target count
-  // (sparkMaxNumber) isn't carried into data/skill-items.json, so the line is dropped
-  // rather than rendering "30% Chance of affecting up to".
+  // Real template: "{%.0f0}% Chance of affecting up to {%d1} targets". valueLine supplies one
+  // value, so the two-argument template is dropped rather than rendering "30% Chance of
+  // affecting up to". Note the target count IS in the payload - sparkMaxNumber rides along on
+  // all 8 blocks that carry sparkChance, mapped to tagSparkMaxNumber, and renders its own
+  // "Affects up to N targets" line today. Folding the pair into one line is Task 9b's spark
+  // half, still deferred, and is an effectText.ts-only change (the plan used to say otherwise).
   const ctx = {
     tagOf: (s: string) => (s === "sparkChance" ? "tagSparkMaxNumberChance" : undefined),
     templateOf: (t: string) =>

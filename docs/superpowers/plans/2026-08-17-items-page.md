@@ -1154,13 +1154,22 @@ Grimtools oracle, verified 2026-08-18 on Crystallum (item level 84):
 - `"+16% Damage to Chthonics"` for `racialBonusPercentDamage`
 - `"Affects up to 5 targets"` for spark
 
-Both source values already exist in `data/deposit/facts.parquet` and are simply never
-carried forward: `racialBonusRace` (n=592) and `sparkMaxNumber` (n=77).
+`racialBonusRace` (n=592) exists in `data/deposit/facts.parquet` and is never carried
+forward, so its half of this task really is a pipeline change.
+
+The spark half is NOT. `sparkMaxNumber` is already in `data/skill-items.json` - all 6 of
+the 6 item modifier blocks carrying `sparkChance` carry it too (8 of 8 including the two
+pet ability blocks), and `data/stat-item-tags.json` already maps it to `tagSparkMaxNumber`.
+Today it renders its own separate "Affects up to N targets" line while `sparkChance` is
+suppressed by the R14 guard. Folding the two into one line is an `effectText.ts`-only fix,
+the same shape as the final round's chance-prefix rule. (An earlier revision of this task
+claimed `sparkMaxNumber` was never carried forward; it was wrong, corrected in the final
+fix round.)
 
 **Files:**
-- Modify: `scripts/build_derived.py` (the `build_skill_modifiers` query)
-- Modify: `scripts/build_skill_items.py` (per-stat emission)
-- Modify: `web/src/items/core/effectText.ts` (consume the new fields)
+- Modify: `scripts/build_derived.py` (the `build_skill_modifiers` query) - racial bonus only
+- Modify: `scripts/build_skill_items.py` (per-stat emission) - racial bonus only
+- Modify: `web/src/items/core/effectText.ts` (consume the new field; compose the spark line)
 - Test: `scripts/test_build_derived.py`, `web/test/items/effectText.test.ts`
 
 **Two traps that make this bigger than one field each:**
