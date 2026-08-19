@@ -672,7 +672,8 @@ main {
   border-color: #6cb6ff;
 }
 #import-go,
-#import-clear {
+#import-clear,
+#export-go {
   flex: none;
   background: #161d27;
   border: 1px solid #283446;
@@ -688,12 +689,14 @@ main {
     color 0.12s;
 }
 #import-go:hover,
-#import-clear:hover {
+#import-clear:hover,
+#export-go:hover {
   background: #1d2530;
   border-color: #3d4a5c;
   color: #e6edf3;
 }
-#import-go:disabled {
+#import-go:disabled,
+#export-go:disabled {
   color: #6b7688;
   cursor: default;
   pointer-events: none;
@@ -712,6 +715,40 @@ main {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: #8fb6e0;
+}
+#export-row {
+  margin-top: 0.35rem;
+}
+/* The row shares .import-row, whose `display: flex` outranks the browser's `[hidden]` rule, so the
+   hidden attribute needs an author-origin rule of its own to take effect. */
+#export-row[hidden] {
+  display: none;
+}
+#export-go {
+  flex: 1;
+}
+#export-msg {
+  margin-top: 0.35rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+}
+/* The copy button sits under the saved message on its own line, styled like the panel's other
+   buttons. */
+#export-copy {
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
+  margin-top: 0.35rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+#export-copy:hover {
+  background: #1d2530;
+  border-color: #3d4a5c;
+  color: #e6edf3;
 }
 .power,
 .tip-power {

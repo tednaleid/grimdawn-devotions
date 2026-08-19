@@ -25,6 +25,9 @@ class FakeElement {
   setAttribute(k: string, v: string) {
     this.attrs.set(k, v);
   }
+  removeAttribute(k: string) {
+    this.attrs.delete(k);
+  }
   getAttribute(k: string) {
     return this.attrs.get(k) ?? null;
   }
@@ -49,14 +52,25 @@ function mount() {
     "#import-source": new FakeElement(),
     "#import-clear": new FakeElement(),
     "#import-msg": new FakeElement(),
+    "#export-row": new FakeElement(),
+    "#export-go": new FakeElement(),
+    "#export-msg": new FakeElement(),
   } as const;
   const root = {
     innerHTML: "",
     querySelector: (sel: string) => kids[sel as keyof typeof kids],
   } as unknown as HTMLElement;
   const calls: string[] = [];
-  const handle = mountImportPanel(root, enLoc, { onSubmit: (s) => calls.push(s) });
-  return { handle, kids, calls };
+  const exports: number[] = [];
+  const copied: string[] = [];
+  const handle = mountImportPanel(root, enLoc, {
+    onSubmit: (s) => calls.push(s),
+    onExport: () => exports.push(1),
+    copyText: async (text) => {
+      copied.push(text);
+    },
+  });
+  return { handle, kids, calls, exports, copied };
 }
 
 // Types into the fake input, firing the "input" event mountImportPanel listens on to recompute
@@ -117,36 +131,36 @@ test("the done state hides the textbox and Import button, showing the source lin
   expect(kids["#import-source"].innerHTML).toBe(enLoc.translate("ui.import.source"));
 });
 
-test("a done state with a title renders it via the titled source string", () => {
+test("a done state with a title renders the title itself as the link text, with no prefix, and as the tooltip", () => {
   const { kids, handle } = mount();
   handle.setState({ kind: "done", slug: "qNYgbjeV", title: "Warder, Level 100 (GD 1.2.1.6)" });
-  expect(kids["#import-source"].innerHTML).toBe(
-    enLoc.translate("ui.import.sourceTitled", { title: "Warder, Level 100 (GD 1.2.1.6)" }),
-  );
+  expect(kids["#import-source"].innerHTML).toBe("Warder, Level 100 (GD 1.2.1.6)");
+  expect(kids["#import-source"].getAttribute("title")).toBe("Warder, Level 100 (GD 1.2.1.6)");
 });
 
-test("a done state with no title (absent, e.g. a pre-title cached worker response) falls back to the untitled source string", () => {
+test("a done state with no title (absent, e.g. a pre-title cached worker response) falls back to the untitled source string and no tooltip", () => {
   const { kids, handle } = mount();
+  handle.setState({ kind: "done", slug: "qNYgbjeV", title: "Warder" });
   handle.setState({ kind: "done", slug: "qNYgbjeV" });
   expect(kids["#import-source"].innerHTML).toBe(enLoc.translate("ui.import.source"));
+  expect(kids["#import-source"].getAttribute("title")).toBeNull();
 });
 
 test("a done state with title explicitly null falls back the same as an absent title", () => {
   const { kids, handle } = mount();
   handle.setState({ kind: "done", slug: "qNYgbjeV", title: null });
   expect(kids["#import-source"].innerHTML).toBe(enLoc.translate("ui.import.source"));
+  expect(kids["#import-source"].getAttribute("title")).toBeNull();
 });
 
-test("a title containing markup is HTML-escaped, not passed through as live tags", () => {
+test("a title containing markup is HTML-escaped in the link text, not passed through as live tags", () => {
   const { kids, handle } = mount();
   handle.setState({ kind: "done", slug: "qNYgbjeV", title: '<script>alert(1)</script> & "quoted"' });
   const rendered = kids["#import-source"].innerHTML;
   expect(rendered).not.toContain("<script>");
-  expect(rendered).toBe(
-    enLoc.translate("ui.import.sourceTitled", {
-      title: "&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quoted&quot;",
-    }),
-  );
+  expect(rendered).toBe("&lt;script&gt;alert(1)&lt;/script&gt; &amp; &quot;quoted&quot;");
+  // An attribute value is inert text, so the tooltip carries the title as-is.
+  expect(kids["#import-source"].getAttribute("title")).toBe('<script>alert(1)</script> & "quoted"');
 });
 
 // main.ts's syncImportPanel() applies a "done" state as the very first setState() call, both on
@@ -211,4 +225,124 @@ test("relocalize re-renders the source link text and a live hint that is current
   handle.setState({ kind: "idle" });
   type(kids, "https://evil.example.com/calc/qNYgbjeV");
   expect(kids["#import-msg"].innerHTML).toBe("FR:ui.import.err.badInput");
+});
+
+test("the heading is the neutral grimtools label, and the import box keeps its own aria-label", () => {
+  const { kids } = mount();
+  expect(kids["#import-h"].textContent).toBe(enLoc.translate("ui.grimtools.label"));
+  expect(kids["#import-input"].getAttribute("aria-label")).toBe(enLoc.translate("ui.import.label"));
+});
+
+test("the export button carries the catalog label and starts hidden until a state is given", () => {
+  const { kids } = mount();
+  expect(kids["#export-go"].textContent).toBe(enLoc.translate("ui.export.submit"));
+  expect(kids["#export-row"].hidden).toBe(true);
+});
+
+test("each disabled reason disables the button and shows its hint", () => {
+  const { handle, kids } = mount();
+  for (const reason of ["empty", "uncapped", "incomplete"] as const) {
+    handle.setExportState({ kind: "disabled", reason });
+    expect(kids["#export-row"].hidden).toBe(false);
+    expect(kids["#export-go"].disabled).toBe(true);
+    expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate(`ui.export.hint.${reason}`));
+  }
+});
+
+test("ready enables the button with no hint; clicking it reports an export", () => {
+  const { handle, kids, exports } = mount();
+  handle.setExportState({ kind: "ready" });
+  expect(kids["#export-go"].disabled).toBe(false);
+  expect(kids["#export-msg"].innerHTML).toBe("");
+  kids["#export-go"].fire("click");
+  expect(exports.length).toBe(1);
+});
+
+test("exporting disables the button and says so", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "exporting" });
+  expect(kids["#export-go"].disabled).toBe(true);
+  expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate("ui.export.exporting"));
+});
+
+test("each error code keeps the button enabled for a retry and shows its message", () => {
+  const { handle, kids } = mount();
+  for (const code of ["rateLimited", "network", "upstream"] as const) {
+    handle.setExportState({ kind: "error", code });
+    expect(kids["#export-go"].disabled).toBe(false);
+    expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate(`ui.export.err.${code}`));
+  }
+});
+
+test("the base error state renders its message", () => {
+  const { kids, handle } = mount();
+  handle.setExportState({ kind: "error", code: "base" });
+  expect(kids["#export-msg"].innerHTML).toBe(enLoc.translate("ui.export.err.base"));
+  expect(kids["#export-go"].disabled).toBe(false);
+});
+
+test("the saved state hides the button and explains that the link is a new build, with a copy button", () => {
+  const { kids, handle } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  expect(kids["#export-row"].hidden).toBe(true);
+  expect(kids["#export-msg"].innerHTML).toContain(enLoc.translate("ui.export.saved"));
+  expect(kids["#export-msg"].innerHTML).toContain(
+    `<button id="export-copy" type="button">${enLoc.translate("ui.export.copy")}</button>`,
+  );
+});
+
+test("clicking the copy button copies the saved build's calculator link and confirms in place", async () => {
+  const { kids, handle, copied } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  const button = { id: "export-copy", textContent: enLoc.translate("ui.export.copy") };
+  kids["#export-msg"].fire("click", { target: button });
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(copied).toEqual(["https://www.grimtools.com/calc/Ze9aYq0Z"]);
+  expect(button.textContent).toBe(enLoc.translate("ui.export.copied"));
+});
+
+test("a click elsewhere in the export message, or a copy click outside the saved state, copies nothing", () => {
+  const { kids, handle, copied } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  kids["#export-msg"].fire("click", { target: { id: "something-else" } });
+  handle.setExportState({ kind: "ready" });
+  kids["#export-msg"].fire("click", { target: { id: "export-copy" } });
+  expect(copied).toEqual([]);
+});
+
+test("leaving the saved state clears its message", () => {
+  const { kids, handle } = mount();
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  handle.setExportState({ kind: "hidden" });
+  expect(kids["#export-msg"].innerHTML).toBe("");
+  handle.setExportState({ kind: "saved", slug: "Ze9aYq0Z" });
+  handle.setExportState({ kind: "ready" });
+  expect(kids["#export-row"].hidden).toBe(false);
+  expect(kids["#export-msg"].innerHTML).toBe("");
+});
+
+test("hidden removes the whole export row and clears its message", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "error", code: "network" });
+  handle.setExportState({ kind: "hidden" });
+  expect(kids["#export-row"].hidden).toBe(true);
+  expect(kids["#export-msg"].innerHTML).toBe("");
+});
+
+test("the export row is independent of the import state: it can show in both State A and State B", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "ready" });
+  handle.setState({ kind: "done", slug: "qNYgbjeV" });
+  expect(kids["#export-row"].hidden).toBe(false);
+  handle.setState({ kind: "idle" });
+  expect(kids["#export-row"].hidden).toBe(false);
+});
+
+test("relocalize re-renders the export label and a hint that is currently showing", () => {
+  const { handle, kids } = mount();
+  handle.setExportState({ kind: "disabled", reason: "incomplete" });
+  handle.relocalize({ ...enLoc, translate: (k: string) => `FR:${k}` } as never);
+  expect(kids["#export-go"].textContent).toBe("FR:ui.export.submit");
+  expect(kids["#export-msg"].innerHTML).toBe("FR:ui.export.hint.incomplete");
 });

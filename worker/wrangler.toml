@@ -17,3 +17,16 @@ ALLOWED_ORIGIN = "https://tednaleid.github.io"
 # The production origin the worker allows in Access-Control-Allow-Origin. Overridden for local
 # development by worker/.dev.vars (gitignored - see worker/README.md "Running locally" for the
 # exact file to create), so `just serve`'s localhost origin is not blocked by CORS.
+
+# Export brakes (POST /export). Two bindings because each carries one limit: per client address, and
+# for everyone together so a crowd cannot turn the route into a firehose at grimtools. Per Cloudflare
+# location and eventually consistent, which is fine for a brake. `wrangler dev --local` simulates them.
+[[ratelimits]]
+name = "EXPORT_LIMITER_IP"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }
+
+[[ratelimits]]
+name = "EXPORT_LIMITER_GLOBAL"
+namespace_id = "1002"
+simple = { limit = 60, period = 60 }

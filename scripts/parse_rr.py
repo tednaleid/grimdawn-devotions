@@ -86,6 +86,45 @@ def parse_array(raw: str) -> list:
     return out
 
 
+SKILLS_ROOT = "records/skills/"
+
+
+def _dbr_refs(raw: str) -> list[str]:
+    """Every ';'-separated record reference in one field value."""
+    out = []
+    for part in raw.split(";"):
+        ref = part.replace("\\", "/").strip()
+        if ref.endswith(".dbr"):
+            out.append(ref)
+    return out
+
+
+def _skill_refs(raw: str) -> list[str]:
+    """The ';'-separated record references in one field value that point under records/skills/."""
+    return [ref for ref in _dbr_refs(raw) if ref.startswith(SKILLS_ROOT)]
+
+
+def _linked_skills(db, ref, depth=3) -> list[str]:
+    """`ref` plus every record its buffSkillName/petSkillName chain reaches. A skill that
+    applies a buff, or an item's SkillSecondary_PetModifier shell whose petSkillName holds
+    the record that actually carries the stats, is the same effect as the record it points
+    at, so both resolve to the same granting item and the same modified skill."""
+    out: list[str] = []
+    seen: set[str] = set()
+    stack = [(ref, depth)]
+    while stack:
+        cur, d = stack.pop()
+        cur = cur.replace("\\", "/").strip()
+        if not cur or cur in seen or d < 0 or not cur.startswith(SKILLS_ROOT):
+            continue
+        seen.add(cur)
+        out.append(cur)
+        rec = db.get(cur)
+        for f in ("buffSkillName", "petSkillName"):
+            stack += [(r, d - 1) for r in _skill_refs(rec.get(f, ""))]
+    return out
+
+
 def iter_skill_records(db: DB):
     """Yield (posix record path like 'records/skills/...', parsed record) for every .dbr under skills."""
     skills_root = db.root / "records/skills"
@@ -220,8 +259,17 @@ def build_modifier_base(db):
     return mmap
 
 
+# skillNameNN lists a record's sub-skills. On a pet (or its player-scaling record) that list
+# IS the pet's ability set, so a pet-borne modifier sits beside the aura that applies the
+# debuff (Raging Tempest beside the Wind Devil's whirlwind aura) and there is no class-tree
+# link to prove it enemy-facing. Elsewhere skillNameNN is a wide edge (a whole class tree),
+# so we follow it only from these two classes: a wrongly proven source ships a wrong row.
+PET_SKILL_LIST_CLASSES = {"Pet", "PetPlayerScaling"}
+
+
 def _reaches_debuff(db, ref, depth=4) -> bool:
-    """True when a skill (or its buffSkillName/petSkillName chain) is a debuff template."""
+    """True when a skill (or its buffSkillName/petSkillName chain, plus a pet's skillNameNN
+    ability list) is a debuff template."""
     seen = set()
     stack = [(ref, depth)]
     while stack:
@@ -233,8 +281,10 @@ def _reaches_debuff(db, ref, depth=4) -> bool:
         rec = db.get(cur)
         if template_name(rec) in DEBUFF_TEMPLATES:
             return True
-        for f in ("buffSkillName", "petSkillName"):
-            nxt = rec.get(f, "").strip()
+        nxts = [rec.get(f, "").strip() for f in ("buffSkillName", "petSkillName")]
+        if rec.get("Class", "").strip() in PET_SKILL_LIST_CLASSES:
+            nxts += [v.strip() for k, v in rec.items() if re.fullmatch(r"skillName\d+", k)]
+        for nxt in nxts:
             if nxt:
                 stack.append((nxt, d - 1))
     return False
@@ -461,9 +511,18 @@ def build_item_skill_map(db):
     whose skills carry the debuff). So we walk each named skill forward through every
     ';'-separated .dbr under records/skills/itemskills*, attributing those reached records
     to the same item, so item-granted buffs/pet skills get the item parent instead of
-    falling back to their internal skill name. When several items grant one skill at
-    different ranks (a base item and its higher-level Mythical version), the highest-level
-    grant wins, so the row shows the top-tier value and names the item that provides it."""
+    falling back to their internal skill name.
+
+    An item's modifier to a pet skill leaves itemskills entirely: the named record is a
+    three-key SkillSecondary_PetModifier shell whose petSkillName points at the real carrier
+    under records/skills/playerclassNN/pets/ (Hexflame's Thermite Mine modifier lives there).
+    So buffSkillName/petSkillName are followed anywhere under records/skills/, while the
+    walk over every other field stays inside itemskills, where an arbitrary reference is
+    item-owned by construction. The walk only starts at an itemskills record: an item that
+    names a class skill directly is merely granting it (a medal casting War Cry), and that
+    skill stays owned by its mastery. When several items grant one skill at different ranks
+    (a base item and its higher-level Mythical version), the highest-level grant wins, so the
+    row shows the top-tier value and names the item that provides it."""
     m: dict[str, dict] = {}
     items_root = db.root / "records/items"
     for p in sorted(items_root.rglob("*.dbr")):
@@ -472,7 +531,7 @@ def build_item_skill_map(db):
         level, controller, mythical = _item_grant_meta(rec)
         for f in ITEM_SKILL_FIELDS:
             v = rec.get(f, "").replace("\\", "/").strip()
-            if not v.endswith(".dbr"):
+            if not v.endswith(".dbr") or "/itemskills" not in v:
                 continue
             grant = {"item": rel, "is_mod": f.startswith("modifierSkillName"),
                      "level": level, "controller": controller, "mythical": mythical}
@@ -483,14 +542,12 @@ def build_item_skill_map(db):
                 if cur in seen or "/itemskills" not in cur:
                     continue
                 seen.add(cur)
-                prev = m.get(cur)
-                if prev is None or (grant["level"] or 0) > (prev["level"] or 0):
-                    m[cur] = grant
+                for reached in _linked_skills(db, cur):
+                    prev = m.get(reached)
+                    if prev is None or (grant["level"] or 0) > (prev["level"] or 0):
+                        m[reached] = grant
                 for vv in db.get(cur).values():
-                    for part in vv.split(";"):
-                        ref = part.replace("\\", "/").strip()
-                        if ref.endswith(".dbr") and "/itemskills" in ref:
-                            stack.append(ref)
+                    stack += [r for r in _skill_refs(vv) if "/itemskills" in r]
     return m
 
 
@@ -555,16 +612,14 @@ def _apply_proc(db, s, controller):
 
 
 def attribute_items(db, tags, game_en, sources):
-    """Override category/parent for item-owned RR sources. Only skills under
-    records/skills/itemskills are item-owned; a class or devotion skill that an item
-    merely references (grants +skills to, e.g. gloves referencing War Cry -> Break Morale)
-    keeps its intrinsic category. A granted skill is valued at the rank its item pins,
-    attributed to the highest-level (Mythical when Tier 3) granting item, and carries that
-    item's proc chance and trigger condition when it procs."""
+    """Override category/parent for item-owned RR sources: those the item-skill walk reaches
+    from an item's own itemSkillName/augmentSkillName/modifierSkillName. A class or devotion
+    skill an item merely references (grants +skills to, e.g. gloves referencing War Cry ->
+    Break Morale) is not on that walk and keeps its intrinsic category. A granted skill is
+    valued at the rank its item pins, attributed to the highest-level (Mythical when Tier 3)
+    granting item, and carries that item's proc chance and trigger condition when it procs."""
     m = build_item_skill_map(db)
     for s in sources:
-        if "/itemskills" not in s["record_path"]:
-            continue
         grant = m.get(s["record_path"])
         if not grant:
             continue
@@ -583,7 +638,10 @@ def attribute_items(db, tags, game_en, sources):
 def build_modifier_modified(db):
     """modifier skill record_path -> the skill it modifies, read from item
     modifierSkillNameN/modifiedSkillNameN pairs. Lets a nameless item skill modifier
-    borrow the modified skill's display name (a Doom Bolt modifier reads as 'Doom Bolt')."""
+    borrow the modified skill's display name (a Doom Bolt modifier reads as 'Doom Bolt').
+    A pet-skill modifier is named through a shell that carries nothing but a petSkillName,
+    so the record that chain reaches borrows the same skill (Veilpiercer's rift hound
+    modifier reads as 'Summon Hellhound')."""
     out: dict[str, str] = {}
     items_root = db.root / "records/items"
     for p in sorted(items_root.rglob("*.dbr")):
@@ -592,7 +650,8 @@ def build_modifier_modified(db):
             mod = rec.get(f"modifierSkillName{i}", "").replace("\\", "/").strip()
             base = rec.get(f"modifiedSkillName{i}", "").replace("\\", "/").strip()
             if mod.endswith(".dbr") and base.endswith(".dbr"):
-                out.setdefault(mod, base)
+                for reached in _linked_skills(db, mod):
+                    out.setdefault(reached, base)
     return out
 
 
@@ -605,21 +664,64 @@ def _humanize(rec_path: str) -> str:
     return " ".join(w.capitalize() for w in words) or stem
 
 
-# A "Conduit" amulet grants one random skill modifier drawn from a folder its item record
-# does not link back to (the pool is wired through dynamic loot tables), so build_item_skill_map
-# can only reach the nameless roll affix. Map the modifier folder to the granting amulet so those
-# rows name the item the player equips. Verified exhaustive: eldritchwhispers is the only RR
-# modifier folder granted purely via lootrandomizer pools (re-check on a new version / new Conduits).
-MODIFIER_POOL_ITEMS = {
-    "/eldritchwhispers/": "records/items/gearaccessories/necklaces/d113c_necklace.dbr",
-}
+LOOT_TABLES_ROOT = "records/items/loottables/"
+
+
+def build_loot_pool_items(db):
+    """skill record_path -> the item whose random affix roll grants that skill.
+
+    A "Conduit" amulet grants one skill modifier drawn at random from a pool its item record
+    never links to, so build_item_skill_map only ever reaches the nameless roll affix. The
+    wiring runs the other way, through a dynamic loot table that names both the item it rolls
+    (lootNameN) and the affix tables rolled onto it (prefix/suffixTableNameN). So walk that
+    table -> each affix table's randomizerNameN entries -> each affix's modifierSkillNameN, and
+    every skill that chain reaches belongs to the item the same loot table names.
+
+    There are ten Conduits, one per mastery, each rolling only its own mastery's affix table
+    (d113f is the Shaman one, d113g the Inquisitor one), so the amulet has to be read from the
+    data per modifier, never assumed. Deriving it keeps an eleventh Conduit, or a new pool
+    entirely, correct with no code change. A table naming more than one item, or a skill two
+    tables reach naming different items, is ambiguous: leave it unattributed rather than name
+    a wrong item, which sends a player farming the wrong amulet.
+    """
+    out: dict[str, str] = {}
+    ambiguous: set[str] = set()
+    for p in sorted((db.root / LOOT_TABLES_ROOT).rglob("*.dbr")):
+        rec = db.get(p.relative_to(db.root).as_posix())
+        items: set[str] = set()
+        affix_tables: set[str] = set()
+        for field, raw in rec.items():
+            if field.startswith("lootName"):
+                # A nested loot table is a branch of the roll, not the item it yields.
+                items |= {r for r in _dbr_refs(raw) if not r.startswith(LOOT_TABLES_ROOT)}
+            elif field.startswith(("prefixTableName", "suffixTableName")):
+                affix_tables |= set(_dbr_refs(raw))
+        if len(items) != 1 or not affix_tables:
+            continue
+        item = next(iter(items))
+        for table in sorted(affix_tables):
+            for field, raw in db.get(table).items():
+                if not field.startswith("randomizerName"):
+                    continue
+                for affix in _dbr_refs(raw):
+                    affix_rec = db.get(affix)
+                    for i in range(1, 6):
+                        for mod in _skill_refs(affix_rec.get(f"modifierSkillName{i}", "")):
+                            for reached in _linked_skills(db, mod):
+                                if out.setdefault(reached, item) != item:
+                                    ambiguous.add(reached)
+    for skill in ambiguous:
+        del out[skill]
+    return out
 
 
 def _display_name_tag(db, skill_path, depth=2):
     """The skillDisplayName tag for a skill, following buffSkillName when the skill record
     itself is unnamed - a skill's name often lives on the buff it applies (the internal
-    'lightningnet1' skill is nameless; its buff is 'Storm Box of Elgoloth'). None if
-    nothing in the short chain names it."""
+    'lightningnet1' skill is nameless; its buff is 'Storm Box of Elgoloth'). None if nothing
+    in the short chain names it. An item's pet-modifier shell carries no name of its own
+    either, but resolve_names reaches it through build_modifier_modified, whose _linked_skills
+    walk already follows petSkillName, so this chain never needs to."""
     seen = set()
     cur = skill_path
     for _ in range(depth + 1):
@@ -643,6 +745,7 @@ def resolve_names(db, tags, game_en, sources, mmap):
     constellation), with a humanized stem as the final resort - so no source ever shows a
     raw synthesized key and an item skill modifier reads as the skill it augments."""
     modmod = build_modifier_modified(db)
+    pool_items = build_loot_pool_items(db)
     for s in sources:
         rec = db.get(s["record_path"])
         if not rec.get("skillDisplayName", "").strip():
@@ -654,15 +757,15 @@ def resolve_names(db, tags, game_en, sources, mmap):
                 s["name"] = s["parent"]
             else:
                 s["name"] = register(_humanize(s["record_path"]), None, game_en)
-        # Attribute a Conduit's random-roll modifier to the amulet the player equips, and flag it:
-        # the amulet rolls ONE augment from a pool, so this source needs that specific roll (identified
-        # by its skill + damage type + value), not merely any copy of the amulet.
-        for folder, item_path in MODIFIER_POOL_ITEMS.items():
-            if folder in s["record_path"]:
-                s["parent"] = _item_name_descriptor(tags, game_en, db.get(item_path), s["name"])
-                s["category"] = "item skill modifier"
-                s["notes"] = f"random-roll; {s['notes']}".strip("; ")
-                break
+        # Attribute a random-roll modifier to the item its loot table rolls it onto (the Conduit
+        # amulet the player equips), and flag it: the amulet rolls ONE augment from a pool, so
+        # this source needs that specific roll (identified by its skill + damage type + value),
+        # not merely any copy of the amulet.
+        pool_item = pool_items.get(s["record_path"])
+        if pool_item:
+            s["parent"] = _item_name_descriptor(tags, game_en, db.get(pool_item), s["name"])
+            s["category"] = "item skill modifier"
+            s["notes"] = f"random-roll; {s['notes']}".strip("; ")
         # An unresolved parent (no real item/mastery/constellation) collapses to the name,
         # so the UI never shows a synthesized key in either column.
         if s["parent"].startswith("x:"):
@@ -855,7 +958,10 @@ def main(argv=None) -> int:
         "game_version": args.game_version,
         "steam_buildid": args.steam_buildid,
         "generated_utc": _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "berserker_present": (db.root / "records/skills/playerclass13").is_dir(),
+        # Berserker (Fangs of Asterkarn) is playerclass10, not playerclass13: the mastery
+        # numbering is dense and gdx3 continued it. tagGDX3Class10SkillName00A is "Berserker".
+        # The old probe named a directory that has never existed, so this always read false.
+        "berserker_present": (db.root / "records/skills/playerclass10").is_dir(),
     }
     doc = {"meta": meta, "sources": sources}
     args.out.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")

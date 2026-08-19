@@ -5,11 +5,13 @@ Each item includes implementation pointers for whoever picks it up. This file
 is future work ONLY: shipped features and their history live in the code, in
 git history, and in the reference docs under `docs/`.
 
-## Grimtools import: deferred follow-ups
+## Grimtools import/export: deferred follow-ups
 
 Shipped: paste a grimtools calc link or slug to load its devotions, with `gt=`
-provenance in the hash and a link back to the source build. See
-`docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`.
+provenance in the hash and a link back to the source build. Also shipped: one-click
+export of a legal selection to a fresh grimtools build, associated the same way as
+`gt=`. See `docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`
+(import) and `docs/superpowers/specs/2026-08-16-grimtools-export-design.md` (export).
 
 - **No e2e leg for the import wiring.** The core parsing, the mapping and the panel
   adapter are unit tested, but nothing drives the three together in a browser. Belongs
@@ -29,6 +31,34 @@ provenance in the hash and a link back to the source build. See
   point may not match). Not fixed here, since it needed real UX judgment (disable the
   input while loading? cancel-and-restart? a request token?) that was out of scope for
   a review-fix pass.
+- Export: cross-session duplicate detection is impossible without a way to read a
+  build's stars back and compare; if it ever matters, the worker's `GET /` already
+  returns them, so "compare on demand when a `gt=` link is restored" is one fetch
+  (`web/src/app/main.ts` `knownBuilds`).
+- Export: the payload is a fresh level-100 character. If grimtools changes its
+  Share defaults (`bio` numbers), update `savePayload`'s fixture test from a fresh
+  capture (spec 2026-08-16, "What the investigation established").
+- Export: the rate limits (5/min per address, 60/min global) are guesses; revisit
+  from worker analytics if real users hit them.
+- Export has no data-version guard. Import refuses a stale mapping table by comparing
+  the worker's reading of `devotion.json`'s version against the table's; export sends
+  the table's `sk` ids with no such check, so a grimtools data update would silently
+  produce a build of the wrong stars. The worker already reads that version on the
+  import route, so a `?dv=` check on `/export` (refuse with a distinct error when it
+  differs from the planner's table version) is small. Until then the daily canary is
+  the only alarm.
+- The controller's export logic has no unit tests: `selectionKey`, the `knownBuilds`
+  memo and `exportStateFor`'s precedence (plus the "pinned to the selection it was made
+  from" rule) all live inside `boot()` in `web/src/app/main.ts`, which has no test
+  harness. Lifting those three into a small pure module would make them testable
+  without one. The round trip added `readBuild`, `ensureSourceRead`, the `remove`
+  computation and the base data-version refusal to that untested surface.
+- grimtools' own "Devotion path" panel reported "There's no way to include all selected
+  constellations with only 55 devotion points" for an exported 53-star build
+  (`https://www.grimtools.com/calc/2d1W1Q8V`, the forum link with Lion completed) that
+  our oracle proves has a legal 55-point schedule; stars, points and affinities matched.
+  Worth checking whether their path finder ignores refundable scaffolding, and whether
+  the game accepts our schedule for that build (docs/reachability-engine.md playbook).
 
 ## Map / List view toggle
 
@@ -1052,3 +1082,25 @@ notion of the carrier's `Class`, so honouring both readings needs either a
 context-sensitive map or a rule in `effectText.ts` that suppresses the stat when a
 `skillLifePercent` sibling is present. `skillLifeBonusBuffDuration` (20 records) is the
 same shape and the same open question.
+
+## `just check` does not run the script tests
+
+`check: fmt-check test lint lint-py typecheck` leaves out `test-scripts`, so the
+pre-commit hook runs none of the twelve `scripts/test_*.py` suites. Every oracle
+over the extracted game data is therefore advisory: a parser change that silently
+mislabels rows can be committed and pushed with a green hook. The Conduit amulet
+bug (every Conduit RR row named for the Occultist amulet) shipped through exactly
+that gap.
+
+Blocked on a pre-existing failure, not on the wiring. `just test-scripts` aborts
+early because `scripts/test_parse_monsters.py` has count drift against the
+1.3.0.7 dataset; adding `test-scripts` to `check` today would block every commit
+in the repo. Fix the monster count drift first, then append `test-scripts` to the
+`check` recipe.
+
+Note the suite is a no-op without a local game install: each test skips itself
+when `extracted/records` is absent, so this gate only bites on Windows machines
+that have run `just extract`. That is the same audience that regenerates the
+datasets, which is the audience that needs the gate.
+
+Pointers: the `check` recipe and the `test-scripts` recipe in `justfile`.

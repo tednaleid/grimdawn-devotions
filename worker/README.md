@@ -1,10 +1,14 @@
 # grimdawn-devotions-import
 
 A small Cloudflare Worker that lets the planner import a devotion build from a
-grimtools calculator link. Grimtools serves those pages with
-`Access-Control-Allow-Origin` locked to its own origin, so a browser on our site
-cannot read them directly. This worker fetches the page server-side and hands back
-the build's skill ids.
+grimtools calculator link, and export the planner's current selection as a fresh
+grimtools build. Grimtools locks `Access-Control-Allow-Origin` to its own origin on
+both the calculator pages and its save endpoint, so a browser on our site can read
+neither directly - a POST from our origin to the save endpoint would either be
+preflighted and refused or sent as an opaque response we cannot read. So, as with
+import, a cooperating server is required for export too. This worker fetches a
+build's page server-side and hands back its skill ids, and posts a selection to
+grimtools' save endpoint server-side and hands back the resulting slug.
 
 Contract: `GET /?slug=<slug>&v=<contract version>` returns
 `{ slug, skills: ["sk688", ...], gameVersion, dataVersion, title }`. `skills` is every
@@ -19,6 +23,27 @@ response served from an entry cached before the field existed predates it entire
 below) - present purely so the app can bust its own browser cache; the worker never
 reads it.
 
+Export contract: `POST /export?v=<contract version>` with JSON body
+`{ skills: ["sk739", ...], base?: { slug, remove: ["sk699", ...] } }` (`skills` 1 to 55
+distinct `sk<digits>` ids, `remove` 0 to 128 distinct ids, `slug` in the slug charset, at
+most 4 KB, `Origin` equal to `ALLOWED_ORIGIN`) returns `201 { slug }`. Without `base` the
+worker posts a fresh level-100 character holding exactly `skills`, in the shape the
+calculator's own Share button uses (`savePayload` in `web/src/core/grimtools.ts`). With
+`base` it reads that build's page, drops the `skills` entries named in `remove` (the
+planner's statement of which of the base's ids are devotion stars; the worker cannot tell),
+appends `skills`, fixes `bio.devotionPoints`, drops a celestial-power binding only when
+its star is not in the new selection (a star removed and requested again keeps its
+binding), and posts everything else exactly as grimtools wrote it (`spliceDevotions`, same
+file). An old worker deployment ignores an unknown `base` field and saves a fresh
+devotions-only build with no error, so while the two deploys race the planner can mint a
+bare build for a minute or two; the Pages bundle and the worker deploy from the same push,
+so the window closes on its own. Errors: `400 bad_request`, `403 forbidden`, `429 rate_limited`, `502 upstream`
+(grimtools failed, redirected, or timed out, for the save or for the base page) or
+`502 unparseable` (grimtools answered without a valid id, or the base page could not be
+read or spliced). Never cached. Rate limits are the two `[[ratelimits]]` bindings in
+`wrangler.toml` (per address and global); `wrangler dev --local` simulates them, and the
+handler treats an absent binding as unlimited so tests need no runtime.
+
 ## Slug, never a URL
 
 The worker takes a `slug` (`^[A-Za-z0-9_-]{1,24}$`) and builds the grimtools URL from
@@ -26,7 +51,10 @@ a hardcoded constant. It has no parameter that can name a host, so there is no c
 path that fetches anywhere but grimtools — it cannot be turned into an open proxy or
 an SSRF relay. See `docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`
 ("Part 2: the worker") for the full security rationale, including why it never
-returns upstream bytes, how it caches, and how it bounds its own work.
+returns upstream bytes, how it caches, and how it bounds its own work. The export route
+is the same: the save URL is a constant, a base is named by slug and fetched from the
+same constant host, and the only caller-controlled bytes are validated skill ids inside
+the JSON `data` field.
 
 ## Changing the response shape
 

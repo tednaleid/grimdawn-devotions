@@ -146,11 +146,39 @@ check("no source shows a raw x: placeholder name", len(synth_names) == 0)
 doombolt = find(lambda s: s["record_path"].endswith("skillmodifiers/legendary/axe2h_d206_doombolt.dbr"))
 tag = doombolt[0]["name"] if doombolt else ""
 check("doom bolt modifier borrows the modified skill's name tag", tag.startswith("tag"))
-# The Conduit of Eldritch Whispers rolls a random skill modifier from a folder its item record
-# does not link back to; those modifiers are attributed to the amulet (a distinct real name).
-conduit = find(lambda s: "/eldritchwhispers/" in s["record_path"])
-check("conduit modifiers attribute to the amulet, not the skill",
-      conduit and all(c["parent"].startswith("tag") and c["parent"] != c["name"] for c in conduit))
+# A Conduit rolls a random skill modifier from a pool its item record does not link back to;
+# those modifiers are attributed to the amulet (a distinct real name) by walking the loot table.
+conduit = find(lambda s: "eldritchwhispers" in s["record_path"])
+check("conduit modifiers attribute to an amulet, not the skill",
+      conduit and all(c["parent"].startswith("tagGDX") and "NecklaceD113" in c["parent"]
+                      and c["parent"] != c["name"] and "random-roll" in c["notes"]
+                      for c in conduit))
+# There are ten Conduits, one per mastery, and each rolls only its own mastery's affix table.
+# A regression to a single hardcoded amulet passes every check above, so pin the spread: the
+# rows must name several distinct amulets, and each mastery's modifier must name its own.
+check("conduit modifiers name more than one amulet (not one hardcoded necklace)",
+      len({c["parent"] for c in conduit}) >= 5)
+# The pool's pet-skill modifiers sit beside the pet's other modifiers, outside the
+# eldritchwhispers folder, and must reach their own amulet just the same. Shaman rolls from
+# d113f (Wild), Inquisitor from d113g (Runic), Oathkeeper from d113i (Divine).
+check("the shaman conduit's pet-skill modifier names the Wild amulet (d113f)",
+      find(lambda s: s["record_path"].endswith("pets/modifier_eldritchwhispers_set1_shaman5.dbr")
+           and s["parent"] == "tagGDX1NecklaceD113F" and "random-roll" in s["notes"]))
+check("the inquisitor conduit's pet-skill modifier names the Runic amulet (d113g)",
+      find(lambda s: s["record_path"].endswith("pets/modifier_eldritchwhispersset1_inquisitor5.dbr")
+           and s["parent"] == "tagGDX1NecklaceD113G" and "random-roll" in s["notes"]))
+check("the oathkeeper conduit's pet-skill modifier names the Divine amulet (d113i)",
+      find(lambda s: s["record_path"].endswith("pets/modifier_eldritchwhispers_set1_oathkeeper3.dbr")
+           and s["parent"] == "tagGDX2NecklaceD113I" and "random-roll" in s["notes"]))
+# The Occultist rows are the ones that were right by accident under the old single-amulet map;
+# keep them pinned so the walk is not merely spreading rows onto the wrong amulets.
+check("the occultist conduit modifier still names the Eldritch amulet (d113c)",
+      find(lambda s: s["record_path"].endswith("eldritchwhispers/set2_occultist4.dbr")
+           and s["parent"] == "tagGDX1NecklaceD113C"))
+# The loot-table walk is generic; it must not sweep unrelated RR rows onto a random-roll item.
+check("only conduit rows are flagged random-roll",
+      all("eldritchwhispers" in s["record_path"]
+          for s in find(lambda s: "random-roll" in s["notes"])))
 
 # --- item-granted skills valued at the rank the item pins, not the skill's max rank ---
 # Scion of Bitter Winds: base grants the debuff at rank 1 (-8%), the Tier-3 Mythical at
@@ -199,8 +227,45 @@ check("Vulnerability survives the modifier cleanup",
       any(s["record_path"].endswith("curse2.dbr") for s in mods))
 check("Night's Chill survives the modifier cleanup",
       any(s["record_path"].endswith("veilofshadows2.dbr") for s in mods))
-check("the Inquisitor Seal item modifiers were excluded",
-      not find(lambda s: "inquisitorseal" in s["record_path"]))
+# An Inquisitor Seal modifier whose granting item exists is kept and names that item; the ones
+# behind a skill-modifier shell no item in this build references stay withheld.
+check("a granted Inquisitor Seal item modifier names its item (Ascendant Hood)",
+      find(lambda s: s["record_path"].endswith("pets/modifier_head_b101_inquisitorseal.dbr")
+           and s["parent"] == "tagGDX1HeadB101" and s["value_at_max"] == -10))
+check("an Inquisitor Seal modifier no item references stays withheld",
+      not find(lambda s: s["record_path"].endswith("pets/modifier_set_d205_inquisitorseal.dbr")))
+
+# --- pet-borne skill modifiers reach the enemy through the pet's own ability list ---
+# Raging Tempest and Hellfire Mine carry their RR on a skill_modifier attached to a summoned
+# pet, not on a class-tree skill: the only proof they face an enemy is that the pet's
+# skillNameNN list also holds the aura whose buff is a debuff template.
+tempest = find(lambda s: s["record_path"].endswith("pets/petskill_whirlwind_exposure.dbr"))
+check("raging tempest stacking elemental base -30 (rank 12) / overcap -40 (rank 22)",
+      len(tempest) == 1 and tempest[0]["value_at_max"] == -30
+      and tempest[0]["value_at_ultimate"] == -40 and tempest[0]["resistances"] == "Elemental"
+      and tempest[0]["name"] == "tagClass06SkillName04B")
+hellfire = find(lambda s: s["record_path"].endswith("pets/thermitemine_skill_flare2.dbr"))
+check("hellfire mine stacking aether+chaos base -35 (rank 12) / overcap -45 (rank 22)",
+      len(hellfire) == 2
+      and all(s["value_at_max"] == -35 and s["value_at_ultimate"] == -45 for s in hellfire)
+      and {tuple(s["resistances"]) for s in hellfire} == {("Aether",), ("Chaos",)})
+
+# --- an item's modifier to a pet skill, reached through its SkillSecondary_PetModifier shell ---
+# Hexflame modifies Thermite Mine; the record carrying the RR lives under the Demolitionist pet
+# folder, so it must resolve to the item (subname) and the skill it modifies (name).
+hexflame = find(lambda s: s["record_path"].endswith("pets/modifier_thermitemine_casterf110.dbr"))
+check("hexflame's thermite mine modifier is -20 Fire and -20 Chaos, named for item + skill",
+      len(hexflame) == 2
+      and all(s["name"] == "tagClass02SkillName06A" and s["parent"] == "tagGDX1WeaponCaster1hF110"
+              and s["category"] == "item skill modifier" and s["value_at_max"] == -20
+              for s in hexflame)
+      and {tuple(s["resistances"]) for s in hexflame} == {("Fire",), ("Chaos",)})
+# The same wiring once shipped this row as 'Occultist' modifying 'Occultist'; it is Veilpiercer's
+# modifier to Summon Hellhound.
+veil = find(lambda s: s["record_path"].endswith("pets/modifier_caster_d108_summonrifthound.dbr"))
+check("veilpiercer's hellhound modifier names the item, not the bare mastery",
+      len(veil) == 1 and veil[0]["name"] == "tagClass03SkillName02A"
+      and veil[0]["parent"] == "tagGDX1WeaponCaster1hD102" and veil[0]["value_at_max"] == 44)
 
 # --- collapse_redundant_sources: the three dedup rules (pure) ---
 def _src(rp, name, parent, rr_type, res, vmax, notes=""):
