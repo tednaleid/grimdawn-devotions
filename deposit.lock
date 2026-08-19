@@ -1,10 +1,10 @@
 {
-  "tag": "deposit-24756825.2",
+  "tag": "deposit-24756825.3",
   "steam_buildid": "24756825",
   "game_version": "1.3.0.7",
   "schema_version": "2",
-  "published_utc": "2026-08-17T04:24:35Z",
-  "download_base": "https://github.com/tednaleid/grimdawn-devotions/releases/download/deposit-24756825.2",
+  "published_utc": "2026-08-19T01:48:46Z",
+  "download_base": "https://github.com/tednaleid/grimdawn-devotions/releases/download/deposit-24756825.3",
   "assets": [
     {
       "name": "facts.parquet",
@@ -75,8 +75,8 @@
     {
       "name": "skills.parquet",
       "dir": "derived",
-      "sha256": "e34531fee5b481511ecbba05f15915a1910d643f8ae590a6b98e82f9c65492e2",
-      "bytes": 13430
+      "sha256": "895657cce66703d068bce4aa8ee11e991f4a625c7d067854b6781468e2c86ce6",
+      "bytes": 14644
     },
     {
       "name": "skill_ranks.parquet",
@@ -93,8 +93,26 @@
     {
       "name": "skill_modifiers.parquet",
       "dir": "derived",
-      "sha256": "5cf96551c23b60d8899eb13b049ca2f3dca2458c974dd5a304d5de7c2e040465",
-      "bytes": 72214
+      "sha256": "f3f9de6895d74a9694edae41ac5522bafc2bc0100ea8a675d10c5e85b12f3d16",
+      "bytes": 74914
+    },
+    {
+      "name": "sets.parquet",
+      "dir": "derived",
+      "sha256": "db32607614d3b1b25f32ee0c400843efbb67dc835e3b77b9d061c3500e1b9537",
+      "bytes": 1972
+    },
+    {
+      "name": "set_modifiers.parquet",
+      "dir": "derived",
+      "sha256": "a1f2f73bca4e42a4025ff798a01b869ed74fa4f3bfdfdc8e15ea863324f20137",
+      "bytes": 12346
+    },
+    {
+      "name": "set_boosts.parquet",
+      "dir": "derived",
+      "sha256": "bb23032d78b2fcdd30a6b0ddeab508bf78f06776e16d9420be3b5f989b83626e",
+      "bytes": 5484
     }
   ]
 }
