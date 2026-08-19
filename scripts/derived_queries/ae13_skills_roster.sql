@@ -19,12 +19,15 @@ WITH checks AS (
           = 0 AS groups_resolve,
         -- The load-bearing invariant behind the whole grouping rule: each group
         -- has exactly one base. Zero bases orphans a group, two makes the choice
-        -- of group_record arbitrary. Pinned at 142 groups over 311 tagged skills
-        -- plus the 4 untagged transform abilities standing alone.
+        -- of group_record arbitrary. Pinned at 150 groups over 311 tagged skills
+        -- plus the 4 untagged transform abilities standing alone. 150 and not 142
+        -- because node_kind reads the record's Class rather than its name-tag
+        -- letter: the 8 weapon-pool and mutually-exclusive skills Crate numbers as
+        -- someone else's B/C/D member are bases of their own one-member groups.
         (SELECT count(*) FROM (SELECT group_record FROM skills GROUP BY group_record
                                 HAVING count(*) FILTER (WHERE record = group_record) != 1))
           = 0 AS one_base_per_group,
-        (SELECT count(DISTINCT group_record) FROM skills) = 146 AS group_count_exact,
+        (SELECT count(DISTINCT group_record) FROM skills) = 154 AS group_count_exact,
         -- Every group's A member must itself be classified base, regardless of
         -- its Class fact (Relic Training's Class is SkillSecondary_PetModifier
         -- even though it is the sole member of its own group).
