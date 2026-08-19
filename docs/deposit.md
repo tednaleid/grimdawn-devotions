@@ -105,8 +105,8 @@ encoding thrives on DBR key/value repetition.
 
 Generated parquet never enters git at any stability level: parquet does not
 delta-diff, so every format iteration would bake a full ~18 MB blob into
-history. Instead, `just publish-deposit` uploads the three deposit files plus
-the twelve derived files (`docs/item-schema.md`) as assets of an immutable
+history. Instead, `just publish-deposit` uploads the three deposit files plus every
+derived table `just derive` writes (`docs/item-schema.md`) as assets of an immutable
 GitHub Release tagged `deposit-<steam buildid>.<rev>` - a format change
 between game patches re-publishes the same buildid under the next `<rev>`,
 and existing releases are never modified or deleted. Git commits only

@@ -46,6 +46,13 @@ from build_deposit import file_size_str, open_deposit, read_meta, sql_str, warn_
 
 DEFAULT_COST_RECORD = "records/game/itemcostformulas.dbr"
 
+# Every parquet this script writes, in build order. The release manifest ships exactly
+# this list (dataset_release.ASSETS), so a table added here reaches every machine that
+# runs `just fetch-deposit` rather than only the one that ran `just derive`.
+OUTPUT_TABLES = ("entities", "stats", "relations", "families", "sources", "boosts",
+                 "conversions", "skills", "skill_effect", "skill_ranks", "pet_ranks",
+                 "skill_modifiers", "sets", "set_modifiers", "set_boosts")
+
 # Gear type -> the equation-key prefix inside a cost-formula record. The three
 # per-prefix keys (<prefix>StrengthEquation/DexterityEquation/IntelligenceEquation)
 # map onto physique/cunning/spirit. Types absent here (medal, component, ...) have
@@ -1831,9 +1838,7 @@ def cmd_build(args) -> int:
                                         if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
-    for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions",
-                 "skills", "skill_effect", "skill_ranks", "pet_ranks", "skill_modifiers",
-                 "sets", "set_modifiers", "set_boosts"):
+    for name in OUTPUT_TABLES:
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")

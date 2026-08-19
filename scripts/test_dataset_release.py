@@ -23,6 +23,7 @@ def load(name):
 
 release = load("dataset_release")
 duck = load("gditems_duckdb")
+derive = load("build_derived")
 
 failures = 0
 def check(name, got, want):
@@ -34,15 +35,20 @@ def check(name, got, want):
         print(f"  ok   {name}")
 
 # The release manifest is the only way a machine without the game gets derived data, so a
-# table the CLI opens but the manifest omits downloads a set that fails on the CREATE VIEW.
-# The two lists drifted apart once already (boosts and conversions shipped in derive but not
-# in the release), which is silent until someone runs `just fetch-deposit` on a clean clone.
+# table `just derive` writes but the manifest omits simply is not there on a clean clone -
+# silent until whatever opens it fails. The two lists drifted apart once already (boosts and
+# conversions shipped in derive but not in the release), and again when the three set tables
+# arrived: the CLI does not open those, but scripts/test_build_derived.py reads them, so
+# pinning the manifest to the CLI's view list was the wrong anchor. Everything derive writes
+# ships; consumers other than the CLI are then free to appear without a manifest edit.
 released_derived = tuple(name.removesuffix(".parquet")
                          for name, d in release.ASSETS if d == "derived")
+check("every table just derive writes is released",
+      sorted(set(derive.OUTPUT_TABLES) - set(released_derived)), [])
+check("the release ships no derived table just derive does not write",
+      sorted(set(released_derived) - set(derive.OUTPUT_TABLES)), [])
 check("every derived table the CLI opens is released",
       sorted(set(duck.DERIVED_TABLES) - set(released_derived)), [])
-check("the release ships no derived table the CLI does not open",
-      sorted(set(released_derived) - set(duck.DERIVED_TABLES)), [])
 
 # The deposit half is fixed by build_deposit, not by the CLI, so it is pinned literally.
 check("the deposit half of the manifest is the three build_deposit artifacts",
