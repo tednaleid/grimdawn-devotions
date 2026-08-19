@@ -429,7 +429,7 @@ test("a set's bonuses render in their own block, one heading per piece count", (
   expect(html).toContain("Ultos' Tempest (4 pieces)");
   expect(html).toContain("Ultos' Tempest (5 pieces)");
   expect(html).toContain("+2 to all skills in Soldier");
-  expect(html).toContain("33 Lightning Damage");
+  expect(html).toContain(">33 Lightning Damage<");
   // The lower count comes first, so the block reads the way the game's own card does.
   expect(html.indexOf("(4 pieces)")).toBeLessThan(html.indexOf("(5 pieces)"));
 });
@@ -438,7 +438,11 @@ test("a set's bonuses render in their own block, one heading per piece count", (
 // (the item's own sections have a heading per skill; this one is grouped by piece count instead).
 test("a set modifier line names the skill it belongs to", () => {
   const html = detailMarkup(synItem({ set: "sets/ultos" }), setCtx);
-  expect(html).toContain('<span class="set-detail-skill">Blitz</span> 33 Lightning Damage');
+  // The line is tinted by its damage type here as everywhere else (see effectMarkup.ts), so the
+  // set block cannot quietly stop matching the item's own sections.
+  expect(html).toContain(
+    '<span class="set-detail-skill">Blitz</span> <span class="dmg dmg-lightning">33 Lightning Damage</span>',
+  );
 });
 
 test("an item in no set renders no set block", () => {

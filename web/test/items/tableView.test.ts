@@ -29,7 +29,7 @@ const ctx: EffectContext = {
 };
 const loc: Localization = makeLocalization({}, {}, "en", GAME, GAME);
 const render = (blocks: { stat: string; value: number }[][]) =>
-  rowEffectLines(blocks, ctx).map((t) => resolveText(loc, t));
+  rowEffectLines(blocks, ctx).map((l) => resolveText(loc, l.text));
 
 // The Skills column resolves its names through the same EffectContext.nameOf the effect lines
 // use, so this ctx is the row-rendering one with two named skills in it.

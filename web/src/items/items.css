@@ -8,6 +8,24 @@
   --it-ink: #e6edf3;
   --it-mut: #9aa4b2;
   --it-ember: #f0c14b;
+  /* The damage-type hues, shared verbatim with the monster page (web/src/monsters/monsters.css)
+     so one type reads the same colour across the site, on the same #0d1117 ground. Chaos is the
+     one that differs: there it is a dark brick so a filled bar separates from bleeding's rose,
+     and as small text that fell short of a 4.5:1 contrast ratio, so it is lightened here. Every
+     hue clears AA against this background at body size. `elemental` is the game's own label for
+     the fire/cold/lightning trio and has no hue of its own, so it borrows the page's ember. */
+  --t-physical: #b8bcc4;
+  --t-pierce: #8fa3b8;
+  --t-fire: #e8703a;
+  --t-cold: #4db8e8;
+  --t-lightning: #e8c341;
+  --t-poison: #7fb03a;
+  --t-aether: #4ec9c9;
+  --t-chaos: #cf5a4d;
+  --t-vitality: #b06fd0;
+  --t-bleeding: #ef5c6b;
+  --t-elemental: #f0c14b;
+
   --it-mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
   margin: 0;
   background: var(--it-bg);
@@ -158,6 +176,46 @@
   height: auto;
   margin: 0 auto;
 }
+/* An effect line about one damage type takes that type's colour, and the two type names inside a
+   conversion line take theirs individually. A heavier weight comes with it: physical sits close
+   to the body ink by design (it is the neutral of the set), so hue alone does not separate it. */
+.items-page .dmg {
+  font-weight: 600;
+}
+.items-page .dmg-physical {
+  color: var(--t-physical);
+}
+.items-page .dmg-pierce {
+  color: var(--t-pierce);
+}
+.items-page .dmg-fire {
+  color: var(--t-fire);
+}
+.items-page .dmg-cold {
+  color: var(--t-cold);
+}
+.items-page .dmg-lightning {
+  color: var(--t-lightning);
+}
+.items-page .dmg-poison {
+  color: var(--t-poison);
+}
+.items-page .dmg-aether {
+  color: var(--t-aether);
+}
+.items-page .dmg-chaos {
+  color: var(--t-chaos);
+}
+.items-page .dmg-vitality {
+  color: var(--t-vitality);
+}
+.items-page .dmg-bleeding {
+  color: var(--t-bleeding);
+}
+.items-page .dmg-elemental {
+  color: var(--t-elemental);
+}
+
 /* The skills column answers "why is this row here"; it is supporting detail next to the item's
    own name, so it reads a step quieter and never crowds out the effect lines. */
 .items-page td.skills {

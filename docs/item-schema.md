@@ -222,6 +222,18 @@ their tags are ordinary percentage templates, and a multiplier of exactly 1.0 is
 modifier at all rather than a bonus. Their `*Modifier` siblings on item blocks are honest
 percentages and are not converted.
 
+Each line is tinted by the damage type it is about, in the ten hues the monster page
+uses. The type comes from the line's game TAG (`web/src/items/core/damageTypes.ts`),
+never from its rendered words, for two reasons: several locales decline the type nouns
+(Russian's Fire is "огнём"), and half of these lines never name their type at all -
+`DamageDurationFire` renders "Burn Damage", cold renders "Frostburn", lightning renders
+"Electrocute". A conversion line names two types, so it takes no colour of its own and
+each type name is `markedT`-wrapped in the `Text` and tinted separately, which is safe in
+every locale because those names are substituted arguments rather than prose. The game's
+`Life` is health far more often than it is the Vitality damage type, so the Vitality tags
+are enumerated and the health ones declared, with a guard test that fails on any new
+damage-token tag that is neither.
+
 `web/test/items/renderSweep.test.ts` renders every modifier block and every pet panel in
 the committed dataset, in all 13 locales, and fails on a value jammed onto a word or a
 word jammed onto a value, a NaN, an unsubstituted brace, an empty line, a dangling

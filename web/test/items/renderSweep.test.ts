@@ -128,8 +128,8 @@ function allRenderedLines(ctx: DetailContext): { where: string; line: string; so
   const out: { where: string; line: string; source: "mod" | "pet" | "card" }[] = [];
   for (const item of catalogue.items) {
     for (const block of item.modifiers) {
-      for (const t of effectLines(block.stats, ctx)) {
-        out.push({ where: `${item.record} / ${block.skill}`, line: resolveText(ctx.loc, t), source: "mod" });
+      for (const l of effectLines(block.stats, ctx)) {
+        out.push({ where: `${item.record} / ${block.skill}`, line: resolveText(ctx.loc, l.text), source: "mod" });
       }
     }
   }
@@ -275,7 +275,7 @@ function linesFor(itemMatch: string, skillMatch: string): string[] {
   const ctx = contextFor("en");
   const item = catalogue.items.find((i) => i.record.endsWith(itemMatch))!;
   const block = item.modifiers.find((m) => m.skill.endsWith(skillMatch))!;
-  return effectLines(block.stats, ctx).map((t) => resolveText(ctx.loc, t));
+  return effectLines(block.stats, ctx).map((l) => resolveText(ctx.loc, l.text));
 }
 
 // C2's oracle. grimtools, Mythical Mark of Anathema, the Callidor's Tempest block:
@@ -324,7 +324,7 @@ test("the retaliation duration slot reads correctly in the two locales a shape r
     const ctx = contextFor(locale);
     const item = catalogue.items.find((i) => i.record.endsWith("gearhead/d121_head.dbr"))!;
     const block = item.modifiers.find((m) => m.skill.endsWith("spectralarmor1.dbr"))!;
-    return effectLines(block.stats, ctx).map((t) => resolveText(ctx.loc, t));
+    return effectLines(block.stats, ctx).map((l) => resolveText(ctx.loc, l.text));
   };
   expect(rendered("en")).toEqual(["0.8 Seconds of Terrify Retaliation"]);
   expect(rendered("it")).toEqual(["Ritorsione che Spaventa per 0.8 Secondi"]);

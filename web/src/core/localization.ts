@@ -97,7 +97,11 @@ export type Text =
   | { k: "gameStripped"; tag: string } // stripValueTokens(gameText(tag)): value-embedded format tags
   | { k: "gameFormat"; tag: string; args: FormatArg[] } // applyGameFormat(gameText(tag), args)
   | { k: "lit"; s: string }
-  | { k: "join"; parts: Text[] };
+  | { k: "join"; parts: Text[] }
+  // A fragment carrying a label for a renderer that wants to decorate it (the /items/ page
+  // colours the damage-type names inside a conversion line). resolveText resolves straight
+  // through it, so a plain string renderer never sees the mark and no locale is affected.
+  | { k: "marked"; mark: string; inner: Text };
 
 export const appT = (key: string, params?: Record<string, string | number | Text>): Text =>
   params ? { k: "app", key, params } : { k: "app", key };
@@ -105,6 +109,7 @@ export const gameT = (tag: string): Text => ({ k: "game", tag });
 export const gameStrippedT = (tag: string): Text => ({ k: "gameStripped", tag });
 export const gameFormatT = (tag: string, args: FormatArg[]): Text => ({ k: "gameFormat", tag, args });
 export const litT = (s: string | number): Text => ({ k: "lit", s: String(s) });
+export const markedT = (mark: string, inner: Text): Text => ({ k: "marked", mark, inner });
 export const joinT = (...parts: (Text | string)[]): Text => ({
   k: "join",
   parts: parts.map((p) => (typeof p === "string" ? litT(p) : p)),
@@ -128,6 +133,8 @@ export function resolveText(loc: Localization, t: Text): string {
       return t.s;
     case "join":
       return t.parts.map((p) => resolveText(loc, p)).join("");
+    case "marked":
+      return resolveText(loc, t.inner);
   }
 }
 

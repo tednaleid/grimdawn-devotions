@@ -4,6 +4,7 @@ import { gameFormatT, gameT, litT, resolveText, type Text } from "../../core/loc
 import type { Localization } from "../../ports/Localization";
 import { rowEffectLines, type EffectContext, type ModStat } from "../core/effectText";
 import type { Item, ItemSet, PetBlock, PetStat, Skill } from "../core/model";
+import { effectHtml } from "./effectMarkup";
 
 // Everything the detail view needs beyond EffectContext: a Localization to resolve Text (the
 // summary table only ever hands resolved strings to esc(), but the detail view builds its own
@@ -89,7 +90,7 @@ function petStatToModStat(s: PetStat): ModStat | null {
 // into one effectLines call would let one ability's Min pair with the other's Max - the exact
 // Krieg's Mask shape this file must not reintroduce. rowEffectLines is what keeps that safe: it
 // calls effectLines per block and only ever concatenates the resulting LINES.
-function petStatLines(ctx: DetailContext, stats: PetStat[]): Text[] {
+function petStatLines(ctx: DetailContext, stats: PetStat[]) {
   const bySource = new Map<string, PetStat[]>();
   for (const s of stats) {
     const arr = bySource.get(s.source) ?? [];
@@ -108,7 +109,7 @@ function petPanelHtml(ctx: DetailContext, pet: PetBlock): string {
   const abilityStats = pet.stats.filter((s) => s.sourceKind === "pet_skill");
 
   const ownLines = petStatLines(ctx, ownStats)
-    .map((t) => `<li>${render(loc, t)}</li>`)
+    .map((l) => `<li>${effectHtml(loc, l)}</li>`)
     .join("");
 
   // Named groups (source_name_tag present) get their own sub-heading, in first-appearance order.
@@ -130,14 +131,14 @@ function petPanelHtml(ctx: DetailContext, pet: PetBlock): string {
   const namedHtml = namedOrder
     .map((tag) => {
       const lines = petStatLines(ctx, named.get(tag)!)
-        .map((t) => `<li>${render(loc, t)}</li>`)
+        .map((l) => `<li>${effectHtml(loc, l)}</li>`)
         .join("");
       return `<div class="pet-ability"><h5 class="pet-ability-name">${render(loc, gameT(tag))}</h5><ul>${lines}</ul></div>`;
     })
     .join("");
   const unnamedLines = unnamed.length
     ? petStatLines(ctx, unnamed)
-        .map((t) => `<li>${render(loc, t)}</li>`)
+        .map((l) => `<li>${effectHtml(loc, l)}</li>`)
         .join("")
     : "";
   const unnamedHtml = unnamedLines ? `<ul class="pet-ability-plain">${unnamedLines}</ul>` : "";
@@ -161,7 +162,7 @@ function skillSectionHtml(ctx: DetailContext, entry: SkillEntry): string {
     lines.push(render(loc, gameFormatT("ItemSkillIncrement", [entry.boostLevel, skillName(ctx, entry.record)])));
   }
   if (entry.modBlocks.length) {
-    for (const line of rowEffectLines(entry.modBlocks, ctx)) lines.push(render(loc, line));
+    for (const line of rowEffectLines(entry.modBlocks, ctx)) lines.push(effectHtml(loc, line));
   }
   const skill = ctx.skillOf(entry.record);
   const pet = skill?.pets[0];
@@ -198,7 +199,7 @@ function setSectionHtml(ctx: DetailContext, set: ItemSet): string {
   for (const m of set.modifiers) {
     const name = render(loc, skillName(ctx, m.skill));
     for (const line of rowEffectLines([m.stats], ctx)) {
-      lineFor(m.pieces).push(`<span class="set-detail-skill">${name}</span> ${render(loc, line)}`);
+      lineFor(m.pieces).push(`<span class="set-detail-skill">${name}</span> ${effectHtml(loc, line)}`);
     }
   }
   const blocks = [...byPieces.keys()]

@@ -1,8 +1,9 @@
 // ABOUTME: The hover card for a tree node: the skill's own stat lines, so a player can see what
 // ABOUTME: an item's modifier is actually modifying (a "-1 Second Skill Recharge" against 18).
-import { resolveText, type Text } from "../../core/localization";
+import { resolveText } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
-import { effectLines, type EffectContext, type ModStat } from "../core/effectText";
+import { effectLines, type EffectContext, type EffectLine, type ModStat } from "../core/effectText";
+import { effectHtml } from "./effectMarkup";
 import type { RankRow, Skill } from "../core/model";
 
 function esc(s: string): string {
@@ -37,11 +38,10 @@ export function skillCardMarkup(skill: Skill, loc: Localization, ctx: EffectCont
   // because the game pairs that value with a separate heading tag the card does not compose.
   // The check is \p{L}, not [A-Za-z]: an ASCII test would suppress every Japanese and Chinese
   // line on the page.
-  const render = (lines: Text[]) =>
+  const render = (lines: EffectLine[]) =>
     lines
-      .map((t) => resolveText(loc, t))
-      .filter((s) => /\p{L}/u.test(s))
-      .map((s) => `<li>${esc(s)}</li>`)
+      .filter((l) => /\p{L}/u.test(resolveText(loc, l.text)))
+      .map((l) => `<li>${effectHtml(loc, l)}</li>`)
       .join("");
 
   // The game's own prose for this skill, the paragraph its tooltip opens with. It is what a node

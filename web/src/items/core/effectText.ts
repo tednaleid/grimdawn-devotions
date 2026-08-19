@@ -1,6 +1,7 @@
 // ABOUTME: Turns a modifier block's raw stats into the card lines the game would show.
 // ABOUTME: Pure and i18n-free: returns Text descriptors built from the game's own tags.
-import { type FormatArg, type Text, appT, gameFormatT, gameT, joinT } from "../../core/localization";
+import { type FormatArg, type Text, appT, gameFormatT, gameT, joinT, markedT } from "../../core/localization";
+import { damageTypeOfTag, type DamageType } from "./damageTypes";
 
 export interface ModStat {
   stat: string;
@@ -235,16 +236,37 @@ function nearestStat(stats: ModStat[], used: Set<number>, from: number, statId: 
 }
 
 /** One card line per group, in first-appearance order. */
-export function effectLines(stats: ModStat[], ctx: EffectContext): Text[] {
+/** One rendered line, and the damage type it is about. `damage` is null for a line that is not
+ *  about one type - a cooldown, a weapon-damage percentage, or a CONVERSION, whose two types are
+ *  marked inside the Text instead so a renderer can colour each in its own hue. */
+export interface EffectLine {
+  text: Text;
+  damage: DamageType | null;
+}
+
+function isConversion(stat: string): boolean {
+  return stat.startsWith("conversionPercentage");
+}
+
+// A damage-type name, marked with the type it names so a renderer can colour it. Unmarked when
+// the tag is one this page does not colour, so the mark never lies about what it is.
+function markedType(tag: string): Text {
+  const type = damageTypeOfTag(tag);
+  return type ? markedT(type, gameT(tag)) : gameT(tag);
+}
+
+export function effectLines(stats: ModStat[], ctx: EffectContext): EffectLine[] {
   const used = new Set<number>();
-  const out: Text[] = [];
+  const out: EffectLine[] = [];
 
   for (let i = 0; i < stats.length; i++) {
     if (used.has(i)) continue;
     const tag = ctx.tagOf(stats[i]!.stat);
     if (!tag) continue;
     const line = renderOne(stats, i, used, ctx, tag);
-    if (line) out.push(line);
+    // The tag is what the line is built from and what names its damage type; the stat id is not,
+    // since one tag serves a whole family of ids. A conversion line reports no type of its own.
+    if (line) out.push({ text: line, damage: isConversion(stats[i]!.stat) ? null : damageTypeOfTag(tag) });
   }
   return out;
 }
@@ -425,9 +447,13 @@ function renderBody(
   // both, the 3-arg composer has nothing sensible to render, so the line is dropped
   // rather than falling through to the plain renderer (which would hand it one value
   // for three placeholders).
-  if (s.stat.startsWith("conversionPercentage")) {
+  if (isConversion(s.stat)) {
     if (!s.from_tag || !s.to_tag) return null;
-    return gameFormatT(tag, [s.value, gameT(s.from_tag), gameT(s.to_tag)]);
+    // "100% Cold converted to Fire" is two damage types in one line, so the line takes no colour
+    // and each type name carries its own. Marking the ARGUMENTS is what makes that safe in every
+    // locale: they are substituted whole, so no renderer has to find a word inside translated
+    // prose (and Russian declines these nouns, which would defeat any search that tried).
+    return gameFormatT(tag, [s.value, markedType(s.from_tag), markedType(s.to_tag)]);
   }
 
   // A Min and its Max collapse into one range line, regardless of which one appears first
@@ -465,12 +491,14 @@ function renderBody(
 // Text descriptor (not on resolved, locale-dependent strings) collapses those genuine repeats
 // back to one line, matching the pre-fix output for that case, while two DIFFERENT descriptors
 // that happen to resolve to the same text in some locale are never merged.
-export function rowEffectLines(modBlocks: ModStat[][], ctx: EffectContext): Text[] {
+export function rowEffectLines(modBlocks: ModStat[][], ctx: EffectContext): EffectLine[] {
   const seen = new Set<string>();
-  const out: Text[] = [];
+  const out: EffectLine[] = [];
   for (const stats of modBlocks) {
     for (const line of effectLines(stats, ctx)) {
-      const key = JSON.stringify(line);
+      // Keyed on the Text descriptor alone: two lines with the same descriptor also carry the
+      // same damage type, since both come from the same tag.
+      const key = JSON.stringify(line.text);
       if (seen.has(key)) continue;
       seen.add(key);
       out.push(line);

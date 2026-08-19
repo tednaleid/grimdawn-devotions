@@ -1,9 +1,10 @@
 // ABOUTME: Renders the item table (mastery picker, skill tree, chip facets, sortable columns) into #items-table.
 // ABOUTME: Every change round-trips through onView; the skill picker is the SVG mastery tree from treeView.ts.
-import { litT, resolveText, type Text } from "../../core/localization";
+import { litT, resolveText } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
 import { CATEGORIES, categoryGameTag, DOMAINS, EFFECT_KINDS, RARITIES } from "../core/facets";
 import { rowEffectLines, type EffectContext } from "../core/effectText";
+import { effectHtml } from "./effectMarkup";
 import { itemCategory, type Row } from "../core/filter";
 import type { Catalogue, Item } from "../core/model";
 import type { ViewState } from "../core/urlState";
@@ -121,8 +122,9 @@ function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext, view: Vi
   const item = row.item;
   const category = esc(categoryLabel(loc, itemCategory(item)));
   const rarity = esc(loc.translate(`items.rarity.${item.rarity.toLowerCase()}`));
-  const lines: Text[] = rowEffectLines(row.modBlocks, effectCtx);
-  const effect = lines.length ? lines.map((t) => esc(resolveText(loc, t))).join("<br>") : "—";
+  // effectHtml escapes as it renders and tints the line by its damage type - see effectMarkup.ts.
+  const lines = rowEffectLines(row.modBlocks, effectCtx);
+  const effect = lines.length ? lines.map((l) => effectHtml(loc, l)).join("<br>") : "—";
   // Which in-scope skills put this row in the table. Without it the answer is only visible by
   // expanding the row, and with several skills picked (or a whole mastery in scope) the effect
   // lines alone do not say which power they belong to. Falls back to the raw record for a skill

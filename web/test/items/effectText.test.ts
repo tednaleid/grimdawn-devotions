@@ -1,8 +1,9 @@
 // ABOUTME: Tests for effectLines: single-stat rendering, min/max range collapse,
 // ABOUTME: damage-over-time/debuff duration composition, refresh, and conversion lines.
 import { test, expect } from "bun:test";
-import { litT, makeLocalization, resolveText } from "../../src/core/localization";
+import { litT, makeLocalization, resolveText, type Text } from "../../src/core/localization";
 import { COMPOSER, effectLines, maxPlaceholderIndex } from "../../src/items/core/effectText";
+import { DECLARED_NOT_DAMAGE, damageTypeOfTag, namesADamageToken } from "../../src/items/core/damageTypes";
 import statItemTags from "../../../data/stat-item-tags.json";
 import gameEn from "../../../data/i18n/game.en.json";
 import appEn from "../../src/i18n/app.en.json";
@@ -25,7 +26,7 @@ const ctx = {
   nameOf: () => undefined,
 };
 const loc = makeLocalization({}, {}, "en", GAME, GAME);
-const render = (stats: any[]) => effectLines(stats, ctx).map((t) => resolveText(loc, t));
+const render = (stats: any[]) => effectLines(stats, ctx).map((l) => resolveText(loc, l.text));
 
 test("a templated stat renders through its own template", () => {
   expect(render([{ stat: "characterAttackSpeed", value: 5 }])).toEqual(["+5% Attack Speed"]);
@@ -198,7 +199,7 @@ const cardCtx = {
 // the raw key and hide what these lines actually say.
 const APP = appEn as Record<string, string>;
 const cardLoc = makeLocalization(APP, APP, "en", CARD_GAME, CARD_GAME);
-const cardRender = (stats: any[]) => effectLines(stats, cardCtx).map((t) => resolveText(cardLoc, t));
+const cardRender = (stats: any[]) => effectLines(stats, cardCtx).map((l) => resolveText(cardLoc, l.text));
 
 test("Badge of the Crimson Company: DoT total is the per-second value times duration", () => {
   // grimtools card: "300 Bleeding Damage over 2 Seconds"
@@ -468,7 +469,9 @@ test("a sign-prefixed placeholder group is recognized as templated, not a plain 
   };
   const loc = makeLocalization({}, {}, "en", signGame, signGame);
   expect(
-    effectLines([{ stat: "characterDefensiveBlockRecoveryReduction", value: 12 }], ctx).map((t) => resolveText(loc, t)),
+    effectLines([{ stat: "characterDefensiveBlockRecoveryReduction", value: 12 }], ctx).map((l) =>
+      resolveText(loc, l.text),
+    ),
   ).toEqual(["-12% Shield Recovery Time"]);
 });
 
@@ -548,9 +551,9 @@ test("racialBonusPercentDamage is suppressed rather than truncated to a dangling
     nameOf: () => undefined,
   };
   const loc = makeLocalization({}, {}, "en", {}, {});
-  expect(effectLines([{ stat: "racialBonusPercentDamage", value: 16 }], ctx).map((t) => resolveText(loc, t))).toEqual(
-    [],
-  );
+  expect(
+    effectLines([{ stat: "racialBonusPercentDamage", value: 16 }], ctx).map((l) => resolveText(loc, l.text)),
+  ).toEqual([]);
 });
 
 test("sparkChance is suppressed rather than truncated with no target count", () => {
@@ -567,7 +570,7 @@ test("sparkChance is suppressed rather than truncated with no target count", () 
     nameOf: () => undefined,
   };
   const loc = makeLocalization({}, {}, "en", {}, {});
-  expect(effectLines([{ stat: "sparkChance", value: 30 }], ctx).map((t) => resolveText(loc, t))).toEqual([]);
+  expect(effectLines([{ stat: "sparkChance", value: 30 }], ctx).map((l) => resolveText(loc, l.text))).toEqual([]);
 });
 
 // --- final fix round, C3: a ModBlock is one (item, skill) pair, not one carrier.
@@ -643,7 +646,7 @@ const ccCtx = {
   nameOf: () => undefined,
 };
 const ccLoc = makeLocalization(APP, APP, "en", CC_GAME, CC_GAME);
-const ccRender = (stats: any[]) => effectLines(stats, ccCtx).map((t) => resolveText(ccLoc, t));
+const ccRender = (stats: any[]) => effectLines(stats, ccCtx).map((l) => resolveText(ccLoc, l.text));
 
 // The oracle for this whole shape. Mythical Mark of Anathema, Callidor's Tempest block:
 // offensivePetrifyChance 10 + offensivePetrifyMin 2. grimtools card:
@@ -760,7 +763,7 @@ function realBlock(item: string, skill: string): { stat: string; value: number }
   if (!block) throw new Error(`${item} has no modifier block for ${skill}`);
   return block.stats;
 }
-const realRender = (stats: any[]) => effectLines(stats, realCtx).map((t) => resolveText(realLoc, t));
+const realRender = (stats: any[]) => effectLines(stats, realCtx).map((l) => resolveText(realLoc, l.text));
 
 // projectilePiercing was called a "pass-through enable flag" and dropped. It is the percentage
 // itself: the skill_modifier template spells the stat projectilePiercingChance carries on a
@@ -779,4 +782,66 @@ test("Ghol's Reach: a wave modifier's reach reads as a range in meters", () => {
     realBlock("records/items/gearhands/d207_hands.dbr", "records/skills/playerclass08/soulscythe1.dbr"),
   );
   expect(lines).toContain("2 Meter Range");
+});
+
+// --- damage-type colouring --------------------------------------------------
+// A line is coloured from its TAG, never from its words. The guard: every tag the real dataset
+// reaches whose name carries a damage token must be either classified or explicitly declared not
+// a damage line. A game patch adding a new one fails here rather than shipping an uncoloured (or
+// wrongly coloured) line, the same "declare it or fail" rule build_stat_item_tags.py applies.
+test("every damage-token tag in the dataset is classified or declared", () => {
+  const tags = statItemTags as Record<string, string>;
+  const unclassified = [...new Set(Object.values(tags))]
+    .filter((t) => namesADamageToken(t) && !damageTypeOfTag(t) && !DECLARED_NOT_DAMAGE.has(t))
+    .sort();
+  expect(unclassified).toEqual([]);
+});
+
+// The whole point of anchoring on the tag: these three lines never contain their damage type's
+// name in any language, so nothing that reads the rendered words could colour them.
+test("a damage-over-time line is coloured by its type even though the type is not in the text", () => {
+  const game = gameEn as Record<string, string>;
+  expect(game.DamageDurationFire).toBe("Burn Damage");
+  expect(damageTypeOfTag("DamageDurationFire")).toBe("fire");
+  expect(game.DamageDurationCold).toBe("Frostburn Damage");
+  expect(damageTypeOfTag("DamageDurationCold")).toBe("cold");
+  expect(game.DamageDurationLightning).toBe("Electrocute Damage");
+  expect(damageTypeOfTag("DamageDurationLightning")).toBe("lightning");
+});
+
+// GD's `Life` means health far more often than it means the Vitality damage type, and painting
+// a healing line purple would misread the number outright.
+test("health, regeneration and leech lines carry no damage colour", () => {
+  for (const tag of ["SkillLifePercent", "tagCharLifeRegen", "DamageLifeLeech", "DamagePercentCurrentLife"]) {
+    expect(damageTypeOfTag(tag)).toBeNull();
+  }
+  expect(damageTypeOfTag("DamageLife")).toBe("vitality");
+});
+
+// ProjectilePiercingChance is about projectiles passing through enemies, not pierce damage.
+test("the pass-through chance is not a pierce line", () => {
+  expect(damageTypeOfTag("ProjectilePiercingChance")).toBeNull();
+  expect(damageTypeOfTag("DamagePierce")).toBe("pierce");
+});
+
+// A conversion names two types, so the LINE takes no colour and each name carries its own. The
+// marks sit on the substituted arguments, which is what makes this safe in every locale.
+test("a conversion line reports no type of its own and marks both names", () => {
+  const [line] = effectLines(
+    [{ stat: "conversionPercentage", value: 100, from_tag: "tagCharStatsCold", to_tag: "tagCharStatsFire" }],
+    realCtx,
+  );
+  expect(line!.damage).toBeNull();
+  const marks: string[] = [];
+  const walk = (t: Text): void => {
+    if (t.k === "marked") {
+      marks.push(t.mark);
+      walk(t.inner);
+    } else if (t.k === "join") t.parts.forEach(walk);
+    else if (t.k === "gameFormat") {
+      for (const a of t.args) if (typeof a === "object" && !Array.isArray(a)) walk(a);
+    }
+  };
+  walk(line!.text);
+  expect(marks).toEqual(["cold", "fire"]);
 });

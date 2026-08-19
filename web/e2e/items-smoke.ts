@@ -227,6 +227,34 @@ try {
   const twoHash = await cdp.evaluate<string>("location.hash");
   check(/skill=[^&]+,[^&]+/.test(twoHash), "both picked skills are recorded in the hash as one list");
 
+  // Damage-type colouring, in a real browser so the CSS custom properties are actually resolved:
+  // a line about one type is tinted whole, and a conversion names two types so it tints each
+  // name instead. The Burn line is the case that matters - it is a fire line whose text never
+  // says "fire", which is why the colour comes from the tag and not from the words.
+  const tinted = await cdp.evaluate<Record<string, string>>(`(() => {
+    const out = {};
+    for (const s of document.querySelectorAll('td.effect .dmg')) {
+      const type = s.className.replace('dmg dmg-', '');
+      if (!out[type]) out[type] = getComputedStyle(s).color;
+    }
+    return out;
+  })()`);
+  const types = Object.keys(tinted);
+  check(types.length >= 5, `effect lines are tinted by damage type (${types.length} types on screen)`);
+  check(
+    Object.values(tinted).every((c) => c !== "rgb(154, 164, 178)") &&
+      new Set(Object.values(tinted)).size === types.length,
+    "each type resolves to its own colour, none falling back to the muted default",
+  );
+  const conv = await cdp.evaluate<string>(`(() => {
+    const el = [...document.querySelectorAll('td.effect')].find((e) => e.innerHTML.includes('converted to <span'));
+    return el ? el.innerHTML.slice(el.innerHTML.indexOf('<span'), el.innerHTML.indexOf('<br>')) : '';
+  })()`);
+  check(
+    (conv.match(/class="dmg dmg-/g) ?? []).length === 2,
+    `a conversion line tints both of its type names, not the whole line (${conv.slice(0, 60)})`,
+  );
+
   // Set bonuses. Ultos' Gem's Savagery block is on its own record; Dawnbreaker's Beacon reaches
   // Savagery only through the same set, so it is in the table because of the set alone and its
   // name is badged. The set's own block is captioned with the piece count it needs. This is the
