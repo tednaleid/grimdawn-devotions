@@ -3,7 +3,7 @@
 import { gameFormatT, gameT, litT, resolveText, type Text } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
 import { rowEffectLines, type EffectContext, type ModStat } from "../core/effectText";
-import type { Item, PetBlock, PetStat, Skill } from "../core/model";
+import type { Item, ItemSet, PetBlock, PetStat, Skill } from "../core/model";
 
 // Everything the detail view needs beyond EffectContext: a Localization to resolve Text (the
 // summary table only ever hands resolved strings to esc(), but the detail view builds its own
@@ -14,6 +14,9 @@ export interface DetailContext extends EffectContext {
   loc: Localization;
   masteryNameOf: (record: string) => Text | undefined;
   skillOf: (record: string) => Skill | undefined;
+  // The set a piece belongs to, when the catalogue carries it. A set's bonuses are stored once
+  // rather than on each member, so the item alone cannot answer this.
+  setOf: (record: string | null) => ItemSet | undefined;
 }
 
 function esc(s: string): string {
@@ -170,8 +173,56 @@ function skillSectionHtml(ctx: DetailContext, entry: SkillEntry): string {
   </section>`;
 }
 
+// The set's own bonuses, grouped by the piece count that turns each on. Rendered as its own
+// block under the item's, and captioned with the count, because a set bonus is not something the
+// player has by equipping this piece: it arrives only once N members of the set are worn.
+function setSectionHtml(ctx: DetailContext, set: ItemSet): string {
+  const loc = ctx.loc;
+  const byPieces = new Map<number, string[]>();
+  const lineFor = (pieces: number): string[] => {
+    let l = byPieces.get(pieces);
+    if (!l) {
+      l = [];
+      byPieces.set(pieces, l);
+    }
+    return l;
+  };
+  for (const b of set.boosts) {
+    lineFor(b.pieces).push(render(loc, gameFormatT("ItemSkillIncrement", [b.level, skillName(ctx, b.skill)])));
+  }
+  for (const mb of set.masteryBoosts) {
+    lineFor(mb.pieces).push(
+      render(loc, gameFormatT("ItemMasteryIncrement", [mb.level, ctx.masteryNameOf(mb.mastery) ?? litT(mb.mastery)])),
+    );
+  }
+  for (const m of set.modifiers) {
+    const name = render(loc, skillName(ctx, m.skill));
+    for (const line of rowEffectLines([m.stats], ctx)) {
+      lineFor(m.pieces).push(`<span class="set-detail-skill">${name}</span> ${render(loc, line)}`);
+    }
+  }
+  const blocks = [...byPieces.keys()]
+    .sort((a, b) => a - b)
+    .map((pieces) => {
+      const caption = esc(loc.translate("items.set.pieces", { set: setName(loc, set), pieces }));
+      const lines = byPieces
+        .get(pieces)!
+        .map((l) => `<li>${l}</li>`)
+        .join("");
+      return `<h4 class="set-detail-name">${caption}</h4><ul class="skill-detail-lines">${lines}</ul>`;
+    })
+    .join("");
+  return blocks ? `<section class="set-detail">${blocks}</section>` : "";
+}
+
+/** The set's display name, falling back to its record like every other name on this page. */
+export function setName(loc: Localization, set: ItemSet): string {
+  const name = set.nameTag ? loc.gameText(set.nameTag) : set.record;
+  return name === set.nameTag ? set.record : name;
+}
+
 /** Pure markup for one item's full detail: every touched skill, its lines, its pet panel when it
- *  carries one, mastery-wide grants, and the grimtools link. */
+ *  carries one, mastery-wide grants, its set's bonuses, and the grimtools link. */
 export function detailMarkup(item: Item, ctx: DetailContext): string {
   const loc = ctx.loc;
   const skillsHtml = touchedSkills(item)
@@ -182,10 +233,12 @@ export function detailMarkup(item: Item, ctx: DetailContext): string {
     .map((t) => `<li>${render(loc, t)}</li>`)
     .join("");
   const masteryHtml = masteryLines ? `<ul class="item-detail-mastery">${masteryLines}</ul>` : "";
+  const set = ctx.setOf(item.set);
+  const setHtml = set ? setSectionHtml(ctx, set) : "";
   const gtHtml = item.grimtools
     ? `<a class="item-detail-grimtools" href="${esc(item.grimtools)}" target="_blank" rel="noopener noreferrer">${esc(loc.translate("items.detail.grimtools"))}</a>`
     : "";
-  return `<div class="item-detail-skills">${skillsHtml}</div>${masteryHtml}${gtHtml}`;
+  return `<div class="item-detail-skills">${skillsHtml}</div>${masteryHtml}${setHtml}${gtHtml}`;
 }
 
 /** Render one item's expanded detail row content. */

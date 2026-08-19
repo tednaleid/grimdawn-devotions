@@ -31,6 +31,7 @@ const realCtx: DetailContext = {
     return m?.nameTag ? gameT(m.nameTag) : undefined;
   },
   skillOf: (r) => skillByRecord.get(r),
+  setOf: () => undefined,
   loc,
 };
 
@@ -101,6 +102,7 @@ test("Wind Devil: the pet panel renders the pet's own stats and groups ability r
     boosts: [{ skill: skill.record, level: 1 }],
     masteryBoosts: [],
     modifiers: [],
+    set: null,
   };
   const html = detailMarkup(item, realCtx);
   expect(html).toContain("<summary>Wind Devil</summary>");
@@ -140,6 +142,7 @@ const synCtx: DetailContext = {
   nameOf: (r) => (synSkillNames[r] ? litT(synSkillNames[r]!) : undefined),
   masteryNameOf: (r) => (r === "masteries/soldier.dbr" ? litT("Soldier") : undefined),
   skillOf: () => undefined,
+  setOf: () => undefined,
   loc: synLoc,
 };
 
@@ -157,6 +160,7 @@ function synItem(overrides: Partial<Item>): Item {
     boosts: [],
     masteryBoosts: [],
     modifiers: [],
+    set: null,
     ...overrides,
   };
 }
@@ -325,6 +329,7 @@ const petCtx: DetailContext = {
   nameOf: () => undefined,
   masteryNameOf: () => undefined,
   skillOf: (r) => (r === petSkill.record ? petSkill : undefined),
+  setOf: () => undefined,
   loc: makeLocalization(
     {},
     {},
@@ -384,4 +389,66 @@ test("pet panel: two different unnamed sources on the same stat id never fabrica
   expect(html).toContain("30-60 Fire Damage");
   expect(html).not.toContain("20-60");
   expect(html).not.toContain("20-30");
+});
+
+// --- set bonuses ------------------------------------------------------------
+// The whole point of the block: a set bonus is not something the player has by equipping this
+// piece, so it renders apart from the item's own lines and says how many pieces it needs.
+// Pinned to the grimtools card for Mythical Ultos' Gem, which reads "(4) Set: +2 to all skills in
+// Shaman" and, under "(5) Set", a Savagery block of "33 Lightning Damage".
+const SET_GAME: Record<string, string> = {
+  ...SYN_GAME,
+  tagUltos: "Ultos' Tempest",
+  DamageLightning: "{%t0} Lightning Damage",
+};
+const setLoc = makeLocalization(
+  appEn as Record<string, string>,
+  appEn as Record<string, string>,
+  "en",
+  SET_GAME,
+  SET_GAME,
+);
+const ultos = {
+  record: "sets/ultos",
+  nameTag: "tagUltos",
+  members: 5,
+  modifiers: [{ pieces: 5, skill: "skills/blitz.dbr", stats: [{ stat: "offensiveLightningMin", value: 33 }] }],
+  boosts: [],
+  masteryBoosts: [{ pieces: 4, mastery: "masteries/soldier.dbr", level: 2 }],
+};
+const setCtx: DetailContext = {
+  ...synCtx,
+  tagOf: (s) => ({ ...SYN_TAGS, offensiveLightningMin: "DamageLightning" })[s],
+  templateOf: (t) => SET_GAME[t],
+  setOf: (r) => (r === "sets/ultos" ? (ultos as never) : undefined),
+  loc: setLoc,
+};
+
+test("a set's bonuses render in their own block, one heading per piece count", () => {
+  const html = detailMarkup(synItem({ set: "sets/ultos" }), setCtx);
+  expect(html).toContain("Ultos' Tempest (4 pieces)");
+  expect(html).toContain("Ultos' Tempest (5 pieces)");
+  expect(html).toContain("+2 to all skills in Soldier");
+  expect(html).toContain("33 Lightning Damage");
+  // The lower count comes first, so the block reads the way the game's own card does.
+  expect(html.indexOf("(4 pieces)")).toBeLessThan(html.indexOf("(5 pieces)"));
+});
+
+// A set block can name several skills, and its lines are useless without saying which is which
+// (the item's own sections have a heading per skill; this one is grouped by piece count instead).
+test("a set modifier line names the skill it belongs to", () => {
+  const html = detailMarkup(synItem({ set: "sets/ultos" }), setCtx);
+  expect(html).toContain('<span class="set-detail-skill">Blitz</span> 33 Lightning Damage');
+});
+
+test("an item in no set renders no set block", () => {
+  const html = detailMarkup(synItem({ boosts: [{ skill: "skills/blitz.dbr", level: 2 }] }), setCtx);
+  expect(html).not.toContain("set-detail");
+});
+
+// A set the catalogue does not carry (one with no skill wiring is never emitted) must read as no
+// set rather than throw or render an empty heading.
+test("an item naming a set the catalogue does not carry renders no set block", () => {
+  const html = detailMarkup(synItem({ set: "sets/missing" }), setCtx);
+  expect(html).not.toContain("set-detail");
 });

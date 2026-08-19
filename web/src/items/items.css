@@ -184,6 +184,19 @@
 .items-page .skill-pick[aria-pressed="true"] {
   color: var(--it-ember);
 }
+/* This row reaches that skill only through its set, which needs the whole set worn. Quiet enough
+   not to compete with the skill name it qualifies; the expanded row names the set and the count. */
+.items-page .set-badge {
+  font-family: var(--it-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--it-mut);
+  border: 1px solid var(--it-line);
+  border-radius: 3px;
+  padding: 0 3px;
+  vertical-align: 1px;
+}
 
 /* Connectors sit under the nodes (they are emitted first) and stay quiet: they exist to show
    which upgrades belong to which skill, not to compete with the icons. */
@@ -404,6 +417,24 @@
 }
 .items-page .item-detail-mastery {
   margin-top: 10px;
+}
+/* The set's own bonuses, under the item's: a separate block because the player does not have
+   these by equipping this piece alone. Each heading carries the set and the piece count. */
+.items-page .set-detail {
+  margin-top: 12px;
+  border-top: 1px solid var(--it-line);
+  padding-top: 10px;
+}
+.items-page .set-detail-name {
+  margin: 10px 0 4px;
+  font-size: 13px;
+  color: var(--it-ember);
+}
+.items-page .set-detail-name:first-child {
+  margin-top: 0;
+}
+.items-page .set-detail-skill {
+  color: var(--it-mut);
 }
 .items-page .item-detail-grimtools {
   display: inline-block;

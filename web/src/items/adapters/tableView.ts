@@ -129,12 +129,17 @@ function rowHtml(loc: Localization, row: Row, effectCtx: EffectContext, view: Vi
   // the game never named, matching nameOf's convention elsewhere in this file.
   // Each name is a button, not text: it carries the same hover card the tree node does (a row
   // can name a skill the reader cannot see on the tree at all), and clicking it toggles that
-  // skill in the selection, so the table is a second way into the same picker.
+  // skill in the selection, so the table is a second way into the same picker. A name the item
+  // reaches only through its set is badged: that bonus needs the whole set worn, and the expanded
+  // row says which set and how many pieces.
+  const fromSet = new Set(row.set?.skills ?? []);
+  const badge = ` <span class="set-badge">${esc(loc.translate("items.set.badge"))}</span>`;
   const skills = row.skills.length
     ? row.skills
         .map((r) => {
           const label = esc(resolveText(loc, effectCtx.nameOf(r) ?? litT(r)));
-          return `<button type="button" class="skill-pick" data-record="${esc(r)}" aria-pressed="${view.skills.has(r)}">${label}</button>`;
+          const mark = fromSet.has(r) ? badge : "";
+          return `<button type="button" class="skill-pick" data-record="${esc(r)}" aria-pressed="${view.skills.has(r)}">${label}${mark}</button>`;
         })
         .join("")
     : "—";

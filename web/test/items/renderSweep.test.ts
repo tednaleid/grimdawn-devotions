@@ -109,6 +109,7 @@ function contextFor(locale: string): DetailContext {
     },
     masteryNameOf: () => undefined,
     skillOf: (r) => skillByRecord.get(r),
+    setOf: () => undefined,
     loc,
   };
 }
@@ -150,6 +151,7 @@ function allRenderedLines(ctx: DetailContext): { where: string; line: string; so
       boosts: [{ skill: skill.record, level: 1 }],
       masteryBoosts: [],
       modifiers: [],
+      set: null,
     };
     const html = detailMarkup(probe, ctx);
     // The panel's own <li>s only: the probe's "+1 to <skill>" grant is the first line of the

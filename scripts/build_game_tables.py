@@ -103,7 +103,9 @@ def collect_referenced_tags(
     for m in (monsters or {}).get("monsters", []):
         _add(tags, m.get("name_tag"))
         _add(tags, m.get("race_tag"))
-    for key in ("masteries", "skills", "items"):
+    # A set's name_tag rides in with the rest: it captions the "<set> (N pieces)"
+    # block an item's set bonus renders under.
+    for key in ("masteries", "skills", "items", "sets"):
         for row in (skill_items or {}).get(key, []):
             _add(tags, row.get("name_tag"))
     # The skill's own prose, shown on the tree's hover card.

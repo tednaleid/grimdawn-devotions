@@ -53,6 +53,39 @@ export interface Boost {
   level: number;
 }
 
+/** A set's own contribution, and the piece count that turns it on. A set bonus is not the item's:
+ *  the player only has it while wearing `pieces` members, so it is kept apart everywhere rather
+ *  than folded into the item's own boosts and modifiers. */
+export interface SetModBlock {
+  pieces: number;
+  skill: string;
+  stats: ModStat[];
+}
+
+export interface SetBoost {
+  pieces: number;
+  skill: string;
+  level: number;
+}
+
+export interface SetMasteryBoost {
+  pieces: number;
+  mastery: string;
+  level: number;
+}
+
+/** One loot set, stored once on the catalogue rather than copied onto each of its members. */
+export interface ItemSet {
+  record: string;
+  nameTag: string;
+  // How many pieces the set has, from the set's own setMembers list. Not the same number as a
+  // bonus's `pieces`, which is the count that bonus needs.
+  members: number;
+  modifiers: SetModBlock[];
+  boosts: SetBoost[];
+  masteryBoosts: SetMasteryBoost[];
+}
+
 export interface MasteryBoost {
   mastery: string;
   level: number;
@@ -81,12 +114,16 @@ export interface Item {
   boosts: Boost[];
   masteryBoosts: MasteryBoost[];
   modifiers: ModBlock[];
+  // The record of the set this piece belongs to, or null. Resolve it through Catalogue.sets;
+  // an item can name a set the catalogue does not carry (one with no skill wiring of its own).
+  set: string | null;
 }
 
 export interface Catalogue {
   meta: Record<string, unknown>;
   masteries: Mastery[];
   skills: Skill[];
+  sets: ItemSet[];
   items: Item[];
 }
 
@@ -139,6 +176,21 @@ interface RawBoost {
   level: number;
 }
 
+interface RawSetModBlock {
+  pieces: number;
+  skill: string;
+  stats: ModStat[];
+}
+
+interface RawSet {
+  record: string;
+  name_tag: string;
+  members: number;
+  modifiers: RawSetModBlock[];
+  boosts: { pieces: number; skill: string; level: number }[];
+  mastery_boosts: { pieces: number; mastery: string; level: number }[];
+}
+
 interface RawMasteryBoost {
   mastery: string;
   level: number;
@@ -164,6 +216,7 @@ interface RawItem {
   boosts: RawBoost[];
   mastery_boosts: RawMasteryBoost[];
   modifiers: RawModBlock[];
+  set: string | null;
 }
 
 function mapMastery(r: RawMastery): Mastery {
@@ -208,6 +261,25 @@ function mapSkill(r: RawSkill): Skill {
   };
 }
 
+function mapSet(r: RawSet): ItemSet {
+  return {
+    record: r.record,
+    nameTag: r.name_tag,
+    members: r.members ?? 0,
+    modifiers: (r.modifiers ?? []).map((m) => ({
+      pieces: m.pieces,
+      skill: m.skill,
+      stats: m.stats ?? [],
+    })),
+    boosts: (r.boosts ?? []).map((b) => ({ pieces: b.pieces, skill: b.skill, level: b.level })),
+    masteryBoosts: (r.mastery_boosts ?? []).map((b) => ({
+      pieces: b.pieces,
+      mastery: b.mastery,
+      level: b.level,
+    })),
+  };
+}
+
 function mapBoost(r: RawBoost): Boost {
   return { skill: r.skill, level: r.level };
 }
@@ -236,6 +308,7 @@ function mapItem(r: RawItem): Item {
     boosts: (r.boosts ?? []).map(mapBoost),
     masteryBoosts: (r.mastery_boosts ?? []).map(mapMasteryBoost),
     modifiers: (r.modifiers ?? []).map(mapModBlock),
+    set: r.set ?? null,
   };
 }
 
@@ -248,12 +321,14 @@ export function parseCatalogue(doc: unknown): Catalogue {
     meta?: Record<string, unknown>;
     masteries?: RawMastery[];
     skills?: RawSkill[];
+    sets?: RawSet[];
     items?: RawItem[];
   };
   return {
     meta: d.meta ?? {},
     masteries: Array.isArray(d.masteries) ? d.masteries.map(mapMastery) : [],
     skills: Array.isArray(d.skills) ? d.skills.map(mapSkill) : [],
+    sets: Array.isArray(d.sets) ? d.sets.map(mapSet) : [],
     items: Array.isArray(d.items) ? d.items.map(mapItem) : [],
   };
 }

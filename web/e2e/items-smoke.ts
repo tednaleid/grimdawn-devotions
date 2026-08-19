@@ -227,6 +227,44 @@ try {
   const twoHash = await cdp.evaluate<string>("location.hash");
   check(/skill=[^&]+,[^&]+/.test(twoHash), "both picked skills are recorded in the hash as one list");
 
+  // Set bonuses. Ultos' Gem's Savagery block is on its own record; Dawnbreaker's Beacon reaches
+  // Savagery only through the same set, so it is in the table because of the set alone and its
+  // name is badged. The set's own block is captioned with the piece count it needs. This is the
+  // one place the whole chain is exercised end to end: set record -> set_modifiers -> dataset ->
+  // filter -> table.
+  const SET_HASH =
+    "#mastery=records%2Fskills%2Fplayerclass06%2F_classtraining_class06.dbr" +
+    "&skill=records%2Fskills%2Fplayerclass06%2Fsavagery1.dbr&cat=amulet&kind=modifies";
+  await cdp.evaluate(`location.hash = ${JSON.stringify(SET_HASH.slice(1))}`);
+  const setRows = await waitFor<string>(
+    cdp,
+    "document.querySelector('#items-tbody').innerText",
+    (t) => t.includes("Ultos' Gem") && t.includes("Dawnbreaker's Beacon"),
+  );
+  check(setRows, "a set bonus puts a piece in the table for a skill it does not touch itself");
+  const badged = await cdp.evaluate<boolean>(`(() => {
+    const tr = [...document.querySelectorAll('tr.item-row')].find(r => r.innerText.includes("Dawnbreaker's Beacon"));
+    return !!tr && !!tr.querySelector('td.skills .set-badge');
+  })()`);
+  check(badged, "that piece's skill name is badged as set-sourced");
+  await cdp.evaluate(`(() => {
+    const tr = [...document.querySelectorAll('tr.item-row')].find(r => r.innerText.includes("Ultos' Gem"));
+    tr.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  })()`);
+  const setDetail = await waitFor<string>(cdp, "(document.querySelector('.set-detail') || {}).innerText || ''", (t) =>
+    t.includes("(5 pieces)"),
+  );
+  const setText = await cdp.evaluate<string>("(document.querySelector('.set-detail') || {}).innerText || ''");
+  check(setDetail, `the expanded row captions the set bonus with its piece count (${setText.slice(0, 40)})`);
+  check(
+    setText.includes("33 Lightning Damage") && setText.includes("reduce cooldown of Primal Strike"),
+    "and carries the set's own Savagery lines, which no member record holds",
+  );
+  await cdp.evaluate(`(() => {
+    const tr = [...document.querySelectorAll('tr.item-row')].find(r => r.innerText.includes("Ultos' Gem"));
+    tr.dispatchEvent(new MouseEvent('click', {bubbles: true}));
+  })()`);
+
   // Expanding a row shows its per-skill detail (Task 14/16's expanded row).
   await cdp.evaluate(`document.querySelector('tr.item-row').dispatchEvent(new MouseEvent('click', {bubbles: true}))`);
   const detailShown = await waitFor<number>(cdp, "document.querySelectorAll('.item-detail').length", (n) => n > 0);

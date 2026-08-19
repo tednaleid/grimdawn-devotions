@@ -338,6 +338,8 @@ const REQUIRED = [
   "items.category.relic",
   "items.detail.grimtools",
   "items.tree.offTree",
+  "items.set.pieces",
+  "items.set.badge",
   "items.card.atRank",
   "items.card.atUltimate",
   "items.effect.chanceOf",

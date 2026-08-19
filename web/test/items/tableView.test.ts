@@ -8,6 +8,7 @@ import type { Row } from "../../src/items/core/filter";
 import type { Item } from "../../src/items/core/model";
 import { DEFAULT_VIEW, type ViewState } from "../../src/items/core/urlState";
 import type { Localization } from "../../src/ports/Localization";
+import appEn from "../../src/i18n/app.en.json";
 
 // Real tags/templates for the two stat families in play (data/stat-item-tags.json,
 // data/i18n/game.en.json), matching effectText.test.ts's fixture shape.
@@ -48,8 +49,9 @@ const ITEM: Item = {
   boosts: [],
   masteryBoosts: [],
   modifiers: [],
+  set: null,
 };
-const row = (skills: string[]): Row => ({ item: ITEM, levels: 1, modBlocks: [], skills });
+const row = (skills: string[]): Row => ({ item: ITEM, levels: 1, modBlocks: [], skills, set: null });
 
 // Krieg's Mask under Soldier scope (records/items/gearhead/d112_head.dbr): Blitz's block
 // carries a flat offensiveAetherMin with no Max sibling; War Cry's block carries a real
@@ -121,4 +123,41 @@ test("a nameless skill still renders as a pick button, labelled by its record", 
 test("a row matching no named skill renders no pick button", () => {
   const html = bodyMarkup(loc, [row([])], namedCtx, { ...DEFAULT_VIEW, mastery: "m1" });
   expect(html).not.toContain("skill-pick");
+});
+
+// A row can be in the table because of its SET rather than because of anything the item itself
+// does, and the Effect column has nothing to say in that case. The badge on the skill name is the
+// only thing that explains the row without expanding it, so it has to be exactly on the names the
+// set is responsible for.
+// The real app catalog, so the badge test also proves items.set.badge exists rather than
+// asserting the raw key a fixture-empty catalog would echo back.
+const APP = appEn as Record<string, string>;
+const appLoc: Localization = makeLocalization(APP, APP, "en", GAME, GAME);
+
+const SET = {
+  record: "sets/ultos",
+  nameTag: "tagUltos",
+  members: 5,
+  modifiers: [],
+  boosts: [],
+  masteryBoosts: [],
+} as never;
+const setRow = (skills: string[], fromSet: string[]): Row => ({
+  item: ITEM,
+  levels: 0,
+  modBlocks: [],
+  skills,
+  set: { set: SET, modBlocks: [], boosts: [], skills: fromSet },
+});
+
+test("a skill reached only through the set is badged, and one the item touches itself is not", () => {
+  const html = bodyMarkup(appLoc, [setRow(["sk1", "sk2"], ["sk2"])], namedCtx, { ...DEFAULT_VIEW, mastery: "m1" });
+  const cadence = html.slice(html.indexOf("Cadence"), html.indexOf("Blitz"));
+  expect(cadence).not.toContain("set-badge");
+  expect(html.slice(html.indexOf("Blitz"))).toContain('<span class="set-badge">Set</span>');
+});
+
+test("a row with no set carries no badge at all", () => {
+  const html = bodyMarkup(appLoc, [row(["sk1", "sk2"])], namedCtx, { ...DEFAULT_VIEW, mastery: "m1" });
+  expect(html).not.toContain("set-badge");
 });

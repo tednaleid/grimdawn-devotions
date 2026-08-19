@@ -45,6 +45,31 @@ def conversion_type_tags(stat_tags: dict) -> dict:
             if k.startswith("stat.damage.")}
 
 
+def mod_stat(m: dict, conv_tags: dict) -> dict:
+    """One emitted stat from a skill_modifiers or set_modifiers row.
+
+    Shared by items and sets: a set's modifier record is an ordinary Skill_Modifier
+    and its stats have to read identically on the card, so there is one shape.
+    """
+    stat = {"stat": m["stat_id"], "value": m["value"]}
+    # A conversion percentage reads as a bare number without the pair of damage
+    # types it converts between, so those ride along on the rows that have them and
+    # are absent everywhere else. They ship as game tags, not as the raw GD type
+    # tokens: see conversion_type_tags.
+    if m["from_type"] is not None:
+        stat["from_tag"] = conv_tags[m["from_type"]]
+        stat["to_tag"] = conv_tags[m["to_type"]]
+    # A refresh amount reads as a bare number without the skill it targets and the
+    # trigger that fires it. The target is frequently a different skill from the
+    # block's own (Badge of the Crimson Company sits on Cadence and reduces Leap),
+    # so it cannot be inferred at read time.
+    if m["refresh_skill"] is not None:
+        stat["refresh_skill"] = m["refresh_skill"]
+    if m["refresh_trigger"] is not None:
+        stat["refresh_trigger"] = m["refresh_trigger"]
+    return stat
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Emit the /items/ page dataset")
     ap.add_argument("--deposit-dir", required=True, type=Path)
@@ -184,6 +209,23 @@ def main(argv=None) -> int:
         print(f"ERROR: conversion damage types absent from stat-tags.json: "
               f"{', '.join(unmapped)}", file=sys.stderr)
         return 2
+    # Which set an item belongs to, from the item's own itemSetName - single-valued,
+    # and what the game puts on the tooltip. sets.parquet's member count comes from
+    # the set's own setMembers list instead; see build_sets on why the two sources
+    # are not interchangeable.
+    set_of_item = {r["record"]: r["set_record"] for r in rows(con, """
+        SELECT t.record, lower(trim(f.value)) AS set_record
+        FROM top t JOIN facts f ON f.record = t.record AND f.key = 'itemSetName'
+        WHERE trim(f.value) != ''""")}
+    set_mods = group("""SELECT m.set_record, m.pieces, m.modified_skill, m.stat_id,
+                               m.value, m.from_type, m.to_type, m.refresh_skill,
+                               m.refresh_trigger
+                        FROM set_modifiers m
+                        ORDER BY m.set_record, m.modified_skill, m.modifier_record,
+                                 m.stat_id""", "set_record")
+    set_boost_rows = group("""SELECT b.set_record, b.pieces, b.kind, b.target, b.level
+                              FROM set_boosts b
+                              ORDER BY b.set_record, b.kind, b.target""", "set_record")
     stats = group("""SELECT s.record, s.stat_id, s.source, s.display_low, s.display_high,
                             s.value_min, s.value_max
                      FROM stats s JOIN top t ON t.record = s.record
@@ -201,23 +243,7 @@ def main(argv=None) -> int:
         rec = t["record"]
         by_skill = {}
         for m in mods.get(rec, []):
-            stat = {"stat": m["stat_id"], "value": m["value"]}
-            # A conversion percentage reads as a bare number without the pair of
-            # damage types it converts between, so those ride along on the rows
-            # that have them and are absent everywhere else. They ship as game
-            # tags, not as the raw GD type tokens: see conversion_type_tags.
-            if m["from_type"] is not None:
-                stat["from_tag"] = conv_tags[m["from_type"]]
-                stat["to_tag"] = conv_tags[m["to_type"]]
-            # A refresh amount reads as a bare number without the skill it targets
-            # and the trigger that fires it. The target is frequently a different
-            # skill from the block's own (Badge of the Crimson Company sits on
-            # Cadence and reduces Leap), so it cannot be inferred at read time.
-            if m["refresh_skill"] is not None:
-                stat["refresh_skill"] = m["refresh_skill"]
-            if m["refresh_trigger"] is not None:
-                stat["refresh_trigger"] = m["refresh_trigger"]
-            by_skill.setdefault(m["modified_skill"], []).append(stat)
+            by_skill.setdefault(m["modified_skill"], []).append(mod_stat(m, conv_tags))
         name = t.get("name_tag")
         en_name = t.get("en_name")
         stats_by_record[rec] = [
@@ -249,6 +275,12 @@ def main(argv=None) -> int:
             "mastery_boosts": [{"mastery": b["target"], "level": b["level"]}
                                for b in boosts.get(rec, []) if b["kind"] == "mastery"],
             "modifiers": [{"skill": k, "stats": v} for k, v in sorted(by_skill.items())],
+            # The set this piece belongs to, or absent. The set's own bonuses are
+            # stored once under the doc's `sets` rather than copied onto all five
+            # members, and they are NOT merged into the fields above: a set bonus is
+            # something the player only has while wearing N pieces, so the page has
+            # to be able to say so.
+            "set": set_of_item.get(rec),
         })
 
     doc_meta = {
@@ -256,10 +288,38 @@ def main(argv=None) -> int:
         "steam_buildid": meta.get("steam_buildid", ""),
         "generated_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
+    # Only the sets a listed item actually belongs to, and only those with skill
+    # wiring of their own: a set with nothing but flat stats says nothing this page
+    # filters on.
+    listed_sets = {r for r in set_of_item.values()
+                   if r in set_mods or r in set_boost_rows}
+    sets = []
+    for srow in rows(con, "SELECT * FROM sets ORDER BY set_record"):
+        rec = srow["set_record"]
+        if rec not in listed_sets:
+            continue
+        by_skill = {}
+        for m in set_mods.get(rec, []):
+            by_skill.setdefault((m["pieces"], m["modified_skill"]), []).append(
+                mod_stat(m, conv_tags))
+        sets.append({
+            "record": rec,
+            "name_tag": srow["name_tag"],
+            "members": srow["members"],
+            "modifiers": [{"pieces": k[0], "skill": k[1], "stats": v}
+                          for k, v in sorted(by_skill.items())],
+            "boosts": [{"pieces": b["pieces"], "skill": b["target"], "level": b["level"]}
+                       for b in set_boost_rows.get(rec, []) if b["kind"] == "skill"],
+            "mastery_boosts": [{"pieces": b["pieces"], "mastery": b["target"],
+                                "level": b["level"]}
+                               for b in set_boost_rows.get(rec, []) if b["kind"] == "mastery"],
+        })
+
     doc = {
         "meta": doc_meta,
         "masteries": masteries,
         "skills": skills,
+        "sets": sets,
         "items": items,
     }
     # Per-item stats live in a second, lazily loaded file: the table view

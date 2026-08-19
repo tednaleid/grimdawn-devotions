@@ -2,7 +2,7 @@
 // ABOUTME: i18n-free: callers inject a nameOf resolver so search/sort see resolved display text.
 import type { ModStat } from "./effectText";
 import { CATEGORIES, categoryOf, RARITIES } from "./facets";
-import type { Item, Skill } from "./model";
+import type { Item, ItemSet, Skill } from "./model";
 import type { ViewState } from "./urlState";
 
 export interface Row {
@@ -15,9 +15,34 @@ export interface Row {
   // effectLines once per block and concatenate the resulting Text lines, not the stats.
   modBlocks: ModStat[][];
   // The in-scope skill records this item actually touches, boosted or modified, in the order the
-  // item lists them. This is the row's answer to "why is this here", which otherwise could only
-  // be had by expanding it.
+  // item lists them, followed by any the item reaches only through its set. This is the row's
+  // answer to "why is this here", which otherwise could only be had by expanding it.
   skills: string[];
+  // The set this piece belongs to, when that set has in-scope bonuses of its own. A set bonus is
+  // NOT merged into levels/modBlocks above: the player only has it while wearing `pieces` members,
+  // so the page has to be able to say which is which.
+  set: SetMatch | null;
+}
+
+/** What a row's set contributes inside the current scope. `skills` is the subset the item does not
+ *  already touch on its own, which is what the table marks as set-sourced. */
+export interface SetMatch {
+  set: ItemSet;
+  modBlocks: SetModMatch[];
+  boosts: SetLevelMatch[];
+  skills: string[];
+}
+
+export interface SetModMatch {
+  pieces: number;
+  skill: string;
+  stats: ModStat[];
+}
+
+export interface SetLevelMatch {
+  pieces: number;
+  skill: string;
+  level: number;
 }
 
 type NameOf = (item: Item) => string;
@@ -56,7 +81,28 @@ function scopeSkillSet(skills: Skill[], view: ViewState): Set<string> {
 // in-scope modifier blocks, kept separate (empty when the item only grants levels). A
 // mastery-wide boost only counts toward levels when the caller has opted into it via
 // view.masteryWide.
-function buildRow(item: Item, scope: Set<string>, view: ViewState): Row | null {
+// What the item's set contributes inside the scope, or null when it contributes nothing. Read
+// through the catalogue's set list rather than off the item: a set's bonuses are stored once, not
+// copied onto each of its five members.
+function setMatch(item: Item, sets: Map<string, ItemSet>, scope: Set<string>, own: Set<string>): SetMatch | null {
+  const set = item.set ? sets.get(item.set) : undefined;
+  if (!set) return null;
+  const modBlocks = set.modifiers.filter((m) => scope.has(m.skill));
+  const boosts = set.boosts.filter((b) => scope.has(b.skill));
+  if (!modBlocks.length && !boosts.length) return null;
+  const reached: string[] = [];
+  for (const r of [...modBlocks.map((m) => m.skill), ...boosts.map((b) => b.skill)]) {
+    if (!own.has(r) && !reached.includes(r)) reached.push(r);
+  }
+  return {
+    set,
+    modBlocks: modBlocks.map((m) => ({ pieces: m.pieces, skill: m.skill, stats: m.stats })),
+    boosts: boosts.map((b) => ({ pieces: b.pieces, skill: b.skill, level: b.level })),
+    skills: reached,
+  };
+}
+
+function buildRow(item: Item, scope: Set<string>, view: ViewState, sets: Map<string, ItemSet>): Row | null {
   let levels = 0;
   const matched = new Set<string>();
   for (const b of item.boosts) {
@@ -74,15 +120,20 @@ function buildRow(item: Item, scope: Set<string>, view: ViewState): Row | null {
     matched.add(mb.skill);
   }
 
-  if (levels === 0 && modBlocks.length === 0) return null;
-  return { item, levels, modBlocks, skills: [...matched] };
+  // A set bonus counts as a match: wearing the piece is how a player gets it, so an item whose
+  // only tie to the selected skill is its set still belongs in the table. Its levels stay OUT of
+  // `levels` and its stats out of `modBlocks`, because those are what the item gives on its own.
+  const set = setMatch(item, sets, scope, matched);
+  if (levels === 0 && modBlocks.length === 0 && !set) return null;
+  return { item, levels, modBlocks, skills: [...matched, ...(set?.skills ?? [])], set };
 }
 
 // A row's effect kind is derived from its already-scoped modBlocks, not recomputed from the raw
 // item: "modifies" means it carries a modifier block for the selected scope, "levels" means it
-// only raises rank there.
+// only raises rank there. A set's modifier block counts, since it is a modifier the player gets
+// by wearing this piece alongside the others.
 function kindOf(row: Row): string {
-  return row.modBlocks.length > 0 ? "modifies" : "levels";
+  return row.modBlocks.length > 0 || (row.set?.modBlocks.length ?? 0) > 0 ? "modifies" : "levels";
 }
 
 function matchesFilters(row: Row, view: ViewState, nameOf: NameOf): boolean {
@@ -117,11 +168,12 @@ function sortKeyValue(row: Row, key: string, nameOf: NameOf): string | number {
 }
 
 /** Filter then sort items for the current view. Stable, pure; ties break by item.record. */
-export function applyView(items: Item[], skills: Skill[], view: ViewState, nameOf: NameOf): Row[] {
+export function applyView(items: Item[], skills: Skill[], sets: ItemSet[], view: ViewState, nameOf: NameOf): Row[] {
   const scope = scopeSkillSet(skills, view);
+  const setsByRecord = new Map(sets.map((s) => [s.record, s]));
   const rows: Row[] = [];
   for (const item of items) {
-    const row = buildRow(item, scope, view);
+    const row = buildRow(item, scope, view, setsByRecord);
     if (row && matchesFilters(row, view, nameOf)) rows.push(row);
   }
   const dir = view.sortDir;

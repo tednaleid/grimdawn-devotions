@@ -1419,6 +1419,126 @@ _MODIFIER_STAT_EXCLUDE = ("skillMaxLevel", "skillUltimateLevel", "skillTier",
                           "instantCast", "petLimit", "petBurstSpawn")
 
 
+def _modifier_rows_sql(paired_sql: str, extra_cols: tuple[str, ...] = ()) -> str:
+    """The SELECT behind skill_modifiers.parquet and set_modifiers.parquet.
+
+    `paired_sql` is the body of a `paired` CTE producing (source_record,
+    modified_skill, modifier_record) plus any column named in `extra_cols`. The two
+    tables differ only in what roots them: an item names its modifier through its own
+    record, a set through the set record every member points at. Everything after
+    that - the shell walk, the conversion pair, the refresh qualifiers, reading a
+    per-rank array's first element - is one implementation, because the two must
+    render identically on the same card and a second copy would drift.
+    """
+    excluded = ", ".join(f"'{k}'" for k in _MODIFIER_STAT_EXCLUDE)
+    # facts.value_num is NULL for every one of the 44,013 semicolon-separated
+    # values, so reading it alone dropped every array-valued stat. The split runs
+    # only on the rows that need it and a scalar still comes straight off the
+    # pre-parsed column.
+    first_rank = ("CASE WHEN f.value LIKE '%;%' "
+                  "THEN TRY_CAST(str_split(f.value, ';')[1] AS DOUBLE) "
+                  "ELSE f.value_num END")
+    # The conversion index carried by a key's trailing digits, the unnumbered key
+    # being index 1 - the same expression build_conversions uses, so the two tables
+    # pair the same three keys the same way.
+    conv_n = "COALESCE(NULLIF(regexp_extract({0}, '(\\d+)$', 1), ''), '1')"
+    extra = "".join(f"p.{c}, " for c in extra_cols)
+    return f"""
+        WITH RECURSIVE conv_key AS (
+            SELECT record, regexp_replace(key, '\\d+$', '') AS base,
+                   {conv_n.format("key")} AS n, trim(value) AS value
+            FROM facts
+            WHERE (key LIKE 'conversionInType%' OR key LIKE 'conversionOutType%')
+              AND trim(value) != ''
+        ),
+        -- Both halves of a pair or neither. conversions.parquet requires an in-type
+        -- AND an out-type at the same index to build a triple, and a percentage with
+        -- one side missing names nothing a card could render, so the two tables must
+        -- not disagree about the same game data. Two modifier records carry
+        -- conversionInType Stun with no out-type; they keep their percentage row and
+        -- report no types at all rather than shipping half a pair.
+        conv AS (
+            SELECT i.record, i.n, i.value AS from_type, o.value AS to_type
+            FROM conv_key i
+            JOIN conv_key o ON o.record = i.record AND o.n = i.n
+                           AND o.base = 'conversionOutType'
+            WHERE i.base = 'conversionInType'
+        ),
+        paired AS ({paired_sql}),
+        -- The refresh families name a target skill and a trigger in sibling string
+        -- keys that the numeric stat gate drops. They ride along on the rows that
+        -- have them, matched on the family prefix, exactly as conv does for
+        -- conversions.
+        --
+        -- A trigger holding more than one token is the template's untouched default
+        -- (the full 13-value enum), not a selection, so it is read as absent.
+        --
+        -- The guard is defensive rather than load-bearing: at build 24756825 no record
+        -- pairs a defaulted enum with a non-zero refresh amount, so the numeric stat
+        -- gate has already dropped every row this could catch. It stays because the
+        -- alternative failure is silent and ugly (the whole enum printed onto a card),
+        -- and test_no_record_pairs_a_defaulted_trigger_with_a_real_amount fails the
+        -- moment that stops being true.
+        refresh_qual AS (
+            SELECT record,
+                   regexp_extract(key, '^(refreshCooldown|refreshDuration)', 1) AS family,
+                   max(CASE WHEN key LIKE '%Skill' THEN trim(value) END) AS refresh_skill,
+                   max(CASE WHEN key LIKE '%Trigger' AND trim(value) NOT LIKE '%;%'
+                            THEN trim(value) END) AS refresh_trigger
+            FROM facts
+            WHERE (key IN ('refreshCooldownSkill', 'refreshCooldownTrigger',
+                           'refreshDurationSkill', 'refreshDurationTrigger'))
+              AND trim(value) != ''
+            GROUP BY 1, 2
+        ),
+        {stat_carrier_walk("SELECT DISTINCT modifier_record, modifier_record, 0 "
+                           "FROM paired",
+                           f"f.key NOT IN ({excluded}) "
+                           f"AND coalesce({first_rank}, 0) != 0")}
+        SELECT p.source_record, {extra}p.modified_skill, p.modifier_record,
+               f.key AS stat_id,
+               {first_rank} AS value,
+               c.from_type,
+               c.to_type,
+               rq.refresh_skill,
+               rq.refresh_trigger
+        FROM paired p
+        JOIN stat_record sr ON sr.root = p.modifier_record
+        JOIN facts f ON f.record = sr.cur
+        -- conversionPercentage says nothing on its own: the pair of damage types
+        -- it converts between lives in two sibling string keys that the numeric
+        -- gate below would drop. They ride along on the row instead, matched on the
+        -- conversion index. The index expression is applied to every stat key, but
+        -- only a conversionPercentage row can find a conv partner on its record, so
+        -- the join simply finds nothing on the others.
+        LEFT JOIN conv c ON c.record = sr.cur
+                        AND f.key LIKE 'conversionPercentage%'
+                        AND c.n = {conv_n.format("f.key")}
+        -- regexp_extract returns '' for a non-refresh key, and no refresh_qual row
+        -- has an empty family, so this join finds nothing on unrelated stats
+        -- without needing a guard.
+        LEFT JOIN refresh_qual rq ON rq.record = sr.cur
+                                 AND rq.family = regexp_extract(
+                                       f.key, '^(refreshCooldown|refreshDuration)', 1)
+        WHERE f.key NOT IN ({excluded})
+          AND coalesce({first_rank}, 0) != 0"""
+
+
+# modifiedSkillName<N> names the skill and modifierSkillName<N> the record holding
+# the stats, the trailing number pairing them. Only a mastery skill can be rendered
+# against the skills roster: records/skills/default/defaultevade.dbr is the one
+# off-roster target at build 24756825, and the nine rune items that qualify for
+# skill_modifiers through it alone would otherwise carry nothing renderable.
+_MODIFIER_PAIR_JOIN = """
+            JOIN facts m ON m.record = root.record
+                        AND m.key LIKE 'modifiedSkillName%' AND trim(m.value) != ''
+            JOIN facts r ON r.record = root.record
+                        AND r.key = 'modifierSkillName'
+                                 || regexp_extract(m.key, 'modifiedSkillName(\\d+)', 1)
+                        AND trim(r.value) != ''
+            WHERE lower(trim(m.value)) IN (SELECT record FROM skills)"""
+
+
 def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     """The extra stats an item attaches to one specific skill.
 
@@ -1457,114 +1577,11 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     A carrier whose only stats are arrays used to look empty, so the walk ran past
     it and the whole block vanished with no diagnostic.
     """
-    excluded = ", ".join(f"'{k}'" for k in _MODIFIER_STAT_EXCLUDE)
-    # facts.value_num is NULL for every one of the 44,013 semicolon-separated
-    # values, so reading it alone dropped every array-valued stat. The split runs
-    # only on the rows that need it and a scalar still comes straight off the
-    # pre-parsed column.
-    first_rank = ("CASE WHEN f.value LIKE '%;%' "
-                  "THEN TRY_CAST(str_split(f.value, ';')[1] AS DOUBLE) "
-                  "ELSE f.value_num END")
-    # The conversion index carried by a key's trailing digits, the unnumbered key
-    # being index 1 - the same expression build_conversions uses, so the two tables
-    # pair the same three keys the same way.
-    conv_n = "COALESCE(NULLIF(regexp_extract({0}, '(\\d+)$', 1), ''), '1')"
-    con.execute(f"""
-        CREATE TEMP TABLE skill_modifiers AS
-        WITH RECURSIVE conv_key AS (
-            SELECT record, regexp_replace(key, '\\d+$', '') AS base,
-                   {conv_n.format("key")} AS n, trim(value) AS value
-            FROM facts
-            WHERE (key LIKE 'conversionInType%' OR key LIKE 'conversionOutType%')
-              AND trim(value) != ''
-        ),
-        -- Both halves of a pair or neither. conversions.parquet requires an in-type
-        -- AND an out-type at the same index to build a triple, and a percentage with
-        -- one side missing names nothing a card could render, so the two tables must
-        -- not disagree about the same game data. Two modifier records carry
-        -- conversionInType Stun with no out-type; they keep their percentage row and
-        -- report no types at all rather than shipping half a pair.
-        conv AS (
-            SELECT i.record, i.n, i.value AS from_type, o.value AS to_type
-            FROM conv_key i
-            JOIN conv_key o ON o.record = i.record AND o.n = i.n
-                           AND o.base = 'conversionOutType'
-            WHERE i.base = 'conversionInType'
-        ),
-        paired AS (
-            SELECT s.record AS item_record,
+    con.execute("CREATE TEMP TABLE skill_modifiers AS " + _modifier_rows_sql(f"""
+            SELECT root.record AS source_record,
                    lower(trim(m.value)) AS modified_skill,
                    lower(trim(r.value)) AS modifier_record
-            FROM scoped s
-            JOIN facts m ON m.record = s.record
-                        AND m.key LIKE 'modifiedSkillName%' AND trim(m.value) != ''
-            JOIN facts r ON r.record = s.record
-                        AND r.key = 'modifierSkillName'
-                                 || regexp_extract(m.key, 'modifiedSkillName(\\d+)', 1)
-                        AND trim(r.value) != ''
-            -- Only a mastery skill can be rendered against the skills roster.
-            -- records/skills/default/defaultevade.dbr is the one off-roster target
-            -- at build 24756825, and the nine rune items that qualify for this
-            -- table through it alone would otherwise carry nothing renderable.
-            WHERE lower(trim(m.value)) IN (SELECT record FROM skills)
-        ),
-        -- The refresh families name a target skill and a trigger in sibling string
-        -- keys that the numeric stat gate drops. They ride along on the rows that
-        -- have them, matched on the family prefix, exactly as conv does for
-        -- conversions.
-        --
-        -- A trigger holding more than one token is the template's untouched default
-        -- (the full 13-value enum), not a selection, so it is read as absent.
-        --
-        -- The guard is defensive rather than load-bearing: at build 24756825 no record
-        -- pairs a defaulted enum with a non-zero refresh amount, so the numeric stat
-        -- gate has already dropped every row this could catch. It stays because the
-        -- alternative failure is silent and ugly (the whole enum printed onto a card),
-        -- and test_no_record_pairs_a_defaulted_trigger_with_a_real_amount fails the
-        -- moment that stops being true.
-        refresh_qual AS (
-            SELECT record,
-                   regexp_extract(key, '^(refreshCooldown|refreshDuration)', 1) AS family,
-                   max(CASE WHEN key LIKE '%Skill' THEN trim(value) END) AS refresh_skill,
-                   max(CASE WHEN key LIKE '%Trigger' AND trim(value) NOT LIKE '%;%'
-                            THEN trim(value) END) AS refresh_trigger
-            FROM facts
-            WHERE (key IN ('refreshCooldownSkill', 'refreshCooldownTrigger',
-                           'refreshDurationSkill', 'refreshDurationTrigger'))
-              AND trim(value) != ''
-            GROUP BY 1, 2
-        ),
-        {stat_carrier_walk("SELECT DISTINCT modifier_record, modifier_record, 0 "
-                           "FROM paired",
-                           f"f.key NOT IN ({excluded}) "
-                           f"AND coalesce({first_rank}, 0) != 0")}
-        SELECT p.item_record, p.modified_skill, p.modifier_record,
-               f.key AS stat_id,
-               {first_rank} AS value,
-               c.from_type,
-               c.to_type,
-               rq.refresh_skill,
-               rq.refresh_trigger
-        FROM paired p
-        JOIN stat_record sr ON sr.root = p.modifier_record
-        JOIN facts f ON f.record = sr.cur
-        -- conversionPercentage says nothing on its own: the pair of damage types
-        -- it converts between lives in two sibling string keys that the numeric
-        -- gate below would drop. They ride along on the row instead, matched on the
-        -- conversion index. The index expression is applied to every stat key, but
-        -- only a conversionPercentage row can find a conv partner on its record, so
-        -- the join simply finds nothing on the others.
-        LEFT JOIN conv c ON c.record = sr.cur
-                        AND f.key LIKE 'conversionPercentage%'
-                        AND c.n = {conv_n.format("f.key")}
-        -- regexp_extract returns '' for a non-refresh key, and no refresh_qual row
-        -- has an empty family, so this join finds nothing on unrelated stats
-        -- without needing a guard.
-        LEFT JOIN refresh_qual rq ON rq.record = sr.cur
-                                 AND rq.family = regexp_extract(
-                                       f.key, '^(refreshCooldown|refreshDuration)', 1)
-        WHERE f.key NOT IN ({excluded})
-          AND coalesce({first_rank}, 0) != 0""")
+            FROM scoped root{_MODIFIER_PAIR_JOIN}"""))
     out = out_dir / "skill_modifiers.parquet"
     # modifier_record is part of the sort key because it is part of the identity:
     # one item can attach two different carriers to the same skill and both can
@@ -1572,10 +1589,155 @@ def build_skill_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
     # skillCooldownReduction 100 (the chance-gated reset) on one carrier and 5 (the
     # flat reduction) on another, so neither row can be dropped or summed, and
     # without the record in the sort their order is not determined.
-    con.execute(f"COPY (SELECT * FROM skill_modifiers "
+    con.execute(f"COPY (SELECT source_record AS item_record, modified_skill, modifier_record, "
+                f"stat_id, value, from_type, to_type, refresh_skill, refresh_trigger "
+                f"FROM skill_modifiers "
                 f"ORDER BY item_record, modified_skill, modifier_record, stat_id) "
                 f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
     return con.execute("SELECT count(*) FROM skill_modifiers").fetchone()[0]
+
+
+# ---------------------------------------------------------------------------
+# loot sets
+# ---------------------------------------------------------------------------
+
+# A set bonus turns on at a piece count, and the set record stores that as one
+# array slot per member: position N carries the value granted while N pieces are
+# worn. Every such array in the game today is a single step (0..0,V,V..V) and
+# position 1 is zero in all 642 of them, one piece not being a set, so a bonus is
+# fully described by the first non-zero position and the value sitting there.
+# build_sets fails the run if a patch ever ships a multi-step array, rather than
+# silently reporting only its first step.
+_PIECES = ("list_position(list_transform(str_split({0}, ';'), "
+           "x -> coalesce(TRY_CAST(x AS DOUBLE), 0) != 0), true)")
+_SET_ARRAY_KEYS = ("itemSkillModifierControl", "augmentSkillLevel%",
+                   "augmentMasteryLevel%", "itemSkillLevel")
+
+
+def build_sets(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
+    """The loot sets and which items belong to them.
+
+    A set is its own record under `records/items/lootsets` and is deliberately
+    outside `scoped`: it carries no `Class` at all and gear-types.json maps its
+    category to no domain, so every other table here passes it by. It nonetheless
+    carries the same skill wiring an item does - `modifiedSkillName<N>` with
+    `modifierSkillName<N>`, `augmentSkillName<N>` with `augmentSkillLevel<N>` - and
+    those bonuses are a real reason to wear a piece. Ultos' Tempest gives Savagery
+    33 lightning damage and a 30% on-crit Primal Strike refresh at 5 pieces, and
+    none of its five members says so on its own record.
+
+    One row per set, not per member: which set an ITEM belongs to is the item's own
+    `itemSetName`, which is single-valued and is what the game puts on its tooltip.
+    The set's `setMembers` list is read only for its length, which is what sizes
+    every piece-count array on the record. The two disagree in the corners (26 items
+    claim a set that does not list them, 19 listed members do not claim back), and no
+    item is a member of two sets that both carry skill wiring, so the item's own
+    claim is the safe side to link from.
+    """
+    con.execute("""
+        CREATE TEMP TABLE sets AS
+        SELECT n.record AS set_record, trim(n.value) AS name_tag,
+               len(str_split(m.value, ';')) AS members
+        FROM facts n
+        JOIN facts m ON m.record = n.record AND m.key = 'setMembers'
+                    AND trim(m.value) != ''
+        WHERE n.key = 'setName' AND trim(n.value) != ''""")
+    # A multi-step array would mean a bonus that grows with the piece count, which
+    # neither this schema nor the page's "(N pieces)" caption can express. Nothing
+    # in the game ships one; the guard is here so a patch that starts to says so.
+    for key in _SET_ARRAY_KEYS:
+        bad = con.execute(f"""
+            SELECT count(*) FROM facts f
+            WHERE f.key LIKE '{key}' AND f.value LIKE '%;%'
+              AND f.record IN (SELECT set_record FROM sets)
+              AND len(list_filter(list_distinct(
+                    list_transform(str_split(f.value, ';'),
+                                   x -> coalesce(TRY_CAST(x AS DOUBLE), 0))),
+                    v -> v != 0)) > 1""").fetchone()[0]
+        if bad:
+            print(f"ERROR: {bad} set arrays for {key} carry more than one non-zero "
+                  f"level; the piece-count model assumes a single step", file=sys.stderr)
+            raise SystemExit(2)
+    out = out_dir / "sets.parquet"
+    con.execute(f"COPY (SELECT * FROM sets ORDER BY set_record) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM sets").fetchone()[0]
+
+
+def build_set_modifiers(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
+    """A set's own skill modifiers, and the piece count that turns them on.
+
+    Same shape and same walk as skill_modifiers (see `_modifier_rows_sql`) - a set's
+    modifier record is a `Skill_Modifier` like any other - plus the piece count. One
+    `itemSkillModifierControl` array governs every `modifiedSkillName<N>` on a set,
+    so all of a set's blocks share a threshold; no set in the game carries a
+    per-block control key.
+    """
+    con.execute("CREATE TEMP TABLE set_modifiers AS " + _modifier_rows_sql(f"""
+            SELECT root.set_record AS source_record,
+                   CAST({_PIECES.format("ctl.value")} AS INTEGER) AS pieces,
+                   lower(trim(m.value)) AS modified_skill,
+                   lower(trim(r.value)) AS modifier_record
+            FROM (SELECT DISTINCT set_record FROM sets) root
+            JOIN facts ctl ON ctl.record = root.set_record
+                          AND ctl.key = 'itemSkillModifierControl'
+                          AND trim(ctl.value) != ''{_MODIFIER_PAIR_JOIN.replace(
+                              "root.record", "root.set_record")}""",
+                                                                          ("pieces",)))
+    out = out_dir / "set_modifiers.parquet"
+    con.execute(f"COPY (SELECT source_record AS set_record, pieces, modified_skill, "
+                f"modifier_record, stat_id, value, from_type, to_type, refresh_skill, "
+                f"refresh_trigger FROM set_modifiers "
+                f"ORDER BY set_record, modified_skill, modifier_record, stat_id) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM set_modifiers").fetchone()[0]
+
+
+def build_set_boosts(con: duckdb.DuckDBPyConnection, out_dir: Path) -> int:
+    """A set's +N to a skill or a mastery, and the piece count that turns it on.
+
+    build_boosts' shape with a piece count: the level lives in the same per-piece
+    array as everything else on a set record, so the level reported is the one at
+    the first piece count that grants anything.
+    """
+    con.execute("CREATE TEMP TABLE set_boosts (set_record VARCHAR, pieces INTEGER, "
+                "kind VARCHAR, target VARCHAR, mastery_record VARCHAR, level INTEGER)")
+    for kind, name_key, level_key in (("skill", "augmentSkillName", "augmentSkillLevel"),
+                                      ("mastery", "augmentMasteryName", "augmentMasteryLevel")):
+        con.execute(f"""
+            INSERT INTO set_boosts
+            WITH raw AS (
+                SELECT s.set_record, lower(trim(n.value)) AS target, lv.value AS arr
+                FROM (SELECT DISTINCT set_record FROM sets) s
+                JOIN facts n ON n.record = s.set_record
+                            AND n.key LIKE '{name_key}%' AND trim(n.value) != ''
+                JOIN facts lv ON lv.record = s.set_record
+                             AND lv.key = '{level_key}'
+                                          || regexp_extract(n.key, '{name_key}(\\d+)', 1)
+                             AND trim(lv.value) != ''
+            ),
+            stepped AS (
+                SELECT set_record, target, arr,
+                       CAST({_PIECES.format("arr")} AS INTEGER) AS pieces
+                FROM raw
+            ),
+            levelled AS (
+                SELECT set_record, target, pieces,
+                       CAST(TRY_CAST(str_split(arr, ';')[pieces] AS DOUBLE) AS INTEGER) AS lvl,
+                       regexp_extract(target, 'playerclass(\\d+)', 1) AS cls
+                FROM stepped
+                WHERE pieces IS NOT NULL
+            )
+            SELECT set_record, pieces, '{kind}', target,
+                   'records/skills/playerclass' || cls
+                   || '/_classtraining_class' || cls || '.dbr',
+                   lvl
+            FROM levelled
+            WHERE cls != '' AND lvl > 0""")
+    out = out_dir / "set_boosts.parquet"
+    con.execute(f"COPY (SELECT * FROM set_boosts ORDER BY set_record, kind, target) "
+                f"TO {sql_str(out.as_posix())} (FORMAT parquet, COMPRESSION zstd)")
+    return con.execute("SELECT count(*) FROM set_boosts").fetchone()[0]
 
 
 # ---------------------------------------------------------------------------
@@ -1613,6 +1775,9 @@ def cmd_build(args) -> int:
     n_skill_ranks = build_skill_ranks(con, out_dir, diag)
     n_pet_ranks = build_pet_ranks(con, out_dir, diag)
     n_skill_modifiers = build_skill_modifiers(con, out_dir)
+    n_sets = build_sets(con, out_dir)
+    n_set_modifiers = build_set_modifiers(con, out_dir)
+    n_set_boosts = build_set_boosts(con, out_dir)
 
     rel_out = out_dir / "relations.parquet"
     con.execute(f"COPY (SELECT * FROM relations ORDER BY src, kind, dst) "
@@ -1660,13 +1825,15 @@ def cmd_build(args) -> int:
     print(f"  skill ranks: {n_skill_ranks}")
     print(f"  pet ranks: {n_pet_ranks}")
     print(f"  skill modifiers: {n_skill_modifiers}")
+    print(f"  sets: {n_sets}   modifiers({n_set_modifiers})  boosts({n_set_boosts})")
     print(f"  skill effect map: {n_skill_effect}")
     print("  diagnostics: " + "  ".join(f"{k}={v}" for k, v in diag.items()
                                         if not k.endswith("_sample")))
     if diag.get("equation_error_sample"):
         print(f"  first equation error: {diag['equation_error_sample']}")
     for name in ("entities", "stats", "relations", "families", "sources", "boosts", "conversions",
-                 "skills", "skill_effect", "skill_ranks", "pet_ranks", "skill_modifiers"):
+                 "skills", "skill_effect", "skill_ranks", "pet_ranks", "skill_modifiers",
+                 "sets", "set_modifiers", "set_boosts"):
         p = out_dir / f"{name}.parquet"
         print(f"  {p.name}: {file_size_str(p)}")
     print(f"  deposit build: {meta.get('steam_buildid') or '(none)'}")

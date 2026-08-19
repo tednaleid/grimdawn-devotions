@@ -77,6 +77,61 @@ def test_refresh_qualifiers_absent_on_unrelated_stats():
     assert n == 0, f"{n} non-refresh rows carry a refresh qualifier"
 
 
+def test_ultos_tempest_set_bonuses_match_the_grimtools_card():
+    """A set's skill wiring is its own record's, and no member says any of it.
+
+    Pinned to the grimtools card for Mythical Ultos' Gem, which lists under
+    "(4) Set" a +2 to all skills in Shaman and under "(5) Set" a Savagery block
+    reading "33 Lightning Damage" and "30% Chance on Critical Attack to reduce
+    cooldown of Primal Strike by 1 Second". The set record is outside `scoped`
+    (no Class, and gear-types.json gives records/items/lootsets no domain), so
+    nothing but build_set_modifiers/build_set_boosts can reach any of it.
+    """
+    con = duckdb.connect()
+    ultos = "records/items/lootsets/itemset_d017b.dbr"
+    mods = con.execute(f"""
+        SELECT pieces, stat_id, value, refresh_skill, refresh_trigger
+        FROM read_parquet('data/derived/set_modifiers.parquet')
+        WHERE set_record = '{ultos}'
+          AND modified_skill = 'records/skills/playerclass06/savagery1.dbr'
+        ORDER BY stat_id""").fetchall()
+    assert mods == [
+        (5, "offensiveLightningMin", 33.0, None, None),
+        (5, "refreshCooldownAmount", 1.0,
+         "records/skills/playerclass06/savagestrike1.dbr", "AttackEnemyCrit"),
+        (5, "refreshCooldownChance", 30.0,
+         "records/skills/playerclass06/savagestrike1.dbr", "AttackEnemyCrit"),
+    ], mods
+    boosts = con.execute(f"""
+        SELECT pieces, kind, target, level
+        FROM read_parquet('data/derived/set_boosts.parquet')
+        WHERE set_record = '{ultos}' ORDER BY pieces, kind""").fetchall()
+    assert boosts == [
+        (4, "mastery", "records/skills/playerclass06/_classtraining_class06.dbr", 2),
+    ], boosts
+
+
+def test_a_set_bonus_never_needs_more_pieces_than_the_set_has():
+    """The piece count is an index into a per-member array, so it cannot exceed the
+    member count. A count that did would mean the array and setMembers disagree, and
+    the page would caption a bonus nobody can ever wear."""
+    con = duckdb.connect()
+    over = con.execute("""
+        WITH s AS (SELECT * FROM read_parquet('data/derived/sets.parquet')),
+             b AS (SELECT set_record, pieces FROM read_parquet('data/derived/set_modifiers.parquet')
+                   UNION ALL
+                   SELECT set_record, pieces FROM read_parquet('data/derived/set_boosts.parquet'))
+        SELECT count(*) FROM b JOIN s USING (set_record) WHERE b.pieces > s.members""").fetchone()[0]
+    assert over == 0, f"{over} set bonuses need more pieces than their set has"
+    lo = con.execute("""
+        SELECT min(pieces) FROM (
+            SELECT pieces FROM read_parquet('data/derived/set_modifiers.parquet')
+            UNION ALL SELECT pieces FROM read_parquet('data/derived/set_boosts.parquet'))""").fetchone()[0]
+    # One piece is not a set: position 1 is zero in every array the game ships, so
+    # nothing should ever report a 1-piece bonus.
+    assert lo == 2, f"lowest piece count is {lo}, expected 2"
+
+
 def run():
     fns = [v for k, v in globals().items() if k.startswith("test_")]
     for fn in fns:

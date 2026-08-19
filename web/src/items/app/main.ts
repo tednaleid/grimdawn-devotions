@@ -37,6 +37,9 @@ async function boot() {
   const knownSkills = new Map(catalogue.skills.map((s) => [s.record, s.mastery]));
   const skillByRecord = new Map(catalogue.skills.map((s) => [s.record, s]));
   const masteryByRecord = new Map(catalogue.masteries.map((m) => [m.record, m]));
+  // A set's bonuses are stored once on the catalogue, not copied onto its members, so an item's
+  // `set` record is resolved through here.
+  const setByRecord = new Map(catalogue.sets.map((s) => [s.record, s]));
 
   const overrideLocale = storedLocale(SUPPORTED_LOCALES);
   let localization = await loadLocalization({
@@ -84,6 +87,7 @@ async function boot() {
         return mastery?.nameTag ? gameT(mastery.nameTag) : undefined;
       },
       skillOf: (skillRecord) => skillByRecord.get(skillRecord),
+      setOf: (setRecord) => (setRecord ? setByRecord.get(setRecord) : undefined),
       loc: localization,
     };
   }
@@ -102,7 +106,7 @@ async function boot() {
   };
 
   function render(): void {
-    const rows = applyView(catalogue.items, catalogue.skills, view, nameOf);
+    const rows = applyView(catalogue.items, catalogue.skills, catalogue.sets, view, nameOf);
     renderTable(tableEl, localization, catalogue, skillIcons, rows, view, detailContext(), handlers);
   }
 
