@@ -1092,11 +1092,12 @@ mislabels rows can be committed and pushed with a green hook. The Conduit amulet
 bug (every Conduit RR row named for the Occultist amulet) shipped through exactly
 that gap.
 
-Blocked on a pre-existing failure, not on the wiring. `just test-scripts` aborts
-early because `scripts/test_parse_monsters.py` has count drift against the
-1.3.0.7 dataset; adding `test-scripts` to `check` today would block every commit
-in the repo. Fix the monster count drift first, then append `test-scripts` to the
-`check` recipe.
+No longer blocked: the monster count drift that made `just test-scripts` abort
+early is gone, and as of the /items/ merge all 17 suites pass. What remains is
+the wiring decision - the suite takes about a minute against the extracted game
+data, so appending it to `check` puts that on every commit rather than on CI
+alone. Either append it to the `check` recipe or add a slower tier next to
+`test-slow` and run it before dataset changes.
 
 Note the suite is a no-op without a local game install: each test skips itself
 when `extracted/records` is absent, so this gate only bites on Windows machines
