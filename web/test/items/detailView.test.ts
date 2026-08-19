@@ -32,6 +32,7 @@ const realCtx: DetailContext = {
   },
   skillOf: (r) => skillByRecord.get(r),
   setOf: () => undefined,
+  membersOf: () => [],
   loc,
 };
 
@@ -143,6 +144,7 @@ const synCtx: DetailContext = {
   masteryNameOf: (r) => (r === "masteries/soldier.dbr" ? litT("Soldier") : undefined),
   skillOf: () => undefined,
   setOf: () => undefined,
+  membersOf: () => [],
   loc: synLoc,
 };
 
@@ -330,6 +332,7 @@ const petCtx: DetailContext = {
   masteryNameOf: () => undefined,
   skillOf: (r) => (r === petSkill.record ? petSkill : undefined),
   setOf: () => undefined,
+  membersOf: () => [],
   loc: makeLocalization(
     {},
     {},
@@ -421,6 +424,7 @@ const setCtx: DetailContext = {
   tagOf: (s) => ({ ...SYN_TAGS, offensiveLightningMin: "DamageLightning" })[s],
   templateOf: (t) => SET_GAME[t],
   setOf: (r) => (r === "sets/ultos" ? (ultos as never) : undefined),
+  membersOf: () => [],
   loc: setLoc,
 };
 
@@ -443,6 +447,76 @@ test("a set modifier line names the skill it belongs to", () => {
   expect(html).toContain(
     '<span class="set-detail-skill">Blitz</span> <span class="dmg dmg-lightning">33 Lightning Damage</span>',
   );
+});
+
+// The pieces of the set, so the player can tell at a glance which slots the set wants and whether
+// one of them is a slot they would rather not give up. Slot first, because an item's name rarely
+// says where it goes; the name too, so an owned piece is recognisable.
+const ultosPieces: Item[] = [
+  synItem({
+    record: "items/ultos-gem",
+    nameTag: "tagUltosGem",
+    gearType: "medal",
+    set: "sets/ultos",
+    grimtools: "https://www.grimtools.com/db/items/gem",
+  }),
+  synItem({ record: "items/ultos-hood", nameTag: "tagUltosHood", gearType: "head", set: "sets/ultos" }),
+  synItem({ record: "items/ultos-stormseeker", nameTag: "tagUltosStormseeker", gearType: "mace2h", set: "sets/ultos" }),
+];
+const memberCtx: DetailContext = {
+  ...setCtx,
+  loc: makeLocalization(
+    appEn as Record<string, string>,
+    appEn as Record<string, string>,
+    "en",
+    {
+      ...SET_GAME,
+      tagUltosGem: "Ultos' Gem",
+      tagUltosHood: "Ultos' Hood",
+      tagUltosStormseeker: "Ultos' Stormseeker",
+      tagLootFilter10: "Two-Handed Melee",
+    },
+    {},
+  ),
+  membersOf: (r) => (r === "sets/ultos" ? ultosPieces : []),
+};
+
+function memberLines(html: string): string[] {
+  const list = html.match(/<ul class="set-detail-members">([\s\S]*?)<\/ul>/);
+  if (!list) return [];
+  return [...list[1]!.matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)].map((m) => m[1]!.replace(/<[^>]+>/g, ""));
+}
+
+test("a set block lists every piece as slot and name, in the table's slot order", () => {
+  const html = detailMarkup(ultosPieces[0]!, memberCtx);
+  expect(memberLines(html)).toEqual(["Head: Ultos' Hood", "Two-Handed Melee: Ultos' Stormseeker", "Medal: Ultos' Gem"]);
+  // The list describes the whole set, so it comes once, above the per-piece-count bonus headings.
+  expect(html.indexOf("set-detail-members")).toBeLessThan(html.indexOf("(4 pieces)"));
+});
+
+test("the expanded piece is marked in its set's member list", () => {
+  const html = detailMarkup(ultosPieces[1]!, memberCtx);
+  const marked = [...html.matchAll(/<li class="set-detail-member is-this"[^>]*>([\s\S]*?)<\/li>/g)].map((m) =>
+    m[1]!.replace(/<[^>]+>/g, ""),
+  );
+  expect(marked).toEqual(["Head: Ultos' Hood"]);
+});
+
+// A piece's name links to its grimtools page exactly as the table's name cell does, so the player
+// can go straight to a piece they do not own; a piece with no known page stays plain text.
+test("a set piece's name links to its grimtools page when it has one", () => {
+  const html = detailMarkup(ultosPieces[1]!, memberCtx);
+  expect(html).toContain(
+    '<a href="https://www.grimtools.com/db/items/gem" target="_blank" rel="noopener noreferrer">Ultos\' Gem</a>',
+  );
+  expect(html).toContain("Head: Ultos' Hood</li>");
+  expect(html).not.toContain('<a href=""');
+});
+
+test("a set with no members in the catalogue renders its bonuses without a member list", () => {
+  const html = detailMarkup(synItem({ set: "sets/ultos" }), setCtx);
+  expect(html).toContain("(4 pieces)");
+  expect(html).not.toContain("set-detail-members");
 });
 
 test("an item in no set renders no set block", () => {

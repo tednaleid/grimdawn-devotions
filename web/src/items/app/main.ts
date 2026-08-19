@@ -40,6 +40,15 @@ async function boot() {
   // A set's bonuses are stored once on the catalogue, not copied onto its members, so an item's
   // `set` record is resolved through here.
   const setByRecord = new Map(catalogue.sets.map((s) => [s.record, s]));
+  // And the other way round: a set's pieces are the items that claim it, since the set record
+  // carries only a member count.
+  const membersBySet = new Map<string, Item[]>();
+  for (const item of catalogue.items) {
+    if (!item.set) continue;
+    const list = membersBySet.get(item.set);
+    if (list) list.push(item);
+    else membersBySet.set(item.set, [item]);
+  }
 
   const overrideLocale = storedLocale(SUPPORTED_LOCALES);
   let localization = await loadLocalization({
@@ -88,6 +97,7 @@ async function boot() {
       },
       skillOf: (skillRecord) => skillByRecord.get(skillRecord),
       setOf: (setRecord) => (setRecord ? setByRecord.get(setRecord) : undefined),
+      membersOf: (setRecord) => membersBySet.get(setRecord) ?? [],
       loc: localization,
     };
   }

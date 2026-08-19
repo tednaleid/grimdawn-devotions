@@ -110,6 +110,7 @@ function contextFor(locale: string): DetailContext {
     masteryNameOf: () => undefined,
     skillOf: (r) => skillByRecord.get(r),
     setOf: () => undefined,
+    membersOf: () => [],
     loc,
   };
 }

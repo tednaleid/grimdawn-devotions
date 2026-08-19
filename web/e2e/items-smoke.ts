@@ -288,6 +288,24 @@ try {
     setText.includes("33 Lightning Damage") && setText.includes("reduce cooldown of Primal Strike"),
     "and carries the set's own Savagery lines, which no member record holds",
   );
+  // The set's pieces, slot first in the table's slot order, with the expanded item marked.
+  const setMembers = await cdp.evaluate<string[]>(
+    "[...document.querySelectorAll('.set-detail-members li')].map(li => li.innerText)",
+  );
+  check(
+    setMembers.join("|") ===
+      "Head: Ultos' Hood|Shoulders: Ultos' Spaulders|Chest: Ultos' Cuirass|" +
+        "2h Melee: Ultos' Stormseeker|Amulet: Ultos' Gem",
+    `the set block lists every piece as slot and name, in slot order (${setMembers.join("|")})`,
+  );
+  const thisPiece = await cdp.evaluate<string>(
+    "(document.querySelector('.set-detail-member.is-this') || {}).innerText || ''",
+  );
+  check(thisPiece === "Amulet: Ultos' Gem", `and marks the expanded piece as this one (${thisPiece})`);
+  const pieceLinks = await cdp.evaluate<number>(
+    "document.querySelectorAll('.set-detail-members a[href^=\"https://www.grimtools.com/\"][target=_blank]').length",
+  );
+  check(pieceLinks === 5, `every piece's name links to its grimtools page (${pieceLinks} of 5)`);
   await cdp.evaluate(`(() => {
     const tr = [...document.querySelectorAll('tr.item-row')].find(r => r.innerText.includes("Ultos' Gem"));
     tr.dispatchEvent(new MouseEvent('click', {bubbles: true}));

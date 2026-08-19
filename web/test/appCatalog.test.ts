@@ -351,6 +351,7 @@ const REQUIRED = [
   "items.detail.grimtools",
   "items.tree.offTree",
   "items.set.pieces",
+  "items.set.member",
   "items.set.badge",
   "items.card.atRank",
   "items.card.atUltimate",

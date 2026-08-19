@@ -494,6 +494,16 @@
 .items-page .set-detail-skill {
   color: var(--it-mut);
 }
+/* The set's pieces, slot first; the expanded item's own entry is the bright one. */
+.items-page .set-detail-members {
+  margin: 0;
+  padding-left: 1.1em;
+  color: var(--it-mut);
+}
+.items-page .set-detail-member.is-this {
+  color: var(--it-ink);
+  font-weight: 600;
+}
 .items-page .item-detail-grimtools {
   display: inline-block;
   margin-top: 12px;

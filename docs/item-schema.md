@@ -151,7 +151,10 @@ each member's `set` field rather than copied onto all five, and they are never m
 into the item's own `boosts`/`modifiers`: a set bonus is something the player has only
 while wearing N pieces, so the page can say which is which. The page treats a set bonus
 as a match - filtering on Primal Strike surfaces every Ultos piece, because wearing them
-is how you get that bonus - and badges the skill names it is responsible for. `data/stat-item-tags.json`
+is how you get that bonus - and badges the skill names it is responsible for. The set
+record itself carries only a member count; the expanded row lists the set's pieces (slot
+and name, the expanded item marked) by grouping the catalogue's items on their own `set`
+claim, which covers every set the catalogue carries. `data/stat-item-tags.json`
 (`just stat-item-tags`) is the raw stat id -> game display tag map behind every stat
 label the page shows - the SAME tags `game.<lang>.json` carries, so a card reuses the
 game's own wording in every locale instead of inventing new labels. A stat id that

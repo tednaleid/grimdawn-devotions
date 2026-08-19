@@ -3,7 +3,9 @@
 import { gameFormatT, gameT, litT, resolveText, type Text } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
 import { rowEffectLines, type EffectContext, type ModStat } from "../core/effectText";
+import { categoryRank, itemCategory } from "../core/filter";
 import type { Item, ItemSet, PetBlock, PetStat, Skill } from "../core/model";
+import { categoryLabel } from "./categoryLabel";
 import { effectHtml } from "./effectMarkup";
 
 // Everything the detail view needs beyond EffectContext: a Localization to resolve Text (the
@@ -18,6 +20,9 @@ export interface DetailContext extends EffectContext {
   // The set a piece belongs to, when the catalogue carries it. A set's bonuses are stored once
   // rather than on each member, so the item alone cannot answer this.
   setOf: (record: string | null) => ItemSet | undefined;
+  // The catalogue's items that belong to a set. The set record itself carries only a member
+  // count, so the pieces are found by grouping items on their own `set` claim.
+  membersOf: (setRecord: string) => Item[];
 }
 
 function esc(s: string): string {
@@ -174,10 +179,38 @@ function skillSectionHtml(ctx: DetailContext, entry: SkillEntry): string {
   </section>`;
 }
 
+// The pieces of the set, slot first, in the table's slot order, with the expanded piece marked:
+// the question this answers is "which slots does this set want, and is one of them a slot I would
+// rather not give up", and an item's name rarely says where it goes. Empty when the catalogue
+// carries none of the set's members.
+function setMembersHtml(ctx: DetailContext, set: ItemSet, item: Item): string {
+  const loc = ctx.loc;
+  const nameOf = (m: Item): string => (m.nameTag ? loc.gameText(m.nameTag) : m.record);
+  const members = [...ctx.membersOf(set.record)].sort(
+    (a, b) => categoryRank(a) - categoryRank(b) || nameOf(a).localeCompare(nameOf(b)),
+  );
+  if (!members.length) return "";
+  const lines = members
+    .map((m) => {
+      // The name links to its grimtools page like the table's name cell, so the params carry
+      // markup and are escaped one by one rather than the line as a whole.
+      const name = m.grimtools
+        ? `<a href="${esc(m.grimtools)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(m))}</a>`
+        : esc(nameOf(m));
+      const text = loc.translate("items.set.member", { slot: esc(categoryLabel(loc, itemCategory(m))), name });
+      return m.record === item.record
+        ? `<li class="set-detail-member is-this" aria-current="true">${text}</li>`
+        : `<li class="set-detail-member">${text}</li>`;
+    })
+    .join("");
+  return `<h4 class="set-detail-name">${esc(setName(loc, set))}</h4><ul class="set-detail-members">${lines}</ul>`;
+}
+
 // The set's own bonuses, grouped by the piece count that turns each on. Rendered as its own
 // block under the item's, and captioned with the count, because a set bonus is not something the
-// player has by equipping this piece: it arrives only once N members of the set are worn.
-function setSectionHtml(ctx: DetailContext, set: ItemSet): string {
+// player has by equipping this piece: it arrives only once N members of the set are worn. The
+// set's pieces lead the block, the way the game's own card lists them before the bonuses.
+function setSectionHtml(ctx: DetailContext, set: ItemSet, item: Item): string {
   const loc = ctx.loc;
   const byPieces = new Map<number, string[]>();
   const lineFor = (pieces: number): string[] => {
@@ -213,7 +246,7 @@ function setSectionHtml(ctx: DetailContext, set: ItemSet): string {
       return `<h4 class="set-detail-name">${caption}</h4><ul class="skill-detail-lines">${lines}</ul>`;
     })
     .join("");
-  return blocks ? `<section class="set-detail">${blocks}</section>` : "";
+  return blocks ? `<section class="set-detail">${setMembersHtml(ctx, set, item)}${blocks}</section>` : "";
 }
 
 /** The set's display name, falling back to its record like every other name on this page. */
@@ -223,7 +256,7 @@ export function setName(loc: Localization, set: ItemSet): string {
 }
 
 /** Pure markup for one item's full detail: every touched skill, its lines, its pet panel when it
- *  carries one, mastery-wide grants, its set's bonuses, and the grimtools link. */
+ *  carries one, mastery-wide grants, its set's pieces and bonuses, and the grimtools link. */
 export function detailMarkup(item: Item, ctx: DetailContext): string {
   const loc = ctx.loc;
   const skillsHtml = touchedSkills(item)
@@ -235,7 +268,7 @@ export function detailMarkup(item: Item, ctx: DetailContext): string {
     .join("");
   const masteryHtml = masteryLines ? `<ul class="item-detail-mastery">${masteryLines}</ul>` : "";
   const set = ctx.setOf(item.set);
-  const setHtml = set ? setSectionHtml(ctx, set) : "";
+  const setHtml = set ? setSectionHtml(ctx, set, item) : "";
   const gtHtml = item.grimtools
     ? `<a class="item-detail-grimtools" href="${esc(item.grimtools)}" target="_blank" rel="noopener noreferrer">${esc(loc.translate("items.detail.grimtools"))}</a>`
     : "";

@@ -2,8 +2,9 @@
 // ABOUTME: Every change round-trips through onView; the skill picker is the SVG mastery tree from treeView.ts.
 import { litT, resolveText } from "../../core/localization";
 import type { Localization } from "../../ports/Localization";
-import { CATEGORIES, categoryGameTag, DOMAINS, EFFECT_KINDS, RARITIES } from "../core/facets";
+import { CATEGORIES, DOMAINS, EFFECT_KINDS, RARITIES } from "../core/facets";
 import { rowEffectLines, type EffectContext } from "../core/effectText";
+import { categoryLabel } from "./categoryLabel";
 import { effectHtml } from "./effectMarkup";
 import { itemCategory, type Row } from "../core/filter";
 import type { Catalogue, Item } from "../core/model";
@@ -66,18 +67,6 @@ const COLS: { key: string; label: string; sortable: boolean }[] = [
 
 function esc(s: string): string {
   return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
-}
-
-const CATEGORY_SET = new Set(CATEGORIES);
-
-// The weapon categories are the game's own (from its loot filter), so they resolve as game text
-// and arrive translated; armour, jewellery and relic have no such tag and resolve from the app
-// catalogue. A category outside the known vocabulary is a gear class core/facets.ts has not been
-// taught yet (see itemCategory): it shows as its raw id rather than as a missing catalog key.
-function categoryLabel(loc: Localization, category: string): string {
-  const tag = categoryGameTag(category);
-  if (tag) return loc.gameText(tag);
-  return CATEGORY_SET.has(category) ? loc.translate(`items.category.${category}`) : category;
 }
 
 function chip(facetKey: string, value: string, label: string, pressed: boolean): string {

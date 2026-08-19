@@ -57,6 +57,11 @@ export function itemCategory(item: Item): string {
   return categoryOf(item.gearType) ?? item.gearType;
 }
 
+/** Where the item's category falls in the table's slot order; an unknown category sorts last. */
+export function categoryRank(item: Item): number {
+  return CATEGORY_RANK[itemCategory(item)] ?? CATEGORIES.length;
+}
+
 // A skill selection scopes to its node group (the base skill and its modifier/transmuter
 // nodes), not the bare skill: see docs/superpowers/specs/2026-08-15-skill-item-finder-page-design.md.
 // A mastery selection (no skill) scopes to every skill in that mastery. Neither selected means
@@ -155,7 +160,7 @@ function sortKeyValue(row: Row, key: string, nameOf: NameOf): string | number {
     case "name":
       return nameOf(row.item);
     case "slot":
-      return CATEGORY_RANK[itemCategory(row.item)] ?? CATEGORIES.length;
+      return categoryRank(row.item);
     case "rarity":
       return RARITY_RANK[row.item.rarity] ?? RARITIES.length;
     case "ilvl":

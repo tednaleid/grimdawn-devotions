@@ -424,6 +424,7 @@
   "items.card.atRank": "At rank {rank}",
   "items.card.atUltimate": "At rank {rank} (item-granted)",
   "items.set.pieces": "{set} ({pieces} pieces)",
+  "items.set.member": "{slot}: {name}",
   "items.set.badge": "Set",
   "items.effect.chanceOf": "{chance}% Chance of {effect}",
   "items.effect.chanceTo": "{chance}% Chance to {effect}",
