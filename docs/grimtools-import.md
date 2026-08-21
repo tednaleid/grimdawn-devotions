@@ -6,6 +6,14 @@ Export and the current selection is saved to grimtools: with a build associated,
 copy of it with its devotions replaced; otherwise a fresh character holding just the
 stars.
 
+**Switched off in the app.** The Cloudflare firewall in front of grimtools returns 403 to
+any request whose User-Agent contains `grimdawn-devotions-import`, which is the worker's,
+so every import and export fails upstream. The planner hides the panel and wires
+`disabledGateway` (`web/src/adapters/grimtoolsGatewayDisabled.ts`) in place of the
+worker gateway; the switch is `GRIMTOOLS_ENABLED` in `web/src/app/main.ts`. The nightly
+canary's schedule is off for the same reason. The worker, its deploy and the rest of this
+document describe the feature as built and as it runs once the switch is back on.
+
 This describes how the feature works now. The dated design records that led to it,
 with the full investigation, are
 [docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md](superpowers/specs/2026-08-09-grimtools-devotion-import-design.md)

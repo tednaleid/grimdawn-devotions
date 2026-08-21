@@ -2,8 +2,10 @@
 # ABOUTME: Catches upstream shape changes and sk-id renumbering before a user hits them.
 name: Import canary
 on:
-  schedule:
-    - cron: "17 6 * * *"
+  # No schedule: grimtools' firewall refuses the worker's User-Agent, so a nightly run can only
+  # fail. Run it by hand to check whether the block has lifted; the cron comes back with the feature.
+  # schedule:
+  #   - cron: "17 6 * * *"
   workflow_dispatch:
 permissions:
   contents: read

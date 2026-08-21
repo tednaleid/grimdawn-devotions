@@ -50,6 +50,7 @@ import { mountSearchPanel } from "../adapters/searchPanel";
 import { mapStars, invertStarTable, toGrimtoolsSkills, type StarTable } from "../core/grimtools";
 import { mountImportPanel, type ExportErrorCode, type ExportState, type ImportState } from "../adapters/importPanel";
 import { makeWorkerGateway } from "../adapters/grimtoolsWorkerGateway";
+import { disabledGateway } from "../adapters/grimtoolsGatewayDisabled";
 import type { ExportBase, FetchBuildResult } from "../ports/GrimtoolsGateway";
 import { affinityTotals } from "../core/affinity";
 import {
@@ -70,8 +71,11 @@ const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/"; // per-build 
 declare const __IMPORT_API__: string;
 declare const __BUILD_ID__: string;
 const importApi = typeof __IMPORT_API__ === "string" ? __IMPORT_API__ : "http://localhost:8787";
+// Grimtools' firewall refuses the worker's User-Agent, so the feature is switched off: the panel is
+// hidden and the gateway sends the worker nothing. Flip this to restore both.
+const GRIMTOOLS_ENABLED = false;
 // The one object that talks to the worker, both directions (see ports/GrimtoolsGateway).
-const gateway = makeWorkerGateway(importApi);
+const gateway = GRIMTOOLS_ENABLED ? makeWorkerGateway(importApi) : disabledGateway;
 const buildId = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 
 async function boot() {
@@ -1182,7 +1186,9 @@ async function boot() {
     }
   }
 
-  const importPanel = mountImportPanel(document.getElementById("import-panel") as HTMLElement, localization, {
+  const importHost = document.getElementById("import-panel") as HTMLElement;
+  importHost.hidden = !GRIMTOOLS_ENABLED;
+  const importPanel = mountImportPanel(importHost, localization, {
     onSubmit: (slug) => void runImport(slug),
     onExport: () => void runExport(),
   });

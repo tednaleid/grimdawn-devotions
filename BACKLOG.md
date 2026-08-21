@@ -13,6 +13,18 @@ export of a legal selection to a fresh grimtools build, associated the same way 
 `gt=`. See `docs/superpowers/specs/2026-08-09-grimtools-devotion-import-design.md`
 (import) and `docs/superpowers/specs/2026-08-16-grimtools-export-design.md` (export).
 
+- **Switched off since 2026-08-20: grimtools blocks the worker.** The Cloudflare
+  firewall in front of grimtools returns 403 to any User-Agent containing
+  `grimdawn-devotions-import`, case sensitive and site wide (calc pages, devotion.json,
+  save_build.php). Generic strings (`foo-import/1.0`, `grimdawn-devotions/1.0`, plain
+  curl) pass, so the rule names this worker specifically. It appeared within two days of
+  export (which writes builds through save_build.php) reaching main on 2026-08-18.
+  Follow-up: contact the grimtools maintainer and agree on terms (import only, a stricter
+  rate limit, a User-Agent of their choosing), then set `GRIMTOOLS_ENABLED` true in
+  `web/src/app/main.ts` and restore the cron in `.github/workflows/canary-import.yml`.
+  Do not rotate the User-Agent to get around the rule: it is a deliberate block by the
+  site owner and the honest UA is what let them block us by name rather than blanket-ban
+  Workers egress.
 - **No e2e leg for the import wiring.** The core parsing, the mapping and the panel
   adapter are unit tested, but nothing drives the three together in a browser. Belongs
   in `web/e2e/smoke.ts` beside the search checks. Note `just e2e` is not in CI, so this
