@@ -358,8 +358,11 @@ compose, and how much of the CSS-class language moves to computed values.
   `web/src/core/reachability.ts` is the shape to mirror for the metric.
 - Consolidate `scripts/gt_scrape.ts` and `scripts/gt_star_table.ts` onto
   `scripts/gt_cdp.ts` (each still carries a private copy of the same
-  chrome-headless-shell and CDP plumbing the new `scripts/gt_harvest_builds.ts`
-  imports from the shared module).
+  chrome-headless-shell and CDP plumbing `scripts/gt_harvest_builds.ts`
+  imports from the shared module). The duplicated block is the Chrome launch,
+  `cleanup`, `pageWsUrl`, and the `CDP` class; the two scripts differ only in
+  the debug port (`gt_scrape.ts` 9412, `gt_star_table.ts` 9417), which
+  `gt_cdp.ts`'s functions already take as a parameter.
 - Harvest polish: `scripts/gt_harvest_builds.ts` reads the devotion.json
   version through a bare in-page fetch that bypasses `fetchText`, so that one
   request is neither delayed nor counted against the politeness cap; and the
@@ -964,31 +967,6 @@ a diff against the committed tables rather than a blind regeneration. Pointers:
 `load_translations` in `scripts/gd_dbr.py`, consumers in
 `scripts/build_game_tables.py` and `scripts/parse_devotions.py`, and the
 placeholder-aware version in `gd_save.load_tags`.
-
-## Extract the shared CDP client out of the grimtools scripts
-
-`scripts/gt_star_table.ts` copies about 90 lines of CDP client verbatim from
-`scripts/gt_scrape.ts` (the Chrome launch, `cleanup`, `pageWsUrl`, and the `CDP`
-class), differing only in the debug port. A protocol fix or a Chrome-path change
-now has to be applied twice, with nothing to remind anyone the second copy
-exists.
-
-The devotion-import plan mandated the copy on the grounds that `scripts/` are
-standalone programs. That rationale does not survive contact with the repo:
-`scripts/gd_dbr.py` is already a shared helper with three Python consumers, so
-this codebase shares script helpers where it helps. The TS scripts simply never
-had a second consumer until now.
-
-Deferred rather than declined, deliberately: the extraction rewrites the very
-region of `gt_scrape.ts` that a sibling branch also modified, so doing it before
-both branches land turns a clean merge into a hand-resolved conflict. **Both have
-now landed, so this is unblocked.**
-
-Pointers: extract to `scripts/gd_cdp.ts`, mirroring `scripts/gd_dbr.py`'s role;
-the block is the Chrome launch through the `CDP` class in `scripts/gt_scrape.ts`
-and the matching head of `scripts/gt_star_table.ts`. Only the debug port differs,
-so it should be a parameter. Find the block by name rather than by line number:
-the save-reader work shifted those lines.
 
 ## Wire a Python type-checker into `just check`
 

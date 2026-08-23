@@ -327,9 +327,10 @@ Re-run all of these; they are the regression gates:
   rates (a heavy oracle cross-check, minutes).
 - `just build-order-validate` - the guided-build-order false-negative/positive rates.
 - `just perf` - per-click latency must stay within the interactive budget.
-- `just order-quality` - compare the synthetic and real-corpus lines (the real
-  corpus at tries=16/256/4096) against the plan's recorded numbers; a widened
-  divergence count or a worse churn/steps aggregate signals a regression.
+- `just order-quality` - run it on the branch and on `main`, then compare the
+  real-corpus aggregate lines (orders, churn, steps) at each tries level:
+  orders must stay 99/99 and churn must not rise. The synthetic aggregate is
+  separately pinned by `web/test/build-order-oracle.test.ts`.
 - `web/test/real-build-order.test.ts` (run by `just test`) - every harvested
   community build in web/test/fixtures/real-builds.json must get an
   oracle-legal order at live settings.
