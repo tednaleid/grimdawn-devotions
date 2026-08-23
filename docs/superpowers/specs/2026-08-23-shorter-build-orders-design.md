@@ -65,7 +65,10 @@ already seeded per build.
 (most viewed, top rated, recent) and dedupe, for diversity across masteries
 and playstyles. Harvest is manual, rate-limited, and never in CI. The app's
 import/export stays off; this uses a real browser against public pages, with
-Chrome's default User-Agent, not the worker's blocked one.
+Chrome's default User-Agent, not the worker's blocked one. grimtools has no
+such listing views or popularity data, so the harvest reads the site's static
+build catalog and picks candidates newest-first round-robin across mastery
+pairs (`scripts/gt_harvest_builds.ts`, `pickCandidates`).
 
 ## Phase 1: corpus harvest pipeline
 

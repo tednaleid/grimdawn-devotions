@@ -326,6 +326,46 @@ Pointers: inputs already pure (`ReachView` from `reachability.ts`,
 own brainstorm/spec: the exact record shape, how the orthogonal opacity factors
 compose, and how much of the CSS-class language moves to computed values.
 
+## Build-order quality: deferred follow-ups
+
+- Local improvement (hill-climbing member swaps and reinsertions re-emitted
+  through `emitSchedule`, plus directed scaffold shrinking) as the next lever:
+  the spec's "Approaches considered and deferred" section
+  (`docs/superpowers/specs/2026-08-23-shorter-build-orders-design.md`)
+  describes it. The measured residual headroom is the gap between the live
+  budget and the escalated one on the real corpus (339 vs 255 wasted points;
+  the escalated budget costs about 2 s per build, so directed moves that reach
+  the same place in a few milliseconds are the prize). Pointer: the
+  quality-mode `consider()` scoring in `sampledConstruction`,
+  `web/src/core/reachability.ts`.
+- Steps-first objective revisit, keyed to `just order-quality`'s divergence
+  counter: 15 of 99 real builds at the live budget get a different schedule
+  under a rows-first objective (definition: the steps-then-churn argmin over
+  greedy, sampler, and the sampler's steps-first schedule differs in churn or
+  length from the churn-first pick). The per-build CSV names them, so the
+  objective question the spec deferred can be settled with real examples.
+  Pointer: the real-corpus section of `web/scripts/order-quality.ts`.
+- Higher-tier constellations earlier as a tiebreak (Ted's idea): devotion
+  points arrive gradually while leveling, so among schedules of equal churn
+  and equal rows, the one that completes the build's highest-tier
+  constellation after fewer points held is more valuable in play. Metric: the
+  `heldAfter` of the `complete` step for the highest-tier member (lower is
+  better), computable from `BuildStep[]`. Open question before building: pure
+  tiebreak below churn and steps, or would a player trade a few wasted points
+  for reaching a T3 sooner (a different objective, needs its own brainstorm).
+  The harness can report the metric per build first. Pointer: quality-mode
+  `consider()` in `sampledConstruction`; `churnPoints` in
+  `web/src/core/reachability.ts` is the shape to mirror for the metric.
+- Consolidate `scripts/gt_scrape.ts` and `scripts/gt_star_table.ts` onto
+  `scripts/gt_cdp.ts` (each still carries a private copy of the same
+  chrome-headless-shell and CDP plumbing the new `scripts/gt_harvest_builds.ts`
+  imports from the shared module).
+- Harvest polish: `scripts/gt_harvest_builds.ts` reads the devotion.json
+  version through a bare in-page fetch that bypasses `fetchText`, so that one
+  request is neither delayed nor counted against the politeness cap; and the
+  catalog's `buildName` carries raw HTML entities (for example `&#39;`) into
+  fixture titles, which are display-only in test output.
+
 ## Known limitations (accepted)
 
 - `racialBonusPercentDamage` aggregation in the sidebar uses the union of all
