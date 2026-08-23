@@ -1,6 +1,5 @@
-// ABOUTME: Build-order quality over the pinned 150-seed synthetic corpus + the reproduction URL, and over
-// ABOUTME: the 99-build real corpus at a tries ladder: per-build churn/steps CSV on stdout, aggregates on
-// ABOUTME: stderr. The launch-gate before/after tool.
+// ABOUTME: Build-order quality over the pinned 150-seed synthetic corpus + repro URL and the 99-build
+// ABOUTME: real corpus at a tries ladder: per-build churn/steps CSV on stdout, aggregates on stderr.
 import {
   buildOrderPath,
   buildOrderCandidates,
@@ -64,6 +63,8 @@ for (const b of real.builds) {
     const c = buildOrderCandidates(cons, table, members, BUDGET, tries);
     const ms = performance.now() - t0;
     const pool = [c.greedy, c.sampler, c.samplerStepsFirst].filter((s): s is BuildStep[] => s !== null);
+    const a = agg.get(tries)!;
+    a.ms += ms;
     if (pool.length === 0) {
       console.log(`${slugOf(b.calc)},${tries},none,none,${ms.toFixed(1)},`);
       continue;
@@ -71,11 +72,9 @@ for (const b of real.builds) {
     const pick = [...pool].sort(byChurnThenSteps)[0]!;
     const alt = [...pool].sort(byStepsThenChurn)[0]!;
     const divergent = churnPoints(pick) !== churnPoints(alt) || pick.length !== alt.length;
-    const a = agg.get(tries)!;
     a.orders++;
     a.churn += churnPoints(pick);
     a.steps += pick.length;
-    a.ms += ms;
     if (divergent) a.divergent++;
     console.log(`${slugOf(b.calc)},${tries},${churnPoints(pick)},${pick.length},${ms.toFixed(1)},${divergent ? 1 : 0}`);
   }
