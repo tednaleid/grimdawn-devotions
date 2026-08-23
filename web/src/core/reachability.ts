@@ -652,13 +652,19 @@ function peelOrder(G: ReachCon[], zeroReqFirst: boolean): ReachCon[] {
   return [...front, ...peeled];
 }
 
-/** The sampler's result: the smallest schedule peak found, the member order behind it, and that
- *  order's legal schedule when the peak fits the budget (the witness IS a schedule). */
+/** What the sampler is searching for: a reachability witness (any order whose schedule fits the
+ *  budget) or a quality schedule (the least-churn order among those that fit). */
+type SamplerMode = "witness" | "quality";
+
+/** The sampler's result: the member order it kept, that order's schedule peak, and its legal schedule
+ *  when the peak fits the budget (the witness IS a schedule). Witness mode keeps the smallest-peak
+ *  order, quality mode the least-churn one. */
 interface SampledConstruction {
   peak: number;
   order: ReachCon[]; // the granting members in their best-peak order
   tail: ReachCon[]; // the zero-grant members, placed last (they never raise the peak above the build size)
   steps: BuildStep[] | null;
+  stepsFirst: BuildStep[] | null; // quality mode: steps-first argmin among fitting schedules
 }
 
 // Core sampler shared by minPeakSampled (which wants the peak), minPeakSampledOrder (which wants the
@@ -667,7 +673,10 @@ interface SampledConstruction {
 // refunded the moment the rules allow, so a scaffold swap holds both sides until the old one may go).
 // Tries three deterministic orders - the bootstrap heuristic (lowest requirement first, then highest
 // grant density) and both peel variants (peelOrder) - plus up to `tries` seeded shuffles of the granting
-// members, keeping the smallest-peak order and early-exiting the moment one lands at or under budget.
+// members. Witness mode keeps the smallest-peak order and stops at the first schedule that fits the
+// budget (a reachability proof needs nothing more). Quality mode spends the whole `tries` budget and
+// keeps the churn-then-steps argmin among the fitting schedules, tracking the steps-first argmin
+// alongside it for the divergence harness.
 function sampledConstruction(
   cons: ReachCon[],
   table: CoverTable,
@@ -675,31 +684,56 @@ function sampledConstruction(
   budget: number,
   tries: number,
   peakNodeCap: number,
+  mode: SamplerMode = "witness",
 ): SampledConstruction {
   const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
   const tail = B.filter((c) => !grants(c));
   const parts = buildParts(cons, B);
-  if (!parts) return { peak: INF, order: [], tail, steps: null };
+  if (!parts) return { peak: INF, order: [], tail, steps: null, stepsFirst: null };
   const { G, totalSize, pool } = parts;
-  if (totalSize > budget) return { peak: INF, order: [], tail, steps: null };
+  if (totalSize > budget) return { peak: INF, order: [], tail, steps: null, stepsFirst: null };
   const reqsum = (c: ReachCon) => c.req[0] + c.req[1] + c.req[2] + c.req[3] + c.req[4];
   const ratio = (c: ReachCon) => (c.grant[0] + c.grant[1] + c.grant[2] + c.grant[3] + c.grant[4]) / c.size;
   const order = [...G].sort((a, b) => reqsum(a) - reqsum(b) || ratio(b) - ratio(a));
   let best = INF;
   let bestOrder: ReachCon[] = [];
   let bestSteps: BuildStep[] | null = null;
-  // Score a candidate; true when it fits the budget (the caller stops sampling).
+  let bestChurn = Infinity; // quality: churn-then-steps argmin among fitting schedules
+  let stepsFirst: BuildStep[] | null = null;
+  let sfChurn = Infinity;
+  // Score a candidate; witness mode returns true when it fits (the caller stops sampling),
+  // quality mode always returns false (tries is the deterministic work budget).
   const consider = (candidate: ReachCon[]): boolean => {
     const sched = emitSchedule(candidate, tail, pool, table, budget, peakNodeCap);
     const peak = sched ? sched.peak : INF;
-    if (peak < best) {
-      best = peak;
-      bestOrder = [...candidate];
-      bestSteps = sched?.steps ?? null;
+    if (mode === "witness") {
+      if (peak < best) {
+        best = peak;
+        bestOrder = [...candidate];
+        bestSteps = sched?.steps ?? null;
+      }
+      return best <= budget;
     }
-    return best <= budget;
+    if (sched?.steps) {
+      const c = churnPoints(sched.steps);
+      const n = sched.steps.length;
+      if (bestSteps === null || c < bestChurn || (c === bestChurn && n < bestSteps.length)) {
+        best = peak;
+        bestOrder = [...candidate];
+        bestSteps = sched.steps;
+        bestChurn = c;
+      }
+      if (stepsFirst === null || n < stepsFirst.length || (n === stepsFirst.length && c < sfChurn)) {
+        stepsFirst = sched.steps;
+        sfChurn = c;
+      }
+    } else if (bestSteps === null && peak < best) {
+      best = peak; // nothing fits yet: keep chasing the lowest peak, as the witness does
+      bestOrder = [...candidate];
+    }
+    return false;
   };
-  const done = (): SampledConstruction => ({ peak: best, order: bestOrder, tail, steps: bestSteps });
+  const done = (): SampledConstruction => ({ peak: best, order: bestOrder, tail, steps: bestSteps, stepsFirst });
   if (consider(order)) return done();
   for (const zeroReqFirst of [true, false]) if (consider(peelOrder(G, zeroReqFirst))) return done();
   let seed = (totalSize * 2654435761 + G.length * 40503) >>> 0; // deterministic per build
@@ -709,7 +743,7 @@ function sampledConstruction(
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  for (let attempt = 0; attempt < tries && best > budget; attempt++) {
+  for (let attempt = 0; attempt < tries && (mode === "quality" || best > budget); attempt++) {
     for (let i = order.length - 1; i > 0; i--) {
       const j = Math.floor(rnd() * (i + 1));
       const tmp = order[i]!;
@@ -956,8 +990,9 @@ function emitSchedule(
 
 /** Both generators' schedules for `B`, before the churn-then-steps pick: the need-driven greedy's
  *  and the sampler's (re-emitted at the cold-path cap, its sampled schedule as fallback).
- *  `samplerStepsFirst` is the steps-first argmin among fitting sampled schedules (null until the
- *  sampler tracks it); the pick itself stays churn-first and lives in buildOrderPath. */
+ *  `samplerStepsFirst` is the steps-first argmin among the fitting sampled schedules, at the
+ *  sampling cap, kept for the divergence harness; only the churn-first pick is re-emitted at the
+ *  cold-path cap. The pick itself stays churn-first and lives in buildOrderPath. */
 export interface OrderCandidates {
   greedy: BuildStep[] | null;
   sampler: BuildStep[] | null;
@@ -977,10 +1012,10 @@ export function buildOrderCandidates(
   if (!parts || parts.totalSize > budget) return { greedy: null, sampler: null, samplerStepsFirst: null };
   const nd = needDrivenOrder(cons, B);
   const viaGreedy = nd ? (emitSchedule(nd.order, nd.tail, parts.pool, table, budget)?.steps ?? null) : null;
-  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
+  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap, "quality");
   const viaSampler =
     sc.steps === null ? null : (emitSchedule(sc.order, sc.tail, parts.pool, table, budget)?.steps ?? sc.steps);
-  return { greedy: viaGreedy, sampler: viaSampler, samplerStepsFirst: null };
+  return { greedy: viaGreedy, sampler: viaSampler, samplerStepsFirst: sc.stepsFirst };
 }
 
 /**
