@@ -661,7 +661,7 @@ type SamplerMode = "witness" | "quality";
  *  order, quality mode the least-churn one. */
 interface SampledConstruction {
   peak: number;
-  order: ReachCon[]; // the granting members in their best-peak order
+  order: ReachCon[]; // the granting members in the order the mode kept
   tail: ReachCon[]; // the zero-grant members, placed last (they never raise the peak above the build size)
   steps: BuildStep[] | null;
   stepsFirst: BuildStep[] | null; // quality mode: steps-first argmin among fitting schedules

@@ -62,14 +62,18 @@ for (const b of real.builds) {
     const t0 = performance.now();
     const c = buildOrderCandidates(cons, table, members, BUDGET, tries);
     const ms = performance.now() - t0;
-    const pool = [c.greedy, c.sampler, c.samplerStepsFirst].filter((s): s is BuildStep[] => s !== null);
+    // `pick` reproduces buildOrderPath's rule exactly (churn, then steps, greedy on a full tie,
+    // over the two shipped generators), so the churn and steps columns are the panel's own numbers.
+    // `alt` is the rows-first alternative over every candidate the sampler tracked.
+    const shipped = [c.greedy, c.sampler].filter((s): s is BuildStep[] => s !== null);
+    const pool = [...shipped, c.samplerStepsFirst].filter((s): s is BuildStep[] => s !== null);
     const a = agg.get(tries)!;
     a.ms += ms;
-    if (pool.length === 0) {
+    if (shipped.length === 0) {
       console.log(`${slugOf(b.calc)},${tries},none,none,${ms.toFixed(1)},`);
       continue;
     }
-    const pick = [...pool].sort(byChurnThenSteps)[0]!;
+    const pick = [...shipped].sort(byChurnThenSteps)[0]!;
     const alt = [...pool].sort(byStepsThenChurn)[0]!;
     const divergent = churnPoints(pick) !== churnPoints(alt) || pick.length !== alt.length;
     a.orders++;

@@ -24,6 +24,8 @@ test("quality search is deterministic and monotone in the work budget", () => {
     const c256 = buildOrderCandidates(cons, table, B, BUDGET, 256).sampler;
     if (c16) expect(c256).not.toBeNull(); // more work never loses an order
     if (c16 && c256) {
+      // A pin over both corpora, not an invariant: the argmin is picked on sampled-cap schedules
+      // and the winner is re-emitted at REPLAY_CAP, so a failure here means re-measure, not broken.
       expect(churnPoints(c256)).toBeLessThanOrEqual(churnPoints(c16)); // monotone
       low += churnPoints(c16);
       high += churnPoints(c256);
@@ -42,6 +44,8 @@ test("samplerStepsFirst is a fitting schedule with no more steps than the churn 
     const c = buildOrderCandidates(cons, table, B, BUDGET, 64);
     if (!c.sampler) continue;
     expect(c.samplerStepsFirst).not.toBeNull();
+    // Also a pin over this corpus: samplerStepsFirst is the sampled-cap steps minimizer while
+    // sampler is re-emitted at REPLAY_CAP, so treat a failure as re-measure, not broken.
     expect(c.samplerStepsFirst!.length).toBeLessThanOrEqual(c.sampler.length);
   }
 });
