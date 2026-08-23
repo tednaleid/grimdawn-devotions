@@ -10,8 +10,11 @@ import {
   buildCoverTable,
   minPeakSampled,
   minPeakSampledOrder,
+  buildOrderCandidates,
+  buildOrderPath,
   type ReachCon,
 } from "../src/core/reachability";
+import { generateValidBuild, mulberry32 } from "../scripts/reachability-fuzz";
 
 const model = buildModel(doc as any);
 const cons = buildReachCons(model);
@@ -61,4 +64,30 @@ test("the order is deterministic", () => {
   const a = minPeakSampledOrder(cons, table, B, 55)!.map((x) => x.id);
   const b = minPeakSampledOrder(cons, table, B, 55)!.map((x) => x.id);
   expect(a).toEqual(b);
+});
+
+test("buildOrderPath returns one of buildOrderCandidates' schedules", () => {
+  for (let seed = 1; seed <= 30; seed++) {
+    const B = generateValidBuild(mulberry32(seed));
+    const c = buildOrderCandidates(cons, table, B, 55, 16);
+    const picked = buildOrderPath(cons, table, B, 55, 16);
+    if (!picked) {
+      expect(c.greedy).toBeNull();
+      expect(c.sampler).toBeNull();
+      continue;
+    }
+    expect([c.greedy, c.sampler]).toContainEqual(picked);
+  }
+});
+
+// Witness characterization: the reachability-proof path must not move when the sampler
+// gains a quality mode. Update this snapshot only for a deliberate witness-path change.
+test("witness order characterization over seeds 1..20", () => {
+  const orders: Record<string, string[]> = {};
+  for (let seed = 1; seed <= 20; seed++) {
+    const B = generateValidBuild(mulberry32(seed));
+    const o = minPeakSampledOrder(cons, table, B, 55, 16);
+    orders[`seed-${seed}`] = o ? o.map((c) => c.id) : [];
+  }
+  expect(orders).toMatchSnapshot();
 });

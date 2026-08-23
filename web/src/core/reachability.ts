@@ -954,6 +954,35 @@ function emitSchedule(
   return { peak, steps };
 }
 
+/** Both generators' schedules for `B`, before the churn-then-steps pick: the need-driven greedy's
+ *  and the sampler's (re-emitted at the cold-path cap, its sampled schedule as fallback).
+ *  `samplerStepsFirst` is the steps-first argmin among fitting sampled schedules (null until the
+ *  sampler tracks it); the pick itself stays churn-first and lives in buildOrderPath. */
+export interface OrderCandidates {
+  greedy: BuildStep[] | null;
+  sampler: BuildStep[] | null;
+  samplerStepsFirst: BuildStep[] | null;
+}
+
+export function buildOrderCandidates(
+  cons: ReachCon[],
+  table: CoverTable,
+  B: ReachCon[],
+  budget = BUDGET,
+  tries = 16,
+  peakNodeCap = 3000,
+): OrderCandidates {
+  B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  const parts = buildParts(cons, B);
+  if (!parts || parts.totalSize > budget) return { greedy: null, sampler: null, samplerStepsFirst: null };
+  const nd = needDrivenOrder(cons, B);
+  const viaGreedy = nd ? (emitSchedule(nd.order, nd.tail, parts.pool, table, budget)?.steps ?? null) : null;
+  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
+  const viaSampler =
+    sc.steps === null ? null : (emitSchedule(sc.order, sc.tail, parts.pool, table, budget)?.steps ?? sc.steps);
+  return { greedy: viaGreedy, sampler: viaSampler, samplerStepsFirst: null };
+}
+
 /**
  * A legal constellation-level order that assembles the self-covering build `B` within `budget` points
  * held at once, including the transient scaffold to ADD before a step and REFUND once the build's own
@@ -977,23 +1006,12 @@ export function buildOrderPath(
   tries = 16,
   peakNodeCap = 3000,
 ): BuildStep[] | null {
-  B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)); // canonical: the order is a function of the build SET
-  const parts = buildParts(cons, B);
-  if (!parts) return null; // not self-covering
-  if (parts.totalSize > budget) return null;
-  const nd = needDrivenOrder(cons, B);
-  const viaGreedy = nd ? (emitSchedule(nd.order, nd.tail, parts.pool, table, budget)?.steps ?? null) : null;
-  // The sampled witness comes with its own legal schedule (at the sampling cap); re-emitting its order at
-  // the cold-path cap usually finds smaller scaffolds, but the witness's schedule is the fallback so a lit
-  // build always has an order.
-  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap);
-  const viaSampler =
-    sc.steps === null ? null : (emitSchedule(sc.order, sc.tail, parts.pool, table, budget)?.steps ?? sc.steps);
-  if (!viaGreedy || !viaSampler) return viaGreedy ?? viaSampler;
-  const g = churnPoints(viaGreedy);
-  const s = churnPoints(viaSampler);
-  if (g !== s) return g < s ? viaGreedy : viaSampler;
-  return viaGreedy.length <= viaSampler.length ? viaGreedy : viaSampler;
+  const { greedy, sampler } = buildOrderCandidates(cons, table, B, budget, tries, peakNodeCap);
+  if (!greedy || !sampler) return greedy ?? sampler;
+  const g = churnPoints(greedy);
+  const s = churnPoints(sampler);
+  if (g !== s) return g < s ? greedy : sampler;
+  return greedy.length <= sampler.length ? greedy : sampler;
 }
 
 /** The on-demand escalation behind the "Find valid order" button: the same schedule at high tries, to
