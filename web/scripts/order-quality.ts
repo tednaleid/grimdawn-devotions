@@ -1,6 +1,14 @@
-// ABOUTME: Build-order quality over the pinned 150-seed corpus + the reproduction URL: per-build
-// ABOUTME: churn/steps CSV on stdout, aggregates on stderr. The launch-gate before/after tool.
-import { buildOrderPath, selectionSummary, BUDGET, churnPoints } from "../src/core/reachability";
+// ABOUTME: Build-order quality over the pinned 150-seed synthetic corpus + the reproduction URL, and over
+// ABOUTME: the 99-build real corpus at a tries ladder: per-build churn/steps CSV on stdout, aggregates on
+// ABOUTME: stderr. The launch-gate before/after tool.
+import {
+  buildOrderPath,
+  buildOrderCandidates,
+  selectionSummary,
+  BUDGET,
+  churnPoints,
+  type BuildStep,
+} from "../src/core/reachability";
 import { model, cons, table, generateValidBuild, mulberry32 } from "./reachability-fuzz";
 import { canonicalStarIds, decodeHash } from "../src/core/urlState";
 
@@ -34,3 +42,48 @@ console.error(
   `aggregate: orders=${orders}/${SEEDS} churn=${churn} steps=${stepsTotal}` +
     (rs ? ` | repro: churn=${churnPoints(rs)} steps=${rs.length}` : " | repro: NO ORDER"),
 );
+
+import realJson from "../test/fixtures/real-builds.json";
+
+const real = realJson as unknown as { builds: { calc: string; title: string; starIds: string[] }[] };
+const TRIES_LADDER = [16, 256, 4096];
+
+const slugOf = (calc: string) => calc.slice(calc.lastIndexOf("/") + 1);
+const byChurnThenSteps = (a: BuildStep[], b: BuildStep[]) =>
+  churnPoints(a) - churnPoints(b) || a.length - b.length;
+const byStepsThenChurn = (a: BuildStep[], b: BuildStep[]) =>
+  a.length - b.length || churnPoints(a) - churnPoints(b);
+
+console.log("build,tries,churn,steps,ms,divergent");
+const agg = new Map<number, { orders: number; churn: number; steps: number; divergent: number; ms: number }>();
+for (const t of TRIES_LADDER) agg.set(t, { orders: 0, churn: 0, steps: 0, divergent: 0, ms: 0 });
+for (const b of real.builds) {
+  const members = selectionSummary(model, new Set(b.starIds)).built;
+  for (const tries of TRIES_LADDER) {
+    const t0 = performance.now();
+    const c = buildOrderCandidates(cons, table, members, BUDGET, tries);
+    const ms = performance.now() - t0;
+    const pool = [c.greedy, c.sampler, c.samplerStepsFirst].filter((s): s is BuildStep[] => s !== null);
+    if (pool.length === 0) {
+      console.log(`${slugOf(b.calc)},${tries},none,none,${ms.toFixed(1)},`);
+      continue;
+    }
+    const pick = [...pool].sort(byChurnThenSteps)[0]!;
+    const alt = [...pool].sort(byStepsThenChurn)[0]!;
+    const divergent = churnPoints(pick) !== churnPoints(alt) || pick.length !== alt.length;
+    const a = agg.get(tries)!;
+    a.orders++;
+    a.churn += churnPoints(pick);
+    a.steps += pick.length;
+    a.ms += ms;
+    if (divergent) a.divergent++;
+    console.log(`${slugOf(b.calc)},${tries},${churnPoints(pick)},${pick.length},${ms.toFixed(1)},${divergent ? 1 : 0}`);
+  }
+}
+for (const tries of TRIES_LADDER) {
+  const a = agg.get(tries)!;
+  console.error(
+    `real corpus @ tries=${tries}: orders=${a.orders}/${real.builds.length} churn=${a.churn} ` +
+      `steps=${a.steps} divergent=${a.divergent} mean_ms=${(a.ms / real.builds.length).toFixed(1)}`,
+  );
+}

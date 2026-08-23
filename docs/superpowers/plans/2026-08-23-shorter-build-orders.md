@@ -1115,9 +1115,13 @@ git commit -m "docs(order): quality-mode search and real-build corpus in the eng
 
 ## Baseline results (filled by Task 8)
 
-- Synthetic corpus aggregate (just order-quality stderr): _recorded at execution_
-- Real corpus @ tries=16 / 256 / 4096 (expected ~flat, the early-exit signature): _recorded at execution_
-- just perf (median / p95 / p99): _recorded at execution_
+- Synthetic corpus aggregate (just order-quality stderr): `aggregate: orders=150/150 churn=22 steps=2701 | repro: churn=4 steps=23`
+- Real corpus @ tries=16 / 256 / 4096 (expected ~flat, the early-exit signature):
+  - `real corpus @ tries=16: orders=99/99 churn=382 steps=2019 divergent=5 mean_ms=0.4`
+  - `real corpus @ tries=256: orders=99/99 churn=382 steps=2019 divergent=5 mean_ms=0.3`
+  - `real corpus @ tries=4096: orders=99/99 churn=382 steps=2019 divergent=5 mean_ms=0.3`
+  - Churn (382), steps (2019), and divergent (5) are identical across all three tries levels: the sampler early-exits at the first fitting schedule, so more tries do not change the picked order at baseline.
+- just perf (median / p95 / p99): resolver WASM (data/reach.wasm); per-click latency over 440 clicks: mean 4.1 ms, median 2.4 ms, p95 14.5 ms, p99 23.5 ms, max 29.8 ms; 0 clicks over 400 ms.
 
 ## After results (filled by Task 10)
 
