@@ -8,18 +8,6 @@ import { writeFileSync } from "node:fs";
 import { launchChrome, pageWsUrl, CDP } from "./gt_cdp";
 import { extractBuildInfo } from "../web/src/core/grimtools";
 
-const argv = process.argv.slice(2);
-const flag = (name: string): string | undefined => {
-  const i = argv.indexOf(name);
-  return i >= 0 ? argv[i + 1] : undefined;
-};
-const OUT = flag("--out");
-const TARGET = Number(flag("--target") ?? 100);
-if (!OUT) {
-  console.error("usage: bun scripts/gt_harvest_builds.ts --out FILE [--target N]");
-  process.exit(2);
-}
-
 const ORIGIN = "https://www.grimtools.com";
 const CONFIG = {
   delayMs: 1500,
@@ -106,6 +94,18 @@ interface RawBuild {
 }
 
 if (import.meta.main) {
+  const argv = process.argv.slice(2);
+  const flag = (name: string): string | undefined => {
+    const i = argv.indexOf(name);
+    return i >= 0 ? argv[i + 1] : undefined;
+  };
+  const OUT = flag("--out");
+  const TARGET = Number(flag("--target") ?? 100);
+  if (!OUT) {
+    console.error("usage: bun scripts/gt_harvest_builds.ts --out FILE [--target N]");
+    process.exit(2);
+  }
+
   const chrome = launchChrome(9418, "gt_harvest");
   try {
     const cdp = await CDP.connect(await pageWsUrl(9418));
