@@ -572,6 +572,14 @@ gd-audit NAME OUT="build.json":
 gt-star-table:
     bun "{{justfile_directory()}}/scripts/gt_star_table.ts"
 
+# Harvest real community builds from grimtools into the committed order-quality corpus.
+# Manual and rate-limited; never run from CI (CI only reads the committed fixture).
+[group("deposit")]
+[doc("Harvest ~75 real grimtools builds into web/test/fixtures/real-builds.json")]
+harvest-real-builds:
+    bun "{{justfile_directory()}}/scripts/gt_harvest_builds.ts" --out "{{justfile_directory()}}/web/test/fixtures/real-builds-raw.json"
+    cd "{{justfile_directory()}}/web" && bun scripts/build-real-builds-fixture.ts test/fixtures/real-builds-raw.json test/fixtures/real-builds.json
+
 # Audit a scraped build against our own data: RR ledger, monster cross-check,
 # circuit breakers, resistance cushions, and a devotion planner link.
 [group("deposit")]
