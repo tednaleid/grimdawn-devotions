@@ -334,10 +334,10 @@ compose, and how much of the CSS-class language moves to computed values.
   (`docs/superpowers/specs/2026-08-23-shorter-build-orders-design.md`)
   describes it. The measured residual headroom is the gap between the live
   budget and the escalated one on the real corpus (339 vs 255 wasted points;
-  the escalated budget costs about 2 s per build, so directed moves that reach
-  the same place in a few milliseconds are the prize). Pointer: the
-  quality-mode `consider()` scoring in `sampledConstruction`,
-  `web/src/core/reachability.ts`.
+  the escalated budget costs about 2 s per build and no control in the app
+  reaches it, so directed moves that reach the same place in a few
+  milliseconds are the prize). Pointer: the quality-mode `consider()` scoring
+  in `sampledConstruction`, `web/src/core/reachability.ts`.
 - Steps-first objective revisit, keyed to `just order-quality`'s divergence
   counter: 15 of 99 real builds at the live budget get a different schedule
   under a rows-first objective (definition: the steps-then-churn argmin over
@@ -368,6 +368,12 @@ compose, and how much of the CSS-class language moves to computed values.
   request is neither delayed nor counted against the politeness cap; and the
   catalog's `buildName` carries raw HTML entities (for example `&#39;`) into
   fixture titles, which are display-only in test output.
+- Escalation control: `buildOrderEscalated` (`web/src/core/reachability.ts`,
+  tries=4096) has no caller outside `web/test/`, so the escalated budget's
+  churn (255 against the live path's 339 on the real corpus) never reaches a
+  user. Wiring a control for it goes through the background-worker search in
+  "Guided build order: remaining follow-ups": quality mode spends the whole
+  budget, about 2 s per build, which is too much for the main thread.
 
 ## Known limitations (accepted)
 

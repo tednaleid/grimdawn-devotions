@@ -49,9 +49,13 @@ ever have produced a different schedule on real builds, the data will show it
 and the objective can be revisited with actual examples.
 
 **Delivery: better synchronous search only.** No worker, no UX change. The
-live per-click path keeps roughly its current cost; the existing "Find valid
-order" escalation button gets the large budget and now improves a found order
-as well as recovering a missing one. The background-worker progressive search
+live per-click path keeps roughly its current cost; the escalation entry point
+gets the large budget and improves a found order as well as recovering a
+missing one. That entry point (`buildOrderEscalated`) is not wired to any
+control in the app, so the large-budget gain is available to the harness and to
+a future control but not to users; wiring it needs the background-worker item,
+because quality mode makes it a fixed cost of about two seconds per build and
+that cannot run on the main thread. The background-worker progressive search
 stays a backlog follow-on.
 
 **Determinism: work budget, not wall clock.** `buildOrderPath` is documented

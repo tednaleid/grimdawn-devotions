@@ -1049,8 +1049,10 @@ export function buildOrderPath(
   return greedy.length <= sampler.length ? greedy : sampler;
 }
 
-/** The on-demand escalation behind the "Find valid order" button: the same schedule at high tries, to
- *  recover cliff builds the live tries=16 pass missed. Off the live/per-click path. */
+/** The same schedule at a large work budget: it recovers cliff builds the live tries=16 pass misses and,
+ *  since quality mode spends the whole budget, keeps lowering churn on builds that already have an order.
+ *  Costs roughly two seconds per build, so it is for callers that can afford that (harnesses, scripts);
+ *  no app control calls it, and it never belongs on the live/per-click path. */
 export function buildOrderEscalated(
   cons: ReachCon[],
   table: CoverTable,
