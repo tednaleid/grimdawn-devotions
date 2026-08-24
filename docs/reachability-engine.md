@@ -320,7 +320,8 @@ UI decides is reproducible headlessly from that hash:
 
 Re-run all of these; they are the regression gates:
 
-- `just test` and `just test-slow` (the metamorphic downward-closure walk).
+- `just test` and `just test-slow` (the metamorphic downward-closure walk and the
+  full-corpus order-quality sweep).
 - `just validate-wasm` - the WASM port must stay verdict-equivalent to TS.
 - `just realmap-hunt` - must report 0 confirmed false-reaches.
 - `just validate-reach` - tracks the synthetic false-reach and real-model false-dim

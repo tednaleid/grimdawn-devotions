@@ -680,12 +680,13 @@ wasm: _ensure-wasm-target
 test *ARGS:
     cd "{{justfile_directory()}}/web" && bun test {{ARGS}}
 
-# Slow reachability property tier: the heavy metamorphic downward-closure walk, gated behind REACH_SLOW
-# so the default suite (and the pre-commit hook) stay fast. Run before big engine changes.
+# Slow reachability property tier: the heavy metamorphic downward-closure walk and the full-corpus
+# order-quality sweep, gated behind REACH_SLOW so the default suite (and the pre-commit hook) stay
+# fast. Run before big engine changes.
 [group("check")]
-[doc("Slow reachability property tier: the heavy metamorphic downward-closure walk (REACH_SLOW)")]
+[doc("Slow reachability property tier: the heavy metamorphic walk and the full order-quality sweep (REACH_SLOW)")]
 test-slow:
-    cd "{{justfile_directory()}}/web" && REACH_SLOW=1 bun test test/reachability-monotonicity.test.ts
+    cd "{{justfile_directory()}}/web" && REACH_SLOW=1 bun test test/reachability-monotonicity.test.ts test/order-quality-mode.test.ts
 
 # Run the Python script test suites (parsers + data tools). The web suite is `just test`.
 # Run `just extract` first: four of the six suites hard-require extracted/records and
