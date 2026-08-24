@@ -92,8 +92,11 @@ argmin climb.
   peakNodeCap)` keeps its signature and its default `tries = 32`. The meaning of
   `tries` narrows to the fallback shuffle cap; on the happy path its value no
   longer affects the result.
-- The eval cap is a module constant, not a parameter. If the separate-climbs lever
-  is adopted, the constant covers the combined budget.
+- The eval cap is a module constant (`CLIMB_EVALS = 64`) applied per climb.
+  `buildOrderPath` does not expose it; `buildOrderCandidates` takes an optional
+  trailing `climbEvals` override so the harness can measure climb-off against
+  climb-on. If the separate-climbs lever is adopted, the constant stays the
+  per-climb cap.
 - Determinism: move enumeration is a fixed sequence derived from the incumbent
   schedule, which is itself deterministic; the seeded RNG remains for the fallback
   branch only. `buildOrderPath` stays a pure function of the build set. No
