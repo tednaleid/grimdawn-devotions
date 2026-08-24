@@ -58,7 +58,7 @@ export async function pageWsUrl(dbgPort: number): Promise<string> {
   throw new Error("chrome debug endpoint never exposed a page target");
 }
 
-/** The slice of a CDP Runtime.evaluate reply this script reads. */
+/** The slice of a CDP Runtime.evaluate reply this module reads. */
 export type CdpResult = {
   result?: { value?: unknown };
   exceptionDetails?: { text?: string; exception?: { description?: string } };

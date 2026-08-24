@@ -10,6 +10,7 @@ import {
 } from "../src/core/reachability";
 import { model, cons, table, generateValidBuild, mulberry32 } from "./reachability-fuzz";
 import { canonicalStarIds, decodeHash } from "../src/core/urlState";
+import realJson from "../test/fixtures/real-builds.json";
 
 const SEEDS = 150; // must match web/test/build-order-oracle.test.ts
 console.log("build,churn,steps");
@@ -42,8 +43,6 @@ console.error(
     (rs ? ` | repro: churn=${churnPoints(rs)} steps=${rs.length}` : " | repro: NO ORDER"),
 );
 
-import realJson from "../test/fixtures/real-builds.json";
-
 const real = realJson as unknown as { builds: { calc: string; title: string; starIds: string[] }[] };
 const TRIES_LADDER = [16, 256, 4096];
 
@@ -64,7 +63,7 @@ for (const b of real.builds) {
     const ms = performance.now() - t0;
     // `pick` reproduces buildOrderPath's rule exactly (churn, then steps, greedy on a full tie,
     // over the two shipped generators), so the churn and steps columns are the panel's own numbers.
-    // `alt` is the rows-first alternative over every candidate the sampler tracked.
+    // `alt` is the steps-first alternative over every candidate the sampler tracked.
     const shipped = [c.greedy, c.sampler].filter((s): s is BuildStep[] => s !== null);
     const pool = [...shipped, c.samplerStepsFirst].filter((s): s is BuildStep[] => s !== null);
     const a = agg.get(tries)!;

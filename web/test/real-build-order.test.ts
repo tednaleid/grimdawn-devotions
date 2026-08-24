@@ -7,7 +7,6 @@ import { model, cons, table } from "../scripts/reachability-fuzz";
 import fixtureJson from "./fixtures/real-builds.json";
 
 const fixture = fixtureJson as unknown as {
-  grimtoolsDataVersion: string;
   builds: { source: string; calc: string; title: string; starIds: string[] }[];
 };
 

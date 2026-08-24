@@ -340,11 +340,14 @@ compose, and how much of the CSS-class language moves to computed values.
   in `sampledConstruction`, `web/src/core/reachability.ts`.
 - Steps-first objective revisit, keyed to `just order-quality`'s divergence
   counter: 15 of 99 real builds at the live budget get a different schedule
-  under a rows-first objective (definition: the steps-then-churn argmin over
+  under a steps-first objective (definition: the steps-then-churn argmin over
   greedy, sampler, and the sampler's steps-first schedule differs in churn or
-  length from the churn-first pick). The per-build CSV names them, so the
-  objective question the spec deferred can be settled with real examples.
-  Pointer: the real-corpus section of `web/scripts/order-quality.ts`.
+  length from the churn-first pick). The counter compares the sampled-cap
+  steps-first schedule against the sampler pick re-emitted at the deeper
+  scaffold cap, so some divergences may vanish under re-emission; read it as
+  directional. The per-build CSV names them, so the objective question the spec
+  deferred can be settled with real examples. Pointer: the real-corpus section
+  of `web/scripts/order-quality.ts`.
 - Higher-tier constellations earlier as a tiebreak (Ted's idea): devotion
   points arrive gradually while leveling, so among schedules of equal churn
   and equal rows, the one that completes the build's highest-tier
@@ -367,7 +370,12 @@ compose, and how much of the CSS-class language moves to computed values.
   version through a bare in-page fetch that bypasses `fetchText`, so that one
   request is neither delayed nor counted against the politeness cap; and the
   catalog's `buildName` carries raw HTML entities (for example `&#39;`) into
-  fixture titles, which are display-only in test output.
+  fixture titles, which are display-only in test output. The next harvest
+  should also apply a minimum-star floor (in `convertRawBuild` in
+  `web/scripts/build-real-builds-fixture.ts`, or in `pickCandidates`): three
+  committed entries hold 3, 3, and 12 stars, too few to carry any ordering
+  signal. And the converter's run summary should count its `warn` lines
+  (mapped-star count against the bio's spent points) the way it counts skips.
 - Escalation control: `buildOrderEscalated` (`web/src/core/reachability.ts`,
   tries=4096) has no caller outside `web/test/`, so the escalated budget's
   churn (255 against the live path's 339 on the real corpus) never reaches a

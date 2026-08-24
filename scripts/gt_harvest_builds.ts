@@ -140,6 +140,12 @@ if (import.meta.main) {
     };
     for (const c of candidates) {
       if (builds.length >= TARGET) break;
+      // Stop at the cap rather than letting fetchText throw it once per remaining candidate, which
+      // would count every one of them as a calc-fetch failure.
+      if (fetches >= CONFIG.maxFetches) {
+        console.error(`politeness cap (${CONFIG.maxFetches} requests) hit; stopping at ${builds.length} builds`);
+        break;
+      }
       let calcHtml: string;
       try {
         calcHtml = await fetchText(cdp, `${ORIGIN}/calc/${c.buildId}`);
