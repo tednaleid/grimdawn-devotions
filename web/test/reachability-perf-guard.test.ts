@@ -32,8 +32,8 @@ const selOf = (sel: Record<string, number>): Set<string> => {
 const TED_STATES = [
   "#p=55&s=AAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAAAAAA4A_8AAAAAAAAAAAAwA8AAADAD_4P",
   "#p=55&s=AAAAAAAAAAA8AAAAAAAAAAAAAAAAAAAA-AMA4A_8AAAAAAAAAAAAwA8AAADAD_4P",
-  // The two confirmed real-map false-reaches: selectionView now also computes buildOrder (tries=16),
-  // which on these unreachable builds runs all 16 passes (no early exit) - the worst build-order cost.
+  // The two confirmed real-map false-reaches: selectionView also computes buildOrder (tries=32),
+  // which on these unreachable builds runs every pass (no early exit) - the worst build-order cost.
   "#p=55&s=HwAAAAAAAD4AAAAABzwAAAAAAAAAAACABwDAHwAAAAAA4AcAAAAAAACA_wMA8AEAAAAf",
   "#p=55&s=AADwAQCADwAAAAAfAAAAAAAAAAAAAD4AAAAAAPADAAAA4AcAAAAAPwCA_wMAAMAP",
   // Partial-constellation reachability states: 4 spare points with Korvaak and Tortoise enterable but

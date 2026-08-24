@@ -26,7 +26,7 @@ test("every real build gets an oracle-legal order at live settings", () => {
   let misses = 0;
   for (const b of fixture.builds) {
     const members = selectionSummary(model, new Set(b.starIds)).built;
-    const steps = buildOrderPath(cons, table, members, BUDGET, 16);
+    const steps = buildOrderPath(cons, table, members, BUDGET, 32);
     if (!steps) {
       misses++;
       if (!KNOWN_MISSES.has(b.calc)) console.error(`unexpected miss: ${b.calc} (${b.title})`);

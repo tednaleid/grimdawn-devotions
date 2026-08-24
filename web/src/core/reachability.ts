@@ -1038,7 +1038,7 @@ export function buildOrderPath(
   table: CoverTable,
   B: ReachCon[],
   budget = BUDGET,
-  tries = 16,
+  tries = 32,
   peakNodeCap = 3000,
 ): BuildStep[] | null {
   const { greedy, sampler } = buildOrderCandidates(cons, table, B, budget, tries, peakNodeCap);
@@ -1049,7 +1049,7 @@ export function buildOrderPath(
   return greedy.length <= sampler.length ? greedy : sampler;
 }
 
-/** The same schedule at a large work budget: it recovers cliff builds the live tries=16 pass misses and,
+/** The same schedule at a large work budget: it recovers cliff builds the live pass misses and,
  *  since quality mode spends the whole budget, keeps lowering churn on builds that already have an order.
  *  Costs roughly two seconds per build, so it is for callers that can afford that (harnesses, scripts);
  *  no app control calls it, and it never belongs on the live/per-click path. */
@@ -1430,7 +1430,7 @@ export interface SelectionView {
   minCost: number; // selectionMinCost: fewest points that keep this selection a legal build (the slider floor)
   reach: ReachView; // reachabilityForSelection: dimming, reachable stars, and the affinity panel vectors
   legal: boolean; // reach.legal: the selection is a legal build within 55 (export gates on it)
-  buildOrder: BuildStep[] | null; // live (tries=16) oracle-verified order to assemble the selection, or null (verified or absent)
+  buildOrder: BuildStep[] | null; // live (tries=32) oracle-verified order to assemble the selection, or null (verified or absent)
   buildOrderStates: StepState[] | null; // per-step post-states from the verifying replay; present exactly when buildOrder is
   /** Compare mode: the verified baseline-to-current transition, with its replay's states; null
    *  when not comparing or when no rung produced a verified order (the panel then falls back to
@@ -1477,7 +1477,7 @@ export function selectionView(
   // Verified or absent: render only orders the independent oracle proves legal at every step;
   // anything else is withheld and the panel shows its honest empty state instead. The verifying
   // replay's per-step states ride along for the step popup - one walk, two outputs.
-  const raw = members.length ? buildOrderPath(cons, table, members, cap, 16) : null;
+  const raw = members.length ? buildOrderPath(cons, table, members, cap, 32) : null;
   const gated = gateBuildOrder(cons, members, raw, cap);
   return {
     minCost,
