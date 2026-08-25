@@ -1,6 +1,6 @@
 // ABOUTME: HTTP adapter for the DataSource port; fetches devotions.json, the asset manifest, and the cover blob.
 // ABOUTME: Uses relative base paths and a shared ?v=<buildId> so the data files stay a coherent, cache-busted pair.
-import { buildModel, type DevotionsDoc } from "../core/model";
+import { buildModel, starIdsByDbr, type DevotionsDoc } from "../core/model";
 import { buildReachCons, type CoverTable, type ReachCon } from "../core/reachability";
 import { decodeCoverBlob } from "./coverTableBlob";
 import type { AssetManifest, DataMeta, DataSource, LoadedData } from "../ports/DataSource";
@@ -66,7 +66,7 @@ export function httpDataSource(base = "."): DataSource {
       } catch (e) {
         console.warn("reach.wasm fetch failed; using the TS resolver", e);
       }
-      return { model, manifest, coverTable, reachWasm, meta: metaFromDoc(doc) };
+      return { model, starDbrIds: starIdsByDbr(doc), manifest, coverTable, reachWasm, meta: metaFromDoc(doc) };
     },
   };
 }

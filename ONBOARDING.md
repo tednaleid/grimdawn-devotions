@@ -13,7 +13,9 @@ browser** (`data/skill-items.json`, `web/src/items/`) lists the endgame items th
 grant or modify each mastery skill, with the game's own effect wording. Deployed to
 GitHub Pages, plus one small Cloudflare Worker (`worker/`) whose only job is to
 fetch a grimtools build past its CORS header, and save one, for the devotion
-planner's import and export.
+planner's import and export. The planner also reads a Grim Dawn character
+save (`player.gdc`) entirely in the browser to load its devotions; see
+`docs/save-file-import.md`.
 
 ## Stack
 - Language: TypeScript (planner), Python 3 (parser), Rust (reachability core)
@@ -126,6 +128,7 @@ Pages, auto-deployed from `main`).
 - `docs/item-cli.md` -- the item query CLI: flags, name resolution, tier semantics
 - `docs/grimtools-build-audit.md` -- reading a shared grimtools build and auditing it against our data
 - `docs/grimtools-import.md` -- importing a build's devotions: the three pieces, the mapping table's gates, why a worker exists
+- `docs/save-file-import.md` -- reading a character save: the cipher, the frozen fields, and the block-end resync that makes it work
 - `worker/README.md` -- the grimtools import worker: contract, local dev, deployment, one-time Cloudflare setup
 - `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings

@@ -1,6 +1,6 @@
 // ABOUTME: Port interfaces for data loading in the devotion planner.
 // ABOUTME: Defines AssetManifest, LoadedData, and the DataSource contract for adapters.
-import type { DevotionModel } from "../core/types";
+import type { DevotionModel, StarId } from "../core/types";
 import type { CoverTable } from "../core/reachability";
 
 export interface AssetImage {
@@ -25,6 +25,8 @@ export interface DataMeta {
 
 export interface LoadedData {
   model: DevotionModel;
+  /** Game record path -> star id, the one identifier a save file and this dataset share. */
+  starDbrIds: Map<string, StarId>;
   manifest: AssetManifest | null;
   coverTable: CoverTable | null;
   reachWasm: Uint8Array | null; // raw reach.wasm bytes, or null (engine falls back to the TS resolver)

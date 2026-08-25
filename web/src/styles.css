@@ -1257,3 +1257,46 @@ body.narrow #total-word {
     opacity: 1;
   }
 }
+
+/* Save-file panel. Shares the import panel's palette so the two read as one family of controls.
+   The file input is styled through ::file-selector-button, which is the only part of a file
+   control a page may restyle; the rest stays the browser's own. */
+.save-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+#save-input {
+  flex: 1;
+  min-width: 0;
+  color: #9aa4b2;
+  font-family: inherit;
+  font-size: 0.75rem;
+}
+#save-input::file-selector-button {
+  background: #161d27;
+  border: 1px solid #283446;
+  border-radius: 4px;
+  padding: 0.3rem 0.45rem;
+  margin-right: 0.4rem;
+  color: #9aa4b2;
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+#save-input::file-selector-button:hover {
+  background: #1d2530;
+  border-color: #3d4a5c;
+  color: #e6edf3;
+}
+#save-hint,
+#save-msg {
+  margin-top: 0.35rem;
+  color: #9aa4b2;
+  font-size: 0.75rem;
+}

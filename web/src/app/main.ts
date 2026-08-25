@@ -49,6 +49,8 @@ import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
 import { mapStars, invertStarTable, toGrimtoolsSkills, type StarTable } from "../core/grimtools";
 import { mountImportPanel, type ExportErrorCode, type ExportState, type ImportState } from "../adapters/importPanel";
+import { mountSavePanel } from "../adapters/savePanel";
+import { parseSave } from "../core/gdSave";
 import { makeWorkerGateway } from "../adapters/grimtoolsWorkerGateway";
 import { disabledGateway } from "../adapters/grimtoolsGatewayDisabled";
 import type { ExportBase, FetchBuildResult } from "../ports/GrimtoolsGateway";
@@ -253,6 +255,7 @@ async function boot() {
       searchIndex = resolveIndex(localization, corpus);
       searchPanel.relocalize(localization);
       importPanel.relocalize(localization);
+      savePanel.relocalize(localization);
       refresh();
     },
   });
@@ -1185,6 +1188,46 @@ async function boot() {
       syncImportPanel();
     }
   }
+
+  // Reads a character straight off disk: the whole parse runs here in the page, so this path needs
+  // no service and cannot be switched off from outside. The cap follows the character's earned
+  // devotion points, so the planner opens with the same budget the character actually plays with.
+  function loadSave(bytes: Uint8Array): void {
+    const result = parseSave(bytes);
+    if (result.kind === "error") {
+      savePanel.setState({ kind: "error", code: result.code });
+      return;
+    }
+    const character = result.character;
+    const wanted = new Set<StarId>();
+    for (const dbr of character.starDbrs) {
+      const id = data.starDbrIds.get(dbr);
+      if (id) wanted.add(id); // an unknown record (a mod, or a dataset older than the save) is dropped
+    }
+    if (wanted.size === 0) {
+      savePanel.setState({ kind: "error", code: "empty" });
+      return;
+    }
+    const cap = Math.max(1, Math.min(55, character.devotionTotal));
+    state = { selected: repairSelection(model, cons, table, wanted, cap), pointCap: cap };
+    // The selection is the character's own, so any grimtools association the hash carried is stale.
+    source = "";
+    savePanel.setState({
+      kind: "done",
+      name: character.name,
+      level: character.level,
+      spent: character.devotionTotal - character.devotionUnspent,
+      total: character.devotionTotal,
+      pruned: character.starDbrs.length - state.selected.size,
+    });
+    // A full refresh, not repaint(): this replaces selection and cap wholesale, so reach, the points
+    // bar and the benefits, affinity and build-order panels are all stale, as they are after an import.
+    refresh("push");
+  }
+
+  const savePanel = mountSavePanel(document.getElementById("save-panel") as HTMLElement, localization, {
+    onBytes: loadSave,
+  });
 
   const importHost = document.getElementById("import-panel") as HTMLElement;
   importHost.hidden = !GRIMTOOLS_ENABLED;

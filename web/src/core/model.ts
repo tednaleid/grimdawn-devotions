@@ -4,6 +4,7 @@ import type { Constellation, DevotionModel, Star, StarId } from "./types";
 
 interface RawStar {
   index: number;
+  dbr?: string;
   predecessors: number[];
   position: { x: number; y: number };
   bonuses: Record<string, number>;
@@ -92,4 +93,19 @@ export function buildModel(doc: DevotionsDoc): DevotionModel {
     });
   }
   return { stars, constellations };
+}
+
+/**
+ * Maps each star's game record path to its planner star id.
+ *
+ * Save files identify devotion stars by record path, which is the one identifier both the game
+ * and this dataset agree on. Kept off the Star interface deliberately: only save import needs it,
+ * and the graph the planner works with is addressed by star id everywhere else.
+ */
+export function starIdsByDbr(doc: DevotionsDoc): Map<string, StarId> {
+  const table = new Map<string, StarId>();
+  for (const c of doc.constellations) {
+    for (const s of c.stars) if (s.dbr) table.set(s.dbr, `${c.id}:${s.index}`);
+  }
+  return table;
 }
