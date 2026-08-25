@@ -368,13 +368,13 @@ compose, and how much of the CSS-class language moves to computed values.
   (mapped-star count against the bio's spent points) the way it counts skips.
 - Escalation control: `buildOrderEscalated` (`web/src/core/reachability.ts`,
   tries=4096) has no caller outside `web/test/`. The guided climb has closed
-  most of the gap to the brute-force reference (262 against the escalated
-  budget's 255 wasted points on the real corpus), so a background worker to
-  reach the escalated budget is likely no longer worth building; kept here as
-  a stub in case the remaining gap becomes worth closing. Wiring a control for
-  it would go through the background-worker search in "Guided build order:
-  remaining follow-ups": quality mode spends the whole budget, about 2 s per
-  build, which is too much for the main thread.
+  most of the gap to the pre-climb brute-force reference (262 against 255
+  wasted points on the real corpus), and the escalated budget itself now also
+  lands at 262 in milliseconds per build, because tries only caps the fallback
+  shuffles and no longer scales quality. A background worker to run a deeper
+  search is likely no longer worth building; kept here as a stub in case the
+  remaining gap becomes worth closing, with the background-worker pointer in
+  "Guided build order: remaining follow-ups".
 
 ## Known limitations (accepted)
 

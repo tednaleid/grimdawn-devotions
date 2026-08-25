@@ -734,7 +734,7 @@ function sampledConstruction(
     }
   };
   // Score a candidate; witness mode returns true when it fits (the caller stops sampling),
-  // quality mode always returns false (tries is the deterministic work budget).
+  // quality mode always returns false so the heuristic-start scoring loop never early-exits (tries only caps the fallback shuffles).
   const consider = (candidate: ReachCon[]): boolean => {
     const sched = emitSchedule(candidate, tail, pool, table, budget, peakNodeCap);
     const peak = sched ? sched.peak : INF;
