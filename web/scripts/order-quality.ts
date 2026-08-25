@@ -1,5 +1,5 @@
 // ABOUTME: Build-order quality over the pinned 150-seed synthetic corpus + repro URL and the 99-build
-// ABOUTME: real corpus at a tries ladder: per-build churn/steps CSV on stdout, aggregates on stderr.
+// ABOUTME: real corpus climb-off vs climb-on: per-build churn/steps CSV on stdout, aggregates on stderr.
 import {
   buildOrderPath,
   buildOrderCandidates,
@@ -44,7 +44,10 @@ console.error(
 );
 
 const real = realJson as unknown as { builds: { calc: string; title: string; starIds: string[] }[] };
-const TRIES_LADDER = [16, 256, 4096];
+const CONFIGS = [
+  { name: "climb-off", climbEvals: 0 },
+  { name: "climb-on", climbEvals: undefined }, // undefined takes the shipped default (CLIMB_EVALS)
+] as const;
 
 const slugOf = (calc: string) => calc.slice(calc.lastIndexOf("/") + 1);
 const byChurnThenSteps = (a: BuildStep[], b: BuildStep[]) =>
@@ -52,24 +55,24 @@ const byChurnThenSteps = (a: BuildStep[], b: BuildStep[]) =>
 const byStepsThenChurn = (a: BuildStep[], b: BuildStep[]) =>
   a.length - b.length || churnPoints(a) - churnPoints(b);
 
-console.log("build,tries,churn,steps,ms,divergent");
-const agg = new Map<number, { orders: number; churn: number; steps: number; divergent: number; ms: number }>();
-for (const t of TRIES_LADDER) agg.set(t, { orders: 0, churn: 0, steps: 0, divergent: 0, ms: 0 });
+console.log("build,config,churn,steps,ms,divergent");
+const agg = new Map<string, { orders: number; churn: number; steps: number; divergent: number; ms: number }>();
+for (const c of CONFIGS) agg.set(c.name, { orders: 0, churn: 0, steps: 0, divergent: 0, ms: 0 });
 for (const b of real.builds) {
   const members = selectionSummary(model, new Set(b.starIds)).built;
-  for (const tries of TRIES_LADDER) {
+  for (const cfg of CONFIGS) {
     const t0 = performance.now();
-    const c = buildOrderCandidates(cons, table, members, BUDGET, tries);
+    const c = buildOrderCandidates(cons, table, members, BUDGET, 32, 3000, cfg.climbEvals);
     const ms = performance.now() - t0;
     // `pick` reproduces buildOrderPath's rule exactly (churn, then steps, greedy on a full tie,
     // over the two shipped generators), so the churn and steps columns are the panel's own numbers.
     // `alt` is the steps-first alternative over every candidate the sampler tracked.
     const shipped = [c.greedy, c.sampler].filter((s): s is BuildStep[] => s !== null);
     const pool = [...shipped, c.samplerStepsFirst].filter((s): s is BuildStep[] => s !== null);
-    const a = agg.get(tries)!;
+    const a = agg.get(cfg.name)!;
     a.ms += ms;
     if (shipped.length === 0) {
-      console.log(`${slugOf(b.calc)},${tries},none,none,${ms.toFixed(1)},`);
+      console.log(`${slugOf(b.calc)},${cfg.name},none,none,${ms.toFixed(1)},`);
       continue;
     }
     const pick = [...shipped].sort(byChurnThenSteps)[0]!;
@@ -79,13 +82,15 @@ for (const b of real.builds) {
     a.churn += churnPoints(pick);
     a.steps += pick.length;
     if (divergent) a.divergent++;
-    console.log(`${slugOf(b.calc)},${tries},${churnPoints(pick)},${pick.length},${ms.toFixed(1)},${divergent ? 1 : 0}`);
+    console.log(
+      `${slugOf(b.calc)},${cfg.name},${churnPoints(pick)},${pick.length},${ms.toFixed(1)},${divergent ? 1 : 0}`,
+    );
   }
 }
-for (const tries of TRIES_LADDER) {
-  const a = agg.get(tries)!;
+for (const cfg of CONFIGS) {
+  const a = agg.get(cfg.name)!;
   console.error(
-    `real corpus @ tries=${tries}: orders=${a.orders}/${real.builds.length} churn=${a.churn} ` +
+    `real corpus @ ${cfg.name}: orders=${a.orders}/${real.builds.length} churn=${a.churn} ` +
       `steps=${a.steps} divergent=${a.divergent} mean_ms=${(a.ms / real.builds.length).toFixed(1)}`,
   );
 }
