@@ -667,16 +667,22 @@ interface SampledConstruction {
   stepsFirst: BuildStep[] | null; // quality mode: steps-first argmin among fitting schedules
 }
 
+/** The guided climb's evaluation cap. Convergence measures under 32 evaluations on the real corpus,
+ *  so 64 buys margin while bounding the worst case. A count, never wall-clock, for determinism. */
+const CLIMB_EVALS = 64;
+
 // Core sampler shared by minPeakSampled (which wants the peak), minPeakSampledOrder (which wants the
 // witness order) and buildOrderPath (which wants the schedule). Every candidate order is scored by the
 // peak of its actual legal schedule (emitSchedule: scaffolds added before the step that needs them,
 // refunded the moment the rules allow, so a scaffold swap holds both sides until the old one may go).
-// Tries three deterministic orders - the bootstrap heuristic (lowest requirement first, then highest
-// grant density) and both peel variants (peelOrder) - plus up to `tries` seeded shuffles of the granting
-// members. Witness mode keeps the smallest-peak order and stops at the first schedule that fits the
-// budget (a reachability proof needs nothing more). Quality mode spends the whole `tries` budget and
-// keeps the churn-then-steps argmin among the fitting schedules, tracking the steps-first argmin
-// alongside it for the divergence harness.
+// Both modes first score three deterministic orders - the bootstrap heuristic (lowest requirement
+// first, then highest grant density) and both peel variants (peelOrder). Witness mode then samples up
+// to `tries` seeded shuffles, keeping the smallest-peak order and stopping at the first schedule that
+// fits the budget (a reachability proof needs nothing more). Quality mode instead hill-climbs from the
+// best heuristic schedule: it reads the incumbent's non-crossroads scaffold buys and scores targeted
+// reorderings (up to `climbEvals`), keeping the churn-then-steps argmin and the steps-first argmin
+// alongside for the divergence harness. Shuffles remain only as a fallback for builds whose heuristic
+// orders never fit: sample until one fits (capped by `tries`), then climb it.
 function sampledConstruction(
   cons: ReachCon[],
   table: CoverTable,
@@ -685,6 +691,7 @@ function sampledConstruction(
   tries: number,
   peakNodeCap: number,
   mode: SamplerMode = "witness",
+  climbEvals: number = CLIMB_EVALS,
 ): SampledConstruction {
   const grants = (c: ReachCon) => c.grant[0] || c.grant[1] || c.grant[2] || c.grant[3] || c.grant[4];
   const tail = B.filter((c) => !grants(c));
@@ -733,6 +740,77 @@ function sampledConstruction(
     }
     return false;
   };
+  // TS flow analysis cannot see closure assignments to bestSteps; read it through a call so the
+  // incumbent is not narrowed to null at the climb sites.
+  const liveSteps = (): BuildStep[] | null => bestSteps;
+  // Guided local search: read the incumbent schedule's first two non-crossroads scaffold buys and
+  // score targeted reorderings, accepting churn-then-steps improvements until convergence or `cap`.
+  const climb = (cap: number): void => {
+    if (liveSteps() === null) return;
+    const byId = new Map(pool.map((c) => [c.id, c]));
+    const moves = (ord: ReachCon[], steps: BuildStep[]): ReachCon[][] => {
+      const out: ReachCon[][] = [];
+      const idx = new Map(ord.map((c, i) => [c.id, i]));
+      let events = 0;
+      for (let s = 0; s < steps.length && events < 2; s++) {
+        const st = steps[s]!;
+        if (st.kind !== "scaffold-add" || st.conId.startsWith("crossroads_")) continue;
+        events++;
+        const scaffold = byId.get(st.conId);
+        // The triggering member: the first completion after the buy that is in the granting order.
+        let ti = -1;
+        for (let t = s + 1; t < steps.length; t++) {
+          const c = steps[t]!;
+          if (c.kind === "complete" && idx.has(c.conId)) {
+            ti = idx.get(c.conId)!;
+            break;
+          }
+        }
+        if (ti < 0) continue;
+        if (scaffold) {
+          // Advance each later member that feeds the scaffold's colors to just before the trigger.
+          for (let j = ti + 1; j < ord.length; j++) {
+            let feeds = false;
+            for (let k = 0; k < 5; k++) if (scaffold.grant[k]! > 0 && ord[j]!.grant[k]! > 0) feeds = true;
+            if (!feeds) continue;
+            const cand = [...ord];
+            const [m] = cand.splice(j, 1);
+            cand.splice(ti, 0, m!);
+            out.push(cand);
+          }
+        }
+        if (ti + 1 < ord.length) {
+          const cand = [...ord];
+          const [m] = cand.splice(ti, 1);
+          cand.push(m!);
+          out.push(cand);
+        }
+        if (ti > 0) {
+          const cand = [...ord];
+          const tmp = cand[ti - 1]!;
+          cand[ti - 1] = cand[ti]!;
+          cand[ti] = tmp;
+          out.push(cand);
+        }
+      }
+      return out;
+    };
+    let evals = 0;
+    for (let improved = true; improved && evals < cap; ) {
+      improved = false;
+      for (const cand of moves(bestOrder, liveSteps()!)) {
+        if (evals >= cap) break;
+        evals++;
+        const c0 = bestChurn;
+        const n0 = liveSteps()!.length;
+        consider(cand);
+        if (bestChurn < c0 || (bestChurn === c0 && liveSteps()!.length < n0)) {
+          improved = true;
+          break;
+        }
+      }
+    }
+  };
   const done = (): SampledConstruction => ({ peak: best, order: bestOrder, tail, steps: bestSteps, stepsFirst });
   if (consider(order)) return done();
   for (const zeroReqFirst of [true, false]) if (consider(peelOrder(G, zeroReqFirst))) return done();
@@ -743,13 +821,28 @@ function sampledConstruction(
     t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  for (let attempt = 0; attempt < tries && (mode === "quality" || best > budget); attempt++) {
+  const shuffle = (): void => {
     for (let i = order.length - 1; i > 0; i--) {
       const j = Math.floor(rnd() * (i + 1));
       const tmp = order[i]!;
       order[i] = order[j]!;
       order[j] = tmp;
     }
+  };
+  if (mode === "quality") {
+    climb(climbEvals);
+    // Fallback for builds whose heuristic orders never fit: sample until one does, then climb it.
+    if (bestSteps === null) {
+      for (let attempt = 0; attempt < tries && bestSteps === null; attempt++) {
+        shuffle();
+        consider(order);
+      }
+      climb(climbEvals);
+    }
+    return done();
+  }
+  for (let attempt = 0; attempt < tries && best > budget; attempt++) {
+    shuffle();
     consider(order);
   }
   return done();
@@ -992,7 +1085,8 @@ function emitSchedule(
  *  and the sampler's (re-emitted at the cold-path cap, its sampled schedule as fallback).
  *  `samplerStepsFirst` is the steps-first argmin among the fitting sampled schedules, at the
  *  sampling cap, kept for the divergence harness; only the churn-first pick is re-emitted at the
- *  cold-path cap. The pick itself stays churn-first and lives in buildOrderPath. */
+ *  cold-path cap. The pick itself stays churn-first and lives in buildOrderPath.
+ *  climbEvals is harness-facing (the climb-off/on comparison); app callers take the default. */
 export interface OrderCandidates {
   greedy: BuildStep[] | null;
   sampler: BuildStep[] | null;
@@ -1006,13 +1100,14 @@ export function buildOrderCandidates(
   budget = BUDGET,
   tries = 16,
   peakNodeCap = 3000,
+  climbEvals = CLIMB_EVALS,
 ): OrderCandidates {
   B = [...B].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
   const parts = buildParts(cons, B);
   if (!parts || parts.totalSize > budget) return { greedy: null, sampler: null, samplerStepsFirst: null };
   const nd = needDrivenOrder(cons, B);
   const viaGreedy = nd ? (emitSchedule(nd.order, nd.tail, parts.pool, table, budget)?.steps ?? null) : null;
-  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap, "quality");
+  const sc = sampledConstruction(cons, table, B, budget, tries, peakNodeCap, "quality", climbEvals);
   const viaSampler =
     sc.steps === null ? null : (emitSchedule(sc.order, sc.tail, parts.pool, table, budget)?.steps ?? sc.steps);
   return { greedy: viaGreedy, sampler: viaSampler, samplerStepsFirst: sc.stepsFirst };
@@ -1024,14 +1119,15 @@ export function buildOrderCandidates(
  * grants cover it. Two candidate orders are emitted (emitSchedule holds the exact scaffold SET
  * peakToReach picks and drains refunds per the in-game rules, docs/devotion-system.md): the
  * need-driven greedy order (needDrivenOrder: the build builds itself, usually from crossroads alone)
- * and the sampled peak-minimizing witness order (sampledConstruction). Neither generator dominates -
- * the greedy wins cap-tight builds the sampler scaffolds heavily, the sampler's bootstrap heuristic
- * wins typical builds the greedy misorders - so the better schedule by the ordering objective is
- * returned: fewer churn points (churnPoints), then fewer steps, the greedy on a full tie. Per-build
- * best-of-both is never worse than either generator alone. Returns null when neither order fits the
- * budget or a held scaffold can never be legally refunded - the honest "not validly buildable"
- * signal. No order is better than an illegal order. Input is canonicalized (sorted by constellation
- * id), so the output is a pure function of the build set - every caller gets the identical order.
+ * and the guided quality search (sampledConstruction: heuristic starts plus a schedule-guided climb).
+ * Neither generator dominates - the greedy wins cap-tight builds the sampler scaffolds heavily, the
+ * sampler's bootstrap heuristic wins typical builds the greedy misorders - so the better schedule by
+ * the ordering objective is returned: fewer churn points (churnPoints), then fewer steps, the greedy
+ * on a full tie. Per-build best-of-both is never worse than either generator alone. Returns null when
+ * neither order fits the budget or a held scaffold can never be legally refunded - the honest "not
+ * validly buildable" signal. No order is better than an illegal order. Input is canonicalized (sorted
+ * by constellation id), so the output is a pure function of the build set - every caller gets the
+ * identical order.
  */
 export function buildOrderPath(
   cons: ReachCon[],
@@ -1049,10 +1145,10 @@ export function buildOrderPath(
   return greedy.length <= sampler.length ? greedy : sampler;
 }
 
-/** The same schedule at a large work budget: it recovers cliff builds the live pass misses and,
- *  since quality mode spends the whole budget, keeps lowering churn on builds that already have an order.
- *  Costs roughly two seconds per build, so it is for callers that can afford that (harnesses, scripts);
- *  no app control calls it, and it never belongs on the live/per-click path. */
+/** The same schedule at a large fallback budget: it recovers cliff builds whose heuristic orders
+ *  never fit and the live fallback cap misses. Quality comes from the guided climb, which both paths
+ *  share, so on typical builds this matches the live result; no app control calls it, and it never
+ *  belongs on the live/per-click path. */
 export function buildOrderEscalated(
   cons: ReachCon[],
   table: CoverTable,
