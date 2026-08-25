@@ -188,23 +188,34 @@ heavily, the sampler's deterministic orders win typical builds - so the
 per-build best of both is never worse than either alone.
 
 `sampledConstruction` scores every candidate order by the peak of its actual
-legal schedule (`emitSchedule`) and runs in one of two modes. Witness mode is
-the engine's reachability witness (`minPeakSampled`, `minPeakSampledOrder`,
-the peak-witness step above): it keeps the smallest-peak order and stops
+legal schedule (`emitSchedule`) and runs in one of two modes. Both modes
+first score the same three deterministic orders - the bootstrap heuristic
+and the two peel orders described above. Witness mode is the engine's
+reachability witness (`minPeakSampled`, `minPeakSampledOrder`, the
+peak-witness step above): it keeps the smallest-peak order and stops
 sampling at the first schedule that fits the budget, because a reachability
 proof needs nothing more. Quality mode is the panel path
-(`buildOrderCandidates`): it spends the whole `tries` budget - a count of
-schedule emissions, never wall-clock, so the order stays a pure function of
-the build set - and keeps the churn-then-steps argmin among the fitting
-schedules, tracking the steps-first argmin alongside it for the divergence
-harness. The real-build corpus (web/test/fixtures/real-builds.json, harvested
-by `just harvest-real-builds`) and `just order-quality`'s tries ladder (16,
-256, 4096) with its divergence counter are the tools that measure quality
-mode. Both modes feed the same emission loop (`emitSchedule`), which adds
-transient scaffold constellations before the steps that need them and refunds
-each the moment the in-game rules allow; the panel re-emits the sampled order
-at a deeper scaffold-search cap for smaller scaffolds and falls back to the
-sampled schedule itself, so a lit build always has an order. Its contract:
+(`buildOrderCandidates`): it hill-climbs from each of the three heuristic
+starts, reading the incumbent schedule's non-crossroads scaffold buys and
+scoring targeted reorderings - advance a feeding member ahead of the buy,
+defer the triggering member to the end, or swap it with its predecessor -
+accepting churn-then-steps improvements up to a fixed evaluation cap
+(`CLIMB_EVALS`) per start. Each start climbs its own local incumbent, but
+every schedule any of the three climbs evaluates feeds one shared
+churn-then-steps argmin, with the steps-first argmin tracked alongside it
+for the divergence harness. Seeded shuffles run only as a fallback, for a
+build none of the three heuristic orders fits: sampled until one does
+(capped by `tries`), then that fit is climbed too. The evaluation cap and
+`tries` are both counts of schedule emissions, never wall-clock, so the
+order stays a pure function of the build set. The real-build corpus
+(web/test/fixtures/real-builds.json, harvested by `just harvest-real-builds`)
+and `just order-quality`'s climb-off-vs-climb-on comparison with its
+divergence counter are the tools that measure quality mode. Both modes feed
+the same emission loop (`emitSchedule`), which adds transient scaffold
+constellations before the steps that need them and refunds each the moment
+the in-game rules allow; the panel re-emits the sampled order at a deeper
+scaffold-search cap for smaller scaffolds and falls back to the sampled
+schedule itself, so a lit build always has an order. Its contract:
 
 - **Canonical input.** The member array is sorted by constellation id at entry,
   so the output is a pure function of the build set. Panel, tests, and scripts
@@ -265,9 +276,10 @@ by `just harvest-real-builds`, gated by web/test/real-build-order.test.ts,
 whose every build must get an oracle-legal order at live settings), the
 aggregate churn/step quality pins in web/test/build-order-oracle.test.ts
 (a silent ordering regression fails CI; `just order-quality` is the
-per-build measurement tool, its tries ladder of 16/256/4096 and divergence
-counter covering both the synthetic corpus and the real one), and the offline
-harness `just build-order-validate`, whose illegal-path count must stay zero.
+per-build measurement tool, its climb-off-vs-climb-on comparison and
+divergence counter covering both the synthetic corpus and the real one), and
+the offline harness `just build-order-validate`, whose illegal-path count
+must stay zero.
 
 ## Investigating a reported build
 
@@ -329,9 +341,9 @@ Re-run all of these; they are the regression gates:
 - `just build-order-validate` - the guided-build-order false-negative/positive rates.
 - `just perf` - per-click latency must stay within the interactive budget.
 - `just order-quality` - run it on the branch and on `main`, then compare the
-  real-corpus aggregate lines (orders, churn, steps) at each tries level:
-  orders must stay 99/99 and churn must not rise. The synthetic aggregate is
-  separately pinned by `web/test/build-order-oracle.test.ts`.
+  real-corpus aggregate lines (orders, churn, steps) for climb-off and
+  climb-on: orders must stay 99/99 and churn must not rise. The synthetic
+  aggregate is separately pinned by `web/test/build-order-oracle.test.ts`.
 - `web/test/real-build-order.test.ts` (run by `just test`) - every harvested
   community build in web/test/fixtures/real-builds.json must get an
   oracle-legal order at live settings.

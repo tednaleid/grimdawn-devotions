@@ -328,18 +328,8 @@ compose, and how much of the CSS-class language moves to computed values.
 
 ## Build-order quality: deferred follow-ups
 
-- Local improvement (hill-climbing member swaps and reinsertions re-emitted
-  through `emitSchedule`, plus directed scaffold shrinking) as the next lever:
-  the spec's "Approaches considered and deferred" section
-  (`docs/superpowers/specs/2026-08-23-shorter-build-orders-design.md`)
-  describes it. The measured residual headroom is the gap between the live
-  budget and the escalated one on the real corpus (339 vs 255 wasted points;
-  the escalated budget costs about 2 s per build and no control in the app
-  reaches it, so directed moves that reach the same place in a few
-  milliseconds are the prize). Pointer: the quality-mode `consider()` scoring
-  in `sampledConstruction`, `web/src/core/reachability.ts`.
 - Steps-first objective revisit, keyed to `just order-quality`'s divergence
-  counter: 15 of 99 real builds at the live budget get a different schedule
+  counter: 7 of 99 real builds at the live budget get a different schedule
   under a steps-first objective (definition: the steps-then-churn argmin over
   greedy, sampler, and the sampler's steps-first schedule differs in churn or
   length from the churn-first pick). The counter compares the sampled-cap
@@ -377,11 +367,14 @@ compose, and how much of the CSS-class language moves to computed values.
   signal. And the converter's run summary should count its `warn` lines
   (mapped-star count against the bio's spent points) the way it counts skips.
 - Escalation control: `buildOrderEscalated` (`web/src/core/reachability.ts`,
-  tries=4096) has no caller outside `web/test/`, so the escalated budget's
-  churn (255 against the live path's 339 on the real corpus) never reaches a
-  user. Wiring a control for it goes through the background-worker search in
-  "Guided build order: remaining follow-ups": quality mode spends the whole
-  budget, about 2 s per build, which is too much for the main thread.
+  tries=4096) has no caller outside `web/test/`. The guided climb has closed
+  most of the gap to the brute-force reference (262 against the escalated
+  budget's 255 wasted points on the real corpus), so a background worker to
+  reach the escalated budget is likely no longer worth building; kept here as
+  a stub in case the remaining gap becomes worth closing. Wiring a control for
+  it would go through the background-worker search in "Guided build order:
+  remaining follow-ups": quality mode spends the whole budget, about 2 s per
+  build, which is too much for the main thread.
 
 ## Known limitations (accepted)
 

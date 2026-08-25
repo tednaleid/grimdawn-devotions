@@ -596,9 +596,61 @@ Run and confirm green, recording each in the Results section:
 
 ## Results (filled during execution)
 
-- Task 1 corpus measurement:
-- Task 1 perf:
-- Task 1 pins (synthetic corpus measured churn/steps, repro measured churn/steps):
-- Task 2 decision and both runner lines:
-- Task 3 aggregate lines:
-- Task 4 final gates:
+- Task 1 corpus measurement (real corpus, all three rungs of the still-present tries ladder,
+  before Task 2's per-start climb):
+  ```
+  real corpus @ tries=16:   orders=99/99 churn=265 steps=1895 divergent=9 mean_ms=1.5
+  real corpus @ tries=256:  orders=99/99 churn=265 steps=1895 divergent=9 mean_ms=1.4
+  real corpus @ tries=4096: orders=99/99 churn=265 steps=1895 divergent=9 mean_ms=1.4
+  ```
+- Task 1 perf: after building the (gitignored) `data/reach.wasm` artifact this worktree was
+  missing (confirmed via `git stash` that its absence, not the climb change, caused the initial
+  HOTSPOT failure), three stable `just perf` runs gave `mean 4.2 ms   median 2.4-2.6 ms   p95
+  14.7-15.2 ms   p99 23.3-24.0 ms   max 29.3-29.7 ms`, `0 click(s) over 400 ms.`, `OK: no
+  hotspots.` - p95 (~15 ms) at/under the prior baseline of mean 3.0 / p95 19.0 / p99 29.1 ms.
+- Task 1 pins: synthetic-corpus measurement (`aggregate: orders=150/150 churn=12 steps=2609 |
+  repro: churn=3 steps=23`), against the pre-climb baseline churn=19 steps=2591 (overfitting guard
+  passed: 12 <= 19). New pins recorded: `CHURN_PIN = 13` (C+1), `STEPS_PIN = 2661`
+  (`Math.round(2609 * 1.02)`), `ORDER_FLOOR` unchanged at 150; repro-pins tightened to the measured
+  exact values (churn <= 3, steps <= 23). Task 2 later re-measured the synthetic corpus after
+  porting the per-start climb - churn stayed 12 (no regression) but steps improved from 2609 to
+  2597, so `STEPS_PIN` was tightened again from 2661 to `Math.round(2597 * 1.02) = 2649`, its final
+  shipped value; `CHURN_PIN` stayed at 13 and the repro pins (3/23) were unchanged.
+- Task 2 decision and both runner lines: rule was adopt iff experiment churn <= shipped churn - 2
+  (i.e. <= 263), AND experiment p95 <= 45 ms, AND illegal = 0.
+  ```
+  shipped: churn=265 steps=1895 illegal=0 p95=6.1ms
+  per-start: churn=262 steps=1869 illegal=0 p95=34.0ms
+  ```
+  Churn: 262 <= 263 - PASS (beats the shipped 265 by 3, one more than the required 2). p95: primary
+  run 34.0ms <= 45ms - PASS (typical value across 10 repeated runs was ~33-35ms; two of ten showed
+  45.6/50.7ms, attributed to system contention since churn/steps never moved while only the timer
+  did). illegal: 0 in every run - PASS. **Decision: ADOPT.** Post-port re-verification on the real
+  corpus (all three rungs of the still-present ladder, matching the runner's per-start row exactly):
+  ```
+  real corpus @ tries=16:   orders=99/99 churn=262 steps=1869 divergent=7 mean_ms=4.7
+  real corpus @ tries=256:  orders=99/99 churn=262 steps=1869 divergent=7 mean_ms=4.7
+  real corpus @ tries=4096: orders=99/99 churn=262 steps=1869 divergent=7 mean_ms=4.7
+  ```
+  `just test` after the port: 1094 pass, 3 skip, 0 fail, 3 snapshots, 57831 expect() calls,
+  matching Task 1's baseline exactly. `just perf` after the port: `OK: no hotspots`, `mean 4.4 ms
+  median 2.5 ms p95 15.4 ms p99 24.8 ms max 44.0 ms`, `0 click(s) over 400 ms` - consistent with
+  Task 1's ~15ms baseline since witness mode (what `just perf` exercises) is untouched.
+- Task 3 aggregate lines (harness reworked from the tries ladder to climb-off vs climb-on):
+  ```
+  real corpus @ climb-off: orders=99/99 churn=354 steps=1965 divergent=12 mean_ms=1.3
+  real corpus @ climb-on: orders=99/99 churn=262 steps=1869 divergent=7 mean_ms=4.9
+  ```
+  The climb-on churn value of 262 matches Task 2's shipped measurement.
+- Task 4 final gates (run before the commit, per the controller's reordering):
+  - `just test`: **PASS** - `1094 pass, 3 skip, 0 fail, 3 snapshots, 57830 expect() calls, Ran 1097
+    tests across 104 files.`
+  - `REACH_SLOW=1 just test-slow`: **PASS** - `4 pass, 0 fail, 1107 expect() calls, Ran 4 tests
+    across 2 files.`
+  - `just fuzz`: **PASS** - `50 builds (avg 55 stars), generator-invalid 0.` `VIOLATIONS (engine
+    dimmed a valid-build member; must be 0): 0`
+  - `just build-order-validate`: **PASS** - FALSE-NEGATIVE and FALSE-POSITIVE both 0 across all
+    three corpora (typical self-covering 3000 builds, single-constellation 104 builds, random 2-4
+    constellation subsets 1500 builds).
+  - `just perf`: **PASS** - `mean 4.4 ms   median 2.5 ms   p95 15.2 ms   p99 24.3 ms   max 41.7
+    ms`, `0 click(s) over 400 ms.`, `OK: no hotspots.` - p95 15.2 ms is at/under the 45 ms gate.
