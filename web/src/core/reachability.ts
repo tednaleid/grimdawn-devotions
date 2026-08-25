@@ -678,11 +678,12 @@ const CLIMB_EVALS = 64;
 // Both modes first score three deterministic orders - the bootstrap heuristic (lowest requirement
 // first, then highest grant density) and both peel variants (peelOrder). Witness mode then samples up
 // to `tries` seeded shuffles, keeping the smallest-peak order and stopping at the first schedule that
-// fits the budget (a reachability proof needs nothing more). Quality mode instead hill-climbs from the
-// best heuristic schedule: it reads the incumbent's non-crossroads scaffold buys and scores targeted
-// reorderings (up to `climbEvals`), keeping the churn-then-steps argmin and the steps-first argmin
-// alongside for the divergence harness. Shuffles remain only as a fallback for builds whose heuristic
-// orders never fit: sample until one fits (capped by `tries`), then climb it.
+// fits the budget (a reachability proof needs nothing more). Quality mode instead hill-climbs each of
+// the three heuristic starts independently (each capped at `climbEvals`, exploring its own basin):
+// every start reads its own incumbent's non-crossroads scaffold buys and scores targeted reorderings,
+// with every evaluation across all three climbs feeding one shared churn-then-steps argmin and the
+// steps-first argmin alongside for the divergence harness. Shuffles remain only as a fallback for
+// builds whose heuristic orders never fit: sample until one fits (capped by `tries`), then climb it.
 function sampledConstruction(
   cons: ReachCon[],
   table: CoverTable,
@@ -708,19 +709,12 @@ function sampledConstruction(
   let bestChurn = Infinity; // quality: churn-then-steps argmin among fitting schedules
   let stepsFirst: BuildStep[] | null = null;
   let sfChurn = Infinity;
-  // Score a candidate; witness mode returns true when it fits (the caller stops sampling),
-  // quality mode always returns false (tries is the deterministic work budget).
-  const consider = (candidate: ReachCon[]): boolean => {
-    const sched = emitSchedule(candidate, tail, pool, table, budget, peakNodeCap);
+  // Global-argmin bookkeeping for quality mode, shared by consider and climbFromStart so every
+  // evaluated candidate - whichever start's climb produced it - competes for the same incumbent:
+  // churn-then-steps argmin among fitting schedules, plus the steps-first argmin for the divergence
+  // harness.
+  const record = (candidate: ReachCon[], sched: Schedule | null): void => {
     const peak = sched ? sched.peak : INF;
-    if (mode === "witness") {
-      if (peak < best) {
-        best = peak;
-        bestOrder = [...candidate];
-        bestSteps = sched?.steps ?? null;
-      }
-      return best <= budget;
-    }
     if (sched?.steps) {
       const c = churnPoints(sched.steps);
       const n = sched.steps.length;
@@ -738,75 +732,99 @@ function sampledConstruction(
       best = peak; // nothing fits yet: keep chasing the lowest peak, as the witness does
       bestOrder = [...candidate];
     }
+  };
+  // Score a candidate; witness mode returns true when it fits (the caller stops sampling),
+  // quality mode always returns false (tries is the deterministic work budget).
+  const consider = (candidate: ReachCon[]): boolean => {
+    const sched = emitSchedule(candidate, tail, pool, table, budget, peakNodeCap);
+    const peak = sched ? sched.peak : INF;
+    if (mode === "witness") {
+      if (peak < best) {
+        best = peak;
+        bestOrder = [...candidate];
+        bestSteps = sched?.steps ?? null;
+      }
+      return best <= budget;
+    }
+    record(candidate, sched);
     return false;
   };
-  // TS flow analysis cannot see closure assignments to bestSteps; read it through a call so the
-  // incumbent is not narrowed to null at the climb sites.
-  const liveSteps = (): BuildStep[] | null => bestSteps;
-  // Guided local search: read the incumbent schedule's first two non-crossroads scaffold buys and
-  // score targeted reorderings, accepting churn-then-steps improvements until convergence or `cap`.
-  const climb = (cap: number): void => {
-    if (liveSteps() === null) return;
-    const byId = new Map(pool.map((c) => [c.id, c]));
-    const moves = (ord: ReachCon[], steps: BuildStep[]): ReachCon[][] => {
-      const out: ReachCon[][] = [];
-      const idx = new Map(ord.map((c, i) => [c.id, i]));
-      let events = 0;
-      for (let s = 0; s < steps.length && events < 2; s++) {
-        const st = steps[s]!;
-        if (st.kind !== "scaffold-add" || st.conId.startsWith("crossroads_")) continue;
-        events++;
-        const scaffold = byId.get(st.conId);
-        // The triggering member: the first completion after the buy that is in the granting order.
-        let ti = -1;
-        for (let t = s + 1; t < steps.length; t++) {
-          const c = steps[t]!;
-          if (c.kind === "complete" && idx.has(c.conId)) {
-            ti = idx.get(c.conId)!;
-            break;
-          }
+  // Candidate reorderings around a schedule's first two non-crossroads scaffold buys: advance a
+  // later feeder ahead of the buy, push the triggering member to the end, or swap it one step earlier.
+  const movesFor = (byId: Map<string, ReachCon>, ord: ReachCon[], steps: BuildStep[]): ReachCon[][] => {
+    const out: ReachCon[][] = [];
+    const idx = new Map(ord.map((c, i) => [c.id, i]));
+    let events = 0;
+    for (let s = 0; s < steps.length && events < 2; s++) {
+      const st = steps[s]!;
+      if (st.kind !== "scaffold-add" || st.conId.startsWith("crossroads_")) continue;
+      events++;
+      const scaffold = byId.get(st.conId);
+      // The triggering member: the first completion after the buy that is in the granting order.
+      let ti = -1;
+      for (let t = s + 1; t < steps.length; t++) {
+        const c = steps[t]!;
+        if (c.kind === "complete" && idx.has(c.conId)) {
+          ti = idx.get(c.conId)!;
+          break;
         }
-        if (ti < 0) continue;
-        if (scaffold) {
-          // Advance each later member that feeds the scaffold's colors to just before the trigger.
-          for (let j = ti + 1; j < ord.length; j++) {
-            let feeds = false;
-            for (let k = 0; k < 5; k++) if (scaffold.grant[k]! > 0 && ord[j]!.grant[k]! > 0) feeds = true;
-            if (!feeds) continue;
-            const cand = [...ord];
-            const [m] = cand.splice(j, 1);
-            cand.splice(ti, 0, m!);
-            out.push(cand);
-          }
-        }
-        if (ti + 1 < ord.length) {
+      }
+      if (ti < 0) continue;
+      if (scaffold) {
+        // Advance each later member that feeds the scaffold's colors to just before the trigger.
+        for (let j = ti + 1; j < ord.length; j++) {
+          let feeds = false;
+          for (let k = 0; k < 5; k++) if (scaffold.grant[k]! > 0 && ord[j]!.grant[k]! > 0) feeds = true;
+          if (!feeds) continue;
           const cand = [...ord];
-          const [m] = cand.splice(ti, 1);
-          cand.push(m!);
-          out.push(cand);
-        }
-        if (ti > 0) {
-          const cand = [...ord];
-          const tmp = cand[ti - 1]!;
-          cand[ti - 1] = cand[ti]!;
-          cand[ti] = tmp;
+          const [m] = cand.splice(j, 1);
+          cand.splice(ti, 0, m!);
           out.push(cand);
         }
       }
-      return out;
-    };
+      if (ti + 1 < ord.length) {
+        const cand = [...ord];
+        const [m] = cand.splice(ti, 1);
+        cand.push(m!);
+        out.push(cand);
+      }
+      if (ti > 0) {
+        const cand = [...ord];
+        const tmp = cand[ti - 1]!;
+        cand[ti - 1] = cand[ti]!;
+        cand[ti] = tmp;
+        out.push(cand);
+      }
+    }
+    return out;
+  };
+  // Guided local search from one heuristic start: tracks a LOCAL incumbent so this start explores its
+  // own basin (churn-then-steps improvements, accepted greedily until convergence or `cap`), while
+  // every evaluation still feeds the global argmin through record.
+  const climbFromStart = (start: ReachCon[], cap: number): void => {
+    const first = emitSchedule(start, tail, pool, table, budget, peakNodeCap);
+    if (!first?.steps) return;
+    let curOrder = start;
+    let curSteps = first.steps;
+    let curChurn = churnPoints(curSteps);
+    const byId = new Map(pool.map((c) => [c.id, c]));
     let evals = 0;
     for (let improved = true; improved && evals < cap; ) {
       improved = false;
-      for (const cand of moves(bestOrder, liveSteps()!)) {
+      for (const cand of movesFor(byId, curOrder, curSteps)) {
         if (evals >= cap) break;
         evals++;
-        const c0 = bestChurn;
-        const n0 = liveSteps()!.length;
-        consider(cand);
-        if (bestChurn < c0 || (bestChurn === c0 && liveSteps()!.length < n0)) {
-          improved = true;
-          break;
+        const sched = emitSchedule(cand, tail, pool, table, budget, peakNodeCap);
+        record(cand, sched);
+        if (sched?.steps) {
+          const c = churnPoints(sched.steps);
+          if (c < curChurn || (c === curChurn && sched.steps.length < curSteps.length)) {
+            curOrder = cand;
+            curSteps = sched.steps;
+            curChurn = c;
+            improved = true;
+            break;
+          }
         }
       }
     }
@@ -830,14 +848,14 @@ function sampledConstruction(
     }
   };
   if (mode === "quality") {
-    climb(climbEvals);
+    for (const start of [order.slice(), peelOrder(G, true), peelOrder(G, false)]) climbFromStart(start, climbEvals);
     // Fallback for builds whose heuristic orders never fit: sample until one does, then climb it.
     if (bestSteps === null) {
       for (let attempt = 0; attempt < tries && bestSteps === null; attempt++) {
         shuffle();
         consider(order);
       }
-      climb(climbEvals);
+      climbFromStart(order.slice(), climbEvals);
     }
     return done();
   }

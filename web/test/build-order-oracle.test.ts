@@ -70,10 +70,11 @@ test("the final step's state agrees with the Affinity panel (supply/target)", ()
 // steps=2741. With the greedy: orders=150 churn=35 steps=2711. With the quality-mode sampler
 // (spec 2026-08-23-shorter-build-orders-design.md): orders=150 churn=19 steps=2591.
 // With the guided climb (spec 2026-08-24-guided-build-order-search-design.md): orders=150 churn=12 steps=2609.
+// With each heuristic start climbed independently (same spec): orders=150 churn=12 steps=2597.
 // Update these deliberately when the algorithm improves; a silent regression must fail here.
 const ORDER_FLOOR = 150;
 const CHURN_PIN = 13;
-const STEPS_PIN = 2661;
+const STEPS_PIN = 2649;
 
 test("seeded corpus: aggregate churn and steps hold their pins; no orders lost", () => {
   let orders = 0;
