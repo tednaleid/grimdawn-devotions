@@ -1142,3 +1142,30 @@ that have run `just extract`. That is the same audience that regenerates the
 datasets, which is the audience that needs the gate.
 
 Pointers: the `check` recipe and the `test-scripts` recipe in `justfile`.
+
+## Live character location tracking (investigated, does not work)
+
+The idea: read the playing character's location and drive a map in a browser
+window on another machine, updating as they move. Investigated against a live
+game session on 2026-08-25 and **ruled out**: Grim Dawn's save files do not carry
+the player's position, and nothing they do carry is a usable substitute.
+
+Full research record, including the measurements and the events tested:
+[docs/superpowers/specs/2026-08-25-live-location-tracking-research.md](docs/superpowers/specs/2026-08-25-live-location-tracking-research.md).
+
+The short version: every save-file signal is driven by novelty (new ground, new
+loot, new riftgate) rather than presence, so it goes quiet exactly when a tracker
+would be wanted. `map.dat`'s `spawnCoords` is a real world coordinate but only
+moves when a different riftgate is activated, not on movement, area transitions,
+or quit. Fog of war is silent on an explored map. Process memory is the only
+remaining source, which is a different project with per-patch maintenance.
+
+Worth keeping if a map-rendering project ever starts: `map.dat` is plaintext, its
+`spawnCoords` is a parseable world coordinate, and `83.197, 7.711, 48.409` (region
+UID `02bb63762e4010d58ede9fb30968866b`) is the Devil's Crossing riftgate, which is
+one calibration point for a coordinate frame. The research record explains how to
+collect more.
+
+Do not embed or drive the grimtools map to deliver this: a cross-origin iframe
+cannot be scripted, so it would mean reloading their ad-supported page on a timer,
+and the same owner already firewalled our import worker.
