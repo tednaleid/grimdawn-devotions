@@ -49,31 +49,44 @@ export function powersGained(model: DevotionModel, selected: Set<StarId>): { sta
   return out;
 }
 
+// Each star granting the raw stat id, mapped to its value for it (bonus plus celestial-power
+// stat, when both carry it) - the search rings scale ring weight by this relative magnitude.
+// Pet attack stats are intentionally not scanned.
+export function starValuesGranting(model: DevotionModel, id: string): Map<StarId, number> {
+  const out = new Map<StarId, number>();
+  for (const star of model.stars.values()) {
+    let value = 0;
+    let hit = false;
+    if (id in star.bonuses) {
+      value += star.bonuses[id]!;
+      hit = true;
+    }
+    const power = star.celestialPower;
+    if (power && id in power.stats) {
+      value += power.stats[id]!;
+      hit = true;
+    }
+    if (hit) out.set(star.id, value);
+  }
+  return out;
+}
+
 // The stars whose bonuses OR celestial power grant ANY of the given raw stat ids - used to highlight
 // on the map where a selected benefit can still be picked up. A power's diamond star lights up when the
-// filter matches its celestial power. Pet attack stats are intentionally not scanned. Empty for an empty set.
+// filter matches its celestial power. Empty for an empty set.
 export function starsGranting(model: DevotionModel, ids: Set<string>): Set<StarId> {
   const out = new Set<StarId>();
-  if (ids.size === 0) return out;
+  for (const id of ids) for (const sid of starValuesGranting(model, id).keys()) out.add(sid);
+  return out;
+}
+
+// Like starValuesGranting, but over pet bonuses: each star whose petBonuses carry the raw pet
+// stat id, mapped to its value for it.
+export function starValuesGrantingPet(model: DevotionModel, id: string): Map<StarId, number> {
+  const out = new Map<StarId, number>();
   for (const star of model.stars.values()) {
-    let hit = false;
-    for (const k of Object.keys(star.bonuses)) {
-      if (ids.has(k)) {
-        hit = true;
-        break;
-      }
-    }
-    if (!hit) {
-      const power = star.celestialPower;
-      if (power)
-        for (const k of Object.keys(power.stats)) {
-          if (ids.has(k)) {
-            hit = true;
-            break;
-          }
-        }
-    }
-    if (hit) out.add(star.id);
+    const pet = star.petBonuses;
+    if (pet && id in pet) out.set(star.id, pet[id]!);
   }
   return out;
 }
@@ -82,17 +95,7 @@ export function starsGranting(model: DevotionModel, ids: Set<string>): Set<StarI
 // given raw pet stat ids. Used to highlight where a tagged pet benefit can be picked up.
 export function starsGrantingPet(model: DevotionModel, ids: Set<string>): Set<StarId> {
   const out = new Set<StarId>();
-  if (ids.size === 0) return out;
-  for (const star of model.stars.values()) {
-    const pet = star.petBonuses;
-    if (!pet) continue;
-    for (const k of Object.keys(pet)) {
-      if (ids.has(k)) {
-        out.add(star.id);
-        break;
-      }
-    }
-  }
+  for (const id of ids) for (const sid of starValuesGrantingPet(model, id).keys()) out.add(sid);
   return out;
 }
 

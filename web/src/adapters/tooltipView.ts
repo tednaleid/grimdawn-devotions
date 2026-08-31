@@ -50,6 +50,16 @@ function requiresLine(
     .join(" ");
 }
 
+// One tooltip stat line. A taggable row (one with a vid) selected in the benefit filter reads
+// like the sidebar: vsel plus its search's ring color and patterned swatch.
+function tipRow(vid: string | undefined, selectedBenefits: Set<string>, value: string, label: string): string {
+  const st = vid !== undefined && selectedBenefits.has(vid) ? tagRingStyles.get(vid) : undefined;
+  const sel = vid !== undefined && selectedBenefits.has(vid) ? " vsel" : "";
+  const ring = st ? ` style="--ring:${st.color}"` : "";
+  const swatch = st ? ringSwatchSvg(st) : "";
+  return `<div class="tip-bonus${sel}"${vid !== undefined ? ` data-vid="${vid}"` : ""}${ring}>${swatch}<span class="val">${value}</span> ${label}</div>`;
+}
+
 // Bonus rows tagged with their filter id (`keyOf` maps a raw stat id to its tag key: identity for
 // player rows, petTagId for pet rows); a row whose tag is in selectedBenefits is marked selected
 // (vsel) so it reads like the sidebar.
@@ -62,14 +72,7 @@ function bonusRowsHtml(
 ): string {
   return sortByResolved(loc, formatBonusRowsWithIds(bonuses, { racialTarget }), (r) => r.label)
     .map((r) => ({ id: r.id, label: resolveText(loc, r.label), value: resolveText(loc, r.value) }))
-    .map((r) => {
-      const vid = keyOf(r.id);
-      const sel = selectedBenefits.has(vid) ? " vsel" : "";
-      const st = sel ? tagRingStyles.get(vid) : undefined;
-      const ring = st ? ` style="--ring:${st.color}"` : "";
-      const swatch = st ? ringSwatchSvg(st) : "";
-      return `<div class="tip-bonus${sel}" data-vid="${vid}"${ring}>${swatch}<span class="val">${r.value}</span> ${hl(r.label)}</div>`;
-    })
+    .map((r) => tipRow(keyOf(r.id), selectedBenefits, r.value, hl(r.label)))
     .join("");
 }
 
@@ -90,16 +93,18 @@ function petBonusHtml(
 }
 
 // Ability stat lines: the semantic rows render in core's order, untouched; the
-// fallthrough segment is resolved, sorted by resolved label, and appended.
-function powerRowsHtml(loc: Localization, power: PowerRows): string {
-  const resolve = (r: { label: Text; value: Text }) => ({
+// fallthrough segment is resolved, sorted by resolved label, and appended. Rows carrying a
+// taggable stat id highlight like bonus rows when their tag is selected.
+function powerRowsHtml(loc: Localization, power: PowerRows, selectedBenefits: Set<string>): string {
+  const resolve = (r: { label: Text; value: Text; id?: string }) => ({
+    id: r.id,
     label: resolveText(loc, r.label),
     value: resolveText(loc, r.value),
   });
   return power.rows
     .map(resolve)
     .concat(sortByResolved(loc, power.fallthrough, (r) => r.label).map(resolve))
-    .map((r) => `<div class="tip-bonus"><span class="val">${r.value}</span> ${hl(r.label)}</div>`)
+    .map((r) => tipRow(r.id, selectedBenefits, r.value, hl(r.label)))
     .join("");
 }
 
@@ -107,7 +112,7 @@ function powerRowsHtml(loc: Localization, power: PowerRows): string {
 // description, granted level, then the ability's stat lines GD-style. Each trigger.<key>
 // entry is the whole "{chance}% Chance ..." phrase, since the game's wording ("on Attack",
 // "when Hit", "on Block") varies per trigger and is not one template.
-function powerHtml(loc: Localization, power: CelestialPower): string {
+function powerHtml(loc: Localization, power: CelestialPower, selectedBenefits: Set<string>): string {
   const proc = power.proc
     ? ` <span class="tip-proc">${loc.translate("ui.tooltip.procQualifier", { trigger: loc.translate(`trigger.${power.proc.triggerKey}`, { chance: power.proc.chance }) })}</span>`
     : "";
@@ -117,7 +122,7 @@ function powerHtml(loc: Localization, power: CelestialPower): string {
   const level = power.level
     ? `<div class="tip-power-level">${loc.translate("ui.tooltip.currentLevel", { level: power.level })}</div>`
     : "";
-  const stats = powerRowsHtml(loc, formatPowerStats(power.stats));
+  const stats = powerRowsHtml(loc, formatPowerStats(power.stats), selectedBenefits);
   const pet = power.pet ? petHtml(loc, power.pet) : "";
   return `<div class="tip-power">${hl(loc.gameText(power.nameTag))}${proc}</div>${desc}${level}${stats}${pet}`;
 }
@@ -126,7 +131,8 @@ function powerHtml(loc: Localization, power: CelestialPower): string {
 // rendered like the power's own ability stat lines.
 function petHtml(loc: Localization, pet: PetInfo): string {
   const { summon, attack } = formatPet(pet);
-  return `<div class="tip-pet">${resolveText(loc, summon)}</div>${powerRowsHtml(loc, attack)}`;
+  // Pet attack stats are intentionally outside the benefit vocabulary, so no tag can select them.
+  return `<div class="tip-pet">${resolveText(loc, summon)}</div>${powerRowsHtml(loc, attack, new Set())}`;
 }
 
 function affinitySections(
@@ -234,7 +240,7 @@ export function tooltipView(el: HTMLElement) {
       const star = model.stars.get(starId);
       if (!star) return;
       const con = model.constellations.get(star.constellationId)!;
-      const power = star.celestialPower ? powerHtml(loc, star.celestialPower) : "";
+      const power = star.celestialPower ? powerHtml(loc, star.celestialPower, selectedBenefits) : "";
       const weaponReqTag = star.weaponRequirement?.descriptionTag;
       // The cost of claiming this star from here (its unselected predecessor path). The controller
       // passes it only for deep reachable stars (cost >= 2); frontier stars keep the plain tooltip.

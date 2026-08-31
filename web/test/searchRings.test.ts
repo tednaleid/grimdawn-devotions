@@ -1,7 +1,7 @@
 // ABOUTME: Tests the pure search-ring ordering: which selected benefit tags ring stars, in what
 // ABOUTME: order, and how per-search star sets fold into one per-star ring list for the renderer.
 import { test, expect } from "bun:test";
-import { benefitRingOrder, reconcileRingSlots, ringMap } from "../src/core/searchRings";
+import { benefitRingOrder, magnitudeWeights, reconcileRingSlots, ringMap } from "../src/core/searchRings";
 import { affinityTagId, petTagId } from "../src/core/benefitTag";
 
 const canonical = ["statA", "statB", petTagId("statC"), affinityTagId("grant", "chaos"), "statD"];
@@ -21,16 +21,23 @@ test("ignores selected tags missing from the canonical list (stale link toleranc
   expect(benefitRingOrder(selected, canonical)).toEqual(["statA"]);
 });
 
-test("ringMap folds per-search star sets into per-star ordered ring lists", () => {
-  // The ring value is opaque to the fold (the adapter passes color+dash style records).
+test("ringMap folds per-search weighted stars into per-star ordered ring entries", () => {
+  // The ring value is opaque to the fold (the adapter passes color+dash style records); each
+  // star carries its per-search magnitude weight through to its entry.
   const rings = ringMap([
-    { ring: { color: "c0", dash: "" }, stars: new Set(["s1", "s2"]) },
-    { ring: { color: "c1", dash: "4 2" }, stars: new Set(["s2"]) },
+    {
+      ring: { color: "c0", dash: "" },
+      stars: new Map([
+        ["s1", 0],
+        ["s2", 1],
+      ]),
+    },
+    { ring: { color: "c1", dash: "4 2" }, stars: new Map([["s2", 0.5]]) },
   ]);
-  expect(rings.get("s1")).toEqual([{ color: "c0", dash: "" }]);
+  expect(rings.get("s1")).toEqual([{ ring: { color: "c0", dash: "" }, weight: 0 }]);
   expect(rings.get("s2")).toEqual([
-    { color: "c0", dash: "" },
-    { color: "c1", dash: "4 2" },
+    { ring: { color: "c0", dash: "" }, weight: 1 },
+    { ring: { color: "c1", dash: "4 2" }, weight: 0.5 },
   ]);
   expect(rings.has("s3")).toBe(false);
 });
@@ -85,4 +92,42 @@ test("reconcile returns entries in active (canonical) order, so arc order never 
   expect([...next.keys()]).toEqual(["statA", "statD"]);
   expect(next.get("statD")).toBe(0); // the incumbent still keeps its slot
   expect(next.get("statA")).toBe(1);
+});
+
+// --- magnitudeWeights: relative magnitude of each star's grant within one search ---
+
+test("magnitudeWeights ramps linearly from the smallest grant (0) to the largest (1)", () => {
+  const w = magnitudeWeights(
+    new Map([
+      ["s1", 10],
+      ["s2", 40],
+      ["s3", 25],
+    ]),
+  );
+  expect(w.get("s1")).toBe(0);
+  expect(w.get("s2")).toBe(1);
+  expect(w.get("s3")).toBe(0.5);
+});
+
+test("equal grants (or a single match) all weigh 0, so the ring renders at base size", () => {
+  const equal = magnitudeWeights(
+    new Map([
+      ["s1", 7],
+      ["s2", 7],
+    ]),
+  );
+  expect(equal.get("s1")).toBe(0);
+  expect(equal.get("s2")).toBe(0);
+  expect(magnitudeWeights(new Map([["s1", 99]])).get("s1")).toBe(0);
+});
+
+test("magnitude is absolute value, so a larger reduction outweighs a smaller one", () => {
+  const w = magnitudeWeights(
+    new Map([
+      ["s1", -10],
+      ["s2", -40],
+    ]),
+  );
+  expect(w.get("s1")).toBe(0);
+  expect(w.get("s2")).toBe(1);
 });

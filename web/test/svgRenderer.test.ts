@@ -207,7 +207,7 @@ test("an affinity filter mutes non-matching constellations; a search ring in a m
     {
       manifest: null,
       affinityFilter: { grants: new Set(["eldritch"]), requires: new Set() },
-      rings: new Map([[matchStar, [{ color: "#3ee6d8", dash: "" }]]]),
+      rings: new Map([[matchStar, [{ ring: { color: "#3ee6d8", dash: "" }, weight: 0 }]]]),
     },
   );
   expect(markup).toContain('class="star selectable"'); // the matched star's dot is identity (not muted)
@@ -227,7 +227,7 @@ test("a search ring in an off-affinity constellation: muted dot AND a mute-wrapp
     {
       manifest: null,
       affinityFilter: { grants: new Set(["chaos"]), requires: new Set() },
-      rings: new Map([[markStar, [{ color: "#3ee6d8", dash: "" }]]]),
+      rings: new Map([[markStar, [{ ring: { color: "#3ee6d8", dash: "" }, weight: 0 }]]]),
     },
   );
   // Two independent channels both fire: the dot desaturates (mute) AND the ring is wrapped in
@@ -241,7 +241,7 @@ test("a single-search match draws one full ring circle in that search's color", 
   const markup = renderSvgMarkup(
     model,
     { selected: new Set(), pointCap: 55 },
-    { manifest: null, rings: new Map([[star, [{ color: "#3ee6d8", dash: "" }]]]) },
+    { manifest: null, rings: new Map([[star, [{ ring: { color: "#3ee6d8", dash: "" }, weight: 0 }]]]) },
   );
   const ring = markup.match(/<g class="search-ring">.*?<\/g>/)![0];
   expect(ring).toContain('stroke="#3ee6d8"');
@@ -260,9 +260,9 @@ test("a multi-search match splits the ring into one arc per search, in ring orde
         [
           star,
           [
-            { color: "#aaa111", dash: "" },
-            { color: "#bbb222", dash: "16 11" },
-            { color: "#ccc333", dash: "0.1 13" },
+            { ring: { color: "#aaa111", dash: "" }, weight: 0 },
+            { ring: { color: "#bbb222", dash: "16 11" }, weight: 0 },
+            { ring: { color: "#ccc333", dash: "0.1 13" }, weight: 0 },
           ],
         ],
       ]),
@@ -281,7 +281,7 @@ test("a power star's ring circles outside its diamond", () => {
   const markup = renderSvgMarkup(
     model,
     { selected: new Set(), pointCap: 55 },
-    { manifest: null, rings: new Map([[power.id, [{ color: "#3ee6d8", dash: "" }]]]) },
+    { manifest: null, rings: new Map([[power.id, [{ ring: { color: "#3ee6d8", dash: "" }, weight: 0 }]]]) },
   );
   const ring = markup.match(/<g class="search-ring">.*?<\/g>/)![0];
   expect(ring).toContain('r="29"'); // POWER_RADIUS + 10, vs 23 for regular stars
@@ -449,7 +449,7 @@ test("a ring style's dash pattern rides on its circle and arcs; solid styles car
   const single = renderSvgMarkup(
     model,
     { selected: new Set(), pointCap: 55 },
-    { manifest: null, rings: new Map([[star, [{ color: "#3ee6d8", dash: "16 11" }]]]) },
+    { manifest: null, rings: new Map([[star, [{ ring: { color: "#3ee6d8", dash: "16 11" }, weight: 0 }]]]) },
   );
   const singleRing = single.match(/<g class="search-ring">.*?<\/g>/)![0];
   expect(singleRing).toContain('stroke-dasharray="16 11"');
@@ -463,8 +463,8 @@ test("a ring style's dash pattern rides on its circle and arcs; solid styles car
         [
           star,
           [
-            { color: "#aaa111", dash: "" },
-            { color: "#bbb222", dash: "0.1 13" },
+            { ring: { color: "#aaa111", dash: "" }, weight: 0 },
+            { ring: { color: "#bbb222", dash: "0.1 13" }, weight: 0 },
           ],
         ],
       ]),
@@ -475,4 +475,49 @@ test("a ring style's dash pattern rides on its circle and arcs; solid styles car
   // The solid arc carries no dasharray attribute.
   expect(multiRing).toMatch(/<path [^>]*stroke="#aaa111"[^>]*\/>/);
   expect(multiRing.match(/<path [^>]*stroke="#aaa111"[^>]*\/>/)![0]).not.toContain("stroke-dasharray");
+});
+
+test("ring width scales with magnitude weight: base at 0, quadruple at 1, growing outward", () => {
+  const star = "crossroads_eldritch:0";
+  const single = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest: null, rings: new Map([[star, [{ ring: { color: "#3ee6d8", dash: "" }, weight: 1 }]]]) },
+  );
+  const max = single.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(max).toContain('stroke-width="32"');
+  // A stroke this wide centered on the base radius would swallow the star dot, so the ring keeps
+  // a fixed inner edge (19 = base radius 23 - base width 4) and grows outward: r = 19 + 32/2.
+  expect(max).toContain('r="35"');
+
+  const multi = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest: null,
+      rings: new Map([
+        [
+          star,
+          [
+            { ring: { color: "#aaa111", dash: "" }, weight: 0 },
+            { ring: { color: "#bbb222", dash: "" }, weight: 0.5 },
+          ],
+        ],
+      ]),
+    },
+  );
+  const ring = multi.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(ring.match(/<path [^>]*stroke="#aaa111"[^>]*\/>/)![0]).toContain('stroke-width="8"');
+  expect(ring.match(/<path [^>]*stroke="#bbb222"[^>]*\/>/)![0]).toContain('stroke-width="20"');
+});
+
+test("a weighted arc's dash pattern scales with its width, so dots stay dots at any size", () => {
+  const star = "crossroads_eldritch:0";
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest: null, rings: new Map([[star, [{ ring: { color: "#3ee6d8", dash: "16 11" }, weight: 1 }]]]) },
+  );
+  const ring = markup.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(ring).toContain('stroke-dasharray="64 44"'); // 4x width -> 4x pattern
 });

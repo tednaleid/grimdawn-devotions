@@ -54,17 +54,40 @@ export function reconcileRingSlots(
 }
 
 /**
- * Folds one star set per search into a per-star list of ring values, preserving search order.
- * The ring value is opaque here (the adapter passes color+dash style records). A star matching
- * several searches lists every value; a star matching none is absent.
+ * Each matching star's relative magnitude within one search: the smallest grant weighs 0 (the
+ * ring renders at base size), the largest 1, linear in between on absolute value (a larger
+ * reduction outweighs a smaller one). Equal grants, or a single match, all weigh 0.
  */
-export function ringMap<T>(searches: { ring: T; stars: ReadonlySet<StarId> }[]): Map<StarId, T[]> {
-  const out = new Map<StarId, T[]>();
+export function magnitudeWeights(values: ReadonlyMap<StarId, number>): Map<StarId, number> {
+  const out = new Map<StarId, number>();
+  let min = Infinity;
+  let max = -Infinity;
+  for (const v of values.values()) {
+    const m = Math.abs(v);
+    if (m < min) min = m;
+    if (m > max) max = m;
+  }
+  const span = max - min;
+  for (const [id, v] of values) out.set(id, span > 0 ? (Math.abs(v) - min) / span : 0);
+  return out;
+}
+
+/**
+ * Folds one weighted star map per search into a per-star list of ring entries, preserving search
+ * order. The ring value is opaque here (the adapter passes color+dash style records); each entry
+ * carries the star's magnitude weight for that search. A star matching several searches lists
+ * every entry; a star matching none is absent.
+ */
+export function ringMap<T>(
+  searches: { ring: T; stars: ReadonlyMap<StarId, number> }[],
+): Map<StarId, { ring: T; weight: number }[]> {
+  const out = new Map<StarId, { ring: T; weight: number }[]>();
   for (const { ring, stars } of searches) {
-    for (const id of stars) {
+    for (const [id, weight] of stars) {
       const list = out.get(id);
-      if (list) list.push(ring);
-      else out.set(id, [ring]);
+      const entry = { ring, weight };
+      if (list) list.push(entry);
+      else out.set(id, [entry]);
     }
   }
   return out;

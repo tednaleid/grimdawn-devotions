@@ -93,22 +93,20 @@ wiring works unchanged. Hidden-when-filtered uses the same match set the map use
 "row" (art + stars + name?) and how selection/dimming read at constant zoom are
 the open questions.
 
-## Filtered benefits highlighted (and toggleable) in the tooltip/popover
+## Filtered benefits toggleable in the touch popover
 
-In the star/constellation tooltip, mark the bonus rows that are part of the
-active benefit filter with the same circled/selected styling the right sidebar
-uses when a benefit is picked, so it is easy to see WHICH of a node's bonuses are
-being filtered on. On touch, where the tooltip is an interactive popover, make
-those rows clickable to toggle their filter membership (add/remove the tag),
-mirroring the sidebar's `onBenefitClick`.
+Tooltip bonus and celestial-power rows already highlight their active filter
+tags with the sidebar's ring styling (vsel outline + swatch, via `tipRow` in
+`web/src/adapters/tooltipView.ts`). The remaining half: on touch, where the
+tooltip is an interactive popover, make those rows clickable to toggle their
+filter membership (add/remove the tag), mirroring the sidebar's
+`onBenefitClick`.
 
-Pointers: `web/src/adapters/tooltipView.ts` renders the bonus rows
-(`bonusRowsHtml`) - tag each row with its benefit id (`data-vid`, the same id
-space as `selectedBenefits` / `benefitCanonical`) and add the selected class when
-the id is in `selectedBenefits`. `main.ts` holds `selectedBenefits` and the
+Pointers: rows carry `data-vid` (the same id space as `selectedBenefits` /
+`benefitCanonical`). `main.ts` holds `selectedBenefits` and the
 `onBenefitClick` toggle; in touch mode, delegate clicks on tooltip benefit rows
 to the same toggle (the popover already commits via a `pointerup` delegate on
-`tooltipEl`). Reuse the sidebar's selected-benefit CSS class for consistency.
+`tooltipEl`).
 
 ## Search rings: deferred follow-ups
 

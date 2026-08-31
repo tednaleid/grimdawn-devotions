@@ -7,6 +7,8 @@ import { STAT_TAGS, STAT_FORMAT_TAGS } from "./statTags";
 export interface StatRow {
   label: Text;
   value: Text;
+  /** The raw stat id the row represents, present when the row is taggable in the benefit filter. */
+  id?: string;
 }
 
 // Resolve a stat catalog key to display text: mapped keys (data/stat-tags.json) go through the
@@ -447,6 +449,7 @@ export function formatPowerStats(stats: Record<string, number>): PowerRows {
       used.add(durK);
       const total = Math.round(stats[minK]! * stats[durK]!);
       rows.push({
+        id: minK,
         value: litT(fmtNum(total)),
         label: appT("stat.power.dotDamageOverSeconds", {
           name: statLabel(`stat.dot.${seg}`),
@@ -469,7 +472,7 @@ export function formatPowerStats(stats: Record<string, number>): PowerRows {
       const dur = stats[durK];
       if (durK in stats) used.add(durK);
       const label = dur !== undefined ? joinT(appT(key), forSecondsSuffix(dur)) : appT(key);
-      rows.push({ value: litT(fmtNum(stats[minK]!)), label });
+      rows.push({ id: minK, value: litT(fmtNum(stats[minK]!)), label });
     }
   }
 
@@ -514,7 +517,7 @@ export function formatPowerStats(stats: Record<string, number>): PowerRows {
       if (durK in stats) used.add(durK);
       const label = dur !== undefined ? joinT(appT(key), forSecondsSuffix(dur)) : appT(key);
       const v = stats[minK]!;
-      rows.push({ value: litT(pct ? `${fmtNum(v)}%` : fmtNum(v)), label });
+      rows.push({ id: minK, value: litT(pct ? `${fmtNum(v)}%` : fmtNum(v)), label });
     }
   }
 
@@ -537,10 +540,11 @@ export function formatPowerStats(stats: Record<string, number>): PowerRows {
     const seconds = max !== undefined && max !== min ? `${fmtNum(min)}-${fmtNum(max)}` : fmtNum(min);
     if (chance !== undefined)
       rows.push({
+        id: minK,
         value: litT(`${fmtNum(chance)}%`),
         label: appT("stat.power.ccChanceDuration", { seconds, effect: appT(key) }),
       });
-    else rows.push({ value: litT(seconds), label: appT("stat.power.ccDuration", { effect: appT(key) }) });
+    else rows.push({ id: minK, value: litT(seconds), label: appT("stat.power.ccDuration", { effect: appT(key) }) });
   }
 
   // Anything else (instant damage ranges, leech, resist reductions): reuse the
@@ -549,9 +553,9 @@ export function formatPowerStats(stats: Record<string, number>): PowerRows {
   const rest: Record<string, number> = {};
   for (const k of Object.keys(stats)) if (!used.has(k)) rest[k] = stats[k]!;
   const fallthrough: StatRow[] = [];
-  for (const r of formatBonusRows(rest)) {
+  for (const r of formatBonusRowsWithIds(rest)) {
     const v = r.value.k === "lit" ? litT(r.value.s.replace(/^\+/, "")) : r.value;
-    fallthrough.push({ label: r.label, value: v });
+    fallthrough.push({ id: r.id, label: r.label, value: v });
   }
   return { rows, fallthrough };
 }

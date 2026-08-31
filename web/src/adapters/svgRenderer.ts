@@ -5,7 +5,7 @@ import type { ReachView } from "../core/reachability";
 import { affinityColor, glowColor, presentAffinities } from "./affinityColors";
 import { constellationDisplay, starDisplay, edgeDisplay } from "../core/displayState";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
-import { QUERY_RING_COLOR, type RingStyle } from "./ringPalette";
+import { QUERY_RING_COLOR, scaleDash, type RingStyle } from "./ringPalette";
 import type { AssetManifest } from "../ports/DataSource";
 
 // A constellation's identity colors = the affinities it GRANTS when fully filled (1-3).
@@ -62,6 +62,12 @@ const RING_RADIUS = STAR_RADIUS + 11;
 const POWER_RING_RADIUS = POWER_RADIUS + 10;
 // Degrees of breathing room between the arcs of a split ring.
 const RING_GAP_DEG = 14;
+// Base ring stroke width; a star's arc thickens up to quadruple with its relative magnitude
+// weight (a per-arc SVG attribute, so each slice of a split ring scales independently). Weighted
+// arcs grow OUTWARD from a fixed inner edge - a stroke this wide centered on the base radius
+// would swallow the star dot - so the radius rises with the width (r = inner + w/2).
+const RING_WIDTH = 8;
+const RING_WEIGHT_SPAN = 3;
 
 // A clockwise ring arc from a0 to a1 (degrees, 0 = twelve o'clock) around (cx, cy).
 function ringArc(cx: number, cy: number, r: number, a0: number, a1: number): string {
@@ -72,33 +78,46 @@ function ringArc(cx: number, cy: number, r: number, a0: number, a1: number): str
   return `M ${pt(a0)} A ${r} ${r} 0 0 1 ${pt(a1)}`;
 }
 
+/** One search's marker on one star: its ring style plus that star's magnitude weight (0..1). */
+export interface RingMark {
+  ring: RingStyle;
+  weight: number;
+}
+
 // The split-ring marker for one star: a full circle for a single matching search, else the ring
 // divided evenly into one arc per search, clockwise from twelve, in ring order. Each search's
-// stroke pattern rides along as the color-vision-safe redundant channel. Stroke width, fill
-// suppression, and the luminous #self-glow filter come from the .search-ring CSS rules.
-function ringMarkup(cx: number, cy: number, r: number, styles: readonly RingStyle[]): string {
-  const dash = (st: RingStyle) => (st.dash ? ` stroke-dasharray="${st.dash}"` : "");
-  if (styles.length === 1) {
-    const st = styles[0]!;
-    return `<g class="search-ring"><circle cx="${cx}" cy="${cy}" r="${r}" stroke="${st.color}"${dash(st)}/></g>`;
+// stroke pattern rides along as the color-vision-safe redundant channel, and each arc's width
+// scales from RING_WIDTH up to quadruple with that star's magnitude weight for the search. Fill
+// suppression and the luminous #self-glow filter come from the .search-ring CSS rules.
+function ringMarkup(cx: number, cy: number, baseR: number, marks: readonly RingMark[]): string {
+  const inner = baseR - RING_WIDTH / 2;
+  const geom = (m: RingMark) => {
+    const w = Math.round(RING_WIDTH * (1 + RING_WEIGHT_SPAN * m.weight) * 10) / 10;
+    // The dash pattern scales with the width, so dots stay dots and dashes stay dashes at any size.
+    const dash = m.ring.dash ? ` stroke-dasharray="${scaleDash(m.ring.dash, w / RING_WIDTH)}"` : "";
+    return { r: inner + w / 2, attrs: ` stroke="${m.ring.color}" stroke-width="${w}"${dash}` };
+  };
+  if (marks.length === 1) {
+    const g = geom(marks[0]!);
+    return `<g class="search-ring"><circle cx="${cx}" cy="${cy}" r="${g.r}"${g.attrs}/></g>`;
   }
-  const span = 360 / styles.length;
-  const arcs = styles
-    .map(
-      (st, i) =>
-        `<path d="${ringArc(cx, cy, r, i * span + RING_GAP_DEG / 2, (i + 1) * span - RING_GAP_DEG / 2)}" stroke="${st.color}"${dash(st)}/>`,
-    )
+  const span = 360 / marks.length;
+  const arcs = marks
+    .map((m, i) => {
+      const g = geom(m);
+      return `<path d="${ringArc(cx, cy, g.r, i * span + RING_GAP_DEG / 2, (i + 1) * span - RING_GAP_DEG / 2)}"${g.attrs}/>`;
+    })
     .join("");
   return `<g class="search-ring">${arcs}</g>`;
 }
 
 export interface RenderOpts {
   manifest: AssetManifest | null;
-  // Per-star search rings: each matched star maps to the ring styles (color + dash pattern) of
-  // the searches that hit it, in ring order (canonical benefit order, query last). One search
-  // draws a full ring; several split it into arcs, clockwise from twelve, so the ring says which
-  // searches matched and how many.
-  rings?: ReadonlyMap<StarId, readonly RingStyle[]>;
+  // Per-star search rings: each matched star maps to the ring marks (color + dash style, plus
+  // the star's magnitude weight) of the searches that hit it, in ring order (canonical benefit
+  // order, query last). One search draws a full ring; several split it into arcs, clockwise from
+  // twelve, so the ring says which searches matched, how many, and how big each grant is.
+  rings?: ReadonlyMap<StarId, readonly RingMark[]>;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   // When present, an affinity filter is active. A constellation matches when it provides any of these
@@ -456,7 +475,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 
 /** Per-render inputs for a mounted map, mirroring RenderOpts minus the boot-time manifest. */
 export interface UpdateOpts {
-  rings?: ReadonlyMap<StarId, readonly RingStyle[]>;
+  rings?: ReadonlyMap<StarId, readonly RingMark[]>;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };

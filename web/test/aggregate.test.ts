@@ -10,6 +10,8 @@ import {
   powersGained,
   starsGranting,
   starsGrantingPet,
+  starValuesGranting,
+  starValuesGrantingPet,
   availableBonusIds,
   availablePetKeys,
   availablePowers,
@@ -239,4 +241,37 @@ test("weaponRequirements carries each gated star's description", () => {
   const reqs = weaponRequirements(model, new Set(["kraken:0"]));
   expect(reqs).toHaveLength(1);
   expect(enLoc.gameText(reqs[0]!.descriptionTag!)).toBe("Requires a two-handed melee or two-handed ranged weapon.");
+});
+
+test("starValuesGranting maps each granting star to its value for the id", () => {
+  const values = starValuesGranting(model, "characterStrength");
+  expect(new Set(values.keys())).toEqual(starsGranting(model, new Set(["characterStrength"])));
+  for (const [sid, v] of values) expect(v).toBe(model.stars.get(sid)!.bonuses.characterStrength!);
+});
+
+test("starValuesGranting reads a power-granted stat's value from the power", () => {
+  const bonusIds = new Set<string>();
+  for (const s of model.stars.values()) for (const k of Object.keys(s.bonuses)) bonusIds.add(k);
+  let powerStarId: string | undefined;
+  let powerOnlyId: string | undefined;
+  for (const s of model.stars.values()) {
+    const p = s.celestialPower;
+    if (!p) continue;
+    const k = Object.keys(p.stats).find((key) => !bonusIds.has(key));
+    if (k) {
+      powerStarId = s.id;
+      powerOnlyId = k;
+      break;
+    }
+  }
+  const values = starValuesGranting(model, powerOnlyId!);
+  expect(values.get(powerStarId!)).toBe(model.stars.get(powerStarId!)!.celestialPower!.stats[powerOnlyId!]!);
+});
+
+test("starValuesGrantingPet maps pet-bonus stars to their pet values", () => {
+  const petStar = [...model.stars.values()].find((s) => s.petBonuses && Object.keys(s.petBonuses).length > 0)!;
+  const id = Object.keys(petStar.petBonuses!)[0]!;
+  const values = starValuesGrantingPet(model, id);
+  expect(values.get(petStar.id)).toBe(petStar.petBonuses![id]!);
+  expect(new Set(values.keys())).toEqual(starsGrantingPet(model, new Set([id])));
 });

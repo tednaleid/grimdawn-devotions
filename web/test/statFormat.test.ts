@@ -467,3 +467,12 @@ describe("isFilterableStat: the in/out boundary for power stats", () => {
     expect(isFilterableStat("damageAbsorption")).toBe(false);
   });
 });
+
+test("formatPowerStats attaches the driving stat id to taggable rows", () => {
+  // A DoT pair renders one semantic row carrying its Min key as the row's id.
+  const dot = formatPowerStats({ offensiveSlowFireMin: 10, offensiveSlowFireDurationMin: 3 });
+  expect(dot.rows[0]!.id).toBe("offensiveSlowFireMin");
+  // A plain bonus-style stat falls through with its own id.
+  const ft = formatPowerStats({ defensiveFire: 10 });
+  expect(ft.fallthrough[0]!.id).toBe("defensiveFire");
+});

@@ -924,7 +924,7 @@ main {
 .search-ring circle,
 .search-ring path {
   fill: none;
-  stroke-width: 8;
+  /* stroke-width is a per-arc attribute in the renderer: base 8, up to double with magnitude. */
   stroke-linecap: round;
 }
 /* The legend swatch: a mini ring in a search's color + dash, keying rows, chips, and the

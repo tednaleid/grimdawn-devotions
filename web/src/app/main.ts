@@ -44,7 +44,7 @@ import {
   normalizeQuery,
 } from "../core/urlState";
 import { parseTag } from "../core/benefitTag";
-import { benefitRingOrder, reconcileRingSlots, ringMap } from "../core/searchRings";
+import { benefitRingOrder, magnitudeWeights, reconcileRingSlots, ringMap } from "../core/searchRings";
 import {
   benefitRingColor,
   benefitRingDash,
@@ -65,9 +65,9 @@ import { disabledGateway } from "../adapters/grimtoolsGatewayDisabled";
 import type { ExportBase, FetchBuildResult } from "../ports/GrimtoolsGateway";
 import { affinityTotals } from "../core/affinity";
 import {
-  starsGranting,
+  starValuesGranting,
   availableBonusIds,
-  starsGrantingPet,
+  starValuesGrantingPet,
   availablePetKeys,
   availablePowers,
 } from "../core/aggregate";
@@ -303,18 +303,21 @@ async function boot() {
   // The per-star split rings: one star set per active search - every selected player/pet tag
   // (player tags scan player bonuses, pet tags pet bonuses; affinity tags are constellation-level,
   // see affinityFilterSets), then the text query in its reserved color.
-  function searchRings(): Map<StarId, RingStyle[]> {
-    const searches: { ring: RingStyle; stars: ReadonlySet<StarId> }[] = [];
+  function searchRings(): Map<StarId, { ring: RingStyle; weight: number }[]> {
+    const searches: { ring: RingStyle; stars: ReadonlyMap<StarId, number> }[] = [];
     for (const [key, ring] of ringStylesByTag()) {
       const tag = parseTag(key);
       if (!tag || tag.kind === "affinity") continue; // benefitRingOrder already excludes these
-      const stars =
-        tag.kind === "pet"
-          ? starsGrantingPet(model, new Set([tag.statId]))
-          : starsGranting(model, new Set([tag.statId]));
-      searches.push({ ring, stars });
+      const values =
+        tag.kind === "pet" ? starValuesGrantingPet(model, tag.statId) : starValuesGranting(model, tag.statId);
+      searches.push({ ring, stars: magnitudeWeights(values) });
     }
-    if (query) searches.push({ ring: { color: QUERY_RING_COLOR, dash: QUERY_RING_DASH }, stars: searchMatch.stars });
+    if (query) {
+      // Text matches have no magnitude; every query ring renders at base weight.
+      const flat = new Map<StarId, number>();
+      for (const id of searchMatch.stars) flat.set(id, 0);
+      searches.push({ ring: { color: QUERY_RING_COLOR, dash: QUERY_RING_DASH }, stars: flat });
+    }
     return ringMap(searches);
   }
 
