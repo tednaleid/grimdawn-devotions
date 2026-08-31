@@ -1,6 +1,7 @@
 // ABOUTME: DOM adapter for the map search box and its match count.
 // ABOUTME: Mounted once into a stable container, because the affinity panel rewrites its own innerHTML.
 import type { SearchMatch } from "../core/search";
+import { QUERY_RING_COLOR, QUERY_RING_DASH, ringSwatchSvg } from "./ringPalette";
 import type { Localization } from "../ports/Localization";
 
 export interface SearchPanelHandle {
@@ -21,11 +22,13 @@ export function mountSearchPanel(
   el.innerHTML =
     `<hr class="panel-sep"/><h2 id="search-h"></h2>` +
     `<div class="search-row">` +
+    `<span id="search-swatch"></span>` +
     `<input id="search-input" type="search" autocomplete="off" spellcheck="false"/>` +
     `<button id="search-clear" type="button"></button>` +
     `</div><div id="search-count" aria-live="polite"></div>`;
 
   const head = el.querySelector("#search-h") as HTMLElement;
+  const swatchEl = el.querySelector("#search-swatch") as HTMLElement;
   const input = el.querySelector("#search-input") as HTMLInputElement;
   const clear = el.querySelector("#search-clear") as HTMLButtonElement;
   const count = el.querySelector("#search-count") as HTMLElement;
@@ -39,6 +42,11 @@ export function mountSearchPanel(
   }
 
   function paintCount() {
+    // An active query (even one with no matches) wears the query's ring style - the same color
+    // and dash its star rings and constellation halo use on the map - plus its swatch as the key.
+    input.setAttribute("class", last ? "qactive" : "");
+    input.setAttribute("style", last ? `--ring:${QUERY_RING_COLOR}` : "");
+    swatchEl.innerHTML = last ? ringSwatchSvg({ color: QUERY_RING_COLOR, dash: QUERY_RING_DASH }) : "";
     if (!last) {
       count.textContent = "";
       return;

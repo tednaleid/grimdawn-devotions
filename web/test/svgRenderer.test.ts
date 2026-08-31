@@ -7,6 +7,7 @@ import { renderSvgMarkup } from "../src/adapters/svgRenderer";
 import type { ReachView } from "../src/core/reachability";
 import { AFFINITIES } from "../src/core/types";
 import { glowColor, presentAffinities } from "../src/adapters/affinityColors";
+import { QUERY_RING_COLOR } from "../src/adapters/ringPalette";
 
 const model = buildModel(doc as any);
 // Shared manifest covering every constellation's art, for the search-halo tests below (they need
@@ -196,9 +197,9 @@ test("no affinity filter leaves no mute", () => {
   expect(markup).not.toContain("mute");
 });
 
-test("an affinity filter mutes non-matching constellations; a benefit match in a matching con stays un-muted", () => {
+test("an affinity filter mutes non-matching constellations; a search ring in a matching con stays un-muted", () => {
   // crossroads_eldritch GRANTS eldritch, so under an eldritch filter its constellation matches: the
-  // highlighted star is identity (not muted) and its benefit-glow layer is NOT mute-wrapped.
+  // ringed star is identity (not muted) and its search-ring layer is NOT mute-wrapped.
   const matchStar = "crossroads_eldritch:0";
   const markup = renderSvgMarkup(
     model,
@@ -206,17 +207,17 @@ test("an affinity filter mutes non-matching constellations; a benefit match in a
     {
       manifest: null,
       affinityFilter: { grants: new Set(["eldritch"]), requires: new Set() },
-      highlight: new Set([matchStar]),
+      rings: new Map([[matchStar, [{ color: "#3ee6d8", dash: "" }]]]),
     },
   );
   expect(markup).toContain('class="star selectable"'); // the matched star's dot is identity (not muted)
-  expect(markup).toContain('<circle class="benefit-glow"'); // benefit emphasis is a separate glow layer
-  expect(markup).not.toContain('<g filter="url(#mute-wide)"'); // a matching con's glow is never mute-wrapped
+  expect(markup).toContain('<g class="search-ring">'); // ring emphasis is a separate layer
+  expect(markup).not.toContain('<g filter="url(#mute-wide)"'); // a matching con's ring is never mute-wrapped
   expect(markup).toContain(' mute"'); // non-matching stars get mute
   expect(markup).toContain('class="link mute"'); // links get mute
 });
 
-test("a benefit match in an off-affinity constellation: muted dot AND a mute-wrapped benefit glow", () => {
+test("a search ring in an off-affinity constellation: muted dot AND a mute-wrapped ring", () => {
   // A constellation that does NOT grant the filtered affinity, so it fails the filter (non-matching).
   const offCon = [...model.constellations.values()].find((c) => (c.affinityBonus.chaos ?? 0) === 0)!;
   const markStar = offCon.starIds[0]!;
@@ -226,13 +227,64 @@ test("a benefit match in an off-affinity constellation: muted dot AND a mute-wra
     {
       manifest: null,
       affinityFilter: { grants: new Set(["chaos"]), requires: new Set() },
-      highlight: new Set([markStar]),
+      rings: new Map([[markStar, [{ color: "#3ee6d8", dash: "" }]]]),
     },
   );
-  // Two independent channels both fire: the dot desaturates (mute) AND the benefit glow is wrapped in
-  // #mute-wide so the whole emphasis greys, reading as "benefit match, off the affinity filter".
-  expect(markup).toMatch(/<g filter="url\(#mute-wide\)"><(circle|polygon) class="benefit-glow"/);
+  // Two independent channels both fire: the dot desaturates (mute) AND the ring is wrapped in
+  // #mute-wide so the whole emphasis greys, reading as "search match, off the affinity filter".
+  expect(markup).toContain('<g filter="url(#mute-wide)"><g class="search-ring">');
   expect(markup).toMatch(/class="star [^"]*mute[^"]*"/); // the dot itself carries mute too
+});
+
+test("a single-search match draws one full ring circle in that search's color", () => {
+  const star = "crossroads_eldritch:0";
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest: null, rings: new Map([[star, [{ color: "#3ee6d8", dash: "" }]]]) },
+  );
+  const ring = markup.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(ring).toContain('stroke="#3ee6d8"');
+  expect(ring).toContain("<circle"); // one search -> a full circle, not arcs
+  expect(ring).not.toContain("<path");
+});
+
+test("a multi-search match splits the ring into one arc per search, in ring order", () => {
+  const star = "crossroads_eldritch:0";
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest: null,
+      rings: new Map([
+        [
+          star,
+          [
+            { color: "#aaa111", dash: "" },
+            { color: "#bbb222", dash: "16 11" },
+            { color: "#ccc333", dash: "0.1 13" },
+          ],
+        ],
+      ]),
+    },
+  );
+  const ring = markup.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(ring.match(/<path/g)!.length).toBe(3); // one arc per matching search
+  expect(ring).not.toContain("<circle");
+  // arcs come out in ring order (canonical benefit order, query last), clockwise from twelve
+  expect(ring.indexOf("#aaa111")).toBeLessThan(ring.indexOf("#bbb222"));
+  expect(ring.indexOf("#bbb222")).toBeLessThan(ring.indexOf("#ccc333"));
+});
+
+test("a power star's ring circles outside its diamond", () => {
+  const power = [...model.stars.values()].find((s) => s.celestialPower)!;
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest: null, rings: new Map([[power.id, [{ color: "#3ee6d8", dash: "" }]]]) },
+  );
+  const ring = markup.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(ring).toContain('r="29"'); // POWER_RADIUS + 10, vs 23 for regular stars
 });
 
 test("an unattainable, non-matching constellation carries both mute class and unattainable opacity", () => {
@@ -327,6 +379,23 @@ test("a matched constellation with art gets a search-glow halo", () => {
   expect(markup).not.toMatch(/<rect class="search-glow"[^>]*filter="url\(#search-glow\)"/);
 });
 
+test("the constellation search halo floods in the query ring color", () => {
+  // The text query is the only search that matches whole constellations, so its halo carries the
+  // query's reserved ring color - the same color its star-level ring hits use.
+  const withArt = [...model.constellations.values()].find((c) => c.background?.image)!;
+  const markup = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest, conHighlight: new Set([withArt.id]) },
+  );
+  expect(markup).toMatch(new RegExp(`<rect class="search-glow"[^>]*fill="${QUERY_RING_COLOR}"`));
+  // The halo filter floods only the query color; the old neutral blue survives elsewhere (the
+  // #match-glow hover treatment) but must be gone from the search halo def.
+  const searchGlowDef = markup.match(/<filter id="search-glow".*?<\/filter>/)![0];
+  expect(searchGlowDef).toContain(`flood-color="${QUERY_RING_COLOR}"`);
+  expect(searchGlowDef).not.toContain('flood-color="#6cb6ff"');
+});
+
 test("the search halo paints under the art, not over it", () => {
   // A surrounding glow drawn on top of thin line art washes it out; the affinity halo wants the
   // opposite (it flushes after the art so its colour reads through), so the two orderings differ.
@@ -373,4 +442,37 @@ test("a matched constellation muted by an affinity filter still gets its halo, w
       `<g filter="url\\(#mute-wide\\)"><g filter="url\\(#search-glow\\)"><rect class="search-glow"[^>]*mask="url\\(#mask-${offCon.id}\\)"`,
     ),
   );
+});
+
+test("a ring style's dash pattern rides on its circle and arcs; solid styles carry none", () => {
+  const star = "crossroads_eldritch:0";
+  const single = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    { manifest: null, rings: new Map([[star, [{ color: "#3ee6d8", dash: "16 11" }]]]) },
+  );
+  const singleRing = single.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(singleRing).toContain('stroke-dasharray="16 11"');
+
+  const multi = renderSvgMarkup(
+    model,
+    { selected: new Set(), pointCap: 55 },
+    {
+      manifest: null,
+      rings: new Map([
+        [
+          star,
+          [
+            { color: "#aaa111", dash: "" },
+            { color: "#bbb222", dash: "0.1 13" },
+          ],
+        ],
+      ]),
+    },
+  );
+  const multiRing = multi.match(/<g class="search-ring">.*?<\/g>/)![0];
+  expect(multiRing).toContain('stroke-dasharray="0.1 13"');
+  // The solid arc carries no dasharray attribute.
+  expect(multiRing).toMatch(/<path [^>]*stroke="#aaa111"[^>]*\/>/);
+  expect(multiRing.match(/<path [^>]*stroke="#aaa111"[^>]*\/>/)![0]).not.toContain("stroke-dasharray");
 });

@@ -44,6 +44,15 @@ import {
   normalizeQuery,
 } from "../core/urlState";
 import { parseTag } from "../core/benefitTag";
+import { benefitRingOrder, reconcileRingSlots, ringMap } from "../core/searchRings";
+import {
+  benefitRingColor,
+  benefitRingDash,
+  QUERY_RING_COLOR,
+  QUERY_RING_DASH,
+  RING_STYLE_COUNT,
+  type RingStyle,
+} from "../adapters/ringPalette";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
@@ -277,26 +286,36 @@ async function boot() {
     el.addEventListener("animationend", () => el.classList.remove("flash-blocked"), { once: true });
   }
 
-  // The map stars to emphasize for the current benefit tags: player tags scan player bonuses,
-  // pet tags scan pet bonuses; affinity tags are constellation-level (see affinityFilterSets).
-  function taggedStars(): Set<StarId> {
-    const playerTags = new Set<string>();
-    const petTags = new Set<string>();
-    for (const k of selectedBenefits) {
-      const tag = parseTag(k);
-      if (tag?.kind === "player") playerTags.add(tag.statId);
-      else if (tag?.kind === "pet") petTags.add(tag.statId);
-    }
-    const out = starsGranting(model, playerTags);
-    for (const id of starsGrantingPet(model, petTags)) out.add(id);
+  // Each selected benefit tag is its own search with its own ring style (color + dash pattern,
+  // paired by palette slot). Slots persist across toggles (module state, reconciled each render):
+  // removing a tag frees only its own style and the rest stay put, which matters more than
+  // shared-link color fidelity - a fresh load reseeds in canonical order, so a reloaded link may
+  // wear different hues but marks the same searches.
+  let ringSlots = new Map<string, number>();
+  function ringStylesByTag(): Map<string, RingStyle> {
+    const order = benefitRingOrder(selectedBenefits, benefitCanonical);
+    ringSlots = reconcileRingSlots(ringSlots, order, RING_STYLE_COUNT);
+    const out = new Map<string, RingStyle>();
+    for (const [key, slot] of ringSlots) out.set(key, { color: benefitRingColor(slot), dash: benefitRingDash(slot) });
     return out;
   }
 
-  // Benefit tags and search share one glow: both mean "this node matches what you asked for".
-  function emphasizedStars(): Set<StarId> {
-    const out = taggedStars();
-    for (const id of searchMatch.stars) out.add(id);
-    return out;
+  // The per-star split rings: one star set per active search - every selected player/pet tag
+  // (player tags scan player bonuses, pet tags pet bonuses; affinity tags are constellation-level,
+  // see affinityFilterSets), then the text query in its reserved color.
+  function searchRings(): Map<StarId, RingStyle[]> {
+    const searches: { ring: RingStyle; stars: ReadonlySet<StarId> }[] = [];
+    for (const [key, ring] of ringStylesByTag()) {
+      const tag = parseTag(key);
+      if (!tag || tag.kind === "affinity") continue; // benefitRingOrder already excludes these
+      const stars =
+        tag.kind === "pet"
+          ? starsGrantingPet(model, new Set([tag.statId]))
+          : starsGranting(model, new Set([tag.statId]));
+      searches.push({ ring, stars });
+    }
+    if (query) searches.push({ ring: { color: QUERY_RING_COLOR, dash: QUERY_RING_DASH }, stars: searchMatch.stars });
+    return ringMap(searches);
   }
 
   // The active affinity filter as grant/require sets, or undefined when no affinity tag is selected.
@@ -761,6 +780,7 @@ async function boot() {
       petCatalog,
       availPetKeys,
       baseline?.selected ?? null,
+      ringStylesByTag(),
     );
     prevBonuses = r.bonuses;
     prevPet = r.petBonuses;
@@ -768,7 +788,7 @@ async function boot() {
     petAvailHtml = r.petAvailHtml;
   }
   // The map's per-render inputs. Shared by refresh() and repaint() so the two paths cannot drift:
-  // benefit tags and search matches are unioned into one highlight set, while constellation-level
+  // benefit tags and star-level search matches become per-star split rings, while constellation-level
   // search matches go to conHighlight (a constellation hit glows the art, not its stars).
   function paintMap() {
     const diff = baseline
@@ -778,7 +798,7 @@ async function boot() {
         }
       : null;
     handle.update(state, {
-      highlight: emphasizedStars(),
+      rings: searchRings(),
       reach,
       diff,
       affinityFilter: affinityFilterSets(),
@@ -791,6 +811,7 @@ async function boot() {
   function paintSearchCount() {
     searchPanel.setCount(query ? searchMatch : null); // `query` is already normalized (trimmed)
     tip.setHighlight(query);
+    tip.setRingStyles(ringStylesByTag()); // tagged tooltip rows read like the sidebar
   }
   // The hash, written by both render paths. Search uses "replace" so typing never floods history.
   function writeHash(urlMode: "push" | "replace") {

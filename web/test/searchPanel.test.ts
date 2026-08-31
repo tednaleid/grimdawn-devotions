@@ -4,6 +4,7 @@ import { test, expect } from "bun:test";
 import { mountSearchPanel } from "../src/adapters/searchPanel";
 import type { SearchMatch } from "../src/core/search";
 import { enLoc } from "./helpers/localizeEn";
+import { QUERY_RING_COLOR } from "../src/adapters/ringPalette";
 
 // A hand-rolled double for the handful of DOM operations mountSearchPanel performs
 // (innerHTML, querySelector by a fixed id, addEventListener, attribute/text setters). This repo
@@ -41,6 +42,7 @@ class FakeElement {
 function mount(initial = "") {
   const kids = {
     "#search-h": new FakeElement(),
+    "#search-swatch": new FakeElement(),
     "#search-input": new FakeElement(),
     "#search-clear": new FakeElement(),
     "#search-count": new FakeElement(),
@@ -139,4 +141,22 @@ test("the initial query seeds the input and setValue() replaces it", () => {
   expect(kids["#search-input"].value).toBe("seed");
   handle.setValue("next");
   expect(kids["#search-input"].value).toBe("next");
+});
+
+test("an active query outlines the search box in the query ring color; clearing removes it", () => {
+  const { handle, kids } = mount();
+  handle.setCount(match([], ["s1"]));
+  expect(kids["#search-input"].getAttribute("class")).toContain("qactive");
+  expect(kids["#search-input"].getAttribute("style")).toContain(QUERY_RING_COLOR);
+  handle.setCount(null);
+  expect(kids["#search-input"].getAttribute("class") ?? "").not.toContain("qactive");
+});
+
+test("an active query shows the query's patterned swatch in the search box; clearing empties it", () => {
+  const { handle, kids } = mount();
+  handle.setCount(match([], []));
+  expect(kids["#search-swatch"].innerHTML).toContain('class="ring-swatch"');
+  expect(kids["#search-swatch"].innerHTML).toContain(QUERY_RING_COLOR);
+  handle.setCount(null);
+  expect(kids["#search-swatch"].innerHTML).toBe("");
 });

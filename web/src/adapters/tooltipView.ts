@@ -12,6 +12,7 @@ import type {
 import { formatBonusRowsWithIds, formatPet, formatPowerStats, type PowerRows } from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
+import { ringSwatchSvg, type RingStyle } from "./ringPalette";
 import { affinityTagId, petTagId } from "../core/benefitTag";
 import { resolveText, sortByResolved, type Text } from "../core/localization";
 import { matchRanges } from "../core/search";
@@ -64,7 +65,10 @@ function bonusRowsHtml(
     .map((r) => {
       const vid = keyOf(r.id);
       const sel = selectedBenefits.has(vid) ? " vsel" : "";
-      return `<div class="tip-bonus${sel}" data-vid="${vid}"><span class="val">${r.value}</span> ${hl(r.label)}</div>`;
+      const st = sel ? tagRingStyles.get(vid) : undefined;
+      const ring = st ? ` style="--ring:${st.color}"` : "";
+      const swatch = st ? ringSwatchSvg(st) : "";
+      return `<div class="tip-bonus${sel}" data-vid="${vid}"${ring}>${swatch}<span class="val">${r.value}</span> ${hl(r.label)}</div>`;
     })
     .join("");
 }
@@ -170,6 +174,11 @@ export const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ESCAPES[c]!
 // setHighlight is the only writer. Threading it through show()/showConstellation() instead would
 // mean another argument on two functions that already take nine.
 let highlightQuery = "";
+
+// The active searches' ring styles by tag key, so a tagged bonus row reads like the sidebar:
+// outlined in its search's color, keyed by its patterned swatch. Module scope for the same
+// reason as highlightQuery; the handle's setRingStyles is the only writer.
+let tagRingStyles: ReadonlyMap<string, RingStyle> = new Map();
 
 /**
  * Escape `text` for innerHTML and wrap the runs matching the current query. Every piece of game
@@ -283,6 +292,9 @@ export function tooltipView(el: HTMLElement) {
       place(clientX, clientY);
     },
     /** The query whose matches the next render should mark up. "" turns highlighting off. */
+    setRingStyles(styles: ReadonlyMap<string, RingStyle>) {
+      tagRingStyles = styles;
+    },
     setHighlight(query: string) {
       highlightQuery = query;
     },

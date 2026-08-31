@@ -149,3 +149,54 @@ test("powersListHtml sorts rows by power name, not input/constellation order", (
   const html = powersListHtml(enLoc, [mk("aaa:1", "Wendigo's Mark"), mk("bbb:1", "Arcane Bomb")] as any);
   expect(html.indexOf("Arcane Bomb")).toBeLessThan(html.indexOf("Wendigo's Mark"));
 });
+
+test("a selected benefit row is outlined in its search's ring color", () => {
+  const bonusStar = [...realModel.stars.values()].find((s) => Object.keys(s.bonuses).length > 0)!;
+  const statId = Object.keys(bonusStar.bonuses)[0]!;
+  const el = { innerHTML: "" } as unknown as HTMLElement;
+  renderBenefits(
+    enLoc,
+    el,
+    realModel,
+    new Set([bonusStar.id]),
+    undefined,
+    new Set([statId]),
+    [],
+    undefined,
+    undefined,
+    [],
+    undefined,
+    null,
+    new Map([[statId, { color: "#3ee6d8", dash: "" }]]),
+  );
+  const html = (el as unknown as { innerHTML: string }).innerHTML;
+  expect(html).toMatch(/class="brow[^"]*vsel[^"]*"[^>]*style="--ring:#3ee6d8"/);
+  // The row also carries a mini ring swatch in its style; a solid style draws no dasharray.
+  const row = html.match(/<div class="brow[^"]*vsel[^"]*"[^>]*>.*?<\/div>/)![0];
+  expect(row).toContain('<svg class="ring-swatch"');
+  expect(row).toContain('stroke="#3ee6d8"');
+  expect(row).not.toContain("stroke-dasharray");
+});
+
+test("a tagged 'available to get' chip is outlined in its first selected id's ring color", () => {
+  const el = { innerHTML: "" } as unknown as HTMLElement;
+  const html = renderBenefits(
+    enLoc,
+    el,
+    emptyModel,
+    new Set(),
+    undefined,
+    new Set(["offensiveFireMin"]),
+    catalog,
+    new Set(["offensiveFireMin"]),
+    undefined,
+    [],
+    undefined,
+    null,
+    new Map([["offensiveFireMin", { color: "#ff9440", dash: "16 11" }]]),
+  ).availHtml;
+  expect(html).toMatch(/class="bgroup avail gsel"[^>]*style="--ring:#ff9440"/);
+  // The chip wears the search's swatch too, with the dash pattern scaled to swatch size.
+  expect(html).toContain('<svg class="ring-swatch"');
+  expect(html).toContain('stroke-dasharray="4.17 2.87"');
+});

@@ -8,6 +8,7 @@ import { affinityOrb } from "./affinityColors";
 import { affinityTagId, petTagId } from "../core/benefitTag";
 import { benefitRows, type BenefitGroup, type BenefitSubject } from "../core/benefitRows";
 import { resolveText, sortByResolved, gameT } from "../core/localization";
+import { ringSwatchSvg, type RingStyle } from "./ringPalette";
 import type { Localization } from "../ports/Localization";
 
 // One row per celestial power: the name plus a data-star-id hook so a hover shows the power's full
@@ -29,7 +30,8 @@ function changeClass(prev: Record<string, number> | undefined, key: string, cur:
 }
 
 // One unified row renderer for both modes. comparing=false -> a single value cell (+ flash);
-// comparing=true -> Base/Now/Delta cells. selectedBenefits drives the row highlight; flash adds the
+// comparing=true -> Base/Now/Delta cells. selectedBenefits drives the row highlight (outlined in
+// the tag's search-ring color via --ring, keyed by its patterned swatch); flash adds the
 // per-render up/down change class (regular mode only).
 function benefitListHtml(
   loc: Localization,
@@ -38,6 +40,7 @@ function benefitListHtml(
   selectedBenefits: Set<string>,
   keyOf: (id: string) => string,
   flash: (id: string) => string,
+  ringStyles: Map<string, RingStyle>,
 ): string {
   const cells = (r: BenefitGroup["subjects"][number]["rows"][number]) =>
     comparing
@@ -45,21 +48,24 @@ function benefitListHtml(
       : `<span class="brow-v${flash(r.id)}">${resolveText(loc, r.now)}</span>`;
   const rowHtml = (s: BenefitSubject, subject: string, r: BenefitGroup["subjects"][number]["rows"][number]) => {
     const vid = keyOf(r.id);
+    const st = selectedBenefits.has(vid) ? ringStyles.get(vid) : undefined;
     const sel = selectedBenefits.has(vid) ? " vsel" : "";
+    const ring = st ? ` style="--ring:${st.color}"` : "";
+    const swatch = st ? ringSwatchSvg(st) : "";
     if (r.role === "subject") {
       const ids = s.ids.map(keyOf);
       const vtint = comparing && s.verdict ? ` ${s.verdict}` : "";
       return (
-        `<div class="brow${sel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}">` +
-        `<span class="brow-lbl subj${vtint}" data-gtoggle title="${subject}">${subject}</span>` +
+        `<div class="brow${sel}" data-gkey="${keyOf(s.key)}" data-ids="${ids.join(",")}"${ring}>` +
+        `<span class="brow-lbl subj${vtint}" data-gtoggle title="${subject}">${swatch}${subject}</span>` +
         `<span class="brow-vals" data-vid="${vid}">${cells(r)}</span></div>`
       );
     }
     const lbl =
       r.role === "sub"
-        ? `<span class="brow-lbl sub">${resolveText(loc, r.subLabel)}</span>`
-        : `<span class="brow-lbl cont"></span>`;
-    return `<div class="brow${sel}" data-vid="${vid}">${lbl}<span class="brow-vals">${cells(r)}</span></div>`;
+        ? `<span class="brow-lbl sub">${swatch}${resolveText(loc, r.subLabel)}</span>`
+        : `<span class="brow-lbl cont">${swatch}</span>`;
+    return `<div class="brow${sel}" data-vid="${vid}"${ring}>${lbl}<span class="brow-vals">${cells(r)}</span></div>`;
   };
   return groups
     .map((g) => {
@@ -94,6 +100,7 @@ export function renderBenefits(
   petCatalog: CondensedGroup[] = [],
   availablePetKeys?: Set<string>,
   baselineSelected: Set<StarId> | null = null,
+  ringStyles: Map<string, RingStyle> = new Map(),
 ): { bonuses: Record<string, number>; petBonuses: Record<string, number>; availHtml: string; petAvailHtml: string } {
   const bonuses = sumBonuses(model, selected);
   const petBonuses = sumPetBonuses(model, selected);
@@ -135,8 +142,16 @@ export function renderBenefits(
   const flashPlayer = (id: string) => changeClass(prev, id, bonuses);
   const flashPet = (id: string) => changeClass(prevPet, id, petBonuses);
   const comparing = baselineSelected !== null;
-  const activeHtml = benefitListHtml(loc, rows.player, comparing, selectedBenefits, (id) => id, flashPlayer);
-  const petActiveHtml = benefitListHtml(loc, rows.pet, comparing, selectedBenefits, petTagId, flashPet);
+  const activeHtml = benefitListHtml(
+    loc,
+    rows.player,
+    comparing,
+    selectedBenefits,
+    (id) => id,
+    flashPlayer,
+    ringStyles,
+  );
+  const petActiveHtml = benefitListHtml(loc, rows.pet, comparing, selectedBenefits, petTagId, flashPet, ringStyles);
   const activeKeys = activeKeysOf(condensedRows(bonuses, { racialTarget: racialTargets(model, selected) }));
   const petActiveKeys = activeKeysOf(condensedRows(petBonuses));
 
@@ -160,10 +175,15 @@ export function renderBenefits(
           }),
           (s) => s.subject,
         )
-          .map(
-            (s) =>
-              `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"><span class="bsubj" data-gtoggle>${resolveText(loc, s.subject)}</span></div>`,
-          )
+          .map((s) => {
+            // A fully tagged chip is outlined and keyed like the active rows; a chip toggling
+            // several tags shows its first tag's style (the map's split ring carries the full story).
+            const firstKey = scope.keys(s).find((k) => selectedBenefits.has(k) && ringStyles.has(k));
+            const st = scope.groupSel(s) && firstKey ? ringStyles.get(firstKey) : undefined;
+            const ring = st ? ` style="--ring:${st.color}"` : "";
+            const swatch = st ? ringSwatchSvg(st) : "";
+            return `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"${ring}><span class="bsubj" data-gtoggle>${swatch}${resolveText(loc, s.subject)}</span></div>`;
+          })
           .join("");
         return subs ? `<h3>${loc.translate(GROUP_KEY[g.group])}</h3><div class="avail-list">${subs}</div>` : "";
       })

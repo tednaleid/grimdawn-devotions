@@ -358,7 +358,9 @@ main {
 .tip-bonus.vsel,
 .aff.vsel {
   background: rgba(108, 182, 255, 0.08);
-  box-shadow: 0 0 0 1.5px rgba(108, 182, 255, 0.6);
+  /* --ring is the row's search-ring color (set inline by the view when the tag rings stars);
+     rows without one (affinity tags, tooltips) keep the neutral blue. */
+  box-shadow: 0 0 0 2px var(--ring, rgba(108, 182, 255, 0.6));
 }
 .bsubj {
   text-transform: capitalize;
@@ -613,9 +615,18 @@ main {
 #search-input::placeholder {
   color: #6b7688;
 }
+/* An active query wears the query's ring color (--ring, set inline by the panel), matching its
+   star rings and constellation halo on the map. Focus keeps its blue border only while idle. */
+#search-input.qactive {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--ring);
+}
 #search-input:focus {
   outline: none;
   border-color: #6cb6ff;
+}
+#search-input.qactive:focus {
+  border-color: transparent;
 }
 /* Chrome renders a second clear affordance inside type="search"; we ship our own button. */
 #search-input::-webkit-search-cancel-button {
@@ -902,6 +913,32 @@ main {
   transform: scale(1.45);
   /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#match-glow);
+}
+/* Search rings: the split-ring marker around a star matched by one or more searches. Geometry
+   (radius, arc spans, per-search stroke colors) is data-driven in the renderer; the tunable look
+   (stroke weight, the luminous #self-glow halo) lives here. */
+.search-ring {
+  pointer-events: none;
+  filter: url(#self-glow);
+}
+.search-ring circle,
+.search-ring path {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+/* The legend swatch: a mini ring in a search's color + dash, keying rows, chips, and the
+   search box to the map's ring styles. */
+.ring-swatch {
+  vertical-align: -2.5px;
+  margin-right: 4px;
+  flex: none;
+}
+#search-swatch {
+  line-height: 0;
+}
+#search-swatch:empty {
+  display: none;
 }
 /* Affinity-filter de-emphasis: drain color, never brightness (see #mute in the renderer). */
 .mute {

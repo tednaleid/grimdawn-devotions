@@ -5,6 +5,7 @@ import type { ReachView } from "../core/reachability";
 import { affinityColor, glowColor, presentAffinities } from "./affinityColors";
 import { constellationDisplay, starDisplay, edgeDisplay } from "../core/displayState";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
+import { QUERY_RING_COLOR, type RingStyle } from "./ringPalette";
 import type { AssetManifest } from "../ports/DataSource";
 
 // A constellation's identity colors = the affinities it GRANTS when fully filled (1-3).
@@ -56,10 +57,48 @@ const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 // The affinity match halo glows full strength on a reachable constellation and dimmer on an unreachable
 // one, so the brightness channel still reads under a filter (reachable matches are not just colored).
 const HALO_UNREACHABLE_OPACITY = 0.25;
+// Search rings orbit outside the star dot (and outside the larger power diamond).
+const RING_RADIUS = STAR_RADIUS + 11;
+const POWER_RING_RADIUS = POWER_RADIUS + 10;
+// Degrees of breathing room between the arcs of a split ring.
+const RING_GAP_DEG = 14;
+
+// A clockwise ring arc from a0 to a1 (degrees, 0 = twelve o'clock) around (cx, cy).
+function ringArc(cx: number, cy: number, r: number, a0: number, a1: number): string {
+  const pt = (deg: number) => {
+    const rad = ((deg - 90) * Math.PI) / 180;
+    return `${(cx + r * Math.cos(rad)).toFixed(2)} ${(cy + r * Math.sin(rad)).toFixed(2)}`;
+  };
+  return `M ${pt(a0)} A ${r} ${r} 0 0 1 ${pt(a1)}`;
+}
+
+// The split-ring marker for one star: a full circle for a single matching search, else the ring
+// divided evenly into one arc per search, clockwise from twelve, in ring order. Each search's
+// stroke pattern rides along as the color-vision-safe redundant channel. Stroke width, fill
+// suppression, and the luminous #self-glow filter come from the .search-ring CSS rules.
+function ringMarkup(cx: number, cy: number, r: number, styles: readonly RingStyle[]): string {
+  const dash = (st: RingStyle) => (st.dash ? ` stroke-dasharray="${st.dash}"` : "");
+  if (styles.length === 1) {
+    const st = styles[0]!;
+    return `<g class="search-ring"><circle cx="${cx}" cy="${cy}" r="${r}" stroke="${st.color}"${dash(st)}/></g>`;
+  }
+  const span = 360 / styles.length;
+  const arcs = styles
+    .map(
+      (st, i) =>
+        `<path d="${ringArc(cx, cy, r, i * span + RING_GAP_DEG / 2, (i + 1) * span - RING_GAP_DEG / 2)}" stroke="${st.color}"${dash(st)}/>`,
+    )
+    .join("");
+  return `<g class="search-ring">${arcs}</g>`;
+}
 
 export interface RenderOpts {
   manifest: AssetManifest | null;
-  highlight?: Set<StarId>;
+  // Per-star search rings: each matched star maps to the ring styles (color + dash pattern) of
+  // the searches that hit it, in ring order (canonical benefit order, query last). One search
+  // draws a full ring; several split it into arcs, clockwise from twelve, so the ring says which
+  // searches matched and how many.
+  rings?: ReadonlyMap<StarId, readonly RingStyle[]>;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   // When present, an affinity filter is active. A constellation matches when it provides any of these
@@ -67,7 +106,8 @@ export interface RenderOpts {
   // the rest desaturate (the mute color outcome) - the filter never changes brightness.
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
   // When present, a text search is active; these constellations matched on name or description
-  // and glow via the search-glow halo. Star-level matches arrive folded into `highlight`.
+  // and glow via the search-glow halo in the query's ring color. Star-level query matches arrive
+  // as `rings` entries instead (a constellation hit glows the art, not its stars).
   conHighlight?: Set<string>;
 }
 
@@ -143,11 +183,12 @@ export function constellationAt(regions: ConRegion[], wx: number, wy: number): s
 export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
   const reach = opts.reach;
   const diff = opts.diff ?? null;
+  const rings = opts.rings;
   const settings = {
     selected: state.selected,
     reach,
     affinityFilter: opts.affinityFilter,
-    benefitMatch: opts.highlight,
+    benefitMatch: rings ? new Set(rings.keys()) : undefined,
     conMatch: opts.conHighlight,
     diff,
   };
@@ -217,12 +258,13 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     );
   }
 
-  // Search-match halo filter def: flooded with #match-glow's neutral blue so a search match reads
-  // identically whether it lands on a star or a whole constellation, and never as an affinity colour.
+  // Search-match halo filter def: flooded with the query's ring color so a query match reads
+  // identically whether it lands on a star (a ring) or a whole constellation (this halo), and never
+  // as an affinity colour.
   // Only emitted when a search is active (mirrors #aff-glow/#mute being gated on affFilter above).
   //
-  // Two blue bands: a near one (16) for brightness against the silhouette, a far one (38) for reach.
-  // Both flooded #6cb6ff, no white core - white washes even under the art, and on thin line work a
+  // Two bands: a near one (16) for brightness against the silhouette, a far one (38) for reach.
+  // Both flooded the query color, no white core - white washes even under the art, and on thin line work a
   // small-radius blur bleeds inward across the strokes and floods the shape rather than rimming it.
   // stdDeviation is in user units against art roughly 250x380. The merge stacking is what carries
   // brightness: a wide blur thins alpha, so reach and intensity have to be bought separately. Pushing
@@ -233,9 +275,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     defs.push(
       `<filter id="search-glow" x="-150%" y="-150%" width="400%" height="400%" color-interpolation-filters="sRGB">` +
         `<feGaussianBlur in="SourceAlpha" stdDeviation="16" result="b1"/>` +
-        `<feFlood flood-color="#6cb6ff" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
+        `<feFlood flood-color="${QUERY_RING_COLOR}" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
         `<feGaussianBlur in="SourceAlpha" stdDeviation="38" result="b2"/>` +
-        `<feFlood flood-color="#6cb6ff" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
+        `<feFlood flood-color="${QUERY_RING_COLOR}" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
         `<feMerge>` +
         `<feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g2"/>` +
         `<feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="g1"/>` +
@@ -316,7 +358,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const glow =
         `<g filter="url(#search-glow)">` +
         `<rect class="search-glow" opacity="${op}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" ` +
-        `fill="#6cb6ff" mask="url(#mask-${c.id})"/>` +
+        `fill="${QUERY_RING_COLOR}" mask="url(#mask-${c.id})"/>` +
         `</g>`;
       // Off-filter constellations desaturate like an off-filter star's benefit glow does, so the
       // halo reads as "matched, off-filter" instead of vanishing.
@@ -392,15 +434,14 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const dot = star.celestialPower
       ? `<polygon class="${cls}" opacity="${op}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
       : `<circle class="${cls}" opacity="${op}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
-    // Benefit-match emphasis is a SEPARATE full-opacity layer (enlarged + halo) so it reads even on an
-    // unattainable (dim) star, whose dot keeps its attainability opacity. When the star's constellation is
-    // off the affinity filter, the glow is wrapped in #mute-wide so the whole glow desaturates too - the
-    // match then reads as "benefit match, off-filter" without the dot's opacity bleeding into the glow.
+    // Search-ring emphasis is a SEPARATE full-opacity layer so it reads even on an unattainable (dim)
+    // star, whose dot keeps its attainability opacity. When the star's constellation is off the
+    // affinity filter, the ring is wrapped in #mute-wide so the whole ring desaturates too - the
+    // match then reads as "search match, off-filter" without the dot's opacity bleeding into the ring.
     let marker = "";
-    if (sd.benefitMatch) {
-      const shape = star.celestialPower
-        ? `<polygon class="benefit-glow" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
-        : `<circle class="benefit-glow" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
+    const ringColors = sd.benefitMatch ? rings?.get(star.id) : undefined;
+    if (ringColors && ringColors.length > 0) {
+      const shape = ringMarkup(cx, cy, star.celestialPower ? POWER_RING_RADIUS : RING_RADIUS, ringColors);
       marker = muted ? `<g filter="url(#mute-wide)">${shape}</g>` : shape;
     }
     parts.push(
@@ -415,7 +456,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 
 /** Per-render inputs for a mounted map, mirroring RenderOpts minus the boot-time manifest. */
 export interface UpdateOpts {
-  highlight?: Set<StarId>;
+  rings?: ReadonlyMap<StarId, readonly RingStyle[]>;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
