@@ -245,13 +245,27 @@ test("a single-search match draws a track and one hand at that search's angle, i
   const markup = renderSvgMarkup(model, noSel, { manifest: null, hands: new Map([[star, [mark(1)]]]) });
   const { cx, cy } = centerOf(markup, star);
   const hands = handsOf(markup);
-  expect(hands).toContain(`<circle class="hand-track" cx="${cx}" cy="${cy}" r="18"/>`); // root 16 + 2
+  expect(hands).toContain(`<circle class="hand-track" cx="${cx}" cy="${cy}" r="18"/>`); // STAR_RADIUS 12 + 6
   const lines = handLines(hands);
   expect(lines.length).toBe(1);
-  // Slot 1 points at 270 degrees (9 o'clock): from the root 16 units left of centre, 8 further at weight 0.
-  expect(lines[0]).toContain(`x1="${cx - 16}" y1="${cy}" x2="${cx - 24}" y2="${cy}"`);
+  // Slot 1 points at 270 degrees (9 o'clock): from the star's centre to 40 units out at weight 0
+  // (the dot's radius 12 plus the 28-unit minimum showing beyond it).
+  expect(lines[0]).toContain(`x1="${cx}" y1="${cy}" x2="${cx - 40}" y2="${cy}"`);
   expect(lines[0]).toContain(`stroke="${handStyle(1).color}"`);
   expect(hands).toContain('<g class="search-hand" data-slot="1">');
+});
+
+test("a star's hands are painted under its dot, so the dot's state and color stay visible over the hub", () => {
+  const star = "crossroads_eldritch:0";
+  const markup = renderSvgMarkup(model, noSel, { manifest: null, hands: new Map([[star, [mark(0)]]]) });
+  const { cx, cy } = centerOf(markup, star);
+  const hit = markup.indexOf(`data-star-id="${star}"`);
+  const hands = markup.indexOf('<g class="search-hands">');
+  const dot = markup.indexOf(`<circle class="star selectable" opacity="1" cx="${cx}" cy="${cy}"`);
+  expect(hit).toBeGreaterThan(-1);
+  expect(dot).toBeGreaterThan(-1);
+  expect(hands).toBeGreaterThan(hit);
+  expect(dot).toBeGreaterThan(hands);
 });
 
 test("each matching search adds its own hand at its own fixed angle, over a dark outline", () => {
@@ -259,8 +273,8 @@ test("each matching search adds its own hand at its own fixed angle, over a dark
   const markup = renderSvgMarkup(model, noSel, { manifest: null, hands: new Map([[star, [mark(0), mark(1)]]]) });
   const { cx, cy } = centerOf(markup, star);
   const hands = handsOf(markup);
-  const right = `x1="${cx + 16}" y1="${cy}" x2="${cx + 24}" y2="${cy}"`; // slot 0: 3 o'clock
-  const left = `x1="${cx - 16}" y1="${cy}" x2="${cx - 24}" y2="${cy}"`; // slot 1: 9 o'clock
+  const right = `x1="${cx}" y1="${cy}" x2="${cx + 40}" y2="${cy}"`; // slot 0: 3 o'clock
+  const left = `x1="${cx}" y1="${cy}" x2="${cx - 40}" y2="${cy}"`; // slot 1: 9 o'clock
   expect(hands).toContain(
     `<g class="search-hand" data-slot="0"><line class="hand-outline" ${right}/><line class="hand" ${right} stroke="${handStyle(0).color}"/></g>`,
   );
@@ -268,7 +282,7 @@ test("each matching search adds its own hand at its own fixed angle, over a dark
   expect(hands.match(/<circle class="hand-track"/g)!.length).toBe(1); // one track per star, not per hand
 });
 
-test("hand length grows with magnitude weight from a fixed root: 8 at weight 0, 30 at weight 1", () => {
+test("hand length grows with magnitude weight from the centre: 40 at weight 0, 80 at weight 1", () => {
   const star = "crossroads_eldritch:0";
   const at = (weight: number) => {
     const markup = renderSvgMarkup(model, noSel, { manifest: null, hands: new Map([[star, [mark(0, weight)]]]) });
@@ -276,9 +290,9 @@ test("hand length grows with magnitude weight from a fixed root: 8 at weight 0, 
     return { line: handLines(handsOf(markup))[0]!, cx, cy };
   };
   const max = at(1);
-  expect(max.line).toContain(`x1="${max.cx + 16}" y1="${max.cy}" x2="${max.cx + 46}" y2="${max.cy}"`);
+  expect(max.line).toContain(`x1="${max.cx}" y1="${max.cy}" x2="${max.cx + 80}" y2="${max.cy}"`);
   const half = at(0.5);
-  expect(half.line).toContain(`x2="${half.cx + 35}"`);
+  expect(half.line).toContain(`x2="${half.cx + 60}"`);
   // Width is constant (a CSS rule), so magnitude reads as length alone.
   expect(max.line).not.toContain("stroke-width");
 });
@@ -293,9 +307,9 @@ test("two searches sharing an angle stack end to end along the ray, lower slot a
   expect(lines.length).toBe(2);
   expect(handStyle(8).angle).toBe(handStyle(0).angle);
   expect(handStyle(8).color).not.toBe(handStyle(0).color);
-  expect(lines[0]).toContain(`x1="${cx + 16}" y1="${cy}" x2="${cx + 24}" y2="${cy}" stroke="${handStyle(0).color}"`);
-  // The next segment starts a 3-unit gap beyond the previous tip.
-  expect(lines[1]).toContain(`x1="${cx + 27}" y1="${cy}" x2="${cx + 35}" y2="${cy}" stroke="${handStyle(8).color}"`);
+  expect(lines[0]).toContain(`x1="${cx}" y1="${cy}" x2="${cx + 40}" y2="${cy}" stroke="${handStyle(0).color}"`);
+  // The next segment starts a 6-unit gap beyond the previous tip and runs the 28-unit minimum.
+  expect(lines[1]).toContain(`x1="${cx + 46}" y1="${cy}" x2="${cx + 74}" y2="${cy}" stroke="${handStyle(8).color}"`);
 });
 
 test("a stack's tip is clamped at the maximum single reach plus one minimum segment", () => {
@@ -306,9 +320,9 @@ test("a stack's tip is clamped at the maximum single reach plus one minimum segm
   });
   const { cx, cy } = centerOf(markup, star);
   const lines = handLines(handsOf(markup));
-  expect(lines[0]).toContain(`x2="${cx + 46}"`);
-  // 46 + gap 3 = 49 start; a full 30 would reach 79, clamped to 16 + 8 + 22 + 3 + 8 = 57.
-  expect(lines[1]).toContain(`x1="${cx + 49}" y1="${cy}" x2="${cx + 57}"`);
+  expect(lines[0]).toContain(`x2="${cx + 80}"`);
+  // 80 + gap 6 = 86 start; a full 68 would reach 154, clamped to 12 + 28 + 40 + 6 + 28 = 114.
+  expect(lines[1]).toContain(`x1="${cx + 86}" y1="${cy}" x2="${cx + 114}"`);
 });
 
 test("the query's hand roots a stack it shares with the eighth benefit slot, both pointing straight up", () => {
@@ -318,17 +332,18 @@ test("the query's hand roots a stack it shares with the eighth benefit slot, bot
   const markup = renderSvgMarkup(model, noSel, { manifest: null, hands: new Map([[star, [mark(7), query]]]) });
   const { cx, cy } = centerOf(markup, star);
   const lines = handLines(handsOf(markup));
-  expect(lines[0]).toContain(`x1="${cx}" y1="${cy - 16}" x2="${cx}" y2="${cy - 24}" stroke="${QUERY_HAND_COLOR}"`);
-  expect(lines[1]).toContain(`x1="${cx}" y1="${cy - 27}" x2="${cx}" y2="${cy - 35}" stroke="${handStyle(7).color}"`);
+  expect(lines[0]).toContain(`x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 40}" stroke="${QUERY_HAND_COLOR}"`);
+  expect(lines[1]).toContain(`x1="${cx}" y1="${cy - 46}" x2="${cx}" y2="${cy - 74}" stroke="${handStyle(7).color}"`);
 });
 
-test("a power star's hands root outside its diamond", () => {
+test("a power star's hands clear its larger diamond", () => {
   const power = [...model.stars.values()].find((s) => s.celestialPower)!;
   const markup = renderSvgMarkup(model, noSel, { manifest: null, hands: new Map([[power.id, [mark(0)]]]) });
   const { cx, cy } = centerOf(markup, power.id);
   const hands = handsOf(markup);
-  expect(hands).toContain(`<circle class="hand-track" cx="${cx}" cy="${cy}" r="25"/>`); // POWER_RADIUS 19 + 4 + 2
-  expect(handLines(hands)[0]).toContain(`x1="${cx + 23}" y1="${cy}" x2="${cx + 31}"`);
+  expect(hands).toContain(`<circle class="hand-track" cx="${cx}" cy="${cy}" r="25"/>`); // POWER_RADIUS 19 + 6
+  // The minimum 28 units show beyond the diamond's 19-unit reach, so a power hand tips at 47.
+  expect(handLines(hands)[0]).toContain(`x1="${cx}" y1="${cy}" x2="${cx + 47}"`);
 });
 
 test("an unattainable, non-matching constellation carries both mute class and unattainable opacity", () => {

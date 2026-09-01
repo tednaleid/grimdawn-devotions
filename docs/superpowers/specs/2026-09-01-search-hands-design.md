@@ -32,8 +32,10 @@ gracefully for the rest.
 ### Marker: hands, not rings
 
 Each search that matches a star draws one **hand**: a straight, round-capped line radiating
-from the star at that search's fixed angle. The star dot itself is untouched (it keeps its
-affinity gradient fill).
+from the star's centre at that search's fixed angle, over the dot. (The draft rooted hands just
+outside the dot and kept them about half the dot's width; the first local review found them a
+few pixels long at the default zoom, so they were enlarged to about the dot's diameter and rooted
+at the centre. The hub covers the dot's middle; its rim still shows the affinity color.)
 
 - **Identity = angle (primary) + color (secondary).** Both are pure functions of the search's
   slot number (see Slot styles). Dash patterns are removed entirely.
@@ -49,14 +51,12 @@ affinity gradient fill).
 Geometry in map user units (existing `STAR_RADIUS` is 12, `POWER_RADIUS` for power stars):
 
 ```
-HAND_ROOT   = STAR_RADIUS + 4          // hub gap so the hand "points" rather than "attaches"
-HAND_MIN    = 8                        // weight 0 still shows direction
-HAND_SPAN   = 22                       // added length at weight 1
-HAND_WIDTH  = 7                        // ~half the dot radius; must stay < ~9 so 45-degree
-                                       //   neighbours never fuse at the hub
-TRACK_R     = HAND_ROOT + 2
-STACK_GAP   = 3                        // between end-to-end segments (see Collisions)
-length(w)   = HAND_MIN + HAND_SPAN * w
+HAND_MIN    = 28                       // showing beyond the dot's edge at weight 0
+HAND_SPAN   = 40                       // added length at weight 1
+HAND_WIDTH  = 20                       // about the dot's diameter (CSS); outline 26
+TRACK_R     = STAR_RADIUS + 6
+STACK_GAP   = 6                        // between end-to-end segments (see Collisions)
+tip(w)      = STAR_RADIUS + HAND_MIN + HAND_SPAN * w   // measured from the centre
 ```
 
 Power stars (diamond) use `POWER_RADIUS` in place of `STAR_RADIUS` exactly as today.
@@ -145,7 +145,7 @@ the existing row outline in the slot color (the `--ring` box-shadow variable bec
 ### Hover pulse (small, high value)
 
 Hovering a selected Benefits row (or the query box) pulses every hand of that slot on the
-map: opacity, not size, ~600 ms, one cycle. This teaches "this row = that angle" faster than
+map: opacity, not size, about five seconds of one-second cycles. This teaches "this row = that angle" faster than
 any legend and turns the conjunction search ("which star has a *big* Frostburn hand") into a
 single-feature pop-out. Implement as a CSS class toggled on `.search-hand[data-slot=N]`
 elements; respect `prefers-reduced-motion`. Ships as its own commit after the hands. Hold to

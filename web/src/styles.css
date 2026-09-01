@@ -914,9 +914,9 @@ main {
   /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#match-glow);
 }
-/* Search hands: the clock-hand marker on a star matched by one or more searches. Geometry (root,
-   angles, lengths, per-search colors) is data-driven in the renderer; the tunable look lives here:
-   hand width (keep it under about 9, or hands 45 degrees apart fuse at the hub), the dark outline
+/* Search hands: the clock-hand marker on a star matched by one or more searches. Geometry
+   (angles, lengths, per-search colors) is data-driven in the renderer; the tunable look lives here:
+   hand width (about the dot's diameter, so a hand reads at the default zoom), the dark outline
    that keeps a hand crisp where it crosses a constellation edge, and the faint track circle. */
 .search-hands {
   pointer-events: none;
@@ -925,11 +925,11 @@ main {
   stroke-linecap: round;
 }
 .search-hand .hand {
-  stroke-width: 7;
+  stroke-width: 20;
 }
 .search-hand .hand-outline {
   stroke: rgba(13, 17, 23, 0.85);
-  stroke-width: 9;
+  stroke-width: 26;
 }
 .hand-track {
   fill: none;
@@ -937,8 +937,8 @@ main {
   stroke-opacity: 0.18;
   stroke-width: 1;
 }
-/* Hovering a legend row pulses its search's hands once (pulseHands on the map handle): an opacity
-   dip rather than a size change, so the hand geometry stays readable mid-pulse. */
+/* Hovering a legend row pulses its search's hands for about five seconds (pulseHands on the map
+   handle): an opacity dip rather than a size change, so the hand geometry stays readable mid-pulse. */
 @keyframes hand-pulse {
   0%,
   100% {
@@ -949,7 +949,7 @@ main {
   }
 }
 .search-hand.pulse {
-  animation: hand-pulse 600ms ease-in-out 1;
+  animation: hand-pulse 1s ease-in-out 5;
 }
 @media (prefers-reduced-motion: reduce) {
   .search-hand.pulse {

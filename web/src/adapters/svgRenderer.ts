@@ -57,20 +57,20 @@ const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 // The affinity match halo glows full strength on a reachable constellation and dimmer on an unreachable
 // one, so the brightness channel still reads under a filter (reachable matches are not just colored).
 const HALO_UNREACHABLE_OPACITY = 0.25;
-// Search hands radiate from a root just outside the star dot (and outside the larger power diamond).
-const HAND_ROOT = STAR_RADIUS + 4;
-const POWER_HAND_ROOT = POWER_RADIUS + 4;
-// A faint track circle just outside the root makes a lone hand read as a clock with one hand.
-const TRACK_OFFSET = 2;
-// Hand length from the root: HAND_MIN at magnitude weight 0 (the direction still shows), up to
-// HAND_MIN + HAND_SPAN at weight 1. Width is constant (a .search-hand CSS rule), so magnitude
-// reads as length from a fixed baseline, the channel readers estimate best.
-const HAND_MIN = 8;
-const HAND_SPAN = 22;
+// Search hands radiate from the star's centre, over the dot, so they read at the default zoom
+// where a hand rooted at the dot's edge was a few pixels long. The lengths below are what shows
+// beyond the dot's edge (STAR_RADIUS, or POWER_RADIUS for the larger diamond).
+// A faint track circle just outside the dot makes a lone hand read as a clock with one hand.
+const TRACK_OFFSET = 6;
+// A hand tips HAND_MIN units beyond the dot's edge at magnitude weight 0 (the direction still
+// shows), up to HAND_MIN + HAND_SPAN at weight 1. Width is constant (a .search-hand CSS rule), so
+// magnitude reads as length from a fixed baseline, the channel readers estimate best.
+const HAND_MIN = 28;
+const HAND_SPAN = 40;
 // Searches sharing an angle stack end to end along the ray with this gap between segments. The
-// stack's tip is clamped one minimum segment past a single full-length hand: the closest stars
-// on the map sit about that far apart, and magnitude past that point would not be read anyway.
-const STACK_GAP = 3;
+// stack's tip is clamped one minimum segment past a single full-length hand: a neighbouring star
+// can sit about that far away, and magnitude past that point would not be read anyway.
+const STACK_GAP = 6;
 const STACK_REACH = HAND_MIN + HAND_SPAN + STACK_GAP + HAND_MIN;
 
 /** One search's marker on one star: its hand style, that star's magnitude weight (0..1), and its style slot. */
@@ -85,7 +85,7 @@ export interface HandMark {
 // angle (slots eight apart, or the query with the eighth benefit slot) stack end to end in slot
 // order. Each hand rides on a dark outline line so it stays a crisp separate object where it
 // crosses a constellation edge; widths, the outline color, and the track look are .search-hand CSS.
-function handMarkup(cx: number, cy: number, root: number, marks: readonly HandMark[]): string {
+function handMarkup(cx: number, cy: number, dotR: number, marks: readonly HandMark[]): string {
   const byAngle = new Map<number, HandMark[]>();
   for (const m of marks) {
     const stack = byAngle.get(m.style.angle);
@@ -95,9 +95,10 @@ function handMarkup(cx: number, cy: number, root: number, marks: readonly HandMa
   const hands: string[] = [];
   for (const [angle, stack] of byAngle) {
     stack.sort((a, b) => a.slot - b.slot);
-    let from = root;
+    let from = 0; // the first segment roots at the centre...
+    let edge = dotR; // ...but its length counts from the dot's edge, where it becomes visible
     for (const m of stack) {
-      const to = Math.min(from + HAND_MIN + HAND_SPAN * m.weight, root + STACK_REACH);
+      const to = Math.min(edge + HAND_MIN + HAND_SPAN * m.weight, dotR + STACK_REACH);
       if (to <= from) break;
       const a = polarPoint(cx, cy, from, angle);
       const b = polarPoint(cx, cy, to, angle);
@@ -106,9 +107,10 @@ function handMarkup(cx: number, cy: number, root: number, marks: readonly HandMa
         `<g class="search-hand" data-slot="${m.slot}"><line class="hand-outline" ${coords}/><line class="hand" ${coords} stroke="${m.style.color}"/></g>`,
       );
       from = to + STACK_GAP;
+      edge = from;
     }
   }
-  const track = `<circle class="hand-track" cx="${cx}" cy="${cy}" r="${root + TRACK_OFFSET}"/>`;
+  const track = `<circle class="hand-track" cx="${cx}" cy="${cy}" r="${dotR + TRACK_OFFSET}"/>`;
   return `<g class="search-hands">${track}${hands.join("")}</g>`;
 }
 
@@ -458,14 +460,16 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     // star, whose dot keeps its attainability opacity. When the star's constellation is off the
     // affinity filter, the hands are wrapped in #mute-wide so the whole marker desaturates too - the
     // match then reads as "search match, off-filter" without the dot's opacity bleeding into the hands.
+    // The hands go UNDER the dot: they radiate from the centre and are about as wide as the dot, so
+    // painted on top they would bury the dot's selected/attainable state and affinity color.
     let marker = "";
     const marks = sd.benefitMatch ? hands?.get(star.id) : undefined;
     if (marks && marks.length > 0) {
-      const shape = handMarkup(cx, cy, star.celestialPower ? POWER_HAND_ROOT : HAND_ROOT, marks);
+      const shape = handMarkup(cx, cy, star.celestialPower ? POWER_RADIUS : STAR_RADIUS, marks);
       marker = muted ? `<g filter="url(#mute-wide)">${shape}</g>` : shape;
     }
     parts.push(
-      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${dot}${marker}`,
+      `<circle data-star-id="${star.id}" class="hit ${st}" cx="${cx}" cy="${cy}" r="${HIT_RADIUS}"/>${marker}${dot}`,
     );
   }
 
