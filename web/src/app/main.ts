@@ -43,7 +43,7 @@ import {
   encodeHash,
   normalizeQuery,
 } from "../core/urlState";
-import { parseTag } from "../core/benefitTag";
+import { parseTag, toggleTagGroup } from "../core/benefitTag";
 import { benefitMarkOrder, magnitudeWeights, reconcileMarkSlots, markMap, QUERY_MARK_KEY } from "../core/searchMarks";
 import { MARK_STYLE_COUNT, type MarkStyle, markStyle } from "../adapters/markPalette";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
@@ -554,8 +554,9 @@ async function boot() {
       if (!group) return;
       const ids = (group.getAttribute("data-ids") ?? "").split(",").filter(Boolean);
       if (ids.length === 0) return;
-      const allSel = ids.every((id) => selectedBenefits.has(id));
-      for (const id of ids) allSel ? selectedBenefits.delete(id) : selectedBenefits.add(id);
+      // An "available to get" chip has no per-value view, so any tagged id makes it read as on and
+      // a click clears the lot; a subject row shows its values, so it completes the group instead.
+      toggleTagGroup(selectedBenefits, ids, group.classList.contains("avail"));
     }
     refresh(); // re-render benefits, re-highlight the map, and persist tags to the URL
   }

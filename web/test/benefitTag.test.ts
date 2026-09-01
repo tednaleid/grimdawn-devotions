@@ -4,7 +4,7 @@ import { expect, test, describe } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel, type DevotionsDoc } from "../src/core/model";
 import { canonicalBenefitIds } from "../src/core/urlState";
-import { parseTag, formatTag, petTagId, affinityTagId } from "../src/core/benefitTag";
+import { parseTag, formatTag, petTagId, affinityTagId, toggleTagGroup } from "../src/core/benefitTag";
 
 describe("parseTag variants", () => {
   test("bare id is a player tag", () => {
@@ -47,4 +47,23 @@ test("round-trip: every canonical benefit id parses and reformats identically", 
     expect(tag).not.toBeNull();
     expect(formatTag(tag!)).toBe(id);
   }
+});
+
+describe("toggleTagGroup", () => {
+  test("a fully tagged group clears; an untagged group tags every id", () => {
+    const sel = new Set(["a", "b"]);
+    toggleTagGroup(sel, ["a", "b"], false);
+    expect([...sel]).toEqual([]);
+    toggleTagGroup(sel, ["a", "b"], false);
+    expect([...sel].sort()).toEqual(["a", "b"]);
+  });
+
+  test("a partly tagged group completes for a row (its values are visible there) but clears for a chip", () => {
+    const row = new Set(["a"]);
+    toggleTagGroup(row, ["a", "b"], false);
+    expect([...row].sort()).toEqual(["a", "b"]);
+    const chip = new Set(["a"]);
+    toggleTagGroup(chip, ["a", "b"], true);
+    expect([...chip]).toEqual([]);
+  });
 });

@@ -526,6 +526,12 @@ main {
 .bgroup.avail.gsel .bsubj {
   color: #cfe8ff;
 }
+/* Only some of the chip's ids are tagged: still on (a click clears them), but dashed. */
+.bgroup.avail.gsel.partial {
+  box-shadow: none;
+  outline: 2px dashed var(--mark, rgba(108, 182, 255, 0.6));
+  outline-offset: -1px;
+}
 .affinity > span:first-child {
   text-transform: capitalize;
 }

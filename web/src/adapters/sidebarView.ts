@@ -120,9 +120,13 @@ export function renderBenefits(
     const rawIds = (s: CondensedSubject) => catIds.get(s.key) ?? s.parts.map((p) => p.id);
     const keys = (s: CondensedSubject) => rawIds(s).map(keyOf);
     const gkey = (s: CondensedSubject) => keyOf(s.key);
+    // A chip counts as tagged when any of its ids is (there is no per-value view to show which),
+    // and as partial when not all are, so a stray single tag stays visible and clearable.
     const groupSel = (s: CondensedSubject) => {
       const k = keys(s);
-      return k.length > 0 && k.every((x) => selectedBenefits.has(x)) ? " gsel" : "";
+      const tagged = k.filter((x) => selectedBenefits.has(x)).length;
+      if (tagged === 0) return "";
+      return tagged === k.length ? " gsel" : " gsel partial";
     };
     return { keys, gkey, groupSel };
   }
@@ -176,10 +180,10 @@ export function renderBenefits(
           (s) => s.subject,
         )
           .map((s) => {
-            // A fully tagged chip is outlined and keyed like the active rows; a chip toggling
-            // several tags shows its first tag's style (the map's arcs carry the full story).
+            // A tagged chip (fully or partly) is outlined and keyed like the active rows; a chip
+            // covering several tags shows its first tagged id's style (the map's arcs carry the rest).
             const firstKey = scope.keys(s).find((k) => selectedBenefits.has(k) && markStyles.has(k));
-            const st = scope.groupSel(s) && firstKey ? markStyles.get(firstKey) : undefined;
+            const st = firstKey ? markStyles.get(firstKey) : undefined;
             const mark = st ? ` style="--mark:${st.color}"` : "";
             const swatch = st ? markSwatchSvg(st) : "";
             return `<div class="bgroup avail${scope.groupSel(s)}" data-gkey="${scope.gkey(s)}" data-ids="${scope.keys(s).join(",")}"${mark}><span class="bsubj" data-gtoggle>${swatch}${resolveText(loc, s.subject)}</span></div>`;

@@ -47,3 +47,17 @@ export function petTagId(statId: string): string {
 export function affinityTagId(dir: "grant" | "req", a: Affinity): string {
   return formatTag({ kind: "affinity", dir, affinity: a });
 }
+
+/**
+ * Flips a subject's tag ids together: when the group counts as on, every id is untagged, else
+ * every id is tagged. A group counts as on when every id is tagged; a chip with no per-value
+ * view (anyCountsAsOn) counts as on when any id is, so a partly tagged chip clears on a click
+ * instead of silently tagging the rest.
+ */
+export function toggleTagGroup(selected: Set<string>, ids: readonly string[], anyCountsAsOn: boolean): void {
+  const on = anyCountsAsOn ? ids.some((id) => selected.has(id)) : ids.every((id) => selected.has(id));
+  for (const id of ids) {
+    if (on) selected.delete(id);
+    else selected.add(id);
+  }
+}

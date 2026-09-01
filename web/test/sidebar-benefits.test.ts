@@ -199,3 +199,52 @@ test("a tagged 'available to get' chip is outlined in its first selected id's ma
   expect(html).toContain('<svg class="mark-swatch"');
   expect(html).toContain('<path d="M 11.96 11.96 A 5.6 5.6 0 0 1 4.04 11.96" fill="none" stroke="#ff9440"');
 });
+
+test("a partly tagged chip is outlined as partial, keyed by its first tagged id, so the tag can be cleared", () => {
+  const twoPart: CondensedGroup[] = [
+    {
+      group: "Offense",
+      subjects: [
+        {
+          subject: litT("Cold"),
+          key: "Offense:Cold",
+          parts: [
+            { dim: "flat", value: litT("+10"), id: "offensiveColdMin" },
+            { dim: "pct", value: litT("+10%"), id: "offensiveColdModifier" },
+          ],
+        },
+      ],
+    },
+  ];
+  const styles = new Map([
+    ["offensiveColdMin", { angle: 180, color: "#3f93d8" }],
+    ["offensiveColdModifier", { angle: 0, color: "#e6c34d" }],
+  ]);
+  const render = (tagged: string[]) => {
+    const el = { innerHTML: "" } as unknown as HTMLElement;
+    return renderBenefits(
+      enLoc,
+      el,
+      emptyModel,
+      new Set(),
+      undefined,
+      new Set(tagged),
+      twoPart,
+      new Set(["offensiveColdMin"]),
+      undefined,
+      [],
+      undefined,
+      null,
+      styles,
+    ).availHtml;
+  };
+  // Only the percent id is tagged: the chip still reads as tagged, marked partial, in that id's style.
+  const partial = render(["offensiveColdModifier"]);
+  expect(partial).toMatch(/class="bgroup avail gsel partial"[^>]*style="--mark:#e6c34d"/);
+  expect(partial).toContain('<svg class="mark-swatch"');
+  // Every id tagged: plain gsel, keyed by the first id.
+  const full = render(["offensiveColdMin", "offensiveColdModifier"]);
+  expect(full).toMatch(/class="bgroup avail gsel"[^>]*style="--mark:#3f93d8"/);
+  expect(full).not.toContain("partial");
+  expect(render([])).toMatch(/class="bgroup avail"[^>]*data-ids="offensiveColdMin,offensiveColdModifier"/);
+});
