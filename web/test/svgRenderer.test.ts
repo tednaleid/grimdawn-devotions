@@ -251,13 +251,13 @@ test("a single-search match draws a track and a half ring centred on that search
   const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(1)]]]) });
   const { cx, cy } = centerOf(markup, star);
   const arcs = arcsOf(markup);
-  expect(arcs).toContain(`<circle class="arc-track" cx="${cx}" cy="${cy}" r="23"/>`); // STAR_RADIUS 12 + 11
+  expect(arcs).toContain(`<circle class="arc-track" cx="${cx}" cy="${cy}" r="27"/>`); // STAR_RADIUS 12 + 15: the base stroke's centre line, inner edge 19
   // Slot 1 is south (180 degrees): alone, its half ring runs the whole bottom, 90 to 270.
   expect(arcSpans(arcs)).toEqual([{ slot: 1, from: 90, to: 270 }]);
   const arc = arcOf(arcs, 1);
-  // A dark outline path under the colored arc, both on the base ring radius at base width.
+  // A light outline path under the colored arc, both on the base ring radius at base width.
   expect(arc).toMatch(
-    /<path class="arc-outline" d="M [^"]*A 23 23 0 0 1 [^"]*" stroke-width="12"\/><path class="arc" d="M [^"]*A 23 23 0 0 1 [^"]*" stroke="#3f93d8" stroke-width="8"\/>/,
+    /<path class="arc-outline" d="M [^"]*A 27 27 0 0 1 [^"]*" stroke-width="22"\/><path class="arc" d="M [^"]*A 27 27 0 0 1 [^"]*" stroke="#3f93d8" stroke-width="16"\/>/,
   );
   expect(markStyle(1).color).toBe("#3f93d8");
 });
@@ -313,16 +313,16 @@ test("three searches partition every overlap at its own bisector", () => {
   ]);
 });
 
-test("arc width grows outward with magnitude weight: base 8 at 0, quadruple at 1, inner edge fixed", () => {
+test("arc width grows outward with magnitude weight: base 16 at 0, triple at 1, inner edge fixed", () => {
   const star = "crossroads_eldritch:0";
   const at = (weight: number) => {
     const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(1, weight)]]]) });
     return arcOf(arcsOf(markup), 1);
   };
   // Inner edge 19 (base radius 23 less half the base width); r = 19 + w/2.
-  expect(at(1)).toMatch(/<path class="arc" d="M [^"]*A 35 35 [^"]*" stroke="#3f93d8" stroke-width="32"\/>/);
-  expect(at(1)).toMatch(/<path class="arc-outline" d="M [^"]*A 35 35 [^"]*" stroke-width="36"\/>/);
-  expect(at(0.5)).toMatch(/<path class="arc" d="M [^"]*A 29 29 [^"]*" stroke="#3f93d8" stroke-width="20"\/>/);
+  expect(at(1)).toMatch(/<path class="arc" d="M [^"]*A 43 43 [^"]*" stroke="#3f93d8" stroke-width="48"\/>/);
+  expect(at(1)).toMatch(/<path class="arc-outline" d="M [^"]*A 43 43 [^"]*" stroke-width="54"\/>/);
+  expect(at(0.5)).toMatch(/<path class="arc" d="M [^"]*A 35 35 [^"]*" stroke="#3f93d8" stroke-width="32"\/>/);
 });
 
 test("searches sharing an angle stack outward, lower slot inside, each at its own width", () => {
@@ -336,9 +336,9 @@ test("searches sharing an angle stack outward, lower slot inside, each at its ow
     { slot: 0, from: -90, to: 90 },
     { slot: 8, from: -90, to: 90 },
   ]);
-  expect(arcOf(arcs, 0)).toMatch(/<path class="arc" d="M [^"]*A 23 23 [^"]*" stroke="#e6c34d" stroke-width="8"\/>/);
-  // The outer arc starts a 2-unit gap beyond the inner one's outer edge (27): r = 29 + 8/2.
-  expect(arcOf(arcs, 8)).toMatch(/<path class="arc" d="M [^"]*A 33 33 [^"]*" stroke="#36b56a" stroke-width="8"\/>/);
+  expect(arcOf(arcs, 0)).toMatch(/<path class="arc" d="M [^"]*A 27 27 [^"]*" stroke="#e6c34d" stroke-width="16"\/>/);
+  // The outer arc starts a 2-unit gap beyond the inner one's outer edge (35): r = 37 + 16/2.
+  expect(arcOf(arcs, 8)).toMatch(/<path class="arc" d="M [^"]*A 45 45 [^"]*" stroke="#36b56a" stroke-width="16"\/>/);
 });
 
 test("a power star's ring sits outside its larger diamond", () => {
@@ -346,8 +346,8 @@ test("a power star's ring sits outside its larger diamond", () => {
   const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[power.id, [mark(1)]]]) });
   const { cx, cy } = centerOf(markup, power.id);
   const arcs = arcsOf(markup);
-  expect(arcs).toContain(`<circle class="arc-track" cx="${cx}" cy="${cy}" r="29"/>`); // POWER_RADIUS 19 + 10
-  expect(arcOf(arcs, 1)).toMatch(/<path class="arc" d="M [^"]*A 29 29 [^"]*"/);
+  expect(arcs).toContain(`<circle class="arc-track" cx="${cx}" cy="${cy}" r="33"/>`); // POWER_RADIUS 19 + 14
+  expect(arcOf(arcs, 1)).toMatch(/<path class="arc" d="M [^"]*A 33 33 [^"]*"/);
 });
 
 test("an unattainable, non-matching constellation carries both mute class and unattainable opacity", () => {

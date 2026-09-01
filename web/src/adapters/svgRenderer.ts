@@ -58,15 +58,16 @@ const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 // one, so the brightness channel still reads under a filter (reachable matches are not just colored).
 const HALO_UNREACHABLE_OPACITY = 0.25;
 // Search arcs ride a ring just outside the star dot (and outside the larger power diamond): the
-// base radius is the centre line of a base-width stroke, so the ring's inner edge stays fixed.
-const ARC_RADIUS = STAR_RADIUS + 11;
-const POWER_ARC_RADIUS = POWER_RADIUS + 10;
-// Base arc stroke width; an arc thickens up to quadruple with its star's magnitude weight for the
+// base radius is the centre line of a base-width stroke, so the ring's inner edge (7 units
+// beyond the dot) stays fixed.
+const ARC_RADIUS = STAR_RADIUS + 15;
+const POWER_ARC_RADIUS = POWER_RADIUS + 14;
+// Base arc stroke width; an arc thickens up to triple with its star's magnitude weight for the
 // search, growing OUTWARD from the fixed inner edge (r = inner + w/2) so the dot stays clear.
-const ARC_WIDTH = 8;
-const ARC_WEIGHT_SPAN = 3;
-// The dark outline under each arc extends this far beyond it on each side.
-const ARC_OUTLINE = 2;
+const ARC_WIDTH = 16;
+const ARC_WEIGHT_SPAN = 2;
+// The light outline under each arc extends this far beyond it on each side.
+const ARC_OUTLINE = 3;
 // Degrees of seam between two arcs that meet, split evenly across the seam.
 const ARC_SEAM_DEG = 6;
 // Searches sharing an angle stack outward, this far apart.
@@ -96,7 +97,7 @@ function arcExtents(angles: readonly number[]): Map<number, { from: number; to: 
 
 // The arcs marker for one star: a faint track ring plus, per matching search, a stroked arc over
 // its angular extent (arcExtents), thickened outward by the star's magnitude weight. Marks sharing
-// an angle (slots eight apart) stack outward in slot order. Each arc rides on a dark outline path
+// an angle (slots eight apart) stack outward in slot order. Each arc rides on a light outline path
 // so it stays crisp against constellation art and edges; the outline color and the track look are
 // .search-arc CSS, the widths are per-arc attributes here.
 function arcMarkup(cx: number, cy: number, baseR: number, marks: readonly StarMark[]): string {
