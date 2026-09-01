@@ -1,12 +1,15 @@
 // ABOUTME: DOM adapter for the map search box and its match count.
 // ABOUTME: Mounted once into a stable container, because the affinity panel rewrites its own innerHTML.
 import type { SearchMatch } from "../core/search";
-import { handSwatchSvg, QUERY_HAND_COLOR, QUERY_HAND_STYLE } from "./handPalette";
+import { markSwatchSvg, type MarkStyle } from "./markPalette";
 import type { Localization } from "../ports/Localization";
 
 export interface SearchPanelHandle {
-  /** null clears the line (empty query); a match renders counts or the empty state. */
-  setCount(m: SearchMatch | null): void;
+  /**
+   * null clears the line (empty query); a match renders counts or the empty state. `style` is the
+   * query's mark style (it holds a palette slot like any tag) and comes with every match.
+   */
+  setCount(m: SearchMatch | null, style?: MarkStyle): void;
   relocalize(loc: Localization): void;
   setValue(q: string): void;
 }
@@ -18,6 +21,7 @@ export function mountSearchPanel(
 ): SearchPanelHandle {
   let localization = loc;
   let last: SearchMatch | null = null;
+  let lastStyle: MarkStyle | null = null;
 
   el.innerHTML =
     `<hr class="panel-sep"/><h2 id="search-h"></h2>` +
@@ -42,11 +46,12 @@ export function mountSearchPanel(
   }
 
   function paintCount() {
-    // An active query (even one with no matches) wears the query's hand style - the same color
-    // its star hands and constellation halo use on the map - plus its swatch as the key.
-    input.setAttribute("class", last ? "qactive" : "");
-    input.setAttribute("style", last ? `--hand:${QUERY_HAND_COLOR}` : "");
-    swatchEl.innerHTML = last ? handSwatchSvg(QUERY_HAND_STYLE) : "";
+    // An active query (even one with no matches) wears the query's mark style - the same color
+    // its star arcs and constellation halo use on the map - plus its swatch as the key.
+    const style = last ? lastStyle : null;
+    input.setAttribute("class", style ? "qactive" : "");
+    input.setAttribute("style", style ? `--mark:${style.color}` : "");
+    swatchEl.innerHTML = style ? markSwatchSvg(style) : "";
     if (!last) {
       count.textContent = "";
       return;
@@ -62,7 +67,7 @@ export function mountSearchPanel(
   input.value = opts.initial;
   applyChrome();
   input.addEventListener("input", () => opts.onInput(input.value));
-  // The pointer entering the box lets the app pulse the query's hands on the map: the search box
+  // The pointer entering the box lets the app pulse the query's arcs on the map: the search box
   // is the query's legend row.
   input.addEventListener("mouseenter", () => opts.onHover?.());
   input.addEventListener("keydown", (e) => {
@@ -84,8 +89,9 @@ export function mountSearchPanel(
   });
 
   return {
-    setCount(m) {
+    setCount(m, style) {
       last = m;
+      lastStyle = style ?? null;
       paintCount();
     },
     relocalize(next) {

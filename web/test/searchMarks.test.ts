@@ -1,7 +1,13 @@
 // ABOUTME: Tests the pure search-mark assignment: which selected benefit tags mark stars, in what
 // ABOUTME: order, session-stable style slots, and how per-search star sets fold into per-star marks.
 import { test, expect } from "bun:test";
-import { benefitMarkOrder, magnitudeWeights, reconcileMarkSlots, markMap } from "../src/core/searchMarks";
+import {
+  benefitMarkOrder,
+  magnitudeWeights,
+  reconcileMarkSlots,
+  markMap,
+  QUERY_MARK_KEY,
+} from "../src/core/searchMarks";
 import { affinityTagId, petTagId } from "../src/core/benefitTag";
 
 const canonical = ["statA", "statB", petTagId("statC"), affinityTagId("grant", "chaos"), "statD"];
@@ -130,4 +136,11 @@ test("magnitude is absolute value, so a larger reduction outweighs a smaller one
   );
   expect(w.get("s1")).toBe(0);
   expect(w.get("s2")).toBe(1);
+});
+
+test("the query joins slot reconciliation under its own key, like any tag, and is never a benefit tag", () => {
+  const next = reconcileMarkSlots(new Map([["statA", 0]]), ["statA", QUERY_MARK_KEY], 8);
+  expect(next.get(QUERY_MARK_KEY)).toBe(1);
+  // Callers append the key while a query is active; the canonical benefit order never lists it.
+  expect(benefitMarkOrder(new Set([QUERY_MARK_KEY, "statA"]), canonical)).toEqual(["statA"]);
 });

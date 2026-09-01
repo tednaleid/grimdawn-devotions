@@ -5,7 +5,7 @@ import type { ReachView } from "../core/reachability";
 import { affinityColor, glowColor, presentAffinities } from "./affinityColors";
 import { constellationDisplay, starDisplay, edgeDisplay } from "../core/displayState";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
-import { type HandStyle, polarPoint, QUERY_HAND_COLOR } from "./handPalette";
+import { arcPath, MARK_COLORS, type MarkStyle } from "./markPalette";
 import type { AssetManifest } from "../ports/DataSource";
 
 // A constellation's identity colors = the affinities it GRANTS when fully filled (1-3).
@@ -57,70 +57,84 @@ const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 // The affinity match halo glows full strength on a reachable constellation and dimmer on an unreachable
 // one, so the brightness channel still reads under a filter (reachable matches are not just colored).
 const HALO_UNREACHABLE_OPACITY = 0.25;
-// Search hands radiate from the star's centre, over the dot, so they read at the default zoom
-// where a hand rooted at the dot's edge was a few pixels long. The lengths below are what shows
-// beyond the dot's edge (STAR_RADIUS, or POWER_RADIUS for the larger diamond).
-// A faint track circle just outside the dot makes a lone hand read as a clock with one hand.
-const TRACK_OFFSET = 6;
-// A hand tips HAND_MIN units beyond the dot's edge at magnitude weight 0 (the direction still
-// shows), up to HAND_MIN + HAND_SPAN at weight 1. Width is constant (a .search-hand CSS rule), so
-// magnitude reads as length from a fixed baseline, the channel readers estimate best.
-const HAND_MIN = 28;
-const HAND_SPAN = 40;
-// Searches sharing an angle stack end to end along the ray with this gap between segments. The
-// stack's tip is clamped one minimum segment past a single full-length hand: a neighbouring star
-// can sit about that far away, and magnitude past that point would not be read anyway.
-const STACK_GAP = 6;
-const STACK_REACH = HAND_MIN + HAND_SPAN + STACK_GAP + HAND_MIN;
+// Search arcs ride a ring just outside the star dot (and outside the larger power diamond): the
+// base radius is the centre line of a base-width stroke, so the ring's inner edge stays fixed.
+const ARC_RADIUS = STAR_RADIUS + 11;
+const POWER_ARC_RADIUS = POWER_RADIUS + 10;
+// Base arc stroke width; an arc thickens up to quadruple with its star's magnitude weight for the
+// search, growing OUTWARD from the fixed inner edge (r = inner + w/2) so the dot stays clear.
+const ARC_WIDTH = 8;
+const ARC_WEIGHT_SPAN = 3;
+// The dark outline under each arc extends this far beyond it on each side.
+const ARC_OUTLINE = 2;
+// Degrees of seam between two arcs that meet, split evenly across the seam.
+const ARC_SEAM_DEG = 6;
+// Searches sharing an angle stack outward, this far apart.
+const ARC_STACK_GAP = 2;
 
-/** One search's marker on one star: its hand style, that star's magnitude weight (0..1), and its style slot. */
-export interface HandMark {
-  style: HandStyle;
+/** One search's marker on one star: its mark style, that star's magnitude weight (0..1), and its style slot. */
+export interface StarMark {
+  style: MarkStyle;
   weight: number;
   slot: number;
 }
 
-// The hands marker for one star: a track circle plus one round-capped line per matching search at
-// that search's fixed angle, its length scaled by the star's magnitude weight. Marks sharing an
-// angle (slots eight apart, or the query with the eighth benefit slot) stack end to end in slot
-// order. Each hand rides on a dark outline line so it stays a crisp separate object where it
-// crosses a constellation edge; widths, the outline color, and the track look are .search-hand CSS.
-function handMarkup(cx: number, cy: number, dotR: number, marks: readonly HandMark[]): string {
-  const byAngle = new Map<number, HandMark[]>();
+// Each angle's arc extent on one star (degrees clockwise from up, unnormalised): the half circle
+// centred on the angle, cut back to the bisector against each neighbouring angle whose half
+// circle overlaps it, less the seam. Alone, an angle keeps its whole half. Angles come back sorted.
+function arcExtents(angles: readonly number[]): Map<number, { from: number; to: number }> {
+  const sorted = [...new Set(angles)].sort((a, b) => a - b);
+  const side = (gap: number) => (gap > 180 ? 90 : gap / 2 - ARC_SEAM_DEG / 2);
+  const out = new Map<number, { from: number; to: number }>();
+  sorted.forEach((angle, i) => {
+    const cw = sorted.length === 1 ? 360 : (sorted[(i + 1) % sorted.length]! - angle + 360) % 360;
+    const ccw = sorted.length === 1 ? 360 : (angle - sorted[(i - 1 + sorted.length) % sorted.length]! + 360) % 360;
+    out.set(angle, { from: angle - side(ccw), to: angle + side(cw) });
+  });
+  return out;
+}
+
+// The arcs marker for one star: a faint track ring plus, per matching search, a stroked arc over
+// its angular extent (arcExtents), thickened outward by the star's magnitude weight. Marks sharing
+// an angle (slots eight apart) stack outward in slot order. Each arc rides on a dark outline path
+// so it stays crisp against constellation art and edges; the outline color and the track look are
+// .search-arc CSS, the widths are per-arc attributes here.
+function arcMarkup(cx: number, cy: number, baseR: number, marks: readonly StarMark[]): string {
+  const inner = baseR - ARC_WIDTH / 2;
+  const byAngle = new Map<number, StarMark[]>();
   for (const m of marks) {
     const stack = byAngle.get(m.style.angle);
     if (stack) stack.push(m);
     else byAngle.set(m.style.angle, [m]);
   }
-  const hands: string[] = [];
-  for (const [angle, stack] of byAngle) {
-    stack.sort((a, b) => a.slot - b.slot);
-    let from = 0; // the first segment roots at the centre...
-    let edge = dotR; // ...but its length counts from the dot's edge, where it becomes visible
-    for (const m of stack) {
-      const to = Math.min(edge + HAND_MIN + HAND_SPAN * m.weight, dotR + STACK_REACH);
-      if (to <= from) break;
-      const a = polarPoint(cx, cy, from, angle);
-      const b = polarPoint(cx, cy, to, angle);
-      const coords = `x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"`;
-      hands.push(
-        `<g class="search-hand" data-slot="${m.slot}"><line class="hand-outline" ${coords}/><line class="hand" ${coords} stroke="${m.style.color}"/></g>`,
+  const arcs: string[] = [];
+  for (const [angle, { from, to }] of arcExtents([...byAngle.keys()])) {
+    let edge = inner;
+    for (const m of byAngle.get(angle)!.sort((a, b) => a.slot - b.slot)) {
+      const w = Math.round(ARC_WIDTH * (1 + ARC_WEIGHT_SPAN * m.weight) * 10) / 10;
+      const d = arcPath(cx, cy, edge + w / 2, from, to);
+      arcs.push(
+        `<g class="search-arc" data-slot="${m.slot}" data-from="${from}" data-to="${to}">` +
+          `<path class="arc-outline" d="${d}" stroke-width="${w + 2 * ARC_OUTLINE}"/>` +
+          `<path class="arc" d="${d}" stroke="${m.style.color}" stroke-width="${w}"/></g>`,
       );
-      from = to + STACK_GAP;
-      edge = from;
+      edge += w + ARC_STACK_GAP;
     }
   }
-  const track = `<circle class="hand-track" cx="${cx}" cy="${cy}" r="${dotR + TRACK_OFFSET}"/>`;
-  return `<g class="search-hands">${track}${hands.join("")}</g>`;
+  const track = `<circle class="arc-track" cx="${cx}" cy="${cy}" r="${baseR}"/>`;
+  return `<g class="search-arcs">${track}${arcs.join("")}</g>`;
 }
 
 export interface RenderOpts {
   manifest: AssetManifest | null;
-  // Per-star search hands: each matched star maps to the hand marks (fixed angle + color style,
-  // the star's magnitude weight, and the style slot) of the searches that hit it. Every search
-  // draws its own hand at its own angle, so the marker says which searches matched and how big
-  // each grant is; see handMarkup.
-  hands?: ReadonlyMap<StarId, readonly HandMark[]>;
+  // Per-star search marks: each matched star maps to the marks (fixed angle + color style, the
+  // star's magnitude weight, and the style slot) of the searches that hit it. Every search draws
+  // its own arc centred on its own angle, so the marker says which searches matched and how big
+  // each grant is; see arcMarkup.
+  marks?: ReadonlyMap<StarId, readonly StarMark[]>;
+  // The text query's mark color for this render (the query holds a style slot like any tag), so
+  // its constellation halo matches its star arcs. Defaults to the first palette color.
+  queryColor?: string;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   // When present, an affinity filter is active. A constellation matches when it provides any of these
@@ -128,8 +142,8 @@ export interface RenderOpts {
   // the rest desaturate (the mute color outcome) - the filter never changes brightness.
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
   // When present, a text search is active; these constellations matched on name or description
-  // and glow via the search-glow halo in the query's hand color. Star-level query matches arrive
-  // as `hands` entries instead (a constellation hit glows the art, not its stars).
+  // and glow via the search-glow halo in the query's mark color. Star-level query matches arrive
+  // as `marks` entries instead (a constellation hit glows the art, not its stars).
   conHighlight?: Set<string>;
 }
 
@@ -205,12 +219,13 @@ export function constellationAt(regions: ConRegion[], wx: number, wy: number): s
 export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
   const reach = opts.reach;
   const diff = opts.diff ?? null;
-  const hands = opts.hands;
+  const marks = opts.marks;
+  const queryColor = opts.queryColor ?? MARK_COLORS[0];
   const settings = {
     selected: state.selected,
     reach,
     affinityFilter: opts.affinityFilter,
-    benefitMatch: hands ? new Set(hands.keys()) : undefined,
+    benefitMatch: marks ? new Set(marks.keys()) : undefined,
     conMatch: opts.conHighlight,
     diff,
   };
@@ -280,8 +295,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     );
   }
 
-  // Search-match halo filter def: flooded with the query's hand color so a query match reads
-  // identically whether it lands on a star (a hand) or a whole constellation (this halo), and never
+  // Search-match halo filter def: flooded with the query's mark color so a query match reads
+  // identically whether it lands on a star (an arc) or a whole constellation (this halo), and never
   // as an affinity colour.
   // Only emitted when a search is active (mirrors #aff-glow/#mute being gated on affFilter above).
   //
@@ -297,9 +312,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     defs.push(
       `<filter id="search-glow" x="-150%" y="-150%" width="400%" height="400%" color-interpolation-filters="sRGB">` +
         `<feGaussianBlur in="SourceAlpha" stdDeviation="16" result="b1"/>` +
-        `<feFlood flood-color="${QUERY_HAND_COLOR}" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
+        `<feFlood flood-color="${queryColor}" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
         `<feGaussianBlur in="SourceAlpha" stdDeviation="38" result="b2"/>` +
-        `<feFlood flood-color="${QUERY_HAND_COLOR}" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
+        `<feFlood flood-color="${queryColor}" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
         `<feMerge>` +
         `<feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g2"/>` +
         `<feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="g1"/>` +
@@ -380,7 +395,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const glow =
         `<g filter="url(#search-glow)">` +
         `<rect class="search-glow" opacity="${op}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" ` +
-        `fill="${QUERY_HAND_COLOR}" mask="url(#mask-${c.id})"/>` +
+        `fill="${queryColor}" mask="url(#mask-${c.id})"/>` +
         `</g>`;
       // Off-filter constellations desaturate like an off-filter star's benefit glow does, so the
       // halo reads as "matched, off-filter" instead of vanishing.
@@ -456,16 +471,15 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const dot = star.celestialPower
       ? `<polygon class="${cls}" opacity="${op}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
       : `<circle class="${cls}" opacity="${op}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
-    // Search-hand emphasis is a SEPARATE full-opacity layer so it reads even on an unattainable (dim)
+    // Search-arc emphasis is a SEPARATE full-opacity layer so it reads even on an unattainable (dim)
     // star, whose dot keeps its attainability opacity. When the star's constellation is off the
-    // affinity filter, the hands are wrapped in #mute-wide so the whole marker desaturates too - the
-    // match then reads as "search match, off-filter" without the dot's opacity bleeding into the hands.
-    // The hands go UNDER the dot: they radiate from the centre and are about as wide as the dot, so
-    // painted on top they would bury the dot's selected/attainable state and affinity color.
+    // affinity filter, the arcs are wrapped in #mute-wide so the whole marker desaturates too - the
+    // match then reads as "search match, off-filter" without the dot's opacity bleeding into the arcs.
+    // The arcs go UNDER the dots: a wide arc can reach a close neighbour, whose dot then stays on top.
     let marker = "";
-    const marks = sd.benefitMatch ? hands?.get(star.id) : undefined;
-    if (marks && marks.length > 0) {
-      const shape = handMarkup(cx, cy, star.celestialPower ? POWER_RADIUS : STAR_RADIUS, marks);
+    const starMarks = sd.benefitMatch ? marks?.get(star.id) : undefined;
+    if (starMarks && starMarks.length > 0) {
+      const shape = arcMarkup(cx, cy, star.celestialPower ? POWER_ARC_RADIUS : ARC_RADIUS, starMarks);
       marker = muted ? `<g filter="url(#mute-wide)">${shape}</g>` : shape;
     }
     parts.push(
@@ -480,7 +494,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 
 /** Per-render inputs for a mounted map, mirroring RenderOpts minus the boot-time manifest. */
 export interface UpdateOpts {
-  hands?: ReadonlyMap<StarId, readonly HandMark[]>;
+  marks?: ReadonlyMap<StarId, readonly StarMark[]>;
+  queryColor?: string;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
@@ -497,9 +512,9 @@ export interface SvgHandle {
   // Emphasize (or clear, with null) a single star with the benefit-match treatment (enlarged + halo),
   // on top of every layer. Used for side-panel power-row hover so the power's own star pops on the map.
   highlightStar(id: string | null): void;
-  // Pulse every hand of the given style slots once (the .pulse CSS animation), so hovering a
-  // legend row shows which hands on the map are that search's. An empty list only clears.
-  pulseHands(slots: readonly number[]): void;
+  // Pulse every arc of the given style slots (the .pulse CSS animation), so hovering a legend row
+  // shows which arcs on the map are that search's. An empty list only clears.
+  pulseMarks(slots: readonly number[]): void;
 }
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
@@ -611,16 +626,16 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     live.appendChild(shape);
   }
 
-  // Pulse the hands of the given slots once: the .pulse class runs one CSS animation cycle and is
-  // removed when it ends, so a later hover can pulse again. Any pulse still running is cut first.
-  function pulseHands(slots: readonly number[]) {
+  // Pulse the arcs of the given slots: the .pulse class runs the CSS animation and is removed when
+  // it ends, so a later hover can pulse again. Any pulse still running is cut first.
+  function pulseMarks(slots: readonly number[]) {
     const live = container.querySelector("svg") as SVGSVGElement | null;
     if (!live) return;
-    live.querySelectorAll(".search-hand.pulse").forEach((el) => {
+    live.querySelectorAll(".search-arc.pulse").forEach((el) => {
       el.classList.remove("pulse");
     });
     if (slots.length === 0) return;
-    live.querySelectorAll(slots.map((s) => `.search-hand[data-slot="${s}"]`).join(",")).forEach((el) => {
+    live.querySelectorAll(slots.map((s) => `.search-arc[data-slot="${s}"]`).join(",")).forEach((el) => {
       el.classList.add("pulse");
       el.addEventListener("animationend", () => el.classList.remove("pulse"), { once: true });
     });
@@ -637,6 +652,6 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     },
     highlightCon,
     highlightStar,
-    pulseHands,
+    pulseMarks,
   };
 }

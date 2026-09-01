@@ -12,7 +12,7 @@ import type {
 import { formatBonusRowsWithIds, formatPet, formatPowerStats, type PowerRows } from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
-import { handSwatchSvg, type HandStyle } from "./handPalette";
+import { markSwatchSvg, type MarkStyle } from "./markPalette";
 import { affinityTagId, petTagId } from "../core/benefitTag";
 import { resolveText, sortByResolved, type Text } from "../core/localization";
 import { matchRanges } from "../core/search";
@@ -51,13 +51,13 @@ function requiresLine(
 }
 
 // One tooltip stat line. A taggable row (one with a vid) selected in the benefit filter reads
-// like the sidebar: vsel plus its search's hand color and mini-star swatch.
+// like the sidebar: vsel plus its search's mark color and mini-star swatch.
 function tipRow(vid: string | undefined, selectedBenefits: Set<string>, value: string, label: string): string {
-  const st = vid !== undefined && selectedBenefits.has(vid) ? tagHandStyles.get(vid) : undefined;
+  const st = vid !== undefined && selectedBenefits.has(vid) ? tagMarkStyles.get(vid) : undefined;
   const sel = vid !== undefined && selectedBenefits.has(vid) ? " vsel" : "";
-  const hand = st ? ` style="--hand:${st.color}"` : "";
-  const swatch = st ? handSwatchSvg(st) : "";
-  return `<div class="tip-bonus${sel}"${vid !== undefined ? ` data-vid="${vid}"` : ""}${hand}>${swatch}<span class="val">${value}</span> ${label}</div>`;
+  const mark = st ? ` style="--mark:${st.color}"` : "";
+  const swatch = st ? markSwatchSvg(st) : "";
+  return `<div class="tip-bonus${sel}"${vid !== undefined ? ` data-vid="${vid}"` : ""}${mark}>${swatch}<span class="val">${value}</span> ${label}</div>`;
 }
 
 // Bonus rows tagged with their filter id (`keyOf` maps a raw stat id to its tag key: identity for
@@ -181,10 +181,10 @@ export const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ESCAPES[c]!
 // mean another argument on two functions that already take nine.
 let highlightQuery = "";
 
-// The active searches' hand styles by tag key, so a tagged bonus row reads like the sidebar:
+// The active searches' mark styles by tag key, so a tagged bonus row reads like the sidebar:
 // outlined in its search's color, keyed by its mini-star swatch. Module scope for the same
-// reason as highlightQuery; the handle's setHandStyles is the only writer.
-let tagHandStyles: ReadonlyMap<string, HandStyle> = new Map();
+// reason as highlightQuery; the handle's setMarkStyles is the only writer.
+let tagMarkStyles: ReadonlyMap<string, MarkStyle> = new Map();
 
 /**
  * Escape `text` for innerHTML and wrap the runs matching the current query. Every piece of game
@@ -297,9 +297,9 @@ export function tooltipView(el: HTMLElement) {
       el.style.pointerEvents = commit ? "auto" : "";
       place(clientX, clientY);
     },
-    /** The active searches' hand styles by tag key, for outlining and keying tagged rows. */
-    setHandStyles(styles: ReadonlyMap<string, HandStyle>) {
-      tagHandStyles = styles;
+    /** The active searches' mark styles by tag key, for outlining and keying tagged rows. */
+    setMarkStyles(styles: ReadonlyMap<string, MarkStyle>) {
+      tagMarkStyles = styles;
     },
     /** The query whose matches the next render should mark up. "" turns highlighting off. */
     setHighlight(query: string) {

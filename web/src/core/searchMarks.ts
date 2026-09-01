@@ -4,6 +4,13 @@ import type { StarId } from "./types";
 import { parseTag } from "./benefitTag";
 
 /**
+ * The text query's key in slot reconciliation. The query is one more search: while it is active,
+ * callers append this key after the canonical benefit tags, so it claims and keeps a slot exactly
+ * as a tag does. It is never a benefit tag id, so benefitMarkOrder never lists it.
+ */
+export const QUERY_MARK_KEY = "query";
+
+/**
  * The selected benefit tags that mark stars (player and pet tags; affinity tags filter
  * constellations instead), ordered by canonical bitset position - the same canonical list the
  * URL's `b=` bitset uses. This gives reconcileMarkSlots a deterministic seeding order on a fresh

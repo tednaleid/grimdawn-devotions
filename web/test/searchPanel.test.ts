@@ -4,7 +4,6 @@ import { test, expect } from "bun:test";
 import { mountSearchPanel } from "../src/adapters/searchPanel";
 import type { SearchMatch } from "../src/core/search";
 import { enLoc } from "./helpers/localizeEn";
-import { QUERY_HAND_COLOR } from "../src/adapters/handPalette";
 
 // A hand-rolled double for the handful of DOM operations mountSearchPanel performs
 // (innerHTML, querySelector by a fixed id, addEventListener, attribute/text setters). This repo
@@ -150,27 +149,31 @@ test("the initial query seeds the input and setValue() replaces it", () => {
   expect(kids["#search-input"].value).toBe("next");
 });
 
-test("an active query outlines the search box in the query hand color; clearing removes it", () => {
+// The query's mark style for a render: it holds a palette slot like any tag, so the panel is told
+// the style alongside the match.
+const north = { angle: 0, color: "#f0f4ff" };
+
+test("an active query outlines the search box in the query's mark color; clearing removes it", () => {
   const { handle, kids } = mount();
-  handle.setCount(match([], ["s1"]));
+  handle.setCount(match([], ["s1"]), north);
   expect(kids["#search-input"].getAttribute("class")).toContain("qactive");
-  expect(kids["#search-input"].getAttribute("style")).toContain(QUERY_HAND_COLOR);
+  expect(kids["#search-input"].getAttribute("style")).toContain("--mark:#f0f4ff");
   handle.setCount(null);
   expect(kids["#search-input"].getAttribute("class") ?? "").not.toContain("qactive");
 });
 
-test("an active query shows the query's swatch, its hand straight up, in the search box; clearing empties it", () => {
+test("an active query shows the query's swatch, its arc across the top, in the search box; clearing empties it", () => {
   const { handle, kids } = mount();
-  handle.setCount(match([], []));
-  expect(kids["#search-swatch"].innerHTML).toContain('class="hand-swatch"');
+  handle.setCount(match([], []), north);
+  expect(kids["#search-swatch"].innerHTML).toContain('class="mark-swatch"');
   expect(kids["#search-swatch"].innerHTML).toContain(
-    `<line x1="8" y1="5.2" x2="8" y2="1.2" stroke="${QUERY_HAND_COLOR}"`,
+    '<path d="M 4.04 4.04 A 5.6 5.6 0 0 1 11.96 4.04" fill="none" stroke="#f0f4ff"',
   );
   handle.setCount(null);
   expect(kids["#search-swatch"].innerHTML).toBe("");
 });
 
-test("the pointer entering the search box notifies onHover, so the map can pulse the query's hands", () => {
+test("the pointer entering the search box notifies onHover, so the map can pulse the query's arcs", () => {
   const { kids, hoverCalls } = mount("physical");
   kids["#search-input"].fire("mouseenter");
   expect(hoverCalls()).toBe(1);

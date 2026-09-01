@@ -358,9 +358,9 @@ main {
 .tip-bonus.vsel,
 .aff.vsel {
   background: rgba(108, 182, 255, 0.08);
-  /* --hand is the row's search-hand color (set inline by the view when the tag marks stars);
+  /* --mark is the row's search-mark color (set inline by the view when the tag marks stars);
      rows without one (affinity tags, tooltips) keep the neutral blue. */
-  box-shadow: 0 0 0 2px var(--hand, rgba(108, 182, 255, 0.6));
+  box-shadow: 0 0 0 2px var(--mark, rgba(108, 182, 255, 0.6));
 }
 .bsubj {
   text-transform: capitalize;
@@ -615,11 +615,11 @@ main {
 #search-input::placeholder {
   color: #6b7688;
 }
-/* An active query wears the query's hand color (--hand, set inline by the panel), matching its
-   star hands and constellation halo on the map. Focus keeps its blue border only while idle. */
+/* An active query wears the query's mark color (--mark, set inline by the panel), matching its
+   star arcs and constellation halo on the map. Focus keeps its blue border only while idle. */
 #search-input.qactive {
   border-color: transparent;
-  box-shadow: 0 0 0 2px var(--hand);
+  box-shadow: 0 0 0 2px var(--mark);
 }
 #search-input:focus {
   outline: none;
@@ -914,32 +914,28 @@ main {
   /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#match-glow);
 }
-/* Search hands: the clock-hand marker on a star matched by one or more searches. Geometry
-   (angles, lengths, per-search colors) is data-driven in the renderer; the tunable look lives here:
-   hand width (about the dot's diameter, so a hand reads at the default zoom), the dark outline
-   that keeps a hand crisp where it crosses a constellation edge, and the faint track circle. */
-.search-hands {
+/* Search arcs: the half-ring marker on a star matched by one or more searches. Geometry (radius,
+   angular extents, per-arc widths and colors) is data-driven in the renderer; the tunable look
+   lives here: the dark outline that keeps an arc crisp against art and edges, and the faint track
+   ring that shows where no arc is. */
+.search-arcs {
   pointer-events: none;
 }
-.search-hand line {
-  stroke-linecap: round;
+.search-arc path {
+  fill: none;
 }
-.search-hand .hand {
-  stroke-width: 20;
-}
-.search-hand .hand-outline {
+.search-arc .arc-outline {
   stroke: rgba(13, 17, 23, 0.85);
-  stroke-width: 26;
 }
-.hand-track {
+.arc-track {
   fill: none;
   stroke: #fff;
   stroke-opacity: 0.18;
   stroke-width: 1;
 }
-/* Hovering a legend row pulses its search's hands for about five seconds (pulseHands on the map
-   handle): an opacity dip rather than a size change, so the hand geometry stays readable mid-pulse. */
-@keyframes hand-pulse {
+/* Hovering a legend row pulses its search's arcs for about five seconds (pulseMarks on the map
+   handle): an opacity dip rather than a size change, so the arc geometry stays readable mid-pulse. */
+@keyframes mark-pulse {
   0%,
   100% {
     opacity: 1;
@@ -948,17 +944,17 @@ main {
     opacity: 0.15;
   }
 }
-.search-hand.pulse {
-  animation: hand-pulse 1s ease-in-out 5;
+.search-arc.pulse {
+  animation: mark-pulse 1s ease-in-out 5;
 }
 @media (prefers-reduced-motion: reduce) {
-  .search-hand.pulse {
+  .search-arc.pulse {
     animation: none;
   }
 }
-/* The legend swatch: a mini star wearing one hand at a search's angle in its color, keying rows,
-   chips, and the search box to the map's hands. */
-.hand-swatch {
+/* The legend swatch: a mini star wearing a quarter arc centred on a search's angle in its color,
+   keying rows, chips, and the search box to the map's arcs. */
+.mark-swatch {
   vertical-align: -2.5px;
   margin-right: 4px;
   flex: none;

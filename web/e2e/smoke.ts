@@ -287,19 +287,19 @@ try {
   let petMatched = false;
   for (let i = 0; i < 20; i++) {
     await Bun.sleep(100);
-    if ((await cdp.evaluate<number>("document.querySelectorAll('.search-hands').length")) > 0) {
+    if ((await cdp.evaluate<number>("document.querySelectorAll('.search-arcs').length")) > 0) {
       petMatched = true;
       break;
     }
   }
   check(petMatched, "tagging a pet bonus highlights the stars that grant it as a pet bonus");
-  // Hovering the tagged chip pulses that search's hands on the map: the legend points at its hands.
+  // Hovering the tagged chip pulses that search's arcs on the map: the legend points at its arcs.
   await cdp.evaluate(
     `(() => { const g = document.querySelector('#affinity .bgroup.avail.gsel[data-ids^="pet:"]'); g.dispatchEvent(new MouseEvent('mousemove',{bubbles:true,clientX:5,clientY:5})); })()`,
   );
   check(
-    (await cdp.evaluate<number>("document.querySelectorAll('.search-hand.pulse').length")) > 0,
-    "hovering a tagged legend chip pulses its hands on the map",
+    (await cdp.evaluate<number>("document.querySelectorAll('.search-arc.pulse').length")) > 0,
+    "hovering a tagged legend chip pulses its arcs on the map",
   );
   // Clear the pet tag so the later 'empties' assertion sees a clean filter.
   await cdp.evaluate(

@@ -10,7 +10,7 @@ import {
 } from "../adapters/localizationAdapter";
 import { mountAppMenu, type AppMenuContent } from "../adapters/appMenu";
 import type { InfoPopoverText } from "../adapters/infoPopover";
-import { type HandMark, mountSvg } from "../adapters/svgRenderer";
+import { type StarMark, mountSvg } from "../adapters/svgRenderer";
 import { attachNav, navHandlers } from "../adapters/navController";
 import { renderBenefits, renderAffinities, powersListHtml } from "../adapters/sidebarView";
 import { buildOrderHtml, transitionHtml, buildStepPopupHtml, type NoOrderInfo } from "../adapters/buildOrderView";
@@ -44,14 +44,8 @@ import {
   normalizeQuery,
 } from "../core/urlState";
 import { parseTag } from "../core/benefitTag";
-import { benefitMarkOrder, magnitudeWeights, reconcileMarkSlots, markMap } from "../core/searchMarks";
-import {
-  HAND_STYLE_COUNT,
-  type HandStyle,
-  handStyle,
-  QUERY_HAND_SLOT,
-  QUERY_HAND_STYLE,
-} from "../adapters/handPalette";
+import { benefitMarkOrder, magnitudeWeights, reconcileMarkSlots, markMap, QUERY_MARK_KEY } from "../core/searchMarks";
+import { MARK_STYLE_COUNT, type MarkStyle, markStyle } from "../adapters/markPalette";
 import { searchCorpus, matchQuery, type SearchMatch } from "../core/search";
 import { resolveIndex } from "../adapters/searchIndex";
 import { mountSearchPanel } from "../adapters/searchPanel";
@@ -285,40 +279,48 @@ async function boot() {
     el.addEventListener("animationend", () => el.classList.remove("flash-blocked"), { once: true });
   }
 
-  // Each selected benefit tag is its own search with its own hand style (angle + color, paired
-  // by palette slot). Slots persist across toggles (module state, reconciled each render):
-  // removing a tag frees only its own style and the rest stay put, which matters more than
-  // shared-link fidelity - a fresh load reseeds in canonical order, so a reloaded link may wear
-  // different hands but marks the same searches.
+  // Each active search - every selected benefit tag, plus the text query while one is typed - has
+  // its own mark style (angle + color, paired by palette slot). Slots persist across toggles
+  // (module state, reconciled each render): removing a search frees only its own style and the
+  // rest stay put, which matters more than shared-link fidelity - a fresh load reseeds in canonical
+  // order (query last), so a reloaded link may wear different styles but marks the same searches.
   let markSlots = new Map<string, number>();
-  function handSlotsByTag(): Map<string, number> {
+  function markSlotsByKey(): Map<string, number> {
     const order = benefitMarkOrder(selectedBenefits, benefitCanonical);
-    markSlots = reconcileMarkSlots(markSlots, order, HAND_STYLE_COUNT);
+    if (query) order.push(QUERY_MARK_KEY);
+    markSlots = reconcileMarkSlots(markSlots, order, MARK_STYLE_COUNT);
     return markSlots;
   }
-  function handStylesByTag(): Map<string, HandStyle> {
-    const out = new Map<string, HandStyle>();
-    for (const [key, slot] of handSlotsByTag()) out.set(key, handStyle(slot));
+  function markStylesByKey(): Map<string, MarkStyle> {
+    const out = new Map<string, MarkStyle>();
+    for (const [key, slot] of markSlotsByKey()) out.set(key, markStyle(slot));
     return out;
   }
+  // The query's mark style while a query is active (it holds a slot like any tag), else undefined.
+  function queryMarkStyle(): MarkStyle | undefined {
+    const slot = markSlotsByKey().get(QUERY_MARK_KEY);
+    return slot === undefined ? undefined : markStyle(slot);
+  }
 
-  // The per-star hand marks: one star set per active search - every selected player/pet tag
-  // (player tags scan player bonuses, pet tags pet bonuses; affinity tags are constellation-level,
-  // see affinityFilterSets), then the text query in its reserved style.
-  function searchHands(): Map<StarId, HandMark[]> {
-    const searches: { mark: { style: HandStyle; slot: number }; stars: ReadonlyMap<StarId, number> }[] = [];
-    for (const [key, slot] of handSlotsByTag()) {
+  // The per-star marks: one star set per active search - every selected player/pet tag (player
+  // tags scan player bonuses, pet tags pet bonuses; affinity tags are constellation-level, see
+  // affinityFilterSets), then the text query's star hits.
+  function starMarks(): Map<StarId, StarMark[]> {
+    const searches: { mark: { style: MarkStyle; slot: number }; stars: ReadonlyMap<StarId, number> }[] = [];
+    for (const [key, slot] of markSlotsByKey()) {
+      const mark = { style: markStyle(slot), slot };
+      if (key === QUERY_MARK_KEY) {
+        // Text matches have no magnitude; every query arc renders at base width.
+        const flat = new Map<StarId, number>();
+        for (const id of searchMatch.stars) flat.set(id, 0);
+        searches.push({ mark, stars: flat });
+        continue;
+      }
       const tag = parseTag(key);
       if (!tag || tag.kind === "affinity") continue; // benefitMarkOrder already excludes these
       const values =
         tag.kind === "pet" ? starValuesGrantingPet(model, tag.statId) : starValuesGranting(model, tag.statId);
-      searches.push({ mark: { style: handStyle(slot), slot }, stars: magnitudeWeights(values) });
-    }
-    if (query) {
-      // Text matches have no magnitude; every query hand renders at base length.
-      const flat = new Map<StarId, number>();
-      for (const id of searchMatch.stars) flat.set(id, 0);
-      searches.push({ mark: { style: QUERY_HAND_STYLE, slot: QUERY_HAND_SLOT }, stars: flat });
+      searches.push({ mark, stars: magnitudeWeights(values) });
     }
     return markMap(searches);
   }
@@ -490,8 +492,8 @@ async function boot() {
   benefitsEl.addEventListener("mouseleave", powerRowLeave);
   affinityEl.addEventListener("mouseleave", powerRowLeave);
 
-  // Hovering a tagged row or a fully tagged chip pulses that search's hands on the map once, so
-  // the legend points at its hands. Delegated on both sidebar containers like powerRowHover (the
+  // Hovering a tagged row or a fully tagged chip pulses that search's arcs on the map, so the
+  // legend points at its arcs. Delegated on both sidebar containers like powerRowHover (the
   // rows are re-rendered on every refresh); a row pulses when the pointer arrives, not on every
   // move within it, and pulses again only after the pointer has left it.
   let pulsedKey: string | null = null;
@@ -501,7 +503,7 @@ async function boot() {
     if (key === pulsedKey) return;
     pulsedKey = key;
     if (!key) return;
-    handle.pulseHands(key.split(",").flatMap((id) => markSlots.get(id) ?? []));
+    handle.pulseMarks(key.split(",").flatMap((id) => markSlots.get(id) ?? []));
   };
   const tagRowLeave = () => {
     pulsedKey = null;
@@ -806,7 +808,7 @@ async function boot() {
       petCatalog,
       availPetKeys,
       baseline?.selected ?? null,
-      handStylesByTag(),
+      markStylesByKey(),
     );
     prevBonuses = r.bonuses;
     prevPet = r.petBonuses;
@@ -814,7 +816,7 @@ async function boot() {
     petAvailHtml = r.petAvailHtml;
   }
   // The map's per-render inputs. Shared by refresh() and repaint() so the two paths cannot drift:
-  // benefit tags and star-level search matches become per-star hands, while constellation-level
+  // benefit tags and star-level search matches become per-star arcs, while constellation-level
   // search matches go to conHighlight (a constellation hit glows the art, not its stars).
   function paintMap() {
     const diff = baseline
@@ -824,7 +826,8 @@ async function boot() {
         }
       : null;
     handle.update(state, {
-      hands: searchHands(),
+      marks: starMarks(),
+      queryColor: queryMarkStyle()?.color,
       reach,
       diff,
       affinityFilter: affinityFilterSets(),
@@ -835,9 +838,9 @@ async function boot() {
   // Also hands the tooltip the query, so hovering a match marks up the text that matched -
   // otherwise a hit on flavour text ("owl" inside "acknowledged") looks like a bug.
   function paintSearchCount() {
-    searchPanel.setCount(query ? searchMatch : null); // `query` is already normalized (trimmed)
+    searchPanel.setCount(query ? searchMatch : null, queryMarkStyle()); // `query` is already normalized (trimmed)
     tip.setHighlight(query);
-    tip.setHandStyles(handStylesByTag()); // tagged tooltip rows read like the sidebar
+    tip.setMarkStyles(markStylesByKey()); // tagged tooltip rows read like the sidebar
   }
   // The hash, written by both render paths. Search uses "replace" so typing never floods history.
   function writeHash(urlMode: "push" | "replace") {
@@ -957,7 +960,8 @@ async function boot() {
   const searchPanel = mountSearchPanel(searchPanelEl, localization, {
     initial: query,
     onHover() {
-      if (query) handle.pulseHands([QUERY_HAND_SLOT]);
+      const slot = markSlots.get(QUERY_MARK_KEY);
+      if (slot !== undefined) handle.pulseMarks([slot]);
     },
     onInput(q) {
       query = normalizeQuery(q); // the same normal form the hash stores, so a shared link restores what is on screen

@@ -150,7 +150,7 @@ test("powersListHtml sorts rows by power name, not input/constellation order", (
   expect(html.indexOf("Arcane Bomb")).toBeLessThan(html.indexOf("Wendigo's Mark"));
 });
 
-test("a selected benefit row is outlined in its search's hand color", () => {
+test("a selected benefit row is outlined in its search's mark color", () => {
   const bonusStar = [...realModel.stars.values()].find((s) => Object.keys(s.bonuses).length > 0)!;
   const statId = Object.keys(bonusStar.bonuses)[0]!;
   const el = { innerHTML: "" } as unknown as HTMLElement;
@@ -170,14 +170,14 @@ test("a selected benefit row is outlined in its search's hand color", () => {
     new Map([[statId, { angle: 90, color: "#3ee6d8" }]]),
   );
   const html = (el as unknown as { innerHTML: string }).innerHTML;
-  expect(html).toMatch(/class="brow[^"]*vsel[^"]*"[^>]*style="--hand:#3ee6d8"/);
-  // The row also carries a mini-star swatch wearing its hand (90 degrees: pointing right).
+  expect(html).toMatch(/class="brow[^"]*vsel[^"]*"[^>]*style="--mark:#3ee6d8"/);
+  // The row also carries a mini-star swatch wearing its arc (90 degrees: across the right side).
   const row = html.match(/<div class="brow[^"]*vsel[^"]*"[^>]*>.*?<\/div>/)![0];
-  expect(row).toContain('<svg class="hand-swatch"');
-  expect(row).toContain('<line x1="10.8" y1="8" x2="14.8" y2="8" stroke="#3ee6d8"');
+  expect(row).toContain('<svg class="mark-swatch"');
+  expect(row).toContain('<path d="M 11.96 4.04 A 5.6 5.6 0 0 1 11.96 11.96" fill="none" stroke="#3ee6d8"');
 });
 
-test("a tagged 'available to get' chip is outlined in its first selected id's hand color", () => {
+test("a tagged 'available to get' chip is outlined in its first selected id's mark color", () => {
   const el = { innerHTML: "" } as unknown as HTMLElement;
   const html = renderBenefits(
     enLoc,
@@ -194,8 +194,8 @@ test("a tagged 'available to get' chip is outlined in its first selected id's ha
     null,
     new Map([["offensiveFireMin", { angle: 180, color: "#ff9440" }]]),
   ).availHtml;
-  expect(html).toMatch(/class="bgroup avail gsel"[^>]*style="--hand:#ff9440"/);
-  // The chip wears the search's swatch too, its hand pointing the slot's way (180: straight down).
-  expect(html).toContain('<svg class="hand-swatch"');
-  expect(html).toContain('<line x1="8" y1="10.8" x2="8" y2="14.8" stroke="#ff9440"');
+  expect(html).toMatch(/class="bgroup avail gsel"[^>]*style="--mark:#ff9440"/);
+  // The chip wears the search's swatch too, its arc centred the slot's way (180: across the bottom).
+  expect(html).toContain('<svg class="mark-swatch"');
+  expect(html).toContain('<path d="M 11.96 11.96 A 5.6 5.6 0 0 1 4.04 11.96" fill="none" stroke="#ff9440"');
 });
