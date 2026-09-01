@@ -26,20 +26,25 @@ test("the first 40 slots wear 40 distinct angle+color styles, then the cycle rep
   expect(markStyle(MARK_STYLE_COUNT)).toEqual(markStyle(0));
 });
 
-test("same-colored slots point at least 90 degrees apart across the whole cycle", () => {
-  // Slots k and k+5 share a color, so the angle table must keep them well separated; this
-  // table achieves 135 degrees, and any reordering must keep at least a right angle.
-  for (let k = 0; k < MARK_STYLE_COUNT; k++) {
+test("same-colored slots sit at least 135 degrees apart through seven concurrent searches", () => {
+  // Slots k and k+5 share a color. With north and south taking the first two slots (see below)
+  // the table cannot keep every such pair apart over the whole cycle; it keeps the pairs among the
+  // first seven slots far apart, and the eighth search is the first to share a color with a
+  // 45-degree neighbour (east and southeast). Any reordering must keep at least this.
+  for (const k of [0, 1]) {
     const a = markStyle(k);
     const b = markStyle(k + 5);
     expect(b.color).toBe(a.color);
-    expect(angleGap(a.angle, b.angle)).toBeGreaterThanOrEqual(90);
+    expect(angleGap(a.angle, b.angle)).toBeGreaterThanOrEqual(135);
   }
+  expect(markStyle(7).color).toBe(markStyle(2).color);
+  expect(angleGap(markStyle(7).angle, markStyle(2).angle)).toBe(45);
 });
 
-test("north comes first and every cardinal direction precedes the diagonals", () => {
-  expect(MARK_ANGLES[0]).toBe(0);
-  expect(MARK_ANGLES.slice(0, 4).every((a) => a % 90 === 0)).toBe(true);
+test("north then south lead, so one or two searches get clean opposite halves; east and west follow", () => {
+  // One or two concurrent searches is the common case (a damage type's flat and percent lines,
+  // say), and opposite halves read far better than two halves split at a bisector.
+  expect(MARK_ANGLES.slice(0, 4)).toEqual([0, 180, 90, 270]);
 });
 
 test("five distinct benefit colors, white first (lightness survives every color deficiency)", () => {

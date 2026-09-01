@@ -51,11 +51,14 @@ never moves it and clearing frees it. Its color comes from the palette like any 
 constellation halo, search-box outline, and swatch follow that color (`queryColor` on the
 renderer's per-render options). Like the tags, a reloaded link may give it a different style.
 
-With north free, the angle table is north, east, west, south, then southwest, southeast,
-northwest, northeast: `[0, 90, 270, 180, 225, 135, 315, 45]`. Exhausting the orderings with north
-first and the four cardinals before the diagonals, this is one of two that keep every same-color
-pair (slots five apart) at least 135 degrees apart around the whole 40-slot cycle; the palette
-test pins the property.
+With north free, the angle table is north, south, east, west, then northwest, southwest,
+northeast, southeast: `[0, 180, 90, 270, 315, 225, 45, 135]`. North and south lead because one or
+two concurrent searches is the common case (a damage type's flat and percent lines) and opposite
+halves read far better than two halves split at a bisector. That choice costs the whole-cycle
+same-color guarantee: exhausting the orderings with north then south first and the cardinals
+before the diagonals, the best keeps every same-color pair (slots five apart) at least 135
+degrees apart through seven concurrent searches, and the eighth search is the first to share a
+color with a 45-degree neighbour (east and southeast). The palette test pins exactly that.
 
 ### Legend swatch
 

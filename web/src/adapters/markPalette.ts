@@ -2,12 +2,15 @@
 // ABOUTME: (benefit tags and the text query alike), and the mini-star swatch that keys chrome to the map.
 
 /**
- * Mark angles by slot, in degrees clockwise from straight up: the four cardinals first (people name
- * up, down, left and right most precisely), then the diagonals. Slots k and k+5 share a color, so
- * the order also keeps MARK_ANGLES[k % 8] and MARK_ANGLES[(k + 5) % 8] at least 135 degrees apart
- * around the whole cycle; the palette test pins that, so reorder only with the test in hand.
+ * Mark angles by slot, in degrees clockwise from straight up. North then south lead: one or two
+ * concurrent searches is the common case (a damage type's flat and percent lines, say) and
+ * opposite halves read far better than two halves split at a bisector. East and west follow
+ * (people name the cardinals most precisely), then the diagonals in the one order that keeps
+ * same-colored slots (k and k+5) at least 135 degrees apart through seven concurrent searches;
+ * the eighth is the first to share a color with a 45-degree neighbour. The palette test pins
+ * that, so reorder only with the test in hand.
  */
-export const MARK_ANGLES = [0, 90, 270, 180, 225, 135, 315, 45] as const;
+export const MARK_ANGLES = [0, 180, 90, 270, 315, 225, 45, 135] as const;
 
 /**
  * Mark colors by slot. Star cores already spend magenta/red/green/yellow/blue on affinity

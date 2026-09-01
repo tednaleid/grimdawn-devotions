@@ -252,8 +252,8 @@ test("a single-search match draws a track and a half ring centred on that search
   const { cx, cy } = centerOf(markup, star);
   const arcs = arcsOf(markup);
   expect(arcs).toContain(`<circle class="arc-track" cx="${cx}" cy="${cy}" r="23"/>`); // STAR_RADIUS 12 + 11
-  // Slot 1 is east (90 degrees): alone, its half ring runs the whole right side, 0 to 180.
-  expect(arcSpans(arcs)).toEqual([{ slot: 1, from: 0, to: 180 }]);
+  // Slot 1 is south (180 degrees): alone, its half ring runs the whole bottom, 90 to 270.
+  expect(arcSpans(arcs)).toEqual([{ slot: 1, from: 90, to: 270 }]);
   const arc = arcOf(arcs, 1);
   // A dark outline path under the colored arc, both on the base ring radius at base width.
   expect(arc).toMatch(
@@ -277,39 +277,39 @@ test("a star's arcs are painted under its dot, so a neighbouring dot stays on to
 
 test("two opposite searches each keep their half, parted by a seam of 3 degrees a side", () => {
   const star = "crossroads_eldritch:0";
-  // Slots 1 and 2 are east and west.
-  const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(2), mark(1)]]]) });
+  // Slots 0 and 1 are north and south: the common two-search case gets clean opposite halves.
+  const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(1), mark(0)]]]) });
   const arcs = arcsOf(markup);
   expect(arcs.match(/<circle class="arc-track"/g)!.length).toBe(1); // one track per star, not per arc
   expect(arcSpans(arcs)).toEqual([
-    { slot: 1, from: 3, to: 177 },
-    { slot: 2, from: 183, to: 357 },
+    { slot: 0, from: -87, to: 87 },
+    { slot: 1, from: 93, to: 267 },
   ]);
 });
 
 test("two searches 45 degrees apart split their overlap at the bisector, each keeping its far side", () => {
   const star = "crossroads_eldritch:0";
-  // Slot 2 is west (270), slot 4 southwest (225): the bisector is 247.5, minus the seam each side.
-  const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(2), mark(4)]]]) });
+  // Slot 3 is west (270), slot 5 southwest (225): the bisector is 247.5, minus the seam each side.
+  const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(3), mark(5)]]]) });
   const spans = arcSpans(arcsOf(markup));
   expect(spans).toEqual([
-    { slot: 4, from: 135, to: 244.5 },
-    { slot: 2, from: 250.5, to: 360 },
+    { slot: 5, from: 135, to: 244.5 },
+    { slot: 3, from: 250.5, to: 360 },
   ]);
 });
 
 test("three searches partition every overlap at its own bisector", () => {
   const star = "crossroads_eldritch:0";
-  // East (slot 1), southwest (slot 4), west (slot 2): east and west touch at the top and bottom
+  // East (slot 2), southwest (slot 5), west (slot 3): east and west touch at the top and bottom
   // (parted only by the seam), and southwest cuts into both.
   const markup = renderSvgMarkup(model, noSel, {
     manifest: null,
-    marks: new Map([[star, [mark(1), mark(4), mark(2)]]]),
+    marks: new Map([[star, [mark(2), mark(5), mark(3)]]]),
   });
   expect(arcSpans(arcsOf(markup))).toEqual([
-    { slot: 1, from: 3, to: 154.5 },
-    { slot: 4, from: 160.5, to: 244.5 },
-    { slot: 2, from: 250.5, to: 357 },
+    { slot: 2, from: 3, to: 154.5 },
+    { slot: 5, from: 160.5, to: 244.5 },
+    { slot: 3, from: 250.5, to: 357 },
   ]);
 });
 
