@@ -66,8 +66,6 @@ const POWER_ARC_RADIUS = POWER_RADIUS + 14;
 // search, growing OUTWARD from the fixed inner edge (r = inner + w/2) so the dot stays clear.
 const ARC_WIDTH = 16;
 const ARC_WEIGHT_SPAN = 2;
-// The light outline under each arc extends this far beyond it on each side.
-const ARC_OUTLINE = 3;
 // Degrees of seam between two arcs that meet, split evenly across the seam.
 const ARC_SEAM_DEG = 6;
 // Searches sharing an angle stack outward, this far apart.
@@ -97,9 +95,10 @@ function arcExtents(angles: readonly number[]): Map<number, { from: number; to: 
 
 // The arcs marker for one star: a faint track ring plus, per matching search, a stroked arc over
 // its angular extent (arcExtents), thickened outward by the star's magnitude weight. Marks sharing
-// an angle (slots eight apart) stack outward in slot order. Each arc rides on a light outline path
-// so it stays crisp against constellation art and edges; the outline color and the track look are
-// .search-arc CSS, the widths are per-arc attributes here.
+// an angle (slots eight apart) stack outward in slot order. Ends are round caps (.search-arc CSS),
+// which reach half the width past a path's ends, so each path stops one cap short of its extent
+// and the cap fills it: a lone half stays a half, and seams keep their gap at any width. The track
+// look is CSS too; the widths are per-arc attributes here.
 function arcMarkup(cx: number, cy: number, baseR: number, marks: readonly StarMark[]): string {
   const inner = baseR - ARC_WIDTH / 2;
   const byAngle = new Map<number, StarMark[]>();
@@ -113,10 +112,14 @@ function arcMarkup(cx: number, cy: number, baseR: number, marks: readonly StarMa
     let edge = inner;
     for (const m of byAngle.get(angle)!.sort((a, b) => a.slot - b.slot)) {
       const w = Math.round(ARC_WIDTH * (1 + ARC_WEIGHT_SPAN * m.weight) * 10) / 10;
-      const d = arcPath(cx, cy, edge + w / 2, from, to);
+      const r = edge + w / 2;
+      const cap = (Math.asin(Math.min(1, w / 2 / r)) * 180) / Math.PI;
+      // An extent narrower than two caps degenerates to a short stub (the caps become a dot).
+      const span = Math.max(0.5, to - from - 2 * cap);
+      const mid = (from + to) / 2;
+      const d = arcPath(cx, cy, r, mid - span / 2, mid + span / 2);
       arcs.push(
         `<g class="search-arc" data-slot="${m.slot}" data-from="${from}" data-to="${to}">` +
-          `<path class="arc-outline" d="${d}" stroke-width="${w + 2 * ARC_OUTLINE}"/>` +
           `<path class="arc" d="${d}" stroke="${m.style.color}" stroke-width="${w}"/></g>`,
       );
       edge += w + ARC_STACK_GAP;

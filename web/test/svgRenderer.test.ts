@@ -255,11 +255,15 @@ test("a single-search match draws a track and a half ring centred on that search
   // Slot 1 is south (180 degrees): alone, its half ring runs the whole bottom, 90 to 270.
   expect(arcSpans(arcs)).toEqual([{ slot: 1, from: 90, to: 270 }]);
   const arc = arcOf(arcs, 1);
-  // A light outline path under the colored arc, both on the base ring radius at base width.
-  expect(arc).toMatch(
-    /<path class="arc-outline" d="M [^"]*A 27 27 0 0 1 [^"]*" stroke-width="22"\/><path class="arc" d="M [^"]*A 27 27 0 0 1 [^"]*" stroke="#3f93d8" stroke-width="16"\/>/,
-  );
-  expect(markStyle(1).color).toBe("#3f93d8");
+  // One stroked path on the base ring radius at base width; no outline underneath.
+  expect(arc).toMatch(/<path class="arc" d="M [^"]*A 27 27 0 0 1 [^"]*" stroke="#3f93d8" stroke-width="16"\/>/);
+  expect(arcs).not.toContain("arc-outline");
+  expect(markStyle(1).color).toBe("#3f93d8"); // slot 1: primordial blue
+  // Ends are round caps, which reach half the width past the path's ends, so the path stops one
+  // cap short of the extent on each side and the cap fills it: the half stays a half. At width
+  // 16 on radius 27 the cap is asin(8/27) = 17.24 degrees, so the path runs 107.24 to 252.76.
+  const near = (v: number) => Math.round(v * 100) / 100; // the renderer's two-decimal rounding
+  expect(arc).toContain(`d="M ${near(cx + 25.79)} ${cy + 8} A 27 27 0 0 1 ${near(cx - 25.79)} ${cy + 8}"`);
 });
 
 test("a star's arcs are painted under its dot, so a neighbouring dot stays on top of a wide arc", () => {
@@ -319,9 +323,8 @@ test("arc width grows outward with magnitude weight: base 16 at 0, triple at 1, 
     const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(1, weight)]]]) });
     return arcOf(arcsOf(markup), 1);
   };
-  // Inner edge 19 (base radius 23 less half the base width); r = 19 + w/2.
+  // Inner edge 19 (base radius 27 less half the base width); r = 19 + w/2.
   expect(at(1)).toMatch(/<path class="arc" d="M [^"]*A 43 43 [^"]*" stroke="#3f93d8" stroke-width="48"\/>/);
-  expect(at(1)).toMatch(/<path class="arc-outline" d="M [^"]*A 43 43 [^"]*" stroke-width="54"\/>/);
   expect(at(0.5)).toMatch(/<path class="arc" d="M [^"]*A 35 35 [^"]*" stroke="#3f93d8" stroke-width="32"\/>/);
 });
 

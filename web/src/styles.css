@@ -916,16 +916,14 @@ main {
 }
 /* Search arcs: the half-ring marker on a star matched by one or more searches. Geometry (radius,
    angular extents, per-arc widths and colors) is data-driven in the renderer; the tunable look
-   lives here: the light outline that parts an arc from same-hued art, dots, and edges, and the
+   lives here: round ends (the renderer shortens each path by a cap so seams survive) and the
    faint track ring that shows where no arc is. */
 .search-arcs {
   pointer-events: none;
 }
 .search-arc path {
   fill: none;
-}
-.search-arc .arc-outline {
-  stroke: rgba(230, 237, 243, 0.9);
+  stroke-linecap: round;
 }
 .arc-track {
   fill: none;
