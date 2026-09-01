@@ -358,9 +358,9 @@ main {
 .tip-bonus.vsel,
 .aff.vsel {
   background: rgba(108, 182, 255, 0.08);
-  /* --ring is the row's search-ring color (set inline by the view when the tag rings stars);
+  /* --hand is the row's search-hand color (set inline by the view when the tag marks stars);
      rows without one (affinity tags, tooltips) keep the neutral blue. */
-  box-shadow: 0 0 0 2px var(--ring, rgba(108, 182, 255, 0.6));
+  box-shadow: 0 0 0 2px var(--hand, rgba(108, 182, 255, 0.6));
 }
 .bsubj {
   text-transform: capitalize;
@@ -615,11 +615,11 @@ main {
 #search-input::placeholder {
   color: #6b7688;
 }
-/* An active query wears the query's ring color (--ring, set inline by the panel), matching its
-   star rings and constellation halo on the map. Focus keeps its blue border only while idle. */
+/* An active query wears the query's hand color (--hand, set inline by the panel), matching its
+   star hands and constellation halo on the map. Focus keeps its blue border only while idle. */
 #search-input.qactive {
   border-color: transparent;
-  box-shadow: 0 0 0 2px var(--ring);
+  box-shadow: 0 0 0 2px var(--hand);
 }
 #search-input:focus {
   outline: none;
@@ -914,22 +914,32 @@ main {
   /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#match-glow);
 }
-/* Search rings: the split-ring marker around a star matched by one or more searches. Geometry
-   (radius, arc spans, per-search stroke colors) is data-driven in the renderer; the tunable look
-   (stroke weight, the luminous #self-glow halo) lives here. */
-.search-ring {
+/* Search hands: the clock-hand marker on a star matched by one or more searches. Geometry (root,
+   angles, lengths, per-search colors) is data-driven in the renderer; the tunable look lives here:
+   hand width (keep it under about 9, or hands 45 degrees apart fuse at the hub), the dark outline
+   that keeps a hand crisp where it crosses a constellation edge, and the faint track circle. */
+.search-hands {
   pointer-events: none;
-  filter: url(#self-glow);
 }
-.search-ring circle,
-.search-ring path {
-  fill: none;
-  /* stroke-width is a per-arc attribute in the renderer: base 8, up to double with magnitude. */
+.search-hand line {
   stroke-linecap: round;
 }
-/* The legend swatch: a mini ring in a search's color + dash, keying rows, chips, and the
-   search box to the map's ring styles. */
-.ring-swatch {
+.search-hand .hand {
+  stroke-width: 7;
+}
+.search-hand .hand-outline {
+  stroke: rgba(13, 17, 23, 0.85);
+  stroke-width: 9;
+}
+.hand-track {
+  fill: none;
+  stroke: #fff;
+  stroke-opacity: 0.18;
+  stroke-width: 1;
+}
+/* The legend swatch: a mini star wearing one hand at a search's angle in its color, keying rows,
+   chips, and the search box to the map's hands. */
+.hand-swatch {
   vertical-align: -2.5px;
   margin-right: 4px;
   flex: none;

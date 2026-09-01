@@ -5,7 +5,7 @@ import type { ReachView } from "../core/reachability";
 import { affinityColor, glowColor, presentAffinities } from "./affinityColors";
 import { constellationDisplay, starDisplay, edgeDisplay } from "../core/displayState";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
-import { QUERY_RING_COLOR, scaleDash, type RingStyle } from "./ringPalette";
+import { type HandStyle, polarPoint, QUERY_HAND_COLOR } from "./handPalette";
 import type { AssetManifest } from "../ports/DataSource";
 
 // A constellation's identity colors = the affinities it GRANTS when fully filled (1-3).
@@ -57,67 +57,68 @@ const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 // The affinity match halo glows full strength on a reachable constellation and dimmer on an unreachable
 // one, so the brightness channel still reads under a filter (reachable matches are not just colored).
 const HALO_UNREACHABLE_OPACITY = 0.25;
-// Search rings orbit outside the star dot (and outside the larger power diamond).
-const RING_RADIUS = STAR_RADIUS + 11;
-const POWER_RING_RADIUS = POWER_RADIUS + 10;
-// Degrees of breathing room between the arcs of a split ring.
-const RING_GAP_DEG = 14;
-// Base ring stroke width; a star's arc thickens up to quadruple with its relative magnitude
-// weight (a per-arc SVG attribute, so each slice of a split ring scales independently). Weighted
-// arcs grow OUTWARD from a fixed inner edge - a stroke this wide centered on the base radius
-// would swallow the star dot - so the radius rises with the width (r = inner + w/2).
-const RING_WIDTH = 8;
-const RING_WEIGHT_SPAN = 3;
+// Search hands radiate from a root just outside the star dot (and outside the larger power diamond).
+const HAND_ROOT = STAR_RADIUS + 4;
+const POWER_HAND_ROOT = POWER_RADIUS + 4;
+// A faint track circle just outside the root makes a lone hand read as a clock with one hand.
+const TRACK_OFFSET = 2;
+// Hand length from the root: HAND_MIN at magnitude weight 0 (the direction still shows), up to
+// HAND_MIN + HAND_SPAN at weight 1. Width is constant (a .search-hand CSS rule), so magnitude
+// reads as length from a fixed baseline, the channel readers estimate best.
+const HAND_MIN = 8;
+const HAND_SPAN = 22;
+// Searches sharing an angle stack end to end along the ray with this gap between segments. The
+// stack's tip is clamped one minimum segment past a single full-length hand: the closest stars
+// on the map sit about that far apart, and magnitude past that point would not be read anyway.
+const STACK_GAP = 3;
+const STACK_REACH = HAND_MIN + HAND_SPAN + STACK_GAP + HAND_MIN;
 
-// A clockwise ring arc from a0 to a1 (degrees, 0 = twelve o'clock) around (cx, cy).
-function ringArc(cx: number, cy: number, r: number, a0: number, a1: number): string {
-  const pt = (deg: number) => {
-    const rad = ((deg - 90) * Math.PI) / 180;
-    return `${(cx + r * Math.cos(rad)).toFixed(2)} ${(cy + r * Math.sin(rad)).toFixed(2)}`;
-  };
-  return `M ${pt(a0)} A ${r} ${r} 0 0 1 ${pt(a1)}`;
-}
-
-/** One search's marker on one star: its ring style plus that star's magnitude weight (0..1). */
-export interface RingMark {
-  ring: RingStyle;
+/** One search's marker on one star: its hand style, that star's magnitude weight (0..1), and its style slot. */
+export interface HandMark {
+  style: HandStyle;
   weight: number;
+  slot: number;
 }
 
-// The split-ring marker for one star: a full circle for a single matching search, else the ring
-// divided evenly into one arc per search, clockwise from twelve, in ring order. Each search's
-// stroke pattern rides along as the color-vision-safe redundant channel, and each arc's width
-// scales from RING_WIDTH up to quadruple with that star's magnitude weight for the search. Fill
-// suppression and the luminous #self-glow filter come from the .search-ring CSS rules.
-function ringMarkup(cx: number, cy: number, baseR: number, marks: readonly RingMark[]): string {
-  const inner = baseR - RING_WIDTH / 2;
-  const geom = (m: RingMark) => {
-    const w = Math.round(RING_WIDTH * (1 + RING_WEIGHT_SPAN * m.weight) * 10) / 10;
-    // The dash pattern scales with the width, so dots stay dots and dashes stay dashes at any size.
-    const dash = m.ring.dash ? ` stroke-dasharray="${scaleDash(m.ring.dash, w / RING_WIDTH)}"` : "";
-    return { r: inner + w / 2, attrs: ` stroke="${m.ring.color}" stroke-width="${w}"${dash}` };
-  };
-  if (marks.length === 1) {
-    const g = geom(marks[0]!);
-    return `<g class="search-ring"><circle cx="${cx}" cy="${cy}" r="${g.r}"${g.attrs}/></g>`;
+// The hands marker for one star: a track circle plus one round-capped line per matching search at
+// that search's fixed angle, its length scaled by the star's magnitude weight. Marks sharing an
+// angle (slots eight apart, or the query with the eighth benefit slot) stack end to end in slot
+// order. Each hand rides on a dark outline line so it stays a crisp separate object where it
+// crosses a constellation edge; widths, the outline color, and the track look are .search-hand CSS.
+function handMarkup(cx: number, cy: number, root: number, marks: readonly HandMark[]): string {
+  const byAngle = new Map<number, HandMark[]>();
+  for (const m of marks) {
+    const stack = byAngle.get(m.style.angle);
+    if (stack) stack.push(m);
+    else byAngle.set(m.style.angle, [m]);
   }
-  const span = 360 / marks.length;
-  const arcs = marks
-    .map((m, i) => {
-      const g = geom(m);
-      return `<path d="${ringArc(cx, cy, g.r, i * span + RING_GAP_DEG / 2, (i + 1) * span - RING_GAP_DEG / 2)}"${g.attrs}/>`;
-    })
-    .join("");
-  return `<g class="search-ring">${arcs}</g>`;
+  const hands: string[] = [];
+  for (const [angle, stack] of byAngle) {
+    stack.sort((a, b) => a.slot - b.slot);
+    let from = root;
+    for (const m of stack) {
+      const to = Math.min(from + HAND_MIN + HAND_SPAN * m.weight, root + STACK_REACH);
+      if (to <= from) break;
+      const a = polarPoint(cx, cy, from, angle);
+      const b = polarPoint(cx, cy, to, angle);
+      const coords = `x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}"`;
+      hands.push(
+        `<g class="search-hand" data-slot="${m.slot}"><line class="hand-outline" ${coords}/><line class="hand" ${coords} stroke="${m.style.color}"/></g>`,
+      );
+      from = to + STACK_GAP;
+    }
+  }
+  const track = `<circle class="hand-track" cx="${cx}" cy="${cy}" r="${root + TRACK_OFFSET}"/>`;
+  return `<g class="search-hands">${track}${hands.join("")}</g>`;
 }
 
 export interface RenderOpts {
   manifest: AssetManifest | null;
-  // Per-star search rings: each matched star maps to the ring marks (color + dash style, plus
-  // the star's magnitude weight) of the searches that hit it, in ring order (canonical benefit
-  // order, query last). One search draws a full ring; several split it into arcs, clockwise from
-  // twelve, so the ring says which searches matched, how many, and how big each grant is.
-  rings?: ReadonlyMap<StarId, readonly RingMark[]>;
+  // Per-star search hands: each matched star maps to the hand marks (fixed angle + color style,
+  // the star's magnitude weight, and the style slot) of the searches that hit it. Every search
+  // draws its own hand at its own angle, so the marker says which searches matched and how big
+  // each grant is; see handMarkup.
+  hands?: ReadonlyMap<StarId, readonly HandMark[]>;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   // When present, an affinity filter is active. A constellation matches when it provides any of these
@@ -125,8 +126,8 @@ export interface RenderOpts {
   // the rest desaturate (the mute color outcome) - the filter never changes brightness.
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };
   // When present, a text search is active; these constellations matched on name or description
-  // and glow via the search-glow halo in the query's ring color. Star-level query matches arrive
-  // as `rings` entries instead (a constellation hit glows the art, not its stars).
+  // and glow via the search-glow halo in the query's hand color. Star-level query matches arrive
+  // as `hands` entries instead (a constellation hit glows the art, not its stars).
   conHighlight?: Set<string>;
 }
 
@@ -202,12 +203,12 @@ export function constellationAt(regions: ConRegion[], wx: number, wy: number): s
 export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opts: RenderOpts): string {
   const reach = opts.reach;
   const diff = opts.diff ?? null;
-  const rings = opts.rings;
+  const hands = opts.hands;
   const settings = {
     selected: state.selected,
     reach,
     affinityFilter: opts.affinityFilter,
-    benefitMatch: rings ? new Set(rings.keys()) : undefined,
+    benefitMatch: hands ? new Set(hands.keys()) : undefined,
     conMatch: opts.conHighlight,
     diff,
   };
@@ -277,8 +278,8 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     );
   }
 
-  // Search-match halo filter def: flooded with the query's ring color so a query match reads
-  // identically whether it lands on a star (a ring) or a whole constellation (this halo), and never
+  // Search-match halo filter def: flooded with the query's hand color so a query match reads
+  // identically whether it lands on a star (a hand) or a whole constellation (this halo), and never
   // as an affinity colour.
   // Only emitted when a search is active (mirrors #aff-glow/#mute being gated on affFilter above).
   //
@@ -294,9 +295,9 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     defs.push(
       `<filter id="search-glow" x="-150%" y="-150%" width="400%" height="400%" color-interpolation-filters="sRGB">` +
         `<feGaussianBlur in="SourceAlpha" stdDeviation="16" result="b1"/>` +
-        `<feFlood flood-color="${QUERY_RING_COLOR}" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
+        `<feFlood flood-color="${QUERY_HAND_COLOR}" result="c1"/><feComposite in="c1" in2="b1" operator="in" result="g1"/>` +
         `<feGaussianBlur in="SourceAlpha" stdDeviation="38" result="b2"/>` +
-        `<feFlood flood-color="${QUERY_RING_COLOR}" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
+        `<feFlood flood-color="${QUERY_HAND_COLOR}" result="c2"/><feComposite in="c2" in2="b2" operator="in" result="g2"/>` +
         `<feMerge>` +
         `<feMergeNode in="g2"/><feMergeNode in="g2"/><feMergeNode in="g2"/>` +
         `<feMergeNode in="g1"/><feMergeNode in="g1"/><feMergeNode in="g1"/>` +
@@ -377,7 +378,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
       const glow =
         `<g filter="url(#search-glow)">` +
         `<rect class="search-glow" opacity="${op}" x="${x}" y="${y}" width="${art.w}" height="${art.h}" ` +
-        `fill="${QUERY_RING_COLOR}" mask="url(#mask-${c.id})"/>` +
+        `fill="${QUERY_HAND_COLOR}" mask="url(#mask-${c.id})"/>` +
         `</g>`;
       // Off-filter constellations desaturate like an off-filter star's benefit glow does, so the
       // halo reads as "matched, off-filter" instead of vanishing.
@@ -453,14 +454,14 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
     const dot = star.celestialPower
       ? `<polygon class="${cls}" opacity="${op}" points="${diamondPoints(cx, cy, POWER_RADIUS)}" style="${style}"/>`
       : `<circle class="${cls}" opacity="${op}" cx="${cx}" cy="${cy}" r="${STAR_RADIUS}" style="${style}"/>`;
-    // Search-ring emphasis is a SEPARATE full-opacity layer so it reads even on an unattainable (dim)
+    // Search-hand emphasis is a SEPARATE full-opacity layer so it reads even on an unattainable (dim)
     // star, whose dot keeps its attainability opacity. When the star's constellation is off the
-    // affinity filter, the ring is wrapped in #mute-wide so the whole ring desaturates too - the
-    // match then reads as "search match, off-filter" without the dot's opacity bleeding into the ring.
+    // affinity filter, the hands are wrapped in #mute-wide so the whole marker desaturates too - the
+    // match then reads as "search match, off-filter" without the dot's opacity bleeding into the hands.
     let marker = "";
-    const ringColors = sd.benefitMatch ? rings?.get(star.id) : undefined;
-    if (ringColors && ringColors.length > 0) {
-      const shape = ringMarkup(cx, cy, star.celestialPower ? POWER_RING_RADIUS : RING_RADIUS, ringColors);
+    const marks = sd.benefitMatch ? hands?.get(star.id) : undefined;
+    if (marks && marks.length > 0) {
+      const shape = handMarkup(cx, cy, star.celestialPower ? POWER_HAND_ROOT : HAND_ROOT, marks);
       marker = muted ? `<g filter="url(#mute-wide)">${shape}</g>` : shape;
     }
     parts.push(
@@ -475,7 +476,7 @@ export function renderSvgMarkup(model: DevotionModel, state: SelectionState, opt
 
 /** Per-render inputs for a mounted map, mirroring RenderOpts minus the boot-time manifest. */
 export interface UpdateOpts {
-  rings?: ReadonlyMap<StarId, readonly RingMark[]>;
+  hands?: ReadonlyMap<StarId, readonly HandMark[]>;
   reach?: ReachView;
   diff?: { added: Set<StarId>; removed: Set<StarId> } | null;
   affinityFilter?: { grants: Set<Affinity>; requires: Set<Affinity> };

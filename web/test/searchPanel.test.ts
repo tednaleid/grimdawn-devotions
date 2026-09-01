@@ -4,7 +4,7 @@ import { test, expect } from "bun:test";
 import { mountSearchPanel } from "../src/adapters/searchPanel";
 import type { SearchMatch } from "../src/core/search";
 import { enLoc } from "./helpers/localizeEn";
-import { QUERY_RING_COLOR } from "../src/adapters/ringPalette";
+import { QUERY_HAND_COLOR } from "../src/adapters/handPalette";
 
 // A hand-rolled double for the handful of DOM operations mountSearchPanel performs
 // (innerHTML, querySelector by a fixed id, addEventListener, attribute/text setters). This repo
@@ -143,20 +143,22 @@ test("the initial query seeds the input and setValue() replaces it", () => {
   expect(kids["#search-input"].value).toBe("next");
 });
 
-test("an active query outlines the search box in the query ring color; clearing removes it", () => {
+test("an active query outlines the search box in the query hand color; clearing removes it", () => {
   const { handle, kids } = mount();
   handle.setCount(match([], ["s1"]));
   expect(kids["#search-input"].getAttribute("class")).toContain("qactive");
-  expect(kids["#search-input"].getAttribute("style")).toContain(QUERY_RING_COLOR);
+  expect(kids["#search-input"].getAttribute("style")).toContain(QUERY_HAND_COLOR);
   handle.setCount(null);
   expect(kids["#search-input"].getAttribute("class") ?? "").not.toContain("qactive");
 });
 
-test("an active query shows the query's patterned swatch in the search box; clearing empties it", () => {
+test("an active query shows the query's swatch, its hand straight up, in the search box; clearing empties it", () => {
   const { handle, kids } = mount();
   handle.setCount(match([], []));
-  expect(kids["#search-swatch"].innerHTML).toContain('class="ring-swatch"');
-  expect(kids["#search-swatch"].innerHTML).toContain(QUERY_RING_COLOR);
+  expect(kids["#search-swatch"].innerHTML).toContain('class="hand-swatch"');
+  expect(kids["#search-swatch"].innerHTML).toContain(
+    `<line x1="8" y1="5.2" x2="8" y2="1.2" stroke="${QUERY_HAND_COLOR}"`,
+  );
   handle.setCount(null);
   expect(kids["#search-swatch"].innerHTML).toBe("");
 });

@@ -287,7 +287,7 @@ try {
   let petMatched = false;
   for (let i = 0; i < 20; i++) {
     await Bun.sleep(100);
-    if ((await cdp.evaluate<number>("document.querySelectorAll('.search-ring').length")) > 0) {
+    if ((await cdp.evaluate<number>("document.querySelectorAll('.search-hands').length")) > 0) {
       petMatched = true;
       break;
     }

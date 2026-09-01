@@ -150,7 +150,7 @@ test("powersListHtml sorts rows by power name, not input/constellation order", (
   expect(html.indexOf("Arcane Bomb")).toBeLessThan(html.indexOf("Wendigo's Mark"));
 });
 
-test("a selected benefit row is outlined in its search's ring color", () => {
+test("a selected benefit row is outlined in its search's hand color", () => {
   const bonusStar = [...realModel.stars.values()].find((s) => Object.keys(s.bonuses).length > 0)!;
   const statId = Object.keys(bonusStar.bonuses)[0]!;
   const el = { innerHTML: "" } as unknown as HTMLElement;
@@ -167,18 +167,17 @@ test("a selected benefit row is outlined in its search's ring color", () => {
     [],
     undefined,
     null,
-    new Map([[statId, { color: "#3ee6d8", dash: "" }]]),
+    new Map([[statId, { angle: 90, color: "#3ee6d8" }]]),
   );
   const html = (el as unknown as { innerHTML: string }).innerHTML;
-  expect(html).toMatch(/class="brow[^"]*vsel[^"]*"[^>]*style="--ring:#3ee6d8"/);
-  // The row also carries a mini ring swatch in its style; a solid style draws no dasharray.
+  expect(html).toMatch(/class="brow[^"]*vsel[^"]*"[^>]*style="--hand:#3ee6d8"/);
+  // The row also carries a mini-star swatch wearing its hand (90 degrees: pointing right).
   const row = html.match(/<div class="brow[^"]*vsel[^"]*"[^>]*>.*?<\/div>/)![0];
-  expect(row).toContain('<svg class="ring-swatch"');
-  expect(row).toContain('stroke="#3ee6d8"');
-  expect(row).not.toContain("stroke-dasharray");
+  expect(row).toContain('<svg class="hand-swatch"');
+  expect(row).toContain('<line x1="10.8" y1="8" x2="14.8" y2="8" stroke="#3ee6d8"');
 });
 
-test("a tagged 'available to get' chip is outlined in its first selected id's ring color", () => {
+test("a tagged 'available to get' chip is outlined in its first selected id's hand color", () => {
   const el = { innerHTML: "" } as unknown as HTMLElement;
   const html = renderBenefits(
     enLoc,
@@ -193,10 +192,10 @@ test("a tagged 'available to get' chip is outlined in its first selected id's ri
     [],
     undefined,
     null,
-    new Map([["offensiveFireMin", { color: "#ff9440", dash: "16 11" }]]),
+    new Map([["offensiveFireMin", { angle: 180, color: "#ff9440" }]]),
   ).availHtml;
-  expect(html).toMatch(/class="bgroup avail gsel"[^>]*style="--ring:#ff9440"/);
-  // The chip wears the search's swatch too, with the dash pattern scaled to swatch size.
-  expect(html).toContain('<svg class="ring-swatch"');
-  expect(html).toContain('stroke-dasharray="4.17 2.87"');
+  expect(html).toMatch(/class="bgroup avail gsel"[^>]*style="--hand:#ff9440"/);
+  // The chip wears the search's swatch too, its hand pointing the slot's way (180: straight down).
+  expect(html).toContain('<svg class="hand-swatch"');
+  expect(html).toContain('<line x1="8" y1="10.8" x2="8" y2="14.8" stroke="#ff9440"');
 });

@@ -1,7 +1,7 @@
 // ABOUTME: DOM adapter for the map search box and its match count.
 // ABOUTME: Mounted once into a stable container, because the affinity panel rewrites its own innerHTML.
 import type { SearchMatch } from "../core/search";
-import { QUERY_RING_COLOR, QUERY_RING_DASH, ringSwatchSvg } from "./ringPalette";
+import { handSwatchSvg, QUERY_HAND_COLOR, QUERY_HAND_STYLE } from "./handPalette";
 import type { Localization } from "../ports/Localization";
 
 export interface SearchPanelHandle {
@@ -42,11 +42,11 @@ export function mountSearchPanel(
   }
 
   function paintCount() {
-    // An active query (even one with no matches) wears the query's ring style - the same color
-    // and dash its star rings and constellation halo use on the map - plus its swatch as the key.
+    // An active query (even one with no matches) wears the query's hand style - the same color
+    // its star hands and constellation halo use on the map - plus its swatch as the key.
     input.setAttribute("class", last ? "qactive" : "");
-    input.setAttribute("style", last ? `--ring:${QUERY_RING_COLOR}` : "");
-    swatchEl.innerHTML = last ? ringSwatchSvg({ color: QUERY_RING_COLOR, dash: QUERY_RING_DASH }) : "";
+    input.setAttribute("style", last ? `--hand:${QUERY_HAND_COLOR}` : "");
+    swatchEl.innerHTML = last ? handSwatchSvg(QUERY_HAND_STYLE) : "";
     if (!last) {
       count.textContent = "";
       return;
