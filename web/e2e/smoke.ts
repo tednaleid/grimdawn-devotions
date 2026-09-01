@@ -293,6 +293,14 @@ try {
     }
   }
   check(petMatched, "tagging a pet bonus highlights the stars that grant it as a pet bonus");
+  // Hovering the tagged chip pulses that search's hands on the map: the legend points at its hands.
+  await cdp.evaluate(
+    `(() => { const g = document.querySelector('#affinity .bgroup.avail.gsel[data-ids^="pet:"]'); g.dispatchEvent(new MouseEvent('mousemove',{bubbles:true,clientX:5,clientY:5})); })()`,
+  );
+  check(
+    (await cdp.evaluate<number>("document.querySelectorAll('.search-hand.pulse').length")) > 0,
+    "hovering a tagged legend chip pulses its hands on the map",
+  );
   // Clear the pet tag so the later 'empties' assertion sees a clean filter.
   await cdp.evaluate(
     `(() => { const g = document.querySelector('#affinity .bgroup.avail.gsel[data-ids^="pet:"]'); if (g) g.querySelector('[data-gtoggle]').dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true})); })()`,

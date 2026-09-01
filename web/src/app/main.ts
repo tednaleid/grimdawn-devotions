@@ -490,6 +490,27 @@ async function boot() {
   benefitsEl.addEventListener("mouseleave", powerRowLeave);
   affinityEl.addEventListener("mouseleave", powerRowLeave);
 
+  // Hovering a tagged row or a fully tagged chip pulses that search's hands on the map once, so
+  // the legend points at its hands. Delegated on both sidebar containers like powerRowHover (the
+  // rows are re-rendered on every refresh); a row pulses when the pointer arrives, not on every
+  // move within it, and pulses again only after the pointer has left it.
+  let pulsedKey: string | null = null;
+  const tagRowHover = (e: Event) => {
+    const row = (e.target as Element)?.closest?.(".vsel[data-vid], .vsel[data-ids], .gsel[data-ids]");
+    const key = row ? (row.getAttribute("data-vid") ?? row.getAttribute("data-ids")) : null;
+    if (key === pulsedKey) return;
+    pulsedKey = key;
+    if (!key) return;
+    handle.pulseHands(key.split(",").flatMap((id) => markSlots.get(id) ?? []));
+  };
+  const tagRowLeave = () => {
+    pulsedKey = null;
+  };
+  benefitsEl.addEventListener("mousemove", tagRowHover);
+  affinityEl.addEventListener("mousemove", tagRowHover);
+  benefitsEl.addEventListener("mouseleave", tagRowLeave);
+  affinityEl.addEventListener("mouseleave", tagRowLeave);
+
   // Benefit selection: click a value to toggle just it; click a subject to toggle
   // all of its values (so the group reads as selected only when every value is). Attached to both
   // sidebars: the "have" benefits live in the left panel, "available to get" in the right one.
@@ -935,6 +956,9 @@ async function boot() {
   let searchTimer: ReturnType<typeof setTimeout> | undefined;
   const searchPanel = mountSearchPanel(searchPanelEl, localization, {
     initial: query,
+    onHover() {
+      if (query) handle.pulseHands([QUERY_HAND_SLOT]);
+    },
     onInput(q) {
       query = normalizeQuery(q); // the same normal form the hash stores, so a shared link restores what is on screen
       clearTimeout(searchTimer);

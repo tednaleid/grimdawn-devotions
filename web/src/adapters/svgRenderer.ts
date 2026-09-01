@@ -493,6 +493,9 @@ export interface SvgHandle {
   // Emphasize (or clear, with null) a single star with the benefit-match treatment (enlarged + halo),
   // on top of every layer. Used for side-panel power-row hover so the power's own star pops on the map.
   highlightStar(id: string | null): void;
+  // Pulse every hand of the given style slots once (the .pulse CSS animation), so hovering a
+  // legend row shows which hands on the map are that search's. An empty list only clears.
+  pulseHands(slots: readonly number[]): void;
 }
 export type HoverTarget = { kind: "star" | "constellation"; id: string } | null;
 export interface SvgDeps {
@@ -604,6 +607,21 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     live.appendChild(shape);
   }
 
+  // Pulse the hands of the given slots once: the .pulse class runs one CSS animation cycle and is
+  // removed when it ends, so a later hover can pulse again. Any pulse still running is cut first.
+  function pulseHands(slots: readonly number[]) {
+    const live = container.querySelector("svg") as SVGSVGElement | null;
+    if (!live) return;
+    live.querySelectorAll(".search-hand.pulse").forEach((el) => {
+      el.classList.remove("pulse");
+    });
+    if (slots.length === 0) return;
+    live.querySelectorAll(slots.map((s) => `.search-hand[data-slot="${s}"]`).join(",")).forEach((el) => {
+      el.classList.add("pulse");
+      el.addEventListener("animationend", () => el.classList.remove("pulse"), { once: true });
+    });
+  }
+
   return {
     svg,
     update(state, opts) {
@@ -615,5 +633,6 @@ export function mountSvg(container: HTMLElement, model: DevotionModel, deps: Svg
     },
     highlightCon,
     highlightStar,
+    pulseHands,
   };
 }

@@ -937,6 +937,25 @@ main {
   stroke-opacity: 0.18;
   stroke-width: 1;
 }
+/* Hovering a legend row pulses its search's hands once (pulseHands on the map handle): an opacity
+   dip rather than a size change, so the hand geometry stays readable mid-pulse. */
+@keyframes hand-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+.search-hand.pulse {
+  animation: hand-pulse 600ms ease-in-out 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .search-hand.pulse {
+    animation: none;
+  }
+}
 /* The legend swatch: a mini star wearing one hand at a search's angle in its color, keying rows,
    chips, and the search box to the map's hands. */
 .hand-swatch {

@@ -119,14 +119,9 @@ the query's constellation halo is tinted its reserved color. See
 `web/src/adapters/handPalette.ts`, and the design record
 `docs/superpowers/specs/2026-09-01-search-hands-design.md`.
 
-- **Hover a benefit row to pulse its hands on the map.** One opacity cycle
-  (about 600 ms) on every `.search-hand[data-slot=N]` while a selected row (or
-  the search box) is hovered, honoring `prefers-reduced-motion`. Pointers:
-  `powerRowHover` in `web/src/app/main.ts` shows the container-level hover
-  pattern that survives innerHTML re-renders; the hand groups already carry
-  `data-slot` (`handMarkup` in `web/src/adapters/svgRenderer.ts`).
 - **Hold to solo.** While a row is held, drop every other slot's hands to 20%
-  opacity so one search can be read alone. Same wiring as the pulse.
+  opacity so one search can be read alone. Same wiring as the hover pulse
+  (`tagRowHover` in `web/src/app/main.ts`, `pulseHands` on the map handle).
 - **Zoom level of detail.** Below the zoom where the track circle renders under
   about 20 px, hands are noise; collapse a star's hands to one presence halo
   (white, or the heaviest slot's color). Only if whole-map zoom looks bad.

@@ -14,7 +14,7 @@ export interface SearchPanelHandle {
 export function mountSearchPanel(
   el: HTMLElement,
   loc: Localization,
-  opts: { initial: string; onInput(q: string): void },
+  opts: { initial: string; onInput(q: string): void; onHover?(): void },
 ): SearchPanelHandle {
   let localization = loc;
   let last: SearchMatch | null = null;
@@ -62,6 +62,9 @@ export function mountSearchPanel(
   input.value = opts.initial;
   applyChrome();
   input.addEventListener("input", () => opts.onInput(input.value));
+  // The pointer entering the box lets the app pulse the query's hands on the map: the search box
+  // is the query's legend row.
+  input.addEventListener("mouseenter", () => opts.onHover?.());
   input.addEventListener("keydown", (e) => {
     const ev = e as KeyboardEvent;
     if (ev.key !== "Escape") return;

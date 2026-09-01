@@ -52,8 +52,15 @@ function mount(initial = "") {
     querySelector: (sel: string) => kids[sel as keyof typeof kids],
   } as unknown as HTMLElement;
   const onInputCalls: string[] = [];
-  const handle = mountSearchPanel(root, enLoc, { initial, onInput: (q) => onInputCalls.push(q) });
-  return { handle, kids, onInputCalls };
+  let onHoverCalls = 0;
+  const handle = mountSearchPanel(root, enLoc, {
+    initial,
+    onInput: (q) => onInputCalls.push(q),
+    onHover: () => {
+      onHoverCalls++;
+    },
+  });
+  return { handle, kids, onInputCalls, hoverCalls: () => onHoverCalls };
 }
 
 function match(constellations: string[], stars: string[]): SearchMatch {
@@ -161,4 +168,10 @@ test("an active query shows the query's swatch, its hand straight up, in the sea
   );
   handle.setCount(null);
   expect(kids["#search-swatch"].innerHTML).toBe("");
+});
+
+test("the pointer entering the search box notifies onHover, so the map can pulse the query's hands", () => {
+  const { kids, hoverCalls } = mount("physical");
+  kids["#search-input"].fire("mouseenter");
+  expect(hoverCalls()).toBe(1);
 });
