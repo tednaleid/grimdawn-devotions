@@ -8,6 +8,7 @@ import {
   arcPath,
   markStyle,
   markSwatchSvg,
+  roundedSectorPath,
 } from "../src/adapters/markPalette";
 import { affinityColor } from "../src/adapters/affinityColors";
 
@@ -80,4 +81,20 @@ test("the swatch is a neutral mini star with a 90-degree arc centred on the styl
 
 test("the swatch arc for north sits across the top", () => {
   expect(markSwatchSvg({ angle: 0, color: "#f0f4ff" })).toContain('<path d="M 4.04 4.04 A 5.6 5.6 0 0 1 11.96 4.04"');
+});
+
+test("roundedSectorPath outlines a ring sector whose four corners are arcs tangent to an edge and an end line", () => {
+  // Inner 10, outer 20, north to east, corner radius 4: the outer edge runs clockwise, the inner
+  // edge back, and each corner sits where its circle touches the edge and the radial end line.
+  expect(roundedSectorPath(0, 0, 10, 20, 0, 90, 4)).toBe(
+    "M 5 -19.36 A 20 20 0 0 1 19.36 -5 A 4 4 0 0 1 15.49 0 L 13.42 0 A 4 4 0 0 1 9.58 -2.86 A 10 10 0 0 0 2.86 -9.58 A 4 4 0 0 1 0 -13.42 L 0 -15.49 A 4 4 0 0 1 5 -19.36 Z",
+  );
+});
+
+test("roundedSectorPath shrinks the corners to fit a sector too narrow for them", () => {
+  // A 4-degree sector of a ring from 10 to 20 cannot hold 4-unit corners; the corner radius drops
+  // to what fits and the inner edge collapses to a point rather than running the long way round.
+  const d = roundedSectorPath(0, 0, 10, 20, 0, 4, 4);
+  expect(d).not.toContain("A 4 4 ");
+  expect(d).toMatch(/A 10 10 0 0 0 /);
 });

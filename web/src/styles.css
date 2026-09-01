@@ -914,16 +914,11 @@ main {
   /* SVG-native halo (see #match-glow in the renderer); CSS drop-shadow on SVG fails on WebKit/iOS. */
   filter: url(#match-glow);
 }
-/* Search arcs: the half-ring marker on a star matched by one or more searches. Geometry (radius,
-   angular extents, per-arc widths and colors) is data-driven in the renderer; the tunable look
-   lives here: round ends (the renderer shortens each path by a cap so seams survive) and the
-   faint track ring that shows where no arc is. */
+/* Search arcs: the half-ring marker on a star matched by one or more searches. Geometry (radii,
+   angular extents, rounded corners, per-arc widths and fills) is data-driven in the renderer; the
+   tunable look here is the faint track ring that shows where no arc is. */
 .search-arcs {
   pointer-events: none;
-}
-.search-arc path {
-  fill: none;
-  stroke-linecap: round;
 }
 .arc-track {
   fill: none;

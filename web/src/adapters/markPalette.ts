@@ -59,6 +59,54 @@ export function arcPath(cx: number, cy: number, r: number, a0: number, a1: numbe
   return `M ${p.x} ${p.y} A ${r} ${r} 0 ${large} 1 ${q.x} ${q.y}`;
 }
 
+/**
+ * SVG path data for a filled ring sector from a0 to a1 (degrees clockwise from up) between radii
+ * ri and ro around (cx, cy), its four corners rounded to radius rc: the outer edge runs clockwise,
+ * the inner edge back, and each corner is an arc tangent to its edge and its radial end line. The
+ * corner radius is capped at half the ring's width and at what a narrow sector can hold.
+ */
+export function roundedSectorPath(
+  cx: number,
+  cy: number,
+  ri: number,
+  ro: number,
+  a0: number,
+  a1: number,
+  rc: number,
+): string {
+  const rad = (deg: number) => (deg * Math.PI) / 180;
+  const deg = (r: number) => (r * 180) / Math.PI;
+  // Corners fit when the inner edge still has room between them: 2 * asin(r / (ri + r)) <= span.
+  const half = Math.sin(rad((a1 - a0) / 2));
+  const rFit = half >= 1 ? Infinity : (ri * half) / (1 - half);
+  const r = Math.round(Math.max(0, Math.min(rc, (ro - ri) / 2, rFit)) * 100) / 100;
+  // Angular offset of each corner's centre from its end line, and the radius of the point where
+  // the corner touches that line.
+  const dOut = deg(Math.asin(r / (ro - r)));
+  const dIn = deg(Math.asin(r / (ri + r)));
+  const tOut = (ro - r) * Math.cos(rad(dOut));
+  const tIn = (ri + r) * Math.cos(rad(dIn));
+  const pt = (radius: number, angle: number) => {
+    const p = polarPoint(cx, cy, radius, angle);
+    return `${p.x} ${p.y}`;
+  };
+  const corner = (radius: number, angle: number) => `A ${r} ${r} 0 0 1 ${pt(radius, angle)}`;
+  const outerLarge = a1 - a0 - 2 * dOut > 180 ? 1 : 0;
+  const innerLarge = a1 - a0 - 2 * dIn > 180 ? 1 : 0;
+  return [
+    `M ${pt(ro, a0 + dOut)}`,
+    `A ${ro} ${ro} 0 ${outerLarge} 1 ${pt(ro, a1 - dOut)}`,
+    corner(tOut, a1),
+    `L ${pt(tIn, a1)}`,
+    corner(ri, a1 - dIn),
+    `A ${ri} ${ri} 0 ${innerLarge} 0 ${pt(ri, a0 + dIn)}`,
+    corner(tIn, a0),
+    `L ${pt(tOut, a0)}`,
+    corner(ro, a0 + dOut),
+    "Z",
+  ].join(" ");
+}
+
 // The swatch's mini star: a neutral disc (a placeholder for "a star", not an affinity), a faint
 // track, and a 90-degree arc centred on the mark's angle, in a 16-unit view box drawn at 16px.
 // The map draws half circles; the swatch's quarter leaves room on both sides so the direction

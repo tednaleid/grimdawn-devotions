@@ -5,7 +5,7 @@ import type { ReachView } from "../core/reachability";
 import { affinityColor, glowColor, presentAffinities } from "./affinityColors";
 import { constellationDisplay, starDisplay, edgeDisplay } from "../core/displayState";
 import { fitViewBox, toViewBoxString } from "../core/viewbox";
-import { arcPath, MARK_COLORS, type MarkStyle } from "./markPalette";
+import { MARK_COLORS, type MarkStyle, roundedSectorPath } from "./markPalette";
 import type { AssetManifest } from "../ports/DataSource";
 
 // A constellation's identity colors = the affinities it GRANTS when fully filled (1-3).
@@ -58,14 +58,17 @@ const EDGE_OPACITY = { active: 1, attainable: 1, unattainable: 0.3 } as const;
 // one, so the brightness channel still reads under a filter (reachable matches are not just colored).
 const HALO_UNREACHABLE_OPACITY = 0.25;
 // Search arcs ride a ring just outside the star dot (and outside the larger power diamond): the
-// base radius is the centre line of a base-width stroke, so the ring's inner edge (7 units
-// beyond the dot) stays fixed.
+// track radius is the centre line of a base-width arc, so the ring's inner edge (7 units beyond
+// the dot) stays fixed.
 const ARC_RADIUS = STAR_RADIUS + 15;
 const POWER_ARC_RADIUS = POWER_RADIUS + 14;
-// Base arc stroke width; an arc thickens up to triple with its star's magnitude weight for the
-// search, growing OUTWARD from the fixed inner edge (r = inner + w/2) so the dot stays clear.
+// Base arc width; an arc thickens up to triple with its star's magnitude weight for the search,
+// growing OUTWARD from the fixed inner edge (outer edge = inner + w) so the dot stays clear.
 const ARC_WIDTH = 16;
 const ARC_WEIGHT_SPAN = 2;
+// Corner radius of an arc's four rounded corners, as a fraction of its width: under the half that
+// would make a fully round end, so ends read as squared-off pills.
+const ARC_CORNER = 0.3;
 // Degrees of seam between two arcs that meet, split evenly across the seam.
 const ARC_SEAM_DEG = 6;
 // Searches sharing an angle stack outward, this far apart.
@@ -93,12 +96,11 @@ function arcExtents(angles: readonly number[]): Map<number, { from: number; to: 
   return out;
 }
 
-// The arcs marker for one star: a faint track ring plus, per matching search, a stroked arc over
-// its angular extent (arcExtents), thickened outward by the star's magnitude weight. Marks sharing
-// an angle (slots eight apart) stack outward in slot order. Ends are round caps (.search-arc CSS),
-// which reach half the width past a path's ends, so each path stops one cap short of its extent
-// and the cap fills it: a lone half stays a half, and seams keep their gap at any width. The track
-// look is CSS too; the widths are per-arc attributes here.
+// The arcs marker for one star: a faint track ring plus, per matching search, a filled ring
+// sector over its angular extent (arcExtents), thickened outward by the star's magnitude weight,
+// its corners rounded (roundedSectorPath) so ends read as squared-off pills while seams sit
+// exactly at the extents. Marks sharing an angle (slots eight apart) stack outward in slot order.
+// The track look is CSS; the sector geometry and fill are attributes here.
 function arcMarkup(cx: number, cy: number, baseR: number, marks: readonly StarMark[]): string {
   const inner = baseR - ARC_WIDTH / 2;
   const byAngle = new Map<number, StarMark[]>();
@@ -112,15 +114,10 @@ function arcMarkup(cx: number, cy: number, baseR: number, marks: readonly StarMa
     let edge = inner;
     for (const m of byAngle.get(angle)!.sort((a, b) => a.slot - b.slot)) {
       const w = Math.round(ARC_WIDTH * (1 + ARC_WEIGHT_SPAN * m.weight) * 10) / 10;
-      const r = edge + w / 2;
-      const cap = (Math.asin(Math.min(1, w / 2 / r)) * 180) / Math.PI;
-      // An extent narrower than two caps degenerates to a short stub (the caps become a dot).
-      const span = Math.max(0.5, to - from - 2 * cap);
-      const mid = (from + to) / 2;
-      const d = arcPath(cx, cy, r, mid - span / 2, mid + span / 2);
+      const d = roundedSectorPath(cx, cy, edge, edge + w, from, to, ARC_CORNER * w);
       arcs.push(
         `<g class="search-arc" data-slot="${m.slot}" data-from="${from}" data-to="${to}">` +
-          `<path class="arc" d="${d}" stroke="${m.style.color}" stroke-width="${w}"/></g>`,
+          `<path class="arc" d="${d}" fill="${m.style.color}"/></g>`,
       );
       edge += w + ARC_STACK_GAP;
     }

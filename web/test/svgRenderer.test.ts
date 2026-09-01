@@ -255,15 +255,14 @@ test("a single-search match draws a track and a half ring centred on that search
   // Slot 1 is south (180 degrees): alone, its half ring runs the whole bottom, 90 to 270.
   expect(arcSpans(arcs)).toEqual([{ slot: 1, from: 90, to: 270 }]);
   const arc = arcOf(arcs, 1);
-  // One stroked path on the base ring radius at base width; no outline underneath.
-  expect(arc).toMatch(/<path class="arc" d="M [^"]*A 27 27 0 0 1 [^"]*" stroke="#3f93d8" stroke-width="16"\/>/);
+  // A filled ring sector (inner edge 19, outer 35 at base width) with rounded corners, not a
+  // stroke: the corner radius is three tenths of the width, so ends read as squared-off pills
+  // and the seam between neighbours sits exactly where the extents put it.
+  expect(arc).toMatch(/<path class="arc" d="M [^"]*A 35 35 0 0 1 [^"]*A 19 19 0 0 0 [^"]*Z" fill="#3f93d8"\/>/);
+  expect(arc.match(/A 4\.8 4\.8 0 0 1 /g)!.length).toBe(4); // four corners at 0.3 * 16
+  expect(arc).not.toContain("stroke");
   expect(arcs).not.toContain("arc-outline");
   expect(markStyle(1).color).toBe("#3f93d8"); // slot 1: primordial blue
-  // Ends are round caps, which reach half the width past the path's ends, so the path stops one
-  // cap short of the extent on each side and the cap fills it: the half stays a half. At width
-  // 16 on radius 27 the cap is asin(8/27) = 17.24 degrees, so the path runs 107.24 to 252.76.
-  const near = (v: number) => Math.round(v * 100) / 100; // the renderer's two-decimal rounding
-  expect(arc).toContain(`d="M ${near(cx + 25.79)} ${cy + 8} A 27 27 0 0 1 ${near(cx - 25.79)} ${cy + 8}"`);
 });
 
 test("a star's arcs are painted under its dot, so a neighbouring dot stays on top of a wide arc", () => {
@@ -323,9 +322,9 @@ test("arc width grows outward with magnitude weight: base 16 at 0, triple at 1, 
     const markup = renderSvgMarkup(model, noSel, { manifest: null, marks: new Map([[star, [mark(1, weight)]]]) });
     return arcOf(arcsOf(markup), 1);
   };
-  // Inner edge 19 (base radius 27 less half the base width); r = 19 + w/2.
-  expect(at(1)).toMatch(/<path class="arc" d="M [^"]*A 43 43 [^"]*" stroke="#3f93d8" stroke-width="48"\/>/);
-  expect(at(0.5)).toMatch(/<path class="arc" d="M [^"]*A 35 35 [^"]*" stroke="#3f93d8" stroke-width="32"\/>/);
+  // The inner edge stays at 19; the outer edge is 19 + width: 67 at weight 1, 51 at weight 0.5.
+  expect(at(1)).toMatch(/<path class="arc" d="M [^"]*A 67 67 0 0 1 [^"]*A 19 19 0 0 0 [^"]*Z" fill="#3f93d8"\/>/);
+  expect(at(0.5)).toMatch(/<path class="arc" d="M [^"]*A 51 51 0 0 1 [^"]*A 19 19 0 0 0 [^"]*Z" fill="#3f93d8"\/>/);
 });
 
 test("searches sharing an angle stack outward, lower slot inside, each at its own width", () => {
@@ -339,9 +338,13 @@ test("searches sharing an angle stack outward, lower slot inside, each at its ow
     { slot: 0, from: -90, to: 90 },
     { slot: 8, from: -90, to: 90 },
   ]);
-  expect(arcOf(arcs, 0)).toMatch(/<path class="arc" d="M [^"]*A 27 27 [^"]*" stroke="#e6c34d" stroke-width="16"\/>/);
-  // The outer arc starts a 2-unit gap beyond the inner one's outer edge (35): r = 37 + 16/2.
-  expect(arcOf(arcs, 8)).toMatch(/<path class="arc" d="M [^"]*A 45 45 [^"]*" stroke="#36b56a" stroke-width="16"\/>/);
+  expect(arcOf(arcs, 0)).toMatch(
+    /<path class="arc" d="M [^"]*A 35 35 0 0 1 [^"]*A 19 19 0 0 0 [^"]*Z" fill="#e6c34d"\/>/,
+  );
+  // The outer sector starts a 2-unit gap beyond the inner one's outer edge (35): 37 to 53.
+  expect(arcOf(arcs, 8)).toMatch(
+    /<path class="arc" d="M [^"]*A 53 53 0 0 1 [^"]*A 37 37 0 0 0 [^"]*Z" fill="#36b56a"\/>/,
+  );
 });
 
 test("a power star's ring sits outside its larger diamond", () => {
@@ -350,7 +353,7 @@ test("a power star's ring sits outside its larger diamond", () => {
   const { cx, cy } = centerOf(markup, power.id);
   const arcs = arcsOf(markup);
   expect(arcs).toContain(`<circle class="arc-track" cx="${cx}" cy="${cy}" r="33"/>`); // POWER_RADIUS 19 + 14
-  expect(arcOf(arcs, 1)).toMatch(/<path class="arc" d="M [^"]*A 33 33 [^"]*"/);
+  expect(arcOf(arcs, 1)).toMatch(/<path class="arc" d="M [^"]*A 41 41 0 0 1 [^"]*A 25 25 0 0 0 [^"]*Z"/); // 25 to 41
 });
 
 test("an unattainable, non-matching constellation carries both mute class and unattainable opacity", () => {

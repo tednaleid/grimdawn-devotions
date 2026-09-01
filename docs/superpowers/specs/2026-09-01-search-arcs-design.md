@@ -38,14 +38,14 @@ ARC_SEAM_DEG     = 6                    // split across a seam where two arcs me
 ```
 
 Magnitude is stroke width growing outward from the fixed inner edge, as the split rings did it;
-width is the channel that keeps the paint area large. Ends are round caps; because a cap reaches
-half the width past a path's end, each path stops one cap short of its extent (asin(w/2 / r)
-degrees) and the cap fills it, so a lone half stays a half and seams keep their gap at any
-width. A faint track ring under the arcs shows where no arc is. Review history: the first cut
+width is the channel that keeps the paint area large. Each arc is a filled ring sector with its
+four corners rounded to three tenths of the width (`roundedSectorPath` in `markPalette.ts`), so
+ends read as squared-off pills rather than full semicircles and seams sit exactly at the
+extents. A faint track ring under the arcs shows where no arc is. Review history: the first cut
 had a dark outline and flat ends at base width 8; with the affinity palette the base arcs were
 small and blended into same-hued dots and art, so the floor doubled (8 to 16) and the ceiling
-rose by half (32 to 48); a light outline was tried and rejected, and the outline went away in
-favour of round ends.
+rose by half (32 to 48); a light outline was tried and rejected; the outline went away in favour
+of round caps, then the caps softened to rounded-corner sectors.
 
 ### The query is a regular search
 
