@@ -257,9 +257,9 @@ test("a single-search match draws a track and a half ring centred on that search
   const arc = arcOf(arcs, 1);
   // A dark outline path under the colored arc, both on the base ring radius at base width.
   expect(arc).toMatch(
-    /<path class="arc-outline" d="M [^"]*A 23 23 0 0 1 [^"]*" stroke-width="12"\/><path class="arc" d="M [^"]*A 23 23 0 0 1 [^"]*" stroke="#3ee6d8" stroke-width="8"\/>/,
+    /<path class="arc-outline" d="M [^"]*A 23 23 0 0 1 [^"]*" stroke-width="12"\/><path class="arc" d="M [^"]*A 23 23 0 0 1 [^"]*" stroke="#3f93d8" stroke-width="8"\/>/,
   );
-  expect(markStyle(1).color).toBe("#3ee6d8");
+  expect(markStyle(1).color).toBe("#3f93d8");
 });
 
 test("a star's arcs are painted under its dot, so a neighbouring dot stays on top of a wide arc", () => {
@@ -320,9 +320,9 @@ test("arc width grows outward with magnitude weight: base 8 at 0, quadruple at 1
     return arcOf(arcsOf(markup), 1);
   };
   // Inner edge 19 (base radius 23 less half the base width); r = 19 + w/2.
-  expect(at(1)).toMatch(/<path class="arc" d="M [^"]*A 35 35 [^"]*" stroke="#3ee6d8" stroke-width="32"\/>/);
+  expect(at(1)).toMatch(/<path class="arc" d="M [^"]*A 35 35 [^"]*" stroke="#3f93d8" stroke-width="32"\/>/);
   expect(at(1)).toMatch(/<path class="arc-outline" d="M [^"]*A 35 35 [^"]*" stroke-width="36"\/>/);
-  expect(at(0.5)).toMatch(/<path class="arc" d="M [^"]*A 29 29 [^"]*" stroke="#3ee6d8" stroke-width="20"\/>/);
+  expect(at(0.5)).toMatch(/<path class="arc" d="M [^"]*A 29 29 [^"]*" stroke="#3f93d8" stroke-width="20"\/>/);
 });
 
 test("searches sharing an angle stack outward, lower slot inside, each at its own width", () => {
@@ -336,9 +336,9 @@ test("searches sharing an angle stack outward, lower slot inside, each at its ow
     { slot: 0, from: -90, to: 90 },
     { slot: 8, from: -90, to: 90 },
   ]);
-  expect(arcOf(arcs, 0)).toMatch(/<path class="arc" d="M [^"]*A 23 23 [^"]*" stroke="#f0f4ff" stroke-width="8"\/>/);
+  expect(arcOf(arcs, 0)).toMatch(/<path class="arc" d="M [^"]*A 23 23 [^"]*" stroke="#e6c34d" stroke-width="8"\/>/);
   // The outer arc starts a 2-unit gap beyond the inner one's outer edge (27): r = 29 + 8/2.
-  expect(arcOf(arcs, 8)).toMatch(/<path class="arc" d="M [^"]*A 33 33 [^"]*" stroke="#ff5e8a" stroke-width="8"\/>/);
+  expect(arcOf(arcs, 8)).toMatch(/<path class="arc" d="M [^"]*A 33 33 [^"]*" stroke="#36b56a" stroke-width="8"\/>/);
 });
 
 test("a power star's ring sits outside its larger diamond", () => {
@@ -443,7 +443,7 @@ test("a matched constellation with art gets a search-glow halo", () => {
 });
 
 test("the constellation search halo floods in the query's mark color", () => {
-  const queryColor = "#3ee6d8";
+  const queryColor = "#3f93d8";
   // The text query is the only search that matches whole constellations, so its halo carries the
   // query's mark color for this render - the same color its star-level arcs use.
   const withArt = [...model.constellations.values()].find((c) => c.background?.image)!;

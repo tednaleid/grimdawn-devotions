@@ -1,5 +1,6 @@
 // ABOUTME: The search-mark style palette: a fixed angle plus color per slot for concurrent searches
 // ABOUTME: (benefit tags and the text query alike), and the mini-star swatch that keys chrome to the map.
+import { affinityColor } from "./affinityColors";
 
 /**
  * Mark angles by slot, in degrees clockwise from straight up. North then south lead: one or two
@@ -13,13 +14,21 @@
 export const MARK_ANGLES = [0, 180, 90, 270, 315, 225, 45, 135] as const;
 
 /**
- * Mark colors by slot. Star cores already spend magenta/red/green/yellow/blue on affinity
- * identity, so these sit between those hues. White leads because pure lightness survives every
- * color vision deficiency; cyan and orange are near-complements; pink and lavender, the closest
- * pair, come last. Five colors against eight angles are coprime, so the combined style stays
- * unique for MARK_STYLE_COUNT slots.
+ * Mark colors by slot: the five affinity orb colors, so the map wears one palette. Direction is
+ * the primary identity, so the colors only need to tell neighbours apart: gold leads as the
+ * lightest, blue is its opposite, and red and green sit east and west so the pair that red-green
+ * color vision deficiency merges is always parted by direction. Five colors against eight angles
+ * are coprime, so the combined style stays unique for MARK_STYLE_COUNT slots. A search's color
+ * can coincide with its star's affinity, and the query's halo with an affinity-filter halo; the
+ * arcs' outline and track, and the star arcs a query always adds, keep those apart.
  */
-export const MARK_COLORS = ["#f0f4ff", "#3ee6d8", "#ff9440", "#ff5e8a", "#a78bff"] as const;
+export const MARK_COLORS = [
+  affinityColor("order"),
+  affinityColor("primordial"),
+  affinityColor("chaos"),
+  affinityColor("eldritch"),
+  affinityColor("ascendant"),
+] as const;
 
 const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
 

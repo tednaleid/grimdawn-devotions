@@ -60,6 +60,17 @@ before the diagonals, the best keeps every same-color pair (slots five apart) at
 degrees apart through seven concurrent searches, and the eighth search is the first to share a
 color with a 45-degree neighbour (east and southeast). The palette test pins exactly that.
 
+### Colors: the affinity palette
+
+Direction now carries identity, so the mark colors only need to tell neighbours apart, and the
+review found the between-affinity hues (white, cyan, orange, pink, lavender) busy next to the
+affinity-colored dots. The marks take the five affinity orb colors instead, from
+`affinityColors.ts`, in the order gold, blue, red, green, purple: gold leads as the lightest,
+blue is its opposite, and red and green sit east and west so the pair red-green color vision
+deficiency merges is always parted by direction. Known cost: with an affinity filter and a text
+query both active, the query's constellation halo can match a filter halo's hue; the star arcs
+the query always adds tell them apart, and the combination is uncommon.
+
 ### Legend swatch
 
 The mini star's hand becomes a 90-degree arc centred on the slot's angle. A quarter, not a half,

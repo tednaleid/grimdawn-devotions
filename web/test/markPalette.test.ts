@@ -9,6 +9,7 @@ import {
   markStyle,
   markSwatchSvg,
 } from "../src/adapters/markPalette";
+import { affinityColor } from "../src/adapters/affinityColors";
 
 const angleGap = (a: number, b: number) => {
   const d = Math.abs(a - b) % 360;
@@ -47,10 +48,21 @@ test("north then south lead, so one or two searches get clean opposite halves; e
   expect(MARK_ANGLES.slice(0, 4)).toEqual([0, 180, 90, 270]);
 });
 
-test("five distinct benefit colors, white first (lightness survives every color deficiency)", () => {
-  expect(MARK_COLORS.length).toBe(5);
-  expect(new Set(MARK_COLORS).size).toBe(MARK_COLORS.length);
-  expect(MARK_COLORS[0]!.toLowerCase()).toBe("#f0f4ff");
+test("the five affinity orb colors, gold then blue first, so the map wears one palette", () => {
+  expect(MARK_COLORS).toEqual([
+    affinityColor("order"),
+    affinityColor("primordial"),
+    affinityColor("chaos"),
+    affinityColor("eldritch"),
+    affinityColor("ascendant"),
+  ]);
+  expect(new Set(MARK_COLORS).size).toBe(5);
+});
+
+test("red and green take opposite directions, so the pair color vision deficiency merges is parted by direction", () => {
+  expect(markStyle(2).color).toBe(affinityColor("chaos"));
+  expect(markStyle(3).color).toBe(affinityColor("eldritch"));
+  expect(angleGap(markStyle(2).angle, markStyle(3).angle)).toBe(180);
 });
 
 test("arcPath draws clockwise from the first angle to the second, flagging arcs past a half turn", () => {
