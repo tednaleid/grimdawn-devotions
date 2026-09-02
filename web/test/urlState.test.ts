@@ -8,6 +8,7 @@ import {
   canonicalStatIds,
   canonicalBenefitIds,
   canonicalPowerStatIds,
+  deprecatedBenefitIds,
   encodeHash,
   decodeHash,
 } from "../src/core/urlState";
@@ -283,4 +284,24 @@ test("gt= alone is enough to make a hash ours to decode", () => {
 
 test("an empty source emits no gt= at all", () => {
   expect(encodeHash(new Set(), 55, canonical, new Set(), [], null, "", "")).not.toContain("gt=");
+});
+
+test("deprecatedBenefitIds: a power's effect timers keep their vocabulary positions but are deprecated", () => {
+  const deprecated = deprecatedBenefitIds(model);
+  expect(deprecated.has("offensiveSlowLightningDurationMin")).toBe(true);
+  expect(deprecated.has("offensiveTotalResistanceReductionAbsoluteDurationMin")).toBe(true);
+  expect(deprecated.has("offensiveStunMin")).toBe(false);
+  expect(deprecated.has("offensiveSlowColdDurationMin")).toBe(false); // a star bonus, still live
+  const ids = canonicalBenefitIds(model);
+  for (const id of deprecated) expect(ids).toContain(id);
+});
+
+test("a deprecated tag decodes as absent while live tags keep their positions", () => {
+  const benefitCanonical = canonicalBenefitIds(model);
+  const dead = "offensiveSlowLightningDurationMin";
+  const live = "offensiveStunMin";
+  const hash = encodeHash(new Set(), 55, canonical, new Set([dead, live]), benefitCanonical);
+  const decoded = decodeHash(`#${hash}`, canonical, benefitCanonical, deprecatedBenefitIds(model))!;
+  expect(decoded.benefits.has(dead)).toBe(false);
+  expect(decoded.benefits.has(live)).toBe(true);
 });

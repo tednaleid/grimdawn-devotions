@@ -2,7 +2,7 @@
 // ABOUTME: Each selection is a trailing-trimmed bitset over a stable canonical id order, base64url-encoded.
 import { AFFINITIES, type DevotionModel, type StarId } from "./types";
 import { affinityTagId, petTagId } from "./benefitTag";
-import { isFilterableStat } from "./statFormat";
+import { isFilterableStat, isPowerEffectDuration } from "./statFormat";
 
 const MIN_CAP = 1;
 const MAX_CAP = 55;
@@ -73,6 +73,7 @@ export function canonicalPetStatIds(model: DevotionModel): string[] {
 /**
  * Recognized celestial-power stat ids that are NOT already player-bonus ids. These extend the benefit
  * vocabulary so powers' debuff/CC/RR subjects become filterable. "Other" (ability-meta) ids are excluded.
+ * Deprecated ids (see deprecatedBenefitIds) are kept: a bit position is wire format.
  */
 export function canonicalPowerStatIds(model: DevotionModel): string[] {
   const bonus = new Set(canonicalStatIds(model));
@@ -83,6 +84,16 @@ export function canonicalPowerStatIds(model: DevotionModel): string[] {
     for (const k of Object.keys(p.stats)) if (!bonus.has(k) && isFilterableStat(k)) set.add(k);
   }
   return [...set].sort();
+}
+
+/**
+ * Deprecated benefit tags: power-only ids that are the power's own effect timers, not benefits it
+ * grants. Every canonical list is append-only (an id is never removed or reordered, since its bit
+ * position is the wire format), so a retired tag keeps its place here and decodes as absent instead:
+ * the catalog never offers it and a stale link cannot restore it.
+ */
+export function deprecatedBenefitIds(model: DevotionModel): Set<string> {
+  return new Set(canonicalPowerStatIds(model).filter(isPowerEffectDuration));
 }
 
 /** The 10 affinity filter tags (each affinity x grant/require), in a stable order. */
@@ -180,6 +191,7 @@ export function decodeHash(
   hash: string,
   canonical: StarId[],
   statCanonical: string[] = [],
+  deprecated: ReadonlySet<string> = new Set(),
 ): {
   selected: Set<StarId>;
   pointCap: number;
@@ -200,6 +212,7 @@ export function decodeHash(
 
   const selected = decodeBitset(params.get("s") ?? "", canonical);
   const benefits = decodeBitset(params.get("b") ?? "", statCanonical);
+  for (const id of deprecated) benefits.delete(id);
 
   // Baseline is active only when cs= decodes to a non-empty selection (a stale/empty/malformed
   // cs= simply means "no comparison", matching the tolerance of the other params).

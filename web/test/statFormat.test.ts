@@ -9,6 +9,7 @@ import {
   formatPowerStats,
   formatPet,
   isFilterableStat,
+  isPowerEffectDuration,
 } from "../src/core/statFormat";
 import { res, resRow, resRows, resSorted } from "./helpers/localizeEn";
 import { makeLocalization, resolveText } from "../src/core/localization";
@@ -475,4 +476,38 @@ test("formatPowerStats attaches the driving stat id to taggable rows", () => {
   // A plain bonus-style stat falls through with its own id.
   const ft = formatPowerStats({ defensiveFire: 10 });
   expect(ft.fallthrough[0]!.id).toBe("defensiveFire");
+});
+
+describe("isPowerEffectDuration: a power's own effect timers are not benefits it grants", () => {
+  test("a damage-over-time tick length is an effect duration", () => {
+    for (const seg of ["Bleeding", "Physical", "Fire", "Cold", "Lightning", "Poison", "Life"])
+      expect(isPowerEffectDuration(`offensiveSlow${seg}DurationMin`)).toBe(true);
+  });
+  test("a debuff timer folded into its magnitude line is an effect duration", () => {
+    for (const id of [
+      "offensiveSlowOffensiveAbilityDurationMin",
+      "offensiveSlowDefensiveAbilityDurationMin",
+      "offensiveSlowRunSpeedDurationMin",
+      "offensiveTotalResistanceReductionAbsoluteDurationMin",
+      "offensiveTotalDamageReductionPercentDurationMin",
+      "offensiveFumbleDurationMin",
+      "offensiveProjectileFumbleDurationMin",
+      "offensiveSlowAttackSpeedDurationMin",
+      "offensiveSlowTotalSpeedDurationMin",
+      "offensiveElementalResistanceReductionAbsoluteDurationMin",
+      "offensivePhysicalReductionPercentDurationMin",
+    ])
+      expect(isPowerEffectDuration(id)).toBe(true);
+  });
+  test("durations with a line of their own, damage, modifiers and ability meta are not", () => {
+    for (const id of [
+      "offensiveSlowManaLeachDurationMin",
+      "offensiveElementalResistanceReductionPercentDurationMin",
+      "offensiveSlowColdMin",
+      "offensiveSlowColdModifier",
+      "skillActiveDuration",
+      "defensiveColdDuration",
+    ])
+      expect(isPowerEffectDuration(id)).toBe(false);
+  });
 });

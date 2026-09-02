@@ -40,6 +40,7 @@ import {
   canonicalBenefitIds,
   canonicalPowerStatIds,
   decodeHash,
+  deprecatedBenefitIds,
   encodeHash,
   normalizeQuery,
 } from "../core/urlState";
@@ -118,6 +119,7 @@ async function boot() {
   const canonical = canonicalStarIds(model);
   const statCanonical = canonicalStatIds(model);
   const benefitCanonical = canonicalBenefitIds(model);
+  const deprecatedBenefits = deprecatedBenefitIds(model);
   let state: SelectionState = { selected: new Set(), pointCap: 55 };
   // Baseline for the comparison mode: null when not comparing.
   let baseline: SelectionState | null = null;
@@ -137,7 +139,7 @@ async function boot() {
   // Decode and repair a hash into planner state. Runs at boot and on every hashchange
   // (Back/Forward, bookmark clicks, hand-edited URLs); an undecodable hash is the empty build.
   function applyHash(hash: string): void {
-    const restored = decodeHash(hash, canonical, benefitCanonical);
+    const restored = decodeHash(hash, canonical, benefitCanonical, deprecatedBenefits);
     state = restored
       ? {
           selected: repairSelection(model, cons, table, restored.selected, restored.pointCap),
@@ -160,7 +162,7 @@ async function boot() {
   // resolved strings), so the catalog is locale-independent and built once at boot.
   const allBonuses: Record<string, number> = {};
   for (const id of statCanonical) allBonuses[id] = 1;
-  for (const id of canonicalPowerStatIds(model)) allBonuses[id] = 1;
+  for (const id of canonicalPowerStatIds(model)) if (!deprecatedBenefits.has(id)) allBonuses[id] = 1;
   // The pet benefit catalog (every pet subject + its stat ids), for the pet "Available to get" list.
   // Pet stat ids are raw here (static per model); the renderer scopes them.
   const allPetBonuses: Record<string, number> = {};

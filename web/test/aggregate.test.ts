@@ -108,23 +108,10 @@ test("starsGranting unions multiple ids and is empty for an empty set", () => {
 });
 
 test("starsGranting matches a star whose celestial power grants the stat", () => {
-  const bonusIds = new Set<string>();
-  for (const s of model.stars.values()) for (const k of Object.keys(s.bonuses)) bonusIds.add(k);
-  let powerStarId: string | undefined;
-  let powerOnlyId: string | undefined;
-  for (const s of model.stars.values()) {
-    const p = s.celestialPower;
-    if (!p) continue;
-    const k = Object.keys(p.stats).find((key) => !bonusIds.has(key));
-    if (k) {
-      powerStarId = s.id;
-      powerOnlyId = k;
-      break;
-    }
-  }
-  expect(powerOnlyId).toBeTruthy();
-  const got = starsGranting(model, new Set([powerOnlyId!]));
-  expect(got.has(powerStarId!)).toBe(true);
+  const powerOnlyId = "offensiveSlowDefensiveAbilityMin"; // Scorpion Sting's reduced DA: no star bonus carries it
+  const powerStarId = [...model.stars.values()].find((s) => powerOnlyId in (s.celestialPower?.stats ?? {}))!.id;
+  const got = starsGranting(model, new Set([powerOnlyId]));
+  expect(got.has(powerStarId)).toBe(true);
 });
 
 test("starsGranting ignores summon-pet attack stats", () => {
@@ -250,22 +237,10 @@ test("starValuesGranting maps each granting star to its value for the id", () =>
 });
 
 test("starValuesGranting reads a power-granted stat's value from the power", () => {
-  const bonusIds = new Set<string>();
-  for (const s of model.stars.values()) for (const k of Object.keys(s.bonuses)) bonusIds.add(k);
-  let powerStarId: string | undefined;
-  let powerOnlyId: string | undefined;
-  for (const s of model.stars.values()) {
-    const p = s.celestialPower;
-    if (!p) continue;
-    const k = Object.keys(p.stats).find((key) => !bonusIds.has(key));
-    if (k) {
-      powerStarId = s.id;
-      powerOnlyId = k;
-      break;
-    }
-  }
-  const values = starValuesGranting(model, powerOnlyId!);
-  expect(values.get(powerStarId!)).toBe(model.stars.get(powerStarId!)!.celestialPower!.stats[powerOnlyId!]!);
+  const powerOnlyId = "offensiveSlowDefensiveAbilityMin"; // Scorpion Sting's reduced DA: no star bonus carries it
+  const powerStarId = [...model.stars.values()].find((s) => powerOnlyId in (s.celestialPower?.stats ?? {}))!.id;
+  const values = starValuesGranting(model, powerOnlyId);
+  expect(values.get(powerStarId)).toBe(model.stars.get(powerStarId)!.celestialPower!.stats[powerOnlyId]!);
 });
 
 test("starValuesGrantingPet maps pet-bonus stars to their pet values", () => {
@@ -274,4 +249,20 @@ test("starValuesGrantingPet maps pet-bonus stars to their pet values", () => {
   const values = starValuesGrantingPet(model, id);
   expect(values.get(petStar.id)).toBe(petStar.petBonuses![id]!);
   expect(new Set(values.keys())).toEqual(starsGrantingPet(model, new Set([id])));
+});
+
+test("starValuesGranting ignores a power's own effect timers: a DoT tick length is not a duration bonus", () => {
+  // Frostburn duration is a bonus on a few stars; the powers that tick Frostburn over N seconds do not grant it.
+  const values = starValuesGranting(model, "offensiveSlowColdDurationMin");
+  expect(values.size).toBeGreaterThan(0);
+  for (const [sid, v] of values) expect(v).toBe(model.stars.get(sid)!.bonuses.offensiveSlowColdDurationMin!);
+  // Electrocute duration rides on powers only, so nothing grants it.
+  expect(starValuesGranting(model, "offensiveSlowLightningDurationMin").size).toBe(0);
+  // The DoT damage itself still lights those powers.
+  const dotPowers = [...model.stars.values()].filter(
+    (s) => s.celestialPower && "offensiveSlowColdMin" in s.celestialPower.stats,
+  );
+  expect(dotPowers.length).toBeGreaterThan(0);
+  const damage = starValuesGranting(model, "offensiveSlowColdMin");
+  for (const s of dotPowers) expect(damage.has(s.id)).toBe(true);
 });

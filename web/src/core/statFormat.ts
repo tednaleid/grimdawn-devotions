@@ -386,6 +386,65 @@ function forSecondsSuffix(seconds: number): Text {
   return appT("stat.power.forSeconds", { seconds: fmtNum(seconds) });
 }
 
+// Offensive/Defensive Ability debuffs (e.g. Scorpion Sting's reduced DA).
+const ABILITY_DEBUFFS: [string, string][] = [
+  ["DefensiveAbility", "stat.power.reducedDefensiveAbility"],
+  ["OffensiveAbility", "stat.power.reducedOffensiveAbility"],
+];
+
+// Other timed target debuffs: a percent movement slow, plus flat/percent resistance
+// and damage reductions (which lack the "Slow" infix the ability debuffs use).
+const TIMED_DEBUFFS: [string, string, string, boolean][] = [
+  ["offensiveSlowRunSpeedMin", "offensiveSlowRunSpeedDurationMin", "stat.power.slowerTargetMovement", true],
+  [
+    "offensiveTotalResistanceReductionAbsoluteMin",
+    "offensiveTotalResistanceReductionAbsoluteDurationMin",
+    "stat.power.reducedTargetResistances",
+    false,
+  ],
+  [
+    "offensiveTotalDamageReductionPercentMin",
+    "offensiveTotalDamageReductionPercentDurationMin",
+    "stat.power.reducedTargetDamage",
+    true,
+  ],
+  // Magnitude + duration status debuffs, reusing the condensed-view subject vocabulary.
+  ["offensiveFumbleMin", "offensiveFumbleDurationMin", "stat.subject.fumble", true],
+  ["offensiveProjectileFumbleMin", "offensiveProjectileFumbleDurationMin", "stat.subject.impairedAim", true],
+  ["offensiveSlowAttackSpeedMin", "offensiveSlowAttackSpeedDurationMin", "stat.subject.slowAttackSpeed", true],
+  ["offensiveSlowTotalSpeedMin", "offensiveSlowTotalSpeedDurationMin", "stat.subject.slowTotalSpeed", true],
+  [
+    "offensiveElementalResistanceReductionAbsoluteMin",
+    "offensiveElementalResistanceReductionAbsoluteDurationMin",
+    "stat.subject.reducedElementalResistancesFlat",
+    false,
+  ],
+  [
+    "offensivePhysicalReductionPercentMin",
+    "offensivePhysicalReductionPercentDurationMin",
+    "stat.subject.reducedPhysicalResistance",
+    true,
+  ],
+];
+
+// A power's timed effects, keyed by the duration stat: the damage-over-time tick lengths and the
+// debuff timers formatPowerStats folds into a magnitude line ("for N seconds").
+const POWER_EFFECT_DURATION_IDS: ReadonlySet<string> = new Set([
+  ...[...DOT_DAMAGE_SEGMENTS].map((seg) => `offensiveSlow${seg}DurationMin`),
+  ...ABILITY_DEBUFFS.map(([seg]) => `offensiveSlow${seg}DurationMin`),
+  ...TIMED_DEBUFFS.map(([, durK]) => durK),
+]);
+
+/**
+ * Whether a stat id is, on a celestial power, the length of the power's own effect rather than a
+ * benefit it grants: a proc that ticks Frostburn over 2 seconds does not extend Frostburn duration.
+ * On a power these ids never light a star or take a tag; the ones no star bonus carries stay in the
+ * URL vocabulary as deprecated tags (see urlState's deprecatedBenefitIds).
+ */
+export function isPowerEffectDuration(id: string): boolean {
+  return POWER_EFFECT_DURATION_IDS.has(id);
+}
+
 /**
  * Format a celestial power's level-selected stat map into GD-style ability rows.
  * Ability meta fields (recharge, projectiles, pass-through, radius, weapon %) and
@@ -458,13 +517,7 @@ export function formatPowerStats(stats: Record<string, number>): PowerRows {
       });
     }
   }
-
-  // Offensive/Defensive Ability debuffs (e.g. Scorpion Sting's reduced DA).
-  const abilityDebuffs: [string, string][] = [
-    ["DefensiveAbility", "stat.power.reducedDefensiveAbility"],
-    ["OffensiveAbility", "stat.power.reducedOffensiveAbility"],
-  ];
-  for (const [seg, key] of abilityDebuffs) {
+  for (const [seg, key] of ABILITY_DEBUFFS) {
     const minK = `offensiveSlow${seg}Min`;
     const durK = `offensiveSlow${seg}DurationMin`;
     if (minK in stats) {
@@ -475,42 +528,7 @@ export function formatPowerStats(stats: Record<string, number>): PowerRows {
       rows.push({ id: minK, value: litT(fmtNum(stats[minK]!)), label });
     }
   }
-
-  // Other timed target debuffs: a percent movement slow, plus flat/percent resistance
-  // and damage reductions (which lack the "Slow" infix the ability debuffs use).
-  const timedDebuffs: [string, string, string, boolean][] = [
-    ["offensiveSlowRunSpeedMin", "offensiveSlowRunSpeedDurationMin", "stat.power.slowerTargetMovement", true],
-    [
-      "offensiveTotalResistanceReductionAbsoluteMin",
-      "offensiveTotalResistanceReductionAbsoluteDurationMin",
-      "stat.power.reducedTargetResistances",
-      false,
-    ],
-    [
-      "offensiveTotalDamageReductionPercentMin",
-      "offensiveTotalDamageReductionPercentDurationMin",
-      "stat.power.reducedTargetDamage",
-      true,
-    ],
-    // Magnitude + duration status debuffs, reusing the condensed-view subject vocabulary.
-    ["offensiveFumbleMin", "offensiveFumbleDurationMin", "stat.subject.fumble", true],
-    ["offensiveProjectileFumbleMin", "offensiveProjectileFumbleDurationMin", "stat.subject.impairedAim", true],
-    ["offensiveSlowAttackSpeedMin", "offensiveSlowAttackSpeedDurationMin", "stat.subject.slowAttackSpeed", true],
-    ["offensiveSlowTotalSpeedMin", "offensiveSlowTotalSpeedDurationMin", "stat.subject.slowTotalSpeed", true],
-    [
-      "offensiveElementalResistanceReductionAbsoluteMin",
-      "offensiveElementalResistanceReductionAbsoluteDurationMin",
-      "stat.subject.reducedElementalResistancesFlat",
-      false,
-    ],
-    [
-      "offensivePhysicalReductionPercentMin",
-      "offensivePhysicalReductionPercentDurationMin",
-      "stat.subject.reducedPhysicalResistance",
-      true,
-    ],
-  ];
-  for (const [minK, durK, key, pct] of timedDebuffs) {
+  for (const [minK, durK, key, pct] of TIMED_DEBUFFS) {
     if (minK in stats) {
       used.add(minK);
       const dur = stats[durK];

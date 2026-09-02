@@ -2,7 +2,7 @@
 // ABOUTME: Computes summed stat bonuses, celestial powers gained, and weapon requirements.
 import type { CelestialPower, DevotionModel, StarId } from "./types";
 import { petTagId } from "./benefitTag";
-import { isFilterableStat } from "./statFormat";
+import { isFilterableStat, isPowerEffectDuration } from "./statFormat";
 
 export function sumBonuses(model: DevotionModel, selected: Set<StarId>): Record<string, number> {
   const out: Record<string, number> = {};
@@ -50,8 +50,9 @@ export function powersGained(model: DevotionModel, selected: Set<StarId>): { sta
 }
 
 // Each star granting the raw stat id, mapped to its value for it (bonus plus celestial-power
-// stat, when both carry it) - the search rings scale ring weight by this relative magnitude.
-// Pet attack stats are intentionally not scanned.
+// stat, when both carry it) - the search arcs scale arc width by this relative magnitude.
+// A power's own effect timers (a DoT tick length, a debuff duration) are not benefits it grants
+// and do not count. Pet attack stats are intentionally not scanned.
 export function starValuesGranting(model: DevotionModel, id: string): Map<StarId, number> {
   const out = new Map<StarId, number>();
   for (const star of model.stars.values()) {
@@ -62,7 +63,7 @@ export function starValuesGranting(model: DevotionModel, id: string): Map<StarId
       hit = true;
     }
     const power = star.celestialPower;
-    if (power && id in power.stats) {
+    if (power && id in power.stats && !isPowerEffectDuration(id)) {
       value += power.stats[id]!;
       hit = true;
     }

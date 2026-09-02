@@ -273,6 +273,16 @@ try {
     availWithBudget > 0,
     `"Available to get" lists reachable benefits while budget remains (got ${availWithBudget})`,
   );
+  // A power's own effect timers are deprecated tags: a chip never carries one. Electrocute rides on
+  // powers only, so its chip has the damage id but not the tick length.
+  const electrocuteIds = await cdp.evaluate<string>(
+    `([...document.querySelectorAll('#affinity .bgroup.avail')].find(g => (g.getAttribute('data-ids')||'').split(',').includes('offensiveSlowLightningMin'))?.getAttribute('data-ids')) || ''`,
+  );
+  check(
+    electrocuteIds.includes("offensiveSlowLightningMin") &&
+      !electrocuteIds.includes("offensiveSlowLightningDurationMin"),
+    `the Electrocute chip carries its damage id but not the power tick length (got "${electrocuteIds}")`,
+  );
   // Pet bonuses have their own "Available to get" list and, when tagged, highlight the stars that
   // grant them as a pet bonus (a pet: tag must hit petBonuses, not player bonuses).
   check(

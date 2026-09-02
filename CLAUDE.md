@@ -37,7 +37,10 @@ Every planner state must be bookmarkable and shareable: the full state lives in
 the URL hash so a copied link restores exactly what the user saw. Any new
 state-bearing feature must round-trip through `web/src/core/urlState.ts`
 (`encodeHash`/`decodeHash`) and tolerate stale or malformed links. Do not add
-client state that only lives in memory or the DOM.
+client state that only lives in memory or the DOM. The canonical id lists behind
+the bitsets are append-only: never remove or reorder an id, since its bit position
+is the wire format. Retire a tag by adding it to `deprecatedBenefitIds` in
+`urlState.ts` so it keeps its position, decodes as absent, and leaves the catalog.
 
 ## Internationalization (invariant we maintain)
 
