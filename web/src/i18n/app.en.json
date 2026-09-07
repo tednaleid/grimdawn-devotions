@@ -53,7 +53,7 @@
   "ui.import.pruned": "{n} star(s) could not be placed and were dropped.",
   "ui.save.label": "Load from a save file",
   "ui.save.choose": "Choose a character file",
-  "ui.save.hint": "Pick a character's player.gdc. Close Grim Dawn first, or the file will be locked.",
+  "ui.save.hint": "Pick a character's player.gdc.",
   "ui.save.reading": "Reading character...",
   "ui.save.loaded": "{name}, level {level}",
   "ui.save.points": "{spent} of {total} devotion points spent",
