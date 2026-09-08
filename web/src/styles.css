@@ -1009,7 +1009,9 @@ main {
 .tip-bonus {
   color: #d7c89a;
 }
-.tip-bonus .val {
+/* Scoped to #tooltip, the only place tip-bonus rows are rendered, so this stays above the
+   earlier, more specific `.benefit.up .val` rather than trailing it in source order. */
+#tooltip .tip-bonus .val {
   color: #e6edf3;
 }
 .tip-req {

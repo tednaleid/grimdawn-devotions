@@ -440,7 +440,9 @@
   line-height: 1.5;
   word-break: break-word;
 }
-.rr-page .srcline b {
+/* Scoped to .resline, the only place source lines are rendered, so this stays above the
+   earlier, more specific `.k.stack b` rather than trailing it in source order. */
+.rr-page .resline .srcline b {
   font-family: var(--rr-mono);
 }
 .rr-page .srcline s {
