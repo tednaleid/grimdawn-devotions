@@ -7,6 +7,49 @@ rules it implements see [devotion-system.md](devotion-system.md); for why the ex
 search is hard and the dead ends we rejected see
 [reachability-performance.md](reachability-performance.md).
 
+## The short version
+
+The user has clicked some stars. For every constellation and every star still
+unclaimed, the planner must answer one question: if you took that too, could you
+still finish a legal build inside your point budget (55 by default, lower if the
+user set it)? That is one answer per candidate, recomputed on every click, so it
+has to be fast.
+
+A build's price is the **most points you hold at any one instant** while building
+it, which can exceed the size of the finished selection. Every constellation but
+the five Crossroads needs affinity before its first star, and the Crossroads are
+the only sources with no requirement of their own, so you often buy a Crossroads,
+use it to activate a constellation, then refund it once that constellation's own
+affinity covers the requirement. Eel is 3 stars and needs 4 points to build. Near
+the 55-point ceiling that gap matters: a build that fits in its final form can
+still be impossible because there is no room to hold the scaffolding that
+activates its last piece.
+
+So the engine decides on that peak, with a ladder of four tests that stops at the
+first one to answer:
+
+1. **Too expensive on its face.** A precomputed table gives the fewest stars that
+   could possibly cover the affinity this selection is short. If even that does not
+   fit the budget, the answer is no.
+2. **Cheap enough on its face.** Build one candidate greedily and price it,
+   including the Crossroads it had to borrow. If that fits, the answer is yes.
+3. **Find an actual order.** When no partly-claimed constellation still has affinity
+   to give, try a handful of construction orders, write out the real step-by-step
+   schedule for each (scaffolds bought before the step that needs them, refunded the
+   moment the rules allow), and measure its peak. A schedule that fits is a yes, and
+   it comes from the same generator the build-order panel uses.
+4. **Search.** Whatever is left goes to an exhaustive, heavily pruned search over
+   which spare constellations to add for their affinity (and which partly-claimed
+   ones to finish). This is the expensive rung, and almost nothing reaches it.
+
+The engine leans deliberately one way. Every yes is paid for by a schedule an
+independent oracle can replay step by step, or by a bound that charges the peak
+honestly. Nothing has been found that the planner lights and no tool can build. The
+error it does make is the opposite one, hiding a build whose only legal order step
+3 failed to find. Both directions are measured; see "Known limits".
+
+The rest of this document is those four steps with the details filled in.
+
 ## The question
 
 For a selection state (the constellations the user has started, some complete, some

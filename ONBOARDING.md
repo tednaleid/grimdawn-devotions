@@ -132,6 +132,6 @@ Pages, auto-deployed from `main`).
 - `worker/README.md` -- the grimtools import worker: contract, local dev, deployment, one-time Cloudflare setup
 - `docs/devotion-system.md` -- the devotion rules + non-obvious construction consequences (read first)
 - `docs/reachability-performance.md` -- reachability resolver perf findings
-- `docs/reachability-engine.md` -- shipped vs costed engine comparison + the current-state decision
+- `docs/reachability-engine.md` -- how a reachable/dim verdict is decided, the guided build order, and the playbook for a reported build (starts with a plain-language summary)
 - `docs/superpowers/specs/` -- design specs for the planner, RR, and monster explorer pages
 - `BACKLOG.md` -- planned enhancements with implementation pointers
