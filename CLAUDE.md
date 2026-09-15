@@ -13,6 +13,9 @@ or URL state. How the engine decides a verdict, and how to reproduce and pin a
 user-reported link ("it will not let me spend my last point"), is in
 [docs/reachability-engine.md](docs/reachability-engine.md), which ends with the
 investigation playbook and the regression gates to run after a resolver change.
+The Resistance Reduction page's formula, its application order, and the tested
+sources behind it are in [docs/resistance-reduction.md](docs/resistance-reduction.md);
+read it before touching the ledger math.
 
 ## Backlog / new ideas
 
