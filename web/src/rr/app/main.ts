@@ -9,6 +9,7 @@ import {
   storeLocale,
 } from "../../adapters/localizationAdapter";
 import { mountAppMenu, type AppMenuContent } from "../../adapters/appMenu";
+import { sendPageHit } from "../../adapters/pageHitBeacon";
 import type { InfoPopoverText } from "../../adapters/infoPopover";
 import { aggregate, type LogicalSource } from "../core/aggregate";
 import { applyView } from "../core/filter";
@@ -151,6 +152,7 @@ async function boot() {
   refresh("replace"); // boot render; canonicalize the hash without a history entry
 }
 
+sendPageHit("rr");
 boot().catch((e) => {
   const el = document.getElementById("boot-loading");
   if (el) el.textContent = String(e);

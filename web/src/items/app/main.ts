@@ -1,6 +1,7 @@
 // ABOUTME: Entry point for the /items/ page: loads the catalogue + localization, owns the render loop.
 // ABOUTME: All view state lives in the URL hash; render reads the decoded ViewState, changes push/replace it.
 import { mountAppMenu, type AppMenuContent } from "../../adapters/appMenu";
+import { sendPageHit } from "../../adapters/pageHitBeacon";
 import type { InfoPopoverText } from "../../adapters/infoPopover";
 import {
   LOCALE_NAMES,
@@ -194,6 +195,7 @@ async function boot() {
   refresh("replace"); // boot render; canonicalize the hash without a history entry
 }
 
+sendPageHit("items");
 boot().catch((e) => {
   const el = document.getElementById("boot-loading");
   if (el) el.textContent = String(e);

@@ -39,6 +39,8 @@ function assetVersionHash(): string {
   return h.digest("hex").slice(0, 16);
 }
 const assetVersion = assetVersionHash();
+// The worker's base URL: the planner's grimtools gateway and every page's page-load beacon use it.
+const workerApiDefine = JSON.stringify(process.env.IMPORT_API ?? "http://localhost:8787");
 
 const result = await Bun.build({
   entrypoints: ["src/app/main.ts"],
@@ -50,7 +52,7 @@ const result = await Bun.build({
   define: {
     __BUILD_ID__: JSON.stringify(buildId),
     __ASSET_V__: JSON.stringify(assetVersion),
-    __IMPORT_API__: JSON.stringify(process.env.IMPORT_API ?? "http://localhost:8787"),
+    __IMPORT_API__: workerApiDefine,
   },
 });
 if (!result.success) {
@@ -86,7 +88,7 @@ const rr = await Bun.build({
   minify: true,
   sourcemap: "linked",
   naming: "rr-[name]-[hash].[ext]", // dist/resistance-reduction/rr-main-<hash>.js
-  define: { __ASSET_V__: JSON.stringify(assetVersion) },
+  define: { __ASSET_V__: JSON.stringify(assetVersion), __IMPORT_API__: workerApiDefine },
 });
 if (!rr.success) {
   for (const log of rr.logs) console.error(log);
@@ -123,7 +125,7 @@ const mon = await Bun.build({
   minify: true,
   sourcemap: "linked",
   naming: "mon-[name]-[hash].[ext]", // dist/monster-resistances/mon-main-<hash>.js
-  define: { __ASSET_V__: JSON.stringify(assetVersion) },
+  define: { __ASSET_V__: JSON.stringify(assetVersion), __IMPORT_API__: workerApiDefine },
 });
 if (!mon.success) {
   for (const log of mon.logs) console.error(log);
@@ -163,7 +165,7 @@ const items = await Bun.build({
   minify: true,
   sourcemap: "linked",
   naming: "items-[name]-[hash].[ext]", // dist/items/items-main-<hash>.js
-  define: { __ASSET_V__: JSON.stringify(assetVersion) },
+  define: { __ASSET_V__: JSON.stringify(assetVersion), __IMPORT_API__: workerApiDefine },
 });
 if (!items.success) {
   for (const log of items.logs) console.error(log);

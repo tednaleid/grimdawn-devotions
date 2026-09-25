@@ -56,6 +56,8 @@ import { mountSavePanel } from "../adapters/savePanel";
 import { parseSave } from "../core/gdSave";
 import { makeWorkerGateway } from "../adapters/grimtoolsWorkerGateway";
 import { disabledGateway } from "../adapters/grimtoolsGatewayDisabled";
+import { workerApi } from "../adapters/workerApi";
+import { sendPageHit } from "../adapters/pageHitBeacon";
 import type { ExportBase, FetchBuildResult } from "../ports/GrimtoolsGateway";
 import { affinityTotals } from "../core/affinity";
 import {
@@ -71,16 +73,13 @@ import type { Affinity, SelectionState, StarId } from "../core/types";
 const GITHUB_URL = "https://github.com/tednaleid/grimdawn-devotions";
 const STEAMDB_PATCHNOTES_URL = "https://steamdb.info/patchnotes/"; // per-build page: <base><buildid>/
 
-// The import service. Local development points at `just worker-dev`; the deployed value is
-// substituted at build time. Both globals come from bundle.ts's define map.
-declare const __IMPORT_API__: string;
+// Substituted at build time from bundle.ts's define map.
 declare const __BUILD_ID__: string;
-const importApi = typeof __IMPORT_API__ === "string" ? __IMPORT_API__ : "http://localhost:8787";
 // Grimtools' firewall refuses the worker's User-Agent, so the feature is switched off: the panel is
 // hidden and the gateway sends the worker nothing. Flip this to restore both.
 const GRIMTOOLS_ENABLED = false;
 // The one object that talks to the worker, both directions (see ports/GrimtoolsGateway).
-const gateway = GRIMTOOLS_ENABLED ? makeWorkerGateway(importApi) : disabledGateway;
+const gateway = GRIMTOOLS_ENABLED ? makeWorkerGateway(workerApi) : disabledGateway;
 const buildId = typeof __BUILD_ID__ === "string" ? __BUILD_ID__ : "dev";
 
 async function boot() {
@@ -1483,6 +1482,7 @@ async function boot() {
   restoreFromSource();
 }
 
+sendPageHit("planner");
 boot().catch((e) => {
   document.body.innerHTML = `<pre style="color:#f88;padding:1rem">${String(e)}</pre>`;
 });

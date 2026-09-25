@@ -16,6 +16,7 @@ import {
   storeLocale,
 } from "../../adapters/localizationAdapter";
 import { mountAppMenu, type AppMenuContent } from "../../adapters/appMenu";
+import { sendPageHit } from "../../adapters/pageHitBeacon";
 import type { InfoPopoverText } from "../../adapters/infoPopover";
 import { esc } from "../adapters/markup";
 
@@ -260,6 +261,7 @@ async function boot() {
   render();
 }
 
+sendPageHit("monsters");
 boot().catch((err) => {
   console.error(err);
   const fail = (globalThis as { bootFailed?: () => void }).bootFailed;
