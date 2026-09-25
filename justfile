@@ -633,6 +633,16 @@ setup-worker-auth:
 deploy-worker:
     cd "{{justfile_directory()}}/worker" && ../web/node_modules/.bin/wrangler deploy
 
+# Store a read-only Cloudflare Account Analytics token for `just stats` (macOS keychain)
+[group("web")]
+setup-stats-auth:
+    bash "{{justfile_directory()}}/scripts/setup_stats_auth.sh"
+
+# Print anonymous page-load counts from the worker's Analytics Engine dataset (e.g. just stats --days 7)
+[group("web")]
+stats *ARGS:
+    uv run "{{justfile_directory()}}/scripts/stats.py" {{ARGS}}
+
 # Generate the precomputed cover table from data/devotions.json (only if stale)
 [group("web")]
 cover-table:
