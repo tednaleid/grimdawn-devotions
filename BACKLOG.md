@@ -1195,3 +1195,13 @@ collect more.
 Do not embed or drive the grimtools map to deliver this: a cross-origin iframe
 cannot be scripted, so it would mean reloading their ad-supported page on a timer,
 and the same owner already firewalled our import worker.
+
+## Page-load counter: long-term history
+
+Analytics Engine keeps about three months of `POST /hit` data points, so `just stats`
+cannot show trends older than that. If longer history matters, roll monthly totals into
+durable storage before they age out. Pointers: a Cron Trigger on the worker
+(`[triggers] crons` in `worker/wrangler.toml`) cannot query the SQL API without a
+token secret, so the simpler path is a `just stats --rollup` mode in `scripts/stats.py`
+that appends last month's per-page totals to a committed `data/page-loads.csv`, run by
+hand or by a scheduled GitHub Action holding the read-only token as a secret.

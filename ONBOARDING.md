@@ -11,9 +11,9 @@ tabulates every RR source with a debuff ledger; the **monster resistance explore
 resist them and lets you filter/sort the underlying monster table; the **skill-item
 browser** (`data/skill-items.json`, `web/src/items/`) lists the endgame items that
 grant or modify each mastery skill, with the game's own effect wording. Deployed to
-GitHub Pages, plus one small Cloudflare Worker (`worker/`) whose only job is to
-fetch a grimtools build past its CORS header, and save one, for the devotion
-planner's import and export. The planner also reads a Grim Dawn character
+GitHub Pages, plus one small Cloudflare Worker (`worker/`) that fetches a grimtools build past its CORS header,
+and saves one, for the devotion planner's import and export, and counts anonymous page loads
+(`POST /hit`) from all four pages. The planner also reads a Grim Dawn character
 save (`player.gdc`) entirely in the browser to load its devotions; see
 `docs/save-file-import.md`.
 
@@ -46,6 +46,7 @@ save (`player.gdc`) entirely in the browser to load its devotions; see
 - Grimtools import/export worker, local dev (no Cloudflare account needed): `just worker-dev`
 - Grimtools import/export worker, first-time/manual deploy (normal deploys are from CI): `just deploy-worker`
 - Grimtools import/export worker, one-time Cloudflare token setup/rotation: `just setup-worker-auth`
+- Page-load counts (last 30 days by default, `--days N`): `just stats`; one-time token setup: `just setup-stats-auth`
 - Regenerate `data/grimtools-stars.json` (needs headless Chrome: `just install-e2e`): `just gt-star-table`
 - Pre-commit hook (opt-in, runs `just check`): `just install-hooks`
 - Tool/data check: `just doctor`

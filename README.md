@@ -9,6 +9,11 @@ The planner runs entirely in your browser. No ads, no paywall, no account. Every
 part of it (the planner, the dataset, and the parser that builds the dataset) is
 open source you can read, fork, and run yourself.
 
+Each page load sends one anonymous count (which page, the visitor's country, and the
+referring site's domain) to the project's own Cloudflare worker. There are no cookies,
+no identifiers, and nothing from your build; browsers with Do Not Track or Global
+Privacy Control enabled send nothing.
+
 ## Features
 
 - **Interactive devotion starmap.** Pan and zoom the full constellation map; click
