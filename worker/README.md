@@ -9,6 +9,7 @@ preflighted and refused or sent as an opaque response we cannot read. So, as wit
 import, a cooperating server is required for export too. This worker fetches a
 build's page server-side and hands back its skill ids, and posts a selection to
 grimtools' save endpoint server-side and hands back the resulting slug.
+It also counts anonymous page loads for the site's own pages (`POST /hit`).
 
 Contract: `GET /?slug=<slug>&v=<contract version>` returns
 `{ slug, skills: ["sk688", ...], gameVersion, dataVersion, title }`. `skills` is every
@@ -43,6 +44,16 @@ so the window closes on its own. Errors: `400 bad_request`, `403 forbidden`, `42
 read or spliced). Never cached. Rate limits are the two `[[ratelimits]]` bindings in
 `wrangler.toml` (per address and global); `wrangler dev --local` simulates them, and the
 handler treats an absent binding as unlimited so tests need no runtime.
+
+Page-load contract: `POST /hit` with a `text/plain` body `{"page": "planner"|"rr"|"monsters"|"items",
+"ref": <referrer label>}` (at most 512 bytes, `Origin` equal to `ALLOWED_ORIGIN`) writes one data point
+to the `grimdawn_devotions_hits` Analytics Engine dataset: `blobs = [page, country, ref]`, where
+`country` is Cloudflare's two-letter code (`XX` when unknown). The referrer label is computed in the
+browser (`referrerLabel` in `web/src/core/pageHit.ts`) so only a domain, `direct`, `internal`, or
+`other` ever arrives; the worker re-validates it. Responses: `204` recorded (or dropped by the
+`HIT_LIMITER_IP` per-address limit), `400` bad body, `403` wrong origin. No IP, cookie, or
+identifier is stored. The pages send it with `sendBeacon` and never read the response. `just stats`
+reads the dataset.
 
 ## Slug, never a URL
 

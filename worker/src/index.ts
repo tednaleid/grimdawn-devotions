@@ -1,5 +1,5 @@
 // ABOUTME: Cloudflare Worker between the planner and grimtools: reads a build's devotion star ids by
-// ABOUTME: slug (GET /) and saves a selection as a fresh build or a copy of a base build (POST /export). Never fetches a caller-named host.
+// ABOUTME: slug (GET /), saves a selection as a grimtools build (POST /export), and counts anonymous page loads (POST /hit). Never fetches a caller-named host.
 /// <reference path="./worker-env.d.ts" />
 import {
   extractBuildInfo,
@@ -11,6 +11,7 @@ import {
   spliceDevotions,
   isSlug,
 } from "../../web/src/core/grimtools";
+import { parseHitBody } from "../../web/src/core/pageHit";
 
 const CALC = "https://www.grimtools.com/calc/";
 const DEVOTION_JSON = "https://www.grimtools.com/static/gdx3/devotion/devotion.json";
@@ -22,10 +23,16 @@ const MAX_EXPORT_BODY = 4096; // 55 ids at ~10 bytes each is well under 1 KB; th
 const MAX_EXPORT_SKILLS = GRIMTOOLS_DEVOTION_POINTS; // the game's devotion budget
 const MAX_BASE_REMOVE = 128; // a base's star entries (normally at most 55); loose so an odd hand-built page is not refused misleadingly
 const SKILL_ID_RE = /^sk\d+$/;
+const MAX_HIT_BODY = 512; // {"page":...,"ref":<=253 chars} fits with room; this bounds a hostile body
 
 /** The surface of a Workers rate-limit binding (`[[ratelimits]]` in wrangler.toml); tests pass a fake. */
 export interface RateLimiter {
   limit(opts: { key: string }): Promise<{ success: boolean }>;
+}
+
+/** The surface of a Workers Analytics Engine binding (`[[analytics_engine_datasets]]` in wrangler.toml); tests pass a fake. */
+export interface AnalyticsDataset {
+  writeDataPoint(p: { blobs?: string[]; doubles?: number[]; indexes?: string[] }): void;
 }
 
 export interface Env {
@@ -35,6 +42,10 @@ export interface Env {
    * limit configuration. */
   EXPORT_LIMITER_IP?: RateLimiter;
   EXPORT_LIMITER_GLOBAL?: RateLimiter;
+  /** Page-load counter: the dataset each hit is written to, and its per-address brake. Absent means
+   * the hit is accepted and discarded (tests, or a runtime without the bindings). */
+  HITS?: AnalyticsDataset;
+  HIT_LIMITER_IP?: RateLimiter;
   /** Injected in tests only; production uses global fetch. */
   fetchImpl?: typeof fetch;
 }
@@ -220,6 +231,27 @@ async function handleExport(request: Request, env: Env): Promise<Response> {
   return json({ slug: id }, 201, origin);
 }
 
+/**
+ * Count one anonymous page load: page name, Cloudflare's country code, and the referrer's domain
+ * label (see web/src/core/pageHit.ts). No IP, cookie, or identifier is stored; the IP is only the
+ * rate-limit key. The browser sends this with sendBeacon and never reads the response.
+ */
+async function handleHit(request: Request, env: Env): Promise<Response> {
+  const origin = env.ALLOWED_ORIGIN;
+  const reply = (status: number) =>
+    new Response(null, { status, headers: { "Access-Control-Allow-Origin": origin, "Cache-Control": "no-store" } });
+  // Keeps localhost, previews and copies of the site out of the counts.
+  if (request.headers.get("Origin") !== origin) return reply(403);
+  const text = await boundedBody(request, MAX_HIT_BODY);
+  const hit = text === null ? null : parseHitBody(text);
+  if (!hit) return reply(400);
+  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+  if (!(await allowed(env.HIT_LIMITER_IP, `ip:${ip}`))) return reply(204);
+  const country = (request as Request & { cf?: { country?: string } }).cf?.country ?? "XX";
+  env.HITS?.writeDataPoint({ blobs: [hit.page, country, hit.ref], indexes: [hit.page] });
+  return reply(204);
+}
+
 /** The three ways reading a calc page can resolve: a real build, an explicit `null` (no such
  * slug - grimtools returns HTTP 200 for these, never a 404), or a page that is malformed in some
  * other way. Kept distinct so the caller can tell "no such build" from "could not understand the
@@ -305,6 +337,10 @@ export async function handleRequest(request: Request, env: Env): Promise<Respons
   if (path === "/export") {
     if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, origin);
     return handleExport(request, env);
+  }
+  if (path === "/hit") {
+    if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405, origin);
+    return handleHit(request, env);
   }
   if (path !== "/") return json({ error: "not_found" }, 404, origin);
   if (request.method !== "GET") return json({ error: "method_not_allowed" }, 405, origin);

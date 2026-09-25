@@ -30,3 +30,15 @@ simple = { limit = 5, period = 60 }
 name = "EXPORT_LIMITER_GLOBAL"
 namespace_id = "1002"
 simple = { limit = 60, period = 60 }
+
+# Page-load counter (POST /hit). Each hit is one data point: blobs = [page, country, referrer label].
+# Analytics Engine keeps about three months; `just stats` reads it through the SQL API.
+[[analytics_engine_datasets]]
+binding = "HITS"
+dataset = "grimdawn_devotions_hits"
+
+# Per client address only: the counter has no upstream to protect, this just caps what one script can add.
+[[ratelimits]]
+name = "HIT_LIMITER_IP"
+namespace_id = "1003"
+simple = { limit = 10, period = 60 }

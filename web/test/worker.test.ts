@@ -629,3 +629,83 @@ test("export with a base: a refused rate limit never fetches the base page", asy
   expect(res.status).toBe(429);
   expect(calls).toEqual([]);
 });
+
+// --- POST /hit -----------------------------------------------------------------------------------
+
+function fakeDataset() {
+  const points: { blobs?: string[]; indexes?: string[] }[] = [];
+  return { points, writeDataPoint: (p: { blobs?: string[]; indexes?: string[] }) => void points.push(p) };
+}
+
+function hitRequest(body: string, origin = ORIGIN, country?: string): Request {
+  const req = new Request("https://w/hit", {
+    method: "POST",
+    headers: { Origin: origin, "Content-Type": "text/plain", "CF-Connecting-IP": "203.0.113.9" },
+    body,
+  });
+  return country === undefined ? req : Object.assign(req, { cf: { country } });
+}
+
+function hitEnv(extra: Record<string, unknown> = {}) {
+  const HITS = fakeDataset();
+  return { HITS, env: { ALLOWED_ORIGIN: ORIGIN, HITS, ...extra } as never };
+}
+
+test("/hit records page, country and referrer label", async () => {
+  const { HITS, env: e } = hitEnv();
+  const res = await handleRequest(hitRequest('{"page":"planner","ref":"reddit.com"}', ORIGIN, "DE"), e);
+  expect(res.status).toBe(204);
+  expect(res.headers.get("Access-Control-Allow-Origin")).toBe(ORIGIN);
+  expect(HITS.points).toEqual([{ blobs: ["planner", "DE", "reddit.com"], indexes: ["planner"] }]);
+});
+
+test("/hit records XX when Cloudflare supplies no country", async () => {
+  const { HITS, env: e } = hitEnv();
+  await handleRequest(hitRequest('{"page":"rr","ref":"direct"}'), e);
+  expect(HITS.points[0]!.blobs).toEqual(["rr", "XX", "direct"]);
+});
+
+test("/hit from another origin is refused and not recorded", async () => {
+  const { HITS, env: e } = hitEnv();
+  const res = await handleRequest(hitRequest('{"page":"rr","ref":"direct"}', "http://localhost:5173"), e);
+  expect(res.status).toBe(403);
+  expect(HITS.points).toEqual([]);
+});
+
+test("/hit with an unknown page is refused and not recorded", async () => {
+  const { HITS, env: e } = hitEnv();
+  const res = await handleRequest(hitRequest('{"page":"admin","ref":"direct"}'), e);
+  expect(res.status).toBe(400);
+  expect(HITS.points).toEqual([]);
+});
+
+test("/hit with an oversized body is refused and not recorded", async () => {
+  const { HITS, env: e } = hitEnv();
+  const res = await handleRequest(hitRequest(`{"page":"rr","ref":"${"a".repeat(1000)}"}`), e);
+  expect(res.status).toBe(400);
+  expect(HITS.points).toEqual([]);
+});
+
+test("/hit over the per-IP limit is dropped silently", async () => {
+  const limiter = fakeLimiter(1);
+  const { HITS, env: e } = hitEnv({ HIT_LIMITER_IP: limiter });
+  const first = await handleRequest(hitRequest('{"page":"items","ref":"direct"}'), e);
+  const second = await handleRequest(hitRequest('{"page":"items","ref":"direct"}'), e);
+  expect([first.status, second.status]).toEqual([204, 204]);
+  expect(HITS.points.length).toBe(1);
+  expect(limiter.keys).toEqual(["ip:203.0.113.9", "ip:203.0.113.9"]);
+});
+
+test("/hit only accepts POST", async () => {
+  const { env: e } = hitEnv();
+  const res = await handleRequest(new Request("https://w/hit"), e);
+  expect(res.status).toBe(405);
+});
+
+test("/hit through the default export is never cached", async () => {
+  installFakeCache();
+  const { HITS, env: e } = hitEnv();
+  await worker.fetch(hitRequest('{"page":"monsters","ref":"direct"}'), e);
+  await worker.fetch(hitRequest('{"page":"monsters","ref":"direct"}'), e);
+  expect(HITS.points.length).toBe(2);
+});
