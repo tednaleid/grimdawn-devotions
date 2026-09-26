@@ -159,6 +159,11 @@ async function allowed(limiter: RateLimiter | undefined, key: string): Promise<b
   return (await limiter.limit({ key })).success;
 }
 
+/** The caller's address for rate-limit keys, or "unknown" outside Cloudflare (tests, local dev). */
+function clientIp(request: Request): string {
+  return request.headers.get("CF-Connecting-IP") ?? "unknown";
+}
+
 /**
  * Save a devotion selection as a new anonymous grimtools build and return its slug: either a fresh
  * character holding only the stars, or a copy of a base build with its stars replaced. One POST to
@@ -175,7 +180,7 @@ async function handleExport(request: Request, env: Env): Promise<Response> {
   const text = await boundedBody(request, MAX_EXPORT_BODY);
   const body = text === null ? null : parseExportBody(text);
   if (!body) return json({ error: "bad_request" }, 400, origin);
-  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+  const ip = clientIp(request);
   if (!(await allowed(env.EXPORT_LIMITER_IP, `ip:${ip}`)) || !(await allowed(env.EXPORT_LIMITER_GLOBAL, "global")))
     return json({ error: "rate_limited" }, 429, origin);
 
@@ -245,7 +250,7 @@ async function handleHit(request: Request, env: Env): Promise<Response> {
   const text = await boundedBody(request, MAX_HIT_BODY);
   const hit = text === null ? null : parseHitBody(text);
   if (!hit) return reply(400);
-  const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+  const ip = clientIp(request);
   if (!(await allowed(env.HIT_LIMITER_IP, `ip:${ip}`))) return reply(204);
   const country = (request as Request & { cf?: { country?: string } }).cf?.country ?? "XX";
   env.HITS?.writeDataPoint({ blobs: [hit.page, country, hit.ref], indexes: [hit.page] });

@@ -52,6 +52,8 @@ def query(sql: str, tok: str, account: str) -> list[dict]:
             return json.load(res)["data"]
     except urllib.error.HTTPError as e:
         sys.exit(f"Analytics Engine SQL API returned {e.code}: {e.read().decode(errors='replace')}")
+    except urllib.error.URLError as e:
+        sys.exit(f"Could not reach the Analytics Engine SQL API: {e.reason}")
 
 
 def since(days: int) -> str:

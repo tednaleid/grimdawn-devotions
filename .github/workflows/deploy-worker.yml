@@ -4,7 +4,7 @@ name: Deploy grimtools worker
 on:
   push:
     branches: [main]
-    paths: ["worker/**", "web/src/core/grimtools.ts", ".github/workflows/deploy-worker.yml"]
+    paths: ["worker/**", "web/src/core/grimtools.ts", "web/src/core/pageHit.ts", ".github/workflows/deploy-worker.yml"]
   workflow_dispatch:
 permissions:
   contents: read
