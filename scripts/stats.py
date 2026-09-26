@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.14"
-# dependencies = []
+# dependencies = ["pycountry"]
 # ///
 # ABOUTME: Prints page-load counts from the worker's Analytics Engine dataset (POST /hit).
 # ABOUTME: Reads a read-only token from GD_STATS_TOKEN or the macOS keychain (see just setup-stats-auth).
@@ -15,6 +15,8 @@ import tomllib
 import urllib.error
 import urllib.request
 from pathlib import Path
+
+import pycountry
 
 ROOT = Path(__file__).resolve().parent.parent
 DATASET = "grimdawn_devotions_hits"
@@ -60,6 +62,19 @@ def since(days: int) -> str:
     return f"timestamp > NOW() - INTERVAL '{days}' DAY"
 
 
+# Cloudflare's own codes alongside ISO 3166-1 alpha-2.
+CLOUDFLARE_COUNTRIES = {"XX": "Unknown", "T1": "Tor network"}
+
+
+def country_label(code: str) -> str:
+    """The code followed by its country's everyday name, e.g. "KR  South Korea"."""
+    if code in CLOUDFLARE_COUNTRIES:
+        return f"{code}  {CLOUDFLARE_COUNTRIES[code]}"
+    country = pycountry.countries.get(alpha_2=code)
+    name = getattr(country, "common_name", country.name) if country else "?"
+    return f"{code}  {name}"
+
+
 def print_table(title: str, header: list[str], rows: list[list[str]]) -> None:
     print(f"\n{title}")
     widths = [max(len(str(r[i])) for r in [header, *rows]) for i in range(len(header))]
@@ -88,14 +103,18 @@ def main() -> None:
     rows.append(["total", *(str(t) for t in totals), str(sum(totals))])
     print_table(f"Page loads per day, last {args.days} days", ["day", *PAGES, "all"], rows)
 
-    for title, column in (("Top countries", "blob2"), ("Top referrers", "blob3")):
+    for title, header, column, describe in (
+        ("Top countries", "country", "blob2", country_label),
+        ("Top referrers", "referrer", "blob3", str),
+    ):
         top = query(
             f"SELECT {column} AS label, SUM(_sample_interval) AS loads FROM {DATASET} "
             f"WHERE {where} GROUP BY label ORDER BY loads DESC LIMIT 15",
             tok,
             account,
         )
-        print_table(f"{title}, last {args.days} days", ["label", "loads"], [[r["label"], str(int(r["loads"]))] for r in top])
+        rows = [[describe(r["label"]), str(int(r["loads"]))] for r in top]
+        print_table(f"{title}, last {args.days} days", [header, "loads"], rows)
 
 
 if __name__ == "__main__":
