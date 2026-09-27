@@ -501,15 +501,17 @@ doc3 = json.loads(out3.read_text(encoding="utf-8"))
 m3 = doc3["monsters"]
 by_id = {m["id"]: m for m in m3}
 
-check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1635)
+check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1636)
 # 2,740 before the trap exclusion. This counts KEPT records (the variant_counts of surviving
 # rows), not records read, so excluding 3 trap records necessarily drops it by 3. Those 3
 # collapse into only 2 logical rows, which is why the row count fell by 2 and this by 3.
 # Re-pinned 2725 -> 2737 at build 24756825 (1.3.0.7): 9 monsters gained variant records
 # (ambient elk/fox/rabbit plus several quest bosses) that collapse into rows that already
 # existed, so the logical row count above is unchanged at 1635.
+# Re-pinned 2737 -> 2738 and 1635 -> 1636 at build 24825149 (1.3.0.8): one quest record
+# (human_kurn_berserker_01a) was added and forms its own row.
 check(f"kept raw record count (got {sum(m['variant_count'] for m in m3)})",
-      sum(m["variant_count"] for m in m3) == 2737)
+      sum(m["variant_count"] for m in m3) == 2738)
 check("all ten resistance keys still present", all(list(m["resistances"].keys()) == TEN for m in m3))
 
 alkamos = by_id.get("enemies.boss-quest.ghost_stepsoftorment_01")

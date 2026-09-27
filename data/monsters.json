@@ -1,8 +1,8 @@
 {
   "meta": {
-    "game_version": "1.3.0.7",
-    "steam_buildid": "24756825",
-    "generated_utc": "2026-08-16T01:50:08Z"
+    "game_version": "1.3.0.8",
+    "steam_buildid": "24825149",
+    "generated_utc": "2026-09-27T18:53:52Z"
   },
   "monsters": [
     {
@@ -7226,6 +7226,36 @@
       ]
     },
     {
+      "id": "enemies.boss-quest.human_kurn_berserker_01a",
+      "name_tag": "tagGDX3NPC_AREAH_48",
+      "classification": "Quest",
+      "role": "boss&quest",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 6,
+        "pierce": 0,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 6
+      },
+      "variant_count": 1,
+      "variants_disagree": false,
+      "record_paths": [
+        "records/creatures/enemies/boss&quest/human_kurn_berserker_01a.dbr"
+      ]
+    },
+    {
       "id": "enemies.boss-quest.human_kurngirl_keepinthefamily_01",
       "name_tag": "tagGDX3NPC_AREAH_35",
       "classification": "Quest",
@@ -7765,7 +7795,7 @@
     {
       "id": "enemies.boss-quest.humanpossessed_loxmere_01",
       "name_tag": "tagHumanPossessedHeroH06",
-      "classification": "Hero",
+      "classification": "Quest",
       "role": "boss&quest",
       "race_tag": null,
       "min_level": 42,
@@ -13174,19 +13204,19 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 90,
-        "pierce": 90,
-        "fire": 90,
-        "cold": 90,
-        "lightning": 90,
-        "poison": 90,
-        "aether": 90,
-        "chaos": 90,
-        "vitality": 90,
-        "bleeding": 90
+        "physical": 99,
+        "pierce": 99,
+        "fire": 99,
+        "cold": 99,
+        "lightning": 99,
+        "poison": 99,
+        "aether": 99,
+        "chaos": 99,
+        "vitality": 99,
+        "bleeding": 99
       },
       "passive_resistances": {
-        "bleeding": 90
+        "bleeding": 99
       },
       "variant_count": 1,
       "variants_disagree": false,
