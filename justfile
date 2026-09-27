@@ -228,6 +228,11 @@ parse-monsters *ARGS:
         --records-dir "{{records_dir}}" --text-dir "{{text_dir}}" --out "{{out_mon}}" \
         --game-version "$version" --steam-buildid "$buildid" {{ARGS}}
 
+# Check data/monsters.json against grimtools' displayed boss and nemesis resistances
+# (fixture: scripts/fixtures/gt-monster-resistances.json; refresh with bun scripts/gt_monster_harvest.mjs).
+monster-parity:
+    uv run "{{justfile_directory()}}/scripts/test_monster_parity.py"
+
 # Diff the regenerated data/*.json against the committed baseline: assert devotion structure is stable,
 # report tuning + RR + monster changes. Run after regenerating, before committing. Exits non-zero on a
 # structural break.

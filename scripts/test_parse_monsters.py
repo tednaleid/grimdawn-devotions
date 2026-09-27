@@ -197,6 +197,144 @@ check("an empty value is rejected", mon.split_difficulty_array("") is None)
 check("a None value is rejected", mon.split_difficulty_array(None) is None)
 check("a non-numeric entry is rejected", mon.split_difficulty_array(";".join(["x"] * 12)) is None)
 
+# --- Task 1 (passives): skill level pinning ---
+check("skill level reads the pinned rank", mon._skill_level({"skillLevel3": "4.000000"}, "3") == 4)
+check("absent skill level defaults to 1", mon._skill_level({}, "3") == 1)
+check("unparseable skill level defaults to 1", mon._skill_level({"skillLevel3": "abc"}, "3") == 1)
+check("zero skill level defaults to 1", mon._skill_level({"skillLevel3": "0"}, "3") == 1)
+
+# --- Task 1 (passives): contribution bucketing by skill Class ---
+SKILLS = {
+    "records/skills/np/passive.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "100.000000"},
+    "records/skills/np/buffpassive.dbr": {"Class": "SkillBuff_Passive", "defensiveFire": "10.000000"},
+    "records/skills/np/onlife.dbr": {"Class": "Skill_PassiveOnLifeBuffSelf", "defensiveChaos": "7.000000"},
+    "records/skills/np/aura.dbr": {"Class": "Skill_BuffAttackRadiusToggled", "defensiveCold": "20.000000"},
+    "records/skills/np/toggled.dbr": {"Class": "Skill_BuffSelfToggled", "defensiveCold": "5.000000"},
+    "records/skills/np/duration.dbr": {"Class": "Skill_BuffSelfDuration", "defensiveAether": "9.000000"},
+    "records/skills/np/minion.dbr": {"Class": "Monster", "defensivePhysical": "50.000000"},
+    "records/skills/np/turret.dbr": {"Class": "Turret", "defensivePierce": "50.000000"},
+    "records/skills/np/weird.dbr": {"Class": "AttributePak", "defensiveVitalityBogus": "1", "defensiveLife": "40.000000"},
+    "records/skills/np/levelled.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "10.000000;20.000000;30.000000"},
+    "records/skills/np/nores.dbr": {"Class": "Skill_Passive", "characterLife": "500.000000"},
+    "records/skills/np/toggledhost.dbr": {"Class": "Skill_BuffRadiusToggled", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
+    "records/skills/np/shieldbuff.dbr": {"Class": "SkillBuff_Passive", "defensiveFire": "33.000000", "defensiveCold": "33.000000"},
+    "records/skills/np/debufhost.dbr": {"Class": "Skill_AttackBuffRadius", "buffSkillName": "records/skills/np/curse.dbr"},
+    "records/skills/np/curse.dbr": {"Class": "SkillBuff_Debuf", "defensivePoison": "-15.000000", "defensiveChaos": "-15.000000"},
+    "records/skills/np/granterwithchild.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "40.000000", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
+}
+get_skill = lambda ref: SKILLS.get(ref.strip(), {})
+
+def contrib(skills_and_levels):
+    rec = {}
+    for i, (ref, lvl) in enumerate(skills_and_levels, start=1):
+        rec[f"skillName{i}"] = ref
+        if lvl is not None:
+            rec[f"skillLevel{i}"] = str(lvl)
+    return mon.skill_contributions("enemies/x.dbr", rec, get_skill)
+
+before = len(mon.SKILL_EXCLUSIONS)
+p, a = contrib([("records/skills/np/passive.dbr", 1)])
+check("self passive contributes to the passive bucket", p == {"bleeding": 100} and a == {})
+p, a = contrib([("records/skills/np/buffpassive.dbr", 1)])
+check("SkillBuff_Passive is resident", p == {"fire": 10})
+p, a = contrib([("records/skills/np/onlife.dbr", 1)])
+check("Skill_PassiveOnLifeBuffSelf is resident", p == {"chaos": 7})
+p, a = contrib([("records/skills/np/aura.dbr", 1)])
+check("aura class goes to the aura bucket only", a == {"cold": 20} and p == {})
+p, a = contrib([("records/skills/np/toggled.dbr", 1)])
+check("toggled class goes to the aura bucket only", a == {"cold": 5} and p == {})
+p, a = contrib([("records/skills/np/duration.dbr", 1)])
+check("duration class goes to the aura bucket only", a == {"aether": 9} and p == {})
+p, a = contrib([("records/skills/np/minion.dbr", 1)])
+check("summoned entity contributes nothing", p == {} and a == {})
+p, a = contrib([("records/skills/np/turret.dbr", 1)])
+check("turret contributes nothing", p == {} and a == {})
+p, a = contrib([("records/skills/np/weird.dbr", 1)])
+check("unclassified class contributes nothing", p == {} and a == {})
+p, a = contrib([("records/skills/np/toggledhost.dbr", 1)])
+check("a toggled host's child grant lands in the aura bucket", a == {"fire": 33, "cold": 33} and p == {})
+p, a = contrib([("records/skills/np/debufhost.dbr", 1)])
+check("a debuff child is never credited to the monster", p == {} and a == {})
+p, a = contrib([("records/skills/np/granterwithchild.dbr", 1)])
+check("a skill granting inline is not also credited with its child", p == {"bleeding": 40} and a == {})
+check("skipped skills carrying a resistance are recorded",
+      len(mon.SKILL_EXCLUSIONS) - before == 3)
+check("skip reasons name summoned entity and unclassified",
+      {"summoned entity"} <= {e["reason"] for e in mon.SKILL_EXCLUSIONS[before:]}
+      and any(e["reason"].startswith("unclassified skill class") for e in mon.SKILL_EXCLUSIONS[before:]))
+
+# a skill with no tracked resistance is not recorded as an exclusion
+before2 = len(mon.SKILL_EXCLUSIONS)
+contrib([("records/skills/np/nores.dbr", 1)])
+check("a resistance-free skill is not recorded as skipped", len(mon.SKILL_EXCLUSIONS) == before2)
+
+# level pinning against a real array, and clamping past its end
+p, _ = contrib([("records/skills/np/levelled.dbr", 2)])
+check("level array picks the pinned entry", p == {"bleeding": 20})
+p, _ = contrib([("records/skills/np/levelled.dbr", 99)])
+check("level array clamps to the last entry", p == {"bleeding": 30})
+p, _ = contrib([("records/skills/np/levelled.dbr", None)])
+check("missing skill level uses rank 1", p == {"bleeding": 10})
+
+# additive across multiple skills
+p, _ = contrib([("records/skills/np/passive.dbr", 1), ("records/skills/np/levelled.dbr", 3)])
+check("contributions add across skills", p == {"bleeding": 130})
+
+# --- Task 1 (passives): combining with inline values ---
+check("tidy drops zero entries", mon._tidy({"fire": 0, "cold": 5}) == {"cold": 5})
+check("tidy keeps whole numbers whole", mon._tidy({"cold": 5.0})["cold"] == 5)
+
+rec_inline = {"defensiveFire": "10.000000", "skillName1": "records/skills/np/buffpassive.dbr", "skillLevel1": "1"}
+res = mon.resolved_resistances("enemies/x.dbr", rec_inline, get_skill)
+check("passive stacks on a nonzero inline value", res["resistances"]["fire"] == 20)
+check("combined keeps all ten keys", list(res["resistances"].keys()) == TEN)
+check("passive provenance is sparse", res["passive"] == {"fire": 10})
+check("aura provenance is empty when unused", res["aura"] == {})
+
+rec_aura = {"defensiveCold": "10.000000", "skillName1": "records/skills/np/aura.dbr", "skillLevel1": "1"}
+res_a = mon.resolved_resistances("enemies/x.dbr", rec_aura, get_skill)
+check("aura is NOT folded into the total", res_a["resistances"]["cold"] == 10)
+check("aura provenance is recorded", res_a["aura"] == {"cold": 20})
+
+# --- Task 2 (passives): collapse consumes the resolved map ---
+def crec2(maxlv, **kw):
+    base = {"Class": "Monster", "description": "tagOk", "monsterClassification": "Common",
+            "maxLevel": str(maxlv), "minLevel": "1"}
+    base.update(kw)
+    return base
+
+g_rec_a = crec2(90, defensiveFire="10")
+g_rec_b = crec2(50, defensiveFire="10")
+groups2 = {("Mon", "Common"): [("enemies/a.dbr", g_rec_a), ("enemies/b.dbr", g_rec_b)]}
+resolved2 = {
+    "enemies/a.dbr": {"resistances": {**mon.resistances_of(g_rec_a), "bleeding": 80},
+                      "passive": {"bleeding": 80}, "aura": {"cold": 20}},
+    "enemies/b.dbr": {"resistances": mon.resistances_of(g_rec_b), "passive": {}, "aura": {}},
+}
+rows2 = mon.collapse_to_logical(groups2, RACE_TAGS, resolved2)
+check("collapse uses the resolved combined resistances", rows2[0]["resistances"]["bleeding"] == 80)
+check("collapse emits sparse passive provenance", rows2[0]["passive_resistances"] == {"bleeding": 80})
+check("collapse emits sparse aura provenance", rows2[0]["aura_resistances"] == {"cold": 20})
+check("variants_disagree compares combined totals", rows2[0]["variants_disagree"] is True)
+
+groups3 = {("Mon", "Common"): [("enemies/a.dbr", g_rec_a)]}
+resolved3 = {"enemies/a.dbr": {"resistances": mon.resistances_of(g_rec_a), "passive": {}, "aura": {}}}
+rows3 = mon.collapse_to_logical(groups3, RACE_TAGS, resolved3)
+check("empty provenance keys are omitted entirely",
+      "passive_resistances" not in rows3[0] and "aura_resistances" not in rows3[0])
+
+# --- Task 1 (explorer): traps are excluded, monsters merely named "trap" are not ---
+check("a trap_ prefixed record is excluded",
+      mon.exclusion_reason("enemies/trap_mineexplosive_a01.dbr", rec(), TAGS) == "trap")
+check("a trap_ prefixed record in a subdir is excluded",
+      mon.exclusion_reason("enemies/special/trap_foo_01.dbr", rec(), TAGS) == "trap")
+check("a monster merely named with trap inside is kept",
+      mon.exclusion_reason("enemies/boss&quest/ghost_ugdenbogtrap_01.dbr", rec(), TAGS) is None)
+check("a monster whose name starts with a trap-like word is kept",
+      mon.exclusion_reason("enemies/boss&quest/trapdoorspider_01.dbr", rec(), TAGS) is None)
+check("rule order: a non-monster record is still reported as such, not as a trap",
+      mon.exclusion_reason("enemies/trap_x.dbr", rec(Class="ProxyPool"), TAGS) == "not a monster record")
+
 # Everything from here on reads the extracted game tree, which comes from a local install
 # via `just extract` and is never in git. The pure checks above still gate everywhere.
 if not (root / "extracted/records").is_dir():
@@ -352,132 +490,6 @@ doc2 = json.loads(out2.read_text(encoding="utf-8"))
 check("deterministic across runs", doc["monsters"] == doc2["monsters"])
 check("deterministic offsets across runs", doc["difficulty_offsets"] == doc2["difficulty_offsets"])
 
-# --- Task 1 (passives): skill level pinning ---
-check("skill level reads the pinned rank", mon._skill_level({"skillLevel3": "4.000000"}, "3") == 4)
-check("absent skill level defaults to 1", mon._skill_level({}, "3") == 1)
-check("unparseable skill level defaults to 1", mon._skill_level({"skillLevel3": "abc"}, "3") == 1)
-check("zero skill level defaults to 1", mon._skill_level({"skillLevel3": "0"}, "3") == 1)
-
-# --- Task 1 (passives): contribution bucketing by skill Class ---
-SKILLS = {
-    "records/skills/np/passive.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "100.000000"},
-    "records/skills/np/buffpassive.dbr": {"Class": "SkillBuff_Passive", "defensiveFire": "10.000000"},
-    "records/skills/np/onlife.dbr": {"Class": "Skill_PassiveOnLifeBuffSelf", "defensiveChaos": "7.000000"},
-    "records/skills/np/aura.dbr": {"Class": "Skill_BuffAttackRadiusToggled", "defensiveCold": "20.000000"},
-    "records/skills/np/toggled.dbr": {"Class": "Skill_BuffSelfToggled", "defensiveCold": "5.000000"},
-    "records/skills/np/duration.dbr": {"Class": "Skill_BuffSelfDuration", "defensiveAether": "9.000000"},
-    "records/skills/np/minion.dbr": {"Class": "Monster", "defensivePhysical": "50.000000"},
-    "records/skills/np/turret.dbr": {"Class": "Turret", "defensivePierce": "50.000000"},
-    "records/skills/np/weird.dbr": {"Class": "AttributePak", "defensiveVitalityBogus": "1", "defensiveLife": "40.000000"},
-    "records/skills/np/levelled.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "10.000000;20.000000;30.000000"},
-    "records/skills/np/nores.dbr": {"Class": "Skill_Passive", "characterLife": "500.000000"},
-    "records/skills/np/toggledhost.dbr": {"Class": "Skill_BuffRadiusToggled", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
-    "records/skills/np/shieldbuff.dbr": {"Class": "SkillBuff_Passive", "defensiveFire": "33.000000", "defensiveCold": "33.000000"},
-    "records/skills/np/debufhost.dbr": {"Class": "Skill_AttackBuffRadius", "buffSkillName": "records/skills/np/curse.dbr"},
-    "records/skills/np/curse.dbr": {"Class": "SkillBuff_Debuf", "defensivePoison": "-15.000000", "defensiveChaos": "-15.000000"},
-    "records/skills/np/granterwithchild.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "40.000000", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
-}
-get_skill = lambda ref: SKILLS.get(ref.strip(), {})
-
-def contrib(skills_and_levels):
-    rec = {}
-    for i, (ref, lvl) in enumerate(skills_and_levels, start=1):
-        rec[f"skillName{i}"] = ref
-        if lvl is not None:
-            rec[f"skillLevel{i}"] = str(lvl)
-    return mon.skill_contributions("enemies/x.dbr", rec, get_skill)
-
-before = len(mon.SKILL_EXCLUSIONS)
-p, a = contrib([("records/skills/np/passive.dbr", 1)])
-check("self passive contributes to the passive bucket", p == {"bleeding": 100} and a == {})
-p, a = contrib([("records/skills/np/buffpassive.dbr", 1)])
-check("SkillBuff_Passive is resident", p == {"fire": 10})
-p, a = contrib([("records/skills/np/onlife.dbr", 1)])
-check("Skill_PassiveOnLifeBuffSelf is resident", p == {"chaos": 7})
-p, a = contrib([("records/skills/np/aura.dbr", 1)])
-check("aura class goes to the aura bucket only", a == {"cold": 20} and p == {})
-p, a = contrib([("records/skills/np/toggled.dbr", 1)])
-check("toggled class goes to the aura bucket only", a == {"cold": 5} and p == {})
-p, a = contrib([("records/skills/np/duration.dbr", 1)])
-check("duration class goes to the aura bucket only", a == {"aether": 9} and p == {})
-p, a = contrib([("records/skills/np/minion.dbr", 1)])
-check("summoned entity contributes nothing", p == {} and a == {})
-p, a = contrib([("records/skills/np/turret.dbr", 1)])
-check("turret contributes nothing", p == {} and a == {})
-p, a = contrib([("records/skills/np/weird.dbr", 1)])
-check("unclassified class contributes nothing", p == {} and a == {})
-p, a = contrib([("records/skills/np/toggledhost.dbr", 1)])
-check("a toggled host's child grant lands in the aura bucket", a == {"fire": 33, "cold": 33} and p == {})
-p, a = contrib([("records/skills/np/debufhost.dbr", 1)])
-check("a debuff child is never credited to the monster", p == {} and a == {})
-p, a = contrib([("records/skills/np/granterwithchild.dbr", 1)])
-check("a skill granting inline is not also credited with its child", p == {"bleeding": 40} and a == {})
-check("skipped skills carrying a resistance are recorded",
-      len(mon.SKILL_EXCLUSIONS) - before == 3)
-check("skip reasons name summoned entity and unclassified",
-      {"summoned entity"} <= {e["reason"] for e in mon.SKILL_EXCLUSIONS[before:]}
-      and any(e["reason"].startswith("unclassified skill class") for e in mon.SKILL_EXCLUSIONS[before:]))
-
-# a skill with no tracked resistance is not recorded as an exclusion
-before2 = len(mon.SKILL_EXCLUSIONS)
-contrib([("records/skills/np/nores.dbr", 1)])
-check("a resistance-free skill is not recorded as skipped", len(mon.SKILL_EXCLUSIONS) == before2)
-
-# level pinning against a real array, and clamping past its end
-p, _ = contrib([("records/skills/np/levelled.dbr", 2)])
-check("level array picks the pinned entry", p == {"bleeding": 20})
-p, _ = contrib([("records/skills/np/levelled.dbr", 99)])
-check("level array clamps to the last entry", p == {"bleeding": 30})
-p, _ = contrib([("records/skills/np/levelled.dbr", None)])
-check("missing skill level uses rank 1", p == {"bleeding": 10})
-
-# additive across multiple skills
-p, _ = contrib([("records/skills/np/passive.dbr", 1), ("records/skills/np/levelled.dbr", 3)])
-check("contributions add across skills", p == {"bleeding": 130})
-
-# --- Task 1 (passives): combining with inline values ---
-check("tidy drops zero entries", mon._tidy({"fire": 0, "cold": 5}) == {"cold": 5})
-check("tidy keeps whole numbers whole", mon._tidy({"cold": 5.0})["cold"] == 5)
-
-rec_inline = {"defensiveFire": "10.000000", "skillName1": "records/skills/np/buffpassive.dbr", "skillLevel1": "1"}
-res = mon.resolved_resistances("enemies/x.dbr", rec_inline, get_skill)
-check("passive stacks on a nonzero inline value", res["resistances"]["fire"] == 20)
-check("combined keeps all ten keys", list(res["resistances"].keys()) == TEN)
-check("passive provenance is sparse", res["passive"] == {"fire": 10})
-check("aura provenance is empty when unused", res["aura"] == {})
-
-rec_aura = {"defensiveCold": "10.000000", "skillName1": "records/skills/np/aura.dbr", "skillLevel1": "1"}
-res_a = mon.resolved_resistances("enemies/x.dbr", rec_aura, get_skill)
-check("aura is NOT folded into the total", res_a["resistances"]["cold"] == 10)
-check("aura provenance is recorded", res_a["aura"] == {"cold": 20})
-
-# --- Task 2 (passives): collapse consumes the resolved map ---
-def crec2(maxlv, **kw):
-    base = {"Class": "Monster", "description": "tagOk", "monsterClassification": "Common",
-            "maxLevel": str(maxlv), "minLevel": "1"}
-    base.update(kw)
-    return base
-
-g_rec_a = crec2(90, defensiveFire="10")
-g_rec_b = crec2(50, defensiveFire="10")
-groups2 = {("Mon", "Common"): [("enemies/a.dbr", g_rec_a), ("enemies/b.dbr", g_rec_b)]}
-resolved2 = {
-    "enemies/a.dbr": {"resistances": {**mon.resistances_of(g_rec_a), "bleeding": 80},
-                      "passive": {"bleeding": 80}, "aura": {"cold": 20}},
-    "enemies/b.dbr": {"resistances": mon.resistances_of(g_rec_b), "passive": {}, "aura": {}},
-}
-rows2 = mon.collapse_to_logical(groups2, RACE_TAGS, resolved2)
-check("collapse uses the resolved combined resistances", rows2[0]["resistances"]["bleeding"] == 80)
-check("collapse emits sparse passive provenance", rows2[0]["passive_resistances"] == {"bleeding": 80})
-check("collapse emits sparse aura provenance", rows2[0]["aura_resistances"] == {"cold": 20})
-check("variants_disagree compares combined totals", rows2[0]["variants_disagree"] is True)
-
-groups3 = {("Mon", "Common"): [("enemies/a.dbr", g_rec_a)]}
-resolved3 = {"enemies/a.dbr": {"resistances": mon.resistances_of(g_rec_a), "passive": {}, "aura": {}}}
-rows3 = mon.collapse_to_logical(groups3, RACE_TAGS, resolved3)
-check("empty provenance keys are omitted entirely",
-      "passive_resistances" not in rows3[0] and "aura_resistances" not in rows3[0])
-
 # --- Task 2 (passives): the regenerated dataset ---
 out3 = Path(tempfile.mkdtemp()) / "monsters3.json"
 rc3 = subprocess.run([sys.executable, str(here / "parse_monsters.py"),
@@ -580,18 +592,6 @@ mon.SKILL_EXCLUSIONS[:] = saved_skips
 seeded = buf.getvalue()
 check("summary counts exactly the seeded skip", "skill grants not counted: 1" in seeded)
 check("summary itemises skip reasons by reason", "- summoned entity: 1" in seeded)
-
-# --- Task 1 (explorer): traps are excluded, monsters merely named "trap" are not ---
-check("a trap_ prefixed record is excluded",
-      mon.exclusion_reason("enemies/trap_mineexplosive_a01.dbr", rec(), TAGS) == "trap")
-check("a trap_ prefixed record in a subdir is excluded",
-      mon.exclusion_reason("enemies/special/trap_foo_01.dbr", rec(), TAGS) == "trap")
-check("a monster merely named with trap inside is kept",
-      mon.exclusion_reason("enemies/boss&quest/ghost_ugdenbogtrap_01.dbr", rec(), TAGS) is None)
-check("a monster whose name starts with a trap-like word is kept",
-      mon.exclusion_reason("enemies/boss&quest/trapdoorspider_01.dbr", rec(), TAGS) is None)
-check("rule order: a non-monster record is still reported as such, not as a trap",
-      mon.exclusion_reason("enemies/trap_x.dbr", rec(Class="ProxyPool"), TAGS) == "not a monster record")
 
 print("FAILURES:", failures)
 raise SystemExit(1 if failures else 0)
