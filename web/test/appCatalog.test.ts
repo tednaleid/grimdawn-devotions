@@ -274,6 +274,7 @@ const REQUIRED = [
   "monsters.rank.median",
   "monsters.rank.empty",
   "monsters.rank.caveat",
+  "monsters.note.level",
   "monsters.type.physical",
   "monsters.type.pierce",
   "monsters.type.fire",

@@ -2,7 +2,7 @@
 // ABOUTME: All view state lives in the URL hash; render reads the decoded ViewState.
 import { loadMonsters, loadGrimtoolsLinks } from "../adapters/dataSource";
 import { diffNoteMarkup } from "../adapters/controlsView";
-import { renderRank } from "../adapters/rankView";
+import { rankCaveatMarkup, renderRank } from "../adapters/rankView";
 import { renderTable } from "../adapters/tableView";
 import { applyView } from "../core/filter";
 import { offsetFor, type Monster } from "../core/model";
@@ -178,7 +178,7 @@ async function boot() {
     if (rankHost) renderRank(rankHost, localization, rows, offsets, view.includeAuras);
     const rankSub = document.getElementById("mon-rank-sub");
     if (rankSub) {
-      rankSub.textContent = localization.translate("monsters.rank.caveat", { count: rows.length });
+      rankSub.textContent = rankCaveatMarkup(localization, rows.length);
     }
 
     const tableHost = document.getElementById("mon-table");

@@ -5,6 +5,12 @@ import type { Monster, Resistances } from "../core/model";
 import type { Localization } from "../../ports/Localization";
 import { esc } from "./markup";
 
+/** The caption under the ranking heading: population size, the difficulty-offset caveat,
+ *  and the level-100 convention every level-scaled skill rank is read at. */
+export function rankCaveatMarkup(loc: Localization, count: number): string {
+  return `${loc.translate("monsters.rank.caveat", { count })} ${loc.translate("monsters.note.level")}`;
+}
+
 /** The ranking as an HTML string: a header row, then one row per damage type. */
 export function rankMarkup(loc: Localization, rows: Monster[], offsets: Resistances, includeAuras: boolean): string {
   const result = rankTypes(rows, offsets, includeAuras);

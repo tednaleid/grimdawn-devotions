@@ -15,7 +15,10 @@ user-reported link ("it will not let me spend my last point"), is in
 investigation playbook and the regression gates to run after a resolver change.
 The Resistance Reduction page's formula, its application order, and the tested
 sources behind it are in [docs/resistance-reduction.md](docs/resistance-reduction.md);
-read it before touching the ledger math.
+read it before touching the ledger math. The Monster Resistances page's formula,
+skill-rank rule, and grimtools parity checks are in
+[docs/monster-resistances.md](docs/monster-resistances.md); read it before touching
+`scripts/parse_monsters.py` or the monster page.
 
 grimtools.com is the reference players compare this app against. When a number we
 show from game data differs from what grimtools displays, treat grimtools as the

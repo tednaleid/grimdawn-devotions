@@ -1,7 +1,7 @@
 // ABOUTME: Markup tests for the ranking view: ordering, bucket bars, shared scale, empty state.
 // ABOUTME: The localization stub echoes keys, so assertions never depend on English wording.
 import { test, expect } from "bun:test";
-import { rankMarkup } from "../../src/monsters/adapters/rankView";
+import { rankCaveatMarkup, rankMarkup } from "../../src/monsters/adapters/rankView";
 import { DAMAGE_TYPES } from "../../src/monsters/core/facets";
 import type { Localization } from "../../src/ports/Localization";
 import type { Monster, Resistances } from "../../src/monsters/core/model";
@@ -118,4 +118,10 @@ test("the header labels the mean and median columns", () => {
   const html = rankMarkup(loc, [mon({ fire: 1 })], ZERO, false);
   expect(html).toContain("monsters.rank.mean");
   expect(html).toContain("monsters.rank.median");
+});
+
+test("the rank caveat states the level-100 convention alongside the population caveat", () => {
+  const caption = rankCaveatMarkup(loc, 5);
+  expect(caption).toContain("monsters.rank.caveat");
+  expect(caption).toContain("monsters.note.level");
 });

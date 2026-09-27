@@ -345,6 +345,7 @@
   "monsters.rank.median": "Median",
   "monsters.rank.empty": "No monsters match these filters, so there is nothing to average.",
   "monsters.rank.caveat": "{count} monsters, weighted equally. Values include the selected difficulty's flat bonus, so they will not match the game or a wiki.",
+  "monsters.note.level": "Level-scaled monster skills are read at monster level 100, as grimtools does.",
   "monsters.type.physical": "Physical",
   "monsters.type.pierce": "Pierce",
   "monsters.type.fire": "Fire",
