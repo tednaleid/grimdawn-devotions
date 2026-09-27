@@ -381,10 +381,9 @@
 .monsters-page .prov.aura {
   border: 1px solid var(--mon-ember);
 }
-.monsters-page .disagree {
-  color: var(--mon-warn);
-  font-weight: 700;
-  cursor: help;
+.monsters-page .m-variant {
+  font-weight: 400;
+  color: var(--mon-mut);
 }
 .monsters-page .mon-empty {
   padding: 40px 16px;

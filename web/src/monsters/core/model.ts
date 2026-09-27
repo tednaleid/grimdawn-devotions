@@ -17,7 +17,10 @@ export interface Monster {
   maxLevel: number;
   isSummon: boolean;
   variantCount: number;
-  variantsDisagree: boolean;
+  /** 1-based, present only when split rows share name, classification and role. */
+  variantIndex: number | null;
+  /** The representative record, shown as the variant suffix's tooltip. */
+  recordPath: string;
   /** Inline plus resident passives, as shipped. Always carries all ten keys. */
   resistances: Resistances;
   /** Sparse: only the types a passive skill contributed to. */
@@ -42,7 +45,8 @@ interface RawMonster {
   max_level: number;
   is_summon: boolean;
   variant_count: number;
-  variants_disagree: boolean;
+  variant_index?: number;
+  record_paths?: string[];
   resistances: Resistances;
   passive_resistances?: Partial<Resistances>;
   aura_resistances?: Partial<Resistances>;
@@ -59,7 +63,8 @@ function mapMonster(r: RawMonster): Monster {
     maxLevel: r.max_level ?? 0,
     isSummon: r.is_summon ?? false,
     variantCount: r.variant_count ?? 1,
-    variantsDisagree: r.variants_disagree ?? false,
+    variantIndex: r.variant_index ?? null,
+    recordPath: r.record_paths?.[0] ?? "",
     resistances: r.resistances,
     // Sparse by contract: absent means "nothing granted", which is an empty object here
     // so every consumer can index it without a null check.

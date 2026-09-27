@@ -24,7 +24,8 @@ function mon(over: Partial<Monster> = {}): Monster {
     maxLevel: 100,
     isSummon: false,
     variantCount: 1,
-    variantsDisagree: false,
+    variantIndex: null,
+    recordPath: "",
     resistances: { ...ZERO },
     passive: {},
     aura: {},
@@ -45,7 +46,8 @@ const DOC = {
       max_level: 100,
       is_summon: false,
       variant_count: 2,
-      variants_disagree: true,
+      variant_index: 2,
+      record_paths: ["records/creatures/enemies/a.dbr", "records/creatures/enemies/a2.dbr"],
       resistances: { ...ZERO, fire: 30, bleeding: 80 },
       passive_resistances: { bleeding: 80 },
       aura_resistances: { cold: 20 },
@@ -63,10 +65,21 @@ test("parseMonsters maps snake_case to camelCase and defaults the sparse objects
   const m = doc.monsters[0]!;
   expect(m.nameTag).toBe("tagA");
   expect(m.raceTag).toBe("tagRace005");
-  expect(m.variantsDisagree).toBe(true);
+  expect(m.variantIndex).toBe(2);
+  expect(m.recordPath).toBe("records/creatures/enemies/a.dbr");
   expect(m.passive).toEqual({ bleeding: 80 });
   expect(m.aura).toEqual({ cold: 20 });
   expect(doc.meta.game_version).toBe("1.3.0.0");
+});
+
+test("an old dataset row without variant_index or record_paths still parses", () => {
+  const raw = structuredClone(DOC) as { monsters: Record<string, unknown>[] };
+  delete raw.monsters[0]!.variant_index;
+  delete raw.monsters[0]!.record_paths;
+  raw.monsters[0]!.variants_disagree = true;
+  const m = parseMonsters(raw).monsters[0]!;
+  expect(m.variantIndex).toBeNull();
+  expect(m.recordPath).toBe("");
 });
 
 test("a monster with no provenance gets empty objects, not undefined", () => {

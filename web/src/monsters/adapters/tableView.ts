@@ -52,9 +52,12 @@ function row(
   nameOf: (m: Monster) => string,
 ): string {
   const eff = effective(m, offsets, view.includeAuras);
-  const warn = m.variantsDisagree
-    ? `<b class="disagree" title="${esc(loc.translate("monsters.table.disagreeTitle"))}">&#9888;</b>`
-    : "";
+  const suffix =
+    m.variantIndex !== null
+      ? ` <span class="m-variant" title="${esc(m.recordPath)}">${esc(
+          loc.translate("monsters.table.variantSuffix", { n: m.variantIndex }),
+        )}</span>`
+      : "";
   const roleText = m.isSummon ? `${m.role} ${loc.translate("monsters.table.summonSuffix")}` : m.role;
 
   const cells = DAMAGE_TYPES.map((t) => {
@@ -80,7 +83,7 @@ function row(
 
   return (
     `<tr data-id="${esc(m.id)}">` +
-    `<td class="left m-name">${esc(nameOf(m))}${warn}</td>` +
+    `<td class="left m-name">${esc(nameOf(m))}${suffix}</td>` +
     `<td class="left m-facet">${esc(m.classification)}</td>` +
     `<td class="left m-facet">${esc(roleText)}</td>` +
     cells +
@@ -94,7 +97,6 @@ function legend(loc: Localization, view: ViewState): string {
     `<div class="legend">` +
     `<span><i class="prov passive"></i>${esc(loc.translate("monsters.legend.passive"))}</span>` +
     `<span><i class="prov aura"></i>${esc(loc.translate(auraKey))}</span>` +
-    `<span>${esc(loc.translate("monsters.legend.disagree"))}</span>` +
     `<span>${esc(loc.translate("monsters.legend.negative"))}</span>` +
     `</div>`
   );

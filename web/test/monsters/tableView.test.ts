@@ -21,7 +21,8 @@ function mon(over: Partial<Monster> = {}): Monster {
     maxLevel: 100,
     isSummon: false,
     variantCount: 1,
-    variantsDisagree: false,
+    variantIndex: null,
+    recordPath: "",
     resistances: { ...ZERO },
     passive: {},
     aura: {},
@@ -146,9 +147,27 @@ test("the legend text follows the toggle too", () => {
   );
 });
 
-test("a disagreeing row carries a warning marker", () => {
-  const html = tableMarkup(loc, [mon({ variantsDisagree: true })], view(), ZERO, nameOf);
-  expect(html).toContain('class="disagree"');
+test("the legend no longer carries the disagree entry", () => {
+  const html = tableMarkup(loc, [mon()], view(), ZERO, nameOf);
+  expect(html).not.toContain("monsters.legend.disagree");
+});
+
+test("a colliding split row shows its variant suffix with the record path as tooltip", () => {
+  const html = tableMarkup(
+    loc,
+    [mon({ variantIndex: 2, recordPath: "records/creatures/enemies/hero/twin_b.dbr" })],
+    view(),
+    ZERO,
+    nameOf,
+  );
+  expect(html).toContain('class="m-variant"');
+  expect(html).toContain('title="records/creatures/enemies/hero/twin_b.dbr"');
+  expect(html).toContain("monsters.table.variantSuffix");
+});
+
+test("a row without a variant index shows no suffix", () => {
+  const html = tableMarkup(loc, [mon()], view(), ZERO, nameOf);
+  expect(html).not.toContain("m-variant");
 });
 
 test("a summon row is labelled as one", () => {
