@@ -140,12 +140,19 @@ export function sameOffsets(a: Resistances, b: Resistances): boolean {
   return DAMAGE_TYPES.every((t) => a[t] === b[t]);
 }
 
-/** What a player actually faces: base plus offset, plus aura grants when included.
+/** The highest resistance grimtools displays; values past it show as this. */
+export const RESISTANCE_CAP = 500;
+
+/** What a player actually faces: base plus offset, plus aura grants when included,
+ *  capped at RESISTANCE_CAP.
  *
  *  Always returns all ten keys in canonical order so callers can index without checking.
  */
 export function effective(m: Monster, offsets: Resistances, includeAuras: boolean): Resistances {
   return Object.fromEntries(
-    DAMAGE_TYPES.map((t) => [t, m.resistances[t] + offsets[t] + (includeAuras ? (m.aura[t] ?? 0) : 0)]),
+    DAMAGE_TYPES.map((t) => [
+      t,
+      Math.min(RESISTANCE_CAP, m.resistances[t] + offsets[t] + (includeAuras ? (m.aura[t] ?? 0) : 0)),
+    ]),
   ) as Resistances;
 }

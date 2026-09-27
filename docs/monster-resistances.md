@@ -28,8 +28,12 @@ tooltip.
 What the page displays for a monster at a given difficulty and player count is:
 
 ```
-displayed = inline + resident passive grants + difficulty offset
+displayed = min(500, inline + resident passive grants + difficulty offset)
 ```
+
+The 500 cap is grimtools' display convention (`RESISTANCE_CAP` in
+`web/src/monsters/core/model.ts`): a monster at 500 base, such as a nemesis ice
+crystal, still shows 500 after the Ascendant offset.
 
 `inline` is the `defensive<Type>` field on the creature record itself. Resident
 passive grants come from the monster's own skills (see below) and are folded into
@@ -63,6 +67,10 @@ about it by expression and count. On game version 1.3.0.8 one such equation exis
 `charlevel/4+1` (lowercase `charlevel`) in `witchgodguardian_solael.dbr`. It has no
 effect on that monster's displayed resistances.
 
+A skill can also carry `defensiveElementalResistance`, which the game and grimtools
+apply to each of fire, cold and lightning. `_skill_grant()` adds it to all three
+(`ELEMENTAL_FIELD`); monster records themselves do not carry it.
+
 ## Resident versus conditional classes
 
 Whether a skill's resistance grant is folded into a monster's permanent
@@ -92,7 +100,9 @@ the Resistance Reduction ledger, not to a monster's own resistance.
 The parity check (`scripts/test_monster_parity.py`, run with `just monster-parity`)
 compares `data/monsters.json` against `scripts/fixtures/gt-monster-resistances.json`,
 a fixture of grimtools' own displayed resistances for every Boss, SuperBoss, and
-nemesis entry (62 entries on grimtools game version 1.3.0.8). The fixture is
+nemesis entry, plus the Hero and Quest entries listed in the harvest script's
+`PINNED_IDS`, which pin elemental resistance below the boss tier (97 entries on
+grimtools game version 1.3.0.8). The fixture is
 harvested at grimtools' default: monster level 100, 1 player, buff toggles off, so
 its offsets and level convention match this page's. Refresh the fixture with
 `bun scripts/gt_monster_harvest.mjs` only when grimtools shows a newer game version;

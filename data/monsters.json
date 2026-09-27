@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.3.0.8",
     "steam_buildid": "24825149",
-    "generated_utc": "2026-09-27T19:20:33Z"
+    "generated_utc": "2026-09-27T22:28:58Z"
   },
   "monsters": [
     {
@@ -342,6 +342,11 @@
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
       },
       "variant_count": 1,
       "record_paths": [
@@ -2253,14 +2258,19 @@
       "resistances": {
         "physical": 15,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 33,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 51,
         "poison": 0,
         "aether": 33,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -2279,14 +2289,19 @@
       "resistances": {
         "physical": 15,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 33,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 51,
         "poison": 0,
         "aether": 33,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -2305,14 +2320,19 @@
       "resistances": {
         "physical": 15,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 33,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 51,
         "poison": 0,
         "aether": 33,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -3162,14 +3182,19 @@
       "resistances": {
         "physical": 50,
         "pierce": 50,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18,
         "poison": 0,
         "aether": 50,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -3953,7 +3978,10 @@
       "aura_resistances": {
         "physical": 10,
         "pierce": 15,
-        "chaos": 10
+        "chaos": 10,
+        "fire": 10,
+        "cold": 10,
+        "lightning": 10
       },
       "variant_count": 2,
       "record_paths": [
@@ -3981,6 +4009,11 @@
         "chaos": 50,
         "vitality": 40,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -4258,6 +4291,11 @@
         "vitality": 20,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/boss&quest/chthonianminion_bocgauntlet.dbr"
@@ -4516,14 +4554,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18,
         "poison": 30,
         "aether": 0,
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -5064,9 +5107,9 @@
       "resistances": {
         "physical": 25,
         "pierce": 25,
-        "fire": 25,
-        "cold": 25,
-        "lightning": 25,
+        "fire": 43,
+        "cold": 43,
+        "lightning": 43,
         "poison": 25,
         "aether": 25,
         "chaos": 80,
@@ -5074,7 +5117,10 @@
         "bleeding": 25
       },
       "passive_resistances": {
-        "bleeding": 25
+        "bleeding": 25,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -5157,8 +5203,9 @@
       },
       "aura_resistances": {
         "physical": 20,
-        "fire": 33,
-        "cold": 33
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -5681,14 +5728,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 25,
-        "fire": 0,
-        "cold": 60,
-        "lightning": 0,
+        "fire": 18,
+        "cold": 78,
+        "lightning": 18,
         "poison": 60,
         "aether": 25,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -5762,14 +5814,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 0,
-        "cold": 60,
-        "lightning": 60,
+        "fire": 18,
+        "cold": 78,
+        "lightning": 78,
         "poison": 33,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -7640,14 +7697,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 27,
+        "cold": 27,
+        "lightning": 27,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 27,
+        "cold": 27,
+        "lightning": 27
       },
       "variant_count": 1,
       "record_paths": [
@@ -7887,9 +7949,9 @@
       "resistances": {
         "physical": 35,
         "pierce": 35,
-        "fire": 35,
-        "cold": 35,
-        "lightning": 35,
+        "fire": 53,
+        "cold": 53,
+        "lightning": 53,
         "poison": 35,
         "aether": 35,
         "chaos": 35,
@@ -7897,7 +7959,10 @@
         "bleeding": 35
       },
       "passive_resistances": {
-        "bleeding": 35
+        "bleeding": 35,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 3,
       "record_paths": [
@@ -9365,14 +9430,19 @@
       "resistances": {
         "physical": 30,
         "pierce": 30,
-        "fire": 20,
-        "cold": 20,
-        "lightning": 20,
+        "fire": 38,
+        "cold": 38,
+        "lightning": 38,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 40,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 2,
       "record_paths": [
@@ -9422,9 +9492,9 @@
       "resistances": {
         "physical": 30,
         "pierce": 30,
-        "fire": 20,
-        "cold": 20,
-        "lightning": 20,
+        "fire": 38,
+        "cold": 38,
+        "lightning": 38,
         "poison": 18,
         "aether": 0,
         "chaos": 0,
@@ -9432,7 +9502,10 @@
         "bleeding": 0
       },
       "passive_resistances": {
-        "poison": 18
+        "poison": 18,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 2,
       "record_paths": [
@@ -9462,7 +9535,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -10123,9 +10199,9 @@
       "resistances": {
         "physical": 0,
         "pierce": 25,
-        "fire": 20,
-        "cold": 10,
-        "lightning": 8,
+        "fire": 25,
+        "cold": 15,
+        "lightning": 13,
         "poison": 15,
         "aether": 33,
         "chaos": 0,
@@ -10133,7 +10209,10 @@
         "bleeding": 0
       },
       "passive_resistances": {
-        "pierce": 10
+        "pierce": 10,
+        "fire": 5,
+        "cold": 5,
+        "lightning": 5
       },
       "variant_count": 1,
       "record_paths": [
@@ -10407,9 +10486,9 @@
       "resistances": {
         "physical": 25,
         "pierce": 25,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25,
         "poison": 25,
         "aether": 25,
         "chaos": 75,
@@ -10423,7 +10502,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 25
+        "bleeding": 25,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25
       },
       "variant_count": 2,
       "record_paths": [
@@ -10537,6 +10619,11 @@
         "vitality": 20,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
       "variant_count": 3,
       "record_paths": [
         "records/creatures/enemies/boss&quest/waveevent_boc_chthonianminion_h03.dbr",
@@ -10565,6 +10652,11 @@
         "vitality": 20,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
       "variant_count": 3,
       "record_paths": [
         "records/creatures/enemies/boss&quest/waveevent_boc_chthonianminion_h04.dbr",
@@ -10592,6 +10684,11 @@
         "chaos": 100,
         "vitality": 20,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 3,
       "record_paths": [
@@ -10932,9 +11029,9 @@
       "resistances": {
         "physical": 25,
         "pierce": 25,
-        "fire": 25,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 50,
+        "cold": 25,
+        "lightning": 25,
         "poison": 25,
         "aether": 75,
         "chaos": 25,
@@ -10948,7 +11045,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 25
+        "bleeding": 25,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25
       },
       "variant_count": 2,
       "record_paths": [
@@ -11140,6 +11240,11 @@
         "chaos": 100,
         "vitality": 20,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 2,
       "record_paths": [
@@ -11616,6 +11721,11 @@
         "chaos": 100,
         "vitality": 20,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 2,
       "record_paths": [
@@ -12898,14 +13008,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18,
         "poison": 50,
         "aether": 50,
         "chaos": 25,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -12924,14 +13039,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18,
         "poison": 50,
         "aether": 50,
         "chaos": 25,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -12950,14 +13070,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 0,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18,
         "poison": 50,
         "aether": 50,
         "chaos": 25,
         "vitality": 25,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 18,
+        "cold": 18,
+        "lightning": 18
       },
       "variant_count": 1,
       "record_paths": [
@@ -13333,7 +13458,10 @@
       },
       "aura_resistances": {
         "physical": 30,
-        "pierce": 30
+        "pierce": 30,
+        "fire": 30,
+        "cold": 30,
+        "lightning": 30
       },
       "variant_count": 1,
       "record_paths": [
@@ -13901,7 +14029,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -14330,6 +14461,11 @@
         "chaos": 100,
         "vitality": 20,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -15318,7 +15454,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -16706,6 +16845,11 @@
         "vitality": 20,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/chthonianminion_a01_cultistbosscompanion.dbr"
@@ -16731,6 +16875,11 @@
         "chaos": 100,
         "vitality": 20,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 2,
       "record_paths": [
@@ -17578,8 +17727,9 @@
       },
       "aura_resistances": {
         "physical": 20,
-        "fire": 33,
-        "cold": 33
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
       },
       "variant_count": 2,
       "record_paths": [
@@ -19212,7 +19362,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 8
+        "physical": 8,
+        "fire": 15,
+        "cold": 15,
+        "lightning": 15
       },
       "variant_count": 2,
       "record_paths": [
@@ -19719,6 +19872,11 @@
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 15,
+        "cold": 15,
+        "lightning": 15
       },
       "variant_count": 2,
       "record_paths": [
@@ -20492,6 +20650,11 @@
       },
       "passive_resistances": {
         "bleeding": 100
+      },
+      "aura_resistances": {
+        "fire": 40,
+        "cold": 40,
+        "lightning": 40
       },
       "variant_count": 2,
       "record_paths": [
@@ -23207,6 +23370,11 @@
         "vitality": 0,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25
+      },
       "variant_count": 2,
       "record_paths": [
         "records/creatures/enemies/harpy_c01.dbr",
@@ -25270,6 +25438,11 @@
       "passive_resistances": {
         "physical": 15
       },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/hero/chthonianminion_h07.dbr"
@@ -25295,6 +25468,11 @@
         "chaos": 100,
         "vitality": 20,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -26074,8 +26252,9 @@
       },
       "aura_resistances": {
         "physical": 20,
-        "fire": 33,
-        "cold": 33
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -26105,8 +26284,9 @@
       },
       "aura_resistances": {
         "physical": 20,
-        "fire": 33,
-        "cold": 33
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -26136,8 +26316,9 @@
       },
       "aura_resistances": {
         "physical": 20,
-        "fire": 33,
-        "cold": 33
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -26167,8 +26348,9 @@
       },
       "aura_resistances": {
         "physical": 20,
-        "fire": 33,
-        "cold": 33
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -26198,8 +26380,9 @@
       },
       "aura_resistances": {
         "physical": 20,
-        "fire": 33,
-        "cold": 33
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -26582,9 +26765,9 @@
       "resistances": {
         "physical": 25,
         "pierce": 25,
-        "fire": 25,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 50,
+        "cold": 25,
+        "lightning": 25,
         "poison": 25,
         "aether": 105,
         "chaos": 25,
@@ -26598,7 +26781,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 25
+        "bleeding": 25,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25
       },
       "variant_count": 1,
       "record_paths": [
@@ -28642,9 +28828,9 @@
       "resistances": {
         "physical": 25,
         "pierce": 25,
-        "fire": -10,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 15,
+        "cold": 25,
+        "lightning": 25,
         "poison": 25,
         "aether": 25,
         "chaos": 25,
@@ -28658,7 +28844,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 25
+        "bleeding": 25,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25
       },
       "variant_count": 1,
       "record_paths": [
@@ -30486,9 +30675,9 @@
       "resistances": {
         "physical": 40,
         "pierce": 25,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25,
         "poison": 25,
         "aether": 25,
         "chaos": 25,
@@ -30502,7 +30691,10 @@
         "aether": 25,
         "chaos": 25,
         "vitality": 25,
-        "bleeding": 25
+        "bleeding": 25,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25
       },
       "variant_count": 1,
       "record_paths": [
@@ -32227,7 +32419,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -32256,7 +32451,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -32285,7 +32483,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -32314,7 +32515,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -32343,7 +32547,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -32372,7 +32579,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -32401,7 +32611,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 1,
       "record_paths": [
@@ -33587,7 +33800,10 @@
       },
       "aura_resistances": {
         "pierce": 25,
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -33616,7 +33832,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -33646,7 +33865,10 @@
       },
       "aura_resistances": {
         "pierce": 25,
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -33678,7 +33900,10 @@
         "chaos": 20
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -33857,7 +34082,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 2,
       "record_paths": [
@@ -33888,6 +34116,9 @@
       },
       "aura_resistances": {
         "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "pierce": 25
       },
       "variant_count": 2,
@@ -33919,6 +34150,9 @@
       },
       "aura_resistances": {
         "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "pierce": 25
       },
       "variant_count": 2,
@@ -33950,6 +34184,9 @@
       },
       "aura_resistances": {
         "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "pierce": 25
       },
       "variant_count": 2,
@@ -33981,6 +34218,9 @@
       },
       "aura_resistances": {
         "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "pierce": 25
       },
       "variant_count": 1,
@@ -34198,6 +34438,11 @@
         "vitality": 30,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/hero/thornedhorror_h03.dbr"
@@ -34224,6 +34469,11 @@
         "vitality": 30,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/hero/thornedhorror_h04.dbr"
@@ -34249,6 +34499,11 @@
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
       },
       "variant_count": 1,
       "record_paths": [
@@ -34279,6 +34534,11 @@
       "passive_resistances": {
         "cold": 26
       },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/hero/thornedhorror_h06.dbr"
@@ -34304,6 +34564,11 @@
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
       },
       "variant_count": 1,
       "record_paths": [
@@ -34907,14 +35172,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 15,
-        "fire": 50,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 85,
+        "cold": 35,
+        "lightning": 35,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -34933,14 +35203,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 15,
-        "fire": 50,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 85,
+        "cold": 35,
+        "lightning": 35,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -35092,9 +35367,9 @@
       "resistances": {
         "physical": 15,
         "pierce": 15,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
@@ -35102,7 +35377,10 @@
         "bleeding": 0
       },
       "passive_resistances": {
-        "physical": 15
+        "physical": 15,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -35121,14 +35399,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 15,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -35147,14 +35430,19 @@
       "resistances": {
         "physical": 0,
         "pierce": 15,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "poison": 0,
         "aether": 0,
         "chaos": 0,
         "vitality": 0,
         "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -40987,7 +41275,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "poison": 20
+        "poison": 20,
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
       },
       "variant_count": 2,
       "record_paths": [
@@ -44144,7 +44435,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 2,
       "record_paths": [
@@ -44175,6 +44469,9 @@
       },
       "aura_resistances": {
         "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "pierce": 25
       },
       "variant_count": 2,
@@ -44426,7 +44723,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 1,
       "record_paths": [
@@ -44456,6 +44756,9 @@
       },
       "aura_resistances": {
         "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "pierce": 25
       },
       "variant_count": 1,
@@ -44485,7 +44788,10 @@
         "bleeding": 0
       },
       "aura_resistances": {
-        "physical": 35
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
       },
       "variant_count": 2,
       "record_paths": [
@@ -44516,6 +44822,9 @@
       },
       "aura_resistances": {
         "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
         "pierce": 25
       },
       "variant_count": 2,
@@ -44680,6 +44989,11 @@
         "vitality": 30,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/thornedhorror_aether_a01.dbr"
@@ -44705,6 +45019,11 @@
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
       },
       "variant_count": 1,
       "record_paths": [
@@ -44732,6 +45051,11 @@
         "vitality": 30,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/thornedhorror_aether_c01.dbr"
@@ -44758,6 +45082,11 @@
         "vitality": 30,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/thornedhorrora_a01.dbr"
@@ -44783,6 +45112,11 @@
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
       },
       "variant_count": 2,
       "record_paths": [
@@ -44811,6 +45145,11 @@
         "vitality": 30,
         "bleeding": 0
       },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
+      },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/thornedhorrora_b01_mogdrogensummon.dbr"
@@ -44836,6 +45175,11 @@
         "chaos": 0,
         "vitality": 30,
         "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33
       },
       "variant_count": 1,
       "record_paths": [

@@ -796,6 +796,32 @@ no matching link) and any link keys that are not current row ids.
 Pointers: `scripts/test_monster_parity.py`, `scripts/diff_data.py`,
 `scripts/gt_monster_links.ts`.
 
+## Monster resistances: the grimtools mismatches outside the parity fixture
+
+A full comparison of every grimtools monsterdb entry (game 1.3.0.8, harvested with
+the same in-page routine as `scripts/gt_monster_harvest.mjs` but without its
+filter) against `data/monsters.json` leaves 9 mismatching entries and about 350 with
+no row to compare:
+
+- **Stationary summons shown as 500 everywhere.** Darius's aether crystals (m1520,
+  m1583, m1584), the obsidian cluster (m1153) and one cult wraith (m3415, m4031):
+  grimtools shows 500 in every type and 0 bleeding, we show the record's own values
+  (for example bleeding 300 from `passiveproperties_darius_aethercrystal.dbr`). Find
+  what grimtools keys this on (an invulnerable or object flag) before adopting it.
+- **Grobleas (snake clan) pierce.** m1500 and m1498 show pierce 25 on grimtools, 0
+  here; the source of the 25 was not found in the records' skills.
+- **Dreeg mindreaper eldritch armor (m2110, Quest).** Every type differs from both
+  of our `eldritcharmor_dreegmindreaper_*` rows, so this looks like a row-mapping
+  question, not a missing resistance.
+- **Entries with no matching row.** 179 Hero, 142 Common, 28 Champion and 7 Quest
+  grimtools entries share no (name tag, classification) with any row. Likely
+  classification differences or records the parser excludes; unconfirmed.
+
+To reproduce: copy `scripts/gt_monster_harvest.mjs`, drop its entry filter and point
+its output at a scratch file, then compare with the same rule as
+`scripts/test_monster_parity.py`. A fixed entry belongs in the harvest's
+`PINNED_IDS` so parity pins it.
+
 ## Veteran mode as a difficulty option
 
 Ascendant is now derived from `gameengine.dbr -> ascendantRecord ->

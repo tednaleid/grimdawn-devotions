@@ -18,9 +18,10 @@ for m in doc["monsters"]:
 
 
 def displayed(m: dict, difficulty: str) -> dict:
-    """What the page shows at 1 player: base plus the difficulty's flat offset."""
+    """What the page shows at 1 player: base plus the difficulty's flat offset, capped at 500
+    (RESISTANCE_CAP in web/src/monsters/core/model.ts)."""
     off = offsets[difficulty]["1"]
-    return {k: m["resistances"][k] + off.get(k, 0) for k in m["resistances"]}
+    return {k: min(500, m["resistances"][k] + off.get(k, 0)) for k in m["resistances"]}
 
 
 failures = 0

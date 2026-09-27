@@ -140,6 +140,14 @@ test("effective excludes auras by default and includes them when asked", () => {
   expect(effective(m, ZERO as Resistances, true).cold).toBe(30);
 });
 
+test("effective caps at 500, as grimtools displays it", () => {
+  // grimtools m580 (ice crystal): base 500 cold plus the Ascendant offset shows 500, not 505.
+  const m = mon({ resistances: { ...ZERO, cold: 500, fire: 490 } as Monster["resistances"] });
+  const e = effective(m, { ...ZERO, cold: 5, fire: 5 } as Resistances, false);
+  expect(e.cold).toBe(500);
+  expect(e.fire).toBe(495);
+});
+
 test("including auras stacks with the difficulty offset", () => {
   const m = mon({ resistances: { ...ZERO, cold: 10 } as Monster["resistances"], aura: { cold: 20 } });
   expect(effective(m, { ...ZERO, cold: 5 } as Resistances, true).cold).toBe(35);

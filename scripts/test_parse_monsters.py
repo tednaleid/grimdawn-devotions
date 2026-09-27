@@ -274,6 +274,8 @@ SKILLS = {
     "records/skills/np/mastery.dbr": {"Class": "Skill_Mastery", "defensiveAether": "4.000000"},
     "records/skills/np/firepassive.dbr": {"Class": "Skill_Passive", "defensiveFire": "10.000000"},
     "records/skills/np/buffhost.dbr": {"Class": "Skill_AttackBuffRadius", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
+    "records/skills/np/elemental.dbr": {"Class": "Skill_Passive", "defensiveFire": "5.000000",
+                                        "defensiveElementalResistance": "6.000000;7.000000;8.000000"},
 }
 get_skill = lambda ref: SKILLS.get(ref.strip(), {})
 
@@ -298,6 +300,9 @@ p, a = contrib([("records/skills/np/mastery.dbr", 1)])
 check("Skill_Mastery is resident", p == {"aether": 4} and a == {})
 p, a = contrib([("records/skills/np/scaled.dbr", "charLevel/4+1")])
 check("a level-scaled passive is read at the evaluated rank", p == {"vitality": 26})
+# grimtools m3853 (Hag miniboss): a passive's defensiveElementalResistance shows on fire, cold and lightning.
+p, a = contrib([("records/skills/np/elemental.dbr", 2)])
+check("elemental resistance adds to fire, cold and lightning", p == {"fire": 12, "cold": 7, "lightning": 7})
 p, a = contrib([("records/skills/np/buffhost.dbr", 1)])
 check("a buff host still reaches a SkillBuff_Passive child, as an aura", p == {} and a == {"fire": 33, "cold": 33})
 
@@ -599,9 +604,11 @@ check("kaisan fire resolves to 71", kaisan and kaisan["resistances"]["fire"] == 
 check("karroz is still present", "enemies.boss-quest.cultist_summoner_01" in by_id)
 
 eldritch = by_id.get("enemies.eldritcharmor_c01")
+# 33 fire/cold from the self-shield plus 20 elemental from its aura buff.
 check("a toggled self-shield is recorded as an aura",
-      eldritch and eldritch.get("aura_resistances", {}).get("fire") == 33
-      and eldritch["aura_resistances"].get("cold") == 33)
+      eldritch and eldritch.get("aura_resistances", {}).get("fire") == 53
+      and eldritch["aura_resistances"].get("cold") == 53
+      and eldritch["aura_resistances"].get("lightning") == 20)
 check("an aura is still kept out of the headline total",
       eldritch and eldritch["resistances"]["fire"] == 0)
 auras = [m for m in m3 if m.get("aura_resistances")]

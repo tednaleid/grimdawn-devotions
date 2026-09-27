@@ -5,6 +5,135 @@
  "players": 1,
  "entries": [
   {
+   "gt_id": 84,
+   "name_tag": "tagGDX1EnclaveBoss01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 15,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 51,
+     "poison": 0,
+     "aether": 33,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 15,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 57,
+     "poison": 6,
+     "aether": 35,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 17,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 61,
+     "poison": 10,
+     "aether": 38,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 85,
+   "name_tag": "tagGDX1EnclaveBoss03",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 15,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 51,
+     "poison": 0,
+     "aether": 33,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 15,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 57,
+     "poison": 6,
+     "aether": 35,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 17,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 61,
+     "poison": 10,
+     "aether": 38,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 86,
+   "name_tag": "tagGDX1EnclaveBoss02",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 15,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 51,
+     "poison": 0,
+     "aether": 33,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 15,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 57,
+     "poison": 6,
+     "aether": 35,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 17,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 61,
+     "poison": 10,
+     "aether": 38,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
    "gt_id": 119,
    "name_tag": "tagNPC_Homestead_03",
    "classification": "SuperBoss",
@@ -39,6 +168,49 @@
      "chaos": 87,
      "vitality": 91,
      "bleeding": 90
+    }
+   }
+  },
+  {
+   "gt_id": 212,
+   "name_tag": "tagHumanPossessedHeroH06",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 0,
+     "fire": 27,
+     "cold": 27,
+     "lightning": 27,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 2,
+     "fire": 31,
+     "cold": 29,
+     "lightning": 33,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 5,
+     "fire": 35,
+     "cold": 32,
+     "lightning": 37,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
     }
    }
   },
@@ -94,6 +266,214 @@
      "chaos": 5,
      "vitality": 12,
      "bleeding": 109
+    }
+   }
+  },
+  {
+   "gt_id": 276,
+   "name_tag": "tagBossTheWarden01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 25,
+     "fire": 25,
+     "cold": 15,
+     "lightning": 13,
+     "poison": 15,
+     "aether": 33,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 27,
+     "fire": 29,
+     "cold": 17,
+     "lightning": 19,
+     "poison": 21,
+     "aether": 35,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 30,
+     "fire": 33,
+     "cold": 20,
+     "lightning": 23,
+     "poison": 25,
+     "aether": 38,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 286,
+   "name_tag": "tagVoidFiendHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": 25,
+     "cold": 25,
+     "lightning": 25,
+     "poison": 25,
+     "aether": 25,
+     "chaos": 75,
+     "vitality": 25,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": 29,
+     "cold": 27,
+     "lightning": 31,
+     "poison": 31,
+     "aether": 27,
+     "chaos": 77,
+     "vitality": 31,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 33,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 30,
+     "chaos": 80,
+     "vitality": 37,
+     "bleeding": 34
+    },
+    "ascendant": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 33,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 30,
+     "chaos": 80,
+     "vitality": 37,
+     "bleeding": 34
+    }
+   }
+  },
+  {
+   "gt_id": 304,
+   "name_tag": "tagFleshHulkHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": 50,
+     "cold": 25,
+     "lightning": 25,
+     "poison": 25,
+     "aether": 75,
+     "chaos": 25,
+     "vitality": 25,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": 54,
+     "cold": 27,
+     "lightning": 31,
+     "poison": 31,
+     "aether": 77,
+     "chaos": 27,
+     "vitality": 31,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 58,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 80,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 34
+    },
+    "ascendant": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 58,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 80,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 34
+    }
+   }
+  },
+  {
+   "gt_id": 316,
+   "name_tag": "tagFleshHulkHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": 50,
+     "cold": 25,
+     "lightning": 25,
+     "poison": 25,
+     "aether": 75,
+     "chaos": 25,
+     "vitality": 25,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": 54,
+     "cold": 27,
+     "lightning": 31,
+     "poison": 31,
+     "aether": 77,
+     "chaos": 27,
+     "vitality": 31,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 58,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 80,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 34
+    },
+    "ascendant": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 58,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 80,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 34
     }
    }
   },
@@ -354,6 +734,362 @@
      "chaos": 5,
      "vitality": 12,
      "bleeding": 109
+    }
+   }
+  },
+  {
+   "gt_id": 580,
+   "name_tag": "tagEnemySummonIceCrystal",
+   "classification": "Common",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": -25,
+     "cold": 500,
+     "lightning": 0,
+     "poison": 100,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 100
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": -21,
+     "cold": 500,
+     "lightning": 6,
+     "poison": 106,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 105
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": -17,
+     "cold": 500,
+     "lightning": 10,
+     "poison": 110,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 109
+    },
+    "ascendant": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": -17,
+     "cold": 500,
+     "lightning": 10,
+     "poison": 110,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 109
+    }
+   }
+  },
+  {
+   "gt_id": 764,
+   "name_tag": "tagVoidFiendHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": 25,
+     "cold": 25,
+     "lightning": 25,
+     "poison": 25,
+     "aether": 25,
+     "chaos": 75,
+     "vitality": 25,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": 29,
+     "cold": 27,
+     "lightning": 31,
+     "poison": 31,
+     "aether": 27,
+     "chaos": 77,
+     "vitality": 31,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 33,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 30,
+     "chaos": 80,
+     "vitality": 37,
+     "bleeding": 34
+    }
+   }
+  },
+  {
+   "gt_id": 801,
+   "name_tag": "tagFleshHulkHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": 50,
+     "cold": 25,
+     "lightning": 25,
+     "poison": 25,
+     "aether": 105,
+     "chaos": 25,
+     "vitality": 25,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": 54,
+     "cold": 27,
+     "lightning": 31,
+     "poison": 31,
+     "aether": 107,
+     "chaos": 27,
+     "vitality": 31,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 58,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 110,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 34
+    }
+   }
+  },
+  {
+   "gt_id": 849,
+   "name_tag": "tagHarvestmanHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": 15,
+     "cold": 25,
+     "lightning": 25,
+     "poison": 25,
+     "aether": 25,
+     "chaos": 25,
+     "vitality": 40,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": 19,
+     "cold": 27,
+     "lightning": 31,
+     "poison": 31,
+     "aether": 27,
+     "chaos": 27,
+     "vitality": 46,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 23,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 30,
+     "chaos": 30,
+     "vitality": 52,
+     "bleeding": 34
+    }
+   }
+  },
+  {
+   "gt_id": 890,
+   "name_tag": "tagManticoreHeroH05",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 40,
+     "pierce": 25,
+     "fire": 25,
+     "cold": 25,
+     "lightning": 25,
+     "poison": 25,
+     "aether": 25,
+     "chaos": 25,
+     "vitality": 25,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 40,
+     "pierce": 27,
+     "fire": 29,
+     "cold": 27,
+     "lightning": 31,
+     "poison": 31,
+     "aether": 27,
+     "chaos": 27,
+     "vitality": 31,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 42,
+     "pierce": 30,
+     "fire": 33,
+     "cold": 30,
+     "lightning": 35,
+     "poison": 35,
+     "aether": 30,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 34
+    }
+   }
+  },
+  {
+   "gt_id": 987,
+   "name_tag": "tagTrollHalfHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 15,
+     "fire": 85,
+     "cold": 35,
+     "lightning": 35,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 17,
+     "fire": 89,
+     "cold": 37,
+     "lightning": 41,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 20,
+     "fire": 93,
+     "cold": 40,
+     "lightning": 45,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 995,
+   "name_tag": "tagTrollHalfSwampHeroH03",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 15,
+     "pierce": 15,
+     "fire": 35,
+     "cold": 35,
+     "lightning": 35,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 15,
+     "pierce": 17,
+     "fire": 39,
+     "cold": 37,
+     "lightning": 41,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 17,
+     "pierce": 20,
+     "fire": 43,
+     "cold": 40,
+     "lightning": 45,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 996,
+   "name_tag": "tagTrollHalfSwampHeroH04",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 15,
+     "fire": 35,
+     "cold": 35,
+     "lightning": 35,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 17,
+     "fire": 39,
+     "cold": 37,
+     "lightning": 41,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 20,
+     "fire": 43,
+     "cold": 40,
+     "lightning": 45,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
     }
    }
   },
@@ -1293,6 +2029,61 @@
    }
   },
   {
+   "gt_id": 1161,
+   "name_tag": "tagEnemySummonIceCrystal",
+   "classification": "Common",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": -25,
+     "cold": 100,
+     "lightning": 0,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": -21,
+     "cold": 102,
+     "lightning": 6,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": -17,
+     "cold": 105,
+     "lightning": 10,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    },
+    "ascendant": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": -17,
+     "cold": 105,
+     "lightning": 10,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
    "gt_id": 1162,
    "name_tag": "tagGDX1Nemesis_Wendigo01",
    "classification": "Boss",
@@ -1403,6 +2194,92 @@
    }
   },
   {
+   "gt_id": 1799,
+   "name_tag": "tagGDX2Boss_Dravis_01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 25,
+     "pierce": 25,
+     "fire": 43,
+     "cold": 43,
+     "lightning": 43,
+     "poison": 25,
+     "aether": 25,
+     "chaos": 80,
+     "vitality": 80,
+     "bleeding": 25
+    },
+    "elite": {
+     "physical": 25,
+     "pierce": 27,
+     "fire": 47,
+     "cold": 45,
+     "lightning": 49,
+     "poison": 31,
+     "aether": 27,
+     "chaos": 82,
+     "vitality": 86,
+     "bleeding": 30
+    },
+    "ultimate": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 51,
+     "cold": 48,
+     "lightning": 53,
+     "poison": 35,
+     "aether": 30,
+     "chaos": 85,
+     "vitality": 92,
+     "bleeding": 34
+    },
+    "ascendant": {
+     "physical": 27,
+     "pierce": 30,
+     "fire": 51,
+     "cold": 48,
+     "lightning": 53,
+     "poison": 35,
+     "aether": 30,
+     "chaos": 85,
+     "vitality": 92,
+     "bleeding": 34
+    }
+   }
+  },
+  {
+   "gt_id": 1817,
+   "name_tag": "tagGDX2Quest_StoneGryphon_TempleGuard_02",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 30,
+     "pierce": 30,
+     "fire": 38,
+     "cold": 38,
+     "lightning": 38,
+     "poison": 18,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 40,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 30,
+     "pierce": 32,
+     "fire": 42,
+     "cold": 40,
+     "lightning": 44,
+     "poison": 24,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 46,
+     "bleeding": 5
+    }
+   }
+  },
+  {
    "gt_id": 1839,
    "name_tag": "tagGDX2Nemesis_Eldritch01",
    "classification": "Boss",
@@ -1508,6 +2385,312 @@
    }
   },
   {
+   "gt_id": 2028,
+   "name_tag": "tagGDX2Miniboss_Beast_03",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 25,
+     "fire": 18,
+     "cold": 78,
+     "lightning": 18,
+     "poison": 60,
+     "aether": 25,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 27,
+     "fire": 22,
+     "cold": 80,
+     "lightning": 24,
+     "poison": 66,
+     "aether": 27,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 30,
+     "fire": 26,
+     "cold": 83,
+     "lightning": 28,
+     "poison": 70,
+     "aether": 30,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 2029,
+   "name_tag": "tagGDX2Quest_EldritchLizard_01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 78,
+     "lightning": 78,
+     "poison": 33,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 80,
+     "lightning": 84,
+     "poison": 39,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 83,
+     "lightning": 88,
+     "poison": 43,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 2117,
+   "name_tag": "tagGDX2Boss_Final01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 35,
+     "pierce": 35,
+     "fire": 53,
+     "cold": 53,
+     "lightning": 53,
+     "poison": 35,
+     "aether": 35,
+     "chaos": 35,
+     "vitality": 35,
+     "bleeding": 35
+    },
+    "elite": {
+     "physical": 35,
+     "pierce": 37,
+     "fire": 57,
+     "cold": 55,
+     "lightning": 59,
+     "poison": 41,
+     "aether": 37,
+     "chaos": 37,
+     "vitality": 41,
+     "bleeding": 40
+    },
+    "ultimate": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    },
+    "ascendant": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    }
+   }
+  },
+  {
+   "gt_id": 2118,
+   "name_tag": "tagGDX2Boss_Final01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 35,
+     "pierce": 35,
+     "fire": 53,
+     "cold": 53,
+     "lightning": 53,
+     "poison": 35,
+     "aether": 35,
+     "chaos": 35,
+     "vitality": 35,
+     "bleeding": 35
+    },
+    "elite": {
+     "physical": 35,
+     "pierce": 37,
+     "fire": 57,
+     "cold": 55,
+     "lightning": 59,
+     "poison": 41,
+     "aether": 37,
+     "chaos": 37,
+     "vitality": 41,
+     "bleeding": 40
+    },
+    "ultimate": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    },
+    "ascendant": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    }
+   }
+  },
+  {
+   "gt_id": 2119,
+   "name_tag": "tagGDX2Boss_Final01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 35,
+     "pierce": 35,
+     "fire": 53,
+     "cold": 53,
+     "lightning": 53,
+     "poison": 35,
+     "aether": 35,
+     "chaos": 35,
+     "vitality": 35,
+     "bleeding": 35
+    },
+    "elite": {
+     "physical": 35,
+     "pierce": 37,
+     "fire": 57,
+     "cold": 55,
+     "lightning": 59,
+     "poison": 41,
+     "aether": 37,
+     "chaos": 37,
+     "vitality": 41,
+     "bleeding": 40
+    },
+    "ultimate": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    },
+    "ascendant": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    }
+   }
+  },
+  {
+   "gt_id": 2120,
+   "name_tag": "tagGDX2Boss_Final01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 35,
+     "pierce": 35,
+     "fire": 53,
+     "cold": 53,
+     "lightning": 53,
+     "poison": 35,
+     "aether": 35,
+     "chaos": 35,
+     "vitality": 35,
+     "bleeding": 35
+    },
+    "elite": {
+     "physical": 35,
+     "pierce": 37,
+     "fire": 57,
+     "cold": 55,
+     "lightning": 59,
+     "poison": 41,
+     "aether": 37,
+     "chaos": 37,
+     "vitality": 41,
+     "bleeding": 40
+    },
+    "ultimate": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    },
+    "ascendant": {
+     "physical": 37,
+     "pierce": 40,
+     "fire": 61,
+     "cold": 58,
+     "lightning": 63,
+     "poison": 45,
+     "aether": 40,
+     "chaos": 40,
+     "vitality": 47,
+     "bleeding": 44
+    }
+   }
+  },
+  {
    "gt_id": 2253,
    "name_tag": "tagGDX2EndlessDungeon_Special04",
    "classification": "SuperBoss",
@@ -1551,6 +2734,161 @@
    }
   },
   {
+   "gt_id": 2256,
+   "name_tag": "tagGDX2Quest_StoneGryphon_TempleGuard_02",
+   "classification": "Quest",
+   "resistances": {
+    "ultimate": {
+     "physical": 32,
+     "pierce": 35,
+     "fire": 46,
+     "cold": 43,
+     "lightning": 48,
+     "poison": 28,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 52,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 3226,
+   "name_tag": "tagGDX2Boss_RoguelikePath_Boss_01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 30,
+     "pierce": 30,
+     "fire": 38,
+     "cold": 38,
+     "lightning": 38,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 40,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 30,
+     "pierce": 32,
+     "fire": 42,
+     "cold": 40,
+     "lightning": 44,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 46,
+     "bleeding": 5
+    }
+   }
+  },
+  {
+   "gt_id": 3227,
+   "name_tag": "tagGDX2Boss_RoguelikePath_Boss_01",
+   "classification": "Quest",
+   "resistances": {
+    "ultimate": {
+     "physical": 32,
+     "pierce": 35,
+     "fire": 46,
+     "cold": 43,
+     "lightning": 48,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 52,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 3333,
+   "name_tag": "tagGDX2Miniboss_Side_05",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 50,
+     "pierce": 50,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 18,
+     "poison": 0,
+     "aether": 50,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 50,
+     "pierce": 52,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 24,
+     "poison": 6,
+     "aether": 52,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 52,
+     "pierce": 55,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 28,
+     "poison": 10,
+     "aether": 55,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 3336,
+   "name_tag": "tagGDX2Miniboss_Side_02",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 18,
+     "poison": 30,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 30,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 24,
+     "poison": 36,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 36,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 28,
+     "poison": 40,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 42,
+     "bleeding": 9
+    }
+   }
+  },
+  {
    "gt_id": 3408,
    "name_tag": "tagNPC_Homestead_03",
    "classification": "SuperBoss",
@@ -1566,6 +2904,92 @@
      "chaos": 90,
      "vitality": 97,
      "bleeding": 94
+    }
+   }
+  },
+  {
+   "gt_id": 3589,
+   "name_tag": "tagGDX3HeroTrollHalf_H01",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 15,
+     "fire": 85,
+     "cold": 35,
+     "lightning": 35,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 17,
+     "fire": 89,
+     "cold": 37,
+     "lightning": 41,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 20,
+     "fire": 93,
+     "cold": 40,
+     "lightning": 45,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 3591,
+   "name_tag": "tagGDX3HeroTrollHalfSwamp_H01",
+   "classification": "Hero",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 15,
+     "fire": 35,
+     "cold": 35,
+     "lightning": 35,
+     "poison": 0,
+     "aether": 0,
+     "chaos": 0,
+     "vitality": 0,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 17,
+     "fire": 39,
+     "cold": 37,
+     "lightning": 41,
+     "poison": 6,
+     "aether": 2,
+     "chaos": 2,
+     "vitality": 6,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 20,
+     "fire": 43,
+     "cold": 40,
+     "lightning": 45,
+     "poison": 10,
+     "aether": 5,
+     "chaos": 5,
+     "vitality": 12,
+     "bleeding": 9
     }
    }
   },
@@ -1861,6 +3285,135 @@
      "chaos": 90,
      "vitality": 123,
      "bleeding": 94
+    }
+   }
+  },
+  {
+   "gt_id": 3853,
+   "name_tag": "tagGDX3Miniboss_Hag01",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 18,
+     "poison": 50,
+     "aether": 50,
+     "chaos": 25,
+     "vitality": 25,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 24,
+     "poison": 56,
+     "aether": 52,
+     "chaos": 27,
+     "vitality": 31,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 28,
+     "poison": 60,
+     "aether": 55,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 3854,
+   "name_tag": "tagGDX3Miniboss_Hag02",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 18,
+     "poison": 50,
+     "aether": 50,
+     "chaos": 25,
+     "vitality": 25,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 24,
+     "poison": 56,
+     "aether": 52,
+     "chaos": 27,
+     "vitality": 31,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 28,
+     "poison": 60,
+     "aether": 55,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 9
+    }
+   }
+  },
+  {
+   "gt_id": 3855,
+   "name_tag": "tagGDX3Miniboss_Hag03",
+   "classification": "Quest",
+   "resistances": {
+    "normal": {
+     "physical": 0,
+     "pierce": 0,
+     "fire": 18,
+     "cold": 18,
+     "lightning": 18,
+     "poison": 50,
+     "aether": 50,
+     "chaos": 25,
+     "vitality": 25,
+     "bleeding": 0
+    },
+    "elite": {
+     "physical": 0,
+     "pierce": 2,
+     "fire": 22,
+     "cold": 20,
+     "lightning": 24,
+     "poison": 56,
+     "aether": 52,
+     "chaos": 27,
+     "vitality": 31,
+     "bleeding": 5
+    },
+    "ultimate": {
+     "physical": 2,
+     "pierce": 5,
+     "fire": 26,
+     "cold": 23,
+     "lightning": 28,
+     "poison": 60,
+     "aether": 55,
+     "chaos": 30,
+     "vitality": 37,
+     "bleeding": 9
     }
    }
   },

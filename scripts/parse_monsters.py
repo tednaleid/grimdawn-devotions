@@ -27,7 +27,7 @@ from gd_dbr import DB, level_array_value, load_translations  # noqa: E402
 # Output key -> the .dbr field holding that resistance. A bare defensive<Type> on a
 # CREATURE record is that monster's own resistance; the same field name on a SKILL
 # record, negative, is a resistance-reduction debuff (what parse_rr.py extracts).
-# defensiveElemental is deliberately absent: elemental is always the three types.
+# Elemental is not a tracked type of its own: see ELEMENTAL_FIELD.
 RESISTANCE_FIELDS = {
     "physical": "defensivePhysical",
     "pierce": "defensivePierce",
@@ -40,6 +40,11 @@ RESISTANCE_FIELDS = {
     "vitality": "defensiveLife",
     "bleeding": "defensiveBleeding",
 }
+
+# A skill's elemental resistance, which the game and grimtools apply to each of fire,
+# cold and lightning. Monster records themselves do not carry it; their skills do.
+ELEMENTAL_FIELD = "defensiveElementalResistance"
+ELEMENTAL_TYPES = ("fire", "cold", "lightning")
 
 VALID_CLASSIFICATIONS = ("Common", "Champion", "Hero", "Boss", "SuperBoss", "Quest")
 
@@ -232,6 +237,11 @@ def _skill_grant(srec: dict, level: int) -> dict:
         v = level_array_value(raw, level)
         if v:
             out[out_key] = v
+    elemental = srec.get(ELEMENTAL_FIELD)
+    v = level_array_value(elemental, level) if elemental else 0
+    if v:
+        for out_key in ELEMENTAL_TYPES:
+            out[out_key] = out.get(out_key, 0) + v
     return out
 
 
