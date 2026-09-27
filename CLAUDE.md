@@ -17,6 +17,11 @@ The Resistance Reduction page's formula, its application order, and the tested
 sources behind it are in [docs/resistance-reduction.md](docs/resistance-reduction.md);
 read it before touching the ledger math.
 
+grimtools.com is the reference players compare this app against. When a number we
+show from game data differs from what grimtools displays, treat grimtools as the
+source of truth: find why, adopt its convention unless the game itself proves it
+wrong, and pin the result with a fixture of grimtools' displayed values.
+
 ## Backlog / new ideas
 
 New ideas and backlog items go in [BACKLOG.md](BACKLOG.md) at the project root.
