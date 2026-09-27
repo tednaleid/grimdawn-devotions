@@ -577,6 +577,12 @@ gd-audit NAME OUT="build.json":
 gt-star-table:
     bun "{{justfile_directory()}}/scripts/gt_star_table.ts"
 
+# Regenerate data/grimtools-monsters.json (monster -> grimtools monsterdb id per difficulty).
+# Re-run after regenerating data/monsters.json.
+[group("deposit")]
+gt-monster-links:
+    bun "{{justfile_directory()}}/scripts/gt_monster_links.ts"
+
 # Harvest real community builds from grimtools into the committed order-quality corpus.
 # Manual and rate-limited; never run from CI (CI only reads the committed fixture).
 [group("deposit")]
@@ -885,6 +891,7 @@ build: cover-table
     cp "{{justfile_directory()}}/data/grimtools-stars.json" dist/data/grimtools-stars.json
     cp "{{justfile_directory()}}/data/resistance-reduction.json" dist/data/resistance-reduction.json
     cp "{{justfile_directory()}}/data/monsters.json" dist/data/monsters.json
+    cp "{{justfile_directory()}}/data/grimtools-monsters.json" dist/data/grimtools-monsters.json
     cp "{{justfile_directory()}}/data/skill-items.json" dist/data/skill-items.json
     cp "{{justfile_directory()}}/data/stat-item-tags.json" dist/data/stat-item-tags.json
     cp "{{justfile_directory()}}/data/skill-icons.json" dist/data/skill-icons.json
