@@ -1,6 +1,6 @@
 #!/usr/bin/env -S uv run --script
 # ABOUTME: Tests for parse_monsters extraction. Run: uv run scripts/test_parse_monsters.py
-# ABOUTME: Covers role/exclusion rules, id and race-tag derivation, difficulty offsets, and skill-granted resistance bucketing.
+# ABOUTME: Covers role/exclusion rules, id/race-tag derivation, difficulty offsets, splitting disagreeing groups, and skill-granted resistance bucketing.
 # /// script
 # requires-python = ">=3.10"
 # ///
@@ -114,12 +114,41 @@ check("variant_count counts every collapsed record", bloater["variant_count"] ==
 check("record_paths lists every collapsed record, representative first",
       bloater["record_paths"][0] == "records/creatures/enemies/bloater_c01.dbr"
       and len(bloater["record_paths"]) == 3)
-check("agreeing variants are not flagged", bloater["variants_disagree"] is False)
+check("rows no longer carry variants_disagree", "variants_disagree" not in bloater)
+check("an unsplit row carries no variant_index", "variant_index" not in bloater)
 check("classification carried through", bloater["classification"] == "Common")
 check("role carried through", by_name["enemies.hero.solo"]["role"] == "hero")
 check("output is sorted by id", [m["id"] for m in logical] == sorted(m["id"] for m in logical))
 check("every logical monster carries all ten resistance keys",
       all(list(m["resistances"].keys()) == TEN for m in logical))
+
+# A group whose records disagree splits into subgroups of agreeing records.
+split_groups = {
+    ("Death Revenant", "Hero"): [
+        ("enemies/boss&quest/rev_02.dbr", crec(250, defensiveCold="50")),
+        ("enemies/waveevent/rev_wave.dbr", crec(250, defensiveCold="50", defensivePierce="33")),
+        ("enemies/bounties/rev_bounty.dbr", crec(250, defensiveCold="50", defensivePierce="33")),
+    ],
+}
+split = mon.collapse_to_logical(split_groups, RACE_TAGS, resolved_of(split_groups))
+check("a disagreeing group becomes one row per agreeing subgroup", len(split) == 2)
+pierce = sorted(m["resistances"]["pierce"] for m in split)
+check("each split row keeps its own values", pierce == [0, 33])
+check("agreeing records stay merged inside a subgroup",
+      sorted(m["variant_count"] for m in split) == [1, 2])
+check("split rows have distinct ids", len({m["id"] for m in split}) == 2)
+check("split rows with different roles need no suffix", all("variant_index" not in m for m in split))
+
+same_role = {
+    ("Twin", "Hero"): [
+        ("enemies/hero/twin_a.dbr", crec(90, defensiveFire="10")),
+        ("enemies/hero/twin_b.dbr", crec(50, defensiveFire="20")),
+    ],
+}
+twins = mon.collapse_to_logical(same_role, RACE_TAGS, resolved_of(same_role))
+idx = {m["id"]: m.get("variant_index") for m in twins}
+check("same name, classification and role get variant 1 and 2 by representative rank",
+      idx == {"enemies.hero.twin_a": 1, "enemies.hero.twin_b": 2})
 
 # maxLevel ties break on minLevel, then on path
 tie_groups = {("Tie", "Common"): [
@@ -141,7 +170,7 @@ dis_groups = {("Dis", "Common"): [
     ("enemies/x_b01.dbr", crec(50, defensiveFire="40")),
 ]}
 dis = mon.collapse_to_logical(dis_groups, RACE_TAGS, resolved_of(dis_groups))
-check("disagreeing variants are flagged", dis[0]["variants_disagree"] is True)
+check("a disagreeing group splits into two rows", len(dis) == 2)
 check("disagreement still reports the representative's values", dis[0]["resistances"]["fire"] == 10)
 
 # summon flag
@@ -346,10 +375,11 @@ resolved2 = {
     "enemies/b.dbr": {"resistances": mon.resistances_of(g_rec_b), "passive": {}, "aura": {}},
 }
 rows2 = mon.collapse_to_logical(groups2, RACE_TAGS, resolved2)
-check("collapse uses the resolved combined resistances", rows2[0]["resistances"]["bleeding"] == 80)
-check("collapse emits sparse passive provenance", rows2[0]["passive_resistances"] == {"bleeding": 80})
-check("collapse emits sparse aura provenance", rows2[0]["aura_resistances"] == {"cold": 20})
-check("variants_disagree compares combined totals", rows2[0]["variants_disagree"] is True)
+check("records that disagree only through a passive still split", len(rows2) == 2)
+r2a = [m for m in rows2 if m["id"] == "enemies.a"][0]
+check("collapse uses the resolved combined resistances", r2a["resistances"]["bleeding"] == 80)
+check("collapse emits sparse passive provenance", r2a["passive_resistances"] == {"bleeding": 80})
+check("collapse emits sparse aura provenance", r2a["aura_resistances"] == {"cold": 20})
 
 groups3 = {("Mon", "Common"): [("enemies/a.dbr", g_rec_a)]}
 resolved3 = {"enemies/a.dbr": {"resistances": mon.resistances_of(g_rec_a), "passive": {}, "aura": {}}}
@@ -494,9 +524,7 @@ check("no devotion-role monster survives", not any(m["role"] == "devotion" for m
 check("no monster has a null classification", all(m["classification"] for m in monsters))
 check("raw records collapsed in band",
       1400 <= sum(m["variant_count"] for m in monsters) <= 3200)
-disagreeing = [m for m in monsters if m["variants_disagree"]]
-check(f"disagreeing groups stay a small minority (got {len(disagreeing)})",
-      len(disagreeing) <= len(monsters) // 10)
+check("no row carries variants_disagree", all("variants_disagree" not in m for m in monsters))
 check("summons are present and flagged", any(m["is_summon"] for m in monsters))
 check("nemesis role is present", any(m["role"] == "nemesis" for m in monsters))
 
@@ -535,7 +563,7 @@ doc3 = json.loads(out3.read_text(encoding="utf-8"))
 m3 = doc3["monsters"]
 by_id = {m["id"]: m for m in m3}
 
-check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1636)
+check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1695)
 # 2,740 before the trap exclusion. This counts KEPT records (the variant_counts of surviving
 # rows), not records read, so excluding 3 trap records necessarily drops it by 3. Those 3
 # collapse into only 2 logical rows, which is why the row count fell by 2 and this by 3.
@@ -544,6 +572,10 @@ check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 
 # existed, so the logical row count above is unchanged at 1635.
 # Re-pinned 2737 -> 2738 and 1635 -> 1636 at build 24825149 (1.3.0.8): one quest record
 # (human_kurn_berserker_01a) was added and forms its own row.
+# Re-pinned 1636 -> 1695: splitting groups whose records disagree (this task) turns each
+# such group into one row per agreeing subgroup, so the row count rises by the number of
+# extra rows created without dropping any kept record; the kept raw record count below is
+# unchanged.
 check(f"kept raw record count (got {sum(m['variant_count'] for m in m3)})",
       sum(m["variant_count"] for m in m3) == 2738)
 check("all ten resistance keys still present", all(list(m["resistances"].keys()) == TEN for m in m3))

@@ -199,7 +199,7 @@ def diff_monsters(old: dict, new: dict):
     since a patch can move where a monster's resistance comes from without moving the
     total. Provenance deltas are prefixed `passive` or `aura` to keep them legible.
     A facet-only change (classification, race_tag, level range, variant_count,
-    variants_disagree) keeps the same id and is reported by neither this function
+    variant_index) keeps the same id and is reported by neither this function
     nor an add/remove, so it is invisible here. `diff_offsets` above separately
     covers the difficulty_offsets block, the one global change a balance patch
     commonly makes.

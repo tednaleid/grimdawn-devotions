@@ -53,6 +53,10 @@ ROLE_MARKERS = (
 
 EXCLUSIONS: list[dict] = []
 
+# Display names of (name, classification) groups whose records disagreed and were
+# split into one row per agreeing subgroup, reported by print_summary.
+SPLIT_GROUPS: list[str] = []
+
 
 def role_of(rel_path: str) -> str:
     """The role directory a record lives under, or 'base'. Matches whole path
@@ -332,45 +336,67 @@ def _representative_rank(entry):
     )
 
 
+def _row(members, classification, tags, resolved) -> dict:
+    """One output row from records that agree, the highest-ranked as representative."""
+    ordered = sorted(members, key=_representative_rank)
+    rel_path, rec = ordered[0]
+    res = resolved[rel_path]
+    entry = {
+        "id": monster_id(rel_path),
+        "name_tag": rec["description"],
+        "classification": classification,
+        "role": role_of(rel_path),
+        "race_tag": race_tag_of(rec, tags),
+        "min_level": int(as_float(rec.get("minLevel")) or 0),
+        "max_level": int(as_float(rec.get("maxLevel")) or 0),
+        "is_summon": rel_path.endswith("_summon.dbr"),
+        "resistances": res["resistances"],
+        "passive_resistances": res["passive"],
+        "aura_resistances": res["aura"],
+        "variant_count": len(ordered),
+        "record_paths": [f"records/creatures/{p}" for p, _ in ordered],
+    }
+    # Sparse by contract: omit the provenance keys entirely when nothing was granted,
+    # so the ~80% of monsters with no skill grants gain no bulk.
+    if not entry["passive_resistances"]:
+        del entry["passive_resistances"]
+    if not entry["aura_resistances"]:
+        del entry["aura_resistances"]
+    return entry
+
+
 def collapse_to_logical(groups: dict, tags: dict, resolved: dict) -> list[dict]:
-    """{(name, classification): [(rel_path, rec)]} -> one dict per logical monster.
+    """{(name, classification): [(rel_path, rec)]} -> rows of records that agree.
 
     Variant records (tier _[abc]NN, _summon, _pN phases) collapse onto the
-    highest-level representative. `resolved` maps each member's path to its
-    combined resistances and provenance, computed before this collapse so the
-    representative's total already includes its skill-granted resistance.
-    Groups whose members disagree on the combined total are flagged rather than
-    silently resolved, so the page can mark them.
+    highest-level representative while their combined resistances agree. A group
+    whose records disagree splits into one row per agreeing subgroup, so every row
+    states values that are true of every record behind it. Rows that end up sharing
+    name, classification and role get a 1-based variant_index to tell them apart.
     """
     out = []
-    for (_name, classification), members in groups.items():
-        ordered = sorted(members, key=_representative_rank)
-        rel_path, rec = ordered[0]
-        res = resolved[rel_path]
-        resistances = res["resistances"]
-        entry = {
-            "id": monster_id(rel_path),
-            "name_tag": rec["description"],
-            "classification": classification,
-            "role": role_of(rel_path),
-            "race_tag": race_tag_of(rec, tags),
-            "min_level": int(as_float(rec.get("minLevel")) or 0),
-            "max_level": int(as_float(rec.get("maxLevel")) or 0),
-            "is_summon": rel_path.endswith("_summon.dbr"),
-            "resistances": resistances,
-            "passive_resistances": res["passive"],
-            "aura_resistances": res["aura"],
-            "variant_count": len(ordered),
-            "variants_disagree": any(resolved[p]["resistances"] != resistances for p, _ in ordered[1:]),
-            "record_paths": [f"records/creatures/{p}" for p, _ in ordered],
+    for (name, classification), members in groups.items():
+        subgroups: dict = {}
+        for rel_path, rec in members:
+            key = tuple(sorted(resolved[rel_path]["resistances"].items()))
+            subgroups.setdefault(key, []).append((rel_path, rec))
+        if len(subgroups) > 1:
+            SPLIT_GROUPS.append(name)
+        rows = [_row(sub, classification, tags, resolved) for sub in subgroups.values()]
+        # Representative rank of each row's first record, so variant numbering is stable.
+        rank_of = {
+            f"records/creatures/{rel_path}": _representative_rank((rel_path, rec))
+            for rel_path, rec in members
         }
-        # Sparse by contract: omit the provenance keys entirely when nothing was granted,
-        # so the ~80% of monsters with no skill grants gain no bulk.
-        if not entry["passive_resistances"]:
-            del entry["passive_resistances"]
-        if not entry["aura_resistances"]:
-            del entry["aura_resistances"]
-        out.append(entry)
+        rows.sort(key=lambda r: rank_of[r["record_paths"][0]])
+        by_role: dict = {}
+        for r in rows:
+            by_role.setdefault(r["role"], []).append(r)
+        for same in by_role.values():
+            if len(same) > 1:
+                for i, r in enumerate(same, start=1):
+                    r["variant_index"] = i
+        out.extend(rows)
     out.sort(key=lambda m: m["id"])
     return out
 
@@ -563,12 +589,12 @@ def print_summary(monsters, exclusions, failed_offset_fields, failed_ascendant_f
     from collections import Counter
     p = lambda *a: print(*a, file=sys.stderr)
     raw = sum(m["variant_count"] for m in monsters)
-    disagreeing = [m for m in monsters if m["variants_disagree"]]
     collapsing = [m for m in monsters if m["variant_count"] > 1]
     p("\n=== MONSTER EXTRACTION SUMMARY ===")
     p(f"  kept records: {raw}  ->  logical monsters: {len(monsters)}")
     p(f"  collapsing >1 record: {len(collapsing)}")
-    p(f"  of those, variants disagree on resistances: {len(disagreeing)}")
+    p(f"  groups split because their records disagree: {len(SPLIT_GROUPS)}")
+    p(f"  rows carrying a variant suffix: {sum(1 for m in monsters if 'variant_index' in m)}")
     # role/is_summon/level range are representative-derived (only the chosen
     # representative's values land on the row), same as resistances above, so a
     # collapsed group's other members can carry a different role or summon status.
