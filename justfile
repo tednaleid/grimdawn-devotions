@@ -243,7 +243,7 @@ diff-data:
 # review the diff and deploy yourself. Requires the game installed + closed (Windows-only extraction).
 # `diff-data` exits non-zero on a devotion structural break, halting the chain. New buildids must be added
 # to data/steam-build-versions.json first (or pass GD_VERSION=...).
-migrate: extract parse parse-rr parse-monsters i18n-tables assets build diff-data check
+migrate: extract parse parse-rr parse-monsters i18n-tables assets build diff-data check monster-parity
     @echo ""
     @echo "Migration regenerated + verified. Review the diff-data report above (before the check output)."
     @echo "Then: just e2e   (recommended), then   git add -A && git commit && git push   to deploy."
