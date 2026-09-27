@@ -1,11 +1,12 @@
 // ABOUTME: Entry point for the monster page: loads the dataset + localization, owns the render loop.
 // ABOUTME: All view state lives in the URL hash; render reads the decoded ViewState.
-import { loadMonsters } from "../adapters/dataSource";
+import { loadMonsters, loadGrimtoolsLinks } from "../adapters/dataSource";
 import { diffNoteMarkup } from "../adapters/controlsView";
 import { renderRank } from "../adapters/rankView";
 import { renderTable } from "../adapters/tableView";
 import { applyView } from "../core/filter";
 import { offsetFor, type Monster } from "../core/model";
+import { grimtoolsMonsterUrl } from "../core/grimtoolsLinks";
 import { DAMAGE_TYPES, DIFFICULTIES, PLAYER_COUNTS, TIERS } from "../core/facets";
 import { decodeHash, encodeHash, type ViewState } from "../core/urlState";
 import {
@@ -29,7 +30,7 @@ async function boot() {
     sessionStorage.removeItem("monBootReloaded");
   } catch {}
 
-  const doc = await loadMonsters("..");
+  const [doc, gtLinks] = await Promise.all([loadMonsters(".."), loadGrimtoolsLinks("..")]);
   const overrideLocale = storedLocale(SUPPORTED_LOCALES);
   let localization = await loadLocalization({
     base: "..",
@@ -41,6 +42,10 @@ async function boot() {
   const knownRoles = new Set(doc.monsters.map((m) => m.role));
   // Monster names are game data: gameText reads the extracted tag tables, translate would not.
   const nameOf = (m: Monster) => localization.gameText(m.nameTag);
+  const linkOf = (m: Monster) => {
+    const id = gtLinks[m.id]?.[view.diff];
+    return id === undefined ? null : grimtoolsMonsterUrl(id);
+  };
 
   const headerEl = document.querySelector("header") as HTMLElement;
 
@@ -177,7 +182,7 @@ async function boot() {
     }
 
     const tableHost = document.getElementById("mon-table");
-    if (tableHost) renderTable(tableHost, localization, rows, view, offsets, nameOf, onSort);
+    if (tableHost) renderTable(tableHost, localization, rows, view, offsets, nameOf, onSort, linkOf);
 
     const heading = document.getElementById("mon-table-heading");
     if (heading) {

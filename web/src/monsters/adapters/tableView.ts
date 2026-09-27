@@ -50,6 +50,7 @@ function row(
   view: ViewState,
   offsets: Resistances,
   nameOf: (m: Monster) => string,
+  linkOf: (m: Monster) => string | null,
 ): string {
   const eff = effective(m, offsets, view.includeAuras);
   const suffix =
@@ -58,6 +59,10 @@ function row(
           loc.translate("monsters.table.variantSuffix", { n: m.variantIndex }),
         )}</span>`
       : "";
+  const href = linkOf(m);
+  const name = href
+    ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(nameOf(m))}</a>`
+    : esc(nameOf(m));
   const roleText = m.isSummon ? `${m.role} ${loc.translate("monsters.table.summonSuffix")}` : m.role;
 
   const cells = DAMAGE_TYPES.map((t) => {
@@ -83,7 +88,7 @@ function row(
 
   return (
     `<tr data-id="${esc(m.id)}">` +
-    `<td class="left m-name">${esc(nameOf(m))}${suffix}</td>` +
+    `<td class="left m-name">${name}${suffix}</td>` +
     `<td class="left m-facet">${esc(m.classification)}</td>` +
     `<td class="left m-facet">${esc(roleText)}</td>` +
     cells +
@@ -109,10 +114,11 @@ export function tableMarkup(
   view: ViewState,
   offsets: Resistances,
   nameOf: (m: Monster) => string,
+  linkOf: (m: Monster) => string | null = () => null,
 ): string {
   const span = FACET_COLUMNS.length + DAMAGE_TYPES.length;
   const body = rows.length
-    ? rows.map((m) => row(loc, m, view, offsets, nameOf)).join("")
+    ? rows.map((m) => row(loc, m, view, offsets, nameOf, linkOf)).join("")
     : `<tr><td class="mon-empty" colspan="${span}">${esc(loc.translate("monsters.table.empty"))}</td></tr>`;
   return (
     `<div class="table-scroll"><table>` +
@@ -132,8 +138,9 @@ export function renderTable(
   offsets: Resistances,
   nameOf: (m: Monster) => string,
   onSort: (key: string) => void,
+  linkOf: (m: Monster) => string | null = () => null,
 ): void {
-  el.innerHTML = tableMarkup(loc, rows, view, offsets, nameOf);
+  el.innerHTML = tableMarkup(loc, rows, view, offsets, nameOf, linkOf);
   // Delegated once per render on the container, so re-rendering the body cannot leak listeners.
   const head = el.querySelector("thead");
   head?.addEventListener("click", (ev) => {

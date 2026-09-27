@@ -198,3 +198,20 @@ test("an empty row set renders an empty state, not a bare header", () => {
   expect(html).toContain("monsters.table.empty");
   expect(html).not.toContain("<tr data-id=");
 });
+
+test("a linked row's name opens its grimtools page in a new tab", () => {
+  const html = tableMarkup(loc, [mon()], view(), ZERO, nameOf, () => "https://www.grimtools.com/monsterdb/364");
+  expect(html).toContain(
+    '<a href="https://www.grimtools.com/monsterdb/364" target="_blank" rel="noopener noreferrer">Name:enemies.a</a>',
+  );
+});
+
+test("an unlinked row's name is plain text", () => {
+  const html = tableMarkup(loc, [mon()], view(), ZERO, nameOf, () => null);
+  expect(html).toContain('<td class="left m-name">Name:enemies.a</td>');
+});
+
+test("omitting linkOf renders plain names", () => {
+  const html = tableMarkup(loc, [mon()], view(), ZERO, nameOf);
+  expect(html).not.toContain("<a ");
+});
