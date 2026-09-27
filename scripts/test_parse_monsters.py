@@ -238,6 +238,10 @@ check("level expr: plain number", mon.eval_level_expr("6", 100) == 6)
 check("level expr: power is refused", mon.eval_level_expr("charLevel**2", 100) is None)
 check("level expr: unknown name is refused", mon.eval_level_expr("__import__('os')", 100) is None)
 check("level expr: garbage is refused", mon.eval_level_expr("charLevel/", 100) is None)
+check("level expr: an overflowing literal is refused", mon.eval_level_expr("1e400", 100) is None)
+check("level expr: inf minus inf (nan) is refused", mon.eval_level_expr("1e400-1e400", 100) is None)
+check("skill level with an overflowing equation defaults to 1",
+      mon._skill_level({"skillLevel1": "charLevel*1e308*10"}, "1") == 1)
 check("skill level evaluates an equation at MONSTER_LEVEL",
       mon._skill_level({"skillLevel5": "charLevel/4+1"}, "5") == 26)
 check("skill level floors a fractional equation",
@@ -572,7 +576,7 @@ check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 
 # existed, so the logical row count above is unchanged at 1635.
 # Re-pinned 2737 -> 2738 and 1635 -> 1636 at build 24825149 (1.3.0.8): one quest record
 # (human_kurn_berserker_01a) was added and forms its own row.
-# Re-pinned 1636 -> 1695: splitting groups whose records disagree (this task) turns each
+# Re-pinned 1636 -> 1695: splitting groups whose records disagree turns each
 # such group into one row per agreeing subgroup, so the row count rises by the number of
 # extra rows created without dropping any kept record; the kept raw record count below is
 # unchanged.

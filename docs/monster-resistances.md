@@ -38,9 +38,9 @@ offset is a flat, monster-independent bonus added per difficulty and player brac
 (`difficulty_offsets` in the dataset, computed by `difficulty_offsets()` in the
 parser); it does not rescale a monster's own resistance, it adds to it. Ascendant is
 not a fourth difficulty in the records: it is Ultimate plus a flat adjustment layered
-on top (today that adjustment is zero for every resistance, so Ascendant reads
-identically to Ultimate; the page states this only while the two rows actually
-agree, never as an assertion).
+on top (on game version 1.3.0.8 that adjustment is zero for every resistance, so
+Ascendant reads identically to Ultimate; the page states this only while the two
+rows actually agree, never as an assertion).
 
 Aura grants (see below) are computed and carried on the row (`aura_resistances`) but
 are excluded from `displayed` by default, since they are conditional. The page's
@@ -78,10 +78,12 @@ Whether a skill's resistance grant is folded into a monster's permanent
   toggles, so here they are recorded but excluded by default.
 
 A toggled or radius buff often carries no `defensive<Type>` field of its own; its
-grant lives on a child record it applies through `buffSkillName`. Reaching a grant
-that way always counts as conditional, regardless of the child's own class, because
-the hop itself is what makes the grant conditional (`BUFF_CHILD_CLASSES` lists which
-child classes are read this way). The `SkillBuff_Debuf` family is never read here:
+grant lives on a child record it applies through `buffSkillName`. Which bucket a
+hop grant lands in still follows the host skill's own class, the same as an inline
+grant: a host in `SELF_PASSIVE_CLASSES` buckets it resident, a host in
+`AURA_CLASSES` buckets it conditional, and only a host in neither set sends its hop
+grant to conditional by default (`BUFF_CHILD_CLASSES` lists which child classes are
+read this way). The `SkillBuff_Debuf` family is never read here:
 its negative values are resistance reduction applied to a player, which belongs to
 the Resistance Reduction ledger, not to a monster's own resistance.
 
@@ -107,7 +109,8 @@ by `scripts/gt_monster_links.ts` (`just gt-monster-links`); the matching rule
 by name tag and classification, then within a difficulty prefers the candidate whose
 inline resistances equal the row's own, breaking ties on the lowest id. The script
 fetches grimtools' public `monsterdb.js` with a browser User-Agent, since Cloudflare
-rejects a custom one, and evaluates it in a sandboxed VM context. A row with no
+rejects a custom one, and evaluates it in-process with `node:vm`; this is not a
+security boundary, so running the script trusts that grimtools asset. A row with no
 match renders as plain text. Re-run `just gt-monster-links` after regenerating
 `data/monsters.json`, since the link table is keyed on this page's row ids and
 inline values. The page loads the link file fail-soft (`loadGrimtoolsLinks` in

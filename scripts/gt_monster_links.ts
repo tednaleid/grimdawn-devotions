@@ -1,5 +1,5 @@
 // ABOUTME: Regenerates data/grimtools-monsters.json: our monster rows -> grimtools monsterdb ids per difficulty.
-// ABOUTME: Fetches grimtools' public monsterdb.js once, evaluates it in a sandbox, and matches with matchLinks.
+// ABOUTME: Fetches grimtools' public monsterdb.js once, evaluates it in-process with node:vm, and matches with matchLinks.
 //
 // Usage: bun scripts/gt_monster_links.ts   (re-run after regenerating data/monsters.json)
 import { readFileSync, writeFileSync } from "node:fs";

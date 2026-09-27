@@ -782,6 +782,20 @@ Found during the final whole-branch review, not yet fixed:
 
 Pointers: `web/test/monsters/rankView.test.ts` and `web/test/monsters/tableView.test.ts`.
 
+## Grimtools link table can go stale silently
+
+`data/grimtools-monsters.json` maps each row id to a grimtools monsterdb id per
+difficulty. `just migrate` regenerates `data/monsters.json` but not this link
+table, since building it needs network access to grimtools; nothing checks the
+two still line up. A row id can change (a re-pin that reshapes groups, like the
+one that took the row count from 1636 to 1695) and leave a link keyed on an id
+that no longer exists, with no failure anywhere in `just check` or `just migrate`.
+Idea: have `monster-parity` or `diff-data` report linked-row coverage (rows with
+no matching link) and any link keys that are not current row ids.
+
+Pointers: `scripts/test_monster_parity.py`, `scripts/diff_data.py`,
+`scripts/gt_monster_links.ts`.
+
 ## Veteran mode as a difficulty option
 
 Ascendant is now derived from `gameengine.dbr -> ascendantRecord ->

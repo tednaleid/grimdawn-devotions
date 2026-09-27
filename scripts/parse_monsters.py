@@ -195,9 +195,10 @@ def eval_level_expr(expr: str, char_level: int) -> float | None:
             return _LEVEL_OPS[type(node.op)](ev(node.left), ev(node.right))
         raise ValueError(node)
     try:
-        return ev(ast.parse(expr.strip(), mode="eval"))
-    except (SyntaxError, ValueError, ZeroDivisionError):
+        v = ev(ast.parse(expr.strip(), mode="eval"))
+    except (SyntaxError, ValueError, ZeroDivisionError, RecursionError):
         return None
+    return v if math.isfinite(v) else None
 
 
 def _skill_level(rec: dict, n: str, rel_path: str = "") -> int:
