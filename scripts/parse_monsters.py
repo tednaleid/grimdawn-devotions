@@ -13,8 +13,10 @@ field mapping, exclusion rules, and dedup grain. Pure stdlib; re-run after any p
 from __future__ import annotations
 
 import argparse
+import ast
 import datetime as _dt
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -139,10 +141,18 @@ def race_tag_of(rec: dict, tags: dict) -> str | None:
 
 
 # How a referenced skill record's resistance counts, keyed on its Class.
-# Resident: the caster's own permanent resistance, folded into the headline total.
-SELF_PASSIVE_CLASSES = {"Skill_Passive", "SkillBuff_Passive", "Skill_PassiveOnLifeBuffSelf"}
+# Resident: permanent, folded into the headline total. Exactly the classes grimtools
+# treats as always-on, so the page matches the site players check it against.
+SELF_PASSIVE_CLASSES = {"Skill_Passive", "Skill_PassiveDualWieldWeapon", "Skill_Mastery"}
 # Conditional: recorded separately so the judgment call stays data, not a guess.
-AURA_CLASSES = {"Skill_BuffSelfDuration", "Skill_BuffSelfToggled", "Skill_BuffAttackRadiusToggled"}
+# SkillBuff_Passive and Skill_PassiveOnLifeBuffSelf are buffs grimtools shows only
+# behind its buff toggles, so they are conditional here too.
+AURA_CLASSES = {
+    "Skill_BuffSelfDuration", "Skill_BuffSelfToggled", "Skill_BuffAttackRadiusToggled",
+    "SkillBuff_Passive", "Skill_PassiveOnLifeBuffSelf",
+}
+# The child classes a buff host can deliver to its bearer through buffSkillName.
+BUFF_CHILD_CLASSES = {"Skill_Passive", "SkillBuff_Passive", "Skill_PassiveOnLifeBuffSelf"}
 # A summoned entity's own stats. Crediting these to the summoner would corrupt
 # exactly the boss records this resolution exists to fix.
 SUMMON_CLASSES = {"Monster", "Turret", "SpiritHost", "PetPlayerScaling"}
@@ -150,15 +160,57 @@ SUMMON_CLASSES = {"Monster", "Turret", "SpiritHost", "PetPlayerScaling"}
 # Skill references that carried a resistance but contributed nothing, with the reason.
 SKILL_EXCLUSIONS: list[dict] = []
 
+# The monster level every level-scaled skill is evaluated at: grimtools' default, so
+# the page matches the numbers players compare it with. Records express a skill's
+# rank as an equation of the monster's level (for example "charLevel/4+1").
+MONSTER_LEVEL = 100
 
-def _skill_level(rec: dict, n: str) -> int:
-    """The rank a monster pins for its skillName<n>, defaulting to 1.
+_LEVEL_OPS = {ast.Add: lambda a, b: a + b, ast.Sub: lambda a, b: a - b,
+              ast.Mult: lambda a, b: a * b, ast.Div: lambda a, b: a / b}
 
-    A monster pins each skill's rank in a skillLevel<n> sibling; that rank selects
-    the entry from the skill's per-level arrays.
+# skillLevel equations the evaluator refused, reported by print_summary.
+UNPARSED_SKILL_LEVELS: list[dict] = []
+
+
+def eval_level_expr(expr: str, char_level: int) -> float | None:
+    """Evaluate a skillLevel value: numbers, `charLevel`, + - * / and parentheses only.
+
+    Walks the parsed tree against that whitelist rather than calling eval, so a
+    record can never execute code. Anything else returns None.
     """
-    v = as_float((rec.get(f"skillLevel{n}") or "").split(";")[0])
-    return int(v) if v and v >= 1 else 1
+    def ev(node):
+        if isinstance(node, ast.Expression):
+            return ev(node.body)
+        if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+            return float(node.value)
+        if isinstance(node, ast.Name) and node.id == "charLevel":
+            return float(char_level)
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):
+            return -ev(node.operand)
+        if isinstance(node, ast.BinOp) and type(node.op) in _LEVEL_OPS:
+            return _LEVEL_OPS[type(node.op)](ev(node.left), ev(node.right))
+        raise ValueError(node)
+    try:
+        return ev(ast.parse(expr.strip(), mode="eval"))
+    except (SyntaxError, ValueError, ZeroDivisionError):
+        return None
+
+
+def _skill_level(rec: dict, n: str, rel_path: str = "") -> int:
+    """The rank a monster gives its skillName<n>, defaulting to 1.
+
+    skillLevel<n> is a number or an equation of the monster's level, evaluated at
+    MONSTER_LEVEL and floored as the game does. The rank selects the entry from the
+    skill's per-level arrays.
+    """
+    raw = (rec.get(f"skillLevel{n}") or "").split(";")[0].strip()
+    if not raw:
+        return 1
+    v = eval_level_expr(raw, MONSTER_LEVEL)
+    if v is None:
+        UNPARSED_SKILL_LEVELS.append({"record_path": f"records/creatures/{rel_path}", "expr": raw})
+        return 1
+    return max(1, math.floor(v))
 
 
 def _skill_grant(srec: dict, level: int) -> dict:
@@ -182,8 +234,8 @@ def _buff_hop_grant(srec: dict, level: int, get_skill) -> dict:
     """The grant a buff-hosting skill delivers through its `buffSkillName` child.
 
     A toggled or radius buff carries no `defensive<Type>` field itself; the grant lives on
-    the child record it applies. Only a `SkillBuff_Passive` child counts, because that
-    buffs the bearer. The `SkillBuff_Debuf` family is excluded on purpose: its values are
+    the child record it applies. Only a child in BUFF_CHILD_CLASSES counts, because those
+    buff the bearer. The `SkillBuff_Debuf` family is excluded on purpose: its values are
     negative because they are resistance reduction applied to the player, which belongs to
     the resistance-reduction pipeline rather than to a monster's own resistance.
     """
@@ -191,7 +243,7 @@ def _buff_hop_grant(srec: dict, level: int, get_skill) -> dict:
     if not ref:
         return {}
     child = get_skill(ref)
-    if not child or (child.get("Class") or "").strip() not in SELF_PASSIVE_CLASSES:
+    if not child or (child.get("Class") or "").strip() not in BUFF_CHILD_CLASSES:
         return {}
     return _skill_grant(child, level)
 
@@ -213,7 +265,7 @@ def skill_contributions(rel_path: str, rec: dict, get_skill) -> tuple[dict, dict
         if not srec:
             continue
         cls = (srec.get("Class") or "").strip()
-        level = _skill_level(rec, m.group(1))
+        level = _skill_level(rec, m.group(1), rel_path)
         own = _skill_grant(srec, level)
         hop = _buff_hop_grant(srec, level, get_skill) if not own else {}
         grant = own or hop
@@ -535,6 +587,11 @@ def print_summary(monsters, exclusions, failed_offset_fields, failed_ascendant_f
     p(f"  skill grants not counted: {len(SKILL_EXCLUSIONS)}")
     for reason, n in sorted(Counter(e["reason"] for e in SKILL_EXCLUSIONS).items()):
         p(f"    - {reason}: {n}")
+    p(f"  skill levels evaluated at monster level {MONSTER_LEVEL}")
+    if UNPARSED_SKILL_LEVELS:
+        p(f"  WARNING: skillLevel equations not understood, read as rank 1: {len(UNPARSED_SKILL_LEVELS)}")
+        for expr, n in Counter(e["expr"] for e in UNPARSED_SKILL_LEVELS).most_common(10):
+            p(f"    - {expr!r}: {n}")
     p(f"  excluded: {len(exclusions)}")
     for reason, n in sorted(Counter(e["reason"] for e in exclusions).items()):
         p(f"    - {reason}: {n}")

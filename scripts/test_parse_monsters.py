@@ -202,6 +202,20 @@ check("skill level reads the pinned rank", mon._skill_level({"skillLevel3": "4.0
 check("absent skill level defaults to 1", mon._skill_level({}, "3") == 1)
 check("unparseable skill level defaults to 1", mon._skill_level({"skillLevel3": "abc"}, "3") == 1)
 check("zero skill level defaults to 1", mon._skill_level({"skillLevel3": "0"}, "3") == 1)
+check("level expr: charLevel/4+1 at 100 is 26", mon.eval_level_expr("charLevel/4+1", 100) == 26)
+check("level expr: parenthesised form", mon.eval_level_expr("(charLevel/4)+1", 100) == 26)
+check("level expr: charLevel*1 is the level", mon.eval_level_expr("charLevel*1", 100) == 100)
+check("level expr: plain number", mon.eval_level_expr("6", 100) == 6)
+check("level expr: power is refused", mon.eval_level_expr("charLevel**2", 100) is None)
+check("level expr: unknown name is refused", mon.eval_level_expr("__import__('os')", 100) is None)
+check("level expr: garbage is refused", mon.eval_level_expr("charLevel/", 100) is None)
+check("skill level evaluates an equation at MONSTER_LEVEL",
+      mon._skill_level({"skillLevel5": "charLevel/4+1"}, "5") == 26)
+check("skill level floors a fractional equation",
+      mon._skill_level({"skillLevel1": "(charLevel/26)+3"}, "1") == 6)
+before_unparsed = len(mon.UNPARSED_SKILL_LEVELS)
+mon._skill_level({"skillLevel2": "charLevel**2"}, "2")
+check("an unparseable equation is recorded", len(mon.UNPARSED_SKILL_LEVELS) == before_unparsed + 1)
 
 # --- Task 1 (passives): contribution bucketing by skill Class ---
 SKILLS = {
@@ -221,6 +235,12 @@ SKILLS = {
     "records/skills/np/debufhost.dbr": {"Class": "Skill_AttackBuffRadius", "buffSkillName": "records/skills/np/curse.dbr"},
     "records/skills/np/curse.dbr": {"Class": "SkillBuff_Debuf", "defensivePoison": "-15.000000", "defensiveChaos": "-15.000000"},
     "records/skills/np/granterwithchild.dbr": {"Class": "Skill_Passive", "defensiveBleeding": "40.000000", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
+    "records/skills/np/scaled.dbr": {"Class": "Skill_Passive",
+                                     "defensiveLife": ";".join(f"{i}.000000" for i in range(1, 61))},
+    "records/skills/np/dualwield.dbr": {"Class": "Skill_PassiveDualWieldWeapon", "defensivePierce": "12.000000"},
+    "records/skills/np/mastery.dbr": {"Class": "Skill_Mastery", "defensiveAether": "4.000000"},
+    "records/skills/np/firepassive.dbr": {"Class": "Skill_Passive", "defensiveFire": "10.000000"},
+    "records/skills/np/buffhost.dbr": {"Class": "Skill_AttackBuffRadius", "buffSkillName": "records/skills/np/shieldbuff.dbr"},
 }
 get_skill = lambda ref: SKILLS.get(ref.strip(), {})
 
@@ -236,9 +256,23 @@ before = len(mon.SKILL_EXCLUSIONS)
 p, a = contrib([("records/skills/np/passive.dbr", 1)])
 check("self passive contributes to the passive bucket", p == {"bleeding": 100} and a == {})
 p, a = contrib([("records/skills/np/buffpassive.dbr", 1)])
-check("SkillBuff_Passive is resident", p == {"fire": 10})
+check("SkillBuff_Passive is conditional, not resident", p == {} and a == {"fire": 10})
 p, a = contrib([("records/skills/np/onlife.dbr", 1)])
-check("Skill_PassiveOnLifeBuffSelf is resident", p == {"chaos": 7})
+check("Skill_PassiveOnLifeBuffSelf is conditional, not resident", p == {} and a == {"chaos": 7})
+p, a = contrib([("records/skills/np/dualwield.dbr", 1)])
+check("Skill_PassiveDualWieldWeapon is resident", p == {"pierce": 12} and a == {})
+p, a = contrib([("records/skills/np/mastery.dbr", 1)])
+check("Skill_Mastery is resident", p == {"aether": 4} and a == {})
+p, a = contrib([("records/skills/np/scaled.dbr", "charLevel/4+1")])
+check("a level-scaled passive is read at the evaluated rank", p == {"vitality": 26})
+p, a = contrib([("records/skills/np/buffhost.dbr", 1)])
+check("a buff host still reaches a SkillBuff_Passive child, as an aura", p == {} and a == {"fire": 33, "cold": 33})
+
+# Ravager of Flesh (grimtools m364): 85 inline + 26 from its passive; Ultimate adds 12 -> 123.
+ravager = {"defensiveLife": "85.000000", "skillName5": "records/skills/np/scaled.dbr",
+           "skillLevel5": "charLevel/4+1"}
+check("ravager-shaped record resolves vitality 111 before the difficulty offset",
+      mon.resolved_resistances("enemies/x.dbr", ravager, get_skill)["resistances"]["vitality"] == 111)
 p, a = contrib([("records/skills/np/aura.dbr", 1)])
 check("aura class goes to the aura bucket only", a == {"cold": 20} and p == {})
 p, a = contrib([("records/skills/np/toggled.dbr", 1)])
@@ -284,7 +318,7 @@ check("contributions add across skills", p == {"bleeding": 130})
 check("tidy drops zero entries", mon._tidy({"fire": 0, "cold": 5}) == {"cold": 5})
 check("tidy keeps whole numbers whole", mon._tidy({"cold": 5.0})["cold"] == 5)
 
-rec_inline = {"defensiveFire": "10.000000", "skillName1": "records/skills/np/buffpassive.dbr", "skillLevel1": "1"}
+rec_inline = {"defensiveFire": "10.000000", "skillName1": "records/skills/np/firepassive.dbr", "skillLevel1": "1"}
 res = mon.resolved_resistances("enemies/x.dbr", rec_inline, get_skill)
 check("passive stacks on a nonzero inline value", res["resistances"]["fire"] == 20)
 check("combined keeps all ten keys", list(res["resistances"].keys()) == TEN)
@@ -469,12 +503,12 @@ check("nemesis role is present", any(m["role"] == "nemesis" for m in monsters))
 # Valdaran (nemesis_aetherial_01) is the fixture from the spec.
 val = [m for m in monsters if m["id"] == "enemies.nemesis.nemesis_aetherial_01"]
 check("valdaran present", len(val) == 1)
-# lightning/aether include +1 each from valdaran_passiveproperties.dbr (Skill_Passive):
-# its skillLevel10 is the dynamic formula "charLevel/4+1", which _skill_level cannot
-# parse, so it defaults to rank 1, pinning the array's level-1 entry (1 for both).
+# lightning/aether include +26 each from valdaran_passiveproperties.dbr (Skill_Passive):
+# its skillLevel10 is "charLevel/4+1", evaluated at MONSTER_LEVEL (100) and floored to
+# rank 26, pinning the array's 26th entry (26 for both).
 check("valdaran resistances match the record",
-      val and val[0]["resistances"]["fire"] == 20 and val[0]["resistances"]["lightning"] == 51
-      and val[0]["resistances"]["aether"] == 51 and val[0]["resistances"]["poison"] == 20
+      val and val[0]["resistances"]["fire"] == 20 and val[0]["resistances"]["lightning"] == 76
+      and val[0]["resistances"]["aether"] == 76 and val[0]["resistances"]["poison"] == 20
       and val[0]["resistances"]["cold"] == 0)
 check("valdaran classification and role", val and val[0]["classification"] == "Boss" and val[0]["role"] == "nemesis")
 check("valdaran level range", val and val[0]["min_level"] == 60 and val[0]["max_level"] == 250)
@@ -521,8 +555,10 @@ check("alkamos records the passive provenance",
 
 kaisan = by_id.get("enemies.nemesis.nemesis_eldritch_01")
 check("kaisan bleeding resolves to 45", kaisan and kaisan["resistances"]["bleeding"] == 45)
-check("kaisan pierce resolves to 67", kaisan and kaisan["resistances"]["pierce"] == 67)
-check("kaisan fire resolves to 46", kaisan and kaisan["resistances"]["fire"] == 46)
+# grimtools m1839: pierce and fire come from level-scaled passives, evaluated at
+# rank 26 (skillLevel "charLevel/4+1" at MONSTER_LEVEL 100) rather than rank 1.
+check("kaisan pierce resolves to 92", kaisan and kaisan["resistances"]["pierce"] == 92)
+check("kaisan fire resolves to 71", kaisan and kaisan["resistances"]["fire"] == 71)
 
 check("karroz is still present", "enemies.boss-quest.cultist_summoner_01" in by_id)
 
@@ -533,7 +569,13 @@ check("a toggled self-shield is recorded as an aura",
 check("an aura is still kept out of the headline total",
       eldritch and eldritch["resistances"]["fire"] == 0)
 auras = [m for m in m3 if m.get("aura_resistances")]
-check(f"aura provenance now covers the toggled hosts (got {len(auras)})", 100 <= len(auras) <= 200)
+# Band rose (was 100-200 with ~140 observed) once SkillBuff_Passive and
+# Skill_PassiveOnLifeBuffSelf moved from resident to aura: 155 observed at build
+# 24825149, checked against rows like enemies.beetle_c01 and
+# enemies.bounties.cu_bounty08, whose physical resistance moved from passive_resistances
+# into aura_resistances and dropped out of the headline total.
+check(f"aura provenance now covers the toggled hosts and reclassified buff-passives (got {len(auras)})",
+      130 <= len(auras) <= 200)
 bleeders = [m for m in m3 if m["resistances"]["bleeding"]]
 # Band widened from the plan's stated 300-900, which was written against the wrong grain.
 # The design doc's "592 monsters" counted raw records across a 3,023-record superset that
