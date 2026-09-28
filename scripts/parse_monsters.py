@@ -112,8 +112,6 @@ def exclusion_reason(rel_path: str, rec: dict, tags: dict) -> str | None:
     desc = rec.get("description")
     if not desc or not tags.get(desc):
         return "no resolvable name"
-    if role_of(rel_path) == "devotion":
-        return "devotion role"
     if rel_path.rsplit("/", 1)[-1].startswith("trap_"):
         # Traps are level furniture, not monsters: mine_explosive carries 500 in nine of ten
         # types and would distort every aggregate. Matched on the filename prefix, never as a

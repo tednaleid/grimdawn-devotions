@@ -63,12 +63,13 @@ check("hiddenFromCombat zero is kept", mon.exclusion_reason("enemies/x.dbr", rec
 check("invincible excluded", mon.exclusion_reason("enemies/x.dbr", rec(invincible="1"), TAGS) == "invincible")
 check("missing description excluded", mon.exclusion_reason("enemies/x.dbr", rec(description=""), TAGS) == "no resolvable name")
 check("unresolvable description excluded", mon.exclusion_reason("enemies/x.dbr", rec(description="tagMissing"), TAGS) == "no resolvable name")
-check("devotion role excluded", mon.exclusion_reason("enemies/devotion/x.dbr", rec(), TAGS) == "devotion role")
+# Devotion shrine guardians are real opponents (grimtools lists them as Heroes).
+check("devotion shrine guardians are kept", mon.exclusion_reason("enemies/devotion/x.dbr", rec(), TAGS) is None)
 check("missing classification excluded", mon.exclusion_reason("enemies/x.dbr", rec(monsterClassification=""), TAGS) == "no classification")
 check("unknown classification excluded", mon.exclusion_reason("enemies/x.dbr", rec(monsterClassification="Prop"), TAGS) == "no classification")
 for c in ("Common", "Champion", "Hero", "Boss", "SuperBoss", "Quest"):
     check(f"classification {c} is valid", mon.exclusion_reason("enemies/x.dbr", rec(monsterClassification=c), TAGS) is None)
-check("rule order: non-monster reported before devotion role",
+check("a non-monster under devotion/ is still excluded",
       mon.exclusion_reason("enemies/devotion/x.dbr", rec(Class="ProxyPool"), TAGS) == "not a monster record")
 
 # --- Task 2: id derivation ---
@@ -529,7 +530,7 @@ check("no monster stores display text",
       all(m["name_tag"].startswith("tag") for m in monsters))
 check("every classification is one of the six valid values",
       {m["classification"] for m in monsters} <= set(mon.VALID_CLASSIFICATIONS))
-check("no devotion-role monster survives", not any(m["role"] == "devotion" for m in monsters))
+check("devotion shrine guardians are present", any(m["role"] == "devotion" for m in monsters))
 check("no monster has a null classification", all(m["classification"] for m in monsters))
 check("raw records collapsed in band",
       1400 <= sum(m["variant_count"] for m in monsters) <= 3200)
@@ -572,7 +573,7 @@ doc3 = json.loads(out3.read_text(encoding="utf-8"))
 m3 = doc3["monsters"]
 by_id = {m["id"]: m for m in m3}
 
-check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1695)
+check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1885)
 # 2,740 before the trap exclusion. This counts KEPT records (the variant_counts of surviving
 # rows), not records read, so excluding 3 trap records necessarily drops it by 3. Those 3
 # collapse into only 2 logical rows, which is why the row count fell by 2 and this by 3.
@@ -585,8 +586,11 @@ check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 
 # such group into one row per agreeing subgroup, so the row count rises by the number of
 # extra rows created without dropping any kept record; the kept raw record count below is
 # unchanged.
+# Re-pinned 1695 -> 1885 and 2738 -> 2929: the devotion shrine guardians (enemies/devotion/,
+# 191 records in 190 rows) are kept; grimtools lists them as Heroes and every comparable one
+# matches it.
 check(f"kept raw record count (got {sum(m['variant_count'] for m in m3)})",
-      sum(m["variant_count"] for m in m3) == 2738)
+      sum(m["variant_count"] for m in m3) == 2929)
 check("all ten resistance keys still present", all(list(m["resistances"].keys()) == TEN for m in m3))
 
 alkamos = by_id.get("enemies.boss-quest.ghost_stepsoftorment_01")
@@ -616,13 +620,14 @@ auras = [m for m in m3 if m.get("aura_resistances")]
 # Skill_PassiveOnLifeBuffSelf moved from resident to aura: 155 observed at build
 # 24825149, checked against rows like enemies.beetle_c01 and
 # enemies.bounties.cu_bounty08, whose physical resistance moved from passive_resistances
-# into aura_resistances and dropped out of the headline total.
+# into aura_resistances and dropped out of the headline total. 210 observed once the
+# devotion shrine guardians were kept.
 check(f"aura provenance now covers the toggled hosts and reclassified buff-passives (got {len(auras)})",
-      130 <= len(auras) <= 200)
+      180 <= len(auras) <= 260)
 bleeders = [m for m in m3 if m["resistances"]["bleeding"]]
 # Band widened from the plan's stated 300-900, which was written against the wrong grain.
 # The design doc's "592 monsters" counted raw records across a 3,023-record superset that
-# includes the devotion role, hiddenFromCombat, and invincible records this pipeline
+# includes the hiddenFromCombat and invincible records this pipeline
 # excludes. Here, 245 logical rows cover 533 raw records (of 1,635 rows after the trap exclusion), so nothing is lost in
 # resolution: the difference is the grain plus those exclusions. Every point of it comes
 # from passive_resistances -- bleeding is never set inline, and no aura skill grants it.

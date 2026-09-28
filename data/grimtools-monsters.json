@@ -3371,6 +3371,1074 @@
    "elite": 506,
    "ultimate": 506
   },
+  "enemies.devotion.aetherialbloater_h01": {
+   "normal": 1774,
+   "elite": 1774,
+   "ultimate": 1774,
+   "ascendant": 1774
+  },
+  "enemies.devotion.aetherialbloater_h02": {
+   "normal": 1775,
+   "elite": 1775,
+   "ultimate": 1775,
+   "ascendant": 1775
+  },
+  "enemies.devotion.aetherialbloater_h03": {
+   "normal": 1776,
+   "elite": 1776,
+   "ultimate": 1776,
+   "ascendant": 1776
+  },
+  "enemies.devotion.aetherialbloater_h04": {
+   "normal": 1777,
+   "elite": 1777,
+   "ultimate": 1777,
+   "ascendant": 1777
+  },
+  "enemies.devotion.aetherialcolossus_h01": {
+   "normal": 1778,
+   "elite": 1778,
+   "ultimate": 1778,
+   "ascendant": 1778
+  },
+  "enemies.devotion.aetherialcolossus_h02": {
+   "normal": 1779,
+   "elite": 1779,
+   "ultimate": 1779,
+   "ascendant": 1779
+  },
+  "enemies.devotion.aetherialcolossus_h03": {
+   "normal": 1780,
+   "elite": 1780,
+   "ultimate": 1780,
+   "ascendant": 1780
+  },
+  "enemies.devotion.aetherialcolossus_h04": {
+   "normal": 1781,
+   "elite": 1781,
+   "ultimate": 1781,
+   "ascendant": 1781
+  },
+  "enemies.devotion.aetherialcorruption_h01": {
+   "normal": 1782,
+   "elite": 1782,
+   "ultimate": 1782,
+   "ascendant": 1782
+  },
+  "enemies.devotion.aetherialcorruption_h02": {
+   "normal": 1783,
+   "elite": 1783,
+   "ultimate": 1783,
+   "ascendant": 1783
+  },
+  "enemies.devotion.aetherialcorruption_h03": {
+   "normal": 1784,
+   "elite": 1784,
+   "ultimate": 1784,
+   "ascendant": 1784
+  },
+  "enemies.devotion.aetherialcorruption_h04": {
+   "normal": 1785,
+   "elite": 1785,
+   "ultimate": 1785,
+   "ascendant": 1785
+  },
+  "enemies.devotion.aetherialphantom_h01": {
+   "normal": 1657,
+   "elite": 1657,
+   "ultimate": 1657,
+   "ascendant": 1657
+  },
+  "enemies.devotion.aetherialphantom_h02": {
+   "normal": 1658,
+   "elite": 1658,
+   "ultimate": 1658,
+   "ascendant": 1658
+  },
+  "enemies.devotion.aetherialphantom_h03": {
+   "normal": 1659,
+   "elite": 1659,
+   "ultimate": 1659,
+   "ascendant": 1659
+  },
+  "enemies.devotion.basilisk_h01": {
+   "normal": 1786,
+   "elite": 1786,
+   "ultimate": 1786,
+   "ascendant": 1786
+  },
+  "enemies.devotion.basilisk_h02": {
+   "normal": 1787,
+   "elite": 1787,
+   "ultimate": 1787,
+   "ascendant": 1787
+  },
+  "enemies.devotion.basilisk_h03": {
+   "normal": 1788,
+   "elite": 1788,
+   "ultimate": 1788,
+   "ascendant": 1788
+  },
+  "enemies.devotion.basilisk_h04": {
+   "normal": 1789,
+   "elite": 1789,
+   "ultimate": 1789,
+   "ascendant": 1789
+  },
+  "enemies.devotion.beetle_h01": {
+   "normal": 1879,
+   "elite": 1879,
+   "ultimate": 1879,
+   "ascendant": 1879
+  },
+  "enemies.devotion.beetle_h02": {
+   "normal": 1880,
+   "elite": 1880,
+   "ultimate": 1880,
+   "ascendant": 1880
+  },
+  "enemies.devotion.beetle_h03": {
+   "normal": 1881,
+   "elite": 1881,
+   "ultimate": 1881,
+   "ascendant": 1881
+  },
+  "enemies.devotion.beetle_h04": {
+   "normal": 1882,
+   "elite": 1882,
+   "ultimate": 1882,
+   "ascendant": 1882
+  },
+  "enemies.devotion.chthoniandevourer_h01": {
+   "normal": 1660,
+   "elite": 1660,
+   "ultimate": 1660,
+   "ascendant": 1660
+  },
+  "enemies.devotion.chthoniandevourer_h02": {
+   "normal": 1661,
+   "elite": 1661,
+   "ultimate": 1661,
+   "ascendant": 1661
+  },
+  "enemies.devotion.chthoniandevourer_h03": {
+   "normal": 1662,
+   "elite": 1662,
+   "ultimate": 1662,
+   "ascendant": 1662
+  },
+  "enemies.devotion.chthoniandevourer_h04": {
+   "normal": 1663,
+   "elite": 1663,
+   "ultimate": 1663,
+   "ascendant": 1663
+  },
+  "enemies.devotion.chthoniandevourer_h05": {
+   "normal": 1664,
+   "elite": 1664,
+   "ultimate": 1664,
+   "ascendant": 1664
+  },
+  "enemies.devotion.chthoniandevourer_h06": {
+   "normal": 1665,
+   "elite": 1665,
+   "ultimate": 1665,
+   "ascendant": 1665
+  },
+  "enemies.devotion.chthoniandreadguard_h01": {
+   "normal": 1666,
+   "elite": 1666,
+   "ultimate": 1666,
+   "ascendant": 1666
+  },
+  "enemies.devotion.chthoniandreadguard_h02": {
+   "normal": 1667,
+   "elite": 1667,
+   "ultimate": 1667,
+   "ascendant": 1667
+  },
+  "enemies.devotion.chthoniandreadguard_h03": {
+   "normal": 1668,
+   "elite": 1668,
+   "ultimate": 1668,
+   "ascendant": 1668
+  },
+  "enemies.devotion.chthoniandreadguard_h04": {
+   "normal": 1669,
+   "elite": 1669,
+   "ultimate": 1669,
+   "ascendant": 1669
+  },
+  "enemies.devotion.chthoniandreadguard_h05": {
+   "normal": 1670,
+   "elite": 1670,
+   "ultimate": 1670,
+   "ascendant": 1670
+  },
+  "enemies.devotion.chthonianfiend_h01": {
+   "normal": 1671,
+   "elite": 1671,
+   "ultimate": 1671,
+   "ascendant": 1671
+  },
+  "enemies.devotion.chthonianfiend_h02": {
+   "normal": 1672,
+   "elite": 1672,
+   "ultimate": 1672,
+   "ascendant": 1672
+  },
+  "enemies.devotion.chthonianfiend_h03": {
+   "normal": 1673,
+   "elite": 1673,
+   "ultimate": 1673,
+   "ascendant": 1673
+  },
+  "enemies.devotion.chthonianfiend_h04": {
+   "normal": 1674,
+   "elite": 1674,
+   "ultimate": 1674,
+   "ascendant": 1674
+  },
+  "enemies.devotion.chthonianfiend_h05": {
+   "normal": 1675,
+   "elite": 1675,
+   "ultimate": 1675,
+   "ascendant": 1675
+  },
+  "enemies.devotion.chthonianfiend_h06": {
+   "normal": 1676,
+   "elite": 1676,
+   "ultimate": 1676,
+   "ascendant": 1676
+  },
+  "enemies.devotion.chthonianherald_h01": {
+   "normal": 3876,
+   "elite": 3876,
+   "ultimate": 3876,
+   "ascendant": 3876
+  },
+  "enemies.devotion.chthonianherald_h02": {
+   "normal": 3877,
+   "elite": 3877,
+   "ultimate": 3877,
+   "ascendant": 3877
+  },
+  "enemies.devotion.chthonianherald_h03": {
+   "normal": 3878,
+   "elite": 3878,
+   "ultimate": 3878,
+   "ascendant": 3878
+  },
+  "enemies.devotion.chthonianherald_h04": {
+   "normal": 3879,
+   "elite": 3879,
+   "ultimate": 3879,
+   "ascendant": 3879
+  },
+  "enemies.devotion.chthonianminion_h01": {
+   "normal": 1677,
+   "elite": 1677,
+   "ultimate": 1677,
+   "ascendant": 1677
+  },
+  "enemies.devotion.chthonianminion_h02": {
+   "normal": 1678,
+   "elite": 1678,
+   "ultimate": 1678,
+   "ascendant": 1678
+  },
+  "enemies.devotion.chthonianminion_h03": {
+   "normal": 1679,
+   "elite": 1679,
+   "ultimate": 1679,
+   "ascendant": 1679
+  },
+  "enemies.devotion.chthonianminion_h04": {
+   "normal": 1680,
+   "elite": 1680,
+   "ultimate": 1680,
+   "ascendant": 1680
+  },
+  "enemies.devotion.chthonianminion_h05": {
+   "normal": 1681,
+   "elite": 1681,
+   "ultimate": 1681,
+   "ascendant": 1681
+  },
+  "enemies.devotion.chthonianminion_h06": {
+   "normal": 1682,
+   "elite": 1682,
+   "ultimate": 1682,
+   "ascendant": 1682
+  },
+  "enemies.devotion.chthonianminion_h07": {
+   "normal": 1683,
+   "elite": 1683,
+   "ultimate": 1683,
+   "ascendant": 1683
+  },
+  "enemies.devotion.chthonianrylok_h01": {
+   "normal": 1883,
+   "elite": 1883,
+   "ultimate": 1883,
+   "ascendant": 1883
+  },
+  "enemies.devotion.chthonianrylok_h02": {
+   "normal": 1884,
+   "elite": 1884,
+   "ultimate": 1884,
+   "ascendant": 1884
+  },
+  "enemies.devotion.chthonianrylok_h03": {
+   "normal": 1885,
+   "elite": 1885,
+   "ultimate": 1885,
+   "ascendant": 1885
+  },
+  "enemies.devotion.chthonianrylok_h04": {
+   "normal": 1886,
+   "elite": 1886,
+   "ultimate": 1886,
+   "ascendant": 1886
+  },
+  "enemies.devotion.chthonianservitor_h01": {
+   "normal": 1887,
+   "elite": 1887,
+   "ultimate": 1887,
+   "ascendant": 1887
+  },
+  "enemies.devotion.chthonianservitor_h02": {
+   "normal": 1888,
+   "elite": 1888,
+   "ultimate": 1888,
+   "ascendant": 1888
+  },
+  "enemies.devotion.chthonianservitor_h03": {
+   "normal": 1889,
+   "elite": 1889,
+   "ultimate": 1889,
+   "ascendant": 1889
+  },
+  "enemies.devotion.chthonianservitor_h04": {
+   "normal": 1890,
+   "elite": 1890,
+   "ultimate": 1890,
+   "ascendant": 1890
+  },
+  "enemies.devotion.dranghoul_h01": {
+   "normal": 3645,
+   "elite": 3645,
+   "ultimate": 3645,
+   "ascendant": 3645
+  },
+  "enemies.devotion.dranghoul_h02": {
+   "normal": 3646,
+   "elite": 3646,
+   "ultimate": 3646,
+   "ascendant": 3646
+  },
+  "enemies.devotion.dranghoul_h03": {
+   "normal": 3647,
+   "elite": 3647,
+   "ultimate": 3647,
+   "ascendant": 3647
+  },
+  "enemies.devotion.dranghoul_h04": {
+   "normal": 3648,
+   "elite": 3648,
+   "ultimate": 3648,
+   "ascendant": 3648
+  },
+  "enemies.devotion.eldritcharmor_h01": {
+   "normal": 1891,
+   "elite": 1891,
+   "ultimate": 1891,
+   "ascendant": 1891
+  },
+  "enemies.devotion.eldritcharmor_h02": {
+   "normal": 1892,
+   "elite": 1892,
+   "ultimate": 1892,
+   "ascendant": 1892
+  },
+  "enemies.devotion.eldritcharmor_h03": {
+   "normal": 1893,
+   "elite": 1893,
+   "ultimate": 1893,
+   "ascendant": 1893
+  },
+  "enemies.devotion.eldritcharmor_h04": {
+   "normal": 1894,
+   "elite": 1894,
+   "ultimate": 1894,
+   "ascendant": 1894
+  },
+  "enemies.devotion.eldritchhound_h01": {
+   "normal": 2034,
+   "elite": 2034,
+   "ultimate": 2034,
+   "ascendant": 2034
+  },
+  "enemies.devotion.eldritchhound_h02": {
+   "normal": 2035,
+   "elite": 2035,
+   "ultimate": 2035,
+   "ascendant": 2035
+  },
+  "enemies.devotion.eldritchhound_h03": {
+   "normal": 2036,
+   "elite": 2036,
+   "ultimate": 2036,
+   "ascendant": 2036
+  },
+  "enemies.devotion.eldritchhound_h04": {
+   "normal": 2037,
+   "elite": 2037,
+   "ultimate": 2037,
+   "ascendant": 2037
+  },
+  "enemies.devotion.eldritchwraith_h01": {
+   "normal": 1895,
+   "elite": 1895,
+   "ultimate": 1895,
+   "ascendant": 1895
+  },
+  "enemies.devotion.eldritchwraith_h02": {
+   "normal": 1896,
+   "elite": 1896,
+   "ultimate": 1896,
+   "ascendant": 1896
+  },
+  "enemies.devotion.eldritchwraith_h03": {
+   "normal": 1897,
+   "elite": 1897,
+   "ultimate": 1897,
+   "ascendant": 1897
+  },
+  "enemies.devotion.eldritchwraith_h04": {
+   "normal": 1898,
+   "elite": 1898,
+   "ultimate": 1898,
+   "ascendant": 1898
+  },
+  "enemies.devotion.fleshhulk_h01": {
+   "normal": 1685,
+   "elite": 1685,
+   "ultimate": 1685,
+   "ascendant": 1685
+  },
+  "enemies.devotion.fleshhulk_h02": {
+   "normal": 1686,
+   "elite": 1686,
+   "ultimate": 1686,
+   "ascendant": 1686
+  },
+  "enemies.devotion.fleshhulk_h03": {
+   "normal": 1687,
+   "elite": 1687,
+   "ultimate": 1687,
+   "ascendant": 1687
+  },
+  "enemies.devotion.fleshhulk_h04": {
+   "normal": 1688,
+   "elite": 1688,
+   "ultimate": 1688,
+   "ascendant": 1688
+  },
+  "enemies.devotion.gargoyle_h01": {
+   "normal": 1899,
+   "elite": 1899,
+   "ultimate": 1899,
+   "ascendant": 1899
+  },
+  "enemies.devotion.gargoyle_h02": {
+   "normal": 1900,
+   "elite": 1900,
+   "ultimate": 1900,
+   "ascendant": 1900
+  },
+  "enemies.devotion.gargoyle_h03": {
+   "normal": 1901,
+   "elite": 1901,
+   "ultimate": 1901,
+   "ascendant": 1901
+  },
+  "enemies.devotion.gargoyle_h04": {
+   "normal": 1902,
+   "elite": 1902,
+   "ultimate": 1902,
+   "ascendant": 1902
+  },
+  "enemies.devotion.ghost_h01": {
+   "normal": 1689,
+   "elite": 1689,
+   "ultimate": 1689,
+   "ascendant": 1689
+  },
+  "enemies.devotion.ghost_h02": {
+   "normal": 1690,
+   "elite": 1690,
+   "ultimate": 1690,
+   "ascendant": 1690
+  },
+  "enemies.devotion.ghost_h03": {
+   "normal": 1691,
+   "elite": 1691,
+   "ultimate": 1691,
+   "ascendant": 1691
+  },
+  "enemies.devotion.ghost_h04": {
+   "normal": 1692,
+   "elite": 1692,
+   "ultimate": 1692,
+   "ascendant": 1692
+  },
+  "enemies.devotion.ghost_h05": {
+   "normal": 1693,
+   "elite": 1693,
+   "ultimate": 1693,
+   "ascendant": 1693
+  },
+  "enemies.devotion.ghost_h06": {
+   "normal": 1694,
+   "elite": 1694,
+   "ultimate": 1694,
+   "ascendant": 1694
+  },
+  "enemies.devotion.ghost_h07": {
+   "normal": 1695,
+   "elite": 1695,
+   "ultimate": 1695,
+   "ascendant": 1695
+  },
+  "enemies.devotion.ghost_h08": {
+   "normal": 1696,
+   "elite": 1696,
+   "ultimate": 1696,
+   "ascendant": 1696
+  },
+  "enemies.devotion.ghost_h09": {
+   "normal": 1697,
+   "elite": 1697,
+   "ultimate": 1697,
+   "ascendant": 1697
+  },
+  "enemies.devotion.gryphonstone_h01": {
+   "normal": 2038,
+   "elite": 2038,
+   "ultimate": 2038,
+   "ascendant": 2038
+  },
+  "enemies.devotion.gryphonstone_h02": {
+   "normal": 2039,
+   "elite": 2039,
+   "ultimate": 2039,
+   "ascendant": 2039
+  },
+  "enemies.devotion.gryphonstone_h03": {
+   "normal": 2040,
+   "elite": 2040,
+   "ultimate": 2040,
+   "ascendant": 2040
+  },
+  "enemies.devotion.gryphonstone_h04": {
+   "normal": 2041,
+   "elite": 2041,
+   "ultimate": 2041,
+   "ascendant": 2041
+  },
+  "enemies.devotion.korvaakascended_h01": {
+   "normal": 2042,
+   "elite": 2042,
+   "ultimate": 2042,
+   "ascendant": 2042
+  },
+  "enemies.devotion.korvaakascended_h02": {
+   "normal": 2043,
+   "elite": 2043,
+   "ultimate": 2043,
+   "ascendant": 2043
+  },
+  "enemies.devotion.korvaakascended_h03": {
+   "normal": 2044,
+   "elite": 2044,
+   "ultimate": 2044,
+   "ascendant": 2044
+  },
+  "enemies.devotion.korvaakascended_h04": {
+   "normal": 2045,
+   "elite": 2045,
+   "ultimate": 2045,
+   "ascendant": 2045
+  },
+  "enemies.devotion.korvaakservant_h01": {
+   "normal": 2046,
+   "elite": 2046,
+   "ultimate": 2046,
+   "ascendant": 2046
+  },
+  "enemies.devotion.korvaakservant_h02": {
+   "normal": 2047,
+   "elite": 2047,
+   "ultimate": 2047,
+   "ascendant": 2047
+  },
+  "enemies.devotion.korvaakservant_h03": {
+   "normal": 2048,
+   "elite": 2048,
+   "ultimate": 2048,
+   "ascendant": 2048
+  },
+  "enemies.devotion.korvaakservant_h04": {
+   "normal": 2049,
+   "elite": 2049,
+   "ultimate": 2049,
+   "ascendant": 2049
+  },
+  "enemies.devotion.prawncave_h01": {
+   "normal": 1698,
+   "elite": 1698,
+   "ultimate": 1698,
+   "ascendant": 1698
+  },
+  "enemies.devotion.prawncave_h02": {
+   "normal": 1699,
+   "elite": 1699,
+   "ultimate": 1699,
+   "ascendant": 1699
+  },
+  "enemies.devotion.prawncave_h03": {
+   "normal": 1700,
+   "elite": 1700,
+   "ultimate": 1700,
+   "ascendant": 1700
+  },
+  "enemies.devotion.rhino_h01": {
+   "normal": 3649,
+   "elite": 3649,
+   "ultimate": 3649,
+   "ascendant": 3649
+  },
+  "enemies.devotion.rhino_h02": {
+   "normal": 3650,
+   "elite": 3650,
+   "ultimate": 3650,
+   "ascendant": 3650
+  },
+  "enemies.devotion.rhino_h03": {
+   "normal": 3651,
+   "elite": 3651,
+   "ultimate": 3651,
+   "ascendant": 3651
+  },
+  "enemies.devotion.rhino_h04": {
+   "normal": 3652,
+   "elite": 3652,
+   "ultimate": 3652,
+   "ascendant": 3652
+  },
+  "enemies.devotion.rok_h01": {
+   "normal": 3880,
+   "elite": 3880,
+   "ultimate": 3880,
+   "ascendant": 3880
+  },
+  "enemies.devotion.rok_h02": {
+   "normal": 3881,
+   "elite": 3881,
+   "ultimate": 3881,
+   "ascendant": 3881
+  },
+  "enemies.devotion.rok_h03": {
+   "normal": 3882,
+   "elite": 3882,
+   "ultimate": 3882,
+   "ascendant": 3882
+  },
+  "enemies.devotion.rok_h04": {
+   "normal": 3883,
+   "elite": 3883,
+   "ultimate": 3883,
+   "ascendant": 3883
+  },
+  "enemies.devotion.scorpion_h01": {
+   "normal": 1903,
+   "elite": 1903,
+   "ultimate": 1903,
+   "ascendant": 1903
+  },
+  "enemies.devotion.scorpion_h02": {
+   "normal": 1904,
+   "elite": 1904,
+   "ultimate": 1904,
+   "ascendant": 1904
+  },
+  "enemies.devotion.scorpion_h03": {
+   "normal": 1905,
+   "elite": 1905,
+   "ultimate": 1905,
+   "ascendant": 1905
+  },
+  "enemies.devotion.scorpion_h04": {
+   "normal": 1906,
+   "elite": 1906,
+   "ultimate": 1906,
+   "ascendant": 1906
+  },
+  "enemies.devotion.skeletalgolem_h01": {
+   "normal": 1701,
+   "elite": 1701,
+   "ultimate": 1701,
+   "ascendant": 1701
+  },
+  "enemies.devotion.skeletalgolem_h02": {
+   "normal": 1702,
+   "elite": 1702,
+   "ultimate": 1702,
+   "ascendant": 1702
+  },
+  "enemies.devotion.skeletalgolem_h03": {
+   "normal": 1703,
+   "elite": 1703,
+   "ultimate": 1703,
+   "ascendant": 1703
+  },
+  "enemies.devotion.skeletalgolem_h04": {
+   "normal": 1704,
+   "elite": 1704,
+   "ultimate": 1704,
+   "ascendant": 1704
+  },
+  "enemies.devotion.skeletalgolem_h05": {
+   "normal": 1705,
+   "elite": 1705,
+   "ultimate": 1705,
+   "ascendant": 1705
+  },
+  "enemies.devotion.skeleton_h01": {
+   "normal": 1706,
+   "elite": 1706,
+   "ultimate": 1706,
+   "ascendant": 1706
+  },
+  "enemies.devotion.skeleton_h02": {
+   "normal": 1707,
+   "elite": 1707,
+   "ultimate": 1707,
+   "ascendant": 1707
+  },
+  "enemies.devotion.skeleton_h03": {
+   "normal": 1708,
+   "elite": 1708,
+   "ultimate": 1708,
+   "ascendant": 1708
+  },
+  "enemies.devotion.skeleton_h04": {
+   "normal": 1709,
+   "elite": 1709,
+   "ultimate": 1709,
+   "ascendant": 1709
+  },
+  "enemies.devotion.skeleton_h05": {
+   "normal": 1710,
+   "elite": 1710,
+   "ultimate": 1710,
+   "ascendant": 1710
+  },
+  "enemies.devotion.skeleton_h06": {
+   "normal": 1711,
+   "elite": 1711,
+   "ultimate": 1711,
+   "ascendant": 1711
+  },
+  "enemies.devotion.skeleton_h07": {
+   "normal": 1712,
+   "elite": 1712,
+   "ultimate": 1712,
+   "ascendant": 1712
+  },
+  "enemies.devotion.skeleton_h08": {
+   "normal": 1713,
+   "elite": 1713,
+   "ultimate": 1713,
+   "ascendant": 1713
+  },
+  "enemies.devotion.skeleton_h09": {
+   "normal": 1714,
+   "elite": 1714,
+   "ultimate": 1714,
+   "ascendant": 1714
+  },
+  "enemies.devotion.skeleton_h10": {
+   "normal": 1715,
+   "elite": 1715,
+   "ultimate": 1715,
+   "ascendant": 1715
+  },
+  "enemies.devotion.slith_h01": {
+   "normal": 1716,
+   "elite": 1716,
+   "ultimate": 1716,
+   "ascendant": 1716
+  },
+  "enemies.devotion.slith_h02": {
+   "normal": 1717,
+   "elite": 1717,
+   "ultimate": 1717,
+   "ascendant": 1717
+  },
+  "enemies.devotion.slith_h03": {
+   "normal": 1718,
+   "elite": 1718,
+   "ultimate": 1718,
+   "ascendant": 1718
+  },
+  "enemies.devotion.slith_h04": {
+   "normal": 1719,
+   "elite": 1719,
+   "ultimate": 1719,
+   "ascendant": 1719
+  },
+  "enemies.devotion.slith_h05": {
+   "normal": 1720,
+   "elite": 1720,
+   "ultimate": 1720,
+   "ascendant": 1720
+  },
+  "enemies.devotion.slith_h06": {
+   "normal": 1721,
+   "elite": 1721,
+   "ultimate": 1721,
+   "ascendant": 1721
+  },
+  "enemies.devotion.slith_h07": {
+   "normal": 1722,
+   "elite": 1722,
+   "ultimate": 1722,
+   "ascendant": 1722
+  },
+  "enemies.devotion.slith_h08": {
+   "normal": 1723,
+   "elite": 1723,
+   "ultimate": 1723,
+   "ascendant": 1723
+  },
+  "enemies.devotion.spider_cave_h01": {
+   "normal": 1724,
+   "elite": 1724,
+   "ultimate": 1724,
+   "ascendant": 1724
+  },
+  "enemies.devotion.spider_cave_h02": {
+   "normal": 1725,
+   "elite": 1725,
+   "ultimate": 1725,
+   "ascendant": 1725
+  },
+  "enemies.devotion.spider_cave_h03": {
+   "normal": 1726,
+   "elite": 1726,
+   "ultimate": 1726,
+   "ascendant": 1726
+  },
+  "enemies.devotion.statue_h01": {
+   "normal": 2050,
+   "elite": 2050,
+   "ultimate": 2050,
+   "ascendant": 2050
+  },
+  "enemies.devotion.statue_h02": {
+   "normal": 2051,
+   "elite": 2051,
+   "ultimate": 2051,
+   "ascendant": 2051
+  },
+  "enemies.devotion.statue_h03": {
+   "normal": 2052,
+   "elite": 2052,
+   "ultimate": 2052,
+   "ascendant": 2052
+  },
+  "enemies.devotion.statue_h04": {
+   "normal": 2053,
+   "elite": 2053,
+   "ultimate": 2053,
+   "ascendant": 2053
+  },
+  "enemies.devotion.swampcrab_h01": {
+   "normal": 1790,
+   "elite": 1790,
+   "ultimate": 1790,
+   "ascendant": 1790
+  },
+  "enemies.devotion.swampcrab_h02": {
+   "normal": 1791,
+   "elite": 1791,
+   "ultimate": 1791,
+   "ascendant": 1791
+  },
+  "enemies.devotion.swampcrab_h03": {
+   "normal": 1792,
+   "elite": 1792,
+   "ultimate": 1792,
+   "ascendant": 1792
+  },
+  "enemies.devotion.swampcrab_h04": {
+   "normal": 1793,
+   "elite": 1793,
+   "ultimate": 1793,
+   "ascendant": 1793
+  },
+  "enemies.devotion.swampgolem_h01": {
+   "normal": 1794,
+   "elite": 1794,
+   "ultimate": 1794,
+   "ascendant": 1794
+  },
+  "enemies.devotion.swampgolem_h02": {
+   "normal": 1795,
+   "elite": 1795,
+   "ultimate": 1795,
+   "ascendant": 1795
+  },
+  "enemies.devotion.swampgolem_h03": {
+   "normal": 1796,
+   "elite": 1796,
+   "ultimate": 1796,
+   "ascendant": 1796
+  },
+  "enemies.devotion.swampgolem_h04": {
+   "normal": 1797,
+   "elite": 1797,
+   "ultimate": 1797,
+   "ascendant": 1797
+  },
+  "enemies.devotion.viper_h01": {
+   "normal": 1907,
+   "elite": 1907,
+   "ultimate": 1907,
+   "ascendant": 1907
+  },
+  "enemies.devotion.viper_h02": {
+   "normal": 1908,
+   "elite": 1908,
+   "ultimate": 1908,
+   "ascendant": 1908
+  },
+  "enemies.devotion.viper_h03": {
+   "normal": 1909,
+   "elite": 1909,
+   "ultimate": 1909,
+   "ascendant": 1909
+  },
+  "enemies.devotion.viper_h04": {
+   "normal": 1910,
+   "elite": 1910,
+   "ultimate": 1910,
+   "ascendant": 1910
+  },
+  "enemies.devotion.wight_h01": {
+   "normal": 3884,
+   "elite": 3884,
+   "ultimate": 3884,
+   "ascendant": 3884
+  },
+  "enemies.devotion.wight_h02": {
+   "normal": 3885,
+   "elite": 3885,
+   "ultimate": 3885,
+   "ascendant": 3885
+  },
+  "enemies.devotion.wight_h03": {
+   "normal": 3886,
+   "elite": 3886,
+   "ultimate": 3886,
+   "ascendant": 3886
+  },
+  "enemies.devotion.wight_h04": {
+   "normal": 3887,
+   "elite": 3887,
+   "ultimate": 3887,
+   "ascendant": 3887
+  },
+  "enemies.devotion.yetidire_h01": {
+   "normal": 3888,
+   "elite": 3888,
+   "ultimate": 3888,
+   "ascendant": 3888
+  },
+  "enemies.devotion.yetidire_h02": {
+   "normal": 3889,
+   "elite": 3889,
+   "ultimate": 3889,
+   "ascendant": 3889
+  },
+  "enemies.devotion.yetidire_h03": {
+   "normal": 3890,
+   "elite": 3890,
+   "ultimate": 3890,
+   "ascendant": 3890
+  },
+  "enemies.devotion.yetidire_h04": {
+   "normal": 3891,
+   "elite": 3891,
+   "ultimate": 3891,
+   "ascendant": 3891
+  },
+  "enemies.devotion.zombie_h01": {
+   "normal": 1727,
+   "elite": 1727,
+   "ultimate": 1727,
+   "ascendant": 1727
+  },
+  "enemies.devotion.zombie_h02": {
+   "normal": 1728,
+   "elite": 1728,
+   "ultimate": 1728,
+   "ascendant": 1728
+  },
+  "enemies.devotion.zombie_h03": {
+   "normal": 1729,
+   "elite": 1729,
+   "ultimate": 1729,
+   "ascendant": 1729
+  },
+  "enemies.devotion.zombie_h04": {
+   "normal": 1730,
+   "elite": 1730,
+   "ultimate": 1730,
+   "ascendant": 1730
+  },
+  "enemies.devotion.zombie_h05": {
+   "normal": 1731,
+   "elite": 1731,
+   "ultimate": 1731,
+   "ascendant": 1731
+  },
+  "enemies.devotion.zombiemutated_h01": {
+   "normal": 1732,
+   "elite": 1732,
+   "ultimate": 1732,
+   "ascendant": 1732
+  },
+  "enemies.devotion.zombiemutated_h02": {
+   "normal": 1733,
+   "elite": 1733,
+   "ultimate": 1733,
+   "ascendant": 1733
+  },
+  "enemies.devotion.zombiemutated_h03": {
+   "normal": 1734,
+   "elite": 1734,
+   "ultimate": 1734,
+   "ascendant": 1734
+  },
+  "enemies.devotion.zombiemutated_h04": {
+   "normal": 1735,
+   "elite": 1735,
+   "ultimate": 1735,
+   "ascendant": 1735
+  },
   "enemies.dranghoul_a01": {
    "normal": 3892,
    "elite": 3892,

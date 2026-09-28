@@ -2,7 +2,7 @@
   "meta": {
     "game_version": "1.3.0.8",
     "steam_buildid": "24825149",
-    "generated_utc": "2026-09-27T22:28:58Z"
+    "generated_utc": "2026-09-28T00:25:37Z"
   },
   "monsters": [
     {
@@ -4322,10 +4322,11 @@
         "vitality": 0,
         "bleeding": 0
       },
-      "variant_count": 2,
+      "variant_count": 3,
       "record_paths": [
         "records/creatures/enemies/boss&quest/chthonianmonstrosity_chthonicroguelike.dbr",
-        "records/creatures/enemies/bounties/kc_bounty13.dbr"
+        "records/creatures/enemies/bounties/kc_bounty13.dbr",
+        "records/creatures/enemies/devotion/chthonianmonstrosity_h01.dbr"
       ]
     },
     {
@@ -17322,6 +17323,5241 @@
       "record_paths": [
         "records/creatures/enemies/dermapteranweavil_a01.dbr",
         "records/creatures/enemies/dermapteranweavil_a01_summon.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialbloater_h01",
+      "name_tag": "tagGDX1DevotionAetherialBloater_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialbloater_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialbloater_h02",
+      "name_tag": "tagGDX1DevotionAetherialBloater_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialbloater_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialbloater_h03",
+      "name_tag": "tagGDX1DevotionAetherialBloater_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 26,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 26
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialbloater_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialbloater_h04",
+      "name_tag": "tagGDX1DevotionAetherialBloater_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialbloater_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcolossus_h01",
+      "name_tag": "tagGDX1DevotionAetherialColossus_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 20,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcolossus_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcolossus_h02",
+      "name_tag": "tagGDX1DevotionAetherialColossus_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 20,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcolossus_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcolossus_h03",
+      "name_tag": "tagGDX1DevotionAetherialColossus_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 20,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcolossus_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcolossus_h04",
+      "name_tag": "tagGDX1DevotionAetherialColossus_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 20,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcolossus_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcorruption_h01",
+      "name_tag": "tagGDX1DevotionAetherialCorruption_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25,
+        "poison": 0,
+        "aether": 20,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcorruption_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcorruption_h02",
+      "name_tag": "tagGDX1DevotionAetherialCorruption_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25,
+        "poison": 0,
+        "aether": 20,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcorruption_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcorruption_h03",
+      "name_tag": "tagGDX1DevotionAetherialCorruption_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25,
+        "poison": 0,
+        "aether": 20,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcorruption_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialcorruption_h04",
+      "name_tag": "tagGDX1DevotionAetherialCorruption_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 25,
+        "poison": 0,
+        "aether": 20,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialcorruption_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialfleshshaper_h01",
+      "name_tag": "tagGDX1DevotionAetherialFleshshaper_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 50,
+        "aether": 50,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialfleshshaper_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialfleshshaper_h02",
+      "name_tag": "tagGDX1DevotionAetherialFleshshaper_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 26,
+        "lightning": 0,
+        "poison": 50,
+        "aether": 50,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 26
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialfleshshaper_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialfleshshaper_h03",
+      "name_tag": "tagGDX1DevotionAetherialFleshshaper_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 50,
+        "aether": 50,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialfleshshaper_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialfleshshaper_h04",
+      "name_tag": "tagGDX1DevotionAetherialFleshshaper_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 50,
+        "aether": 50,
+        "chaos": 20,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialfleshshaper_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialphantom_h01",
+      "name_tag": "tagDevotion_AetherialH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace003",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 100,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialphantom_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialphantom_h02",
+      "name_tag": "tagDevotion_AetherialH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace003",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 100,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialphantom_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.aetherialphantom_h03",
+      "name_tag": "tagDevotion_AetherialH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace003",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 100,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/aetherialphantom_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.basilisk_h01",
+      "name_tag": "tagGDX1DevotionBasilisk_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/basilisk_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.basilisk_h02",
+      "name_tag": "tagGDX1DevotionBasilisk_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/basilisk_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.basilisk_h03",
+      "name_tag": "tagGDX1DevotionBasilisk_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/basilisk_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.basilisk_h04",
+      "name_tag": "tagGDX1DevotionBasilisk_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/basilisk_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.beetle_h01",
+      "name_tag": "tagGDX2DevotionBeetle_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 40,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 60
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/beetle_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.beetle_h02",
+      "name_tag": "tagGDX2DevotionBeetle_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 40,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 60
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/beetle_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.beetle_h03",
+      "name_tag": "tagGDX2DevotionBeetle_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 40,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 60
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/beetle_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.beetle_h04",
+      "name_tag": "tagGDX2DevotionBeetle_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 40,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 60
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/beetle_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandevourer_h01",
+      "name_tag": "tagDevotion_ChthonianDevourerH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 25,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandevourer_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandevourer_h02",
+      "name_tag": "tagDevotion_ChthonianDevourerH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 25,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandevourer_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandevourer_h03",
+      "name_tag": "tagDevotion_ChthonianDevourerH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 25,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandevourer_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandevourer_h04",
+      "name_tag": "tagDevotion_ChthonianDevourerH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 64,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 25,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "fire": 39
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandevourer_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandevourer_h05",
+      "name_tag": "tagDevotion_ChthonianDevourerH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 64,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 25,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "lightning": 64
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandevourer_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandevourer_h06",
+      "name_tag": "tagDevotion_ChthonianDevourerH06",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 25,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandevourer_h06.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandreadguard_h01",
+      "name_tag": "tagDevotion_ChthonianDreadguardH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 75,
+        "cold": 0,
+        "lightning": 20,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 15,
+        "vitality": 15,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandreadguard_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandreadguard_h02",
+      "name_tag": "tagDevotion_ChthonianDreadguardH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 75,
+        "cold": 0,
+        "lightning": 20,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 15,
+        "vitality": 15,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandreadguard_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandreadguard_h03",
+      "name_tag": "tagDevotion_ChthonianDreadguardH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 75,
+        "cold": 0,
+        "lightning": 65,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 15,
+        "vitality": 15,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandreadguard_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandreadguard_h04",
+      "name_tag": "tagDevotion_ChthonianDreadguardH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 75,
+        "cold": 0,
+        "lightning": 20,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 15,
+        "vitality": 15,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandreadguard_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthoniandreadguard_h05",
+      "name_tag": "tagDevotion_ChthonianDreadguardH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 75,
+        "cold": 76,
+        "lightning": 20,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 15,
+        "vitality": 15,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 26
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthoniandreadguard_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianfiend_h01",
+      "name_tag": "tagDevotion_VoidFiendH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianfiend_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianfiend_h02",
+      "name_tag": "tagDevotion_VoidFiendH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianfiend_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianfiend_h03",
+      "name_tag": "tagDevotion_VoidFiendH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianfiend_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianfiend_h04",
+      "name_tag": "tagDevotion_VoidFiendH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianfiend_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianfiend_h05",
+      "name_tag": "tagDevotion_VoidFiendH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianfiend_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianfiend_h06",
+      "name_tag": "tagDevotion_VoidFiendH06",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 75,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianfiend_h06.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianherald_h01",
+      "name_tag": "tagGDX3Devotion_ChthonianHerald_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 40,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianherald_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianherald_h02",
+      "name_tag": "tagGDX3Devotion_ChthonianHerald_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 40,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianherald_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianherald_h03",
+      "name_tag": "tagGDX3Devotion_ChthonianHerald_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 40,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 40,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianherald_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianherald_h04",
+      "name_tag": "tagGDX3Devotion_ChthonianHerald_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 40,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianherald_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianminion_h01",
+      "name_tag": "tagDevotion_ChthonianMinionH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 20,
+        "lightning": 20,
+        "poison": 20,
+        "aether": 0,
+        "chaos": 100,
+        "vitality": 20,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianminion_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianminion_h02",
+      "name_tag": "tagDevotion_ChthonianMinionH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 20,
+        "lightning": 20,
+        "poison": 20,
+        "aether": 0,
+        "chaos": 100,
+        "vitality": 20,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianminion_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianminion_h03",
+      "name_tag": "tagDevotion_ChthonianMinionH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 20,
+        "lightning": 20,
+        "poison": 20,
+        "aether": 0,
+        "chaos": 100,
+        "vitality": 20,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianminion_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianminion_h04",
+      "name_tag": "tagDevotion_ChthonianMinionH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 20,
+        "lightning": 20,
+        "poison": 20,
+        "aether": 0,
+        "chaos": 100,
+        "vitality": 20,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianminion_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianminion_h05",
+      "name_tag": "tagDevotion_ChthonianMinionH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 20,
+        "lightning": 20,
+        "poison": 20,
+        "aether": 0,
+        "chaos": 100,
+        "vitality": 20,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianminion_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianminion_h06",
+      "name_tag": "tagDevotion_ChthonianMinionH06",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 46,
+        "lightning": 20,
+        "poison": 20,
+        "aether": 0,
+        "chaos": 100,
+        "vitality": 20,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 26
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianminion_h06.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianminion_h07",
+      "name_tag": "tagDevotion_ChthonianMinionH07",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 45,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 20,
+        "lightning": 20,
+        "poison": 20,
+        "aether": 0,
+        "chaos": 100,
+        "vitality": 20,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
+      },
+      "aura_resistances": {
+        "fire": 20,
+        "cold": 20,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianminion_h07.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianrylok_h01",
+      "name_tag": "tagGDX1DevotionChthonianRylok_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 40,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianrylok_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianrylok_h02",
+      "name_tag": "tagGDX1DevotionChthonianRylok_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 40,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianrylok_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianrylok_h03",
+      "name_tag": "tagGDX1DevotionChthonianRylok_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 40,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianrylok_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianrylok_h04",
+      "name_tag": "tagGDX1DevotionChthonianRylok_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace004",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 35,
+        "fire": 80,
+        "cold": 40,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianrylok_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianservitor_h01",
+      "name_tag": "tagGDX1DevotionChthonianServitor_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 10,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 25,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianservitor_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianservitor_h02",
+      "name_tag": "tagGDX1DevotionChthonianServitor_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 10,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 25,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianservitor_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianservitor_h03",
+      "name_tag": "tagGDX1DevotionChthonianServitor_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 10,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 25,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianservitor_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.chthonianservitor_h04",
+      "name_tag": "tagGDX1DevotionChthonianServitor_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 10,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 25,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/chthonianservitor_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.dranghoul_h01",
+      "name_tag": "tagGDX3Devotion_Dranghoul_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 30,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/dranghoul_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.dranghoul_h02",
+      "name_tag": "tagGDX3Devotion_Dranghoul_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 30,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/dranghoul_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.dranghoul_h03",
+      "name_tag": "tagGDX3Devotion_Dranghoul_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 30,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/dranghoul_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.dranghoul_h04",
+      "name_tag": "tagGDX3Devotion_Dranghoul_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 30,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/dranghoul_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritcharmor_h01",
+      "name_tag": "tagGDX2DevotionEldritchArmor_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 20,
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritcharmor_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritcharmor_h02",
+      "name_tag": "tagGDX2DevotionEldritchArmor_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 20,
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritcharmor_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritcharmor_h03",
+      "name_tag": "tagGDX2DevotionEldritchArmor_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 20,
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritcharmor_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritcharmor_h04",
+      "name_tag": "tagGDX2DevotionEldritchArmor_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 20,
+        "fire": 53,
+        "cold": 53,
+        "lightning": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritcharmor_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchhound_h01",
+      "name_tag": "tagGDX2DevotionEldritchHound_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchhound_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchhound_h02",
+      "name_tag": "tagGDX2DevotionEldritchHound_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchhound_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchhound_h03",
+      "name_tag": "tagGDX2DevotionEldritchHound_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchhound_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchhound_h04",
+      "name_tag": "tagGDX2DevotionEldritchHound_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchhound_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchwraith_h01",
+      "name_tag": "tagGDX2DevotionEldritchWraith_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchwraith_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchwraith_h02",
+      "name_tag": "tagGDX2DevotionEldritchWraith_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchwraith_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchwraith_h03",
+      "name_tag": "tagGDX2DevotionEldritchWraith_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchwraith_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.eldritchwraith_h04",
+      "name_tag": "tagGDX2DevotionEldritchWraith_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/eldritchwraith_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.fleshhulk_h01",
+      "name_tag": "tagDevotion_FleshHulkH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 80,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/fleshhulk_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.fleshhulk_h02",
+      "name_tag": "tagDevotion_FleshHulkH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 80,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/fleshhulk_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.fleshhulk_h03",
+      "name_tag": "tagDevotion_FleshHulkH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 80,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/fleshhulk_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.fleshhulk_h04",
+      "name_tag": "tagDevotion_FleshHulkH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 80,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/fleshhulk_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gargoyle_h01",
+      "name_tag": "tagGDX2DevotionGargoyle_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 35,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 61,
+        "lightning": 0,
+        "poison": 35,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 26
+      },
+      "aura_resistances": {
+        "physical": 15,
+        "pierce": 20,
+        "bleeding": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gargoyle_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gargoyle_h02",
+      "name_tag": "tagGDX2DevotionGargoyle_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 35,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 0,
+        "poison": 35,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 15,
+        "pierce": 20,
+        "bleeding": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gargoyle_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gargoyle_h03",
+      "name_tag": "tagGDX2DevotionGargoyle_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 35,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 0,
+        "poison": 35,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 15,
+        "pierce": 20,
+        "bleeding": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gargoyle_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gargoyle_h04",
+      "name_tag": "tagGDX2DevotionGargoyle_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 35,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 0,
+        "poison": 35,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 15,
+        "pierce": 20,
+        "bleeding": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gargoyle_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h01",
+      "name_tag": "tagDevotion_GhostH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h02",
+      "name_tag": "tagDevotion_GhostH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h03",
+      "name_tag": "tagDevotion_GhostH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h04",
+      "name_tag": "tagDevotion_GhostH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 50,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h05",
+      "name_tag": "tagDevotion_GhostH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h06",
+      "name_tag": "tagDevotion_GhostH06",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 50,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h06.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h07",
+      "name_tag": "tagDevotion_GhostH07",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h07.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h08",
+      "name_tag": "tagDevotion_GhostH08",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h08.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.ghost_h09",
+      "name_tag": "tagDevotion_GhostH09",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 30,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/ghost_h09.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gryphonstone_h01",
+      "name_tag": "tagGDX2DevotionGryphonStone_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 50,
+        "fire": 35,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gryphonstone_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gryphonstone_h02",
+      "name_tag": "tagGDX2DevotionGryphonStone_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 50,
+        "fire": 35,
+        "cold": 26,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "cold": 26,
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gryphonstone_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gryphonstone_h03",
+      "name_tag": "tagGDX2DevotionGryphonStone_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 50,
+        "fire": 35,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gryphonstone_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.gryphonstone_h04",
+      "name_tag": "tagGDX2DevotionGryphonStone_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 20,
+        "pierce": 50,
+        "fire": 35,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/gryphonstone_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakascended_h01",
+      "name_tag": "tagGDX2DevotionKorvaakAscended_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakascended_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakascended_h02",
+      "name_tag": "tagGDX2DevotionKorvaakAscended_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 50,
+        "cold": 26,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 26
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakascended_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakascended_h03",
+      "name_tag": "tagGDX2DevotionKorvaakAscended_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 70,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakascended_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakascended_h04",
+      "name_tag": "tagGDX2DevotionKorvaakAscended_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakascended_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakservant_h01",
+      "name_tag": "tagGDX2DevotionKorvaakServant_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakservant_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakservant_h02",
+      "name_tag": "tagGDX2DevotionKorvaakServant_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakservant_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakservant_h03",
+      "name_tag": "tagGDX2DevotionKorvaakServant_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakservant_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.korvaakservant_h04",
+      "name_tag": "tagGDX2DevotionKorvaakServant_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace007",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 30,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/korvaakservant_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.prawncave_h01",
+      "name_tag": "tagDevotion_CavePrawnH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 3,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 15,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/prawncave_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.prawncave_h02",
+      "name_tag": "tagDevotion_CavePrawnH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 3,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/prawncave_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.prawncave_h03",
+      "name_tag": "tagDevotion_CavePrawnH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 3,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 15,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/prawncave_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rhino_h01",
+      "name_tag": "tagGDX3Devotion_Rhino_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 10,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rhino_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rhino_h02",
+      "name_tag": "tagGDX3Devotion_Rhino_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 10,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rhino_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rhino_h03",
+      "name_tag": "tagGDX3Devotion_Rhino_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 10,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "fire": 10
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rhino_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rhino_h04",
+      "name_tag": "tagGDX3Devotion_Rhino_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 10,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 25,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rhino_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rok_h01",
+      "name_tag": "tagGDX3Devotion_Rok_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 15,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "physical": 15
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rok_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rok_h02",
+      "name_tag": "tagGDX3Devotion_Rok_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 15,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rok_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rok_h03",
+      "name_tag": "tagGDX3Devotion_Rok_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 15,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rok_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.rok_h04",
+      "name_tag": "tagGDX3Devotion_Rok_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 15,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/rok_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.scorpion_h01",
+      "name_tag": "tagGDX2DevotionScorpion_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/scorpion_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.scorpion_h02",
+      "name_tag": "tagGDX2DevotionScorpion_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/scorpion_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.scorpion_h03",
+      "name_tag": "tagGDX2DevotionScorpion_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/scorpion_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.scorpion_h04",
+      "name_tag": "tagGDX2DevotionScorpion_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace008",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/scorpion_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeletalgolem_h01",
+      "name_tag": "tagDevotion_SkeletalGolemH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 50,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 65,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeletalgolem_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeletalgolem_h02",
+      "name_tag": "tagDevotion_SkeletalGolemH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 76,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 65,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "cold": 26
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeletalgolem_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeletalgolem_h03",
+      "name_tag": "tagDevotion_SkeletalGolemH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 50,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 65,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeletalgolem_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeletalgolem_h04",
+      "name_tag": "tagDevotion_SkeletalGolemH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 50,
+        "chaos": 0,
+        "vitality": 65,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeletalgolem_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeletalgolem_h05",
+      "name_tag": "tagDevotion_SkeletalGolemH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 10,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 50,
+        "vitality": 65,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeletalgolem_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h01",
+      "name_tag": "tagDevotion_SkeletonH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 5,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 15,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h02",
+      "name_tag": "tagDevotion_SkeletonH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 8,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 15,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h03",
+      "name_tag": "tagDevotion_SkeletonH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 5,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 15,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h04",
+      "name_tag": "tagDevotion_SkeletonH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 8,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 50,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 15,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h05",
+      "name_tag": "tagDevotion_SkeletonH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 5,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 15,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h06",
+      "name_tag": "tagDevotion_SkeletonH06",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 5,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 76,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 15,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "cold": 26,
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h06.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h07",
+      "name_tag": "tagDevotion_SkeletonH07",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 8,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h07.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h08",
+      "name_tag": "tagDevotion_SkeletonH08",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 5,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h08.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h09",
+      "name_tag": "tagDevotion_SkeletonH09",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 15,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 33,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h09.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.skeleton_h10",
+      "name_tag": "tagDevotion_SkeletonH10",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 5,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 100
+      },
+      "passive_resistances": {
+        "bleeding": 100
+      },
+      "aura_resistances": {
+        "physical": 15,
+        "pierce": 15,
+        "cold": 30
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/skeleton_h10.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h01",
+      "name_tag": "tagDevotion_SlithH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 10,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "cold": 39
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h02",
+      "name_tag": "tagDevotion_SlithH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 10,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h03",
+      "name_tag": "tagDevotion_SlithH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 10,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h04",
+      "name_tag": "tagDevotion_SlithH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 10,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h05",
+      "name_tag": "tagDevotion_SlithH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 10,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h06",
+      "name_tag": "tagDevotion_SlithH06",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 50,
+        "chaos": 0,
+        "vitality": 10,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h06.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h07",
+      "name_tag": "tagDevotion_SlithH07",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 20,
+        "lightning": 0,
+        "poison": 25,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h07.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.slith_h08",
+      "name_tag": "tagDevotion_SlithH08",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace002",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 8,
+        "pierce": 8,
+        "fire": 0,
+        "cold": 20,
+        "lightning": 0,
+        "poison": 25,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/slith_h08.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.spider_cave_h01",
+      "name_tag": "tagDevotion_CaveSpiderH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace015",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": -15,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 30,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/spider_cave_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.spider_cave_h02",
+      "name_tag": "tagDevotion_CaveSpiderH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace015",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": -15,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 30,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/spider_cave_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.spider_cave_h03",
+      "name_tag": "tagDevotion_CaveSpiderH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace015",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": -15,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 30,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/spider_cave_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.statue_h01",
+      "name_tag": "tagGDX2DevotionStatue_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/statue_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.statue_h02",
+      "name_tag": "tagGDX2DevotionStatue_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/statue_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.statue_h03",
+      "name_tag": "tagGDX2DevotionStatue_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/statue_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.statue_h04",
+      "name_tag": "tagGDX2DevotionStatue_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 59,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "cold": 26,
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/statue_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampcrab_h01",
+      "name_tag": "tagGDX1DevotionSwampCrab_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampcrab_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampcrab_h02",
+      "name_tag": "tagGDX1DevotionSwampCrab_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
+        "pierce": 25
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampcrab_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampcrab_h03",
+      "name_tag": "tagGDX1DevotionSwampCrab_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
+        "pierce": 25
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampcrab_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampcrab_h04",
+      "name_tag": "tagGDX1DevotionSwampCrab_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 35,
+        "lightning": 80,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "physical": 35,
+        "fire": 35,
+        "cold": 35,
+        "lightning": 35,
+        "pierce": 25
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampcrab_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampgolem_h01",
+      "name_tag": "tagGDX1DevotionSwampGolem_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampgolem_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampgolem_h02",
+      "name_tag": "tagGDX1DevotionSwampGolem_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampgolem_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampgolem_h03",
+      "name_tag": "tagGDX1DevotionSwampGolem_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampgolem_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.swampgolem_h04",
+      "name_tag": "tagGDX1DevotionSwampGolem_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 30,
+        "pierce": 15,
+        "fire": 33,
+        "cold": 33,
+        "lightning": 33,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 33,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/swampgolem_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.viper_h01",
+      "name_tag": "tagGDX2DevotionViper_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/viper_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.viper_h02",
+      "name_tag": "tagGDX2DevotionViper_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/viper_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.viper_h03",
+      "name_tag": "tagGDX2DevotionViper_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/viper_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.viper_h04",
+      "name_tag": "tagGDX2DevotionViper_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 15,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 80,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/viper_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wendigo_h01",
+      "name_tag": "tagGDX1DevotionWendigo_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "pierce": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wendigo_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wendigo_h02",
+      "name_tag": "tagGDX1DevotionWendigo_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wendigo_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wendigo_h03",
+      "name_tag": "tagGDX1DevotionWendigo_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "aura_resistances": {
+        "pierce": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wendigo_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wendigo_h04",
+      "name_tag": "tagGDX1DevotionWendigo_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 15,
+        "pierce": 0,
+        "fire": 25,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 25,
+        "chaos": 20,
+        "vitality": 60,
+        "bleeding": 0
+      },
+      "passive_resistances": {
+        "chaos": 20
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wendigo_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wight_h01",
+      "name_tag": "tagGDX3Devotion_Wight_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 50,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wight_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wight_h02",
+      "name_tag": "tagGDX3Devotion_Wight_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 50,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wight_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wight_h03",
+      "name_tag": "tagGDX3Devotion_Wight_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 50,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wight_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wight_h04",
+      "name_tag": "tagGDX3Devotion_Wight_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 50,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wight_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wraith_h01",
+      "name_tag": "tagGDX1DevotionWraith_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wraith_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wraith_h02",
+      "name_tag": "tagGDX1DevotionWraith_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wraith_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wraith_h03",
+      "name_tag": "tagGDX1DevotionWraith_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wraith_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.wraith_h04",
+      "name_tag": "tagGDX1DevotionWraith_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 25,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 80
+      },
+      "passive_resistances": {
+        "bleeding": 80
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/wraith_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.yetidire_h01",
+      "name_tag": "tagGDX3Devotion_YetiDire_H01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 30,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 30,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/yetidire_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.yetidire_h02",
+      "name_tag": "tagGDX3Devotion_YetiDire_H02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 30,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 30,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/yetidire_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.yetidire_h03",
+      "name_tag": "tagGDX3Devotion_YetiDire_H03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 30,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 30,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/yetidire_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.yetidire_h04",
+      "name_tag": "tagGDX3Devotion_YetiDire_H04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace012",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 0,
+        "cold": 30,
+        "lightning": 30,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 30,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/yetidire_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombie_h01",
+      "name_tag": "tagDevotion_ZombieH01",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 40,
+        "pierce": 26,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombie_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombie_h02",
+      "name_tag": "tagDevotion_ZombieH02",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 40,
+        "pierce": 26,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombie_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombie_h03",
+      "name_tag": "tagDevotion_ZombieH03",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 40,
+        "pierce": 26,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombie_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombie_h04",
+      "name_tag": "tagDevotion_ZombieH04",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 40,
+        "pierce": 26,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 50,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombie_h04.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombie_h05",
+      "name_tag": "tagDevotion_ZombieH05",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 40,
+        "pierce": 26,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 15,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombie_h05.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombiemutated_h01",
+      "name_tag": "tagDevotion_ZombieH06",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombiemutated_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombiemutated_h02",
+      "name_tag": "tagDevotion_ZombieH07",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 50,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombiemutated_h02.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombiemutated_h03",
+      "name_tag": "tagDevotion_ZombieH08",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombiemutated_h03.dbr"
+      ]
+    },
+    {
+      "id": "enemies.devotion.zombiemutated_h04",
+      "name_tag": "tagDevotion_ZombieH09",
+      "classification": "Hero",
+      "role": "devotion",
+      "race_tag": "tagRace005",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 0,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 0,
+        "bleeding": 0
+      },
+      "variant_count": 1,
+      "record_paths": [
+        "records/creatures/enemies/devotion/zombiemutated_h04.dbr"
       ]
     },
     {

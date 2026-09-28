@@ -17,6 +17,13 @@ value that is true of every record behind it. The representative of each subgrou
 the record with the highest `maxLevel`, then the highest `minLevel`, then the
 lexicographically lowest path, so a run is reproducible.
 
+`exclusion_reason()` drops records that are not opponents: non-`Monster` classes,
+`hiddenFromCombat` or `invincible` records, records whose name does not resolve,
+traps (`trap_*` files), and records with no valid classification. Devotion shrine
+guardians (`enemies/devotion/`) are kept; grimtools lists them as Heroes. Player
+pets and summons that grimtools lists come from skill records, not
+`records/creatures`, so they have no row.
+
 Splitting can leave two or more rows that share name, classification, and role, for
 example a scripted-event copy of a monster that granted an extra resistance and a
 plain copy that did not. Those rows carry a 1-based `variant_index` and the page
