@@ -800,7 +800,7 @@ Pointers: `scripts/test_monster_parity.py`, `scripts/diff_data.py`,
 
 A full comparison of every grimtools monsterdb entry (game 1.3.0.8, harvested with
 the same in-page routine as `scripts/gt_monster_harvest.mjs` but without its
-filter) against `data/monsters.json` leaves 9 mismatching entries and about 350 with
+filter) against `data/monsters.json` leaves 9 mismatching entries and about 180 with
 no row to compare:
 
 - **Stationary summons shown as 500 everywhere.** Darius's aether crystals (m1520,
@@ -813,9 +813,12 @@ no row to compare:
 - **Dreeg mindreaper eldritch armor (m2110, Quest).** Every type differs from both
   of our `eldritcharmor_dreegmindreaper_*` rows, so this looks like a row-mapping
   question, not a missing resistance.
-- **Entries with no matching row.** 179 Hero, 142 Common, 28 Champion and 7 Quest
-  grimtools entries share no (name tag, classification) with any row. Likely
-  classification differences or records the parser excludes; unconfirmed.
+- **Entries with no matching row, explained.** 83 are player pets and summons
+  defined in skill records, not `records/creatures`. About 30 share an English name
+  with another record and are merged into that row under its tag (the 21 that line
+  up all match). About 26 are records `exclusion_reason()` drops on purpose
+  (hiddenFromCombat ambient animals and anomalies, traps, town guards). 6 are Common
+  on grimtools but Champion here; that difference is not yet explained.
 
 To reproduce: copy `scripts/gt_monster_harvest.mjs`, drop its entry filter and point
 its output at a scratch file, then compare with the same rule as
