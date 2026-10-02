@@ -1,7 +1,9 @@
 // ABOUTME: Round-trip + tolerance tests for the URL state codec (point cap + selected stars bitset).
-import { test, expect } from "bun:test";
+// ABOUTME: Also pins the canonical star and benefit id orders against test/fixtures/url-wire-ids.json.
+import { test, expect, describe } from "bun:test";
 import type { StarId } from "../src/core/types";
 import doc from "../../data/devotions.json";
+import wire from "./fixtures/url-wire-ids.json";
 import { buildModel } from "../src/core/model";
 import {
   canonicalStarIds,
@@ -331,4 +333,21 @@ test("a shared player-resistance link keeps its tag", () => {
   expect([...physical.benefits]).toEqual(["defensivePhysical"]);
   const bleeding = decodeHash("#p=55&s=&b=AAAAAAAU", canonical, benefitCanonical, deprecatedBenefitIds(model))!;
   expect(bleeding.benefits.has("defensiveBleeding")).toBe(true);
+});
+
+// The canonical id lists are the wire format of s= and b=: an id's index is its bit position. They
+// are derived from game data, so a data refresh that inserts, removes, or reorders an id would
+// silently change what every older link decodes to. The fixture pins the published order.
+describe("canonical id lists match the pinned wire format", () => {
+  const cases: [string, string[], string[]][] = [
+    ["star ids (s=)", canonicalStarIds(model), wire.starIds],
+    ["benefit ids (b=)", canonicalBenefitIds(model), wire.benefitIds],
+  ];
+  for (const [name, current, pinned] of cases)
+    test(name, () => {
+      // Any change inside the pinned range breaks published links: keep old ids at their index.
+      expect(current.slice(0, pinned.length)).toEqual(pinned);
+      // Ids appended after it are safe; add them to the end of test/fixtures/url-wire-ids.json.
+      expect(current.length).toBe(pinned.length);
+    });
 });
