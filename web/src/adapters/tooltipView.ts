@@ -9,7 +9,13 @@ import type {
   PetInfo,
   StarId,
 } from "../core/types";
-import { formatBonusRowsWithIds, formatPet, formatPowerStats, type PowerRows } from "../core/statFormat";
+import {
+  formatBonusRowsWithIds,
+  formatPet,
+  formatPowerStats,
+  powerStatBenefit,
+  type PowerRows,
+} from "../core/statFormat";
 import { sumBonuses, sumPetBonuses, powersGained, racialTargets, weaponRequirements } from "../core/aggregate";
 import { affinityOrb, presentAffinities } from "./affinityColors";
 import { markSwatchSvg, type MarkStyle } from "./markPalette";
@@ -95,9 +101,14 @@ function petBonusHtml(
 // Ability stat lines: the semantic rows render in core's order, untouched; the
 // fallthrough segment is resolved, sorted by resolved label, and appended. Rows carrying a
 // taggable stat id highlight like bonus rows when their tag is selected.
-function powerRowsHtml(loc: Localization, power: PowerRows, selectedBenefits: Set<string>): string {
+function powerRowsHtml(
+  loc: Localization,
+  power: PowerRows,
+  selectedBenefits: Set<string>,
+  tagOf: (id: string) => string | undefined,
+): string {
   const resolve = (r: { label: Text; value: Text; id?: string }) => ({
-    id: r.id,
+    id: r.id === undefined ? undefined : tagOf(r.id),
     label: resolveText(loc, r.label),
     value: resolveText(loc, r.value),
   });
@@ -122,7 +133,9 @@ function powerHtml(loc: Localization, power: CelestialPower, selectedBenefits: S
   const level = power.level
     ? `<div class="tip-power-level">${loc.translate("ui.tooltip.currentLevel", { level: power.level })}</div>`
     : "";
-  const stats = powerRowsHtml(loc, formatPowerStats(power.stats), selectedBenefits);
+  const stats = powerRowsHtml(loc, formatPowerStats(power.stats), selectedBenefits, (id) =>
+    id in power.stats ? powerStatBenefit(id, power.stats[id]!)?.id : undefined,
+  );
   const pet = power.pet ? petHtml(loc, power.pet) : "";
   return `<div class="tip-power">${hl(loc.gameText(power.nameTag))}${proc}</div>${desc}${level}${stats}${pet}`;
 }
@@ -132,7 +145,7 @@ function powerHtml(loc: Localization, power: CelestialPower, selectedBenefits: S
 function petHtml(loc: Localization, pet: PetInfo): string {
   const { summon, attack } = formatPet(pet);
   // Pet attack stats are intentionally outside the benefit vocabulary, so no tag can select them.
-  return `<div class="tip-pet">${resolveText(loc, summon)}</div>${powerRowsHtml(loc, attack, new Set())}`;
+  return `<div class="tip-pet">${resolveText(loc, summon)}</div>${powerRowsHtml(loc, attack, new Set(), () => undefined)}`;
 }
 
 function affinitySections(

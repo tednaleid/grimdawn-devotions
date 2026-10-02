@@ -186,6 +186,8 @@ const REQUIRED = [
   "stat.group.armorAndMitigation",
   "stat.group.other",
   "stat.override.characterHealIncreasePercent",
+  "stat.override.offensiveTargetArmorReduction",
+  "stat.template.resistanceReduction",
   "stat.power.ccChanceDuration",
   "stat.power.ccDuration",
   "trigger.AttackEnemy",

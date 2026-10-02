@@ -9,6 +9,7 @@ import {
   canonicalBenefitIds,
   canonicalPowerStatIds,
   deprecatedBenefitIds,
+  canonicalPowerDebuffIds,
   encodeHash,
   decodeHash,
 } from "../src/core/urlState";
@@ -304,4 +305,30 @@ test("a deprecated tag decodes as absent while live tags keep their positions", 
   const decoded = decodeHash(`#${hash}`, canonical, benefitCanonical, deprecatedBenefitIds(model))!;
   expect(decoded.benefits.has(dead)).toBe(false);
   expect(decoded.benefits.has(live)).toBe(true);
+});
+
+test("canonicalPowerDebuffIds: the target-side debuff ids, appended after the power block", () => {
+  const debuffs = canonicalPowerDebuffIds(model);
+  expect(debuffs).toContain("offensiveTargetPhysicalResistanceReduction");
+  expect(debuffs).toContain("offensiveTargetArmorReduction");
+  expect(debuffs).not.toContain("offensiveSlowOffensiveAbilityMin"); // already a power stat id
+  const all = canonicalBenefitIds(model);
+  expect(all.slice(all.length - debuffs.length)).toEqual(debuffs);
+});
+
+test("deprecatedBenefitIds: a power-only resistance a debuff carries is deprecated", () => {
+  // No star grants Cold or Fire resistance; only Murmur's and Solael's debuffs carry the ids.
+  const deprecated = deprecatedBenefitIds(model);
+  expect(deprecated.has("defensiveCold")).toBe(true);
+  expect(deprecated.has("defensiveFire")).toBe(true);
+  expect(deprecated.has("defensivePhysical")).toBe(false);
+});
+
+test("a shared player-resistance link keeps its tag", () => {
+  // From a user report: b= selects Physical Resistance and Bleeding Resistance.
+  const benefitCanonical = canonicalBenefitIds(model);
+  const physical = decodeHash("#p=55&s=&b=AAAAAAAAAIA", canonical, benefitCanonical, deprecatedBenefitIds(model))!;
+  expect([...physical.benefits]).toEqual(["defensivePhysical"]);
+  const bleeding = decodeHash("#p=55&s=&b=AAAAAAAU", canonical, benefitCanonical, deprecatedBenefitIds(model))!;
+  expect(bleeding.benefits.has("defensiveBleeding")).toBe(true);
 });
