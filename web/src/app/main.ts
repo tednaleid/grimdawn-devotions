@@ -39,6 +39,7 @@ import {
   canonicalPetStatIds,
   canonicalBenefitIds,
   canonicalPowerStatIds,
+  canonicalPowerDebuffIds,
   decodeHash,
   deprecatedBenefitIds,
   encodeHash,
@@ -162,6 +163,7 @@ async function boot() {
   const allBonuses: Record<string, number> = {};
   for (const id of statCanonical) allBonuses[id] = 1;
   for (const id of canonicalPowerStatIds(model)) if (!deprecatedBenefits.has(id)) allBonuses[id] = 1;
+  for (const id of canonicalPowerDebuffIds(model)) allBonuses[id] = 1;
   // The pet benefit catalog (every pet subject + its stat ids), for the pet "Available to get" list.
   // Pet stat ids are raw here (static per model); the renderer scopes them.
   const allPetBonuses: Record<string, number> = {};

@@ -10,6 +10,8 @@ import {
   formatPet,
   isFilterableStat,
   isPowerEffectDuration,
+  powerStatBenefit,
+  condensedRows,
 } from "../src/core/statFormat";
 import { res, resRow, resRows, resSorted } from "./helpers/localizeEn";
 import { makeLocalization, resolveText } from "../src/core/localization";
@@ -509,5 +511,40 @@ describe("isPowerEffectDuration: a power's own effect timers are not benefits it
       "defensiveColdDuration",
     ])
       expect(isPowerEffectDuration(id)).toBe(false);
+  });
+});
+
+describe("powerStatBenefit: the benefit tag a celestial power stat answers", () => {
+  test("a positive filterable stat answers its own id", () => {
+    expect(powerStatBenefit("defensivePhysical", 18)).toEqual({ id: "defensivePhysical", value: 18 });
+  });
+  test("ability meta and effect timers answer nothing", () => {
+    expect(powerStatBenefit("skillActiveDuration", 5)).toBeNull();
+    expect(powerStatBenefit("offensiveSlowLightningDurationMin", 3)).toBeNull();
+  });
+  test("a negative resistance is a stacking resistance reduction on the target", () => {
+    expect(powerStatBenefit("defensivePhysical", -32)).toEqual({
+      id: "offensiveTargetPhysicalResistanceReduction",
+      value: 32,
+    });
+  });
+  test("a negative OA, run speed or armor stat answers the target debuff", () => {
+    expect(powerStatBenefit("characterOffensiveAbility", -150)).toEqual({
+      id: "offensiveSlowOffensiveAbilityMin",
+      value: 150,
+    });
+    expect(powerStatBenefit("characterRunSpeedModifier", -36)?.id).toBe("offensiveSlowRunSpeedMin");
+    expect(powerStatBenefit("defensiveProtectionModifier", -35)?.id).toBe("offensiveTargetArmorReduction");
+  });
+  test("a negative stat with no target-side meaning answers nothing", () => {
+    expect(powerStatBenefit("defensiveSlowLifeLeach", -8)).toBeNull();
+  });
+  test("the target-side ids group and label as debuffs", () => {
+    expect(resRow(statRow("offensiveTargetBleedingResistanceReduction", 32))).toEqual({
+      label: "Bleeding Resistance Reduction",
+      value: "+32%",
+    });
+    const groups = condensedRows({ offensiveTargetBleedingResistanceReduction: 32, offensiveTargetArmorReduction: 35 });
+    expect(groups.map((g) => g.group)).toEqual(["Resistance Reduction", "Crowd Control"]);
   });
 });

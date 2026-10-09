@@ -2,7 +2,7 @@
 // ABOUTME: Each selection is a trailing-trimmed bitset over a stable canonical id order, base64url-encoded.
 import { AFFINITIES, type DevotionModel, type StarId } from "./types";
 import { affinityTagId, petTagId } from "./benefitTag";
-import { isFilterableStat, isPowerEffectDuration } from "./statFormat";
+import { isFilterableStat, powerStatBenefit } from "./statFormat";
 
 const MIN_CAP = 1;
 const MAX_CAP = 55;
@@ -86,14 +86,39 @@ export function canonicalPowerStatIds(model: DevotionModel): string[] {
   return [...set].sort();
 }
 
+// Every benefit id some celestial power grants (see powerStatBenefit).
+function powerBenefitIds(model: DevotionModel): Set<string> {
+  const set = new Set<string>();
+  for (const s of model.stars.values()) {
+    const p = s.celestialPower;
+    if (!p) continue;
+    for (const [k, v] of Object.entries(p.stats)) {
+      const benefit = powerStatBenefit(k, v);
+      if (benefit) set.add(benefit.id);
+    }
+  }
+  return set;
+}
+
 /**
- * Deprecated benefit tags: power-only ids that are the power's own effect timers, not benefits it
- * grants. Every canonical list is append-only (an id is never removed or reordered, since its bit
- * position is the wire format), so a retired tag keeps its place here and decodes as absent instead:
- * the catalog never offers it and a stale link cannot restore it.
+ * Power benefit ids that are neither player-bonus ids nor raw power stat ids: the target-side names
+ * of debuffs a power writes as a negative player-side stat (see powerStatBenefit).
+ */
+export function canonicalPowerDebuffIds(model: DevotionModel): string[] {
+  const taken = new Set([...canonicalStatIds(model), ...canonicalPowerStatIds(model)]);
+  return [...powerBenefitIds(model)].filter((id) => !taken.has(id)).sort();
+}
+
+/**
+ * Deprecated benefit tags: power-only ids that no power grants as a benefit, such as a power's own
+ * effect timers or the player-side id of a target debuff. Every canonical list is append-only (an
+ * id is never removed or reordered, since its bit position is the wire format), so a retired tag
+ * keeps its place here and decodes as absent instead: the catalog never offers it and a stale link
+ * cannot restore it.
  */
 export function deprecatedBenefitIds(model: DevotionModel): Set<string> {
-  return new Set(canonicalPowerStatIds(model).filter(isPowerEffectDuration));
+  const granted = powerBenefitIds(model);
+  return new Set(canonicalPowerStatIds(model).filter((id) => !granted.has(id)));
 }
 
 /** The 10 affinity filter tags (each affinity x grant/require), in a stable order. */
@@ -103,8 +128,8 @@ function canonicalAffinityIds(): string[] {
 
 /**
  * The benefit-tag ordering for the URL bitset: the player stat ids (unchanged positions), then the
- * pet stat ids prefixed `pet:`, then the 10 affinity tags, then the recognized power-only stat ids.
- * Each block is appended after the last, so an older player/pet/affinity `b=` payload decodes
+ * pet stat ids prefixed `pet:`, then the 10 affinity tags, then the recognized power-only stat ids,
+ * then the power debuff ids. Each block is appended after the last, so an older payload decodes
  * identically; a later block extends the bitset only when one of its tags is set.
  */
 export function canonicalBenefitIds(model: DevotionModel): string[] {
@@ -112,7 +137,8 @@ export function canonicalBenefitIds(model: DevotionModel): string[] {
     ...canonicalStatIds(model),
     ...canonicalPetStatIds(model).map(petTagId),
     ...canonicalAffinityIds(),
-    ...canonicalPowerStatIds(model), // appended LAST so older player/pet/affinity payloads decode unchanged
+    ...canonicalPowerStatIds(model), // appended after the affinity block so older payloads decode unchanged
+    ...canonicalPowerDebuffIds(model), // appended LAST so older payloads decode unchanged
   ];
 }
 

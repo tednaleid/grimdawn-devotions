@@ -3,7 +3,7 @@
 import { test, expect } from "bun:test";
 import doc from "../../data/devotions.json";
 import { buildModel } from "../src/core/model";
-import { isFilterableStat } from "../src/core/statFormat";
+import { powerStatBenefit } from "../src/core/statFormat";
 import {
   sumBonuses,
   sumPetBonuses,
@@ -34,13 +34,17 @@ const bonusIdsOf = (starIds: Iterable<string>, skip: Set<string> = new Set()): S
   return out;
 };
 
-// Filterable power stat ids for a set of stars (mirrors what availableBonusIds now collects).
+// Power benefit ids for a set of stars (mirrors what availableBonusIds collects).
 const filtPowerIdsOf = (starIds: Iterable<string>, skip: Set<string> = new Set()): Set<string> => {
   const out = new Set<string>();
   for (const sid of starIds) {
     if (skip.has(sid)) continue;
     const p = model.stars.get(sid)!.celestialPower;
-    if (p) for (const k of Object.keys(p.stats)) if (isFilterableStat(k)) out.add(k);
+    if (p)
+      for (const [k, v] of Object.entries(p.stats)) {
+        const benefit = powerStatBenefit(k, v);
+        if (benefit) out.add(benefit.id);
+      }
   }
   return out;
 };
@@ -193,7 +197,7 @@ test("availableBonusIds includes recognized power stats of unselected stars in c
       const p = model.stars.get(sid)!.celestialPower;
       if (!p) continue;
       const k = Object.keys(p.stats).find(
-        (key) => !bonusIds.has(key) && /^offensive|^defensive|^character|^retaliation/.test(key),
+        (key) => !bonusIds.has(key) && powerStatBenefit(key, p.stats[key]!)?.id === key,
       );
       if (k) {
         conId = c.id;
@@ -265,4 +269,38 @@ test("starValuesGranting ignores a power's own effect timers: a DoT tick length 
   expect(dotPowers.length).toBeGreaterThan(0);
   const damage = starValuesGranting(model, "offensiveSlowColdMin");
   for (const s of dotPowers) expect(damage.has(s.id)).toBe(true);
+});
+
+// The power star of the constellation with this English name.
+const powerStarOf = (name: string): string =>
+  conByName(name).starIds.find((sid) => model.stars.get(sid)!.celestialPower)!;
+
+test("a power's negative resistance is a target debuff: it answers resistance reduction, not the player's resistance", () => {
+  const assassin = powerStarOf("Assassin's Blade");
+  const huntress = powerStarOf("Huntress");
+  expect(starValuesGranting(model, "defensivePhysical").has(assassin)).toBe(false);
+  expect(starValuesGranting(model, "defensivePierce").has(assassin)).toBe(false);
+  expect(starValuesGranting(model, "defensiveBleeding").has(huntress)).toBe(false);
+  expect(starValuesGranting(model, "offensiveTargetPhysicalResistanceReduction").get(assassin)).toBe(32);
+  expect(starValuesGranting(model, "offensiveTargetPierceResistanceReduction").get(assassin)).toBe(36);
+  expect(starValuesGranting(model, "offensiveTargetBleedingResistanceReduction").get(huntress)).toBe(32);
+});
+
+test("a power's other negative stats answer the matching target debuff tag", () => {
+  const huntress = powerStarOf("Huntress");
+  expect(starValuesGranting(model, "characterOffensiveAbility").has(huntress)).toBe(false);
+  expect(starValuesGranting(model, "offensiveSlowOffensiveAbilityMin").get(huntress)).toBe(150);
+  const witchblade = powerStarOf("Solael's Witchblade");
+  expect(starValuesGranting(model, "characterRunSpeedModifier").has(witchblade)).toBe(false);
+  expect(starValuesGranting(model, "offensiveSlowRunSpeedMin").get(witchblade)).toBe(36);
+  const bear = powerStarOf("Dire Bear");
+  expect(starValuesGranting(model, "defensiveProtectionModifier").has(bear)).toBe(false);
+  expect(starValuesGranting(model, "offensiveTargetArmorReduction").get(bear)).toBe(35);
+});
+
+test("availableBonusIds offers a debuff power's target-side ids, not its player-side ones", () => {
+  const got = availableBonusIds(model, unselectedStarsOf(conByName("Murmur, Mistress of Rumors").id));
+  expect(got.has("offensiveTargetColdResistanceReduction")).toBe(true);
+  expect(got.has("offensiveTargetPoisonResistanceReduction")).toBe(true);
+  expect(got.has("defensiveCold")).toBe(false);
 });

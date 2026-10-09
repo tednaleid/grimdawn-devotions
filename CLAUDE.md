@@ -58,6 +58,8 @@ client state that only lives in memory or the DOM. The canonical id lists behind
 the bitsets are append-only: never remove or reorder an id, since its bit position
 is the wire format. Retire a tag by adding it to `deprecatedBenefitIds` in
 `urlState.ts` so it keeps its position, decodes as absent, and leaves the catalog.
+`web/test/fixtures/url-wire-ids.json` pins the published star and benefit id order;
+when a data refresh appends ids, add them to the end of that fixture.
 
 ## Internationalization (invariant we maintain)
 

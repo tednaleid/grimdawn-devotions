@@ -2,7 +2,7 @@
 // ABOUTME: Computes summed stat bonuses, celestial powers gained, and weapon requirements.
 import type { CelestialPower, DevotionModel, StarId } from "./types";
 import { petTagId } from "./benefitTag";
-import { isFilterableStat, isPowerEffectDuration } from "./statFormat";
+import { powerStatBenefit } from "./statFormat";
 
 export function sumBonuses(model: DevotionModel, selected: Set<StarId>): Record<string, number> {
   const out: Record<string, number> = {};
@@ -49,10 +49,11 @@ export function powersGained(model: DevotionModel, selected: Set<StarId>): { sta
   return out;
 }
 
-// Each star granting the raw stat id, mapped to its value for it (bonus plus celestial-power
+// Each star granting the benefit id, mapped to its value for it (bonus plus celestial-power
 // stat, when both carry it) - the search arcs scale arc width by this relative magnitude.
-// A power's own effect timers (a DoT tick length, a debuff duration) are not benefits it grants
-// and do not count. Pet attack stats are intentionally not scanned.
+// A power stat counts as the benefit powerStatBenefit names for it, so a debuff answers the
+// target-side tag and a power's own effect timers count for nothing. Pet attack stats are
+// intentionally not scanned.
 export function starValuesGranting(model: DevotionModel, id: string): Map<StarId, number> {
   const out = new Map<StarId, number>();
   for (const star of model.stars.values()) {
@@ -63,10 +64,13 @@ export function starValuesGranting(model: DevotionModel, id: string): Map<StarId
       hit = true;
     }
     const power = star.celestialPower;
-    if (power && id in power.stats && !isPowerEffectDuration(id)) {
-      value += power.stats[id]!;
-      hit = true;
-    }
+    if (power)
+      for (const [k, v] of Object.entries(power.stats)) {
+        const benefit = powerStatBenefit(k, v);
+        if (benefit?.id !== id) continue;
+        value += benefit.value;
+        hit = true;
+      }
     if (hit) out.set(star.id, value);
   }
   return out;
@@ -110,7 +114,11 @@ export function availableBonusIds(model: DevotionModel, reachableStars: Set<Star
     if (!star) continue;
     for (const k of Object.keys(star.bonuses)) out.add(k);
     const power = star.celestialPower;
-    if (power) for (const k of Object.keys(power.stats)) if (isFilterableStat(k)) out.add(k);
+    if (power)
+      for (const [k, v] of Object.entries(power.stats)) {
+        const benefit = powerStatBenefit(k, v);
+        if (benefit) out.add(benefit.id);
+      }
   }
   return out;
 }

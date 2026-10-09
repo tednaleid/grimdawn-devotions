@@ -111,6 +111,7 @@ const OVERRIDES: Record<string, { percent: boolean; sign: number }> = {
   offensiveElementalResistanceReductionPercentMin: { percent: true, sign: 1 },
   offensiveElementalResistanceReductionPercentDurationMin: { percent: false, sign: 1 },
   offensiveLightningModifierChance: { percent: true, sign: 1 },
+  offensiveTargetArmorReduction: { percent: true, sign: 1 },
   retaliationTotalDamageModifier: { percent: true, sign: 1 },
   // retaliationDamagePct is not here: its noun is a value-PREFIX game format
   // (SkillRetaliationDamageFormat), so it resolves via STAT_FORMAT_TAGS instead.
@@ -189,6 +190,11 @@ export function classify(id: string): Classified | null {
   if ((m = id.match(/^defensive([A-Za-z]+?)Duration$/))) {
     const type = dotDamageLabel(m[1]!);
     if (type) return { label: appT("stat.template.reducedDuration", { type }), percent: true, sign: 1 };
+  }
+  // Stacking resistance reduction on the target, as named by powerStatBenefit.
+  if ((m = id.match(/^offensiveTarget([A-Za-z]+?)ResistanceReduction$/))) {
+    const type = resistLabel(m[1]!);
+    if (type) return { label: appT("stat.template.resistanceReduction", { type }), percent: true, sign: 1 };
   }
   // Defensive base resistance: defensive<Type>
   if ((m = id.match(/^defensive([A-Za-z]+?)$/))) {
@@ -286,7 +292,7 @@ function groupFor(id: string): StatGroup {
   if (/^retaliation/.test(id)) return "Retaliation";
   if (/ResistanceReduction/.test(id) || /^offensivePhysicalReductionPercent/.test(id)) return "Resistance Reduction";
   if (
-    /^offensive(Stun|Freeze|Petrify|Knockdown|Confusion|Fumble|ProjectileFumble|SlowRunSpeed|SlowTotalSpeed|SlowAttackSpeed|SlowOffensiveAbility|SlowDefensiveAbility|TotalDamageReductionPercent)/.test(
+    /^offensive(Stun|Freeze|Petrify|Knockdown|Confusion|Fumble|ProjectileFumble|SlowRunSpeed|SlowTotalSpeed|SlowAttackSpeed|SlowOffensiveAbility|SlowDefensiveAbility|TotalDamageReductionPercent|TargetArmorReduction)/.test(
       id,
     )
   )
@@ -443,6 +449,31 @@ const POWER_EFFECT_DURATION_IDS: ReadonlySet<string> = new Set([
  */
 export function isPowerEffectDuration(id: string): boolean {
   return POWER_EFFECT_DURATION_IDS.has(id);
+}
+
+// Target debuffs a power writes as a negative player-side stat on the enemy, mapped to the
+// benefit id that names the same debuff where a power states it directly.
+const NEGATIVE_TARGET_DEBUFFS: Record<string, string> = {
+  characterOffensiveAbility: "offensiveSlowOffensiveAbilityMin",
+  characterRunSpeedModifier: "offensiveSlowRunSpeedMin",
+  defensiveProtectionModifier: "offensiveTargetArmorReduction",
+};
+
+/**
+ * The benefit a celestial power stat grants, as the tag id it answers and the magnitude that tag
+ * weighs, or null when the stat is not a benefit. A power's own effect timers are not benefits. A
+ * negative value is a debuff on the enemy that reuses the player-side id: "-32% Physical
+ * Resistance" is defensivePhysical: -32 applied to the target, a stacking resistance reduction
+ * (docs/resistance-reduction.md), so it answers offensiveTargetPhysicalResistanceReduction and
+ * never the player's Physical Resistance. A negative stat with no target-side meaning is dropped.
+ */
+export function powerStatBenefit(id: string, value: number): { id: string; value: number } | null {
+  if (isPowerEffectDuration(id)) return null;
+  if (value >= 0) return isFilterableStat(id) ? { id, value } : null;
+  const m = id.match(/^defensive([A-Za-z]+)$/);
+  if (m && RESIST_SEGMENTS.has(m[1]!)) return { id: `offensiveTarget${m[1]!}ResistanceReduction`, value: -value };
+  const debuff = NEGATIVE_TARGET_DEBUFFS[id];
+  return debuff ? { id: debuff, value: -value } : null;
 }
 
 /**
