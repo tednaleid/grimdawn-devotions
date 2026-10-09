@@ -25,6 +25,12 @@ show from game data differs from what grimtools displays, treat grimtools as the
 source of truth: find why, adopt its convention unless the game itself proves it
 wrong, and pin the result with a fixture of grimtools' displayed values.
 
+## Game updates
+
+After a Grim Dawn patch, follow [docs/game-update.md](docs/game-update.md): it is
+the single runbook for regenerating every dataset (`just migrate`,
+`just migrate-grimtools`) and the review steps around them.
+
 ## Backlog / new ideas
 
 New ideas and backlog items go in [BACKLOG.md](BACKLOG.md) at the project root.

@@ -233,14 +233,9 @@ weapon-requirement counts, and a per-tier breakdown.
 ## Re-running after a patch
 
 The parser **discovers** keys/paths at runtime and logs anything unexpected; it
-does not hard-code the full key list. After any game update (notably **Fangs of
-Asterkarn / v1.3, 2026‑07‑23**, which will likely change devotion balance), just:
-
-```bash
-just all          # re-extract + re-parse against the patched install
-```
-
-and the swapped-in `devotions.json` is current. Bump `GD_VERSION` to taste.
+does not hard-code the full key list. After any game update, follow
+[docs/game-update.md](docs/game-update.md): pin the new Steam buildid, then
+`just migrate` regenerates and verifies every committed dataset.
 
 ## Layout
 

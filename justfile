@@ -241,12 +241,18 @@ diff-data:
 
 # One-command version bump: regenerate all game data, rebuild, and verify, stopping BEFORE commit so you
 # review the diff and deploy yourself. Requires the game installed + closed (Windows-only extraction).
-# `diff-data` exits non-zero on a devotion structural break, halting the chain. New buildids must be added
-# to data/steam-build-versions.json first (or pass GD_VERSION=...).
-migrate: extract parse parse-rr parse-monsters i18n-tables assets build diff-data check monster-parity
+# New buildids must be added to data/steam-build-versions.json first (or pass GD_VERSION=...).
+# `i18n-tables` runs early only to extract every language's text for `deposit`; the tables themselves
+# are rebuilt by `i18n-tables-rebuild` after `skill-items` and `stat-item-tags`, whose tags they include.
+# The runbook, including the expected failures and the review steps after this, is docs/game-update.md.
+migrate: extract i18n-tables parse parse-rr parse-monsters assets skill-icons deposit derive skill-items stat-item-tags i18n-tables-rebuild build diff-data check test-scripts monster-parity q-ae-all
     @echo ""
     @echo "Migration regenerated + verified. Review the diff-data report above (before the check output)."
-    @echo "Then: just e2e   (recommended), then   git add -A && git commit && git push   to deploy."
+    @echo "Next steps (docs/game-update.md): just e2e, just migrate-grimtools, just publish-deposit, commit."
+
+# Regenerate the tables that join our data to grimtools.com (network; run once grimtools shows the new
+# game version). The second half of a version bump; see docs/game-update.md.
+migrate-grimtools: gt-star-table gt-monster-links
 
 # Full pipeline: extract then parse
 [group("devotions")]

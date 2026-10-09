@@ -126,12 +126,11 @@ counted in the `expansion_defaulted` diagnostic.
   grimtools and re-pinned.
 - `just clean-derived` - delete the artifacts
 
-After a patch: `just extract` -> `just deposit` -> `just derive` ->
-`just skill-items` -> `just stat-item-tags` -> `just i18n-tables` ->
-`just q-ae-all`.
+After a patch, `just migrate` runs this track in order (see
+[game-update.md](game-update.md)).
 
-`i18n-tables` must run after `skill-items` and `stat-item-tags`, not before: it
-reads `data/skill-items.json` for the mastery, skill, pet and item name tags and
+The game text tables must be built after `skill-items` and `stat-item-tags`, not before: the
+builder reads `data/skill-items.json` for the mastery, skill, pet and item name tags and
 `data/stat-item-tags.json` for the stat-label tags it resolves into every locale
 table. Running it first builds all 13 tables from the previous patch's dataset, so
 anything the patch added falls through to its raw tag on the page in every
