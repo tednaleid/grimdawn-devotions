@@ -9,10 +9,27 @@
 plus a manifest the web app reads. The output dir (assets/devotions) is committed for the
 GitHub Pages build; regenerate it with `just assets`. See docs/assets-and-textures.md for the .tex format."""
 from __future__ import annotations
-import argparse, json, re, subprocess, sys, tempfile
+import argparse, hashlib, json, re, subprocess, sys, tempfile
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from tex2png import tex_to_image  # reuse the proven decoder
+
+# Re-encoding every texture at WebP method 6 takes minutes, and most patches change no art. The
+# sidecar records each texture's source hash and the encoder settings, so an unchanged texture
+# keeps its existing .webp. It is not in manifest.json because the planner downloads that file.
+HASHES_FILE = "source-hashes.json"
+
+
+def source_key(tex: bytes) -> str:
+    """The identity of one extracted .tex: a hash of its bytes."""
+    return hashlib.sha256(tex).hexdigest()
+
+
+def is_current(stem: str, key: str, settings: str, previous: dict, out: Path) -> bool:
+    """True when out was encoded from these exact source bytes with these settings."""
+    return (previous.get("settings") == settings
+            and previous.get("textures", {}).get(stem) == key
+            and out.exists())
 
 
 def main(argv=None) -> int:
@@ -62,6 +79,11 @@ def main(argv=None) -> int:
     images: dict[str, dict] = {}
     skipped: list[str] = []
     converted = 0
+    reused = 0
+    settings = f"webp q{args.quality} method6 maxdim{args.max_dim}"
+    hashes_path = args.out_dir / HASHES_FILE
+    previous = json.loads(hashes_path.read_text()) if hashes_path.exists() else {}
+    hashes: dict[str, str] = {}
     with tempfile.TemporaryDirectory() as td:
         for stem, (arc, e) in sorted(chosen.items()):
             subprocess.run([str(tool), str(arc), "-extract", td, e], capture_output=True)
@@ -69,8 +91,9 @@ def main(argv=None) -> int:
             if not tex.exists():
                 skipped.append(f"{e}: extraction produced no file")
                 continue
+            data = tex.read_bytes()
             try:
-                img = tex_to_image(tex.read_bytes())
+                img = tex_to_image(data)
             except ValueError as exc:
                 skipped.append(f"{e}: {exc}")
                 continue
@@ -78,19 +101,26 @@ def main(argv=None) -> int:
             # space. The web app renders the <image> at this size so the art aligns
             # with the star positions regardless of how much the file is downscaled.
             native_w, native_h = img.size
-            if args.max_dim > 0 and max(native_w, native_h) > args.max_dim:
-                scale = args.max_dim / max(native_w, native_h)
-                img = img.resize((max(1, round(native_w * scale)), max(1, round(native_h * scale))))
             out = args.out_dir / f"{stem}.webp"
-            img.save(out, "WEBP", quality=args.quality, method=6)
+            key = source_key(data)
+            hashes[stem] = key
+            if is_current(stem, key, settings, previous, out):
+                reused += 1
+            else:
+                if args.max_dim > 0 and max(native_w, native_h) > args.max_dim:
+                    scale = args.max_dim / max(native_w, native_h)
+                    img = img.resize((max(1, round(native_w * scale)), max(1, round(native_h * scale))))
+                img.save(out, "WEBP", quality=args.quality, method=6)
+                converted += 1
             entry = {"url": f"assets/devotions/{stem}.webp", "w": native_w, "h": native_h}
             images[f"{stem}.tex"] = entry
             images[f"{stem}.png"] = entry
-            converted += 1
 
     (args.out_dir / "manifest.json").write_text(json.dumps({"images": images}, indent=2))
+    hashes_path.write_text(json.dumps({"settings": settings, "textures": hashes}, indent=2, sort_keys=True))
     total = sum(p.stat().st_size for p in args.out_dir.glob("*.webp"))
-    print(f"Wrote {converted} images, {total/1_048_576:.1f} MB, manifest -> {args.out_dir}")
+    print(f"Encoded {converted} images, kept {reused} unchanged, {total/1_048_576:.1f} MB, "
+          f"manifest -> {args.out_dir}")
     if skipped:
         print(f"{len(skipped)} skipped:", file=sys.stderr)
         for s in skipped:

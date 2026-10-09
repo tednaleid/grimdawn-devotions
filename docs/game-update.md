@@ -30,7 +30,7 @@ Runs, in order:
 | `extract` | `extracted/records`, `extracted/text_en` | Destructive re-extract of base game + every `gdx*` expansion |
 | `i18n-tables` | `extracted/text_<lang>` | Extracts every other language's text. The tables it also writes are rebuilt below |
 | `parse`, `parse-rr`, `parse-monsters` | `data/devotions.json`, `resistance-reduction.json`, `monsters.json` | |
-| `assets`, `skill-icons` | `assets/devotions/`, `data/skill-icons.*` | |
+| `assets`, `skill-icons` | `assets/devotions/`, `data/skill-icons.*` | `assets` re-encodes only textures whose bytes or encoder settings changed (`assets/devotions/source-hashes.json`); a full re-encode takes about 8 minutes |
 | `deposit`, `derive` | `data/deposit/`, `data/derived/` (parquet, never in git) | `derive` fails on curation drift by design, see below |
 | `skill-items`, `stat-item-tags` | `data/skill-items*.json`, `data/stat-item-tags.json` | `stat-item-tags` fails on a stat id it cannot name, see below |
 | `i18n-tables-rebuild` | `data/i18n/game.<lang>.json` | Must follow `skill-items` and `stat-item-tags`: the tables include their tags, so building them earlier leaves anything the patch added as a raw tag in every language |
