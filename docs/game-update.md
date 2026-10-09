@@ -52,6 +52,12 @@ starting over; every step reads only what the earlier ones wrote.
   patch; a failed structural check or transcribed oracle is a bug. Repin only
   after diffing the old and new data to explain the change, and record that
   explanation in the commit message.
+- **URL wire-format pin** (`web/test/urlState.test.ts`, in `check`). A patch that
+  adds a benefit stat (a new pet bonus, a new power debuff) produces a benefit id
+  the published order does not have. Append the new ids, in the order the test
+  reports, to the end of `data/url-wire-ids.json`; never insert or reorder, since
+  each id's index is its bit in every shared link. Retired ids need nothing: they
+  keep their bit and decode as absent.
 - **`diff-data` structural break.** A constellation or star added, removed, or
   rewired. That changes the planner's model: read `docs/devotion-system.md`,
   run `just gen-reach-fixtures`, and run the regression gates at the end of

@@ -1248,3 +1248,18 @@ durable storage before they age out. Pointers: a Cron Trigger on the worker
 token secret, so the simpler path is a `just stats --rollup` mode in `scripts/stats.py`
 that appends last month's per-page totals to a committed `data/page-loads.csv`, run by
 hand or by a scheduled GitHub Action holding the read-only token as a secret.
+
+## Star ids (s=) are still ordered by the game data
+
+`canonicalBenefitIds` reads its order from `data/url-wire-ids.json`, so a patch that
+retires or adds a benefit stat cannot shift a shared link's `b=` bits. `canonicalStarIds`
+still derives its order from `data/devotions.json` (constellation order, then star
+index), so a patch that adds, removes, or reorders a constellation or star would shift
+every later `s=` bit. The pin test in `web/test/urlState.test.ts` fails loudly when that
+happens, so nothing ships broken, but the fix is not in place yet.
+Idea: read the star order from `starIds` in the same file, append new stars, and drop
+retired star ids at decode (they are not in the model, so `repairSelection` must never
+see them).
+
+Pointers: `web/src/core/urlState.ts` (`canonicalStarIds`, `decodeHash`),
+`web/src/app/main.ts` (`applyHash`), `data/url-wire-ids.json`.

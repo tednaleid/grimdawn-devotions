@@ -808,6 +808,10 @@
     "offensiveTargetLifeResistanceReduction",
     "offensiveTargetPhysicalResistanceReduction",
     "offensiveTargetPierceResistanceReduction",
-    "offensiveTargetPoisonResistanceReduction"
+    "offensiveTargetPoisonResistanceReduction",
+    "pet:characterRunSpeedModifier",
+    "pet:offensiveSlowColdModifier",
+    "pet:offensiveSlowFireModifier",
+    "pet:offensiveSlowLightningModifier"
   ]
 }

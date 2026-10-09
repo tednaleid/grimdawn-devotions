@@ -3,6 +3,7 @@
 import { AFFINITIES, type DevotionModel, type StarId } from "./types";
 import { affinityTagId, petTagId } from "./benefitTag";
 import { isFilterableStat, powerStatBenefit } from "./statFormat";
+import wire from "../../../data/url-wire-ids.json";
 
 const MIN_CAP = 1;
 const MAX_CAP = 55;
@@ -118,7 +119,12 @@ export function canonicalPowerDebuffIds(model: DevotionModel): string[] {
  */
 export function deprecatedBenefitIds(model: DevotionModel): Set<string> {
   const granted = powerBenefitIds(model);
-  return new Set(canonicalPowerStatIds(model).filter((id) => !granted.has(id)));
+  const live = new Set(dataBenefitIds(model));
+  return new Set([
+    ...canonicalPowerStatIds(model).filter((id) => !granted.has(id)),
+    // Published ids a game patch retired (1.3.1.0 removed most pet resists from devotions).
+    ...wire.benefitIds.filter((id) => !live.has(id)),
+  ]);
 }
 
 /** The 10 affinity filter tags (each affinity x grant/require), in a stable order. */
@@ -127,19 +133,30 @@ function canonicalAffinityIds(): string[] {
 }
 
 /**
- * The benefit-tag ordering for the URL bitset: the player stat ids (unchanged positions), then the
- * pet stat ids prefixed `pet:`, then the 10 affinity tags, then the recognized power-only stat ids,
- * then the power debuff ids. Each block is appended after the last, so an older payload decodes
- * identically; a later block extends the bitset only when one of its tags is set.
+ * Every benefit tag the current game data produces: the player stat ids, then the pet stat ids
+ * prefixed `pet:`, then the 10 affinity tags, then the recognized power-only stat ids, then the
+ * power debuff ids. Sorted within each block, so a patch that adds or removes a stat shifts every
+ * id after it: this is the vocabulary, not the wire order (see canonicalBenefitIds).
  */
-export function canonicalBenefitIds(model: DevotionModel): string[] {
+function dataBenefitIds(model: DevotionModel): string[] {
   return [
     ...canonicalStatIds(model),
     ...canonicalPetStatIds(model).map(petTagId),
     ...canonicalAffinityIds(),
-    ...canonicalPowerStatIds(model), // appended after the affinity block so older payloads decode unchanged
-    ...canonicalPowerDebuffIds(model), // appended LAST so older payloads decode unchanged
+    ...canonicalPowerStatIds(model),
+    ...canonicalPowerDebuffIds(model),
   ];
+}
+
+/**
+ * The benefit-tag ordering for the URL bitset: the published order in data/url-wire-ids.json, then
+ * any id the data produces that was never published, appended so every older payload decodes
+ * identically. A published id the data no longer produces keeps its position and is deprecated
+ * (see deprecatedBenefitIds). A data refresh appends its new ids to the end of that file.
+ */
+export function canonicalBenefitIds(model: DevotionModel): string[] {
+  const published = new Set(wire.benefitIds);
+  return [...wire.benefitIds, ...dataBenefitIds(model).filter((id) => !published.has(id))];
 }
 
 function bytesToBase64Url(bytes: Uint8Array): string {

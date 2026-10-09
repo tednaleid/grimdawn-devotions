@@ -1,9 +1,9 @@
 // ABOUTME: Round-trip + tolerance tests for the URL state codec (point cap + selected stars bitset).
-// ABOUTME: Also pins the canonical star and benefit id orders against test/fixtures/url-wire-ids.json.
+// ABOUTME: Also pins the canonical star and benefit id orders against data/url-wire-ids.json.
 import { test, expect, describe } from "bun:test";
 import type { StarId } from "../src/core/types";
 import doc from "../../data/devotions.json";
-import wire from "./fixtures/url-wire-ids.json";
+import wire from "../../data/url-wire-ids.json";
 import { buildModel } from "../src/core/model";
 import {
   canonicalStarIds,
@@ -77,9 +77,13 @@ test("encodes an uncapped (Infinity) cap as the p=0 sentinel and round-trips it"
 });
 
 test("canonicalBenefitIds is player ids, then pet: ids, then 10 aff: ids, then power-stat ids", () => {
-  const player = canonicalStatIds(model);
-  const all = canonicalBenefitIds(model);
-  expect(all.slice(0, player.length)).toEqual(player);
+  // The published layout; ids a later data refresh adds are appended after it.
+  const all = canonicalBenefitIds(model).slice(0, 248);
+  const player = all.slice(
+    0,
+    all.findIndex((k) => k.startsWith("pet:")),
+  );
+  expect(player.every((k) => canonicalStatIds(model).includes(k) || deprecatedBenefitIds(model).has(k))).toBe(true);
   // aff: block is 10 entries; find it by its first index
   const affStart = all.findIndex((k) => k.startsWith("aff:"));
   const affBlock = all.slice(affStart, affStart + 10);
@@ -314,7 +318,7 @@ test("canonicalPowerDebuffIds: the target-side debuff ids, appended after the po
   expect(debuffs).toContain("offensiveTargetPhysicalResistanceReduction");
   expect(debuffs).toContain("offensiveTargetArmorReduction");
   expect(debuffs).not.toContain("offensiveSlowOffensiveAbilityMin"); // already a power stat id
-  const all = canonicalBenefitIds(model);
+  const all = canonicalBenefitIds(model).slice(0, 248); // the published layout
   expect(all.slice(all.length - debuffs.length)).toEqual(debuffs);
 });
 
@@ -347,7 +351,31 @@ describe("canonical id lists match the pinned wire format", () => {
     test(name, () => {
       // Any change inside the pinned range breaks published links: keep old ids at their index.
       expect(current.slice(0, pinned.length)).toEqual(pinned);
-      // Ids appended after it are safe; add them to the end of test/fixtures/url-wire-ids.json.
+      // Ids appended after it are safe; add them to the end of data/url-wire-ids.json.
       expect(current.length).toBe(pinned.length);
     });
+});
+
+// Game 1.3.1.0 removed seven pet resist stats from devotions and added four new pet stats. A link
+// shared before that refresh must decode to the same tags it was built with, minus the ones the
+// game retired: every surviving id keeps its bit, and a retired id decodes as absent.
+test("an old benefit link still decodes after a refresh retires and adds ids", () => {
+  const oldLink = encodeHash(
+    new Set([canonical[0]!]),
+    55,
+    canonical,
+    new Set(["pet:defensiveAether", "pet:defensiveFreeze", "pet:offensiveTotalDamageModifier", "defensivePhysical"]),
+    wire.benefitIds,
+  );
+  const decoded = decodeHash(`#${oldLink}`, canonical, canonicalBenefitIds(model), deprecatedBenefitIds(model))!;
+  expect([...decoded.benefits].sort()).toEqual([
+    "defensivePhysical",
+    "pet:defensiveFreeze",
+    "pet:offensiveTotalDamageModifier",
+  ]);
+});
+
+test("a benefit id the game added is appended after every published id", () => {
+  // 248 ids were published before 1.3.1.1; Run Speed for pets is new in it.
+  expect(canonicalBenefitIds(model).indexOf("pet:characterRunSpeedModifier")).toBeGreaterThanOrEqual(248);
 });
