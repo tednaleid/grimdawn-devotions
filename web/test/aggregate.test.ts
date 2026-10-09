@@ -81,12 +81,12 @@ test("availableBonusIds: empty when reachableStars is empty", () => {
 });
 
 test("sumPetBonuses sums 'Bonus to All Pets' stats, separate from player bonuses", () => {
-  // Shepherd's Crook's elemental-resistance star: 10% to the player, 15% to pets.
-  const con = [...model.constellations.values()].find((c) => enLoc.gameText(c.nameTag) === "Shepherd's Crook")!;
-  const star = con.starIds.map((id) => model.stars.get(id)!).find((s) => s.petBonuses?.defensiveElementalResistance)!;
-  expect(star.bonuses.defensiveElementalResistance).toBe(10);
-  expect(star.petBonuses!.defensiveElementalResistance).toBe(15);
-  expect(sumPetBonuses(model, [star.id])).toEqual({ defensiveElementalResistance: 15 });
+  // Lion's health star: 4% Health to the player, 8% to pets.
+  const con = [...model.constellations.values()].find((c) => enLoc.gameText(c.nameTag) === "Lion")!;
+  const star = con.starIds.map((id) => model.stars.get(id)!).find((s) => s.petBonuses?.characterLifeModifier)!;
+  expect(star.bonuses.characterLifeModifier).toBe(4);
+  expect(star.petBonuses!.characterLifeModifier).toBe(8);
+  expect(sumPetBonuses(model, [star.id])).toEqual({ characterLifeModifier: 8 });
 });
 
 function manualCount(pred: (b: Record<string, number>) => boolean): number {

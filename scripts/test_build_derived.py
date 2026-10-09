@@ -83,7 +83,8 @@ def test_ultos_tempest_set_bonuses_match_the_grimtools_card():
     Pinned to the grimtools card for Mythical Ultos' Gem, which lists under
     "(4) Set" a +2 to all skills in Shaman and under "(5) Set" a Savagery block
     reading "33 Lightning Damage" and "30% Chance on Critical Attack to reduce
-    cooldown of Primal Strike by 1 Second". The set record is outside `scoped`
+    cooldown of Primal Strike by 1 Second" (1.5 Seconds since game 1.3.1.0, per its patch notes
+    and the record; grimtools had not updated to show it yet). The set record is outside `scoped`
     (no Class, and gear-types.json gives records/items/lootsets no domain), so
     nothing but build_set_modifiers/build_set_boosts can reach any of it.
     """
@@ -97,7 +98,7 @@ def test_ultos_tempest_set_bonuses_match_the_grimtools_card():
         ORDER BY stat_id""").fetchall()
     assert mods == [
         (5, "offensiveLightningMin", 33.0, None, None),
-        (5, "refreshCooldownAmount", 1.0,
+        (5, "refreshCooldownAmount", 1.5,
          "records/skills/playerclass06/savagestrike1.dbr", "AttackEnemyCrit"),
         (5, "refreshCooldownChance", 30.0,
          "records/skills/playerclass06/savagestrike1.dbr", "AttackEnemyCrit"),

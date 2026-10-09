@@ -1,6 +1,6 @@
 -- ABOUTME: AE16 acceptance: the pet chain gives every summon archetype a panel a player can judge,
 -- ABOUTME: pinning pet resistances, rank-scaled ability damage, and that no reachable grant is lost.
--- Empty result = failure. Values pinned to build 24756825, read off the game data.
+-- Empty result = failure. Values pinned to build 25813250 (1.3.1.1), read off the game data.
 WITH RECURSIVE hh AS (
     SELECT source_kind, source_record, stat_id, at_first, at_max, at_ultimate
     FROM pet_ranks
@@ -86,18 +86,20 @@ checks AS (
         (SELECT count(*) FROM skill_ranks
           WHERE skill_record = 'records/skills/playerclass03/summon_hellhound1.dbr')
           = 4 AS summon_own_stats_are_thin,
-        (SELECT count(*) FROM hh) = 25 AS hellhound_rows_exact,
+        (SELECT count(*) FROM hh) = 20 AS hellhound_rows_exact,
         -- The pet creature record: Hellhound is a fire pet, and its authored
-        -- resistances say so. None of these move with the summon's rank.
+        -- resistances say so. None of these move with the summon's rank. Game
+        -- 1.3.1.0 normalized pet base resists down to one immunity, so its 75%
+        -- poison resist is gone and must stay gone.
         (SELECT at_first FROM hh WHERE source_kind = 'pet'
            AND stat_id = 'defensiveFire') = 500 AS hh_fire_resist,
         (SELECT at_ultimate FROM hh WHERE source_kind = 'pet'
            AND stat_id = 'defensiveFire') = 500 AS hh_fire_resist_flat,
-        (SELECT at_first FROM hh WHERE source_kind = 'pet'
-           AND stat_id = 'defensivePoison') = 75 AS hh_poison_resist,
+        (SELECT count(*) FROM hh WHERE source_kind = 'pet'
+           AND stat_id = 'defensivePoison') = 0 AS hh_poison_resist_removed,
         (SELECT at_first FROM hh WHERE source_kind = 'pet'
            AND stat_id = 'defensivePhysical') = 24 AS hh_physical_resist,
-        (SELECT count(*) FROM hh WHERE source_kind = 'pet') = 13 AS hh_body_rows,
+        (SELECT count(*) FROM hh WHERE source_kind = 'pet') = 8 AS hh_body_rows,
         -- Claw and Fang Attacks, the pet's innate: 6 fire damage at one point in
         -- the summon, 110 fully invested, 234 at the hard cap. This is the number
         -- a +4 to Summon Hellhound is actually buying.
@@ -176,14 +178,15 @@ checks AS (
         -- Inquisitor Seal carries two auras on one creature, a defensive and an
         -- offensive one, each a shell over its own buff record. Both must appear,
         -- and they must stay two rows: source_record is what separates them.
+        -- (1.3.1.0 swapped the defense aura's % Elemental Resist for max resists.)
         (SELECT at_first || '/' || at_max || '/' || at_ultimate FROM pet_ranks
           WHERE skill_record = 'records/skills/playerclass07/arcaneseal1.dbr'
             AND source_record = 'records/skills/playerclass07/pets/petskill_arcaneseal_defenseaura.dbr'
-            AND stat_id = 'damageAbsorption') = '34.0/190.0/430.0' AS seal_absorb,
+            AND stat_id = 'damageAbsorption') = '32.0/210.0/470.0' AS seal_absorb,
         (SELECT at_ultimate FROM pet_ranks
           WHERE skill_record = 'records/skills/playerclass07/arcaneseal1.dbr'
             AND source_record = 'records/skills/playerclass07/pets/petskill_arcaneseal_defenseaura.dbr'
-            AND stat_id = 'defensiveElementalResistance') = 40 AS seal_elemental,
+            AND stat_id = 'defensiveFireMaxResist') = 5 AS seal_elemental_max_resist,
         (SELECT at_first || '/' || at_max || '/' || at_ultimate FROM pet_ranks
           WHERE skill_record = 'records/skills/playerclass07/arcaneseal1.dbr'
             AND source_record = 'records/skills/playerclass07/pets/petskill_arcaneseal_offenseaura.dbr'
@@ -194,7 +197,7 @@ checks AS (
         -- which are one-rank nodes indexed by their group base's rank. All three
         -- are node_kind 'modifier'; none of the 22 'pet_modifier' nodes is here.
         (SELECT count(DISTINCT skill_record) FROM pet_ranks) = 20 AS twenty_summons,
-        (SELECT count(*) FROM pet_ranks) = 743 AS rows_exact,
+        (SELECT count(*) FROM pet_ranks) = 728 AS rows_exact,
         -- The gate the archetype oracles above generalise: every ability a pet is
         -- granted at a positive level, whose chain reaches a record carrying a
         -- rank-scaling stat, contributes at least one row. Deleting a block can no
@@ -249,7 +252,7 @@ checks AS (
 SELECT h.source_kind, h.source_record, h.stat_id, h.at_first, h.at_max, h.at_ultimate
 FROM hh h CROSS JOIN checks c
 WHERE c.summon_own_stats_are_thin AND c.hellhound_rows_exact
-  AND c.hh_fire_resist AND c.hh_fire_resist_flat AND c.hh_poison_resist
+  AND c.hh_fire_resist AND c.hh_fire_resist_flat AND c.hh_poison_resist_removed
   AND c.hh_physical_resist AND c.hh_body_rows
   AND c.hh_innate_fire AND c.hh_innate_physical
   AND c.hh_growth_damage AND c.hh_growth_life
@@ -258,7 +261,7 @@ WHERE c.summon_own_stats_are_thin AND c.hellhound_rows_exact
   AND c.devil_physical AND c.devil_lightning_min AND c.devil_lightning_max
   AND c.devil_fumble
   AND c.totem_heal_flat AND c.totem_heal_percent
-  AND c.seal_absorb AND c.seal_elemental AND c.seal_fire
+  AND c.seal_absorb AND c.seal_elemental_max_resist AND c.seal_fire
   AND c.twenty_summons AND c.rows_exact
   AND c.every_reachable_grant_contributes AND c.every_summon_has_rows
   AND c.swapped_pet_scales AND c.no_null_breakpoints AND c.monotonic

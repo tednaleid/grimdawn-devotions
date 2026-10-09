@@ -1,6 +1,6 @@
 -- ABOUTME: AE10 acceptance: the boosts table carries both kinds of skill bonus, with every
 -- ABOUTME: skill boost resolving to the mastery its playerclass path names.
--- Empty result = failure. Counts pinned to build 24756825; a game patch that shifts them
+-- Empty result = failure. Counts pinned to build 25813250 (1.3.1.1); a game patch that shifts them
 -- should fail this recipe so the pins are re-checked deliberately. The structural checks
 -- below (every boost resolves to a mastery, every level positive, a mastery boost targets
 -- itself) are what actually prove the table; the two counts only detect that it moved.
@@ -14,8 +14,8 @@ sample AS (
 ),
 checks AS (
     SELECT
-        (SELECT n FROM k WHERE kind = 'skill') = 18862 AS skill_rows_exact,
-        (SELECT n FROM k WHERE kind = 'mastery') = 1488 AS mastery_rows_exact,
+        (SELECT n FROM k WHERE kind = 'skill') = 18994 AS skill_rows_exact,
+        (SELECT n FROM k WHERE kind = 'mastery') = 1509 AS mastery_rows_exact,
         (SELECT count(*) FROM boosts WHERE mastery_record IS NULL) = 0 AS every_boost_has_mastery,
         (SELECT count(*) FROM boosts WHERE level <= 0) = 0 AS levels_positive,
         (SELECT count(*) FROM boosts WHERE kind = 'mastery' AND target != mastery_record) = 0 AS mastery_target_is_self

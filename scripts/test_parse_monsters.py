@@ -573,7 +573,7 @@ doc3 = json.loads(out3.read_text(encoding="utf-8"))
 m3 = doc3["monsters"]
 by_id = {m["id"]: m for m in m3}
 
-check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1885)
+check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 1887)
 # 2,740 before the trap exclusion. This counts KEPT records (the variant_counts of surviving
 # rows), not records read, so excluding 3 trap records necessarily drops it by 3. Those 3
 # collapse into only 2 logical rows, which is why the row count fell by 2 and this by 3.
@@ -589,8 +589,14 @@ check(f"row count is the post-trap-exclusion total (got {len(m3)})", len(m3) == 
 # Re-pinned 1695 -> 1885 and 2738 -> 2929: the devotion shrine guardians (enemies/devotion/,
 # 191 records in 190 rows) are kept; grimtools lists them as Heroes and every comparable one
 # matches it.
+# Re-pinned 1885 -> 1887 and 2929 -> 2935 at build 25813250 (1.3.1.1): six records were added
+# (rhinovoid_h01..h04, which join the four rhino hero rows, and wight_cellarambush_h01/h02,
+# which join and re-key the two wight hero rows). Two existing records now disagree with
+# the group they shared and split into rows of their own: human_kurn_berserker_01 (The
+# Obsidian Swordsman, out of Blackheart's row) and wraith_frostveilaltar_01 (Vengeful Spirit,
+# out of the Chilling End wraith's row).
 check(f"kept raw record count (got {sum(m['variant_count'] for m in m3)})",
-      sum(m["variant_count"] for m in m3) == 2929)
+      sum(m["variant_count"] for m in m3) == 2935)
 check("all ten resistance keys still present", all(list(m["resistances"].keys()) == TEN for m in m3))
 
 alkamos = by_id.get("enemies.boss-quest.ghost_stepsoftorment_01")

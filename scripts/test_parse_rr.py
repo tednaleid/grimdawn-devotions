@@ -106,9 +106,9 @@ check("night's chill covers Cold/Pierce/Poison&Acid/Vitality",
       {"Cold", "Pierce", "Poison & Acid", "Vitality"} <= nc_res)
 
 censure = find(lambda s: s["record_path"].endswith("skills/playerclass07/auracensure1_buff.dbr"))
-# Base max (rank 12) = -25; overcap (rank 22) = -35.
-check("aura of censure stacking elemental base -25 / overcap -35",
-      censure and censure[0]["value_at_max"] == -25 and censure[0]["value_at_ultimate"] == -35)
+# Base max (rank 12) = -30; overcap (rank 22) = -40 (raised from -25 / -35 in game 1.3.1.0).
+check("aura of censure stacking elemental base -30 / overcap -40",
+      censure and censure[0]["value_at_max"] == -30 and censure[0]["value_at_ultimate"] == -40)
 
 # --- Task 6: category, parent, trigger + item attribution ---
 check("every source has a category", all(s["category"] for s in doc["sources"]))

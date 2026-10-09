@@ -1,8 +1,8 @@
 {
   "meta": {
-    "game_version": "1.3.0.8",
-    "steam_buildid": "24825149",
-    "generated_utc": "2026-09-28T00:25:37Z"
+    "game_version": "1.3.1.1",
+    "steam_buildid": "25813250",
+    "generated_utc": "2026-10-09T01:41:45Z"
   },
   "monsters": [
     {
@@ -6766,12 +6766,10 @@
       "passive_resistances": {
         "physical": 18
       },
-      "variant_count": 4,
+      "variant_count": 2,
       "record_paths": [
         "records/creatures/enemies/boss&quest/human_chthonickurn_blackheart_01.dbr",
-        "records/creatures/enemies/boss&quest/human_chthonickurn_blackheart_01u.dbr",
-        "records/creatures/enemies/boss&quest/human_kurn_berserker_01.dbr",
-        "records/creatures/enemies/boss&quest/human_kurn_berserker_01u.dbr"
+        "records/creatures/enemies/boss&quest/human_chthonickurn_blackheart_01u.dbr"
       ]
     },
     {
@@ -7110,6 +7108,37 @@
       ]
     },
     {
+      "id": "enemies.boss-quest.human_kurn_berserker_01",
+      "name_tag": "tagGDX3NPC_AREAH_48",
+      "classification": "Quest",
+      "role": "boss&quest",
+      "race_tag": null,
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 25,
+        "pierce": 25,
+        "fire": 25,
+        "cold": 25,
+        "lightning": 50,
+        "poison": 25,
+        "aether": 25,
+        "chaos": 25,
+        "vitality": 50,
+        "bleeding": 25
+      },
+      "passive_resistances": {
+        "bleeding": 25
+      },
+      "variant_count": 2,
+      "record_paths": [
+        "records/creatures/enemies/boss&quest/human_kurn_berserker_01.dbr",
+        "records/creatures/enemies/boss&quest/human_kurn_berserker_01u.dbr"
+      ],
+      "variant_index": 1
+    },
+    {
       "id": "enemies.boss-quest.human_kurn_berserker_01a",
       "name_tag": "tagGDX3NPC_AREAH_48",
       "classification": "Quest",
@@ -7119,24 +7148,25 @@
       "max_level": 250,
       "is_summon": false,
       "resistances": {
-        "physical": 18,
-        "pierce": 0,
-        "fire": 50,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 50,
-        "vitality": 0,
-        "bleeding": 0
+        "physical": 80,
+        "pierce": 80,
+        "fire": 80,
+        "cold": 80,
+        "lightning": 90,
+        "poison": 80,
+        "aether": 80,
+        "chaos": 80,
+        "vitality": 90,
+        "bleeding": 80
       },
       "passive_resistances": {
-        "physical": 18
+        "bleeding": 80
       },
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/boss&quest/human_kurn_berserker_01a.dbr"
-      ]
+      ],
+      "variant_index": 2
     },
     {
       "id": "enemies.boss-quest.human_kurngirl_keepinthefamily_01",
@@ -12853,6 +12883,68 @@
       ]
     },
     {
+      "id": "enemies.boss-quest.wight_cellarambush_h01",
+      "name_tag": "tagGDX3HeroWight_H01",
+      "classification": "Hero",
+      "role": "boss&quest",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 50,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 6,
+      "record_paths": [
+        "records/creatures/enemies/boss&quest/wight_cellarambush_h01.dbr",
+        "records/creatures/enemies/hero/wight_h01.dbr",
+        "records/creatures/enemies/hero/wightambusher_00_h01.dbr",
+        "records/creatures/enemies/hero/wightambusher_01_h01.dbr",
+        "records/creatures/enemies/hero/wightambusher_02_h01.dbr",
+        "records/creatures/enemies/waveevent/wight_h01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.boss-quest.wight_cellarambush_h02",
+      "name_tag": "tagGDX3HeroWight_H02",
+      "classification": "Hero",
+      "role": "boss&quest",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 0,
+        "pierce": 50,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 0,
+        "aether": 0,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 0
+      },
+      "variant_count": 6,
+      "record_paths": [
+        "records/creatures/enemies/boss&quest/wight_cellarambush_h02.dbr",
+        "records/creatures/enemies/hero/wight_h02.dbr",
+        "records/creatures/enemies/hero/wightambusher_00_h02.dbr",
+        "records/creatures/enemies/hero/wightambusher_01_h02.dbr",
+        "records/creatures/enemies/hero/wightambusher_02_h02.dbr",
+        "records/creatures/enemies/waveevent/wight_h02.dbr"
+      ]
+    },
+    {
       "id": "enemies.boss-quest.wight_iceboundpassage_01",
       "name_tag": "tagGDX3Miniboss_Wight01",
       "classification": "Quest",
@@ -13340,9 +13432,38 @@
         "physical": 18,
         "bleeding": 50
       },
-      "variant_count": 2,
+      "variant_count": 1,
       "record_paths": [
-        "records/creatures/enemies/boss&quest/wraith_chillingend_01.dbr",
+        "records/creatures/enemies/boss&quest/wraith_chillingend_01.dbr"
+      ]
+    },
+    {
+      "id": "enemies.boss-quest.wraith_frostveilaltar_01",
+      "name_tag": "tagGDX3NPC_AREAH_51",
+      "classification": "Quest",
+      "role": "boss&quest",
+      "race_tag": "tagRace001",
+      "min_level": 1,
+      "max_level": 250,
+      "is_summon": false,
+      "resistances": {
+        "physical": 43,
+        "pierce": 20,
+        "fire": 0,
+        "cold": 0,
+        "lightning": 0,
+        "poison": 25,
+        "aether": 25,
+        "chaos": 0,
+        "vitality": 50,
+        "bleeding": 50
+      },
+      "passive_resistances": {
+        "physical": 18,
+        "bleeding": 50
+      },
+      "variant_count": 1,
+      "record_paths": [
         "records/creatures/enemies/boss&quest/wraith_frostveilaltar_01.dbr"
       ]
     },
@@ -37030,9 +37151,10 @@
         "vitality": 25,
         "bleeding": 0
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "record_paths": [
-        "records/creatures/enemies/hero/rhino_h01.dbr"
+        "records/creatures/enemies/hero/rhino_h01.dbr",
+        "records/creatures/enemies/hero/rhinovoid_h01.dbr"
       ]
     },
     {
@@ -37056,9 +37178,10 @@
         "vitality": 25,
         "bleeding": 0
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "record_paths": [
-        "records/creatures/enemies/hero/rhino_h02.dbr"
+        "records/creatures/enemies/hero/rhino_h02.dbr",
+        "records/creatures/enemies/hero/rhinovoid_h02.dbr"
       ]
     },
     {
@@ -37085,9 +37208,10 @@
       "aura_resistances": {
         "fire": 10
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "record_paths": [
-        "records/creatures/enemies/hero/rhino_h03.dbr"
+        "records/creatures/enemies/hero/rhino_h03.dbr",
+        "records/creatures/enemies/hero/rhinovoid_h03.dbr"
       ]
     },
     {
@@ -37111,9 +37235,10 @@
         "vitality": 25,
         "bleeding": 0
       },
-      "variant_count": 1,
+      "variant_count": 2,
       "record_paths": [
-        "records/creatures/enemies/hero/rhino_h04.dbr"
+        "records/creatures/enemies/hero/rhino_h04.dbr",
+        "records/creatures/enemies/hero/rhinovoid_h04.dbr"
       ]
     },
     {
@@ -41193,66 +41318,6 @@
       "variant_count": 1,
       "record_paths": [
         "records/creatures/enemies/hero/waspgiant_h08.dbr"
-      ]
-    },
-    {
-      "id": "enemies.hero.wight_h01",
-      "name_tag": "tagGDX3HeroWight_H01",
-      "classification": "Hero",
-      "role": "hero",
-      "race_tag": "tagRace001",
-      "min_level": 1,
-      "max_level": 250,
-      "is_summon": false,
-      "resistances": {
-        "physical": 0,
-        "pierce": 50,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 50,
-        "bleeding": 0
-      },
-      "variant_count": 5,
-      "record_paths": [
-        "records/creatures/enemies/hero/wight_h01.dbr",
-        "records/creatures/enemies/hero/wightambusher_00_h01.dbr",
-        "records/creatures/enemies/hero/wightambusher_01_h01.dbr",
-        "records/creatures/enemies/hero/wightambusher_02_h01.dbr",
-        "records/creatures/enemies/waveevent/wight_h01.dbr"
-      ]
-    },
-    {
-      "id": "enemies.hero.wight_h02",
-      "name_tag": "tagGDX3HeroWight_H02",
-      "classification": "Hero",
-      "role": "hero",
-      "race_tag": "tagRace001",
-      "min_level": 1,
-      "max_level": 250,
-      "is_summon": false,
-      "resistances": {
-        "physical": 0,
-        "pierce": 50,
-        "fire": 0,
-        "cold": 0,
-        "lightning": 0,
-        "poison": 0,
-        "aether": 0,
-        "chaos": 0,
-        "vitality": 50,
-        "bleeding": 0
-      },
-      "variant_count": 5,
-      "record_paths": [
-        "records/creatures/enemies/hero/wight_h02.dbr",
-        "records/creatures/enemies/hero/wightambusher_00_h02.dbr",
-        "records/creatures/enemies/hero/wightambusher_01_h02.dbr",
-        "records/creatures/enemies/hero/wightambusher_02_h02.dbr",
-        "records/creatures/enemies/waveevent/wight_h02.dbr"
       ]
     },
     {

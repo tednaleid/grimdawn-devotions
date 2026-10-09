@@ -227,12 +227,13 @@ for (const locale of LOCALES) {
 
   // Floors, not targets, and deliberately close to the real counts: every shape assertion above
   // passes vacuously on a dataset rendered into nothing, and a loose floor is no floor at all.
-  // 4,358 modifier-block lines and 654 pet-panel lines ship today; conversion lines alone are 795
-  // of the former, so a floor with more slack than that would not notice every one of them
-  // disappearing. A dataset rebuild that legitimately adds or removes content moves these.
+  // 4,358 modifier-block lines and 639 pet-panel lines ship today (game 1.3.1.1's pet resist rework
+  // removed most pet resistances); conversion lines alone are 795 of the former, so a floor with more
+  // slack than that would not notice every one of them disappearing. A dataset rebuild that
+  // legitimately adds or removes content moves these.
   test(`${locale}: the sweep reads the whole dataset`, () => {
     expect(lines.filter((l) => l.source === "mod").length).toBeGreaterThanOrEqual(4300);
-    expect(lines.filter((l) => l.source === "pet").length).toBeGreaterThanOrEqual(640);
+    expect(lines.filter((l) => l.source === "pet").length).toBeGreaterThanOrEqual(630);
     expect(lines.filter((l) => l.source === "card").length).toBeGreaterThanOrEqual(1800);
   });
 }
@@ -290,15 +291,11 @@ test("Mark of Anathema's Callidor's Tempest block matches its grimtools card", (
   ]);
 });
 
-// C3. Stormrend's Werewolf block carries TWO complete refresh carriers, one targeting Primal
-// Strike and one Stun Jacks. It rendered one line, naming the wrong target.
-test("Stormrend's Werewolf block renders both refresh carriers, each with its own target", () => {
-  expect(linesFor("gearweapons/axe1h/d205_axe.dbr", "werewolf1.dbr")).toEqual([
-    "+10% Attack Speed",
-    "100% Physical converted to Lightning",
-    "100% Pierce converted to Lightning",
-    "+150% Bleeding Damage",
-    "+150% Electrocute Damage",
+// C3. Stormrend's Feral Claws block carries TWO complete refresh carriers, one targeting Primal
+// Strike and one Stun Jacks. It rendered one line, naming the wrong target. (Game 1.3.1.0 moved
+// both carriers off the Werewolf block onto Feral Claws.)
+test("Stormrend's Feral Claws block renders both refresh carriers, each with its own target", () => {
+  expect(linesFor("gearweapons/axe1h/d205_axe.dbr", "werewolf1_skill01_claws.dbr")).toEqual([
     "30% Chance on Critical Attack to reduce cooldown of Primal Strike by 2 Seconds",
     "30% Chance on Critical Attack to reduce cooldown of Stun Jacks by 2 Seconds",
   ]);

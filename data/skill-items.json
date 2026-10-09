@@ -1,8 +1,8 @@
 {
  "meta": {
-  "game_version": "1.3.0.7",
-  "steam_buildid": "24756825",
-  "generated_utc": "2026-08-18T23:50:27Z"
+  "game_version": "1.3.1.1",
+  "steam_buildid": "25813250",
+  "generated_utc": "2026-10-09T01:53:59Z"
  },
  "masteries": [
   {
@@ -60,6 +60,12 @@
    "max_level": 16,
    "ultimate_level": 26,
    "ranks": [
+    {
+     "stat": "offensivePhysicalMin",
+     "first": 22.0,
+     "max": 262.0,
+     "ultimate": 476.0
+    },
     {
      "stat": "offensiveSlowBleedingDurationMin",
      "first": 3.0,
@@ -172,9 +178,9 @@
     },
     {
      "stat": "offensivePhysicalMin",
-     "first": 15.0,
-     "max": 114.0,
-     "ultimate": 244.0
+     "first": 18.0,
+     "max": 162.0,
+     "ultimate": 332.0
     },
     {
      "stat": "offensiveSlowBleedingModifier",
@@ -393,6 +399,12 @@
      "ultimate": 8.0
     },
     {
+     "stat": "skillTargetNumber",
+     "first": 1.0,
+     "max": 1.0,
+     "ultimate": 1.0
+    },
+    {
      "stat": "weaponDamagePct",
      "first": 130.0,
      "max": 430.0,
@@ -514,33 +526,15 @@
    "ranks": [
     {
      "stat": "offensivePhysicalMax",
-     "first": 20.0,
-     "max": 130.0,
-     "ultimate": 265.0
+     "first": 22.0,
+     "max": 154.0,
+     "ultimate": 309.0
     },
     {
      "stat": "offensivePhysicalMin",
-     "first": 12.0,
-     "max": 91.0,
-     "ultimate": 192.0
-    },
-    {
-     "stat": "offensivePhysicalModifier",
-     "first": 10.0,
-     "max": 87.0,
-     "ultimate": 160.0
-    },
-    {
-     "stat": "offensivePierceModifier",
-     "first": 10.0,
-     "max": 87.0,
-     "ultimate": 160.0
-    },
-    {
-     "stat": "offensiveSlowBleedingModifier",
-     "first": 10.0,
-     "max": 87.0,
-     "ultimate": 160.0
+     "first": 15.0,
+     "max": 116.0,
+     "ultimate": 237.0
     },
     {
      "stat": "offensiveSlowPhysicalDurationMin",
@@ -555,10 +549,10 @@
      "ultimate": 115.0
     },
     {
-     "stat": "offensiveSlowPhysicalModifier",
-     "first": 10.0,
-     "max": 87.0,
-     "ultimate": 160.0
+     "stat": "offensiveTotalDamageModifier",
+     "first": 12.0,
+     "max": 100.0,
+     "ultimate": 185.0
     },
     {
      "stat": "skillActiveDuration",
@@ -666,9 +660,9 @@
    "ranks": [
     {
      "stat": "characterDefensiveAbility",
-     "first": 9.0,
-     "max": 86.0,
-     "ultimate": 156.0
+     "first": 11.0,
+     "max": 110.0,
+     "ultimate": 200.0
     },
     {
      "stat": "characterManaLimitReserve",
@@ -678,9 +672,9 @@
     },
     {
      "stat": "characterOffensiveAbility",
-     "first": 9.0,
-     "max": 86.0,
-     "ultimate": 156.0
+     "first": 11.0,
+     "max": 110.0,
+     "ultimate": 200.0
     },
     {
      "stat": "defensiveProtectionModifier",
@@ -711,6 +705,12 @@
    "ultimate_level": 22,
    "ranks": [
     {
+     "stat": "characterAttackSpeedMaxModifier",
+     "first": 3.0,
+     "max": 14.0,
+     "ultimate": 18.0
+    },
+    {
      "stat": "characterAttackSpeedModifier",
      "first": 3.0,
      "max": 14.0,
@@ -721,6 +721,12 @@
      "first": 22.0,
      "max": 50.0,
      "ultimate": 75.0
+    },
+    {
+     "stat": "characterSpellCastSpeedMaxModifier",
+     "first": 3.0,
+     "max": 14.0,
+     "ultimate": 18.0
     },
     {
      "stat": "characterSpellCastSpeedModifier",
@@ -810,9 +816,9 @@
     },
     {
      "stat": "damageAbsorption",
-     "first": 6.0,
-     "max": 90.0,
-     "ultimate": 150.0
+     "first": 10.0,
+     "max": 150.0,
+     "ultimate": 250.0
     },
     {
      "stat": "defensiveBlockAmountModifier",
@@ -840,9 +846,9 @@
     },
     {
      "stat": "skillCooldownTime",
-     "first": 24.0,
-     "max": 24.0,
-     "ultimate": 24.0
+     "first": 16.0,
+     "max": 16.0,
+     "ultimate": 16.0
     },
     {
      "stat": "skillManaCost",
@@ -879,16 +885,22 @@
      "ultimate": -10.0
     },
     {
+     "stat": "refreshDurationChance",
+     "first": 100.0,
+     "max": 100.0,
+     "ultimate": 100.0
+    },
+    {
+     "stat": "refreshDurationMax",
+     "first": 10.0,
+     "max": 10.0,
+     "ultimate": 10.0
+    },
+    {
      "stat": "retaliationDamageMultModifier",
      "first": -10.0,
      "max": -10.0,
      "ultimate": -10.0
-    },
-    {
-     "stat": "skillCooldownTime",
-     "first": -9.5,
-     "max": -9.5,
-     "ultimate": -9.5
     }
    ],
    "pets": []
@@ -948,9 +960,9 @@
     },
     {
      "stat": "characterLifeRegen",
-     "first": 6.0,
-     "max": 60.0,
-     "ultimate": 170.0
+     "first": 8.0,
+     "max": 80.0,
+     "ultimate": 250.0
     },
     {
      "stat": "characterLifeRegenModifier",
@@ -988,15 +1000,33 @@
     },
     {
      "stat": "offensivePhysicalModifier",
-     "first": 8.0,
-     "max": 64.0,
-     "ultimate": 164.0
+     "first": 10.0,
+     "max": 80.0,
+     "ultimate": 180.0
+    },
+    {
+     "stat": "offensivePierceModifier",
+     "first": 10.0,
+     "max": 80.0,
+     "ultimate": 180.0
+    },
+    {
+     "stat": "offensiveSlowPhysicalDurationMin",
+     "first": 5.0,
+     "max": 5.0,
+     "ultimate": 5.0
+    },
+    {
+     "stat": "offensiveSlowPhysicalMin",
+     "first": 6.0,
+     "max": 28.0,
+     "ultimate": 90.0
     },
     {
      "stat": "offensiveSlowPhysicalModifier",
-     "first": 8.0,
-     "max": 64.0,
-     "ultimate": 164.0
+     "first": 10.0,
+     "max": 80.0,
+     "ultimate": 180.0
     }
    ],
    "pets": []
@@ -1426,9 +1456,9 @@
     },
     {
      "stat": "offensiveTotalDamageReductionPercentDurationMin",
-     "first": 5.0,
-     "max": 5.0,
-     "ultimate": 5.0
+     "first": 12.0,
+     "max": 12.0,
+     "ultimate": 12.0
     },
     {
      "stat": "offensiveTotalDamageReductionPercentMin",
@@ -1490,9 +1520,9 @@
     },
     {
      "stat": "offensiveTotalResistanceReductionAbsoluteDurationMin",
-     "first": 5.0,
-     "max": 5.0,
-     "ultimate": 5.0
+     "first": 12.0,
+     "max": 12.0,
+     "ultimate": 12.0
     },
     {
      "stat": "offensiveTotalResistanceReductionAbsoluteMin",
@@ -1673,12 +1703,6 @@
    "ultimate_level": 26,
    "ranks": [
     {
-     "stat": "characterLifeRegen",
-     "first": 40.0,
-     "max": 369.0,
-     "ultimate": 705.0
-    },
-    {
      "stat": "lifeMonitorPercent",
      "first": 33.0,
      "max": 33.0,
@@ -1701,6 +1725,12 @@
      "first": 15.0,
      "max": 70.0,
      "ultimate": 100.0
+    },
+    {
+     "stat": "skillLifePercentBuffDuration",
+     "first": 5.0,
+     "max": 18.0,
+     "ultimate": 22.0
     }
    ],
    "pets": []
@@ -2245,6 +2275,12 @@
      "first": 1.0,
      "max": 3.0,
      "ultimate": 5.0
+    },
+    {
+     "stat": "skillTargetNumber",
+     "first": 1.0,
+     "max": 1.0,
+     "ultimate": 1.0
     },
     {
      "stat": "weaponDamagePct",
@@ -2968,18 +3004,18 @@
        "source": "records/skills/playerclass02/pets/mortartrap_firemortar1.dbr",
        "source_name_tag": "tagClass02SkillName05D",
        "stat": "offensiveFireMin",
-       "first": 34.0,
-       "max": 199.0,
-       "ultimate": 354.0
+       "first": 36.0,
+       "max": 231.0,
+       "ultimate": 406.0
       },
       {
        "source_kind": "pet_skill",
        "source": "records/skills/playerclass02/pets/mortartrap_firemortar1.dbr",
        "source_name_tag": "tagClass02SkillName05D",
        "stat": "offensivePhysicalMin",
-       "first": 52.0,
-       "max": 231.0,
-       "ultimate": 376.0
+       "first": 54.0,
+       "max": 263.0,
+       "ultimate": 428.0
       },
       {
        "source_kind": "pet_skill",
@@ -3210,15 +3246,15 @@
     },
     {
      "stat": "offensiveLightningMax",
-     "first": 46.0,
-     "max": 227.0,
-     "ultimate": 409.0
+     "first": 48.0,
+     "max": 251.0,
+     "ultimate": 453.0
     },
     {
      "stat": "offensiveLightningMin",
-     "first": 26.0,
-     "max": 119.0,
-     "ultimate": 224.0
+     "first": 28.0,
+     "max": 143.0,
+     "ultimate": 268.0
     },
     {
      "stat": "offensivePhysicalModifier",
@@ -3280,9 +3316,9 @@
     },
     {
      "stat": "offensiveSlowFireMin",
-     "first": 70.0,
-     "max": 312.0,
-     "ultimate": 592.0
+     "first": 74.0,
+     "max": 360.0,
+     "ultimate": 680.0
     },
     {
      "stat": "offensiveSlowTotalSpeedDurationMin",
@@ -3588,9 +3624,9 @@
     },
     {
      "stat": "offensiveSlowLightningMin",
-     "first": 16.0,
-     "max": 188.0,
-     "ultimate": 380.0
+     "first": 20.0,
+     "max": 236.0,
+     "ultimate": 468.0
     },
     {
      "stat": "offensiveSlowPhysicalDurationMin",
@@ -4399,6 +4435,12 @@
      "first": 10.0,
      "max": 100.0,
      "ultimate": 210.0
+    },
+    {
+     "stat": "refreshDurationChance",
+     "first": 3.0,
+     "max": 20.0,
+     "ultimate": 30.0
     },
     {
      "stat": "retaliationTotalDamageModifier",
@@ -5424,24 +5466,6 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
        "source_name_tag": null,
-       "stat": "defensiveAether",
-       "first": 15.0,
-       "max": 15.0,
-       "ultimate": 15.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
-       "source_name_tag": null,
-       "stat": "defensiveChaos",
-       "first": 30.0,
-       "max": 30.0,
-       "ultimate": 30.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
-       "source_name_tag": null,
        "stat": "defensiveFire",
        "first": 500.0,
        "max": 500.0,
@@ -5460,37 +5484,10 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
        "source_name_tag": null,
-       "stat": "defensiveLightning",
-       "first": 15.0,
-       "max": 15.0,
-       "ultimate": 15.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
-       "source_name_tag": null,
        "stat": "defensivePhysical",
        "first": 24.0,
        "max": 24.0,
        "ultimate": 24.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePierce",
-       "first": 22.0,
-       "max": 22.0,
-       "ultimate": 22.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_hellhound_a01.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePoison",
-       "first": 75.0,
-       "max": 75.0,
-       "ultimate": 75.0
       },
       {
        "source_kind": "pet",
@@ -5879,33 +5876,6 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass03/pets/pet_raven_a01.dbr",
        "source_name_tag": null,
-       "stat": "defensiveAether",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_raven_a01.dbr",
-       "source_name_tag": null,
-       "stat": "defensiveChaos",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_raven_a01.dbr",
-       "source_name_tag": null,
-       "stat": "defensiveCold",
-       "first": 15.0,
-       "max": 15.0,
-       "ultimate": 15.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass03/pets/pet_raven_a01.dbr",
-       "source_name_tag": null,
        "stat": "defensiveKnockdown",
        "first": 500.0,
        "max": 500.0,
@@ -6085,12 +6055,6 @@
    "max_level": 12,
    "ultimate_level": 22,
    "ranks": [
-    {
-     "stat": "defensiveElementalResistance",
-     "first": 3.0,
-     "max": 30.0,
-     "ultimate": 40.0
-    },
     {
      "stat": "offensiveElementalMin",
      "first": 3.0,
@@ -6838,6 +6802,12 @@
      "first": 10.0,
      "max": 100.0,
      "ultimate": 210.0
+    },
+    {
+     "stat": "refreshDurationChance",
+     "first": 3.0,
+     "max": 20.0,
+     "ultimate": 30.0
     },
     {
      "stat": "skillManaCost",
@@ -8954,21 +8924,21 @@
    "ranks": [
     {
      "stat": "offensiveAetherMin",
-     "first": 60.0,
-     "max": 300.0,
-     "ultimate": 494.0
+     "first": 36.0,
+     "max": 180.0,
+     "ultimate": 296.0
     },
     {
      "stat": "offensiveFireMax",
-     "first": 76.0,
-     "max": 332.0,
-     "ultimate": 544.0
+     "first": 46.0,
+     "max": 199.0,
+     "ultimate": 326.0
     },
     {
      "stat": "offensiveFireMin",
-     "first": 56.0,
-     "max": 236.0,
-     "ultimate": 390.0
+     "first": 34.0,
+     "max": 142.0,
+     "ultimate": 234.0
     },
     {
      "stat": "projectileExplosionRadius",
@@ -8978,9 +8948,9 @@
     },
     {
      "stat": "projectileLaunchNumber",
-     "first": 1.0,
-     "max": 1.0,
-     "ultimate": 1.0
+     "first": 2.0,
+     "max": 2.0,
+     "ultimate": 2.0
     },
     {
      "stat": "skillActiveDuration",
@@ -8990,15 +8960,15 @@
     },
     {
      "stat": "skillCooldownTime",
-     "first": 14.0,
-     "max": 14.0,
-     "ultimate": 14.0
+     "first": 8.0,
+     "max": 8.0,
+     "ultimate": 8.0
     },
     {
      "stat": "skillManaCost",
-     "first": 260.0,
-     "max": 610.0,
-     "ultimate": 845.0
+     "first": 200.0,
+     "max": 380.0,
+     "ultimate": 500.0
     },
     {
      "stat": "skillTargetInterval",
@@ -9608,32 +9578,32 @@
    "ranks": [
     {
      "stat": "offensiveAetherMax",
-     "first": 8.0,
-     "max": 86.0,
-     "ultimate": 170.0
+     "first": 14.0,
+     "max": 137.0,
+     "ultimate": 251.0
     },
     {
      "stat": "offensiveAetherMin",
-     "first": 6.0,
-     "max": 60.0,
-     "ultimate": 124.0
+     "first": 12.0,
+     "max": 111.0,
+     "ultimate": 205.0
     },
     {
      "stat": "offensiveFireMax",
-     "first": 10.0,
-     "max": 130.0,
-     "ultimate": 250.0
+     "first": 18.0,
+     "max": 153.0,
+     "ultimate": 283.0
     },
     {
      "stat": "offensiveFireMin",
-     "first": 8.0,
-     "max": 76.0,
-     "ultimate": 158.0
+     "first": 16.0,
+     "max": 114.0,
+     "ultimate": 216.0
     },
     {
      "stat": "skillManaCost",
-     "first": 16.0,
-     "max": 82.0,
+     "first": 15.0,
+     "max": 72.0,
      "ultimate": 132.0
     },
     {
@@ -9646,7 +9616,7 @@
      "stat": "weaponDamagePct",
      "first": 12.0,
      "max": 115.0,
-     "ultimate": 145.0
+     "ultimate": 165.0
     }
    ],
    "pets": []
@@ -9666,9 +9636,9 @@
    "ranks": [
     {
      "stat": "offensiveDamageMultModifier",
-     "first": 180.0,
-     "max": 180.0,
-     "ultimate": 180.0
+     "first": 135.0,
+     "max": 135.0,
+     "ultimate": 135.0
     },
     {
      "stat": "offensiveKnockdownMin",
@@ -9696,9 +9666,9 @@
     },
     {
      "stat": "weaponDamagePct",
-     "first": 40.0,
-     "max": 40.0,
-     "ultimate": 40.0
+     "first": 55.0,
+     "max": 55.0,
+     "ultimate": 55.0
     }
    ],
    "pets": []
@@ -9730,9 +9700,9 @@
     },
     {
      "stat": "offensiveLightningMin",
-     "first": 8.0,
-     "max": 85.0,
-     "ultimate": 184.0
+     "first": 10.0,
+     "max": 109.0,
+     "ultimate": 228.0
     },
     {
      "stat": "offensiveSlowFireDurationMin",
@@ -9742,9 +9712,9 @@
     },
     {
      "stat": "offensiveSlowFireMin",
-     "first": 32.0,
-     "max": 179.0,
-     "ultimate": 340.0
+     "first": 36.0,
+     "max": 227.0,
+     "ultimate": 428.0
     },
     {
      "stat": "skillManaCost",
@@ -10095,8 +10065,8 @@
     {
      "stat": "offensivePhysicalMin",
      "first": 4.0,
-     "max": 71.0,
-     "ultimate": 167.0
+     "max": 92.0,
+     "ultimate": 218.0
     },
     {
      "stat": "offensiveSlowBleedingDurationMin",
@@ -10106,9 +10076,9 @@
     },
     {
      "stat": "offensiveSlowBleedingMin",
-     "first": 4.0,
-     "max": 71.0,
-     "ultimate": 167.0
+     "first": 6.0,
+     "max": 142.0,
+     "ultimate": 336.0
     },
     {
      "stat": "offensiveSlowRunSpeedDurationMin",
@@ -10163,10 +10133,10 @@
    "ultimate_level": 22,
    "ranks": [
     {
-     "stat": "offensivePhysicalModifier",
-     "first": 10.0,
-     "max": 100.0,
-     "ultimate": 200.0
+     "stat": "offensivePhysicalMin",
+     "first": 5.0,
+     "max": 38.0,
+     "ultimate": 108.0
     },
     {
      "stat": "offensiveSlowAttackSpeedDurationMin",
@@ -10194,9 +10164,9 @@
     },
     {
      "stat": "offensiveSlowLifeMin",
-     "first": 10.0,
-     "max": 87.0,
-     "ultimate": 186.0
+     "first": 14.0,
+     "max": 146.0,
+     "ultimate": 295.0
     },
     {
      "stat": "offensiveTrapChance",
@@ -10435,6 +10405,12 @@
      "ultimate": 20.0
     },
     {
+     "stat": "defensiveBleeding",
+     "first": 3.0,
+     "max": 32.0,
+     "ultimate": 42.0
+    },
+    {
      "stat": "offensivePhysicalModifier",
      "first": 25.0,
      "max": 135.0,
@@ -10545,6 +10521,12 @@
      "first": 1.0,
      "max": 7.0,
      "ultimate": 10.0
+    },
+    {
+     "stat": "skillTargetNumber",
+     "first": 1.0,
+     "max": 1.0,
+     "ultimate": 1.0
     },
     {
      "stat": "weaponDamagePct",
@@ -12367,15 +12349,6 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass06/pets/thornedhorror_01.dbr",
        "source_name_tag": null,
-       "stat": "defensiveLife",
-       "first": 30.0,
-       "max": 30.0,
-       "ultimate": 30.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass06/pets/thornedhorror_01.dbr",
-       "source_name_tag": null,
        "stat": "defensivePetrify",
        "first": 25.0,
        "max": 25.0,
@@ -12389,15 +12362,6 @@
        "first": 24.0,
        "max": 24.0,
        "ultimate": 24.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass06/pets/thornedhorror_01.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePierce",
-       "first": 30.0,
-       "max": 30.0,
-       "ultimate": 30.0
       },
       {
        "source_kind": "pet",
@@ -12670,12 +12634,6 @@
      "ultimate": 186.0
     },
     {
-     "stat": "defensiveBleeding",
-     "first": 3.0,
-     "max": 32.0,
-     "ultimate": 42.0
-    },
-    {
      "stat": "defensivePhysical",
      "first": 1.0,
      "max": 8.0,
@@ -12783,36 +12741,36 @@
        "source": "records/skills/playerclass06/pets/manticore_01.dbr",
        "source_name_tag": null,
        "stat": "defensiveAether",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
       },
       {
        "source_kind": "pet",
        "source": "records/skills/playerclass06/pets/manticore_01.dbr",
        "source_name_tag": null,
        "stat": "defensiveChaos",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
       },
       {
        "source_kind": "pet",
        "source": "records/skills/playerclass06/pets/manticore_01.dbr",
        "source_name_tag": null,
        "stat": "defensiveCold",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
       },
       {
        "source_kind": "pet",
        "source": "records/skills/playerclass06/pets/manticore_01.dbr",
        "source_name_tag": null,
        "stat": "defensiveFire",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
       },
       {
        "source_kind": "pet",
@@ -12836,10 +12794,19 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass06/pets/manticore_01.dbr",
        "source_name_tag": null,
+       "stat": "defensiveLife",
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
+      },
+      {
+       "source_kind": "pet",
+       "source": "records/skills/playerclass06/pets/manticore_01.dbr",
+       "source_name_tag": null,
        "stat": "defensiveLightning",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
       },
       {
        "source_kind": "pet",
@@ -12864,9 +12831,18 @@
        "source": "records/skills/playerclass06/pets/manticore_01.dbr",
        "source_name_tag": null,
        "stat": "defensivePierce",
-       "first": 25.0,
-       "max": 25.0,
-       "ultimate": 25.0
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
+      },
+      {
+       "source_kind": "pet",
+       "source": "records/skills/playerclass06/pets/manticore_01.dbr",
+       "source_name_tag": null,
+       "stat": "defensivePoison",
+       "first": 5.0,
+       "max": 5.0,
+       "ultimate": 5.0
       },
       {
        "source_kind": "pet",
@@ -13662,8 +13638,8 @@
     {
      "stat": "offensiveLifeLeechMin",
      "first": 10.0,
-     "max": 33.0,
-     "ultimate": 40.0
+     "max": 25.0,
+     "ultimate": 30.0
     },
     {
      "stat": "offensiveSlowBleedingDurationMin",
@@ -13673,9 +13649,9 @@
     },
     {
      "stat": "offensiveSlowBleedingMin",
-     "first": 21.0,
-     "max": 102.0,
-     "ultimate": 230.0
+     "first": 25.0,
+     "max": 142.0,
+     "ultimate": 310.0
     },
     {
      "stat": "projectilePiercingChance",
@@ -13703,9 +13679,9 @@
     },
     {
      "stat": "weaponDamagePct",
-     "first": 130.0,
-     "max": 180.0,
-     "ultimate": 230.0
+     "first": 145.0,
+     "max": 220.0,
+     "ultimate": 290.0
     }
    ],
    "pets": []
@@ -13725,9 +13701,15 @@
    "ranks": [
     {
      "stat": "offensiveLightningMin",
-     "first": 25.0,
-     "max": 106.0,
-     "ultimate": 224.0
+     "first": 30.0,
+     "max": 120.0,
+     "ultimate": 265.0
+    },
+    {
+     "stat": "offensivePhysicalMin",
+     "first": 30.0,
+     "max": 120.0,
+     "ultimate": 265.0
     },
     {
      "stat": "offensiveSlowBleedingDurationMin",
@@ -13755,9 +13737,9 @@
     },
     {
      "stat": "weaponDamagePct",
-     "first": 80.0,
-     "max": 140.0,
-     "ultimate": 170.0
+     "first": 120.0,
+     "max": 200.0,
+     "ultimate": 250.0
     }
    ],
    "pets": []
@@ -14134,18 +14116,36 @@
        "source": "records/skills/playerclass07/pets/petskill_arcaneseal_defenseaura.dbr",
        "source_name_tag": "tagGDX1Class07SkillName06A_PetSkill01",
        "stat": "damageAbsorption",
-       "first": 34.0,
-       "max": 190.0,
-       "ultimate": 430.0
+       "first": 32.0,
+       "max": 210.0,
+       "ultimate": 470.0
       },
       {
        "source_kind": "pet_skill",
        "source": "records/skills/playerclass07/pets/petskill_arcaneseal_defenseaura.dbr",
        "source_name_tag": "tagGDX1Class07SkillName06A_PetSkill01",
-       "stat": "defensiveElementalResistance",
-       "first": 5.0,
-       "max": 30.0,
-       "ultimate": 40.0
+       "stat": "defensiveColdMaxResist",
+       "first": 1.0,
+       "max": 3.0,
+       "ultimate": 5.0
+      },
+      {
+       "source_kind": "pet_skill",
+       "source": "records/skills/playerclass07/pets/petskill_arcaneseal_defenseaura.dbr",
+       "source_name_tag": "tagGDX1Class07SkillName06A_PetSkill01",
+       "stat": "defensiveFireMaxResist",
+       "first": 1.0,
+       "max": 3.0,
+       "ultimate": 5.0
+      },
+      {
+       "source_kind": "pet_skill",
+       "source": "records/skills/playerclass07/pets/petskill_arcaneseal_defenseaura.dbr",
+       "source_name_tag": "tagGDX1Class07SkillName06A_PetSkill01",
+       "stat": "defensiveLightningMaxResist",
+       "first": 1.0,
+       "max": 3.0,
+       "ultimate": 5.0
       },
       {
        "source_kind": "pet_skill",
@@ -14240,8 +14240,8 @@
     {
      "stat": "offensiveCritDamageModifier",
      "first": 2.0,
-     "max": 15.0,
-     "ultimate": 25.0
+     "max": 20.0,
+     "ultimate": 30.0
     },
     {
      "stat": "offensiveElementalMin",
@@ -14291,9 +14291,9 @@
     },
     {
      "stat": "defensiveElementalResistance",
-     "first": -3.0,
-     "max": -25.0,
-     "ultimate": -35.0
+     "first": -5.0,
+     "max": -30.0,
+     "ultimate": -40.0
     },
     {
      "stat": "offensiveDisruptionChance",
@@ -14321,9 +14321,9 @@
     },
     {
      "stat": "offensiveSlowFireMin",
-     "first": 8.0,
-     "max": 46.0,
-     "ultimate": 120.0
+     "first": 12.0,
+     "max": 94.0,
+     "ultimate": 224.0
     },
     {
      "stat": "offensiveTotalDamageReductionPercentDurationMin",
@@ -14334,8 +14334,8 @@
     {
      "stat": "offensiveTotalDamageReductionPercentMin",
      "first": 4.0,
-     "max": 15.0,
-     "ultimate": 22.0
+     "max": 20.0,
+     "ultimate": 28.0
     },
     {
      "stat": "skillTargetRadius",
@@ -14962,9 +14962,9 @@
    "ranks": [
     {
      "stat": "characterDefensiveAbility",
-     "first": 15.0,
-     "max": 115.0,
-     "ultimate": 263.0
+     "first": 16.0,
+     "max": 170.0,
+     "ultimate": 310.0
     },
     {
      "stat": "characterRunSpeedModifier",
@@ -15157,6 +15157,12 @@
      "first": 3.0,
      "max": 12.0,
      "ultimate": 24.0
+    },
+    {
+     "stat": "refreshDurationChance",
+     "first": 3.0,
+     "max": 15.0,
+     "ultimate": 25.0
     },
     {
      "stat": "skillManaCost",
@@ -15951,6 +15957,12 @@
    "max_level": 10,
    "ultimate_level": 20,
    "ranks": [
+    {
+     "stat": "cooldownCharges",
+     "first": 1.0,
+     "max": 1.0,
+     "ultimate": 2.0
+    },
     {
      "stat": "cooldownTime",
      "first": -0.1,
@@ -18373,15 +18385,6 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass08/pets/blightbeast_01.dbr",
        "source_name_tag": null,
-       "stat": "defensiveLife",
-       "first": 50.0,
-       "max": 50.0,
-       "ultimate": 50.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/blightbeast_01.dbr",
-       "source_name_tag": null,
        "stat": "defensivePetrify",
        "first": 25.0,
        "max": 25.0,
@@ -18395,24 +18398,6 @@
        "first": 26.0,
        "max": 26.0,
        "ultimate": 26.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/blightbeast_01.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePierce",
-       "first": 30.0,
-       "max": 30.0,
-       "ultimate": 30.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/blightbeast_01.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePoison",
-       "first": 50.0,
-       "max": 50.0,
-       "ultimate": 50.0
       },
       {
        "source_kind": "pet",
@@ -18702,15 +18687,6 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass08/pets/blightbeast_01b.dbr",
        "source_name_tag": null,
-       "stat": "defensiveLife",
-       "first": 50.0,
-       "max": 50.0,
-       "ultimate": 50.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/blightbeast_01b.dbr",
-       "source_name_tag": null,
        "stat": "defensivePetrify",
        "first": 25.0,
        "max": 25.0,
@@ -18724,24 +18700,6 @@
        "first": 26.0,
        "max": 26.0,
        "ultimate": 26.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/blightbeast_01b.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePierce",
-       "first": 30.0,
-       "max": 30.0,
-       "ultimate": 30.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/blightbeast_01b.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePoison",
-       "first": 50.0,
-       "max": 50.0,
-       "ultimate": 50.0
       },
       {
        "source_kind": "pet",
@@ -19189,15 +19147,6 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass08/pets/skeleton_01.dbr",
        "source_name_tag": null,
-       "stat": "defensiveCold",
-       "first": 50.0,
-       "max": 50.0,
-       "ultimate": 50.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/skeleton_01.dbr",
-       "source_name_tag": null,
        "stat": "defensiveFreeze",
        "first": 50.0,
        "max": 50.0,
@@ -19216,28 +19165,10 @@
        "source_kind": "pet",
        "source": "records/skills/playerclass08/pets/skeleton_01.dbr",
        "source_name_tag": null,
-       "stat": "defensiveLife",
-       "first": 50.0,
-       "max": 50.0,
-       "ultimate": 50.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/skeleton_01.dbr",
-       "source_name_tag": null,
        "stat": "defensivePhysical",
        "first": 24.0,
        "max": 24.0,
        "ultimate": 24.0
-      },
-      {
-       "source_kind": "pet",
-       "source": "records/skills/playerclass08/pets/skeleton_01.dbr",
-       "source_name_tag": null,
-       "stat": "defensivePierce",
-       "first": 15.0,
-       "max": 15.0,
-       "ultimate": 15.0
       },
       {
        "source_kind": "pet_skill",
@@ -19426,16 +19357,10 @@
    "ultimate_level": 22,
    "ranks": [
     {
-     "stat": "defensiveLife",
-     "first": 10.0,
-     "max": 50.0,
-     "ultimate": 80.0
-    },
-    {
      "stat": "defensiveProtectionModifier",
      "first": 10.0,
-     "max": 98.0,
-     "ultimate": 198.0
+     "max": 60.0,
+     "ultimate": 100.0
     },
     {
      "stat": "offensiveElementalModifier",
@@ -20061,9 +19986,9 @@
     },
     {
      "stat": "skillTargetRadius",
-     "first": 3.0,
-     "max": 3.0,
-     "ultimate": 3.0
+     "first": 3.8,
+     "max": 3.8,
+     "ultimate": 3.8
     },
     {
      "stat": "weaponDamagePct",
@@ -20708,6 +20633,12 @@
      "first": 1.0,
      "max": 7.0,
      "ultimate": 10.0
+    },
+    {
+     "stat": "skillTargetNumber",
+     "first": 1.0,
+     "max": 1.0,
+     "ultimate": 1.0
     },
     {
      "stat": "weaponDamagePct",
@@ -21901,9 +21832,9 @@
    "ranks": [
     {
      "stat": "offensivePhysicalMin",
-     "first": 17.0,
-     "max": 80.0,
-     "ultimate": 183.0
+     "first": 30.0,
+     "max": 193.0,
+     "ultimate": 406.0
     },
     {
      "stat": "offensivePhysicalResistanceReductionAbsoluteMin",
@@ -21919,9 +21850,9 @@
     },
     {
      "stat": "offensiveSlowPhysicalMin",
-     "first": 25.0,
-     "max": 110.0,
-     "ultimate": 245.0
+     "first": 27.0,
+     "max": 130.0,
+     "ultimate": 285.0
     },
     {
      "stat": "skillChanceWeight",
@@ -21937,9 +21868,9 @@
     },
     {
      "stat": "weaponDamagePct",
-     "first": 80.0,
-     "max": 140.0,
-     "ultimate": 160.0
+     "first": 120.0,
+     "max": 210.0,
+     "ultimate": 270.0
     }
    ],
    "pets": []
@@ -22368,8 +22299,8 @@
     {
      "stat": "weaponDamagePct",
      "first": 130.0,
-     "max": 265.0,
-     "ultimate": 345.0
+     "max": 310.0,
+     "ultimate": 410.0
     }
    ],
    "pets": []
@@ -22448,8 +22379,8 @@
     {
      "stat": "skillComboChargeLevel",
      "first": 3.0,
-     "max": 5.0,
-     "ultimate": 6.0
+     "max": 3.0,
+     "ultimate": 5.0
     },
     {
      "stat": "skillManaCost",
@@ -22458,10 +22389,16 @@
      "ultimate": 10.0
     },
     {
+     "stat": "skillTargetNumber",
+     "first": 1.0,
+     "max": 1.0,
+     "ultimate": 1.0
+    },
+    {
      "stat": "weaponDamagePct",
      "first": 100.0,
-     "max": 170.0,
-     "ultimate": 210.0
+     "max": 162.0,
+     "ultimate": 182.0
     }
    ],
    "pets": []
@@ -22574,8 +22511,8 @@
     {
      "stat": "skillComboChargeLevel",
      "first": 1.0,
-     "max": 4.0,
-     "ultimate": 8.0
+     "max": 3.0,
+     "ultimate": 5.0
     },
     {
      "stat": "skillManaCost",
@@ -22744,10 +22681,10 @@
      "ultimate": 33.0
     },
     {
-     "stat": "offensiveDamageMultModifier",
-     "first": 3.0,
-     "max": 10.0,
-     "ultimate": 15.0
+     "stat": "offensiveTotalDamageModifier",
+     "first": 25.0,
+     "max": 135.0,
+     "ultimate": 210.0
     },
     {
      "stat": "refreshDurationChance",
@@ -22878,6 +22815,12 @@
     {
      "stat": "offensiveCritDamageModifier",
      "first": 2.0,
+     "max": 20.0,
+     "ultimate": 30.0
+    },
+    {
+     "stat": "refreshDurationChance",
+     "first": 3.0,
      "max": 20.0,
      "ultimate": 30.0
     },
@@ -23077,9 +23020,9 @@
    "ranks": [
     {
      "stat": "offensiveColdMin",
-     "first": 10.0,
-     "max": 120.0,
-     "ultimate": 304.0
+     "first": 12.0,
+     "max": 144.0,
+     "ultimate": 348.0
     },
     {
      "stat": "offensiveSlowColdDurationMin",
@@ -23104,6 +23047,12 @@
      "first": 20.0,
      "max": 50.0,
      "ultimate": 60.0
+    },
+    {
+     "stat": "refreshCooldownChance",
+     "first": 4.0,
+     "max": 10.0,
+     "ultimate": 15.0
     },
     {
      "stat": "skillManaCost",
@@ -23146,6 +23095,12 @@
      "ultimate": 220.0
     },
     {
+     "stat": "offensiveCritDamageModifier",
+     "first": 2.0,
+     "max": 20.0,
+     "ultimate": 30.0
+    },
+    {
      "stat": "offensivePierceModifier",
      "first": 10.0,
      "max": 120.0,
@@ -23162,12 +23117,6 @@
      "first": 10.0,
      "max": 120.0,
      "ultimate": 220.0
-    },
-    {
-     "stat": "refreshCooldownChance",
-     "first": 4.0,
-     "max": 10.0,
-     "ultimate": 15.0
     }
    ],
    "pets": []
@@ -23234,8 +23183,8 @@
     {
      "stat": "weaponDamagePct",
      "first": 70.0,
-     "max": 150.0,
-     "ultimate": 192.0
+     "max": 162.0,
+     "ultimate": 214.0
     }
    ],
    "pets": []
@@ -23310,8 +23259,8 @@
     {
      "stat": "weaponDamagePct",
      "first": 100.0,
-     "max": 295.0,
-     "ultimate": 385.0
+     "max": 315.0,
+     "ultimate": 415.0
     }
    ],
    "pets": []
@@ -23613,15 +23562,181 @@
     },
     {
      "stat": "weaponDamagePct",
-     "first": 70.0,
-     "max": 120.0,
-     "ultimate": 135.0
+     "first": 80.0,
+     "max": 140.0,
+     "ultimate": 170.0
     }
    ],
    "pets": []
   }
  ],
  "sets": [
+  {
+   "record": "records/items/awakened/lootsets/itemset_c004c.dbr",
+   "name_tag": "tagGDX3ItemAwakenedSetC004CName",
+   "members": 5,
+   "modifiers": [
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass04/phantomblade.dbr",
+     "stats": [
+      {
+       "stat": "offensivePierceMin",
+       "value": 80.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 3.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 280.0
+      }
+     ]
+    },
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
+     "stats": [
+      {
+       "stat": "defensivePierce",
+       "value": -15.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 1.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 400.0
+      }
+     ]
+    },
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass10/werewolf1_skill01_claws.dbr",
+     "stats": [
+      {
+       "stat": "offensivePierceMin",
+       "value": 60.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 2.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 220.0
+      },
+      {
+       "stat": "refreshCooldownAmount",
+       "value": 1.0,
+       "refresh_skill": "records/skills/playerclass04/phantomblade.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "refreshCooldownChance",
+       "value": 15.0,
+       "refresh_skill": "records/skills/playerclass04/phantomblade.dbr",
+       "refresh_trigger": "AttackEnemy"
+      }
+     ]
+    }
+   ],
+   "boosts": [],
+   "mastery_boosts": [
+    {
+     "pieces": 5,
+     "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
+     "level": 1
+    },
+    {
+     "pieces": 5,
+     "mastery": "records/skills/playerclass06/_classtraining_class06.dbr",
+     "level": 1
+    },
+    {
+     "pieces": 5,
+     "mastery": "records/skills/playerclass10/_classtraining_class10.dbr",
+     "level": 1
+    }
+   ]
+  },
+  {
+   "record": "records/items/awakened/lootsets/itemset_c011b.dbr",
+   "name_tag": "tagGDX3ItemAwakenedSetC011BName",
+   "members": 5,
+   "modifiers": [
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveDamageMultModifier",
+       "value": 35.0
+      }
+     ]
+    },
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass03/summon_raven1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveDamageMultModifier",
+       "value": 35.0
+      }
+     ]
+    },
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass08/illomen1.dbr",
+     "stats": [
+      {
+       "stat": "defensiveChaos",
+       "value": -18.0
+      }
+     ]
+    },
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass08/summon_skeleton1.dbr",
+     "stats": [
+      {
+       "stat": "skillCooldownTime",
+       "value": -8.0
+      },
+      {
+       "stat": "skillManaCostReduction",
+       "value": 30.0
+      }
+     ]
+    }
+   ],
+   "boosts": [
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
+     "level": 3
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass03/summon_raven1.dbr",
+     "level": 3
+    },
+    {
+     "pieces": 5,
+     "skill": "records/skills/playerclass08/summon_skeleton1.dbr",
+     "level": 4
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "pieces": 5,
+     "mastery": "records/skills/playerclass03/_classtraining_class03.dbr",
+     "level": 2
+    }
+   ]
+  },
   {
    "record": "records/items/awakened/lootsets/itemset_c021b.dbr",
    "name_tag": "tagGDX3ItemAwakenedSetC021BName",
@@ -23774,12 +23889,16 @@
        "value": 12.0
       },
       {
+       "stat": "offensiveLifeMin",
+       "value": 55.0
+      },
+      {
        "stat": "skillComboChargeDuration",
        "value": 5.0
       },
       {
        "stat": "skillComboChargeLevel",
-       "value": 5.0
+       "value": 6.0
       }
      ]
     }
@@ -24057,7 +24176,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 10.0
+       "value": 20.0
       }
      ]
     }
@@ -24100,30 +24219,6 @@
     {
      "pieces": 3,
      "mastery": "records/skills/playerclass05/_classtraining_class05.dbr",
-     "level": 1
-    }
-   ]
-  },
-  {
-   "record": "records/items/lootsets/itemset_c004c.dbr",
-   "name_tag": "tagItemSetC004NameC",
-   "members": 5,
-   "modifiers": [],
-   "boosts": [],
-   "mastery_boosts": [
-    {
-     "pieces": 5,
-     "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-     "level": 1
-    },
-    {
-     "pieces": 5,
-     "mastery": "records/skills/playerclass06/_classtraining_class06.dbr",
-     "level": 1
-    },
-    {
-     "pieces": 5,
-     "mastery": "records/skills/playerclass10/_classtraining_class10.dbr",
      "level": 1
     }
    ]
@@ -24225,31 +24320,6 @@
      "pieces": 4,
      "mastery": "records/skills/playerclass07/_classtraining_class07.dbr",
      "level": 1
-    }
-   ]
-  },
-  {
-   "record": "records/items/lootsets/itemset_c011b.dbr",
-   "name_tag": "tagItemSetC011BName",
-   "members": 5,
-   "modifiers": [],
-   "boosts": [
-    {
-     "pieces": 4,
-     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
-     "level": 3
-    },
-    {
-     "pieces": 4,
-     "skill": "records/skills/playerclass03/summon_raven1.dbr",
-     "level": 3
-    }
-   ],
-   "mastery_boosts": [
-    {
-     "pieces": 5,
-     "mastery": "records/skills/playerclass03/_classtraining_class03.dbr",
-     "level": 2
     }
    ]
   },
@@ -25172,13 +25242,13 @@
        "stat": "refreshCooldownAmount",
        "value": 4.5,
        "refresh_skill": "records/skills/playerclass08/reapspirit1.dbr",
-       "refresh_trigger": "OnKill"
+       "refresh_trigger": "AttackEnemyCrit"
       },
       {
        "stat": "refreshCooldownChance",
-       "value": 50.0,
+       "value": 20.0,
        "refresh_skill": "records/skills/playerclass08/reapspirit1.dbr",
-       "refresh_trigger": "OnKill"
+       "refresh_trigger": "AttackEnemyCrit"
       },
       {
        "stat": "skillCooldownReduction",
@@ -25210,13 +25280,13 @@
        "stat": "refreshCooldownAmount",
        "value": 3.5,
        "refresh_skill": "records/skills/playerclass03/doombolt1.dbr",
-       "refresh_trigger": "OnKill"
+       "refresh_trigger": "AttackEnemyCrit"
       },
       {
        "stat": "refreshCooldownChance",
-       "value": 50.0,
+       "value": 35.0,
        "refresh_skill": "records/skills/playerclass03/doombolt1.dbr",
-       "refresh_trigger": "OnKill"
+       "refresh_trigger": "AttackEnemyCrit"
       },
       {
        "stat": "skillCooldownReduction",
@@ -25481,7 +25551,7 @@
       },
       {
        "stat": "refreshCooldownAmount",
-       "value": 1.0,
+       "value": 1.5,
        "refresh_skill": "records/skills/playerclass06/savagestrike1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
       },
@@ -25541,6 +25611,10 @@
        "to_tag": "tagCharStatsCold"
       },
       {
+       "stat": "cooldownCharges",
+       "value": 1.0
+      },
+      {
        "stat": "offensiveColdMin",
        "value": 240.0
       }
@@ -25550,6 +25624,18 @@
      "pieces": 4,
      "skill": "records/skills/playerclass05/skyshard1.dbr",
      "stats": [
+      {
+       "stat": "refreshCooldownAmount",
+       "value": 1.0,
+       "refresh_skill": "records/skills/playerclass03/sigilofdestruction1.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "refreshCooldownChance",
+       "value": 10.0,
+       "refresh_skill": "records/skills/playerclass03/sigilofdestruction1.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
       {
        "stat": "skillCooldownTime",
        "value": -0.5
@@ -25602,6 +25688,20 @@
       {
        "stat": "offensivePierceMin",
        "value": 220.0
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "stats": [
+      {
+       "stat": "characterAttackSpeedMaxModifier",
+       "value": 20.0
+      },
+      {
+       "stat": "characterAttackSpeedModifier",
+       "value": 20.0
       }
      ]
     },
@@ -25851,7 +25951,7 @@
       },
       {
        "stat": "refreshCooldownAmount",
-       "value": 0.5,
+       "value": 1.0,
        "refresh_skill": "records/skills/playerclass09/judgment1.dbr",
        "refresh_trigger": "AttackEnemy"
       },
@@ -26514,7 +26614,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 100.0
+       "value": 60.0
       }
      ]
     },
@@ -26533,10 +26633,6 @@
       {
        "stat": "skillActiveDuration",
        "value": 1.0
-      },
-      {
-       "stat": "skillCooldownTime",
-       "value": -8.0
       },
       {
        "stat": "skillTargetRadius",
@@ -26843,12 +26939,6 @@
        "value": 30.0,
        "refresh_skill": "records/skills/playerclass07/passive02.dbr",
        "refresh_trigger": "AttackEnemyCrit"
-      },
-      {
-       "stat": "refreshDurationMax",
-       "value": 9.0,
-       "refresh_skill": "records/skills/playerclass07/passive02.dbr",
-       "refresh_trigger": "AttackEnemyCrit"
       }
      ]
     },
@@ -26929,12 +27019,6 @@
       {
        "stat": "refreshDurationChance",
        "value": 10.0,
-       "refresh_skill": "records/skills/playerclass07/passive02.dbr",
-       "refresh_trigger": "AttackEnemy"
-      },
-      {
-       "stat": "refreshDurationMax",
-       "value": 9.0,
        "refresh_skill": "records/skills/playerclass07/passive02.dbr",
        "refresh_trigger": "AttackEnemy"
       }
@@ -27098,7 +27182,7 @@
      "stats": [
       {
        "stat": "projectileLaunchNumber",
-       "value": 1.0
+       "value": 2.0
       },
       {
        "stat": "skillTargetRadius",
@@ -27226,12 +27310,16 @@
        "value": 20.0,
        "refresh_skill": "records/skills/playerclass01/fightingspirit1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
-      },
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass01/weaponpool1.dbr",
+     "stats": [
       {
-       "stat": "refreshDurationMax",
-       "value": 9.0,
-       "refresh_skill": "records/skills/playerclass01/fightingspirit1.dbr",
-       "refresh_trigger": "AttackEnemyCrit"
+       "stat": "weaponDamagePct",
+       "value": 40.0
       }
      ]
     }
@@ -27351,6 +27439,14 @@
       {
        "stat": "offensiveSlowDefensiveAbilityMin",
        "value": 140.0
+      },
+      {
+       "stat": "skillComboChargeDuration",
+       "value": 5.0
+      },
+      {
+       "stat": "skillComboChargeLevel",
+       "value": 4.0
       }
      ]
     }
@@ -27388,8 +27484,30 @@
        "value": 350.0
       },
       {
+       "stat": "refreshCooldownAmount",
+       "value": 1.5,
+       "refresh_skill": "records/skills/playerclass07/voiceofcommand1.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "refreshCooldownChance",
+       "value": 20.0,
+       "refresh_skill": "records/skills/playerclass07/voiceofcommand1.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
+      {
        "stat": "skillCooldownTime",
        "value": -0.5
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass02/vindictiveflame1.dbr",
+     "stats": [
+      {
+       "stat": "skillLifeBonusBuffDuration",
+       "value": 800.0
       }
      ]
     },
@@ -27399,11 +27517,11 @@
      "stats": [
       {
        "stat": "defensiveCold",
-       "value": -20.0
+       "value": -25.0
       },
       {
        "stat": "defensivePierce",
-       "value": -20.0
+       "value": -25.0
       },
       {
        "stat": "defensiveTrap",
@@ -27786,7 +27904,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 10.0
+       "value": 20.0
       },
       {
        "stat": "weaponDamagePct",
@@ -27870,6 +27988,10 @@
       {
        "stat": "offensiveTotalResistanceReductionAbsoluteMin",
        "value": 26.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 20.0
       },
       {
        "stat": "skillTargetAngle",
@@ -28636,7 +28758,7 @@
      "stats": [
       {
        "stat": "offensivePhysicalMin",
-       "value": 150.0
+       "value": 100.0
       },
       {
        "stat": "offensiveSlowPhysicalDurationMin",
@@ -29052,7 +29174,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 35.0
+       "value": 50.0
       }
      ]
     },
@@ -29437,7 +29559,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 200.0
+       "value": 120.0
       }
      ]
     }
@@ -29500,7 +29622,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 10.0
+       "value": 20.0
       },
       {
        "stat": "weaponDamagePct",
@@ -29670,7 +29792,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 10.0
       }
      ]
     },
@@ -29692,7 +29814,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     }
@@ -29743,6 +29865,10 @@
      "pieces": 4,
      "skill": "records/skills/playerclass10/wereraven1_skill01_icicles.dbr",
      "stats": [
+      {
+       "stat": "offensiveColdMin",
+       "value": 60.0
+      },
       {
        "stat": "offensiveSlowColdDurationMin",
        "value": 2.0
@@ -29802,11 +29928,11 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
-       "value": 10.0
+       "value": 14.0
       }
      ]
     },
@@ -29840,7 +29966,7 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
@@ -29924,6 +30050,10 @@
        "value": 25.0
       },
       {
+       "stat": "skillChanceWeight",
+       "value": 10.0
+      },
+      {
        "stat": "skillTargetAngle",
        "value": 40.0
       },
@@ -29969,11 +30099,11 @@
       },
       {
        "stat": "offensivePoisonMin",
-       "value": 260.0
+       "value": 400.0
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 10.0
       }
      ]
     }
@@ -30008,7 +30138,7 @@
      "stats": [
       {
        "stat": "projectileLaunchNumber",
-       "value": 1.0
+       "value": 2.0
       }
      ]
     },
@@ -30321,7 +30451,7 @@
      "stats": [
       {
        "stat": "offensiveDamageMultModifier",
-       "value": 200.0
+       "value": 150.0
       },
       {
        "stat": "skillCooldownTime",
@@ -30363,12 +30493,6 @@
      "skill": "records/skills/playerclass04/shadowstrike.dbr",
      "stats": [
       {
-       "stat": "conversionPercentage",
-       "value": 100.0,
-       "from_tag": "tagCharStatsPierce",
-       "to_tag": "tagCharStatsCold"
-      },
-      {
        "stat": "cooldownCharges",
        "value": 1.0
       },
@@ -30390,11 +30514,23 @@
       },
       {
        "stat": "skillCooldownReductionChance",
-       "value": 25.0
+       "value": 15.0
       },
       {
        "stat": "skillManaCostReduction",
        "value": 25.0
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass05/mindovermatter2.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsPierce",
+       "to_tag": "tagCharStatsCold"
       }
      ]
     },
@@ -30422,7 +30558,19 @@
       },
       {
        "stat": "offensiveColdMin",
-       "value": 330.0
+       "value": 420.0
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass08/spectralarmor1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsPierce",
+       "to_tag": "tagCharStatsCold"
       }
      ]
     }
@@ -30469,6 +30617,18 @@
     },
     {
      "pieces": 4,
+     "skill": "records/skills/playerclass03/witchfire1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsPierce",
+       "to_tag": "tagCharStatsCold"
+      }
+     ]
+    },
+    {
+     "pieces": 4,
      "skill": "records/skills/playerclass04/eviscerate1.dbr",
      "stats": [
       {
@@ -30500,14 +30660,8 @@
        "value": 120.0
       },
       {
-       "stat": "conversionPercentage",
-       "value": 100.0,
-       "from_tag": "tagCharStatsPierce",
-       "to_tag": "tagCharStatsCold"
-      },
-      {
        "stat": "offensiveColdMin",
-       "value": 120.0
+       "value": 160.0
       }
      ]
     }
@@ -30527,6 +30681,180 @@
      "pieces": 4,
      "skill": "records/skills/playerclass10/werewolf1.dbr",
      "level": 5
+    }
+   ],
+   "mastery_boosts": []
+  },
+  {
+   "record": "records/items/lootsets/itemset_d316.dbr",
+   "name_tag": "tagGDX3ItemSetD316Name",
+   "members": 4,
+   "modifiers": [
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass07/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "offensiveChaosMin",
+       "value": 200.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 3.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 300.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 15.0
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass09/righteousfervor1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsFire",
+       "to_tag": "tagCharStatsChaos"
+      },
+      {
+       "stat": "offensiveDamageMultModifier",
+       "value": 15.0
+      },
+      {
+       "stat": "refreshDurationAmount",
+       "value": 1.0,
+       "refresh_skill": "records/skills/playerclass09/passive02.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "refreshDurationChance",
+       "value": 15.0,
+       "refresh_skill": "records/skills/playerclass09/passive02.dbr",
+       "refresh_trigger": "AttackEnemy"
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass10/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "offensiveChaosMin",
+       "value": 120.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 3.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 250.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
+      }
+     ]
+    }
+   ],
+   "boosts": [
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass07/wpattack01.dbr",
+     "level": 3
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass09/wpattack01.dbr",
+     "level": 3
+    },
+    {
+     "pieces": 3,
+     "skill": "records/skills/playerclass10/wpattack01.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": []
+  },
+  {
+   "record": "records/items/lootsets/itemset_d317.dbr",
+   "name_tag": "tagGDX3ItemSetD317Name",
+   "members": 4,
+   "modifiers": [
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass02/flamestrike1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveSlowPhysicalDurationMin",
+       "value": 5.0
+      },
+      {
+       "stat": "offensiveSlowPhysicalMin",
+       "value": 240.0
+      },
+      {
+       "stat": "refreshCooldownAmount",
+       "value": 1.0,
+       "refresh_skill": "records/skills/playerclass10/leap1.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "refreshCooldownChance",
+       "value": 15.0,
+       "refresh_skill": "records/skills/playerclass10/leap1.dbr",
+       "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 30.0
+      }
+     ]
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass10/leap1.dbr",
+     "stats": [
+      {
+       "stat": "cooldownCharges",
+       "value": 1.0
+      },
+      {
+       "stat": "offensiveSlowPhysicalDurationMin",
+       "value": 5.0
+      },
+      {
+       "stat": "offensiveSlowPhysicalMin",
+       "value": 440.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 40.0
+      }
+     ]
+    }
+   ],
+   "boosts": [
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass02/flamestrike2.dbr",
+     "level": 3
+    },
+    {
+     "pieces": 3,
+     "skill": "records/skills/playerclass09/wpattack02.dbr",
+     "level": 3
+    },
+    {
+     "pieces": 4,
+     "skill": "records/skills/playerclass10/leap1.dbr",
+     "level": 3
     }
    ],
    "mastery_boosts": []
@@ -30604,6 +30932,39 @@
     }
    ],
    "set": null
+  },
+  {
+   "record": "records/items/awakened/gearaccessories/medals/c012_medal.dbr",
+   "name_tag": "tagMedalC012",
+   "domain": "gear",
+   "slots": [
+    "medal"
+   ],
+   "gear_type": "medal",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    70,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICqYAWB7ANgTwAQGUBLAc0M13QDNcAXVGXAYXQDcZIwaQAaEAJwgB3BKEI0YUADIw2mESCiEwCAJwAWXlAgAPVWoC+hoA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound2_petmodifier.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass03/summon_raven4_petmodifier.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass08/summon_skeleton1.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": "records/items/awakened/lootsets/itemset_c011b.dbr"
   },
   {
    "record": "records/items/awakened/gearaccessories/medals/c020_medal.dbr",
@@ -30739,16 +31100,133 @@
      "skill": "records/skills/playerclass04/wpattack1.dbr",
      "stats": [
       {
-       "stat": "offensiveSlowBleedingDurationMin",
-       "value": 3.0
-      },
-      {
-       "stat": "offensiveSlowBleedingMin",
-       "value": 150.0
-      },
-      {
        "stat": "skillChanceWeight",
+       "value": 15.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearaccessories/medals/c038_medal.dbr",
+   "name_tag": "tagMedalC004",
+   "domain": "gear",
+   "slots": [
+    "medal"
+   ],
+   "gear_type": "medal",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    25,
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABALITYDWIANCNhAO4KgCWALjFADIwAbjBQcQUTmAQBOACxMoEAB6y5AX01A",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass04/passive2.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass06/totem2_petmodifier.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf3.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass04/phantomblade.dbr",
+     "stats": [
+      {
+       "stat": "projectileLaunchNumber",
+       "value": 1.0
+      },
+      {
+       "stat": "projectileLaunchRotation",
+       "value": 15.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/awakened/lootsets/itemset_c004c.dbr"
+  },
+  {
+   "record": "records/items/awakened/gearaccessories/medals/c110_medal.dbr",
+   "name_tag": "tagGDX1MedalC102",
+   "domain": "gear",
+   "slots": [
+    "medal"
+   ],
+   "gear_type": "medal",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    50,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICyEBOBrABAewGaYEkoAHAV1QEsAXATxABoRUIB3BUamKAGRgDcYAG3YgoFMAgCcAFkZQIADynSAvmqA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/cadence2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass03/curse1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass08/ravenousearth2.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass09/wpattack02.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "stats": [
+      {
+       "stat": "characterAttackSpeedMaxModifier",
        "value": 10.0
+      },
+      {
+       "stat": "offensiveLifeModifier",
+       "value": 60.0
+      },
+      {
+       "stat": "offensivePhysicalMin",
+       "value": 20.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass03/curse1.dbr",
+     "stats": [
+      {
+       "stat": "characterDefensiveAbility",
+       "value": -50.0
+      },
+      {
+       "stat": "characterOffensiveAbility",
+       "value": -50.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass08/ravenousearth1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveLifeMin",
+       "value": 80.0
       }
      ]
     }
@@ -30976,6 +31454,80 @@
     }
    ],
    "set": "records/items/awakened/lootsets/itemset_c302.dbr"
+  },
+  {
+   "record": "records/items/awakened/gearaccessories/necklaces/c037_necklace.dbr",
+   "name_tag": "tagNecklaceC037",
+   "domain": "gear",
+   "slots": [
+    "amulet"
+   ],
+   "gear_type": "amulet",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    75,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICSBjGAXAThADiANCNgO4KgCW6MUAMjAG4wA2ZIU5YCAnACyFQQAHtx4BfcUA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass04/veilofshadows2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass07/icerune.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/windsofasterkarn1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/windsofasterkarn2.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass05/_classtraining_class05.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass04/veilofshadows1.dbr",
+     "stats": [
+      {
+       "stat": "characterDefensiveAbility",
+       "value": -90.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass07/icerune.dbr",
+     "stats": [
+      {
+       "stat": "cooldownCharges",
+       "value": 1.0
+      },
+      {
+       "stat": "skillCooldownTime",
+       "value": -1.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass10/windsofasterkarn2.dbr",
+     "stats": [
+      {
+       "stat": "offensiveColdMin",
+       "value": 100.0
+      }
+     ]
+    }
+   ],
+   "set": null
   },
   {
    "record": "records/items/awakened/gearaccessories/necklaces/c049_necklace.dbr",
@@ -31428,6 +31980,47 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearaccessories/rings/c113_ring.dbr",
+   "name_tag": "tagGDX1RingC105",
+   "domain": "gear",
+   "slots": [
+    "ring"
+   ],
+   "gear_type": "ring",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    50,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKBLA5mGAXABAewDMcBBAZywCcIAbHAJQFcoVIsU8xSQAaEKgdwSgUWGFAAyMAG4xqQkMzAIAnABZeUCAA8VqgL4GgA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/weaponpool1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass02/flamestrike3.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass05/passive02.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/savagestrike1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass07/wpattack03.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": null
+  },
+  {
    "record": "records/items/awakened/gearaccessories/rings/c117_ring.dbr",
    "name_tag": "tagGDX1RingC117",
    "domain": "gear",
@@ -31625,6 +32218,49 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearaccessories/waist/c109_waist.dbr",
+   "name_tag": "tagGDX1WaistC101",
+   "domain": "gear",
+   "slots": [
+    "waist"
+   ],
+   "gear_type": "waist",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    30,
+    70,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAHAlgFxgdwE4UwAsACAcTVwBMAbOAGhH2wVExigBkYA3GalkFDRgEATgAsDKBAAeY8QF8lQA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/passive2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass04/eviscerate1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass05/chillingsurge.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass10/wereraven1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass08/_classtraining_class08.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [],
+   "set": null
+  },
+  {
    "record": "records/items/awakened/gearaccessories/waist/c112_waist.dbr",
    "name_tag": "tagGDX1WaistC104",
    "domain": "gear",
@@ -31767,6 +32403,48 @@
     },
     {
      "skill": "records/skills/playerclass10/wereraven1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearfeet/c107_feet.dbr",
+   "name_tag": "tagGDX1FeetC101",
+   "domain": "gear",
+   "slots": [
+    "feet"
+   ],
+   "gear_type": "feet",
+   "rarity": "Legendary",
+   "item_level": 84,
+   "tiers": [
+    30,
+    65,
+    84
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDiAnAllABACQigbjAM4AumAQgPaUlEgA0IKEA7gqGiTFADIyEAbdiChowCABwAWRlAgAPSVIC+qoA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/fieldcommand2.dbr",
+     "level": 4
+    },
+    {
+     "skill": "records/skills/playerclass03/bondsofbysmiel1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass03/bondsofbysmiel2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/summon_briarthorn1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass08/masterofdeath1.dbr",
      "level": 2
     }
    ],
@@ -32033,12 +32711,12 @@
      "skill": "records/skills/playerclass06/squall1.dbr",
      "stats": [
       {
-       "stat": "offensiveSlowLightningChance",
-       "value": 180.0
-      },
-      {
        "stat": "offensiveSlowLightningDurationMin",
        "value": 2.0
+      },
+      {
+       "stat": "offensiveSlowLightningMin",
+       "value": 180.0
       }
      ]
     },
@@ -32047,7 +32725,7 @@
      "stats": [
       {
        "stat": "offensiveSlowFireDurationMin",
-       "value": 2.0
+       "value": 5.0
       },
       {
        "stat": "offensiveSlowFireMin",
@@ -32073,6 +32751,88 @@
       {
        "stat": "weaponDamagePct",
        "value": 8.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearhands/c210_hands.dbr",
+   "name_tag": "tagGDX2HandsC204",
+   "domain": "gear",
+   "slots": [
+    "hands"
+   ],
+   "gear_type": "hands",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    30,
+    50,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBqBLANjAzgYwPYCcwACAIXwmxn0xABoRyB3BUFAFxigBkYA3GNCxBQUYBAE4ALPSgQAHhMkBfFUA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/cadence1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass04/bladebarrier1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass04/eviscerate2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass08/reaper1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass09/righteousfervor3.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "stats": [
+      {
+       "stat": "offensivePhysicalMin",
+       "value": 22.0
+      },
+      {
+       "stat": "offensiveTotalDamageModifier",
+       "value": 50.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass04/eviscerate2.dbr",
+     "stats": [
+      {
+       "stat": "offensivePoisonMin",
+       "value": 22.0
+      },
+      {
+       "stat": "offensiveTotalDamageModifier",
+       "value": 50.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass09/righteousfervor1.dbr",
+     "stats": [
+      {
+       "stat": "characterAttackSpeedModifier",
+       "value": 8.0
+      },
+      {
+       "stat": "retaliationDamagePct",
+       "value": 3.0
       }
      ]
     }
@@ -32154,13 +32914,63 @@
      "skill": "records/skills/playerclass10/onslaught1.dbr",
      "stats": [
       {
-       "stat": "skillComboChargeLevel",
-       "value": 2.0
+       "stat": "weaponDamagePct",
+       "value": 12.0
       }
      ]
     }
    ],
    "set": null
+  },
+  {
+   "record": "records/items/awakened/gearhead/c021_head.dbr",
+   "name_tag": "tagHeadC021",
+   "domain": "gear",
+   "slots": [
+    "head"
+   ],
+   "gear_type": "head",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    70,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICqYAWB7ANgTwAQDUBLAZwgHMZd0AzXAF1UoGF0A3GSMOkAGhACcIAdwShCdGFAAyMdplEgohMAgCcAFj5QIADzXqAvkaA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass03/summon_raven1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass08/_classtraining_class08.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsPhysical",
+       "to_tag": "tagCharStatsChaos"
+      },
+      {
+       "stat": "offensiveChaosMin",
+       "value": 120.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/awakened/lootsets/itemset_c011b.dbr"
   },
   {
    "record": "records/items/awakened/gearhead/c040_head.dbr",
@@ -32256,6 +33066,54 @@
     }
    ],
    "set": null
+  },
+  {
+   "record": "records/items/awakened/gearhead/c044_head.dbr",
+   "name_tag": "tagHeadC009",
+   "domain": "gear",
+   "slots": [
+    "head"
+   ],
+   "gear_type": "head",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    25,
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMJoDuKIANCNhDQqAJYAuMUAMjABuMevFBQOYBAE4ALEygQAHjNkBfDUA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass04/phantomblade_mod1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf2.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
+     "stats": [
+      {
+       "stat": "defensiveBleeding",
+       "value": -10.0
+      },
+      {
+       "stat": "defensivePierce",
+       "value": -10.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/awakened/lootsets/itemset_c004c.dbr"
   },
   {
    "record": "records/items/awakened/gearhead/c116_head.dbr",
@@ -32369,6 +33227,63 @@
       {
        "stat": "skillManaCostReduction",
        "value": 25.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearhead/c117_head.dbr",
+   "name_tag": "tagGDX1HeadC106",
+   "domain": "gear",
+   "slots": [
+    "head"
+   ],
+   "gear_type": "head",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    75,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKB7ArgGwzAzjgBAOIQBecANCAE4QDuCoAlgC4xQAyMAbjBgyFEZgEATgAslKBAAeosQF9FQA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass05/aetherray1.dbr",
+     "level": 4
+    },
+    {
+     "skill": "records/skills/playerclass06/totem1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass02/_classtraining_class02.dbr",
+     "level": 1
+    },
+    {
+     "mastery": "records/skills/playerclass08/_classtraining_class08.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass05/aetherray1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveAetherMin",
+       "value": 70.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass06/totem1.dbr",
+     "stats": [
+      {
+       "stat": "skillCooldownTime",
+       "value": -1.0
       }
      ]
     }
@@ -32789,8 +33704,8 @@
      "skill": "records/skills/playerclass10/wpattack01.dbr",
      "stats": [
       {
-       "stat": "skillChanceWeight",
-       "value": 10.0
+       "stat": "weaponDamagePct",
+       "value": 15.0
       }
      ]
     }
@@ -32948,6 +33863,81 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearlegs/c206_legs.dbr",
+   "name_tag": "tagGDX2LegsC202",
+   "domain": "gear",
+   "slots": [
+    "legs"
+   ],
+   "gear_type": "legs",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    30,
+    50,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICCBnALgJwgGwAQBkYBzAdywAcUQAaELEhUASzRikIDcZtGQomwCAJwAWWlAgAPYSIC+8oA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass05/mindovermatter1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass06/savagestrike3.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass08/spectralarmor2.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass10/passive04.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearshoulders/c012_shoulder.dbr",
+   "name_tag": "tagShoulderC012",
+   "domain": "gear",
+   "slots": [
+    "shoulders"
+   ],
+   "gear_type": "shoulders",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    70,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICqYAWB7ANgTwAQFkIwAXTGXdAM12NXIGF0A3GSEkAGhACcIB3BKACWxGFAAyMFpkEgoQsAgCcAFi5QIAD2UqAvvqA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass03/bondsofbysmiel1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass03/bondsofbysmiel2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass08/callofthegrave.dbr",
+     "level": 4
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": "records/items/awakened/lootsets/itemset_c011b.dbr"
+  },
+  {
    "record": "records/items/awakened/gearshoulders/c019_shoulder.dbr",
    "name_tag": "tagShoulderC019",
    "domain": "gear",
@@ -33023,6 +34013,43 @@
     {
      "skill": "records/skills/playerclass10/bonechillingcry1.dbr",
      "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearshoulders/c110_shoulder.dbr",
+   "name_tag": "tagGDX1ShoulderC104",
+   "domain": "gear",
+   "slots": [
+    "shoulders"
+   ],
+   "gear_type": "shoulders",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    50,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCB7ArmALgTwAQAkNMYAnAcgGdcBlAC3QBsATUgczQhKYpABoQSEAO4JQAS2JQAMjABuMBqJBQxYBAE4ALPygQAHhs0BfE0A",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass04/summon_bladespirit.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass07/passive01.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass07/passive02.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass10/passive01.dbr",
+     "level": 3
     }
    ],
    "mastery_boosts": [],
@@ -33129,6 +34156,47 @@
    "set": "records/items/awakened/lootsets/itemset_c302.dbr"
   },
   {
+   "record": "records/items/awakened/geartorso/c015_torso.dbr",
+   "name_tag": "tagTorsoC015",
+   "domain": "gear",
+   "slots": [
+    "chest"
+   ],
+   "gear_type": "chest",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAHAlgExgJwM5oBsBrAAgAkIBXAIxyJABoRsIB3BUNAFxigBkYANxgEOIKGjAIAnABYmUCAA8ZsgL4agA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/cadence1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass04/shadowstrike_mod1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass04/wpattack4.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass09/pathofthethree1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/passive04.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": null
+  },
+  {
    "record": "records/items/awakened/geartorso/c024_torso.dbr",
    "name_tag": "tagTorsoC024",
    "domain": "gear",
@@ -33202,6 +34270,40 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
+  },
+  {
+   "record": "records/items/awakened/geartorso/c043_torso.dbr",
+   "name_tag": "tagTorsoC008",
+   "domain": "gear",
+   "slots": [
+    "chest"
+   ],
+   "gear_type": "chest",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    25,
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMJoQAuIANCNhAO4KgCWtMUAMjABuMFBxBROYBAE4ALEygQAHjNkBfDUA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass04/phantomblade_mod1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf2.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": "records/items/awakened/lootsets/itemset_c004c.dbr"
   },
   {
    "record": "records/items/awakened/geartorso/c107_torso.dbr",
@@ -33519,6 +34621,82 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearweapons/axe1h/c019_axe.dbr",
+   "name_tag": "tagWeaponAxeC005",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "axe1h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    26,
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAXA9gJygcgM4AIBRAEwHM4AaEDCAdwVAEsUYoAZGANxgBsGQojMAgCcAFipQIAD1FiAvoqA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/stunjacks2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass02/vindictiveflame2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/naturesblessing3.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass06/squall2.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass07/_classtraining_class07.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass02/stunjacks1.dbr",
+     "stats": [
+      {
+       "stat": "retaliationDamagePct",
+       "value": 8.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass06/natureblessing1.dbr",
+     "stats": [
+      {
+       "stat": "characterLifeModifier",
+       "value": 4.0
+      },
+      {
+       "stat": "retaliationLightningMin",
+       "value": 220.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass07/auracensure1.dbr",
+     "stats": [
+      {
+       "stat": "defensiveLightning",
+       "value": -10.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
    "record": "records/items/awakened/gearweapons/axe1h/c022_axe.dbr",
    "name_tag": "tagWeaponAxeC008",
    "domain": "gear",
@@ -33584,6 +34762,108 @@
       },
       {
        "stat": "skillChanceWeight",
+       "value": 10.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearweapons/axe1h/c025_axe.dbr",
+   "name_tag": "tagWeaponAxeC004",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "axe1h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    1,
+    25,
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMIp4BuRIANCNhAO4KgCWALjFABkY9FJxBQuYBAE4ALMygQAHjNkBfDUA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass04/phantomblade.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass10/werewolf1_skill01_claws.dbr",
+     "stats": [
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 2.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 120.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/awakened/lootsets/itemset_c004c.dbr"
+  },
+  {
+   "record": "records/items/awakened/gearweapons/blunt1h/c013_blunt.dbr",
+   "name_tag": "tagWeaponBluntC013",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "mace1h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    58,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbCBjA1gAgBITABNsB7AM2wGUCIAnAckoEsmwQAaEWiAdwVCYAXGFAAyMAG4wU-EFFYIAnABZOUCAA8lygL56gA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound4_petmodifier.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/summon_briarthorn1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass06/summon_briarthorn3_petmodifier.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass08/summon_skeleton1.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass06/summon_briarthorn1.dbr",
+     "stats": [
+      {
+       "stat": "characterTotalSpeedModifier",
        "value": 15.0
       }
      ]
@@ -33777,6 +35057,129 @@
       {
        "stat": "offensiveSlowColdModifier",
        "value": 120.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearweapons/caster/c022_dagger.dbr",
+   "name_tag": "tagWeaponCaster1hC022",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "dagger",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    70,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgSxpgBACIQDmJMATvmgGb4AuAFjPgMJoBuMkY9IANCAoQA7glDZ6MKABkYXFOJBRsYBAE4ALIKgQAHhs0BfE0A",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass03/summon_raven1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass08/summon_skeleton2.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
+     "stats": [
+      {
+       "stat": "characterLifeModifier",
+       "value": 30.0
+      },
+      {
+       "stat": "offensiveChaosModifier",
+       "value": 300.0
+      },
+      {
+       "stat": "offensiveTauntMin",
+       "value": 30.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/awakened/lootsets/itemset_c011b.dbr"
+  },
+  {
+   "record": "records/items/awakened/gearweapons/caster/c033_scepter.dbr",
+   "name_tag": "tagWeaponCaster1hC010",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "scepter",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    40,
+    75,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIAyBLAZjARisATGATiADQgEQDuCoKALjFEjAG4wA21IUOCAnACykoEAB59+AXylA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass05/aetherray2.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass06/totem1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass08/reapspirit1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass03/_classtraining_class03.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass05/aetherray1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsAether",
+       "to_tag": "tagCharStatsVitality"
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 15.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass08/reapspirit1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsAether",
+       "to_tag": "tagCharStatsVitality"
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 80.0
       }
      ]
     }
@@ -34124,6 +35527,49 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearweapons/focus/c012_focus.dbr",
+   "name_tag": "tagFocusC012",
+   "domain": "gear",
+   "slots": [
+    "off_hand"
+   ],
+   "gear_type": "offhand",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    70,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDCALCYwwDYEswHMACAeQCcAjQgewDNCAXFGQpKgNxkjHpABoRSEAO4JQOejCgAZGByyiQUPAgCcAFn5QIAD1VqAvoaA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound3_petmodifier.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass03/summon_hellhound4_petmodifier.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass08/summon_skeleton3_petmodifier.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass03/summon_raven1.dbr",
+     "stats": [
+      {
+       "stat": "weaponDamagePct",
+       "value": 6.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/awakened/lootsets/itemset_c011b.dbr"
+  },
+  {
    "record": "records/items/awakened/gearweapons/focus/c026_focus.dbr",
    "name_tag": "tagFocusC008",
    "domain": "gear",
@@ -34159,6 +35605,94 @@
    ],
    "mastery_boosts": [],
    "modifiers": [],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearweapons/focus/c111_focus.dbr",
+   "name_tag": "tagGDX1FocusC104",
+   "domain": "gear",
+   "slots": [
+    "off_hand"
+   ],
+   "gear_type": "offhand",
+   "rarity": "Legendary",
+   "item_level": 84,
+   "tiers": [
+    50,
+    65,
+    84
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDqB7ATgEwAQoGZYEkwBHAVwEsBncgF3SwEEAjCAGxTBABoQ0IB3BKFowoAGRgA3GKyEgo5TvAAcAFh5QIADwRqAvgaA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass07/hunteraura2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass08/lifetap1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass09/ascension1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/wereraven1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass07/_classtraining_class07.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass07/purifyingflame1.dbr",
+     "stats": [
+      {
+       "stat": "weaponDamagePct",
+       "value": 15.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass08/lifetap1.dbr",
+     "stats": [
+      {
+       "stat": "weaponDamagePct",
+       "value": 15.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass09/ascension1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveElementalModifier",
+       "value": 80.0
+      },
+      {
+       "stat": "skillLifeBonusBuffDuration",
+       "value": 600.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass10/wereraven1.dbr",
+     "stats": [
+      {
+       "stat": "characterSpellCastSpeedModifier",
+       "value": 10.0
+      },
+      {
+       "stat": "skillLifeBonusBuffDuration",
+       "value": 600.0
+      }
+     ]
+    }
+   ],
    "set": null
   },
   {
@@ -34371,7 +35905,7 @@
      "stats": [
       {
        "stat": "offensiveSlowPhysicalDurationMin",
-       "value": 2.0
+       "value": 5.0
       },
       {
        "stat": "offensiveSlowPhysicalMin",
@@ -34585,7 +36119,7 @@
      "stats": [
       {
        "stat": "offensiveColdMin",
-       "value": 50.0
+       "value": 80.0
       }
      ]
     }
@@ -34671,7 +36205,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 10.0
+       "value": 15.0
       }
      ]
     },
@@ -34681,6 +36215,88 @@
       {
        "stat": "skillLifePercentBuffDuration",
        "value": 4.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearweapons/guns1h/c024_gun1h.dbr",
+   "name_tag": "tagWeaponGun1hC006B",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "ranged1h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    58,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAbArgcwzATiANCDhAO4KgCWALjFADIwBuMK5IUFYCAnACyFQIADx68AvhKA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/cadence2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass07/passive01.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass07/voiceofcommand1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass01/cadence1.dbr",
+     "stats": [
+      {
+       "stat": "skillComboChargeDuration",
+       "value": 5.0
+      },
+      {
+       "stat": "skillComboChargeLevel",
+       "value": 3.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 24.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "stats": [
+      {
+       "stat": "characterAttackSpeedMaxModifier",
+       "value": 10.0
+      },
+      {
+       "stat": "characterAttackSpeedModifier",
+       "value": 10.0
+      },
+      {
+       "stat": "offensivePierceModifier",
+       "value": 70.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass07/voiceofcommand1.dbr",
+     "stats": [
+      {
+       "stat": "weaponDamagePct",
+       "value": 40.0
       }
      ]
     }
@@ -34988,6 +36604,80 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearweapons/guns2h/c017_gun2h.dbr",
+   "name_tag": "tagWeaponGun2hC008",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "ranged2h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    50,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDqAnCAXAFgIxQSzAHMYUQAaENAdwVD3RigBkYA3GAG1pCgIQE4ALBSgQAHgMEBfGUA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass09/summon_celestialguardian2_petmodifier.dbr",
+     "level": 4
+    },
+    {
+     "skill": "records/skills/playerclass09/wpattack01.dbr",
+     "level": 4
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass08/_classtraining_class08.dbr",
+     "level": 2
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass08/weaponpool01.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsAether",
+       "to_tag": "tagCharStatsVitality"
+      },
+      {
+       "stat": "projectilePiercing",
+       "value": 100.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 50.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass09/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsFire",
+       "to_tag": "tagCharStatsVitality"
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 15.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 50.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
    "record": "records/items/awakened/gearweapons/guns2h/c022_gun2h.dbr",
    "name_tag": "tagWeaponCrossbow2hC011",
    "domain": "gear",
@@ -35116,7 +36806,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     }
@@ -35262,7 +36952,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     },
@@ -35280,6 +36970,95 @@
       {
        "stat": "offensiveSlowBleedingMin",
        "value": 300.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/awakened/gearweapons/melee2h/c024_sword2h.dbr",
+   "name_tag": "tagWeaponMelee2hC003",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "sword2h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    14,
+    58,
+    84,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAbAlgFwBYCMJjgBoQAnCAdwVExigBkYA3GFKkKNMBATgBZioEAB49eAXwlA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass03/bloodofdreeg1.dbr",
+     "level": 4
+    },
+    {
+     "skill": "records/skills/playerclass04/wpattack4.dbr",
+     "level": 4
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass01/_classtraining_class01.dbr",
+     "level": 2
+    },
+    {
+     "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
+     "level": 2
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass01/weaponpool1.dbr",
+     "stats": [
+      {
+       "stat": "skillChanceWeight",
+       "value": 15.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 60.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass04/wpattack0.dbr",
+     "stats": [
+      {
+       "stat": "Sword2h",
+       "value": 1.0
+      },
+      {
+       "stat": "offensivePoisonMin",
+       "value": 33.0
+      },
+      {
+       "stat": "overwriteBaseSkill",
+       "value": 1.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass04/wpattack3.dbr",
+     "stats": [
+      {
+       "stat": "Sword2h",
+       "value": 1.0
+      },
+      {
+       "stat": "overwriteBaseSkill",
+       "value": 1.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 40.0
       }
      ]
     }
@@ -35385,7 +37164,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 50.0
+       "value": 80.0
       }
      ]
     }
@@ -35599,6 +37378,63 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearweapons/shields/c009_shield.dbr",
+   "name_tag": "tagShieldC009",
+   "domain": "gear",
+   "slots": [
+    "off_hand"
+   ],
+   "gear_type": "shield",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    75,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIAiEDuYDOALCAnAJgAQBCArgDap4DWIANCLmgqAJYAuMUAMjAG4xyLEFFZgEATgAsDKBAAekqQF9VQA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/blastshield2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass02/vindictiveflame2.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass07/_classtraining_class07.dbr",
+     "level": 1
+    },
+    {
+     "mastery": "records/skills/playerclass09/_classtraining_class09.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass02/grenado1.dbr",
+     "stats": [
+      {
+       "stat": "retaliationDamagePct",
+       "value": 14.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass02/vindictiveflame2.dbr",
+     "stats": [
+      {
+       "stat": "retaliationDamagePct",
+       "value": 8.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
    "record": "records/items/awakened/gearweapons/shields/c015_shield.dbr",
    "name_tag": "tagShieldC015B",
    "domain": "gear",
@@ -35667,7 +37503,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     },
@@ -35981,6 +37817,167 @@
    "set": null
   },
   {
+   "record": "records/items/awakened/gearweapons/swords1h/c027_sword.dbr",
+   "name_tag": "tagWeaponSwordC006",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "sword1h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    25,
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMIoQDuIANCNnQqAJYAuMUAMjADcYKNiCjswCAJwAWJlAgAPaTIC+6oA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass04/phantomblade.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass04/phantomblade.dbr",
+     "stats": [
+      {
+       "stat": "offensivePierceMin",
+       "value": 40.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 3.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 140.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf1_skill01_claws.dbr",
+     "stats": [
+      {
+       "stat": "offensivePierceMin",
+       "value": 40.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/awakened/lootsets/itemset_c004c.dbr"
+  },
+  {
+   "record": "records/items/awakened/gearweapons/swords1h/c103_sword.dbr",
+   "name_tag": "tagGDX1WeaponSwordC101",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "dagger",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    25,
+    65,
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDCAbGEwGcYBMAEAQihDjHgPYBmeAoigObkrkAuAFiADQgBOEA7glABLFjCgAZGADcYKISCjCwCAJwAWblAgAPNeoC+RoA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass06/squall1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass07/lightningnet1.dbr",
+     "level": 4
+    },
+    {
+     "skill": "records/skills/playerclass09/ascension1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass10/leap1.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass07/lightningnet1.dbr",
+     "stats": [
+      {
+       "stat": "cooldownCharges",
+       "value": 1.0
+      },
+      {
+       "stat": "defensiveLightning",
+       "value": -8.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass09/ascension1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveColdModifier",
+       "value": 80.0
+      },
+      {
+       "stat": "offensiveSlowColdModifier",
+       "value": 80.0
+      },
+      {
+       "stat": "skillActiveDuration",
+       "value": 2.0
+      },
+      {
+       "stat": "skillLifePercentBuffDuration",
+       "value": 3.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass10/leap1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveCritDamageModifier",
+       "value": 15.0
+      },
+      {
+       "stat": "refreshCooldownAmount",
+       "value": 3.0,
+       "refresh_skill": "records/skills/playerclass07/lightningnet1.dbr",
+       "refresh_trigger": "AttackEnemyCrit"
+      },
+      {
+       "stat": "refreshCooldownChance",
+       "value": 25.0,
+       "refresh_skill": "records/skills/playerclass07/lightningnet1.dbr",
+       "refresh_trigger": "AttackEnemyCrit"
+      },
+      {
+       "stat": "skillCooldownTime",
+       "value": -0.4
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
    "record": "records/items/awakened/gearweapons/swords1h/c203_sword.dbr",
    "name_tag": "tagGDX2WeaponSwordC201",
    "domain": "gear",
@@ -36027,7 +38024,7 @@
      "stats": [
       {
        "stat": "offensiveFireMin",
-       "value": 120.0
+       "value": 80.0
       },
       {
        "stat": "refreshCooldownAmount",
@@ -37434,7 +39431,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     },
@@ -46263,7 +48260,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     },
@@ -46305,7 +48302,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     }
@@ -46418,8 +48415,8 @@
        "to_tag": "tagCharStatsChaos"
       },
       {
-       "stat": "skillChanceWeight",
-       "value": 15.0
+       "stat": "offensiveChaosMin",
+       "value": 100.0
       }
      ]
     }
@@ -46570,7 +48567,7 @@
       },
       {
        "stat": "offensiveLifeMin",
-       "value": 200.0
+       "value": 60.0
       },
       {
        "stat": "offensiveSlowLifeDurationMin",
@@ -47861,7 +49858,7 @@
       },
       {
        "stat": "offensiveSlowColdMin",
-       "value": 180.0
+       "value": 210.0
       }
      ]
     },
@@ -49459,7 +51456,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "weaponDamagePct",
@@ -49637,11 +51634,11 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 20.0
       },
       {
        "stat": "weaponDamagePct",
-       "value": 60.0
+       "value": 90.0
       }
      ]
     },
@@ -51220,11 +53217,11 @@
       },
       {
        "stat": "offensiveLightningMax",
-       "value": 112.0
+       "value": 90.0
       },
       {
        "stat": "offensiveLightningMin",
-       "value": 55.0
+       "value": 45.0
       }
      ]
     }
@@ -51423,7 +53420,7 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 10.0
+       "value": 8.0
       },
       {
        "stat": "weaponDamagePct",
@@ -51669,7 +53666,7 @@
      "stats": [
       {
        "stat": "offensivePhysicalMin",
-       "value": 110.0
+       "value": 80.0
       }
      ]
     },
@@ -51981,7 +53978,7 @@
       },
       {
        "stat": "offensiveColdMin",
-       "value": 78.0
+       "value": 60.0
       }
      ]
     },
@@ -52760,7 +54757,7 @@
      "stats": [
       {
        "stat": "offensivePhysicalMin",
-       "value": 100.0
+       "value": 120.0
       },
       {
        "stat": "waveDistance",
@@ -53305,8 +55302,8 @@
      "skill": "records/skills/playerclass10/wpattack02.dbr",
      "stats": [
       {
-       "stat": "skillChanceWeight",
-       "value": 10.0
+       "stat": "offensiveColdMin",
+       "value": 120.0
       }
      ]
     }
@@ -53512,43 +55509,6 @@
     {
      "skill": "records/skills/playerclass10/onslaught3.dbr",
      "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/gearaccessories/medals/c110_medal.dbr",
-   "name_tag": "tagGDX1MedalC102",
-   "domain": "gear",
-   "slots": [
-    "medal"
-   ],
-   "gear_type": "medal",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    50,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICyEBOBrABAewGaYEkoAHAV1QEsAXATxABoRUIB3BUamKAGRgDcYAG3YgoFMAgCcAFkZQIADynSAvmqA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass01/cadence2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass03/curse1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass08/ravenousearth2.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass09/wpattack02.dbr",
-     "level": 3
     }
    ],
    "mastery_boosts": [],
@@ -54496,6 +56456,10 @@
       {
        "stat": "offensiveSlowBleedingMin",
        "value": 160.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       }
      ]
     },
@@ -55098,11 +57062,11 @@
      "stats": [
       {
        "stat": "offensiveLightningMax",
-       "value": 144.0
+       "value": 184.0
       },
       {
        "stat": "offensiveLightningMin",
-       "value": 80.0
+       "value": 100.0
       },
       {
        "stat": "offensiveStunMin",
@@ -55392,7 +57356,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 10.0
       }
      ]
     },
@@ -55487,8 +57451,8 @@
      "skill": "records/skills/playerclass10/onslaught1.dbr",
      "stats": [
       {
-       "stat": "offensiveDamageMultModifier",
-       "value": 8.0
+       "stat": "weaponDamagePct",
+       "value": 15.0
       }
      ]
     }
@@ -55556,7 +57520,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     },
@@ -55736,10 +57700,6 @@
        "to_tag": "tagCharStatsAcid"
       },
       {
-       "stat": "skillChanceWeight",
-       "value": 15.0
-      },
-      {
        "stat": "weaponDamagePct",
        "value": 55.0
       }
@@ -55757,6 +57717,10 @@
       {
        "stat": "offensivePoisonMin",
        "value": 180.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       }
      ]
     }
@@ -56514,7 +58478,7 @@
      "stats": [
       {
        "stat": "offensivePhysicalMin",
-       "value": 110.0
+       "value": 70.0
       }
      ]
     },
@@ -57083,7 +59047,7 @@
      "stats": [
       {
        "stat": "offensiveCritDamageModifier",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "offensivePierceModifier",
@@ -59629,10 +61593,6 @@
       {
        "stat": "offensiveAetherMin",
        "value": 160.0
-      },
-      {
-       "stat": "skillChanceWeight",
-       "value": 10.0
       }
      ]
     }
@@ -60596,6 +62556,15 @@
      ]
     },
     {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "stats": [
+      {
+       "stat": "offensiveElementalModifier",
+       "value": 80.0
+      }
+     ]
+    },
+    {
      "skill": "records/skills/playerclass05/passive02.dbr",
      "stats": [
       {
@@ -60603,8 +62572,8 @@
        "value": 6.0
       },
       {
-       "stat": "offensiveDamageMultModifier",
-       "value": 15.0
+       "stat": "offensiveElementalModifier",
+       "value": 120.0
       }
      ]
     },
@@ -60732,20 +62701,11 @@
      ]
     },
     {
-     "skill": "records/skills/playerclass04/eviscerate1.dbr",
-     "stats": [
-      {
-       "stat": "weaponDamagePct",
-       "value": 70.0
-      }
-     ]
-    },
-    {
      "skill": "records/skills/playerclass10/werewolf1_skill01_claws.dbr",
      "stats": [
       {
        "stat": "refreshCooldownAmount",
-       "value": 10.0,
+       "value": 15.0,
        "refresh_skill": "records/skills/playerclass03/summon_hellhound1.dbr",
        "refresh_trigger": "AttackEnemy"
       },
@@ -60754,10 +62714,6 @@
        "value": 30.0,
        "refresh_skill": "records/skills/playerclass03/summon_hellhound1.dbr",
        "refresh_trigger": "AttackEnemy"
-      },
-      {
-       "stat": "weaponDamagePct",
-       "value": 50.0
       }
      ]
     }
@@ -60886,6 +62842,130 @@
    ],
    "modifiers": [],
    "set": null
+  },
+  {
+   "record": "records/items/gearaccessories/necklaces/d319_necklace.dbr",
+   "name_tag": "tagGDX3NecklaceD315",
+   "domain": "gear",
+   "slots": [
+    "amulet"
+   ],
+   "gear_type": "amulet",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDiBXALgdwE4zAYwAsYsByAZwAIBRAMxoEsBzATxABoQsIMFR60YUADIwAbjAA2vEFHpgEATgAsHKBAAeipQF9dQA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/passive1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass02/thermitemines2_petmod.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass01/_classtraining_class01.dbr",
+     "level": 1
+    },
+    {
+     "mastery": "records/skills/playerclass03/_classtraining_class03.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "stats": [
+      {
+       "stat": "characterAttackSpeedMaxModifier",
+       "value": 15.0
+      },
+      {
+       "stat": "characterAttackSpeedModifier",
+       "value": 8.0
+      },
+      {
+       "stat": "offensiveChaosModifier",
+       "value": 80.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass02/thermitemines1.dbr",
+     "stats": [
+      {
+       "stat": "defensiveChaos",
+       "value": -8.0
+      },
+      {
+       "stat": "defensivePhysical",
+       "value": -12.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass03/doombolt1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveLifeLeechMin",
+       "value": 5.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 40.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/gearaccessories/necklaces/d320_necklace.dbr",
+   "name_tag": "tagGDX3NecklaceD316",
+   "domain": "gear",
+   "slots": [
+    "amulet"
+   ],
+   "gear_type": "amulet",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICSBzAlgJwwezAcgGcACAZQAsIMATAkAGhAwgHcFQ0AXGKAGRgDcYAGzYgoaMAgCcAFgZQIAD2kyAvuqA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass09/passive02.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass09/_classtraining_class09.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass09/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "offensiveLifeLeechMin",
+       "value": 8.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 15.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/lootsets/itemset_d316.dbr"
   },
   {
    "record": "records/items/gearaccessories/rings/b002f_ring_outlawleader.dbr",
@@ -61785,43 +63865,6 @@
     },
     {
      "skill": "records/skills/playerclass10/bonechillingcry1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/gearaccessories/rings/c113_ring.dbr",
-   "name_tag": "tagGDX1RingC105",
-   "domain": "gear",
-   "slots": [
-    "ring"
-   ],
-   "gear_type": "ring",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    50,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKBLA5mGAXABAewDMcBBAZywCcIAbHAJQFcoVIsU8xSQAaEKgdwSgUWGFAAyMAG4xqQkMzAIAnABZeUCAA8VqgL4GgA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass01/weaponpool1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass02/flamestrike3.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/savagestrike1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass07/wpattack03.dbr",
      "level": 2
     }
    ],
@@ -64211,44 +66254,6 @@
    "set": "records/items/lootsets/itemset_c005b.dbr"
   },
   {
-   "record": "records/items/gearaccessories/waist/c109_waist.dbr",
-   "name_tag": "tagGDX1WaistC101",
-   "domain": "gear",
-   "slots": [
-    "waist"
-   ],
-   "gear_type": "waist",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    30,
-    70,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAHAlgFxgdwE4UwAsACAcTVwBMAbOAGhH2wVExigBkYA3GalkFDRgEATgAsDKBAAeY8QF8lQA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/eviscerate1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass05/chillingsurge.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass08/lifetap1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/wereraven1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
    "record": "records/items/gearaccessories/waist/c110_waist.dbr",
    "name_tag": "tagGDX1WaistC102",
    "domain": "gear",
@@ -65704,44 +67709,6 @@
    "set": null
   },
   {
-   "record": "records/items/gearfeet/c107_feet.dbr",
-   "name_tag": "tagGDX1FeetC101",
-   "domain": "gear",
-   "slots": [
-    "feet"
-   ],
-   "gear_type": "feet",
-   "rarity": "Epic",
-   "item_level": 84,
-   "tiers": [
-    30,
-    65,
-    84
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDiAnAllABACQigbjAM4AumAQgPaUlEgA0IKEA7gqGiTFADIyEAbdiChowCABwAWRlAgAPSVIC+qoA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass01/fieldcommand2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass03/bondsofbysmiel1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/summon_briarthorn1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass08/masterofdeath1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
    "record": "records/items/gearfeet/c108_feet.dbr",
    "name_tag": "tagGDX1FeetC102",
    "domain": "gear",
@@ -66549,6 +68516,42 @@
    "set": null
   },
   {
+   "record": "records/items/gearfeet/d307_feet.dbr",
+   "name_tag": "tagGDX3FeetD304",
+   "domain": "gear",
+   "slots": [
+    "feet"
+   ],
+   "gear_type": "feet",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDiBXALgZzQeygBxgCcMQAaEQiAdwVAEs0YoAZGANxgBtaQo6wEATgAs5KBAAeQ4QF85QA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass01/weaponpool1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass04/wpattack1.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/weaponpool01.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass09/passive02.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": null
+  },
+  {
    "record": "records/items/gearhands/c011_hands.dbr",
    "name_tag": "tagHandsC011",
    "domain": "gear",
@@ -66926,44 +68929,6 @@
     },
     {
      "skill": "records/skills/playerclass08/summon_skeleton2.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/gearhands/c210_hands.dbr",
-   "name_tag": "tagGDX2HandsC204",
-   "domain": "gear",
-   "slots": [
-    "hands"
-   ],
-   "gear_type": "hands",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    30,
-    50,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBqBLANjAzgYwPYCcwACAIXwmxn0xABoRyB3BUFAFxigBkYA3GNCxBQUYBAE4ALPSgQAHhMkBfFUA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass01/cadence1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass04/bladebarrier1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass04/eviscerate2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass09/righteousfervor3.dbr",
      "level": 2
     }
    ],
@@ -67391,10 +69356,6 @@
       {
        "stat": "offensiveSlowBleedingMin",
        "value": 160.0
-      },
-      {
-       "stat": "skillChanceWeight",
-       "value": 8.0
       }
      ]
     }
@@ -67733,10 +69694,6 @@
       {
        "stat": "offensiveChaosMin",
        "value": 8.0
-      },
-      {
-       "stat": "offensiveChaosModifier",
-       "value": 80.0
       }
      ]
     }
@@ -68192,11 +70149,7 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 10.0
-      },
-      {
-       "stat": "weaponDamagePct",
-       "value": 40.0
+       "value": 15.0
       }
      ]
     },
@@ -68441,7 +70394,7 @@
       },
       {
        "stat": "retaliationDamagePct",
-       "value": 12.0
+       "value": 22.0
       },
       {
        "stat": "skillChanceWeight",
@@ -68514,6 +70467,78 @@
       {
        "stat": "offensiveElementalMin",
        "value": 150.0
+      }
+     ]
+    }
+   ],
+   "set": null
+  },
+  {
+   "record": "records/items/gearhands/d312_hands.dbr",
+   "name_tag": "tagGDX3HandsD308",
+   "domain": "gear",
+   "slots": [
+    "hands"
+   ],
+   "gear_type": "hands",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDiBXALgdwE4zAYwAsYsACJLASwAcBnEAGhCwgwVArRigBkYA3GABs2IKBTAIAnABZGUCAA8p0gL5qgA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike4.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass03/curse2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass05/devastation.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass07/wpattack01.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass10/amatokpact2.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike1.dbr",
+     "stats": [
+      {
+       "stat": "offensiveFireMin",
+       "value": 24.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass03/curse1.dbr",
+     "stats": [
+      {
+       "stat": "characterDefensiveAbility",
+       "value": -60.0
+      },
+      {
+       "stat": "characterTotalSpeedModifier",
+       "value": -10.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass07/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "weaponDamagePct",
+       "value": 25.0
       }
      ]
     }
@@ -69831,7 +71856,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
@@ -69958,7 +71983,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     },
@@ -70047,7 +72072,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       }
      ]
     }
@@ -70279,11 +72304,11 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
-       "value": 25.0
+       "value": 40.0
       }
      ]
     },
@@ -70292,7 +72317,7 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
@@ -71522,44 +73547,6 @@
     }
    ],
    "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/gearhead/c117_head.dbr",
-   "name_tag": "tagGDX1HeadC106",
-   "domain": "gear",
-   "slots": [
-    "head"
-   ],
-   "gear_type": "head",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    75,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKB7ArgGwzAzjgBAOIQBecANCAE4QDuCoAlgC4xQAyMAbjBgyFEZgEATgAslKBAAeosQF9FQA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass02/flashbang2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass05/aetherray1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/totem1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [
-    {
-     "mastery": "records/skills/playerclass08/_classtraining_class08.dbr",
-     "level": 1
-    }
-   ],
    "modifiers": [],
    "set": null
   },
@@ -73103,7 +75090,7 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
@@ -74554,7 +76541,7 @@
      "stats": [
       {
        "stat": "offensiveLightningMin",
-       "value": 90.0
+       "value": 110.0
       },
       {
        "stat": "offensiveSlowLightningDurationMin",
@@ -74800,7 +76787,12 @@
       {
        "stat": "offensiveCritDamageModifier",
        "value": 15.0
-      },
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass10/wereraven1_skill01_icicles.dbr",
+     "stats": [
       {
        "stat": "refreshDurationAmount",
        "value": 1.0,
@@ -74810,12 +76802,6 @@
       {
        "stat": "refreshDurationChance",
        "value": 30.0,
-       "refresh_skill": "records/skills/playerclass01/fightingspirit1.dbr",
-       "refresh_trigger": "AttackEnemyCrit"
-      },
-      {
-       "stat": "refreshDurationMax",
-       "value": 6.0,
        "refresh_skill": "records/skills/playerclass01/fightingspirit1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
       }
@@ -74831,7 +76817,12 @@
       {
        "stat": "offensiveCritDamageModifier",
        "value": 15.0
-      },
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf1_skill01_claws.dbr",
+     "stats": [
       {
        "stat": "refreshDurationAmount",
        "value": 1.0,
@@ -74841,12 +76832,6 @@
       {
        "stat": "refreshDurationChance",
        "value": 30.0,
-       "refresh_skill": "records/skills/playerclass01/fightingspirit1.dbr",
-       "refresh_trigger": "AttackEnemyCrit"
-      },
-      {
-       "stat": "refreshDurationMax",
-       "value": 6.0,
        "refresh_skill": "records/skills/playerclass01/fightingspirit1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
       }
@@ -75373,7 +77358,7 @@
      "stats": [
       {
        "stat": "weaponDamagePct",
-       "value": 8.0
+       "value": 4.0
       }
      ]
     },
@@ -75840,7 +77825,7 @@
      "stats": [
       {
        "stat": "refreshCooldownAmount",
-       "value": 10.0,
+       "value": 15.0,
        "refresh_skill": "records/skills/playerclass03/summon_hellhound1.dbr",
        "refresh_trigger": "AttackEnemy"
       },
@@ -76013,6 +77998,121 @@
     }
    ],
    "set": null
+  },
+  {
+   "record": "records/items/gearhead/d323_head.dbr",
+   "name_tag": "tagGDX3HeadD320",
+   "domain": "gear",
+   "slots": [
+    "head"
+   ],
+   "gear_type": "head",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICSBzAlgJwwezAcgGcACANTQOwxABoQMIB3BUNAFxigBkYA3GAG2YgoaMAgCcAFlpQIADwmSAviqA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass09/wpattack01.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass07/_classtraining_class07.dbr",
+     "level": 1
+    },
+    {
+     "mastery": "records/skills/playerclass10/_classtraining_class10.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass09/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsFire",
+       "to_tag": "tagCharStatsChaos"
+      },
+      {
+       "stat": "offensiveChaosMin",
+       "value": 140.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 3.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 140.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/lootsets/itemset_d316.dbr"
+  },
+  {
+   "record": "records/items/gearhead/d324_head.dbr",
+   "name_tag": "tagGDX3HeadD321",
+   "domain": "gear",
+   "slots": [
+    "head"
+   ],
+   "gear_type": "head",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAnCYAmMMAIBqAlgM4QDmcANCGgO4KgEAuMUAMjAG4wA29IUBMAgCcAFipQIADxGiAvgqA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass10/passive03.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass02/_classtraining_class02.dbr",
+     "level": 1
+    },
+    {
+     "mastery": "records/skills/playerclass09/_classtraining_class09.dbr",
+     "level": 1
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagQualifyingDamageElemental",
+       "to_tag": "tagCharStatsPhysical"
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 16.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass09/wpattack02.dbr",
+     "stats": [
+      {
+       "stat": "weaponDamagePct",
+       "value": 30.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/lootsets/itemset_d317.dbr"
   },
   {
    "record": "records/items/gearlegs/b004e_legs.dbr",
@@ -76823,48 +78923,6 @@
    "set": null
   },
   {
-   "record": "records/items/gearlegs/c206_legs.dbr",
-   "name_tag": "tagGDX2LegsC202",
-   "domain": "gear",
-   "slots": [
-    "legs"
-   ],
-   "gear_type": "legs",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    30,
-    50,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICCBnALgJwgGwAQBkYBzAdywAcUQAaELEhUASzRikIDcZtGQomwCAJwAWWlAgAPYSIC+8oA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass01/cadence1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass05/mindovermatter1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/savagestrike1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass08/spectralarmor2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/passive04.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
    "record": "records/items/gearlegs/c303_legs.dbr",
    "name_tag": "tagGDX3LegsC301",
    "domain": "gear",
@@ -77510,6 +79568,42 @@
     },
     {
      "skill": "records/skills/playerclass10/amatokpact3.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": null
+  },
+  {
+   "record": "records/items/gearlegs/d311_legs.dbr",
+   "name_tag": "tagGDX3LegsD307",
+   "domain": "gear",
+   "slots": [
+    "legs"
+   ],
+   "gear_type": "legs",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDiBXALgdwgExgJwAIAZGAcwzwgAcBnEAGhEowVAEs0YoSA3GAG1YgobMAgCcAFkZQIADwmSAviqA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike2.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass06/weaponpool02.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass09/wpattack01.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/leap1.dbr",
      "level": 3
     }
    ],
@@ -80775,43 +82869,6 @@
    "set": null
   },
   {
-   "record": "records/items/gearshoulders/c110_shoulder.dbr",
-   "name_tag": "tagGDX1ShoulderC104",
-   "domain": "gear",
-   "slots": [
-    "shoulders"
-   ],
-   "gear_type": "shoulders",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    50,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCB7ArmALgTwAQAkNMYAnAcgGdcBlAC3QBsATUgczQhKYpABoQSEAO4JQAS2JQAMjABuMBqJBQxYBAE4ALPygQAHhs0BfE0A",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/ringofsteel.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass07/passive01.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass07/passive02.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass10/passive01.dbr",
-     "level": 3
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
    "record": "records/items/gearshoulders/c111_shoulder.dbr",
    "name_tag": "tagGDX1ShoulderC111",
    "domain": "gear",
@@ -83136,6 +85193,38 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
+  },
+  {
+   "record": "records/items/gearshoulders/d323_shoulder.dbr",
+   "name_tag": "tagGDX3ShoulderD319",
+   "domain": "gear",
+   "slots": [
+    "shoulders"
+   ],
+   "gear_type": "shoulders",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAnCYAmMMAIDiArhChiADQhoDuCoAlgC4xQAyMAbjADa0hR1gEATgAsFKBAAewkQF95QA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike2.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass09/presenceofvirtue3.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/leap2.dbr",
+     "level": 3
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": "records/items/lootsets/itemset_d317.dbr"
   },
   {
    "record": "records/items/geartorso/b002f_torso.dbr",
@@ -86359,6 +88448,38 @@
    "set": "records/items/lootsets/itemset_d313.dbr"
   },
   {
+   "record": "records/items/geartorso/d319_torso.dbr",
+   "name_tag": "tagGDX3TorsoD316",
+   "domain": "gear",
+   "slots": [
+    "chest"
+   ],
+   "gear_type": "chest",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAnCYAmMMAIDCEA5nADQhoDuCoAlgC4xQAyMAbjADbUhQ1gIBOACxkoEAB6ChAX1lA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass09/presenceofvirtue1.dbr",
+     "level": 3
+    },
+    {
+     "skill": "records/skills/playerclass10/leap1.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [],
+   "set": "records/items/lootsets/itemset_d317.dbr"
+  },
+  {
    "record": "records/items/gearweapons/axe1h/b001f_axe.dbr",
    "name_tag": "tagWeaponAxeB001",
    "domain": "gear",
@@ -86976,7 +89097,7 @@
       },
       {
        "stat": "offensivePhysicalMin",
-       "value": 132.0
+       "value": 60.0
       }
      ]
     },
@@ -87215,7 +89336,7 @@
      "stats": [
       {
        "stat": "offensiveSlowBleedingDurationMin",
-       "value": 2.0
+       "value": 5.0
       },
       {
        "stat": "offensiveSlowBleedingMin",
@@ -87478,7 +89599,7 @@
       },
       {
        "stat": "skillComboChargeLevel",
-       "value": 3.0
+       "value": 2.0
       },
       {
        "stat": "weaponDamagePct",
@@ -88073,7 +90194,7 @@
       },
       {
        "stat": "offensivePierceMin",
-       "value": 80.0
+       "value": 40.0
       },
       {
        "stat": "weaponDamagePct",
@@ -88614,7 +90735,12 @@
       {
        "stat": "offensiveSlowLightningModifier",
        "value": 150.0
-      },
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass10/werewolf1_skill01_claws.dbr",
+     "stats": [
       {
        "stat": "refreshCooldownAmount",
        "value": 2.0,
@@ -88830,7 +90956,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
@@ -88980,7 +91106,7 @@
       },
       {
        "stat": "offensiveDamageMultModifier",
-       "value": 70.0
+       "value": 45.0
       },
       {
        "stat": "skillCooldownTime",
@@ -89174,7 +91300,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 10.0
       }
      ]
     },
@@ -89234,7 +91360,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 10.0
       }
      ]
     }
@@ -90251,7 +92377,7 @@
      "stats": [
       {
        "stat": "weaponDamagePct",
-       "value": 33.0
+       "value": 45.0
       }
      ]
     }
@@ -90961,7 +93087,7 @@
      "stats": [
       {
        "stat": "retaliationDamagePct",
-       "value": 26.0
+       "value": 36.0
       }
      ]
     }
@@ -91138,18 +93264,8 @@
      ]
     },
     {
-     "skill": "records/skills/playerclass08/spectralarmor1.dbr",
+     "skill": "records/skills/playerclass08/soulscythe1.dbr",
      "stats": [
-      {
-       "stat": "conversionPercentage",
-       "value": 50.0,
-       "from_tag": "tagCharStatsAether",
-       "to_tag": "tagCharStatsCold"
-      },
-      {
-       "stat": "offensiveColdModifier",
-       "value": 60.0
-      },
       {
        "stat": "refreshCooldownAmount",
        "value": 2.0,
@@ -91161,6 +93277,21 @@
        "value": 25.0,
        "refresh_skill": "records/skills/playerclass10/leap1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass08/spectralarmor1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 50.0,
+       "from_tag": "tagCharStatsAether",
+       "to_tag": "tagCharStatsCold"
+      },
+      {
+       "stat": "offensiveColdModifier",
+       "value": 60.0
       }
      ]
     },
@@ -91221,7 +93352,7 @@
      "stats": [
       {
        "stat": "offensivePhysicalMin",
-       "value": 80.0
+       "value": 40.0
       },
       {
        "stat": "offensiveSlowPhysicalDurationMin",
@@ -94698,7 +96829,11 @@
       },
       {
        "stat": "offensiveColdMin",
-       "value": 110.0
+       "value": 140.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       }
      ]
     }
@@ -96199,7 +98334,7 @@
       },
       {
        "stat": "offensiveDamageMultModifier",
-       "value": 80.0
+       "value": 60.0
       },
       {
        "stat": "skillCooldownTime",
@@ -96222,7 +98357,7 @@
       },
       {
        "stat": "offensiveDamageMultModifier",
-       "value": 80.0
+       "value": 60.0
       },
       {
        "stat": "skillCooldownTime",
@@ -96302,7 +98437,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 10.0
       },
       {
        "stat": "weaponDamagePct",
@@ -96681,7 +98816,7 @@
      "stats": [
       {
        "stat": "offensiveDamageMultModifier",
-       "value": 80.0
+       "value": 50.0
       },
       {
        "stat": "skillCooldownTime",
@@ -99766,49 +101901,6 @@
    "set": null
   },
   {
-   "record": "records/items/gearweapons/focus/c111_focus.dbr",
-   "name_tag": "tagGDX1FocusC104",
-   "domain": "gear",
-   "slots": [
-    "off_hand"
-   ],
-   "gear_type": "offhand",
-   "rarity": "Epic",
-   "item_level": 84,
-   "tiers": [
-    50,
-    65,
-    84
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDqB7ATgEwAQoGZYEkwBHAVwEsBncgF3SwEEAjCAGxTBABoQ0IB3BKFowoAGRgA3GKyEgo5TvAAcAFh5QIADwRqAvgaA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass07/hunteraura2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass08/lifetap1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass09/ascension1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/wereraven1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [
-    {
-     "mastery": "records/skills/playerclass07/_classtraining_class07.dbr",
-     "level": 1
-    }
-   ],
-   "modifiers": [],
-   "set": null
-  },
-  {
    "record": "records/items/gearweapons/focus/c112_focus.dbr",
    "name_tag": "tagGDX1FocusC105",
    "domain": "gear",
@@ -100250,14 +102342,6 @@
       {
        "stat": "offensiveSlowFireModifier",
        "value": 450.0
-      },
-      {
-       "stat": "skillActiveDuration",
-       "value": 0.5
-      },
-      {
-       "stat": "skillCooldownTime",
-       "value": -1.0
       }
      ]
     },
@@ -100277,6 +102361,24 @@
       {
        "stat": "offensiveFireMin",
        "value": 60.0
+      },
+      {
+       "stat": "refreshDurationAmount",
+       "value": 0.4,
+       "refresh_skill": "records/skills/playerclass05/arcaneshield.dbr",
+       "refresh_trigger": "AttackEnemyCrit"
+      },
+      {
+       "stat": "refreshDurationChance",
+       "value": 15.0,
+       "refresh_skill": "records/skills/playerclass05/arcaneshield.dbr",
+       "refresh_trigger": "AttackEnemyCrit"
+      },
+      {
+       "stat": "refreshDurationMax",
+       "value": 1.2,
+       "refresh_skill": "records/skills/playerclass05/arcaneshield.dbr",
+       "refresh_trigger": "AttackEnemyCrit"
       }
      ]
     }
@@ -101218,10 +103320,6 @@
       {
        "stat": "offensiveSlowFireMin",
        "value": 160.0
-      },
-      {
-       "stat": "skillCooldownTime",
-       "value": -2.0
       }
      ]
     },
@@ -104232,6 +106330,10 @@
       {
        "stat": "offensiveElementalMin",
        "value": 200.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       }
      ]
     },
@@ -104481,7 +106583,7 @@
      "stats": [
       {
        "stat": "offensiveDamageMultModifier",
-       "value": 70.0
+       "value": 45.0
       },
       {
        "stat": "skillCooldownTime",
@@ -104494,7 +106596,7 @@
      "stats": [
       {
        "stat": "offensiveDamageMultModifier",
-       "value": 70.0
+       "value": 45.0
       },
       {
        "stat": "skillCooldownTime",
@@ -104582,6 +106684,110 @@
     }
    ],
    "set": "records/items/lootsets/itemset_d308.dbr"
+  },
+  {
+   "record": "records/items/gearweapons/guns1h/d308_gun1h.dbr",
+   "name_tag": "tagGDX3WeaponGun1hD305",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "ranged1h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICSBzAlgJwwezAcgGcACAZQFcwATGDGkAGhAwgHcFQ0AXGKAGRgBuMADbsQUNGAQBOACyMoEAB4zZAXw1A",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass07/wpattack01.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/wpattack01.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass07/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsFire",
+       "to_tag": "tagCharStatsChaos"
+      },
+      {
+       "stat": "explosionRadius",
+       "value": 1.5
+      },
+      {
+       "stat": "offensiveChaosMin",
+       "value": 140.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 3.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 140.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/lootsets/itemset_d316.dbr"
+  },
+  {
+   "record": "records/items/gearweapons/guns1h/d309_gun1h.dbr",
+   "name_tag": "tagGDX3WeaponGun1hD306",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "ranged1h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICSBzAlgJwwezAcgGcACAJQFcAHAFzIxgxABoQMIB3BUNKmKAGRgA3GABtOIKGjAIAnABZmUCAA9ZcgL6agA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass07/wpattack01.dbr",
+     "level": 2
+    },
+    {
+     "skill": "records/skills/playerclass10/wpattack01.dbr",
+     "level": 2
+    }
+   ],
+   "mastery_boosts": [],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass10/wpattack01.dbr",
+     "stats": [
+      {
+       "stat": "offensiveChaosMin",
+       "value": 60.0
+      },
+      {
+       "stat": "offensiveSlowBleedingDurationMin",
+       "value": 3.0
+      },
+      {
+       "stat": "offensiveSlowBleedingMin",
+       "value": 140.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/lootsets/itemset_d316.dbr"
   },
   {
    "record": "records/items/gearweapons/guns2h/b001f_gun2h.dbr",
@@ -104858,8 +107064,8 @@
        "value": 10.0
       },
       {
-       "stat": "offensiveDamageMultModifier",
-       "value": 12.0
+       "stat": "offensiveTotalDamageModifier",
+       "value": 120.0
       },
       {
        "stat": "refreshDurationAmount",
@@ -105303,19 +107509,11 @@
       },
       {
        "stat": "offensiveSlowBleedingMin",
-       "value": 140.0
-      },
-      {
-       "stat": "projectileLaunchNumber",
-       "value": 2.0
-      },
-      {
-       "stat": "projectileLaunchRotation",
-       "value": 15.0
+       "value": 300.0
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     }
@@ -105815,7 +108013,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 60.0
+       "value": 80.0
       }
      ]
     }
@@ -107524,7 +109722,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     },
@@ -107539,11 +109737,11 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "weaponDamagePct",
-       "value": 40.0
+       "value": 90.0
       }
      ]
     }
@@ -107649,7 +109847,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "skillTargetAngle",
@@ -107932,11 +110130,11 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "weaponDamagePct",
-       "value": 50.0
+       "value": 80.0
       }
      ]
     },
@@ -108305,11 +110503,11 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "weaponDamagePct",
-       "value": 50.0
+       "value": 80.0
       }
      ]
     }
@@ -108675,7 +110873,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "skillTargetAngle",
@@ -108814,7 +111012,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "skillTargetAngle",
@@ -109077,7 +111275,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "skillTargetAngle",
@@ -109554,7 +111752,7 @@
      "skill": "records/skills/playerclass10/onslaught1.dbr",
      "stats": [
       {
-       "stat": "offensiveDamageMultModifier",
+       "stat": "weaponDamagePct",
        "value": 15.0
       }
      ]
@@ -109570,7 +111768,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 10.0
+       "value": 15.0
       },
       {
        "stat": "skillTargetAngle",
@@ -109655,6 +111853,14 @@
        "value": 25.0,
        "refresh_skill": "records/skills/playerclass05/devastation.dbr",
        "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "skillTargetAngle",
+       "value": 90.0
+      },
+      {
+       "stat": "skillTargetNumber",
+       "value": 2.0
       }
      ]
     },
@@ -109678,16 +111884,20 @@
        "to_tag": "tagCharStatsChaos"
       },
       {
+       "stat": "offensiveChaosMin",
+       "value": 330.0
+      },
+      {
+       "stat": "offensiveLifeLeechMin",
+       "value": 5.0
+      },
+      {
        "stat": "overwriteBaseSkill",
        "value": 1.0
       },
       {
        "stat": "skillTargetRadius",
        "value": -1.0
-      },
-      {
-       "stat": "weaponDamagePct",
-       "value": 100.0
       }
      ]
     },
@@ -109798,7 +112008,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 50.0
+       "value": 70.0
       }
      ]
     }
@@ -110042,6 +112252,12 @@
      "skill": "records/skills/playerclass08/spectralarmor1.dbr",
      "stats": [
       {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsVitality",
+       "to_tag": "tagCharStatsCold"
+      },
+      {
        "stat": "offensiveColdMin",
        "value": 70.0
       },
@@ -110058,12 +112274,6 @@
     {
      "skill": "records/skills/playerclass08/weaponpool02.dbr",
      "stats": [
-      {
-       "stat": "conversionPercentage",
-       "value": 100.0,
-       "from_tag": "tagCharStatsVitality",
-       "to_tag": "tagCharStatsCold"
-      },
       {
        "stat": "skillChanceWeight",
        "value": 10.0
@@ -110561,6 +112771,12 @@
      "skill": "records/skills/playerclass08/spectralarmor1.dbr",
      "stats": [
       {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsVitality",
+       "to_tag": "tagCharStatsAcid"
+      },
+      {
        "stat": "offensivePoisonMin",
        "value": 70.0
       },
@@ -110579,12 +112795,6 @@
      "stats": [
       {
        "stat": "conversionPercentage",
-       "value": 100.0,
-       "from_tag": "tagCharStatsVitality",
-       "to_tag": "tagCharStatsAcid"
-      },
-      {
-       "stat": "conversionPercentage2",
        "value": 100.0,
        "from_tag": "tagCharStatsCold",
        "to_tag": "tagCharStatsAcid"
@@ -110634,7 +112844,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 50.0
+       "value": 70.0
       }
      ]
     }
@@ -110724,6 +112934,10 @@
        "value": 25.0,
        "refresh_skill": "records/skills/playerclass05/arcanemissile.dbr",
        "refresh_trigger": "AttackEnemy"
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 15.0
       }
      ]
     }
@@ -111827,8 +114041,12 @@
      "skill": "records/skills/playerclass06/weaponpool02.dbr",
      "stats": [
       {
+       "stat": "skillChanceWeight",
+       "value": 15.0
+      },
+      {
        "stat": "weaponDamagePct",
-       "value": 45.0
+       "value": 80.0
       }
      ]
     },
@@ -111845,7 +114063,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 50.0
+       "value": 80.0
       }
      ]
     }
@@ -112580,7 +114798,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     }
@@ -112637,7 +114855,7 @@
       },
       {
        "stat": "refreshDurationAmount",
-       "value": 3.0,
+       "value": 1.0,
        "refresh_skill": "records/skills/playerclass02/passive1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
       },
@@ -112649,13 +114867,13 @@
       },
       {
        "stat": "refreshDurationMax",
-       "value": 9.0,
+       "value": 15.0,
        "refresh_skill": "records/skills/playerclass02/passive1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     },
@@ -112681,7 +114899,7 @@
       },
       {
        "stat": "refreshDurationAmount",
-       "value": 3.0,
+       "value": 1.0,
        "refresh_skill": "records/skills/playerclass02/passive1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
       },
@@ -112693,13 +114911,13 @@
       },
       {
        "stat": "refreshDurationMax",
-       "value": 9.0,
+       "value": 15.0,
        "refresh_skill": "records/skills/playerclass02/passive1.dbr",
        "refresh_trigger": "AttackEnemyCrit"
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     }
@@ -112810,7 +115028,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       }
      ]
     }
@@ -112860,7 +115078,7 @@
       },
       {
        "stat": "offensiveColdMin",
-       "value": 110.0
+       "value": 220.0
       }
      ]
     },
@@ -112883,6 +115101,89 @@
     }
    ],
    "set": "records/items/lootsets/itemset_d315.dbr"
+  },
+  {
+   "record": "records/items/gearweapons/melee2h/d308_sword2h.dbr",
+   "name_tag": "tagGDX3WeaponMelee2hD305",
+   "domain": "gear",
+   "slots": [
+    "main_hand",
+    "off_hand"
+   ],
+   "gear_type": "sword2h",
+   "rarity": "Legendary",
+   "item_level": 94,
+   "tiers": [
+    94
+   ],
+   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAnCYAmMMAIDKANhAJ4wogA0IaA7gqAJYAuMUAMjAG4wH0hQMwCAJwAWKlAgAPEaIC+CoA",
+   "boosts": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike1.dbr",
+     "level": 4
+    },
+    {
+     "skill": "records/skills/playerclass09/wpattack02.dbr",
+     "level": 6
+    }
+   ],
+   "mastery_boosts": [
+    {
+     "mastery": "records/skills/playerclass10/_classtraining_class10.dbr",
+     "level": 2
+    }
+   ],
+   "modifiers": [
+    {
+     "skill": "records/skills/playerclass02/flamestrike1.dbr",
+     "stats": [
+      {
+       "stat": "conversionPercentage",
+       "value": 100.0,
+       "from_tag": "tagCharStatsChaos",
+       "to_tag": "tagCharStatsPhysical"
+      },
+      {
+       "stat": "skillTargetAngle",
+       "value": 120.0
+      },
+      {
+       "stat": "skillTargetNumber",
+       "value": 3.0
+      },
+      {
+       "stat": "weaponDamagePct",
+       "value": 30.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass09/wpattack02.dbr",
+     "stats": [
+      {
+       "stat": "Sword2h",
+       "value": 1.0
+      },
+      {
+       "stat": "offensiveSlowPhysicalDurationMin",
+       "value": 5.0
+      },
+      {
+       "stat": "offensiveSlowPhysicalMin",
+       "value": 280.0
+      },
+      {
+       "stat": "overwriteBaseSkill",
+       "value": 1.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 20.0
+      }
+     ]
+    }
+   ],
+   "set": "records/items/lootsets/itemset_d317.dbr"
   },
   {
    "record": "records/items/gearweapons/shields/b001f_shielda.dbr",
@@ -114482,19 +116783,32 @@
       },
       {
        "stat": "refreshCooldownAmount",
-       "value": 2.5,
+       "value": 1.0,
        "refresh_skill": "records/skills/playerclass03/doombolt1.dbr",
        "refresh_trigger": "AttackEnemy"
       },
       {
        "stat": "refreshCooldownChance",
-       "value": 30.0,
+       "value": 100.0,
        "refresh_skill": "records/skills/playerclass03/doombolt1.dbr",
        "refresh_trigger": "AttackEnemy"
       },
       {
        "stat": "weaponDamagePct",
        "value": 70.0
+      }
+     ]
+    },
+    {
+     "skill": "records/skills/playerclass01/cadence3.dbr",
+     "stats": [
+      {
+       "stat": "characterSpellCastSpeedModifier",
+       "value": 10.0
+      },
+      {
+       "stat": "offensiveChaosMin",
+       "value": 40.0
       }
      ]
     },
@@ -116061,7 +118375,7 @@
      "stats": [
       {
        "stat": "offensivePhysicalMin",
-       "value": 124.0
+       "value": 80.0
       },
       {
        "stat": "skillManaCostReduction",
@@ -116168,7 +118482,7 @@
       },
       {
        "stat": "offensivePoisonMin",
-       "value": 180.0
+       "value": 100.0
       },
       {
        "stat": "retaliationDamagePct",
@@ -116899,7 +119213,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 55.0
+       "value": 35.0
       }
      ]
     },
@@ -117764,7 +120078,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 18.0
+       "value": 12.0
       }
      ]
     },
@@ -117772,12 +120086,8 @@
      "skill": "records/skills/playerclass10/onslaught1.dbr",
      "stats": [
       {
-       "stat": "skillTargetAngle",
-       "value": 60.0
-      },
-      {
-       "stat": "skillTargetNumber",
-       "value": 1.0
+       "stat": "weaponDamagePct",
+       "value": 16.0
       }
      ]
     }
@@ -118089,45 +120399,6 @@
     },
     {
      "skill": "records/skills/playerclass04/wpattack4.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/gearweapons/swords1h/c103_sword.dbr",
-   "name_tag": "tagGDX1WeaponSwordC101",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "sword1h",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    25,
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDCAbGEwGcYBMAEAQihDjHgPYBmeAoigObkrkAuAFiADQgBOEA7glABLFjCgAZGADcYKISCjCwCAJwAWblAgAPNeoC+RoA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass06/squall1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass07/lightningnet1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass09/ascension1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/wpattack02.dbr",
      "level": 2
     }
    ],
@@ -118488,7 +120759,7 @@
       },
       {
        "stat": "offensivePoisonMin",
-       "value": 110.0
+       "value": 70.0
       },
       {
        "stat": "offensiveSlowPoisonDurationMin",
@@ -118645,6 +120916,10 @@
       {
        "stat": "offensivePierceMin",
        "value": 200.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       }
      ]
     },
@@ -119182,14 +121457,6 @@
      "skill": "records/skills/playerclass01/cadence1.dbr",
      "stats": [
       {
-       "stat": "offensiveTotalResistanceReductionAbsoluteDurationMin",
-       "value": 2.0
-      },
-      {
-       "stat": "offensiveTotalResistanceReductionAbsoluteMin",
-       "value": 20.0
-      },
-      {
        "stat": "skillTargetAngle",
        "value": 100.0
       },
@@ -119672,35 +121939,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearaccessories/medals/c012_medal.dbr",
-   "name_tag": "tagMedalC012",
-   "domain": "gear",
-   "slots": [
-    "medal"
-   ],
-   "gear_type": "medal",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    70,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICqYAWB7ANgTwAQGUBLAc0M13QDNcAXVGXAYXQDcZIwaQAaEAJwgB3BKEI0YUADIw2mESCiEwCAJwAWXlAgAPVWoC+hoA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/summon_hellhound2_petmodifier.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass03/summon_raven4_petmodifier.dbr",
-     "level": 3
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c011b.dbr"
   },
   {
    "record": "records/items/upgraded/gearaccessories/medals/c017_medal.dbr",
@@ -120194,40 +122432,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearaccessories/medals/c038_medal.dbr",
-   "name_tag": "tagMedalC004",
-   "domain": "gear",
-   "slots": [
-    "medal"
-   ],
-   "gear_type": "medal",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    25,
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABALITYDWIANCNhAO4KgCWALjFADIwAbjBQcQUTmAQBOACxMoEAB6y5AX01A",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/passive2.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass06/totem2_petmodifier.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass10/werewolf3.dbr",
-     "level": 3
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c004c.dbr"
   },
   {
    "record": "records/items/upgraded/gearaccessories/medals/c039_medal.dbr",
@@ -121360,43 +123564,6 @@
     },
     {
      "skill": "records/skills/playerclass09/righteousfervor2.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearaccessories/necklaces/c037_necklace.dbr",
-   "name_tag": "tagNecklaceC037",
-   "domain": "gear",
-   "slots": [
-    "amulet"
-   ],
-   "gear_type": "amulet",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    75,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICSBjGAXAThADiANCNgO4KgCW6MUAMjAG4wA2ZIU5YCAnACyFQQAHtx4BfcUA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/veilofshadows2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass05/chillingsurge.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass07/icerune.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/windsofasterkarn1.dbr",
      "level": 2
     }
    ],
@@ -122877,7 +125044,11 @@
      "stats": [
       {
        "stat": "retaliationDamagePct",
-       "value": 16.0
+       "value": 24.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       }
      ]
     }
@@ -128198,7 +130369,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 60.0
+       "value": 40.0
       }
      ]
     }
@@ -128460,35 +130631,6 @@
    ],
    "modifiers": [],
    "set": "records/items/lootsets/itemset_c010b.dbr"
-  },
-  {
-   "record": "records/items/upgraded/gearhead/c021_head.dbr",
-   "name_tag": "tagHeadC021",
-   "domain": "gear",
-   "slots": [
-    "head"
-   ],
-   "gear_type": "head",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    70,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICqYAWB7ANgTwAQDUBLAZwgHMZd0AzXAF1UoGF0A3GSMOkAGhACcIAdwShCdGFAAyMdplEgohMAgCcAFj5QIADzXqAvkaA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass03/summon_raven1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c011b.dbr"
   },
   {
    "record": "records/items/upgraded/gearhead/c022_head.dbr",
@@ -128892,40 +131034,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearhead/c044_head.dbr",
-   "name_tag": "tagHeadC009",
-   "domain": "gear",
-   "slots": [
-    "head"
-   ],
-   "gear_type": "head",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    25,
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMJoDuKIANCNhDQqAJYAuMUAMjABuMevFBQOYBAE4ALEygQAHjNkBfDUA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/phantomblade_mod1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/werewolf2.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c004c.dbr"
   },
   {
    "record": "records/items/upgraded/gearhead/c047_head.dbr",
@@ -129698,7 +131806,7 @@
      "stats": [
       {
        "stat": "weaponDamagePct",
-       "value": 60.0
+       "value": 40.0
       }
      ]
     }
@@ -130233,7 +132341,7 @@
       },
       {
        "stat": "skillCooldownTime",
-       "value": -4.0
+       "value": -3.0
       }
      ]
     }
@@ -130287,7 +132395,7 @@
       },
       {
        "stat": "offensiveChaosMin",
-       "value": 144.0
+       "value": 80.0
       },
       {
        "stat": "offensiveDamageMultModifier",
@@ -130323,7 +132431,11 @@
       },
       {
        "stat": "offensiveChaosMin",
-       "value": 120.0
+       "value": 200.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       }
      ]
     }
@@ -131595,35 +133707,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearshoulders/c012_shoulder.dbr",
-   "name_tag": "tagShoulderC012",
-   "domain": "gear",
-   "slots": [
-    "shoulders"
-   ],
-   "gear_type": "shoulders",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    70,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcICqYAWB7ANgTwAQFkIwAXTGXdAM12NXIGF0A3GSEkAGhACcIB3BKACWxGFAAyMFpkEgoQsAgCcAFi5QIAD2UqAvvqA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/bondsofbysmiel1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass03/bondsofbysmiel2.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c011b.dbr"
   },
   {
    "record": "records/items/upgraded/gearshoulders/c013_shoulder.dbr",
@@ -133056,47 +135139,6 @@
    "set": null
   },
   {
-   "record": "records/items/upgraded/geartorso/c015_torso.dbr",
-   "name_tag": "tagTorsoC015",
-   "domain": "gear",
-   "slots": [
-    "chest"
-   ],
-   "gear_type": "chest",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAHAlgExgJwM5oBsBrAAgAkIBXAIxyJABoRsIB3BUNAFxigBkYANxgEOIKGjAIAnABYmUCAA8ZsgL4agA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass01/cadence1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass04/shadowstrike_mod1.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass04/wpattack4.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass09/pathofthethree1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/passive04.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
    "record": "records/items/upgraded/geartorso/c016_torso.dbr",
    "name_tag": "tagTorsoC016",
    "domain": "gear",
@@ -133552,40 +135594,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/geartorso/c043_torso.dbr",
-   "name_tag": "tagTorsoC008",
-   "domain": "gear",
-   "slots": [
-    "chest"
-   ],
-   "gear_type": "chest",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    25,
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMJoQAuIANCNhAO4KgCWtMUAMjABuMFBxBROYBAE4ALEygQAHjNkBfDUA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/phantomblade_mod1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/werewolf2.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c004c.dbr"
   },
   {
    "record": "records/items/upgraded/geartorso/c045_torso.dbr",
@@ -134759,45 +136767,6 @@
    "set": null
   },
   {
-   "record": "records/items/upgraded/gearweapons/axe1h/c019_axe.dbr",
-   "name_tag": "tagWeaponAxeC005",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "axe1h",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    26,
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAXA9gJygcgM4AIBRAEwHM4AaEDCAdwVAEsUYoAZGANxgBsGQojMAgCcAFipQIAD1FiAvoqA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass02/stunjacks1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/naturesblessing3.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/squall3.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass07/lightningnet2.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
    "record": "records/items/upgraded/gearweapons/axe1h/c021_axe.dbr",
    "name_tag": "tagWeaponAxeC007",
    "domain": "gear",
@@ -134836,42 +136805,6 @@
    ],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/axe1h/c025_axe.dbr",
-   "name_tag": "tagWeaponAxeC004",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "axe1h",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    1,
-    25,
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMIp4BuRIANCNhAO4KgCWALjFABkY9FJxBQuYBAE4ALMygQAHjNkBfDUA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/phantomblade.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/werewolf1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c004c.dbr"
   },
   {
    "record": "records/items/upgraded/gearweapons/axe1h/d001_axe.dbr",
@@ -135182,7 +137115,11 @@
      "stats": [
       {
        "stat": "offensivePhysicalMin",
-       "value": 50.0
+       "value": 120.0
+      },
+      {
+       "stat": "skillChanceWeight",
+       "value": 10.0
       },
       {
        "stat": "waveDistance",
@@ -135397,44 +137334,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": "records/items/lootsets/itemset_c009b.dbr"
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/blunt1h/c013_blunt.dbr",
-   "name_tag": "tagWeaponBluntC013",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "mace1h",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    58,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbCBjA1gAgBITABNsB7AM2wGUCIAnAckoEsmwQAaEWiAdwVCYAXGFAAyMAG4wU-EFFYIAnABZOUCAA8lygL56gA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass03/summon_hellhound4_petmodifier.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/summon_briarthorn1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass08/summon_skeleton1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
   },
   {
    "record": "records/items/upgraded/gearweapons/blunt1h/c015_blunt.dbr",
@@ -135969,7 +137868,7 @@
       },
       {
        "stat": "offensiveFireMin",
-       "value": 60.0
+       "value": 40.0
       },
       {
        "stat": "offensiveSlowFireDurationMin",
@@ -135977,7 +137876,7 @@
       },
       {
        "stat": "offensiveSlowFireMin",
-       "value": 180.0
+       "value": 210.0
       }
      ]
     }
@@ -136491,36 +138390,6 @@
    "set": null
   },
   {
-   "record": "records/items/upgraded/gearweapons/caster/c022_dagger.dbr",
-   "name_tag": "tagWeaponCaster1hC022",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "dagger",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    70,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgSxpgBACIQDmJMATvmgGb4AuAFjPgMJoBuMkY9IANCAoQA7glDZ6MKABkYXFOJBRsYBAE4ALIKgQAHhs0BfE0A",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/summon_hellhound1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass03/summon_raven1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c011b.dbr"
-  },
-  {
    "record": "records/items/upgraded/gearweapons/caster/c024_scepter.dbr",
    "name_tag": "tagWeaponCaster1hC001",
    "domain": "gear",
@@ -136745,41 +138614,6 @@
     },
     {
      "skill": "records/skills/playerclass10/wereraven3.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/caster/c033_scepter.dbr",
-   "name_tag": "tagWeaponCaster1hC010",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "scepter",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    40,
-    75,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIAyBLAZjARisATGATiADQgEQDuCoKALjFEjAG4wA21IUOCAnACykoEAB59+AXylA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/witchfire2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/totem1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass08/reapspirit1.dbr",
      "level": 2
     }
    ],
@@ -137487,10 +139321,6 @@
       {
        "stat": "skillComboChargeLevel",
        "value": 3.0
-      },
-      {
-       "stat": "skillTargetRadius",
-       "value": 1.0
       }
      ]
     }
@@ -138245,10 +140075,6 @@
       {
        "stat": "offensiveAetherMin",
        "value": 120.0
-      },
-      {
-       "stat": "skillCooldownTime",
-       "value": -1.2
       }
      ]
     },
@@ -138356,35 +140182,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/focus/c012_focus.dbr",
-   "name_tag": "tagFocusC012",
-   "domain": "gear",
-   "slots": [
-    "off_hand"
-   ],
-   "gear_type": "offhand",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    70,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDCALCYwwDYEswHMACAeQCcAjQgewDNCAXFGQpKgNxkjHpABoRSEAO4JQOejCgAZGByyiQUPAgCcAFn5QIAD1VqAvoaA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/summon_hellhound3_petmodifier.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass03/summon_hellhound4_petmodifier.dbr",
-     "level": 3
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c011b.dbr"
   },
   {
    "record": "records/items/upgraded/gearweapons/focus/c016_focus.dbr",
@@ -139438,7 +141235,7 @@
      "stats": [
       {
        "stat": "offensiveFireMin",
-       "value": 95.0
+       "value": 70.0
       },
       {
        "stat": "offensiveLifeLeechMin",
@@ -139450,7 +141247,7 @@
       },
       {
        "stat": "offensiveSlowFireMin",
-       "value": 180.0
+       "value": 200.0
       },
       {
        "stat": "retaliationDamagePct",
@@ -139966,44 +141763,6 @@
     },
     {
      "skill": "records/skills/playerclass07/wpattack03.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/guns1h/c024_gun1h.dbr",
-   "name_tag": "tagWeaponGun1hC006B",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "ranged1h",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    58,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAbArgcwzATiANCDhAO4KgCWALjFADIwBuMK5IUFYCAnACyFQIADx68AvhKA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass01/cadence2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass01/cadence3.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass07/passive01.dbr",
-     "level": 3
-    },
-    {
-     "skill": "records/skills/playerclass07/voiceofcommand1.dbr",
      "level": 2
     }
    ],
@@ -140661,7 +142420,7 @@
       },
       {
        "stat": "offensivePhysicalMin",
-       "value": 110.0
+       "value": 130.0
       }
      ]
     }
@@ -140822,37 +142581,6 @@
    "mastery_boosts": [
     {
      "mastery": "records/skills/playerclass03/_classtraining_class03.dbr",
-     "level": 2
-    }
-   ],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/guns2h/c017_gun2h.dbr",
-   "name_tag": "tagWeaponGun2hC008",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "ranged2h",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    50,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDqAnCAXAFgIxQSzAHMYUQAaENAdwVD3RigBkYA3GAG1pCgIQE4ALBSgQAHgMEBfGUA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass09/summon_celestialguardian2_petmodifier.dbr",
-     "level": 4
-    }
-   ],
-   "mastery_boosts": [
-    {
-     "mastery": "records/skills/playerclass08/_classtraining_class08.dbr",
      "level": 2
     }
    ],
@@ -141446,7 +143174,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 30.0
+       "value": 50.0
       }
      ]
     }
@@ -142056,7 +143784,7 @@
      "stats": [
       {
        "stat": "skillChanceWeight",
-       "value": 15.0
+       "value": 20.0
       },
       {
        "stat": "weaponDamagePct",
@@ -142082,12 +143810,6 @@
       {
        "stat": "refreshDurationChance",
        "value": 15.0,
-       "refresh_skill": "records/skills/playerclass07/passive02.dbr",
-       "refresh_trigger": "AttackEnemy"
-      },
-      {
-       "stat": "refreshDurationMax",
-       "value": 9.0,
        "refresh_skill": "records/skills/playerclass07/passive02.dbr",
        "refresh_trigger": "AttackEnemy"
       }
@@ -142386,42 +144108,6 @@
     }
    ],
    "mastery_boosts": [],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/melee2h/c024_sword2h.dbr",
-   "name_tag": "tagWeaponMelee2hC003",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "sword2h",
-   "rarity": "Epic",
-   "item_level": 84,
-   "tiers": [
-    14,
-    58,
-    84
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIDKAbAlgFwBYCMJjgBoQAnCAdwVExigBkYA3GFKkKNMBADgBZioEAB49eAXwlA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass03/bloodofdreeg1.dbr",
-     "level": 4
-    }
-   ],
-   "mastery_boosts": [
-    {
-     "mastery": "records/skills/playerclass01/_classtraining_class01.dbr",
-     "level": 2
-    },
-    {
-     "mastery": "records/skills/playerclass04/_classtraining_class04.dbr",
-     "level": 2
-    }
-   ],
    "modifiers": [],
    "set": null
   },
@@ -143330,6 +145016,10 @@
        "to_tag": "tagCharStatsVitality"
       },
       {
+       "stat": "cooldownCharges",
+       "value": 1.0
+      },
+      {
        "stat": "offensiveLifeLeechMin",
        "value": 12.0
       }
@@ -143438,7 +145128,7 @@
       },
       {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "skillTargetAngle",
@@ -143454,18 +145144,12 @@
      "skill": "records/skills/playerclass10/wpattack02.dbr",
      "stats": [
       {
-       "stat": "conversionPercentage",
-       "value": 100.0,
-       "from_tag": "tagCharStatsCold",
-       "to_tag": "tagCharStatsPhysical"
-      },
-      {
        "stat": "skillChanceWeight",
-       "value": 20.0
+       "value": 15.0
       },
       {
        "stat": "weaponDamagePct",
-       "value": 50.0
+       "value": 90.0
       }
      ]
     }
@@ -143549,40 +145233,6 @@
     {
      "mastery": "records/skills/playerclass02/_classtraining_class02.dbr",
      "level": 2
-    }
-   ],
-   "modifiers": [],
-   "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/shields/c009_shield.dbr",
-   "name_tag": "tagShieldC009",
-   "domain": "gear",
-   "slots": [
-    "off_hand"
-   ],
-   "gear_type": "shield",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    75,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIAiEDuYDOALCAnAJgAQBCArgDap4DWIANCLmgqAJYAuMUAMjAG4xyLEFFZgEATgAsDKBAAekqQF9VQA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass02/blastshield2.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass07/auracensure1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [
-    {
-     "mastery": "records/skills/playerclass09/_classtraining_class09.dbr",
-     "level": 1
     }
    ],
    "modifiers": [],
@@ -144390,8 +146040,12 @@
      "skill": "records/skills/playerclass09/wpattack02.dbr",
      "stats": [
       {
+       "stat": "skillChanceWeight",
+       "value": 10.0
+      },
+      {
        "stat": "weaponDamagePct",
-       "value": 40.0
+       "value": 45.0
       }
      ]
     },
@@ -144406,7 +146060,7 @@
       },
       {
        "stat": "weaponDamagePct",
-       "value": 35.0
+       "value": 45.0
       }
      ]
     }
@@ -144958,41 +146612,6 @@
    "mastery_boosts": [],
    "modifiers": [],
    "set": null
-  },
-  {
-   "record": "records/items/upgraded/gearweapons/swords1h/c027_sword.dbr",
-   "name_tag": "tagWeaponSwordC006",
-   "domain": "gear",
-   "slots": [
-    "main_hand",
-    "off_hand"
-   ],
-   "gear_type": "sword1h",
-   "rarity": "Epic",
-   "item_level": 94,
-   "tiers": [
-    25,
-    65,
-    94
-   ],
-   "grimtools": "https://www.grimtools.com/db/advsearch?query=N4IgdghgtgpiBcIBCAbA9mgJgJxhADjNgOQDOABAMIoQDuIANCNnQqAJYAuMUAMjADcYKNiCjswCAJwAWJlAgAPaTIC+6oA",
-   "boosts": [
-    {
-     "skill": "records/skills/playerclass04/phantomblade.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass06/devouringswarm1.dbr",
-     "level": 2
-    },
-    {
-     "skill": "records/skills/playerclass10/werewolf1.dbr",
-     "level": 2
-    }
-   ],
-   "mastery_boosts": [],
-   "modifiers": [],
-   "set": "records/items/lootsets/itemset_c004c.dbr"
   },
   {
    "record": "records/items/upgraded/gearweapons/swords1h/d001_sword.dbr",

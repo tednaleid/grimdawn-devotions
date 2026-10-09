@@ -1,8 +1,8 @@
 {
  "meta": {
-  "game_version": "1.3.0.7",
-  "steam_buildid": "24756825",
-  "generated_utc": "2026-08-18T23:50:27Z"
+  "game_version": "1.3.1.1",
+  "steam_buildid": "25813250",
+  "generated_utc": "2026-10-09T01:53:59Z"
  },
  "stats": {
   "records/items/awakened/gearaccessories/medals/c010_medal.dbr": [
@@ -62,6 +62,62 @@
    },
    {
     "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
+   }
+  ],
+  "records/items/awakened/gearaccessories/medals/c012_medal.dbr": [
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 6.0,
+    "high": 6.0
+   },
+   {
+    "stat": "defensiveTotalSpeedResistance",
+    "source": "pet_bonus",
+    "low": 30.0,
+    "high": 30.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 304.0,
+    "high": 456.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 32.0,
+    "high": 48.0
+   },
+   {
+    "stat": "defensivePierce",
+    "source": "self",
+    "low": 18.0,
+    "high": 26.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
     "source": "self",
     "low": 60.0,
     "high": 90.0
@@ -213,6 +269,136 @@
     "source": "self",
     "low": 56.0,
     "high": 84.0
+   }
+  ],
+  "records/items/awakened/gearaccessories/medals/c038_medal.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensiveAether",
+    "source": "self",
+    "low": 21.0,
+    "high": 31.0
+   },
+   {
+    "stat": "defensiveBleeding",
+    "source": "self",
+    "low": 31.0,
+    "high": 45.0
+   },
+   {
+    "stat": "offensiveLifeLeech",
+    "source": "self",
+    "low": 5.0,
+    "high": 7.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveSlowBleeding",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDuration",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
+   }
+  ],
+  "records/items/awakened/gearaccessories/medals/c110_medal.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 76.0,
+    "high": 112.0
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensiveChaos",
+    "source": "self",
+    "low": 23.0,
+    "high": 33.0
+   },
+   {
+    "stat": "defensivePierce",
+    "source": "self",
+    "low": 16.0,
+    "high": 24.0
+   },
+   {
+    "stat": "offensiveLifeModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
+   },
+   {
+    "stat": "offensiveSlowLifeModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
    }
   ],
   "records/items/awakened/gearaccessories/medals/c117_medal.dbr": [
@@ -499,18 +685,80 @@
     "high": 90.0
    }
   ],
+  "records/items/awakened/gearaccessories/necklaces/c037_necklace.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "defensiveCold",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
+   },
+   {
+    "stat": "defensiveColdMaxResist",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "defensiveFreeze",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
+    "stat": "offensiveColdModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
+   },
+   {
+    "stat": "offensiveSlowColdModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
+   }
+  ],
   "records/items/awakened/gearaccessories/necklaces/c049_necklace.dbr": [
    {
     "stat": "characterTotalSpeedModifier",
     "source": "pet_bonus",
     "low": 10.0,
     "high": 10.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
    },
    {
     "stat": "offensivePoisonModifier",
@@ -1097,8 +1345,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 12.0,
-    "high": 12.0
+    "low": 6.0,
+    "high": 6.0
    },
    {
     "stat": "characterOffensiveAbilityModifier",
@@ -1183,6 +1431,122 @@
     "source": "skill_buff",
     "low": 20.0,
     "high": 20.0
+   }
+  ],
+  "records/items/awakened/gearaccessories/rings/c113_ring.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "defensiveLifeMaxResist",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "defensivePierce",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
+    "stat": "offensiveLightning",
+    "source": "self",
+    "low": 4.0,
+    "high": 16.0
+   },
+   {
+    "stat": "offensiveLightningModifier",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 56.0,
+    "high": 84.0
+   },
+   {
+    "stat": "offensiveSlowLightningModifier",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
+    "source": "self",
+    "low": 56.0,
+    "high": 84.0
+   },
+   {
+    "stat": "offensiveLightning",
+    "source": "skill",
+    "low": 50.0,
+    "high": 255.0
+   },
+   {
+    "stat": "offensiveSlowLightning",
+    "source": "skill",
+    "low": 122.0,
+    "high": 122.0
+   },
+   {
+    "stat": "offensiveSlowLightningDuration",
+    "source": "skill",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercent",
+    "source": "skill",
+    "low": 15.0,
+    "high": 15.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercentDuration",
+    "source": "skill",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 0.5,
+    "high": 0.5
+   },
+   {
+    "stat": "skillProcChance",
+    "source": "skill",
+    "low": 10.0,
+    "high": 10.0
    }
   ],
   "records/items/awakened/gearaccessories/rings/c117_ring.dbr": [
@@ -1603,18 +1967,6 @@
     "high": 15.0
    },
    {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 70.0,
@@ -1653,8 +2005,8 @@
    {
     "stat": "defensiveElementalResistance",
     "source": "self",
-    "low": 26.0,
-    "high": 38.0
+    "low": 34.0,
+    "high": 50.0
    },
    {
     "stat": "defensiveProtection",
@@ -1667,6 +2019,86 @@
     "source": "self",
     "low": 40.0,
     "high": 60.0
+   }
+  ],
+  "records/items/awakened/gearaccessories/waist/c109_waist.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 320.0,
+    "high": 480.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 72.0,
+    "high": 108.0
+   },
+   {
+    "stat": "defensiveBleeding",
+    "source": "self",
+    "low": 16.0,
+    "high": 24.0
+   },
+   {
+    "stat": "defensiveBleedingMaxResist",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 28.0,
+    "high": 40.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 77.0,
+    "high": 115.0
+   },
+   {
+    "stat": "offensiveAetherModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
+   },
+   {
+    "stat": "offensiveColdModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
+   },
+   {
+    "stat": "offensiveCritDamageModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "offensiveSlowColdModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
    }
   ],
   "records/items/awakened/gearaccessories/waist/c112_waist.dbr": [
@@ -2035,6 +2467,80 @@
     "source": "skill",
     "low": 20.0,
     "high": 20.0
+   }
+  ],
+  "records/items/awakened/gearfeet/c107_feet.dbr": [
+   {
+    "stat": "defensiveTotalSpeedResistance",
+    "source": "pet_bonus",
+    "low": 25.0,
+    "high": 25.0
+   },
+   {
+    "stat": "offensiveCritDamageModifier",
+    "source": "pet_bonus",
+    "low": 8.0,
+    "high": 8.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterDefensiveAbilityModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "characterRunSpeedModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "defensiveBleeding",
+    "source": "self",
+    "low": 16.0,
+    "high": 24.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 36.0,
+    "high": 52.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 719.0,
+    "high": 1077.0
+   },
+   {
+    "stat": "defensiveTotalSpeedResistance",
+    "source": "self",
+    "low": 20.0,
+    "high": 30.0
+   },
+   {
+    "stat": "skillActiveDuration",
+    "source": "skill",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 40.0,
+    "high": 40.0
    }
   ],
   "records/items/awakened/gearfeet/c209_feet.dbr": [
@@ -2503,6 +3009,80 @@
     "high": 78.0
    }
   ],
+  "records/items/awakened/gearhands/c210_hands.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 13.0,
+    "high": 19.0
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 13.0,
+    "high": 19.0
+   },
+   {
+    "stat": "defensiveAether",
+    "source": "self",
+    "low": 23.0,
+    "high": 33.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 856.0,
+    "high": 1284.0
+   },
+   {
+    "stat": "offensiveLifeModifier",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "offensivePoison",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "offensivePoisonModifier",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "offensiveSlowLifeModifier",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "offensiveSlowPoisonModifier",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "retaliationPoison",
+    "source": "self",
+    "low": 352.0,
+    "high": 528.0
+   }
+  ],
   "records/items/awakened/gearhands/c303_hands.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -2569,6 +3149,74 @@
     "source": "self",
     "low": 52.0,
     "high": 78.0
+   }
+  ],
+  "records/items/awakened/gearhead/c021_head.dbr": [
+   {
+    "stat": "characterDefensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 5.0,
+    "high": 5.0
+   },
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 10.0,
+    "high": 10.0
+   },
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 416.0,
+    "high": 624.0
+   },
+   {
+    "stat": "characterManaRegen",
+    "source": "self",
+    "low": 3.8,
+    "high": 3.8
+   },
+   {
+    "stat": "defensiveChaos",
+    "source": "self",
+    "low": 29.0,
+    "high": 43.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 23.0,
+    "high": 33.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 891.0,
+    "high": 1335.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
    }
   ],
   "records/items/awakened/gearhead/c040_head.dbr": [
@@ -2651,6 +3299,74 @@
     "high": 62.0
    }
   ],
+  "records/items/awakened/gearhead/c044_head.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterDexterity",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 528.0,
+    "high": 792.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 29.0,
+    "high": 43.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 20.0,
+    "high": 30.0
+   },
+   {
+    "stat": "defensivePhysical",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1061.0,
+    "high": 1591.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 39.0,
+    "high": 57.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDurationModifier",
+    "source": "self",
+    "low": 30.0,
+    "high": 30.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   }
+  ],
   "records/items/awakened/gearhead/c116_head.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -2731,6 +3447,98 @@
     "high": 84.0
    }
   ],
+  "records/items/awakened/gearhead/c117_head.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentMasteryLevel2",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterDefensiveAbility",
+    "source": "self",
+    "low": 40.0,
+    "high": 60.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 480.0,
+    "high": 720.0
+   },
+   {
+    "stat": "characterManaRegen",
+    "source": "self",
+    "low": 3.8,
+    "high": 3.8
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensiveBleeding",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
+    "stat": "defensivePoison",
+    "source": "self",
+    "low": 32.0,
+    "high": 48.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 891.0,
+    "high": 1335.0
+   },
+   {
+    "stat": "defensiveStun",
+    "source": "self",
+    "low": 20.0,
+    "high": 30.0
+   },
+   {
+    "stat": "offensiveAetherModifier",
+    "source": "self",
+    "low": 56.0,
+    "high": 84.0
+   },
+   {
+    "stat": "offensiveLifeModifier",
+    "source": "self",
+    "low": 56.0,
+    "high": 84.0
+   },
+   {
+    "stat": "offensiveSlowLifeModifier",
+    "source": "self",
+    "low": 56.0,
+    "high": 84.0
+   }
+  ],
   "records/items/awakened/gearhead/c122_head.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -2801,12 +3609,6 @@
     "high": 12.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
-   },
-   {
     "stat": "offensiveChaos",
     "source": "pet_bonus",
     "low": 10.0,
@@ -2857,8 +3659,8 @@
    {
     "stat": "defensiveElementalResistance",
     "source": "self",
-    "low": 24.0,
-    "high": 36.0
+    "low": 32.0,
+    "high": 48.0
    },
    {
     "stat": "defensiveProtection",
@@ -3363,8 +4165,8 @@
    {
     "stat": "characterLife",
     "source": "self",
-    "low": 864.0,
-    "high": 1296.0
+    "low": 544.0,
+    "high": 816.0
    },
    {
     "stat": "defensiveAether",
@@ -3665,6 +4467,142 @@
     "high": 25.0
    }
   ],
+  "records/items/awakened/gearlegs/c206_legs.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterDodgePercent",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 808.0,
+    "high": 1212.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 32.0,
+    "high": 48.0
+   },
+   {
+    "stat": "defensivePoison",
+    "source": "self",
+    "low": 26.0,
+    "high": 38.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1220.0,
+    "high": 1828.0
+   },
+   {
+    "stat": "offensiveAetherModifier",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "offensiveLightningModifier",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "offensiveSlowLightningModifier",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "offensiveAether",
+    "source": "skill",
+    "low": 233.0,
+    "high": 480.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 1.5,
+    "high": 1.5
+   },
+   {
+    "stat": "skillProcChance",
+    "source": "skill",
+    "low": 25.0,
+    "high": 25.0
+   }
+  ],
+  "records/items/awakened/gearshoulders/c012_shoulder.dbr": [
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "pet_bonus",
+    "low": 8.0,
+    "high": 8.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterDefensiveAbility",
+    "source": "self",
+    "low": 52.0,
+    "high": 76.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 416.0,
+    "high": 624.0
+   },
+   {
+    "stat": "defensiveAether",
+    "source": "self",
+    "low": 32.0,
+    "high": 48.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 26.0,
+    "high": 38.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 891.0,
+    "high": 1335.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   }
+  ],
   "records/items/awakened/gearshoulders/c019_shoulder.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -3871,6 +4809,92 @@
     "source": "skill",
     "low": 30.0,
     "high": 30.0
+   }
+  ],
+  "records/items/awakened/gearshoulders/c110_shoulder.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterDeflectProjectile",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "characterLifeModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 42.0,
+    "high": 62.0
+   },
+   {
+    "stat": "defensiveBleeding",
+    "source": "self",
+    "low": 29.0,
+    "high": 43.0
+   },
+   {
+    "stat": "defensivePierce",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1061.0,
+    "high": 1591.0
+   },
+   {
+    "stat": "offensivePierce",
+    "source": "self",
+    "low": 9.0,
+    "high": 13.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 40.0,
+    "high": 60.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "characterAttackSpeedMaxModifier",
+    "source": "skill",
+    "low": 10.0,
+    "high": 10.0
+   },
+   {
+    "stat": "characterDefensiveAbilityModifier",
+    "source": "skill",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "skill",
+    "low": 4.0,
+    "high": 4.0
    }
   ],
   "records/items/awakened/gearshoulders/c304_shoulder.dbr": [
@@ -4119,6 +5143,116 @@
     "high": 79.0
    }
   ],
+  "records/items/awakened/geartorso/c015_torso.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterDefensiveAbility",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 37.0,
+    "high": 55.0
+   },
+   {
+    "stat": "defensiveChaos",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
+    "stat": "defensivePoison",
+    "source": "self",
+    "low": 29.0,
+    "high": 43.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1220.0,
+    "high": 1830.0
+   },
+   {
+    "stat": "defensiveTrap",
+    "source": "self",
+    "low": 40.0,
+    "high": 60.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 39.0,
+    "high": 57.0
+   },
+   {
+    "stat": "offensivePoisonModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveSlowPoisonDurationModifier",
+    "source": "self",
+    "low": 50.0,
+    "high": 50.0
+   },
+   {
+    "stat": "offensiveSlowPoisonModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "characterDefensiveAbilityModifier",
+    "source": "skill_buff",
+    "low": 6.0,
+    "high": 6.0
+   },
+   {
+    "stat": "characterManaLimitReserve",
+    "source": "skill_buff",
+    "low": 250.0,
+    "high": 250.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "skill_buff",
+    "low": 60.0,
+    "high": 60.0
+   },
+   {
+    "stat": "offensivePoisonModifier",
+    "source": "skill_buff",
+    "low": 70.0,
+    "high": 70.0
+   },
+   {
+    "stat": "offensiveSlowPoisonModifier",
+    "source": "skill_buff",
+    "low": 70.0,
+    "high": 70.0
+   },
+   {
+    "stat": "skillTargetRadius",
+    "source": "skill_buff",
+    "low": 15.0,
+    "high": 15.0
+   }
+  ],
   "records/items/awakened/geartorso/c024_torso.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -4295,6 +5429,68 @@
     "source": "skill_buff",
     "low": 15.0,
     "high": 15.0
+   }
+  ],
+  "records/items/awakened/geartorso/c043_torso.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 720.0,
+    "high": 1080.0
+   },
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensivePierce",
+    "source": "self",
+    "low": 36.0,
+    "high": 52.0
+   },
+   {
+    "stat": "defensivePoison",
+    "source": "self",
+    "low": 26.0,
+    "high": 38.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1220.0,
+    "high": 1828.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 39.0,
+    "high": 57.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDurationModifier",
+    "source": "self",
+    "low": 30.0,
+    "high": 30.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
    }
   ],
   "records/items/awakened/geartorso/c107_torso.dbr": [
@@ -4925,6 +6121,110 @@
     "high": 40.0
    }
   ],
+  "records/items/awakened/gearweapons/axe1h/c019_axe.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterDefensiveAbility",
+    "source": "self",
+    "low": 23.0,
+    "high": 33.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 288.0,
+    "high": 432.0
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 16.0,
+    "high": 24.0
+   },
+   {
+    "stat": "offensiveLightningModifier",
+    "source": "self",
+    "low": 82.0,
+    "high": 122.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "self",
+    "low": 114.0,
+    "high": 148.0
+   },
+   {
+    "stat": "offensiveSlowLightningModifier",
+    "source": "self",
+    "low": 82.0,
+    "high": 122.0
+   },
+   {
+    "stat": "retaliationLightning",
+    "source": "self",
+    "low": 320.0,
+    "high": 480.0
+   },
+   {
+    "stat": "retaliationTotalDamageModifier",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "offensiveLightning",
+    "source": "skill",
+    "low": 135.0,
+    "high": 650.0
+   },
+   {
+    "stat": "offensiveStun",
+    "source": "skill",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "retaliationDamagePct",
+    "source": "skill",
+    "low": 12.0,
+    "high": 12.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 2.5,
+    "high": 2.5
+   },
+   {
+    "stat": "skillProcChance",
+    "source": "skill",
+    "low": 30.0,
+    "high": 30.0
+   },
+   {
+    "stat": "skillTargetRadius",
+    "source": "skill",
+    "low": 2.0,
+    "high": 2.0
+   }
+  ],
   "records/items/awakened/gearweapons/axe1h/c022_axe.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -5033,6 +6333,148 @@
     "source": "skill",
     "low": 6.0,
     "high": 6.0
+   }
+  ],
+  "records/items/awakened/gearweapons/axe1h/c025_axe.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 336.0,
+    "high": 504.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 60.0,
+    "high": 88.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "self",
+    "low": 84.0,
+    "high": 128.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 68.0,
+    "high": 102.0
+   },
+   {
+    "stat": "offensivePierceRatio",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   },
+   {
+    "stat": "offensiveSlowBleeding",
+    "source": "self",
+    "low": 17.0,
+    "high": 25.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDuration",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDurationModifier",
+    "source": "self",
+    "low": 75.0,
+    "high": 75.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   }
+  ],
+  "records/items/awakened/gearweapons/blunt1h/c013_blunt.dbr": [
+   {
+    "stat": "characterDefensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 6.0,
+    "high": 6.0
+   },
+   {
+    "stat": "characterLifeModifier",
+    "source": "pet_bonus",
+    "low": 6.0,
+    "high": 6.0
+   },
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 6.0,
+    "high": 6.0
+   },
+   {
+    "stat": "offensiveTotalDamageModifier",
+    "source": "pet_bonus",
+    "low": 55.0,
+    "high": 55.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterDefensiveAbilityModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "self",
+    "low": 94.0,
+    "high": 193.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "skillProcChance",
+    "source": "skill",
+    "low": 50.0,
+    "high": 50.0
    }
   ],
   "records/items/awakened/gearweapons/blunt1h/c022_blunt.dbr": [
@@ -5171,6 +6613,130 @@
     "high": 126.0
    }
   ],
+  "records/items/awakened/gearweapons/caster/c022_dagger.dbr": [
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 6.0,
+    "high": 6.0
+   },
+   {
+    "stat": "offensiveChaos",
+    "source": "pet_bonus",
+    "low": 12.0,
+    "high": 12.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "pet_bonus",
+    "low": 150.0,
+    "high": 150.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "offensiveBaseLife",
+    "source": "self",
+    "low": 70.0,
+    "high": 75.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 149.0,
+    "high": 223.0
+   }
+  ],
+  "records/items/awakened/gearweapons/caster/c033_scepter.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 258.0,
+    "high": 386.0
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
+   },
+   {
+    "stat": "offensiveBaseLife",
+    "source": "self",
+    "low": 77.0,
+    "high": 80.0
+   },
+   {
+    "stat": "offensiveLife",
+    "source": "self",
+    "low": 17.0,
+    "high": 25.0
+   },
+   {
+    "stat": "offensiveLifeLeech",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "offensiveLifeModifier",
+    "source": "self",
+    "low": 151.0,
+    "high": 225.0
+   },
+   {
+    "stat": "offensiveSlowLifeModifier",
+    "source": "self",
+    "low": 151.0,
+    "high": 225.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercent",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercentDuration",
+    "source": "self",
+    "low": 5.0,
+    "high": 5.0
+   }
+  ],
   "records/items/awakened/gearweapons/caster/c108_dagger.dbr": [
    {
     "stat": "characterDefensiveAbilityModifier",
@@ -5183,12 +6749,6 @@
     "source": "pet_bonus",
     "low": 6.0,
     "high": 6.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -5415,12 +6975,6 @@
   ],
   "records/items/awakened/gearweapons/caster/c305_dagger.dbr": [
    {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
-   },
-   {
     "stat": "offensiveElementalModifier",
     "source": "pet_bonus",
     "low": 200.0,
@@ -5485,6 +7039,62 @@
     "source": "self",
     "low": 80.0,
     "high": 120.0
+   }
+  ],
+  "records/items/awakened/gearweapons/focus/c012_focus.dbr": [
+   {
+    "stat": "characterOffensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 12.0,
+    "high": 12.0
+   },
+   {
+    "stat": "defensiveStun",
+    "source": "pet_bonus",
+    "low": 30.0,
+    "high": 30.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterManaRegenModifier",
+    "source": "self",
+    "low": 74.0,
+    "high": 74.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 56.0,
+    "high": 84.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 26.0,
+    "high": 38.0
+   },
+   {
+    "stat": "defensiveStun",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 96.0,
+    "high": 144.0
    }
   ],
   "records/items/awakened/gearweapons/focus/c026_focus.dbr": [
@@ -5571,6 +7181,62 @@
     "source": "skill",
     "low": 280.0,
     "high": 280.0
+   }
+  ],
+  "records/items/awakened/gearweapons/focus/c111_focus.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 740.0,
+    "high": 1108.0
+   },
+   {
+    "stat": "characterManaRegen",
+    "source": "self",
+    "low": 5.5,
+    "high": 5.5
+   },
+   {
+    "stat": "characterManaRegenModifier",
+    "source": "self",
+    "low": 25.0,
+    "high": 25.0
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
+   },
+   {
+    "stat": "defensiveCrowdControl",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "offensiveElementalModifier",
+    "source": "self",
+    "low": 82.0,
+    "high": 122.0
    }
   ],
   "records/items/awakened/gearweapons/focus/c114_focus.dbr": [
@@ -6035,6 +7701,86 @@
     "high": 122.0
    }
   ],
+  "records/items/awakened/gearweapons/guns1h/c024_gun1h.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 68.0,
+    "high": 100.0
+   },
+   {
+    "stat": "offensiveCritDamageModifier",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "offensiveKnockdown",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "offensiveKnockdownChance",
+    "source": "self",
+    "low": 15.0,
+    "high": 15.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "self",
+    "low": 66.0,
+    "high": 80.0
+   },
+   {
+    "stat": "offensivePierce",
+    "source": "self",
+    "low": 18.0,
+    "high": 26.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "offensivePierceRatio",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercent",
+    "source": "self",
+    "low": 8.0,
+    "high": 12.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercentDuration",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   }
+  ],
   "records/items/awakened/gearweapons/guns1h/c029_gun1h.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -6219,6 +7965,86 @@
     "source": "self",
     "low": 80.0,
     "high": 120.0
+   }
+  ],
+  "records/items/awakened/gearweapons/guns2h/c017_gun2h.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 16.0,
+    "high": 24.0
+   },
+   {
+    "stat": "characterIntelligence",
+    "source": "self",
+    "low": 53.0,
+    "high": 79.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 71.0,
+    "high": 105.0
+   },
+   {
+    "stat": "offensiveBaseLife",
+    "source": "self",
+    "low": 216.0,
+    "high": 246.0
+   },
+   {
+    "stat": "offensiveLife",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveLifeLeech",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "offensiveLifeModifier",
+    "source": "self",
+    "low": 144.0,
+    "high": 216.0
+   },
+   {
+    "stat": "offensiveSlowLifeModifier",
+    "source": "self",
+    "low": 144.0,
+    "high": 216.0
+   },
+   {
+    "stat": "offensiveLife",
+    "source": "skill",
+    "low": 180.0,
+    "high": 180.0
+   },
+   {
+    "stat": "offensiveLifeLeech",
+    "source": "skill",
+    "low": 15.0,
+    "high": 15.0
    }
   ],
   "records/items/awakened/gearweapons/guns2h/c022_gun2h.dbr": [
@@ -6577,6 +8403,98 @@
     "high": 1.0
    }
   ],
+  "records/items/awakened/gearweapons/melee2h/c024_sword2h.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentMasteryLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 18.0,
+    "high": 26.0
+   },
+   {
+    "stat": "characterDexterity",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 1392.0,
+    "high": 2088.0
+   },
+   {
+    "stat": "offensiveBasePoison",
+    "source": "self",
+    "low": 312.0,
+    "high": 378.0
+   },
+   {
+    "stat": "offensivePoison",
+    "source": "self",
+    "low": 55.0,
+    "high": 90.0
+   },
+   {
+    "stat": "offensivePoisonModifier",
+    "source": "self",
+    "low": 176.0,
+    "high": 264.0
+   },
+   {
+    "stat": "offensiveSlowPoisonModifier",
+    "source": "self",
+    "low": 176.0,
+    "high": 264.0
+   },
+   {
+    "stat": "offensivePoison",
+    "source": "skill",
+    "low": 220.0,
+    "high": 220.0
+   },
+   {
+    "stat": "offensiveSlowPoison",
+    "source": "skill",
+    "low": 166.0,
+    "high": 166.0
+   },
+   {
+    "stat": "offensiveSlowPoisonDuration",
+    "source": "skill",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "skillTargetNumber",
+    "source": "skill",
+    "low": 5.0,
+    "high": 5.0
+   }
+  ],
   "records/items/awakened/gearweapons/melee2h/c026_blunt2h.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -6919,6 +8837,146 @@
     "source": "self",
     "low": 160.0,
     "high": 240.0
+   }
+  ],
+  "records/items/awakened/gearweapons/shields/c009_shield.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentMasteryLevel2",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterLightRadius",
+    "source": "self",
+    "low": 25.0,
+    "high": 25.0
+   },
+   {
+    "stat": "characterStrength",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "defensiveBlock",
+    "source": "self",
+    "low": 1275.0,
+    "high": 1275.0
+   },
+   {
+    "stat": "defensiveBlockChance",
+    "source": "self",
+    "low": 32.0,
+    "high": 32.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 44.0,
+    "high": 66.0
+   },
+   {
+    "stat": "defensivePhysical",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "offensiveBaseCold",
+    "source": "self",
+    "low": 58.0,
+    "high": 58.0
+   },
+   {
+    "stat": "offensiveBaseFire",
+    "source": "self",
+    "low": 58.0,
+    "high": 58.0
+   },
+   {
+    "stat": "offensiveBaseLightning",
+    "source": "self",
+    "low": 58.0,
+    "high": 58.0
+   },
+   {
+    "stat": "offensiveElementalModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 90.0
+   },
+   {
+    "stat": "retaliationFire",
+    "source": "self",
+    "low": 1320.0,
+    "high": 1980.0
+   },
+   {
+    "stat": "retaliationTotalDamageModifier",
+    "source": "self",
+    "low": 72.0,
+    "high": 108.0
+   },
+   {
+    "stat": "offensiveElemental",
+    "source": "skill",
+    "low": 300.0,
+    "high": 300.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercent",
+    "source": "skill",
+    "low": 20.0,
+    "high": 20.0
+   },
+   {
+    "stat": "offensiveTotalDamageReductionPercentDuration",
+    "source": "skill",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "retaliationDamagePct",
+    "source": "skill",
+    "low": 16.0,
+    "high": 16.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "skillProcChance",
+    "source": "skill",
+    "low": 30.0,
+    "high": 30.0
+   },
+   {
+    "stat": "skillTargetRadius",
+    "source": "skill",
+    "low": 6.0,
+    "high": 6.0
    }
   ],
   "records/items/awakened/gearweapons/shields/c015_shield.dbr": [
@@ -7409,6 +9467,142 @@
     "source": "skill",
     "low": 3.0,
     "high": 3.0
+   }
+  ],
+  "records/items/awakened/gearweapons/swords1h/c027_sword.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 336.0,
+    "high": 504.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 60.0,
+    "high": 88.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "self",
+    "low": 91.0,
+    "high": 114.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 68.0,
+    "high": 102.0
+   },
+   {
+    "stat": "offensivePierceRatio",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   },
+   {
+    "stat": "offensiveSlowBleeding",
+    "source": "self",
+    "low": 17.0,
+    "high": 25.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDuration",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDurationModifier",
+    "source": "self",
+    "low": 75.0,
+    "high": 75.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   }
+  ],
+  "records/items/awakened/gearweapons/swords1h/c103_sword.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 62.0,
+    "high": 92.0
+   },
+   {
+    "stat": "offensiveBaseCold",
+    "source": "self",
+    "low": 28.0,
+    "high": 61.0
+   },
+   {
+    "stat": "offensiveBaseLightning",
+    "source": "self",
+    "low": 28.0,
+    "high": 61.0
+   },
+   {
+    "stat": "offensiveColdModifier",
+    "source": "self",
+    "low": 162.0,
+    "high": 242.0
+   },
+   {
+    "stat": "offensiveLightningModifier",
+    "source": "self",
+    "low": 162.0,
+    "high": 242.0
+   },
+   {
+    "stat": "offensiveSlowColdDurationModifier",
+    "source": "self",
+    "low": 50.0,
+    "high": 50.0
+   },
+   {
+    "stat": "offensiveSlowColdModifier",
+    "source": "self",
+    "low": 162.0,
+    "high": 242.0
+   },
+   {
+    "stat": "offensiveSlowLightningDurationModifier",
+    "source": "self",
+    "low": 50.0,
+    "high": 50.0
+   },
+   {
+    "stat": "offensiveSlowLightningModifier",
+    "source": "self",
+    "low": 162.0,
+    "high": 242.0
    }
   ],
   "records/items/awakened/gearweapons/swords1h/c203_sword.dbr": [
@@ -8407,12 +10601,6 @@
     "high": 8.0
    },
    {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 120.0,
@@ -8523,12 +10711,6 @@
     "source": "pet_bonus",
     "low": 5.0,
     "high": 5.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -9931,8 +12113,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
+    "low": 10.0,
+    "high": 10.0
    },
    {
     "stat": "characterTotalSpeedModifier",
@@ -12491,12 +14673,6 @@
     "source": "pet_bonus",
     "low": 5.0,
     "high": 5.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
    },
    {
     "stat": "offensiveCritDamageModifier",
@@ -15595,10 +17771,10 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveAether",
+    "stat": "defensiveStun",
     "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
+    "low": 20.0,
+    "high": 20.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -16833,12 +19009,6 @@
     "source": "pet_bonus",
     "low": 8.0,
     "high": 8.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -18397,12 +20567,6 @@
     "source": "pet_bonus",
     "low": 6.0,
     "high": 6.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -20179,12 +22343,6 @@
     "high": 10.0
    },
    {
-    "stat": "defensiveBleeding",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 80.0,
@@ -20687,7 +22845,7 @@
     "high": 7.0
    },
    {
-    "stat": "defensivePoison",
+    "stat": "defensiveStun",
     "source": "pet_bonus",
     "low": 25.0,
     "high": 25.0
@@ -22213,18 +24371,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 35.0,
@@ -22325,16 +24471,16 @@
   ],
   "records/items/faction/torso/f102b_torso.dbr": [
    {
+    "stat": "characterDefensiveAbilityModifier",
+    "source": "pet_bonus",
+    "low": 5.0,
+    "high": 5.0
+   },
+   {
     "stat": "characterOffensiveAbilityModifier",
     "source": "pet_bonus",
     "low": 8.0,
     "high": 8.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "defensiveTotalSpeedResistance",
@@ -23185,7 +25331,7 @@
     "high": 25.0
    },
    {
-    "stat": "defensivePoison",
+    "stat": "defensiveStun",
     "source": "pet_bonus",
     "low": 25.0,
     "high": 25.0
@@ -23555,12 +25701,6 @@
     "source": "pet_bonus",
     "low": 6.0,
     "high": 6.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -24145,7 +26285,7 @@
   ],
   "records/items/faction/torso/f212b_torso.dbr": [
    {
-    "stat": "defensiveChaos",
+    "stat": "defensiveFreeze",
     "source": "pet_bonus",
     "low": 25.0,
     "high": 25.0
@@ -26237,12 +28377,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 33.0,
-    "high": 33.0
-   },
-   {
     "stat": "augmentMasteryLevel1",
     "source": "self",
     "low": 1.0,
@@ -26443,8 +28577,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 12.0,
-    "high": 12.0
+    "low": 8.0,
+    "high": 8.0
    },
    {
     "stat": "characterTotalSpeedModifier",
@@ -26599,8 +28733,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
+    "low": 10.0,
+    "high": 10.0
    },
    {
     "stat": "offensiveCritDamageModifier",
@@ -27048,12 +29182,6 @@
    }
   ],
   "records/items/faction/weapons/caster/f207a_dagger.dbr": [
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
    {
     "stat": "defensivePetrify",
     "source": "pet_bonus",
@@ -28529,16 +30657,10 @@
   ],
   "records/items/faction/weapons/focus/f301a_focus.dbr": [
    {
-    "stat": "defensiveBleeding",
+    "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
+    "low": 8.0,
+    "high": 8.0
    },
    {
     "stat": "offensiveColdModifier",
@@ -32935,12 +35057,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "augmentSkillLevel1",
     "source": "self",
     "low": 4.0,
@@ -33553,12 +35669,6 @@
     "high": 24.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 36.0,
@@ -33993,92 +36103,6 @@
     "source": "self",
     "low": 56.0,
     "high": 84.0
-   }
-  ],
-  "records/items/gearaccessories/medals/c110_medal.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 71.0,
-    "high": 105.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "self",
-    "low": 19.0,
-    "high": 27.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "self",
-    "low": 13.0,
-    "high": 19.0
-   },
-   {
-    "stat": "offensiveLifeModifier",
-    "source": "self",
-    "low": 61.0,
-    "high": 91.0
-   },
-   {
-    "stat": "offensivePhysicalModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   },
-   {
-    "stat": "offensiveSlowLifeModifier",
-    "source": "self",
-    "low": 61.0,
-    "high": 91.0
-   },
-   {
-    "stat": "offensiveSlowPhysicalModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   },
-   {
-    "stat": "offensiveLife",
-    "source": "skill",
-    "low": 292.0,
-    "high": 292.0
-   },
-   {
-    "stat": "offensiveLifeLeech",
-    "source": "skill",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "skillTargetRadius",
-    "source": "skill",
-    "low": 6.0,
-    "high": 6.0
    }
   ],
   "records/items/gearaccessories/medals/c111_medal.dbr": [
@@ -35795,12 +37819,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveBleeding",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
-   },
-   {
     "stat": "defensivePetrify",
     "source": "pet_bonus",
     "low": 20.0,
@@ -35851,8 +37869,8 @@
    {
     "stat": "defensiveElementalResistance",
     "source": "self",
-    "low": 30.0,
-    "high": 44.0
+    "low": 34.0,
+    "high": 50.0
    },
    {
     "stat": "defensiveFireMaxResist",
@@ -36052,12 +38070,6 @@
    }
   ],
   "records/items/gearaccessories/medals/d213_medal.dbr": [
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
    {
     "stat": "offensivePoisonModifier",
     "source": "pet_bonus",
@@ -38187,18 +40199,6 @@
     "high": 12.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 50.0,
@@ -38289,8 +40289,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 16.0,
-    "high": 16.0
+    "low": 10.0,
+    "high": 10.0
    },
    {
     "stat": "offensiveElemental",
@@ -41791,14 +43791,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 24.0,
-    "high": 24.0
-   },
-   {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
+    "low": 12.0,
+    "high": 12.0
    },
    {
     "stat": "offensiveElementalModifier",
@@ -41823,6 +43817,12 @@
     "source": "self",
     "low": 272.0,
     "high": 408.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
    },
    {
     "stat": "defensivePetrify",
@@ -42799,10 +44799,10 @@
   ],
   "records/items/gearaccessories/necklaces/d316_necklace.dbr": [
    {
-    "stat": "defensiveElementalResistance",
+    "stat": "characterAttackSpeedModifier",
     "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
+    "low": 8.0,
+    "high": 8.0
    },
    {
     "stat": "offensiveColdModifier",
@@ -43035,6 +45035,130 @@
     "source": "skill",
     "low": 3.0,
     "high": 3.0
+   }
+  ],
+  "records/items/gearaccessories/necklaces/d319_necklace.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentMasteryLevel2",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "defensiveAether",
+    "source": "self",
+    "low": 36.0,
+    "high": 52.0
+   },
+   {
+    "stat": "defensiveAetherMaxResist",
+    "source": "self",
+    "low": 4.0,
+    "high": 6.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "self",
+    "low": 8.0,
+    "high": 12.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
+    "source": "self",
+    "low": 61.0,
+    "high": 91.0
+   }
+  ],
+  "records/items/gearaccessories/necklaces/d320_necklace.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterTotalSpeedModifier",
+    "source": "self",
+    "low": 7.0,
+    "high": 9.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 29.0,
+    "high": 43.0
+   },
+   {
+    "stat": "defensiveTotalSpeedResistance",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 88.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 60.0,
+    "high": 88.0
    }
   ],
   "records/items/gearaccessories/rings/b002f_ring_outlawleader.dbr": [
@@ -43605,6 +45729,12 @@
     "high": 62.0
    },
    {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
     "stat": "offensiveAetherModifier",
     "source": "self",
     "low": 36.0,
@@ -43881,12 +46011,6 @@
     "source": "pet_bonus",
     "low": 10.0,
     "high": 10.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -44251,92 +46375,6 @@
     "source": "self",
     "low": 23.0,
     "high": 33.0
-   }
-  ],
-  "records/items/gearaccessories/rings/c113_ring.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterAttackSpeedModifier",
-    "source": "self",
-    "low": 5.0,
-    "high": 7.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 21.0,
-    "high": 31.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "defensiveLifeMaxResist",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
-   },
-   {
-    "stat": "offensiveLightningModifier",
-    "source": "self",
-    "low": 64.0,
-    "high": 96.0
-   },
-   {
-    "stat": "offensivePhysicalModifier",
-    "source": "self",
-    "low": 56.0,
-    "high": 84.0
-   },
-   {
-    "stat": "offensiveSlowLightningModifier",
-    "source": "self",
-    "low": 64.0,
-    "high": 96.0
-   },
-   {
-    "stat": "offensiveSlowPhysicalModifier",
-    "source": "self",
-    "low": 56.0,
-    "high": 84.0
-   },
-   {
-    "stat": "offensiveLightning",
-    "source": "skill",
-    "low": 52.0,
-    "high": 596.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 10.0,
-    "high": 10.0
    }
   ],
   "records/items/gearaccessories/rings/c114_ring.dbr": [
@@ -46679,12 +48717,6 @@
   ],
   "records/items/gearaccessories/rings/d211_ring.dbr": [
    {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "offensiveElemental",
     "source": "pet_bonus",
     "low": 15.0,
@@ -46728,12 +48760,6 @@
    }
   ],
   "records/items/gearaccessories/rings/d212_ring.dbr": [
-   {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
    {
     "stat": "offensiveElemental",
     "source": "pet_bonus",
@@ -48345,12 +50371,6 @@
   ],
   "records/items/gearaccessories/waist/b103e_waist.dbr": [
    {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
     "stat": "augmentMasteryLevel1",
     "source": "self",
     "low": 1.0,
@@ -49139,122 +51159,6 @@
     "high": 3.0
    }
   ],
-  "records/items/gearaccessories/waist/c109_waist.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 29.0,
-    "high": 43.0
-   },
-   {
-    "stat": "defensiveBleeding",
-    "source": "self",
-    "low": 16.0,
-    "high": 24.0
-   },
-   {
-    "stat": "defensiveBleedingMaxResist",
-    "source": "self",
-    "low": 4.0,
-    "high": 6.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "self",
-    "low": 24.0,
-    "high": 36.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 77.0,
-    "high": 115.0
-   },
-   {
-    "stat": "offensiveAetherModifier",
-    "source": "self",
-    "low": 61.0,
-    "high": 91.0
-   },
-   {
-    "stat": "offensiveColdModifier",
-    "source": "self",
-    "low": 61.0,
-    "high": 91.0
-   },
-   {
-    "stat": "offensiveCritDamageModifier",
-    "source": "self",
-    "low": 4.0,
-    "high": 6.0
-   },
-   {
-    "stat": "offensiveSlowColdModifier",
-    "source": "self",
-    "low": 61.0,
-    "high": 91.0
-   },
-   {
-    "stat": "offensiveCold",
-    "source": "skill",
-    "low": 408.0,
-    "high": 408.0
-   },
-   {
-    "stat": "offensiveFreeze",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "offensiveFreezeChance",
-    "source": "skill",
-    "low": 33.0,
-    "high": 33.0
-   },
-   {
-    "stat": "offensiveSlowTotalSpeed",
-    "source": "skill",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "offensiveSlowTotalSpeedDuration",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "skillTargetRadius",
-    "source": "skill",
-    "low": 5.0,
-    "high": 5.0
-   }
-  ],
   "records/items/gearaccessories/waist/c110_waist.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -49347,18 +51251,6 @@
     "source": "pet_bonus",
     "low": 4.0,
     "high": 4.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -50125,18 +52017,6 @@
     "source": "pet_bonus",
     "low": 4.0,
     "high": 4.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
    },
    {
     "stat": "augmentMasteryLevel1",
@@ -51251,12 +53131,6 @@
   ],
   "records/items/gearaccessories/waist/d210_waist.dbr": [
    {
-    "stat": "defensiveBleeding",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
     "stat": "defensiveConvert",
     "source": "pet_bonus",
     "low": 100.0,
@@ -52043,12 +53917,6 @@
     "high": 5.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
-   },
-   {
     "stat": "defensivePetrify",
     "source": "pet_bonus",
     "low": 100.0,
@@ -52409,68 +54277,6 @@
     "source": "skill",
     "low": 100.0,
     "high": 100.0
-   }
-  ],
-  "records/items/gearfeet/c107_feet.dbr": [
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "offensiveCritDamageModifier",
-    "source": "pet_bonus",
-    "low": 8.0,
-    "high": 8.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterDefensiveAbilityModifier",
-    "source": "self",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "characterRunSpeedModifier",
-    "source": "self",
-    "low": 4.0,
-    "high": 6.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 24.0,
-    "high": 36.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 719.0,
-    "high": 1077.0
-   },
-   {
-    "stat": "defensiveTotalSpeedResistance",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
    }
   ],
   "records/items/gearfeet/c108_feet.dbr": [
@@ -54399,22 +56205,16 @@
   ],
   "records/items/gearfeet/d306_feet.dbr": [
    {
-    "stat": "defensiveAether",
+    "stat": "characterDefensiveAbilityModifier",
     "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
+    "low": 6.0,
+    "high": 6.0
    },
    {
-    "stat": "defensiveChaos",
+    "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
+    "low": 6.0,
+    "high": 6.0
    },
    {
     "stat": "defensiveTotalSpeedResistance",
@@ -54461,8 +56261,8 @@
    {
     "stat": "defensiveElementalResistance",
     "source": "self",
-    "low": 24.0,
-    "high": 36.0
+    "low": 28.0,
+    "high": 42.0
    },
    {
     "stat": "defensiveProtection",
@@ -54493,6 +56293,104 @@
     "source": "skill",
     "low": 18.0,
     "high": 18.0
+   },
+   {
+    "stat": "skillProcChance",
+    "source": "skill",
+    "low": 20.0,
+    "high": 20.0
+   }
+  ],
+  "records/items/gearfeet/d307_feet.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterLifeModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "characterRunSpeedModifier",
+    "source": "self",
+    "low": 6.0,
+    "high": 8.0
+   },
+   {
+    "stat": "characterStrength",
+    "source": "self",
+    "low": 36.0,
+    "high": 54.0
+   },
+   {
+    "stat": "defensiveChaos",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "defensivePoison",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1164.0,
+    "high": 1744.0
+   },
+   {
+    "stat": "defensiveTotalSpeedResistance",
+    "source": "self",
+    "low": 20.0,
+    "high": 30.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 39.0,
+    "high": 57.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "skill",
+    "low": 232.0,
+    "high": 232.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 1.2,
+    "high": 1.2
    },
    {
     "stat": "skillProcChance",
@@ -55235,80 +57133,6 @@
     "source": "self",
     "low": 53.0,
     "high": 79.0
-   }
-  ],
-  "records/items/gearhands/c210_hands.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterAttackSpeedModifier",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "characterSpellCastSpeedModifier",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "defensiveAether",
-    "source": "self",
-    "low": 20.0,
-    "high": 28.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 856.0,
-    "high": 1284.0
-   },
-   {
-    "stat": "offensiveLifeModifier",
-    "source": "self",
-    "low": 32.0,
-    "high": 48.0
-   },
-   {
-    "stat": "offensivePoison",
-    "source": "self",
-    "low": 6.0,
-    "high": 8.0
-   },
-   {
-    "stat": "offensivePoisonModifier",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   },
-   {
-    "stat": "offensiveSlowLifeModifier",
-    "source": "self",
-    "low": 32.0,
-    "high": 48.0
-   },
-   {
-    "stat": "offensiveSlowPoisonModifier",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   },
-   {
-    "stat": "retaliationPoison",
-    "source": "self",
-    "low": 232.0,
-    "high": 348.0
    }
   ],
   "records/items/gearhands/d105_hands.dbr": [
@@ -56927,6 +58751,80 @@
     "high": 78.0
    }
   ],
+  "records/items/gearhands/d312_hands.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 12.0,
+    "high": 18.0
+   },
+   {
+    "stat": "characterDefensiveAbility",
+    "source": "self",
+    "low": 27.0,
+    "high": 39.0
+   },
+   {
+    "stat": "characterSpellCastSpeedModifier",
+    "source": "self",
+    "low": 12.0,
+    "high": 18.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 884.0,
+    "high": 1324.0
+   },
+   {
+    "stat": "offensiveChaos",
+    "source": "self",
+    "low": 4.0,
+    "high": 12.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 52.0,
+    "high": 78.0
+   },
+   {
+    "stat": "offensiveFireModifier",
+    "source": "self",
+    "low": 52.0,
+    "high": 78.0
+   },
+   {
+    "stat": "offensiveLifeLeech",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 52.0,
+    "high": 78.0
+   },
+   {
+    "stat": "offensiveSlowFireModifier",
+    "source": "self",
+    "low": 52.0,
+    "high": 78.0
+   }
+  ],
   "records/items/gearhead/b001f_head.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -57338,12 +59236,6 @@
    }
   ],
   "records/items/gearhead/b102e_head.dbr": [
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
    {
     "stat": "offensiveAetherModifier",
     "source": "pet_bonus",
@@ -59679,14 +61571,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 15.0,
-    "high": 15.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
+    "low": 8.0,
+    "high": 8.0
    },
    {
     "stat": "offensiveSlowPoison",
@@ -59995,110 +61881,6 @@
     "high": 60.0
    }
   ],
-  "records/items/gearhead/c117_head.dbr": [
-   {
-    "stat": "augmentMasteryLevel1",
-    "source": "self",
-    "low": 1.0,
-    "high": 1.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterDefensiveAbility",
-    "source": "self",
-    "low": 27.0,
-    "high": 39.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 384.0,
-    "high": 576.0
-   },
-   {
-    "stat": "characterManaRegen",
-    "source": "self",
-    "low": 3.8,
-    "high": 3.8
-   },
-   {
-    "stat": "defensiveBleeding",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "self",
-    "low": 29.0,
-    "high": 43.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 891.0,
-    "high": 1335.0
-   },
-   {
-    "stat": "offensiveAetherModifier",
-    "source": "self",
-    "low": 56.0,
-    "high": 84.0
-   },
-   {
-    "stat": "offensiveLifeModifier",
-    "source": "self",
-    "low": 56.0,
-    "high": 84.0
-   },
-   {
-    "stat": "offensiveSlowLifeModifier",
-    "source": "self",
-    "low": 56.0,
-    "high": 84.0
-   },
-   {
-    "stat": "offensiveAether",
-    "source": "skill",
-    "low": 450.0,
-    "high": 555.0
-   },
-   {
-    "stat": "offensiveLife",
-    "source": "skill",
-    "low": 450.0,
-    "high": 555.0
-   },
-   {
-    "stat": "offensiveLifeLeech",
-    "source": "skill",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 1.5,
-    "high": 1.5
-   },
-   {
-    "stat": "skillManaCost",
-    "source": "skill",
-    "low": 32.0,
-    "high": 32.0
-   }
-  ],
   "records/items/gearhead/c118_head.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -60198,12 +61980,6 @@
    }
   ],
   "records/items/gearhead/c120_head.dbr": [
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
    {
     "stat": "offensiveLife",
     "source": "pet_bonus",
@@ -61996,12 +63772,6 @@
    }
   ],
   "records/items/gearhead/d124_head.dbr": [
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
    {
     "stat": "augmentSkillLevel1",
     "source": "self",
@@ -65003,16 +66773,10 @@
   ],
   "records/items/gearhead/d318_head.dbr": [
    {
-    "stat": "defensiveAether",
+    "stat": "characterOffensiveAbilityModifier",
     "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
+    "low": 5.0,
+    "high": 5.0
    },
    {
     "stat": "offensiveColdModifier",
@@ -65081,12 +66845,6 @@
     "source": "pet_bonus",
     "low": 9.0,
     "high": 9.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
    },
    {
     "stat": "defensiveStun",
@@ -65239,6 +66997,142 @@
     "source": "self",
     "low": 416.0,
     "high": 624.0
+   }
+  ],
+  "records/items/gearhead/d323_head.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentMasteryLevel2",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensivePoison",
+    "source": "self",
+    "low": 26.0,
+    "high": 38.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1086.0,
+    "high": 1628.0
+   },
+   {
+    "stat": "defensiveTrap",
+    "source": "self",
+    "low": 20.0,
+    "high": 30.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDurationModifier",
+    "source": "self",
+    "low": 50.0,
+    "high": 50.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   }
+  ],
+  "records/items/gearhead/d324_head.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentMasteryLevel2",
+    "source": "self",
+    "low": 1.0,
+    "high": 1.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 21.0,
+    "high": 31.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1333.0,
+    "high": 1999.0
+   },
+   {
+    "stat": "defensiveTotalSpeedResistance",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveSlowPhysical",
+    "source": "self",
+    "low": 12.0,
+    "high": 16.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalDuration",
+    "source": "self",
+    "low": 5.0,
+    "high": 5.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalDurationModifier",
+    "source": "self",
+    "low": 50.0,
+    "high": 50.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
    }
   ],
   "records/items/gearlegs/b004e_legs.dbr": [
@@ -66183,68 +68077,6 @@
     "high": 76.0
    }
   ],
-  "records/items/gearlegs/c206_legs.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterDodgePercent",
-    "source": "self",
-    "low": 4.0,
-    "high": 6.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 528.0,
-    "high": 792.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 28.0,
-    "high": 42.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "self",
-    "low": 20.0,
-    "high": 30.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 1220.0,
-    "high": 1828.0
-   },
-   {
-    "stat": "offensiveAetherModifier",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   },
-   {
-    "stat": "offensiveLightningModifier",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   },
-   {
-    "stat": "offensiveSlowLightningModifier",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   }
-  ],
   "records/items/gearlegs/c303_legs.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -67085,18 +68917,6 @@
     "high": 7.0
    },
    {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 28.0,
-    "high": 28.0
-   },
-   {
     "stat": "defensiveStun",
     "source": "pet_bonus",
     "low": 30.0,
@@ -67135,8 +68955,8 @@
    {
     "stat": "defensiveElementalResistance",
     "source": "self",
-    "low": 15.0,
-    "high": 21.0
+    "low": 23.0,
+    "high": 33.0
    },
    {
     "stat": "defensiveFreeze",
@@ -67739,16 +69559,10 @@
   ],
   "records/items/gearlegs/d308_legs.dbr": [
    {
-    "stat": "defensiveAether",
+    "stat": "defensivePetrify",
     "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
+    "low": 20.0,
+    "high": 20.0
    },
    {
     "stat": "defensiveTotalSpeedResistance",
@@ -68035,6 +69849,98 @@
     "source": "skill",
     "low": 0.2,
     "high": 0.2
+   },
+   {
+    "stat": "skillProcChance",
+    "source": "skill",
+    "low": 25.0,
+    "high": 25.0
+   }
+  ],
+  "records/items/gearlegs/d311_legs.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 64.0,
+    "high": 96.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "defensivePetrify",
+    "source": "self",
+    "low": 20.0,
+    "high": 30.0
+   },
+   {
+    "stat": "defensivePhysical",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensivePoison",
+    "source": "self",
+    "low": 24.0,
+    "high": 36.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1527.0,
+    "high": 2289.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensivePierceModifier",
+    "source": "self",
+    "low": 39.0,
+    "high": 57.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "skill",
+    "low": 232.0,
+    "high": 232.0
+   },
+   {
+    "stat": "skillCooldownTime",
+    "source": "skill",
+    "low": 1.2,
+    "high": 1.2
    },
    {
     "stat": "skillProcChance",
@@ -68687,12 +70593,6 @@
     "source": "pet_bonus",
     "low": 10.0,
     "high": 10.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -71541,8 +73441,8 @@
    {
     "stat": "offensiveTotalDamageReductionPercent",
     "source": "skill",
-    "low": 20.0,
-    "high": 20.0
+    "low": 12.0,
+    "high": 12.0
    },
    {
     "stat": "offensiveTotalDamageReductionPercentDuration",
@@ -73629,12 +75529,6 @@
   ],
   "records/items/gearshoulders/b311e_shoulder.dbr": [
    {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
     "stat": "defensivePetrify",
     "source": "pet_bonus",
     "low": 25.0,
@@ -73678,12 +75572,6 @@
    }
   ],
   "records/items/gearshoulders/b312e_shoulder.dbr": [
-   {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
    {
     "stat": "defensiveFreeze",
     "source": "pet_bonus",
@@ -74415,12 +76303,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
     "stat": "offensiveCritDamageModifier",
     "source": "pet_bonus",
     "low": 10.0,
@@ -74579,68 +76461,6 @@
     "high": 1.0
    }
   ],
-  "records/items/gearshoulders/c110_shoulder.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "characterDeflectProjectile",
-    "source": "self",
-    "low": 7.0,
-    "high": 9.0
-   },
-   {
-    "stat": "characterLifeModifier",
-    "source": "self",
-    "low": 4.0,
-    "high": 6.0
-   },
-   {
-    "stat": "defensiveBleeding",
-    "source": "self",
-    "low": 23.0,
-    "high": 33.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 1061.0,
-    "high": 1591.0
-   },
-   {
-    "stat": "offensivePierce",
-    "source": "self",
-    "low": 7.0,
-    "high": 9.0
-   },
-   {
-    "stat": "offensivePierceModifier",
-    "source": "self",
-    "low": 40.0,
-    "high": 60.0
-   },
-   {
-    "stat": "offensiveSlowBleedingModifier",
-    "source": "self",
-    "low": 40.0,
-    "high": 60.0
-   }
-  ],
   "records/items/gearshoulders/c111_shoulder.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -74704,12 +76524,6 @@
    }
   ],
   "records/items/gearshoulders/c112_shoulder.dbr": [
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
    {
     "stat": "defensiveStun",
     "source": "pet_bonus",
@@ -76161,18 +77975,6 @@
     "high": 10.0
    },
    {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "augmentSkillLevel1",
     "source": "self",
     "low": 2.0,
@@ -76611,12 +78413,6 @@
     "source": "pet_bonus",
     "low": 5.0,
     "high": 5.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
    },
    {
     "stat": "augmentSkillLevel1",
@@ -78049,18 +79845,6 @@
   ],
   "records/items/gearshoulders/d217_shoulder.dbr": [
    {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
-   },
-   {
     "stat": "offensivePoisonModifier",
     "source": "pet_bonus",
     "low": 120.0,
@@ -78875,12 +80659,6 @@
   ],
   "records/items/gearshoulders/d306_shoulder.dbr": [
    {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
-   },
-   {
     "stat": "defensiveFreeze",
     "source": "pet_bonus",
     "low": 40.0,
@@ -78889,8 +80667,8 @@
    {
     "stat": "offensiveColdModifier",
     "source": "pet_bonus",
-    "low": 180.0,
-    "high": 180.0
+    "low": 120.0,
+    "high": 120.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -80031,6 +81809,50 @@
     "source": "skill",
     "low": 15.0,
     "high": 15.0
+   }
+  ],
+  "records/items/gearshoulders/d323_shoulder.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterDefensiveAbility",
+    "source": "self",
+    "low": 36.0,
+    "high": 52.0
+   },
+   {
+    "stat": "defensiveAether",
+    "source": "self",
+    "low": 16.0,
+    "high": 24.0
+   },
+   {
+    "stat": "defensiveBleeding",
+    "source": "self",
+    "low": 16.0,
+    "high": 24.0
+   },
+   {
+    "stat": "defensivePierce",
+    "source": "self",
+    "low": 28.0,
+    "high": 42.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1333.0,
+    "high": 1999.0
    }
   ],
   "records/items/geartorso/b002f_torso.dbr": [
@@ -81885,12 +83707,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "defensiveFreeze",
     "source": "pet_bonus",
     "low": 25.0,
@@ -82529,14 +84345,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 16.0,
-    "high": 16.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 40.0,
-    "high": 40.0
+    "low": 12.0,
+    "high": 12.0
    },
    {
     "stat": "defensiveStun",
@@ -82583,8 +84393,8 @@
    {
     "stat": "defensiveElementalResistance",
     "source": "self",
-    "low": 28.0,
-    "high": 42.0
+    "low": 32.0,
+    "high": 48.0
    },
    {
     "stat": "defensivePhysical",
@@ -83841,12 +85651,6 @@
   ],
   "records/items/geartorso/d121_torso.dbr": [
    {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
     "stat": "offensiveCritDamageModifier",
     "source": "pet_bonus",
     "low": 12.0,
@@ -84407,6 +86211,12 @@
     "high": 4.0
    },
    {
+    "stat": "defensiveAether",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
     "stat": "defensivePhysical",
     "source": "self",
     "low": 4.0,
@@ -84459,12 +86269,6 @@
     "source": "skill_buff",
     "low": 250.0,
     "high": 250.0
-   },
-   {
-    "stat": "defensiveAether",
-    "source": "skill_buff",
-    "low": 24.0,
-    "high": 24.0
    },
    {
     "stat": "offensiveChaos",
@@ -85205,12 +87009,6 @@
     "source": "pet_bonus",
     "low": 20.0,
     "high": 20.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "augmentSkillLevel1",
@@ -86843,12 +88641,6 @@
     "high": 50.0
    },
    {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
     "stat": "augmentSkillLevel1",
     "source": "self",
     "low": 3.0,
@@ -86966,6 +88758,74 @@
    },
    {
     "stat": "offensiveSlowPoisonModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   }
+  ],
+  "records/items/geartorso/d319_torso.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterLife",
+    "source": "self",
+    "low": 352.0,
+    "high": 528.0
+   },
+   {
+    "stat": "characterOffensiveAbility",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "defensiveChaos",
+    "source": "self",
+    "low": 32.0,
+    "high": 48.0
+   },
+   {
+    "stat": "defensivePhysical",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "defensiveProtection",
+    "source": "self",
+    "low": 1527.0,
+    "high": 2289.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 48.0,
+    "high": 72.0
+   },
+   {
+    "stat": "offensiveSlowPhysical",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalDuration",
+    "source": "self",
+    "low": 5.0,
+    "high": 5.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
     "source": "self",
     "low": 48.0,
     "high": 72.0
@@ -89697,12 +91557,6 @@
   ],
   "records/items/gearweapons/blunt1h/b001f_bluntb.dbr": [
    {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
     "stat": "augmentSkillLevel1",
     "source": "self",
     "low": 4.0,
@@ -92057,12 +93911,6 @@
     "source": "pet_bonus",
     "low": 6.0,
     "high": 6.0
-   },
-   {
-    "stat": "defensiveBleeding",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
    },
    {
     "stat": "offensiveAether",
@@ -95675,12 +97523,6 @@
   ],
   "records/items/gearweapons/caster/d108_dagger.dbr": [
    {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
     "stat": "defensivePetrify",
     "source": "pet_bonus",
     "low": 25.0,
@@ -96239,12 +98081,6 @@
     "source": "pet_bonus",
     "low": 8.0,
     "high": 8.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -97424,12 +99260,6 @@
    }
   ],
   "records/items/gearweapons/caster/d309_scepter.dbr": [
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
    {
     "stat": "defensiveStun",
     "source": "pet_bonus",
@@ -100645,62 +102475,6 @@
     "high": 10.0
    }
   ],
-  "records/items/gearweapons/focus/c111_focus.dbr": [
-   {
-    "stat": "augmentMasteryLevel1",
-    "source": "self",
-    "low": 1.0,
-    "high": 1.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 560.0,
-    "high": 840.0
-   },
-   {
-    "stat": "characterManaRegen",
-    "source": "self",
-    "low": 5.5,
-    "high": 5.5
-   },
-   {
-    "stat": "characterSpellCastSpeedModifier",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "offensiveElementalModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "offensiveLifeModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "offensiveSlowLifeModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   }
-  ],
   "records/items/gearweapons/focus/c112_focus.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -100893,12 +102667,6 @@
     "high": 5.0
    },
    {
-    "stat": "defensiveBleeding",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
     "stat": "offensiveElemental",
     "source": "pet_bonus",
     "low": 12.0,
@@ -101016,12 +102784,6 @@
    }
   ],
   "records/items/gearweapons/focus/d106_focus.dbr": [
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
    {
     "stat": "defensiveFreeze",
     "source": "pet_bonus",
@@ -101898,12 +103660,6 @@
    }
   ],
   "records/items/gearweapons/focus/d116_focus.dbr": [
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
    {
     "stat": "offensiveLife",
     "source": "pet_bonus",
@@ -106405,6 +108161,112 @@
     "high": 2.0
    }
   ],
+  "records/items/gearweapons/guns1h/d308_gun1h.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterRunSpeedMaxModifier",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterTotalSpeedModifier",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "offensiveBaseChaos",
+    "source": "self",
+    "low": 65.0,
+    "high": 77.0
+   },
+   {
+    "stat": "offensiveChaos",
+    "source": "self",
+    "low": 4.0,
+    "high": 20.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   }
+  ],
+  "records/items/gearweapons/guns1h/d309_gun1h.dbr": [
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "characterRunSpeedMaxModifier",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "characterTotalSpeedModifier",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "offensiveBaseChaos",
+    "source": "self",
+    "low": 65.0,
+    "high": 77.0
+   },
+   {
+    "stat": "offensiveChaosModifier",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   },
+   {
+    "stat": "offensiveSlowBleeding",
+    "source": "self",
+    "low": 13.0,
+    "high": 19.0
+   },
+   {
+    "stat": "offensiveSlowBleedingDuration",
+    "source": "self",
+    "low": 3.0,
+    "high": 3.0
+   },
+   {
+    "stat": "offensiveSlowBleedingModifier",
+    "source": "self",
+    "low": 80.0,
+    "high": 120.0
+   }
+  ],
   "records/items/gearweapons/guns2h/b001f_gun2h.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -108495,12 +110357,6 @@
   ],
   "records/items/gearweapons/guns2h/c108_gun2h.dbr": [
    {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 33.0,
-    "high": 33.0
-   },
-   {
     "stat": "offensiveCritDamageModifier",
     "source": "pet_bonus",
     "low": 15.0,
@@ -109679,14 +111535,14 @@
    {
     "stat": "offensiveAether",
     "source": "skill",
-    "low": 110.0,
-    "high": 110.0
+    "low": 180.0,
+    "high": 180.0
    },
    {
     "stat": "offensiveLife",
     "source": "skill",
-    "low": 90.0,
-    "high": 130.0
+    "low": 132.0,
+    "high": 190.0
    },
    {
     "stat": "offensiveLifeLeech",
@@ -109697,8 +111553,8 @@
    {
     "stat": "offensiveSlowLife",
     "source": "skill",
-    "low": 120.0,
-    "high": 120.0
+    "low": 180.0,
+    "high": 180.0
    },
    {
     "stat": "offensiveSlowLifeDuration",
@@ -114525,8 +116381,8 @@
    {
     "stat": "offensivePhysical",
     "source": "skill",
-    "low": 204.0,
-    "high": 204.0
+    "low": 300.0,
+    "high": 300.0
    },
    {
     "stat": "skillTargetRadius",
@@ -114678,6 +116534,74 @@
    },
    {
     "stat": "offensiveSlowColdModifier",
+    "source": "self",
+    "low": 176.0,
+    "high": 264.0
+   }
+  ],
+  "records/items/gearweapons/melee2h/d308_sword2h.dbr": [
+   {
+    "stat": "augmentMasteryLevel1",
+    "source": "self",
+    "low": 2.0,
+    "high": 2.0
+   },
+   {
+    "stat": "augmentSkillLevel1",
+    "source": "self",
+    "low": 6.0,
+    "high": 6.0
+   },
+   {
+    "stat": "augmentSkillLevel2",
+    "source": "self",
+    "low": 4.0,
+    "high": 4.0
+   },
+   {
+    "stat": "characterAttackSpeedModifier",
+    "source": "self",
+    "low": 10.0,
+    "high": 14.0
+   },
+   {
+    "stat": "offensiveCritDamageModifier",
+    "source": "self",
+    "low": 12.0,
+    "high": 18.0
+   },
+   {
+    "stat": "offensivePhysical",
+    "source": "self",
+    "low": 348.0,
+    "high": 466.0
+   },
+   {
+    "stat": "offensivePhysicalModifier",
+    "source": "self",
+    "low": 176.0,
+    "high": 264.0
+   },
+   {
+    "stat": "offensiveSlowPhysical",
+    "source": "self",
+    "low": 56.0,
+    "high": 84.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalDuration",
+    "source": "self",
+    "low": 5.0,
+    "high": 5.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalDurationModifier",
+    "source": "self",
+    "low": 150.0,
+    "high": 150.0
+   },
+   {
+    "stat": "offensiveSlowPhysicalModifier",
     "source": "self",
     "low": 176.0,
     "high": 264.0
@@ -119325,22 +121249,16 @@
   ],
   "records/items/gearweapons/shields/d304_shield.dbr": [
    {
-    "stat": "defensiveBleeding",
+    "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
+    "low": 10.0,
+    "high": 10.0
    },
    {
-    "stat": "defensiveChaos",
+    "stat": "offensiveChaosModifier",
     "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
+    "low": 120.0,
+    "high": 120.0
    },
    {
     "stat": "augmentMasteryLevel1",
@@ -120863,92 +122781,6 @@
     "high": 30.0
    }
   ],
-  "records/items/gearweapons/swords1h/c103_sword.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 39.0,
-    "high": 57.0
-   },
-   {
-    "stat": "offensiveColdModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "offensiveLightningModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "offensivePhysical",
-    "source": "self",
-    "low": 97.0,
-    "high": 166.0
-   },
-   {
-    "stat": "offensiveSlowColdModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "offensiveSlowLightningDurationModifier",
-    "source": "self",
-    "low": 50.0,
-    "high": 50.0
-   },
-   {
-    "stat": "offensiveSlowLightningModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "offensiveCold",
-    "source": "skill",
-    "low": 260.0,
-    "high": 260.0
-   },
-   {
-    "stat": "offensiveLightning",
-    "source": "skill",
-    "low": 260.0,
-    "high": 260.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 1.5,
-    "high": 1.5
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 10.0,
-    "high": 10.0
-   },
-   {
-    "stat": "skillTargetRadius",
-    "source": "skill",
-    "low": 2.0,
-    "high": 2.0
-   }
-  ],
   "records/items/gearweapons/swords1h/c104_sword.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -122181,56 +124013,6 @@
     "high": 24.0
    }
   ],
-  "records/items/upgraded/gearaccessories/medals/c012_medal.dbr": [
-   {
-    "stat": "defensiveTotalSpeedResistance",
-    "source": "pet_bonus",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 224.0,
-    "high": 336.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 47.0,
-    "high": 69.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "self",
-    "low": 28.0,
-    "high": 42.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
-   },
-   {
-    "stat": "offensiveChaosModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   }
-  ],
   "records/items/upgraded/gearaccessories/medals/c017_medal.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -123050,62 +124832,6 @@
    },
    {
     "stat": "offensiveSlowLightningModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   }
-  ],
-  "records/items/upgraded/gearaccessories/medals/c038_medal.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "characterOffensiveAbilityModifier",
-    "source": "self",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "defensiveAether",
-    "source": "self",
-    "low": 18.0,
-    "high": 26.0
-   },
-   {
-    "stat": "defensiveBleeding",
-    "source": "self",
-    "low": 24.0,
-    "high": 36.0
-   },
-   {
-    "stat": "offensiveLifeLeech",
-    "source": "self",
-    "low": 5.0,
-    "high": 7.0
-   },
-   {
-    "stat": "offensiveSlowBleeding",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "offensiveSlowBleedingDuration",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "offensiveSlowBleedingModifier",
     "source": "self",
     "low": 60.0,
     "high": 90.0
@@ -124465,12 +126191,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 18.0,
-    "high": 18.0
-   },
-   {
     "stat": "offensiveCritDamageModifier",
     "source": "pet_bonus",
     "low": 18.0,
@@ -124821,116 +126541,6 @@
     "high": 66.0
    }
   ],
-  "records/items/upgraded/gearaccessories/necklaces/c037_necklace.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 44.0,
-    "high": 66.0
-   },
-   {
-    "stat": "defensiveCold",
-    "source": "self",
-    "low": 39.0,
-    "high": 57.0
-   },
-   {
-    "stat": "defensiveColdMaxResist",
-    "source": "self",
-    "low": 4.0,
-    "high": 6.0
-   },
-   {
-    "stat": "defensiveFreeze",
-    "source": "self",
-    "low": 24.0,
-    "high": 36.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
-   },
-   {
-    "stat": "offensiveColdModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   },
-   {
-    "stat": "offensiveSlowColdModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   },
-   {
-    "stat": "offensiveCold",
-    "source": "skill",
-    "low": 173.0,
-    "high": 173.0
-   },
-   {
-    "stat": "offensiveSlowCold",
-    "source": "skill",
-    "low": 151.0,
-    "high": 151.0
-   },
-   {
-    "stat": "offensiveSlowColdDuration",
-    "source": "skill",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "offensiveSlowRunSpeed",
-    "source": "skill",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "offensiveSlowRunSpeedDuration",
-    "source": "skill",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "skillActiveDuration",
-    "source": "skill",
-    "low": 8.0,
-    "high": 8.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 16.0,
-    "high": 16.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 10.0,
-    "high": 10.0
-   },
-   {
-    "stat": "skillTargetRadius",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   }
-  ],
   "records/items/upgraded/gearaccessories/necklaces/c038_necklace.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -124999,12 +126609,6 @@
     "source": "pet_bonus",
     "low": 6.0,
     "high": 6.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 24.0,
-    "high": 24.0
    },
    {
     "stat": "augmentMasteryLevel1",
@@ -126155,8 +127759,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 28.0,
-    "high": 28.0
+    "low": 12.0,
+    "high": 12.0
    },
    {
     "stat": "augmentMasteryLevel1",
@@ -126199,6 +127803,12 @@
     "source": "self",
     "low": 5.0,
     "high": 7.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 12.0,
+    "high": 18.0
    },
    {
     "stat": "offensiveChaosModifier",
@@ -129089,12 +130699,6 @@
     "source": "pet_bonus",
     "low": 10.0,
     "high": 10.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
    },
    {
     "stat": "offensiveLifeModifier",
@@ -133071,24 +134675,6 @@
   ],
   "records/items/upgraded/gearaccessories/waist/d004_waist.dbr": [
    {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
-    "stat": "defensiveLightning",
-    "source": "pet_bonus",
-    "low": 50.0,
-    "high": 50.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
     "stat": "offensiveLightningModifier",
     "source": "pet_bonus",
     "low": 1300.0,
@@ -133129,6 +134715,12 @@
     "source": "self",
     "low": 28.0,
     "high": 42.0
+   },
+   {
+    "stat": "defensiveElementalResistance",
+    "source": "self",
+    "low": 13.0,
+    "high": 19.0
    },
    {
     "stat": "defensiveLife",
@@ -137307,14 +138899,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
+    "low": 16.0,
+    "high": 16.0
    },
    {
     "stat": "augmentSkillLevel1",
@@ -138603,68 +140189,6 @@
     "high": 18.0
    }
   ],
-  "records/items/upgraded/gearhead/c021_head.dbr": [
-   {
-    "stat": "characterDefensiveAbilityModifier",
-    "source": "pet_bonus",
-    "low": 5.0,
-    "high": 5.0
-   },
-   {
-    "stat": "characterOffensiveAbilityModifier",
-    "source": "pet_bonus",
-    "low": 10.0,
-    "high": 10.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 376.0,
-    "high": 564.0
-   },
-   {
-    "stat": "characterManaRegen",
-    "source": "self",
-    "low": 3.8,
-    "high": 3.8
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "self",
-    "low": 20.0,
-    "high": 28.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 20.0,
-    "high": 28.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 891.0,
-    "high": 1335.0
-   },
-   {
-    "stat": "offensiveChaosModifier",
-    "source": "self",
-    "low": 48.0,
-    "high": 72.0
-   }
-  ],
   "records/items/upgraded/gearhead/c022_head.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -139013,12 +140537,6 @@
     "high": 8.0
    },
    {
-    "stat": "defensivePoison",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "augmentSkillLevel1",
     "source": "self",
     "low": 2.0,
@@ -139271,12 +140789,6 @@
     "high": 8.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 80.0,
@@ -139519,68 +141031,6 @@
     "source": "skill",
     "low": 4.0,
     "high": 4.0
-   }
-  ],
-  "records/items/upgraded/gearhead/c044_head.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterDexterity",
-    "source": "self",
-    "low": 64.0,
-    "high": 96.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 480.0,
-    "high": 720.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 21.0,
-    "high": 31.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "self",
-    "low": 18.0,
-    "high": 26.0
-   },
-   {
-    "stat": "defensivePhysical",
-    "source": "self",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 1061.0,
-    "high": 1591.0
-   },
-   {
-    "stat": "offensiveSlowBleedingDurationModifier",
-    "source": "self",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "offensiveSlowBleedingModifier",
-    "source": "self",
-    "low": 48.0,
-    "high": 72.0
    }
   ],
   "records/items/upgraded/gearhead/c047_head.dbr": [
@@ -140441,12 +141891,6 @@
     "high": 6.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 24.0,
-    "high": 24.0
-   },
-   {
     "stat": "defensiveStun",
     "source": "pet_bonus",
     "low": 50.0,
@@ -141227,18 +142671,6 @@
     "source": "pet_bonus",
     "low": 12.0,
     "high": 12.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 24.0,
-    "high": 24.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 24.0,
-    "high": 24.0
    },
    {
     "stat": "offensiveColdModifier",
@@ -142675,12 +144107,6 @@
     "source": "pet_bonus",
     "low": 7.0,
     "high": 7.0
-   },
-   {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 24.0,
-    "high": 24.0
    },
    {
     "stat": "augmentSkillLevel1",
@@ -144223,12 +145649,6 @@
     "high": 8.0
    },
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
     "stat": "offensiveLightningModifier",
     "source": "pet_bonus",
     "low": 110.0,
@@ -144281,62 +145701,6 @@
     "source": "self",
     "low": 1061.0,
     "high": 1591.0
-   }
-  ],
-  "records/items/upgraded/gearshoulders/c012_shoulder.dbr": [
-   {
-    "stat": "characterAttackSpeedModifier",
-    "source": "pet_bonus",
-    "low": 8.0,
-    "high": 8.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterDefensiveAbility",
-    "source": "self",
-    "low": 44.0,
-    "high": 66.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 304.0,
-    "high": 456.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "self",
-    "low": 27.0,
-    "high": 39.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 891.0,
-    "high": 1335.0
-   },
-   {
-    "stat": "offensiveChaosModifier",
-    "source": "self",
-    "low": 48.0,
-    "high": 72.0
    }
   ],
   "records/items/upgraded/gearshoulders/c013_shoulder.dbr": [
@@ -145110,12 +146474,6 @@
    }
   ],
   "records/items/upgraded/gearshoulders/c030_shoulder.dbr": [
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
    {
     "stat": "offensiveCritDamageModifier",
     "source": "pet_bonus",
@@ -145955,18 +147313,6 @@
     "high": 10.0
    },
    {
-    "stat": "defensiveAether",
-    "source": "pet_bonus",
-    "low": 45.0,
-    "high": 45.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 45.0,
-    "high": 45.0
-   },
-   {
     "stat": "defensiveFreeze",
     "source": "pet_bonus",
     "low": 25.0,
@@ -146119,12 +147465,6 @@
     "source": "pet_bonus",
     "low": 8.0,
     "high": 8.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 28.0,
-    "high": 28.0
    },
    {
     "stat": "augmentSkillLevel1",
@@ -146794,12 +148134,6 @@
    }
   ],
   "records/items/upgraded/gearshoulders/d020_shoulder.dbr": [
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 60.0,
-    "high": 60.0
-   },
    {
     "stat": "offensiveCritDamageModifier",
     "source": "pet_bonus",
@@ -147589,80 +148923,6 @@
     "high": 72.0
    }
   ],
-  "records/items/upgraded/geartorso/c015_torso.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "characterDefensiveAbility",
-    "source": "self",
-    "low": 20.0,
-    "high": 28.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 37.0,
-    "high": 55.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "self",
-    "low": 15.0,
-    "high": 21.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "self",
-    "low": 23.0,
-    "high": 33.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 1220.0,
-    "high": 1830.0
-   },
-   {
-    "stat": "defensiveTrap",
-    "source": "self",
-    "low": 40.0,
-    "high": 60.0
-   },
-   {
-    "stat": "offensivePierceModifier",
-    "source": "self",
-    "low": 39.0,
-    "high": 57.0
-   },
-   {
-    "stat": "offensivePoisonModifier",
-    "source": "self",
-    "low": 48.0,
-    "high": 72.0
-   },
-   {
-    "stat": "offensiveSlowPoisonDurationModifier",
-    "source": "self",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "offensiveSlowPoisonModifier",
-    "source": "self",
-    "low": 48.0,
-    "high": 72.0
-   }
-  ],
   "records/items/upgraded/geartorso/c016_torso.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -148179,12 +149439,6 @@
     "high": 9.0
    },
    {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 15.0,
-    "high": 15.0
-   },
-   {
     "stat": "offensiveTotalDamageModifier",
     "source": "pet_bonus",
     "low": 70.0,
@@ -148506,62 +149760,6 @@
    },
    {
     "stat": "offensiveSlowLifeModifier",
-    "source": "self",
-    "low": 48.0,
-    "high": 72.0
-   }
-  ],
-  "records/items/upgraded/geartorso/c043_torso.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 660.0,
-    "high": 988.0
-   },
-   {
-    "stat": "characterOffensiveAbilityModifier",
-    "source": "self",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "defensivePierce",
-    "source": "self",
-    "low": 32.0,
-    "high": 48.0
-   },
-   {
-    "stat": "defensivePoison",
-    "source": "self",
-    "low": 18.0,
-    "high": 26.0
-   },
-   {
-    "stat": "defensiveProtection",
-    "source": "self",
-    "low": 1220.0,
-    "high": 1828.0
-   },
-   {
-    "stat": "offensiveSlowBleedingDurationModifier",
-    "source": "self",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "offensiveSlowBleedingModifier",
     "source": "self",
     "low": 48.0,
     "high": 72.0
@@ -149071,6 +150269,12 @@
     "high": 6.0
    },
    {
+    "stat": "defensiveChaos",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
     "stat": "defensiveElementalResistance",
     "source": "self",
     "low": 15.0,
@@ -149105,12 +150309,6 @@
     "source": "skill_buff",
     "low": 250.0,
     "high": 250.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "skill_buff",
-    "low": 24.0,
-    "high": 24.0
    },
    {
     "stat": "offensiveSlowPoisonDurationModifier",
@@ -149163,6 +150361,12 @@
     "high": 88.0
    },
    {
+    "stat": "defensiveChaos",
+    "source": "self",
+    "low": 20.0,
+    "high": 28.0
+   },
+   {
     "stat": "defensivePhysical",
     "source": "self",
     "low": 4.0,
@@ -149209,12 +150413,6 @@
     "source": "skill_buff",
     "low": 250.0,
     "high": 250.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "skill_buff",
-    "low": 24.0,
-    "high": 24.0
    },
    {
     "stat": "offensiveLife",
@@ -149353,12 +150551,6 @@
     "high": 8.0
    },
    {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 35.0,
-    "high": 35.0
-   },
-   {
     "stat": "offensiveChaos",
     "source": "pet_bonus",
     "low": 8.0,
@@ -149367,8 +150559,8 @@
    {
     "stat": "offensiveChaosModifier",
     "source": "pet_bonus",
-    "low": 180.0,
-    "high": 180.0
+    "low": 120.0,
+    "high": 120.0
    },
    {
     "stat": "augmentSkillLevel1",
@@ -149471,8 +150663,14 @@
    {
     "stat": "defensiveFire",
     "source": "self",
-    "low": 32.0,
-    "high": 48.0
+    "low": 56.0,
+    "high": 84.0
+   },
+   {
+    "stat": "defensiveLife",
+    "source": "self",
+    "low": 15.0,
+    "high": 21.0
    },
    {
     "stat": "defensivePhysical",
@@ -149512,18 +150710,6 @@
    },
    {
     "stat": "defensiveChaos",
-    "source": "skill_buff",
-    "low": 18.0,
-    "high": 18.0
-   },
-   {
-    "stat": "defensiveFire",
-    "source": "skill_buff",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "defensiveLife",
     "source": "skill_buff",
     "low": 18.0,
     "high": 18.0
@@ -149605,12 +150791,6 @@
   ],
   "records/items/upgraded/geartorso/d010_torso.dbr": [
    {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 28.0,
-    "high": 28.0
-   },
-   {
     "stat": "defensiveProtectionModifier",
     "source": "pet_bonus",
     "low": 20.0,
@@ -149667,8 +150847,8 @@
    {
     "stat": "defensiveElementalResistance",
     "source": "self",
-    "low": 21.0,
-    "high": 31.0
+    "low": 29.0,
+    "high": 43.0
    },
    {
     "stat": "defensiveProtection",
@@ -151365,104 +152545,6 @@
     "high": 30.0
    }
   ],
-  "records/items/upgraded/gearweapons/axe1h/c019_axe.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterSpellCastSpeedModifier",
-    "source": "self",
-    "low": 16.0,
-    "high": 24.0
-   },
-   {
-    "stat": "offensiveLightning",
-    "source": "self",
-    "low": 1.0,
-    "high": 46.0
-   },
-   {
-    "stat": "offensiveLightningModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "offensivePhysical",
-    "source": "self",
-    "low": 114.0,
-    "high": 148.0
-   },
-   {
-    "stat": "offensiveSlowLightningModifier",
-    "source": "self",
-    "low": 82.0,
-    "high": 122.0
-   },
-   {
-    "stat": "retaliationLightning",
-    "source": "self",
-    "low": 256.0,
-    "high": 384.0
-   },
-   {
-    "stat": "retaliationTotalDamageModifier",
-    "source": "self",
-    "low": 64.0,
-    "high": 96.0
-   },
-   {
-    "stat": "offensiveLightning",
-    "source": "skill",
-    "low": 110.0,
-    "high": 522.0
-   },
-   {
-    "stat": "offensiveSlowLightning",
-    "source": "skill",
-    "low": 141.0,
-    "high": 141.0
-   },
-   {
-    "stat": "offensiveSlowLightningDuration",
-    "source": "skill",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "offensiveStun",
-    "source": "skill",
-    "low": 0.5,
-    "high": 1.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 2.5,
-    "high": 2.5
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "skillTargetRadius",
-    "source": "skill",
-    "low": 1.0,
-    "high": 1.0
-   }
-  ],
   "records/items/upgraded/gearweapons/axe1h/c021_axe.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -151529,68 +152611,6 @@
     "source": "self",
     "low": 117.0,
     "high": 154.0
-   }
-  ],
-  "records/items/upgraded/gearweapons/axe1h/c025_axe.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 304.0,
-    "high": 456.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   },
-   {
-    "stat": "offensivePhysical",
-    "source": "self",
-    "low": 84.0,
-    "high": 128.0
-   },
-   {
-    "stat": "offensivePierceRatio",
-    "source": "self",
-    "low": 80.0,
-    "high": 120.0
-   },
-   {
-    "stat": "offensiveSlowBleeding",
-    "source": "self",
-    "low": 17.0,
-    "high": 25.0
-   },
-   {
-    "stat": "offensiveSlowBleedingDuration",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "offensiveSlowBleedingDurationModifier",
-    "source": "self",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "offensiveSlowBleedingModifier",
-    "source": "self",
-    "low": 80.0,
-    "high": 120.0
    }
   ],
   "records/items/upgraded/gearweapons/axe1h/d001_axe.dbr": [
@@ -152237,68 +153257,6 @@
     "source": "self",
     "low": 80.0,
     "high": 120.0
-   }
-  ],
-  "records/items/upgraded/gearweapons/blunt1h/c013_blunt.dbr": [
-   {
-    "stat": "characterDefensiveAbilityModifier",
-    "source": "pet_bonus",
-    "low": 6.0,
-    "high": 6.0
-   },
-   {
-    "stat": "characterOffensiveAbilityModifier",
-    "source": "pet_bonus",
-    "low": 6.0,
-    "high": 6.0
-   },
-   {
-    "stat": "offensiveTotalDamageModifier",
-    "source": "pet_bonus",
-    "low": 55.0,
-    "high": 55.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterOffensiveAbilityModifier",
-    "source": "self",
-    "low": 4.0,
-    "high": 6.0
-   },
-   {
-    "stat": "offensiveChaosModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   },
-   {
-    "stat": "offensivePhysical",
-    "source": "self",
-    "low": 94.0,
-    "high": 193.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 5.0,
-    "high": 5.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 50.0,
-    "high": 50.0
    }
   ],
   "records/items/upgraded/gearweapons/blunt1h/c015_blunt.dbr": [
@@ -154311,50 +155269,6 @@
     "high": 7.0
    }
   ],
-  "records/items/upgraded/gearweapons/caster/c022_dagger.dbr": [
-   {
-    "stat": "characterOffensiveAbilityModifier",
-    "source": "pet_bonus",
-    "low": 6.0,
-    "high": 6.0
-   },
-   {
-    "stat": "offensiveChaos",
-    "source": "pet_bonus",
-    "low": 12.0,
-    "high": 12.0
-   },
-   {
-    "stat": "offensiveTotalDamageModifier",
-    "source": "pet_bonus",
-    "low": 70.0,
-    "high": 70.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "offensiveBaseLife",
-    "source": "self",
-    "low": 70.0,
-    "high": 75.0
-   },
-   {
-    "stat": "offensiveChaosModifier",
-    "source": "self",
-    "low": 149.0,
-    "high": 223.0
-   }
-  ],
   "records/items/upgraded/gearweapons/caster/c024_scepter.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -154883,110 +155797,6 @@
     "high": 7.0
    }
   ],
-  "records/items/upgraded/gearweapons/caster/c033_scepter.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterAttackSpeedModifier",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "characterSpellCastSpeedModifier",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "offensiveBaseLife",
-    "source": "self",
-    "low": 77.0,
-    "high": 80.0
-   },
-   {
-    "stat": "offensiveLife",
-    "source": "self",
-    "low": 17.0,
-    "high": 25.0
-   },
-   {
-    "stat": "offensiveLifeLeech",
-    "source": "self",
-    "low": 7.0,
-    "high": 9.0
-   },
-   {
-    "stat": "offensiveLifeModifier",
-    "source": "self",
-    "low": 151.0,
-    "high": 225.0
-   },
-   {
-    "stat": "offensiveSlowLifeModifier",
-    "source": "self",
-    "low": 151.0,
-    "high": 225.0
-   },
-   {
-    "stat": "offensiveTotalDamageReductionPercent",
-    "source": "self",
-    "low": 8.0,
-    "high": 12.0
-   },
-   {
-    "stat": "offensiveTotalDamageReductionPercentDuration",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "offensiveLife",
-    "source": "skill",
-    "low": 180.0,
-    "high": 388.0
-   },
-   {
-    "stat": "offensiveLifeLeech",
-    "source": "skill",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "offensiveSlowLife",
-    "source": "skill",
-    "low": 80.0,
-    "high": 80.0
-   },
-   {
-    "stat": "offensiveSlowLifeDuration",
-    "source": "skill",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 10.0,
-    "high": 10.0
-   }
-  ],
   "records/items/upgraded/gearweapons/caster/c034_dagger.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -155483,12 +156293,6 @@
     "source": "pet_bonus",
     "low": 6.0,
     "high": 6.0
-   },
-   {
-    "stat": "defensiveChaos",
-    "source": "pet_bonus",
-    "low": 33.0,
-    "high": 33.0
    },
    {
     "stat": "augmentMasteryLevel1",
@@ -157213,56 +158017,6 @@
     "source": "self",
     "low": 84.0,
     "high": 126.0
-   }
-  ],
-  "records/items/upgraded/gearweapons/focus/c012_focus.dbr": [
-   {
-    "stat": "characterOffensiveAbilityModifier",
-    "source": "pet_bonus",
-    "low": 12.0,
-    "high": 12.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "characterManaRegenModifier",
-    "source": "self",
-    "low": 74.0,
-    "high": 74.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 36.0,
-    "high": 52.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 21.0,
-    "high": 31.0
-   },
-   {
-    "stat": "defensiveStun",
-    "source": "self",
-    "low": 24.0,
-    "high": 36.0
-   },
-   {
-    "stat": "offensiveChaosModifier",
-    "source": "self",
-    "low": 96.0,
-    "high": 144.0
    }
   ],
   "records/items/upgraded/gearweapons/focus/c016_focus.dbr": [
@@ -159831,86 +160585,6 @@
     "high": 2.0
    }
   ],
-  "records/items/upgraded/gearweapons/guns1h/c024_gun1h.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "characterAttackSpeedModifier",
-    "source": "self",
-    "low": 7.0,
-    "high": 9.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 56.0,
-    "high": 84.0
-   },
-   {
-    "stat": "offensiveCritDamageModifier",
-    "source": "self",
-    "low": 7.0,
-    "high": 9.0
-   },
-   {
-    "stat": "offensiveKnockdown",
-    "source": "self",
-    "low": 1.0,
-    "high": 1.0
-   },
-   {
-    "stat": "offensiveKnockdownChance",
-    "source": "self",
-    "low": 15.0,
-    "high": 15.0
-   },
-   {
-    "stat": "offensivePhysical",
-    "source": "self",
-    "low": 66.0,
-    "high": 80.0
-   },
-   {
-    "stat": "offensivePierce",
-    "source": "self",
-    "low": 16.0,
-    "high": 24.0
-   },
-   {
-    "stat": "offensivePierceModifier",
-    "source": "self",
-    "low": 64.0,
-    "high": 96.0
-   },
-   {
-    "stat": "offensivePierceRatio",
-    "source": "self",
-    "low": 80.0,
-    "high": 120.0
-   },
-   {
-    "stat": "offensiveTotalDamageReductionPercent",
-    "source": "self",
-    "low": 8.0,
-    "high": 12.0
-   },
-   {
-    "stat": "offensiveTotalDamageReductionPercentDuration",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   }
-  ],
   "records/items/upgraded/gearweapons/guns1h/c026_gun1h.dbr": [
    {
     "stat": "augmentSkillLevel1",
@@ -161079,104 +161753,6 @@
     "source": "self",
     "low": 120.0,
     "high": 180.0
-   }
-  ],
-  "records/items/upgraded/gearweapons/guns2h/c017_gun2h.dbr": [
-   {
-    "stat": "augmentMasteryLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "characterAttackSpeedModifier",
-    "source": "self",
-    "low": 12.0,
-    "high": 18.0
-   },
-   {
-    "stat": "characterIntelligence",
-    "source": "self",
-    "low": 47.0,
-    "high": 69.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 62.0,
-    "high": 92.0
-   },
-   {
-    "stat": "offensiveBaseLife",
-    "source": "self",
-    "low": 216.0,
-    "high": 246.0
-   },
-   {
-    "stat": "offensiveLife",
-    "source": "self",
-    "low": 26.0,
-    "high": 38.0
-   },
-   {
-    "stat": "offensiveLifeModifier",
-    "source": "self",
-    "low": 104.0,
-    "high": 156.0
-   },
-   {
-    "stat": "offensiveSlowLife",
-    "source": "self",
-    "low": 64.0,
-    "high": 96.0
-   },
-   {
-    "stat": "offensiveSlowLifeChance",
-    "source": "self",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "offensiveSlowLifeDuration",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "offensiveSlowLifeModifier",
-    "source": "self",
-    "low": 104.0,
-    "high": 156.0
-   },
-   {
-    "stat": "offensiveLife",
-    "source": "skill",
-    "low": 340.0,
-    "high": 340.0
-   },
-   {
-    "stat": "offensiveLifeLeech",
-    "source": "skill",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "skillManaCost",
-    "source": "skill",
-    "low": 60.0,
-    "high": 60.0
    }
   ],
   "records/items/upgraded/gearweapons/guns2h/c018_gun2h.dbr": [
@@ -162523,8 +163099,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 24.0,
-    "high": 24.0
+    "low": 12.0,
+    "high": 12.0
    },
    {
     "stat": "characterTotalSpeedModifier",
@@ -163821,92 +164397,6 @@
     "high": 168.0
    }
   ],
-  "records/items/upgraded/gearweapons/melee2h/c024_sword2h.dbr": [
-   {
-    "stat": "augmentMasteryLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentMasteryLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 4.0,
-    "high": 4.0
-   },
-   {
-    "stat": "characterAttackSpeedModifier",
-    "source": "self",
-    "low": 18.0,
-    "high": 26.0
-   },
-   {
-    "stat": "characterDexterity",
-    "source": "self",
-    "low": 58.0,
-    "high": 86.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 800.0,
-    "high": 1200.0
-   },
-   {
-    "stat": "offensiveBasePoison",
-    "source": "self",
-    "low": 285.0,
-    "high": 328.0
-   },
-   {
-    "stat": "offensivePoison",
-    "source": "self",
-    "low": 35.0,
-    "high": 58.0
-   },
-   {
-    "stat": "offensivePoisonModifier",
-    "source": "self",
-    "low": 152.0,
-    "high": 228.0
-   },
-   {
-    "stat": "offensiveSlowPoisonModifier",
-    "source": "self",
-    "low": 152.0,
-    "high": 228.0
-   },
-   {
-    "stat": "offensivePoison",
-    "source": "skill",
-    "low": 220.0,
-    "high": 350.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 1.0,
-    "high": 1.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "skillTargetNumber",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   }
-  ],
   "records/items/upgraded/gearweapons/melee2h/c027_sword2h.dbr": [
    {
     "stat": "augmentMasteryLevel1",
@@ -165143,14 +165633,8 @@
    {
     "stat": "characterLifeModifier",
     "source": "pet_bonus",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "pet_bonus",
-    "low": 50.0,
-    "high": 50.0
+    "low": 20.0,
+    "high": 20.0
    },
    {
     "stat": "offensiveTotalDamageModifier",
@@ -165575,12 +166059,6 @@
     "high": 70.0
    },
    {
-    "stat": "offensiveColdModifier",
-    "source": "self",
-    "low": 160.0,
-    "high": 240.0
-   },
-   {
     "stat": "offensivePhysical",
     "source": "self",
     "low": 130.0,
@@ -165593,22 +166071,10 @@
     "high": 276.0
    },
    {
-    "stat": "offensiveSlowColdModifier",
-    "source": "self",
-    "low": 160.0,
-    "high": 240.0
-   },
-   {
     "stat": "offensiveSlowPhysicalModifier",
     "source": "self",
     "low": 184.0,
     "high": 276.0
-   },
-   {
-    "stat": "offensiveCold",
-    "source": "skill",
-    "low": 300.0,
-    "high": 500.0
    },
    {
     "stat": "offensiveFreeze",
@@ -165625,8 +166091,8 @@
    {
     "stat": "offensivePhysical",
     "source": "skill",
-    "low": 300.0,
-    "high": 500.0
+    "low": 600.0,
+    "high": 1000.0
    },
    {
     "stat": "offensiveSlowDefensiveAbility",
@@ -165937,152 +166403,6 @@
     "source": "skill",
     "low": 66.0,
     "high": 66.0
-   }
-  ],
-  "records/items/upgraded/gearweapons/shields/c009_shield.dbr": [
-   {
-    "stat": "augmentMasteryLevel1",
-    "source": "self",
-    "low": 1.0,
-    "high": 1.0
-   },
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterLightRadius",
-    "source": "self",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "characterStrength",
-    "source": "self",
-    "low": 48.0,
-    "high": 72.0
-   },
-   {
-    "stat": "defensiveBlock",
-    "source": "self",
-    "low": 1275.0,
-    "high": 1275.0
-   },
-   {
-    "stat": "defensiveBlockChance",
-    "source": "self",
-    "low": 32.0,
-    "high": 32.0
-   },
-   {
-    "stat": "defensiveElementalResistance",
-    "source": "self",
-    "low": 32.0,
-    "high": 48.0
-   },
-   {
-    "stat": "defensivePhysical",
-    "source": "self",
-    "low": 10.0,
-    "high": 14.0
-   },
-   {
-    "stat": "offensiveBaseCold",
-    "source": "self",
-    "low": 58.0,
-    "high": 58.0
-   },
-   {
-    "stat": "offensiveBaseFire",
-    "source": "self",
-    "low": 58.0,
-    "high": 58.0
-   },
-   {
-    "stat": "offensiveBaseLightning",
-    "source": "self",
-    "low": 58.0,
-    "high": 58.0
-   },
-   {
-    "stat": "offensiveElementalModifier",
-    "source": "self",
-    "low": 60.0,
-    "high": 90.0
-   },
-   {
-    "stat": "retaliationFire",
-    "source": "self",
-    "low": 1160.0,
-    "high": 1740.0
-   },
-   {
-    "stat": "retaliationTotalDamageModifier",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   },
-   {
-    "stat": "offensiveElemental",
-    "source": "skill",
-    "low": 220.0,
-    "high": 220.0
-   },
-   {
-    "stat": "offensiveFumble",
-    "source": "skill",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "offensiveFumbleDuration",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "offensiveProjectileFumble",
-    "source": "skill",
-    "low": 20.0,
-    "high": 20.0
-   },
-   {
-    "stat": "offensiveProjectileFumbleDuration",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "retaliationDamagePct",
-    "source": "skill",
-    "low": 15.0,
-    "high": 15.0
-   },
-   {
-    "stat": "skillCooldownTime",
-    "source": "skill",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "skillProcChance",
-    "source": "skill",
-    "low": 30.0,
-    "high": 30.0
-   },
-   {
-    "stat": "skillTargetRadius",
-    "source": "skill",
-    "low": 6.0,
-    "high": 6.0
    }
   ],
   "records/items/upgraded/gearweapons/shields/c010_shield.dbr": [
@@ -166949,12 +167269,6 @@
     "source": "pet_bonus",
     "low": 16.0,
     "high": 16.0
-   },
-   {
-    "stat": "defensiveLife",
-    "source": "pet_bonus",
-    "low": 45.0,
-    "high": 45.0
    },
    {
     "stat": "offensiveLife",
@@ -168887,68 +169201,6 @@
     "source": "skill_buff",
     "low": 1.0,
     "high": 1.0
-   }
-  ],
-  "records/items/upgraded/gearweapons/swords1h/c027_sword.dbr": [
-   {
-    "stat": "augmentSkillLevel1",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "augmentSkillLevel2",
-    "source": "self",
-    "low": 2.0,
-    "high": 2.0
-   },
-   {
-    "stat": "characterLife",
-    "source": "self",
-    "low": 304.0,
-    "high": 456.0
-   },
-   {
-    "stat": "characterOffensiveAbility",
-    "source": "self",
-    "low": 53.0,
-    "high": 79.0
-   },
-   {
-    "stat": "offensivePhysical",
-    "source": "self",
-    "low": 91.0,
-    "high": 114.0
-   },
-   {
-    "stat": "offensivePierceRatio",
-    "source": "self",
-    "low": 80.0,
-    "high": 120.0
-   },
-   {
-    "stat": "offensiveSlowBleeding",
-    "source": "self",
-    "low": 17.0,
-    "high": 25.0
-   },
-   {
-    "stat": "offensiveSlowBleedingDuration",
-    "source": "self",
-    "low": 3.0,
-    "high": 3.0
-   },
-   {
-    "stat": "offensiveSlowBleedingDurationModifier",
-    "source": "self",
-    "low": 25.0,
-    "high": 25.0
-   },
-   {
-    "stat": "offensiveSlowBleedingModifier",
-    "source": "self",
-    "low": 80.0,
-    "high": 120.0
    }
   ],
   "records/items/upgraded/gearweapons/swords1h/d001_sword.dbr": [

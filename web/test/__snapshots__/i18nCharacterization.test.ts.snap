@@ -5,49 +5,6 @@ exports[`characterization: en surfaces are stable 1`] = `
   "benefitRowsCompare": {
     "pet": [
       {
-        "group": "Resistances",
-        "subjects": [
-          {
-            "ids": [
-              "defensivePoison",
-            ],
-            "key": "Resistances:Poison & Acid Resistance",
-            "rows": [
-              {
-                "base": "+20%",
-                "delta": "—",
-                "id": "defensivePoison",
-                "now": "+20%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "same",
-              },
-            ],
-            "subject": "Poison & Acid Resistance",
-            "verdict": "same",
-          },
-          {
-            "ids": [
-              "defensiveLife",
-            ],
-            "key": "Resistances:Vitality Resistance",
-            "rows": [
-              {
-                "base": "+20%",
-                "delta": "+20",
-                "id": "defensiveLife",
-                "now": "+40%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "up",
-              },
-            ],
-            "subject": "Vitality Resistance",
-            "verdict": "up",
-          },
-        ],
-      },
-      {
         "group": "Offense",
         "subjects": [
           {
@@ -758,49 +715,6 @@ exports[`characterization: en surfaces are stable 1`] = `
               },
             ],
             "subject": "All Damage",
-            "verdict": "",
-          },
-        ],
-      },
-      {
-        "group": "Resistances",
-        "subjects": [
-          {
-            "ids": [
-              "defensivePoison",
-            ],
-            "key": "Resistances:Poison & Acid Resistance",
-            "rows": [
-              {
-                "base": "",
-                "delta": "",
-                "id": "defensivePoison",
-                "now": "+20%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "",
-              },
-            ],
-            "subject": "Poison & Acid Resistance",
-            "verdict": "",
-          },
-          {
-            "ids": [
-              "defensiveLife",
-            ],
-            "key": "Resistances:Vitality Resistance",
-            "rows": [
-              {
-                "base": "",
-                "delta": "",
-                "id": "defensiveLife",
-                "now": "+40%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "",
-              },
-            ],
-            "subject": "Vitality Resistance",
             "verdict": "",
           },
         ],
@@ -1875,33 +1789,6 @@ exports[`characterization: en surfaces are stable 1`] = `
       ],
     },
     {
-      "group": "Resistances",
-      "subjects": [
-        {
-          "key": "Resistances:Poison & Acid Resistance",
-          "parts": [
-            {
-              "dim": "pct",
-              "id": "defensivePoison",
-              "value": "+20%",
-            },
-          ],
-          "subject": "Poison & Acid Resistance",
-        },
-        {
-          "key": "Resistances:Vitality Resistance",
-          "parts": [
-            {
-              "dim": "pct",
-              "id": "defensiveLife",
-              "value": "+40%",
-            },
-          ],
-          "subject": "Vitality Resistance",
-        },
-      ],
-    },
-    {
       "group": "Status Protection",
       "subjects": [
         {
@@ -2514,49 +2401,6 @@ exports[`characterization: zh surfaces are stable 1`] = `
 {
   "benefitRowsCompare": {
     "pet": [
-      {
-        "group": "Resistances",
-        "subjects": [
-          {
-            "ids": [
-              "defensivePoison",
-            ],
-            "key": "Resistances:毒素&酸性抗性",
-            "rows": [
-              {
-                "base": "+20%",
-                "delta": "—",
-                "id": "defensivePoison",
-                "now": "+20%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "same",
-              },
-            ],
-            "subject": "毒素&酸性抗性",
-            "verdict": "same",
-          },
-          {
-            "ids": [
-              "defensiveLife",
-            ],
-            "key": "Resistances:活力抗性",
-            "rows": [
-              {
-                "base": "+20%",
-                "delta": "+20",
-                "id": "defensiveLife",
-                "now": "+40%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "up",
-              },
-            ],
-            "subject": "活力抗性",
-            "verdict": "up",
-          },
-        ],
-      },
       {
         "group": "Offense",
         "subjects": [
@@ -3268,49 +3112,6 @@ exports[`characterization: zh surfaces are stable 1`] = `
               },
             ],
             "subject": "所有类型伤害",
-            "verdict": "",
-          },
-        ],
-      },
-      {
-        "group": "Resistances",
-        "subjects": [
-          {
-            "ids": [
-              "defensivePoison",
-            ],
-            "key": "Resistances:毒素&酸性抗性",
-            "rows": [
-              {
-                "base": "",
-                "delta": "",
-                "id": "defensivePoison",
-                "now": "+20%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "",
-              },
-            ],
-            "subject": "毒素&酸性抗性",
-            "verdict": "",
-          },
-          {
-            "ids": [
-              "defensiveLife",
-            ],
-            "key": "Resistances:活力抗性",
-            "rows": [
-              {
-                "base": "",
-                "delta": "",
-                "id": "defensiveLife",
-                "now": "+40%",
-                "role": "subject",
-                "subLabel": "",
-                "verdict": "",
-              },
-            ],
-            "subject": "活力抗性",
             "verdict": "",
           },
         ],
@@ -4381,33 +4182,6 @@ exports[`characterization: zh surfaces are stable 1`] = `
             },
           ],
           "subject": "所有类型伤害",
-        },
-      ],
-    },
-    {
-      "group": "Resistances",
-      "subjects": [
-        {
-          "key": "Resistances:毒素&酸性抗性",
-          "parts": [
-            {
-              "dim": "pct",
-              "id": "defensivePoison",
-              "value": "+20%",
-            },
-          ],
-          "subject": "毒素&酸性抗性",
-        },
-        {
-          "key": "Resistances:活力抗性",
-          "parts": [
-            {
-              "dim": "pct",
-              "id": "defensiveLife",
-              "value": "+40%",
-            },
-          ],
-          "subject": "活力抗性",
         },
       ],
     },

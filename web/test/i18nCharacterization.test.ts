@@ -27,7 +27,8 @@ const model = buildModel(devotions as unknown as DevotionsDoc);
 
 // Constellations chosen to touch every formatting path: power with durations/CC
 // (akeron_s_scorpion), max-resist (abomination), weapon requirement (berserker),
-// pet summon power (bysmiel_s_bonds), pet bonuses (crane), racial target (gallows).
+// pet summon power and pet bonuses (bysmiel_s_bonds), racial target (gallows). Crane is also the
+// baseline; it lost its pet resist bonuses in game 1.3.1.0's pet resist rework.
 const CONS = ["akeron_s_scorpion", "abomination", "berserker", "bysmiel_s_bonds", "crane", "gallows"];
 const selection = new Set<StarId>(CONS.flatMap((c) => model.constellations.get(c)!.starIds));
 const baseline = new Set<StarId>(model.constellations.get("crane")!.starIds);

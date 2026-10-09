@@ -58,13 +58,15 @@ checks AS (
             SELECT 1 FROM skill_modifiers
             GROUP BY item_record, modified_skill, modifier_record, stat_id
             HAVING count(*) > 1)) = 0 AS identity_unique,
-        -- Measured against the built table (pinned: 3211 at build 24756825, up
-        -- from 3150: 70 items whose only carrier stores its stats as a per-rank
-        -- array were being walked past, and 9 rune items left with nothing once
-        -- off-roster targets stopped counting). Below the 3,362 items that carry
+        -- Measured against the built table (pinned: 3239 at build 25813250, up
+        -- from 3211 at 24756825 by 28 items the patch added: newly awakened
+        -- epics and the new legendary set pieces; 3211 was up from 3150 when 70
+        -- items whose only carrier stores its stats as a per-rank array were
+        -- being walked past, and 9 rune items left with nothing once off-roster
+        -- targets stopped counting). Below the 3,362 items that carry
         -- modifier pairs, since 198 modifier records hold only effect or pet
         -- changes and contribute no stat rows.
-        (SELECT count(DISTINCT item_record) FROM skill_modifiers) = 3211 AS item_count_exact,
+        (SELECT count(DISTINCT item_record) FROM skill_modifiers) = 3239 AS item_count_exact,
         -- A carrier that stores its stats only as per-rank arrays used to look
         -- empty to the walk, which ran past it and dropped the block silently.
         -- Bysmiel's Mindweaver's Summon Hellhound line is one such block: the

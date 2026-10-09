@@ -1,9 +1,9 @@
 {
   "meta": {
-    "game_version": "1.3.0.7",
-    "steam_buildid": "24756825",
+    "game_version": "1.3.1.1",
+    "steam_buildid": "25813250",
     "extracted_from": "records/ui/skills/devotion/",
-    "generated_utc": "2026-08-16T01:49:45Z",
+    "generated_utc": "2026-10-09T01:39:26Z",
     "affinities": [
       "ascendant",
       "chaos",
@@ -681,11 +681,7 @@
             "defensivePoison": 12
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensivePoison": 20
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier1_31b_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 2,
@@ -718,11 +714,7 @@
             "defensiveLife": 12
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveLife": 20
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier1_31d_perbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 4,
@@ -1163,7 +1155,7 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensivePierce": 15
+            "characterLifeModifier": 4
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_16b_petbonus.dbr"
         },
@@ -1184,7 +1176,6 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensiveAether": 15,
             "defensiveFreeze": 25
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_16c_petbonus.dbr"
@@ -1206,7 +1197,6 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensiveChaos": 15,
             "defensiveStun": 25
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_16d_petbonus.dbr"
@@ -2812,7 +2802,6 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensiveElementalResistance": 15,
             "offensiveSlowBleedingModifier": 30
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_43b_petbonus.dbr"
@@ -3669,11 +3658,7 @@
             "defensiveElementalResistance": 10
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveElementalResistance": 15
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier1_06c_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 3,
@@ -3891,7 +3876,6 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensivePierce": 15,
             "offensiveTotalDamageModifier": 60
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_39b_skill_petbonus.dbr"
@@ -4529,11 +4513,7 @@
             "characterDefensiveAbility": 15
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensivePierce": 10
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier1_28a_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 1,
@@ -4550,11 +4530,7 @@
             "retaliationTotalDamageModifier": 30
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveLife": 15
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier1_28b_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 2,
@@ -4572,7 +4548,7 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensivePoison": 15
+            "characterDefensiveAbilityModifier": 2
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_28c_petbonus.dbr"
         },
@@ -4594,7 +4570,7 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensiveBleeding": 25
+            "characterRunSpeedModifier": 5
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_28d_petbonus.dbr"
         },
@@ -4616,7 +4592,7 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "characterDefensiveAbilityModifier": 5
+            "characterDefensiveAbilityModifier": 4
           },
           "pet_bonus_dbr": "records/skills/devotion/tier1_28e_petbonus.dbr"
         }
@@ -6318,11 +6294,7 @@
             "defensiveLife": 15
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveLife": 20
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier2_12c_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 3,
@@ -8550,7 +8522,10 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "offensiveElementalModifier": 60
+            "offensiveElementalModifier": 40,
+            "offensiveSlowColdModifier": 40,
+            "offensiveSlowFireModifier": 40,
+            "offensiveSlowLightningModifier": 40
           },
           "pet_bonus_dbr": "records/skills/devotion/tier2_01b_petbonus.dbr"
         },
@@ -8610,7 +8585,10 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensiveElementalResistance": 18
+            "offensiveElementalModifier": 40,
+            "offensiveSlowColdModifier": 40,
+            "offensiveSlowFireModifier": 40,
+            "offensiveSlowLightningModifier": 40
           },
           "pet_bonus_dbr": "records/skills/devotion/tier2_01d_petbonus.dbr"
         },
@@ -9385,11 +9363,7 @@
             "defensiveAether": 15
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveAether": 20
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier2_33b_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 2,
@@ -9427,11 +9401,7 @@
             "defensiveLife": 10
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveLife": 20
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier2_33d_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 4,
@@ -9873,12 +9843,7 @@
             "defensivePoison": 15
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveBleeding": 15,
-            "defensivePoison": 15
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier2_35c_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 3,
@@ -9981,11 +9946,7 @@
             "defensiveElementalResistance": 15
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveElementalResistance": 15
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier2_30a_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 1,
@@ -10047,12 +10008,7 @@
             "defensivePoison": 20
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveChaos": 20,
-            "defensivePoison": 20
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier2_30d_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 4,
@@ -11539,11 +11495,7 @@
             "defensivePoison": 25
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensivePoison": 30
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier3_15b_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 2,
@@ -11583,7 +11535,6 @@
           "celestial_power": null,
           "weapon_requirement": null,
           "pet_bonuses": {
-            "defensiveBleeding": 30,
             "offensiveTotalDamageModifier": 80
           },
           "pet_bonus_dbr": "records/skills/devotion/tier3_15d_petbonus.dbr"
@@ -11714,11 +11665,7 @@
             "defensiveChaos": 20
           },
           "celestial_power": null,
-          "weapon_requirement": null,
-          "pet_bonuses": {
-            "defensiveChaos": 20
-          },
-          "pet_bonus_dbr": "records/skills/devotion/tier3_19c_petbonus.dbr"
+          "weapon_requirement": null
         },
         {
           "index": 3,
